@@ -226,14 +226,17 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
               <div
                 style={{
                   padding: '18px 20px 8px',
-                  fontSize: 11,
-                  fontWeight: 700,
+              <div
+                style={{
+                  padding: '18px 20px 8px',
+                  fontSize: 10.5,
+                  fontWeight: 800,
                   color: INK_45,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                 }}
               >
-                Not yet supported
+                More countries on the way
               </div>
 
               <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
