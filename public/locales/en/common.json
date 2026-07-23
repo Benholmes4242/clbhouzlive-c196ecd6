@@ -78,5 +78,32 @@
     "tryAgainLater": "Please try again later.",
     "updated": "Updated",
     "uploading": "Uploading..."
+  },
+  "connectGhost": {
+    "eyebrow": "THIS COULD BE YOURS",
+    "cta": "Connect your handicap",
+    "footnote": "TAKES 30 SECONDS · WE NEVER POST ON YOUR BEHALF",
+    "slimCta": "Connect →",
+    "dismissA11y": "Dismiss",
+    "holes": {
+      "headline": "See exactly where your shots go here",
+      "sub": "Connect your handicap and every round you've played at this course becomes a hole-by-hole breakdown - your worst holes, your doubles, where your round slips.",
+      "slim": "See where your shots go on this course"
+    },
+    "about": {
+      "headline": "See how you measure up here",
+      "sub": "Connect your handicap to see your scoring average at this course against members, your friends and the course record.",
+      "slim": "See how you compare here"
+    },
+    "profile": {
+      "headline": "Your handicap belongs here",
+      "sub": "Connect once and your index, your trend and every round you play appear on your profile automatically - no manual logging, ever.",
+      "slim": "Add your handicap to your profile"
+    },
+    "champions": {
+      "headline": "Seven crowns at this club",
+      "sub": "Connect your handicap and every round you play here counts automatically - no logging, no admin. Take a crown and your name sits on the board.",
+      "slim": "Play for the crowns at this club"
+    }
   }
 }
