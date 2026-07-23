@@ -647,11 +647,13 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
     }
 
-    // Defence in depth: a profile whose 9 importance fields are all identical
-    // (e.g. legacy placeholder rows written as flat 50s) is NOT usable for
-    // course fit — the weighted average degenerates into a plain average of
-    // player percentiles. Treat such a row as ABSENT so no course-fit score
-    // is derived from it. See BRIEF — three TI data-integrity fixes, FAULT 1.
+    // Defence in depth: a profile whose 9 importance fields are near-uniform
+    // (legacy placeholder rows, or rows where a single stat was correlated
+    // while the other 8 defaulted to 50) is NOT usable for course fit — the
+    // weighted average degenerates. Treat any low-variance row as ABSENT.
+    // Threshold: population std dev < 5 (empirically catches "all 50 except
+    // one" placeholder rows like the TPC Twin Cities row). See BRIEF —
+    // three TI data-integrity fixes, FAULT 1.
     if (courseDNA) {
       const importances = [
         courseDNA.driving_distance_importance,
@@ -663,11 +665,14 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         courseDNA.sg_approach_importance,
         courseDNA.sg_around_green_importance,
         courseDNA.sg_putting_importance,
-      ];
-      const allEqual = importances.every((v) => v === importances[0]);
-      if (allEqual) {
+      ].map((v) => (typeof v === 'number' ? v : 0));
+      const mean = importances.reduce((a, b) => a + b, 0) / importances.length;
+      const variance =
+        importances.reduce((s, v) => s + (v - mean) * (v - mean), 0) / importances.length;
+      const stdDev = Math.sqrt(variance);
+      if (stdDev < 5) {
         console.error(
-          `[generate-predictions] Course DNA for "${courseDNA.venue_name}" has all-identical importances (${importances[0]}) — treating as ABSENT. Course Fit will be omitted.`,
+          `[generate-predictions] Course DNA for "${courseDNA.venue_name}" is low-variance (stdDev=${stdDev.toFixed(2)}, mean=${mean.toFixed(1)}) — treating as ABSENT. Course Fit will be omitted.`,
         );
         courseDNA = null;
       }
