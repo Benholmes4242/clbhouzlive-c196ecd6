@@ -18180,6 +18180,7 @@ export type Database = {
         Args: { p_golf_course_id: string }
         Returns: {
           avg_gross: number
+          complete_rounds: number
           holes: Json
           rounds: number
           total_over_par: number
