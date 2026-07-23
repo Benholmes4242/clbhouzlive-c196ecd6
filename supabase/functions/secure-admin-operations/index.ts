@@ -42,7 +42,9 @@ type AdminAction =
   | 'unhide_post'
   | 'delete_course'
   | 'change_username'
-  | 'retry_asset_cleanup';
+  | 'retry_asset_cleanup'
+  | 'verify_golfer'
+  | 'unverify_golfer';
 
 interface AdminOperationRequest {
   action: AdminAction;
@@ -55,6 +57,7 @@ interface AdminOperationRequest {
   suspended?: boolean;
   durationDays?: number | null;
   newUsername?: string;
+  adminNote?: string;
 }
 
 // Username format — source of truth: src/pages/ManageProfile.tsx L140
@@ -80,7 +83,7 @@ serve(async (req) => {
 
   // Unauthenticated ping to verify running function version.
   // Bump FUNCTION_VERSION on every change to this function.
-  const FUNCTION_VERSION = '2026-07-23T04:50:00Z-v5-delegated-erasure';
+  const FUNCTION_VERSION = '2026-07-23T18:00:00Z-v6-golfer-verify';
 
   try {
     const peek = req.clone();
@@ -156,10 +159,11 @@ serve(async (req) => {
       suspended,
       durationDays,
       newUsername,
+      adminNote,
     } = body;
 
     // Per-action gate
-    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username'];
+    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username', 'verify_golfer', 'unverify_golfer'];
     const moderationActions: AdminAction[] = [
       'suspend_user', 'unsuspend', 'warn_user', 'hide_post', 'unhide_post',
     ];
@@ -756,6 +760,91 @@ serve(async (req) => {
         }
         auditDetails = { targetUserId, deleted, failed, total: rows?.length ?? 0 };
         result = { success: true, deleted, failed, total: rows?.length ?? 0 };
+        break;
+      }
+
+      case 'verify_golfer': {
+        if (!targetUserId) {
+          return new Response(JSON.stringify({ error: 'targetUserId required' }), {
+            status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const { data: prof, error: profErr } = await supabase
+          .from('user_profiles')
+          .select('id, is_verified_golfer, display_name, username')
+          .eq('id', targetUserId)
+          .maybeSingle();
+        if (profErr || !prof) {
+          return new Response(JSON.stringify({ error: 'target_not_found' }), {
+            status: 404, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        if (prof.is_verified_golfer === true) {
+          return new Response(JSON.stringify({ error: 'already_verified' }), {
+            status: 409, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const { error: updErr } = await supabase
+          .from('user_profiles')
+          .update({ is_verified_golfer: true })
+          .eq('id', targetUserId);
+        if (updErr) {
+          auditDetails.error = updErr.message;
+          result = { error: updErr.message };
+          break;
+        }
+        // In-app notification (auto_queue_push_notification trigger fans this
+        // out to push). NULL actor_id -> system-authored, lowercase clbhouz.
+        await supabase.from('notifications').insert({
+          user_id: targetUserId,
+          recipient_actor_type: 'personal',
+          recipient_actor_id: targetUserId,
+          actor_id: null,
+          type: 'golfer_verified',
+          entity_type: 'profile',
+          entity_id: targetUserId,
+          title: "You're verified",
+          message: 'clbhouz has verified your account.',
+          data: { route: '/profile' },
+        });
+        auditDetails = { targetUserId, verified: true, adminNote: adminNote ?? null };
+        result = { success: true, message: 'Golfer verified' };
+        break;
+      }
+
+      case 'unverify_golfer': {
+        if (!targetUserId) {
+          return new Response(JSON.stringify({ error: 'targetUserId required' }), {
+            status: 400, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const { data: prof, error: profErr } = await supabase
+          .from('user_profiles')
+          .select('id, is_verified_golfer')
+          .eq('id', targetUserId)
+          .maybeSingle();
+        if (profErr || !prof) {
+          return new Response(JSON.stringify({ error: 'target_not_found' }), {
+            status: 404, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        if (prof.is_verified_golfer !== true) {
+          return new Response(JSON.stringify({ error: 'already_unverified' }), {
+            status: 409, headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+        const { error: updErr } = await supabase
+          .from('user_profiles')
+          .update({ is_verified_golfer: false })
+          .eq('id', targetUserId);
+        if (updErr) {
+          auditDetails.error = updErr.message;
+          result = { error: updErr.message };
+          break;
+        }
+        // Deliberately NO notification — removal is silent to the user.
+        auditDetails = { targetUserId, verified: false, adminNote: adminNote ?? null };
+        result = { success: true, message: 'Verification removed' };
         break;
       }
     }

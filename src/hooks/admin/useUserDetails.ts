@@ -243,6 +243,42 @@ export function useUserActions() {
     }
   }, []);
 
+  const verifyGolfer = useCallback(async (userId: string, adminNote?: string) => {
+    setLoading(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: { action: 'verify_golfer', targetUserId: userId, adminNote },
+      });
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to verify golfer');
+        return { success: false, error: msg };
+      }
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error };
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
+  const unverifyGolfer = useCallback(async (userId: string, adminNote?: string) => {
+    setLoading(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: { action: 'unverify_golfer', targetUserId: userId, adminNote },
+      });
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to remove verification');
+        return { success: false, error: msg };
+      }
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error };
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   return {
     loading,
     changeRole,
@@ -250,5 +286,7 @@ export function useUserActions() {
     deleteUser,
     resetPassword,
     changeUsername,
+    verifyGolfer,
+    unverifyGolfer,
   };
 }

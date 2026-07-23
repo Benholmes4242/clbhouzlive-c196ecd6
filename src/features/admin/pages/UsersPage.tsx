@@ -93,9 +93,9 @@ export default function UsersPage() {
 
 /* ─────────────────────── Members (roster) ─────────────────────── */
 
-const LEGACY_FILTER_VALUES = new Set(['verified', 'unverified', 'new_today']);
+const LEGACY_FILTER_VALUES = new Set(['unverified', 'new_today']);
 const VALID_FILTERS: UserFilterStatus[] = [
-  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'admin',
+  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'verified', 'admin',
 ];
 
 function MembersTab() {
@@ -171,6 +171,7 @@ function MembersTab() {
     { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
     { id: 'eg_issues',     label: 'EG issues',      count: counts.eg_issues },
     { id: 'suspended',     label: 'Suspended',      count: counts.suspended },
+    { id: 'verified',      label: 'Verified',       count: counts.verified },
     { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
 
@@ -394,7 +395,7 @@ function Member360Sheet({
   const isLimited = panelRole === 'limited';
   const createRequest = useCreateAdminActionRequest();
 
-  const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset'>(null);
+  const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset' | 'verify' | 'unverify'>(null);
   const [busy, setBusy] = useState(false);
   const [requestMode, setRequestMode] = useState<null | 'delete' | 'ban' | 'role'>(null);
   const [reqReason, setReqReason] = useState('');
@@ -405,6 +406,7 @@ function Member360Sheet({
   const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'member';
 
+  const qc = useQueryClient();
   const runConfirmed = async () => {
     if (!detail || !confirm) return;
     setBusy(true);
@@ -413,15 +415,28 @@ function Member360Sheet({
       if (confirm === 'suspend') res = await actions.suspendUser(detail.id);
       if (confirm === 'delete')  res = await actions.deleteUser(detail.id);
       if (confirm === 'reset')   res = await actions.resetPassword(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
+      if (confirm === 'verify')  res = await actions.verifyGolfer(detail.id);
+      if (confirm === 'unverify') res = await actions.unverifyGolfer(detail.id);
       if (res && !res.success) {
-        const msg = res.error instanceof Error ? res.error.message : (typeof res.error === 'string' ? res.error : 'Action failed');
-        toast.error(msg);
+        const errAny: any = (res as any).error;
+        const msg = errAny instanceof Error ? errAny.message : (typeof errAny === 'string' ? errAny : 'Action failed');
+        if (msg === 'already_verified') toast.error('This member is already verified');
+        else if (msg === 'already_unverified') toast.error('This member is not verified');
+        else toast.error(msg);
       } else if (res?.success) {
         toast.success(
           confirm === 'delete' ? 'User deleted' :
           confirm === 'suspend' ? 'User suspended' :
+          confirm === 'verify' ? 'Golfer verified' :
+          confirm === 'unverify' ? 'Verification removed' :
           'Password reset email sent'
         );
+        if (confirm === 'verify' || confirm === 'unverify') {
+          qc.invalidateQueries({ queryKey: ['admin-v2', 'users'] });
+          qc.invalidateQueries({ queryKey: ['admin-v2', 'users', 'detail', detail.id] });
+          qc.invalidateQueries({ queryKey: ['admin-user-details', detail.id] });
+          qc.invalidateQueries({ queryKey: ['user-profile', detail.id] });
+        }
       }
     } finally {
       setBusy(false);
@@ -486,6 +501,15 @@ function Member360Sheet({
               <>
                 <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
                 <DrawerBtn icon={<AtSign size={14} />} onClick={() => setRenameOpen(true)}>Change username</DrawerBtn>
+                {detail.is_verified ? (
+                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => setConfirm('unverify')}>
+                    Remove verification
+                  </DrawerBtn>
+                ) : (
+                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => setConfirm('verify')}>
+                    Verify golfer
+                  </DrawerBtn>
+                )}
                 <DrawerBtn
                   icon={<Ban size={14} />}
                   tone={detail.is_suspended ? undefined : 'warn'}
@@ -687,6 +711,25 @@ function Member360Sheet({
         description="This permanently deletes the member and their data. This cannot be undone."
         requireText={detail?.username || detail?.display_name || 'DELETE'}
         confirmLabel="Delete member"
+        tone="danger"
+        busy={busy}
+      />
+      <ConfirmDialog
+        open={confirm === 'verify'}
+        onClose={() => setConfirm(null)}
+        onConfirm={runConfirmed}
+        title={`Verify ${name}?`}
+        description="They'll be notified."
+        confirmLabel="Verify golfer"
+        busy={busy}
+      />
+      <ConfirmDialog
+        open={confirm === 'unverify'}
+        onClose={() => setConfirm(null)}
+        onConfirm={runConfirmed}
+        title={`Remove verification from ${name}?`}
+        description="They will not be notified."
+        confirmLabel="Remove verification"
         tone="danger"
         busy={busy}
       />

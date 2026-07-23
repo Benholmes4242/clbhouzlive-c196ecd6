@@ -60,6 +60,7 @@ export type UserFilterStatus =
   | 'dormant_14d'
   | 'eg_issues'
   | 'suspended'
+  | 'verified'
   | 'admin';
 
 
@@ -235,6 +236,7 @@ export function useUsers() {
       rows = rows.filter(u => hasEgIssue(u, s));
     }
     if (filter === 'suspended') rows = rows.filter(u => isSuspended(u));
+    if (filter === 'verified') rows = rows.filter(u => u.is_verified);
     return rows;
   }, [allUsers, search, filter, activeIds, egIssueIds]);
 
@@ -266,6 +268,7 @@ export function useUsers() {
       dormant_14d: allUsers.filter(u => isDormant14dPlus(u)).length,
       eg_issues: allUsers.filter(u => hasEgIssue(u, egSet)).length,
       suspended: allUsers.filter(u => isSuspended(u)).length,
+      verified: allUsers.filter(u => u.is_verified).length,
       admin: allUsers.filter(u => !!u.role).length,
     };
 
