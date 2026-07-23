@@ -1284,8 +1284,8 @@ Return a JSON object with this exact structure:
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
-6. **Do NOT output a `courseFitScore` field** — the server attaches it
-7. **Do NOT output a `worldRanking` field** — the server attaches it from official rankings
+6. **Do NOT output a courseFitScore field** — the server attaches it
+7. **Do NOT output a worldRanking field** — the server attaches it from official rankings
 8. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
 9. **No gambling language**
 
