@@ -344,8 +344,24 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               );
             })}
           </div>
-          <Sentence>{s1Sentence}</Sentence>
+          {hasInterpretation ? (
+            <Sentence>{s1Sentence}</Sentence>
+          ) : (
+            <p
+              style={{
+                margin: 0,
+                marginTop: 13,
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: INK_45,
+                lineHeight: 1.45,
+              }}
+            >
+              {t('courses:holes.scoringBreakdown.moreRoundsHint')}
+            </p>
+          )}
         </div>
+
 
         {/* 3c. Stratum 2 */}
         <div style={{ padding: '16px', borderBottom: `1px solid ${HAIR}` }}>
