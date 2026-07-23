@@ -571,7 +571,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       if (!courseDNA) {
         console.log('[generate-predictions] No course DNA profile — attempting on-the-fly build');
         try {
-          await fetch(`${supabaseUrl}/functions/v1/build-course-dna`, {
+          const buildRes = await fetch(`${supabaseUrl}/functions/v1/build-course-dna`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${supabaseServiceKey}`,
@@ -579,6 +579,12 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             },
             body: JSON.stringify({ venueName: tournament.venue_name }),
           });
+          if (!buildRes.ok) {
+            const bodyText = await buildRes.text().catch(() => '');
+            console.error(
+              `[generate-predictions] build-course-dna returned ${buildRes.status} for venue="${tournament.venue_name}": ${bodyText.slice(0, 300)}`,
+            );
+          }
           const { data: freshDNA } = await supabase
             .from('course_dna_profiles')
             .select('*')
@@ -586,12 +592,17 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
             .single();
           courseDNA = freshDNA;
         } catch (e) {
-          console.warn('[generate-predictions] On-the-fly course DNA build failed:', e);
+          console.error('[generate-predictions] On-the-fly course DNA build failed:', e);
         }
       }
 
       if (courseDNA) {
         console.log(`[generate-predictions] Course DNA: ${courseDNA.course_type} for ${courseDNA.venue_name}`);
+      } else {
+        // Escalated: Course Fit row will be absent for this venue.
+        console.error(
+          `[generate-predictions] No course DNA available for venue="${tournament.venue_name}" — Course Fit will be omitted from all picks`,
+        );
       }
     } catch (err) {
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
