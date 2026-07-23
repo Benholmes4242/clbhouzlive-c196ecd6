@@ -431,64 +431,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             );
           })()}
 
-          {/* Projection card — only when doubles-per-round >= 1 and we have an avg gross */}
-          {hasInterpretation && showProjection && avgGross != null && projected != null && (
-            <div
-              style={{
-                marginTop: 14,
-                background: 'linear-gradient(160deg,#FFFFFF,#FFF7EC)',
-                border: '1px solid rgba(247,147,30,0.28)',
-                borderRadius: 14,
-                padding: 14,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: AMBER,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('courses:holes.scoringBreakdown.projectionEyebrow')}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  flexWrap: 'wrap',
-                  gap: 10,
-                  marginTop: 8,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: INK_45,
-                    textDecoration: 'line-through',
-                    ...NUM,
-                  }}
-                >
-                  {avgGross.toFixed(1)}
-                </div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK_45 }}>→</div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: INK, letterSpacing: '-1px', ...NUM }}>
-                  {projected.toFixed(1)}
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 800, color: GREEN, ...NUM }}>
-                  {t('courses:holes.scoringBreakdown.projectionShotsSaved', { n: convertible.toFixed(1) })}
-                </div>
-              </div>
-              <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_60, marginTop: 8, lineHeight: 1.45 }}>
-                {t('courses:holes.scoringBreakdown.projectionBody', {
-                  avg: avgGross.toFixed(1),
-                  perRound: doublesPR1.toFixed(1),
-                })}
-              </div>
-            </div>
-          )}
+
 
           {topDoubles.length > 0 && (
             <>
