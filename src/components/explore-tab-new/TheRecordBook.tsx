@@ -20,6 +20,9 @@ import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { DiscoverYouStripMount } from './DiscoverYouStripMount';
+import { slugToCacheRegion } from './regionScope';
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -230,11 +233,21 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
         ))}
       </div>
 
+      {/* G2 wiring — YouStrip under The Record Book only.
+          Flag DISCOVER_YOU_STRIP OFF → renders nothing. */}
+      <DiscoverYouStripMount
+        railKey={mode === 'alltime'
+          ? `records_alltime:${slugToCacheRegion(region)}`
+          : `records:${slugToCacheRegion(region)}`}
+        emptyMessage="Post a round to appear on the record book"
+      />
+
       {/* NOTE: "Your next conquests" strip has moved into <AttackDefendBand />
           (the Attack tab). It used to render here as <ConquestsStrip />. */}
 
 
       <TierSeeAllSheet
+
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         tier="records"

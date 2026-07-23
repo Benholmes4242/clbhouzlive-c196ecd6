@@ -12,6 +12,9 @@ import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { DiscoverYouStripMount } from './DiscoverYouStripMount';
+import { slugToCacheRegion } from './regionScope';
+
 
 const ROWS = 5;
 
@@ -97,6 +100,17 @@ export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
           );
         })}
       </div>
+
+      {/* G2 wiring — YouStrip under Latest Birdie Hauls only.
+          Flag DISCOVER_YOU_STRIP OFF → renders nothing. */}
+      {mode === 'latest' ? (
+        <DiscoverYouStripMount
+          railKey={`feats:${slugToCacheRegion(region)}:birdie_hauls`}
+          emptyMessage="Post a round to appear on the birdie board"
+        />
+      ) : null}
+
+
 
       <TierSeeAllSheet
         open={sheetOpen}

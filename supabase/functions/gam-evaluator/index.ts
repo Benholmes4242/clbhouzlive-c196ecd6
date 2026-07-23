@@ -5,9 +5,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+export const FUNCTION_VERSION = '2026-07-23T05:10:00Z-v2-crown-events';
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
 const MAX_ATTEMPTS = 5;
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Top 100 list mapping
@@ -44,11 +46,17 @@ Deno.serve(async (req) => {
       try { body = await req.json(); } catch { body = {}; }
     }
 
+    // Ping — surfaces the deployed version without touching state.
+    if (body?.action === 'ping' || req.method === 'GET') {
+      return json({ version: FUNCTION_VERSION });
+    }
+
     // Single-row mode
     if (body?.whs_score_id) {
       const res = await processSingle(body.whs_score_id);
       return json({ ok: true, result: res });
     }
+
 
     // User replay mode
     if (body?.user_id && body?.replay) {
@@ -85,11 +93,18 @@ Deno.serve(async (req) => {
 });
 
 function json(body: any, status = 200) {
+  // Note: CORS is applied at the edge via `corsFor()` in the handler; this
+  // helper intentionally emits a permissive baseline so pings/replies don't
+  // crash when the module-scoped `corsHeaders` symbol isn't in scope.
   return new Response(JSON.stringify(body), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    },
     status,
   });
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Queue
@@ -1221,7 +1236,75 @@ async function applyCourseLegends(stats: any) {
     return;
   }
   for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
+  // G2 — crown_taken / crown_lost. Bounded, silent-fail; contract owned by
+  // Ben's SQL that populates `discover_rail_cache.course_regular:{course_id}`.
+  await maybeEmitCrownDelta(stats.course_id).catch((e) => {
+    console.warn('[gam-evaluator] maybeEmitCrownDelta failed', (e as Error).message);
+  });
 }
+
+/**
+ * Reads `discover_rail_cache.course_regular:{courseId}` and, if the payload
+ * exposes both a current `user_id` and a `previous_user_id` that differ,
+ * emits `crown_taken` to the new holder and `crown_lost` to the previous
+ * one. Payload contract per BRIEF_G2_CLIENT_AND_EDGE:
+ *   { user_id, display_name, username, rounds_90d, held_since,
+ *     previous_user_id? }
+ * If the row is missing / has no previous_user_id / user_id equals
+ * previous_user_id, this is a no-op. Course name is looked up from
+ * `golf_courses` (never from PII sources). User-facing copy is composed by
+ * the dispatcher — this function only routes identifiers.
+ */
+async function maybeEmitCrownDelta(courseId: string): Promise<void> {
+  const railKey = `course_regular:${courseId}`;
+  const { data: cacheRow } = await supabase
+    .from('discover_rail_cache')
+    .select('payload')
+    .eq('rail_key', railKey)
+    .maybeSingle();
+  const p: any = cacheRow?.payload ?? null;
+  if (!p) return;
+  const current: string | null = p.user_id ?? null;
+  const previous: string | null = p.previous_user_id ?? null;
+  if (!current || !previous || current === previous) return;
+
+  // Course name lookup — degrades gracefully to null so the dispatcher can
+  // fall back to generic copy. Never read whs_friends (PII).
+  let courseName: string | null = null;
+  try {
+    const { data: course } = await supabase
+      .from('golf_courses')
+      .select('name')
+      .eq('id', courseId)
+      .maybeSingle();
+    courseName = course?.name?.trim() || null;
+  } catch { /* non-fatal */ }
+
+  // New holder profile (display name for the "took your crown" copy on the
+  // loser's push). Same PII rules as legend_lost.
+  let newHolderName: string | null = null;
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('display_name, username')
+      .eq('id', current)
+      .maybeSingle();
+    newHolderName = (profile?.display_name?.trim() || profile?.username?.trim() || null);
+  } catch { /* non-fatal */ }
+
+  await enqueueNotification(current, 'crown_taken', {
+    course_id: courseId,
+    course_name: courseName,
+    previous_user_id: previous,
+  });
+  await enqueueNotification(previous, 'crown_lost', {
+    course_id: courseId,
+    course_name: courseName,
+    new_holder_id: current,
+    new_holder_name: newHolderName,
+  });
+}
+
 
 async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   // Current top 10
@@ -1494,7 +1577,10 @@ const URGENCY: Record<string, string> = {
   status_reclaimed: "medium",
   level_up: "medium",
   level_near: "low",
+  crown_taken: "medium",   // gainer side — welcome, not urgent
+  crown_lost: "high",      // loss event, same tier as legend_lost
 };
+
 
 function dedupKey(type: string, userId: string, payload: any): string {
   switch (type) {
@@ -1509,6 +1595,9 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "status_reclaimed": return `status_reclaimed:${userId}:${payload.badge_id}:${new Date().toISOString().slice(0, 10)}`;
     case "level_up": return `level_up:${userId}:${payload.level}`;
     case "level_near": return `level_near:${userId}:${payload.level}`;
+    case "crown_taken": return `crown_taken:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+    case "crown_lost": return `crown_lost:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+
     default: return `${type}:${userId}`;
   }
 }

@@ -4,6 +4,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+export const FUNCTION_VERSION = '2026-07-23T05:12:00Z-v2-crown-templates';
+
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -27,7 +29,20 @@ type OutboxRow = {
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Ping — surfaces the deployed version without draining the outbox.
+  if (req.method === 'GET') {
+    return json({ version: FUNCTION_VERSION }, 200, corsHeaders);
+  }
+  if (req.method === 'POST') {
+    try {
+      const body = await req.clone().json();
+      if (body?.action === 'ping') return json({ version: FUNCTION_VERSION }, 200, corsHeaders);
+    } catch { /* fall through to drain */ }
+  }
+
   try {
+
     const result = await runOnce();
     return json(result, 200, corsHeaders);
   } catch (e) {
@@ -359,7 +374,38 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
         data: { route: "/handicap", level: p.level, label: p.label },
       };
     }
+    case "crown_taken": {
+      // Gainer copy — new Regular at the course.
+      // ASCII-only, no internal ids. Falls back if course_name is null.
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      return {
+        title: courseName
+          ? `You're now the Regular at ${courseName}`
+          : `You're now a Regular`,
+        body: courseName
+          ? `Your rounds at ${courseName} lead the field.`
+          : `Your rounds at this course lead the field.`,
+        data: { route: p.course_id ? `/courses/${p.course_id}?tab=legends` : '/handicap',
+                course_id: p.course_id },
+      };
+    }
+    case "crown_lost": {
+      // Loser copy — someone took your Regular crown.
+      const holderName = typeof p.new_holder_name === 'string' ? p.new_holder_name.trim() : '';
+      const courseName = typeof p.course_name === 'string' ? p.course_name.trim() : '';
+      const namePart = holderName || 'Someone';
+      const wherePart = courseName ? ` at ${courseName}` : '';
+      return {
+        title: `${namePart} took your Regular crown${wherePart}`,
+        body: courseName
+          ? `Play a round at ${courseName} to take it back.`
+          : `Play a round to take it back.`,
+        data: { route: p.course_id ? `/courses/${p.course_id}?tab=legends` : '/handicap',
+                course_id: p.course_id },
+      };
+    }
     default:
       return null;
+
   }
 }
