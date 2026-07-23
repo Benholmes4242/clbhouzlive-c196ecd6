@@ -869,9 +869,6 @@ const ExpandedCard: React.FC<{
                 )}
               </div>
               <div style={{ height: 1, background: INK_06, width: '100%', marginTop: 2 }} />
-              <div style={{ marginTop: 6 }}>
-                <HoleGlyph kind={b.kind} size={13} />
-              </div>
               <div
                 style={{
                   fontSize: 9,
