@@ -516,3 +516,40 @@ export function useWhsCourseId(
     staleTime: 24 * 60 * 60 * 1000,
   });
 }
+
+// ── Scoring breakdown across ALL courses (Form tab) ──────────────
+export interface ParSplit {
+  par: number;
+  avg_over: number;
+  holes_played: number;
+  pct_par_better: number;
+  pct_bogey: number;
+  pct_double: number;
+}
+
+export interface ScoringBreakdownAllCourses {
+  rounds: number;
+  complete_rounds: number;
+  courses_played: number;
+  avg_gross: number | null;
+  avg_over_par: number | null;
+  par3: ParSplit | null;
+  par4: ParSplit | null;
+  par5: ParSplit | null;
+  thirds: Array<{ third: number; avg_over_six: number }>;
+  worst_courses: Array<{ id: string; name: string; rounds: number; over_par_round: number }>;
+}
+
+export function useScoringBreakdownAllCourses(enabled: boolean) {
+  return useQuery<ScoringBreakdownAllCourses | null>({
+    queryKey: ['scoring-breakdown-all-courses'],
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)('get_my_scoring_breakdown_all_courses');
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return (row as ScoringBreakdownAllCourses) ?? null;
+    },
+  });
+}
