@@ -568,29 +568,32 @@ Deno.serve(async (req) => {
     };
     try { await drain(); } catch (e) { console.error('[delete-account v3] drain failed:', e); }
 
-    // Terminal audit row with full details.
+    // Terminal audit row with full details (includes per-table sweep counts).
     try {
       await admin.from('admin_audit_log').insert({
         admin_user_id: targetId,
-        action: 'SELF_DELETE_ACCOUNT_GDPR',
+        action: auditAction,
         target_user_id: targetId,
         target_email: user.email,
         details: {
           phase: 'completed',
           deleted_at: deletedAt,
           version: FUNCTION_VERSION,
+          mode,
           deletionAuditId,
           deletion_results: results,
           assetCounts,
           gdpr_compliant: true,
         },
       });
-    } catch (e) { console.error('[delete-account v3] terminal audit failed:', e); }
+    } catch (e) { console.error('[delete-account v4] terminal audit failed:', e); }
 
-    console.log(`[delete-account v3] done user=${targetId} assets=`, assetCounts);
+    console.log(`[delete-account v4] done mode=${mode} user=${targetId} assets=`, assetCounts);
     return new Response(JSON.stringify({
-      success: true, message: 'Account deleted', version: FUNCTION_VERSION, assetCounts,
+      success: true, message: 'Account deleted', version: FUNCTION_VERSION, mode,
+      assetCounts, deletion_results: results,
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
   } catch (error) {
     console.error('[delete-account v3] unexpected:', error);
     return new Response(JSON.stringify({ error: 'An unexpected error occurred' }),
