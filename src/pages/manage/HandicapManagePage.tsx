@@ -12,6 +12,7 @@ import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
+import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
@@ -101,8 +102,8 @@ export default function HandicapManagePage() {
   }
 
   return (
-    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'} fill={!connection}>
-      <div className={connection ? 'px-4 pt-4 pb-0' : 'px-4 pt-4 pb-0 flex flex-col flex-1 min-h-0'}>
+    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'} fill>
+      <div className="px-4 pt-4 pb-0 flex flex-col flex-1 min-h-0">
         {connection ? (
           <SyncedBody
             connection={connection}
@@ -137,6 +138,16 @@ export default function HandicapManagePage() {
   );
 }
 
+const isoForProvider = (provider: string | null | undefined): string => {
+  if (!provider) return 'GB-ENG';
+  const p = provider.toLowerCase();
+  if (p.includes('england')) return 'GB-ENG';
+  if (p.includes('scotland')) return 'GB-SCT';
+  if (p.includes('wales')) return 'GB-WLS';
+  if (p.includes('ireland')) return 'IE';
+  return 'GB-ENG';
+};
+
 const SyncedBody: React.FC<{
   connection: WhsConnection;
   onDisconnect: () => void;
@@ -145,8 +156,10 @@ const SyncedBody: React.FC<{
   const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
   const isAuthFailed = connection.last_sync_status === 'auth_failed';
   const connectedAt = new Date(connection.created_at);
+  const bodyName = bodyNameForProvider(connection.provider);
+  const iso = isoForProvider(connection.provider);
 
-  const rows = [
+  const tiles = [
     { label: 'Membership', value: connection.membership_number || '--' },
     { label: 'Passport ID', value: String(connection.passport_id ?? '--') },
     { label: 'Connected', value: formatRelativeAgoLong(connectedAt.toISOString()) },
@@ -154,126 +167,169 @@ const SyncedBody: React.FC<{
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontFamily: FONT }}>
-      {/* Facts card */}
-      <div style={{ background: '#fff', border: `1px solid ${HAIR}`, borderRadius: 16, padding: '4px 16px' }}>
-        {rows.map((r, i) => (
+    <div className="flex flex-col flex-1 min-h-0" style={{ fontFamily: FONT, padding: '20px 0 8px' }}>
+      {/* Middle region - centered */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 24,
+        }}
+      >
+        {/* Identity cluster */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          <div style={{ transform: 'scale(1.35)', transformOrigin: 'center' }}>
+            <MiniFlag iso={iso} />
+          </div>
           <div
-            key={r.label}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 0',
-              borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${HAIR}`,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: INK_45,
             }}
           >
+            Connected to {bodyName}
+          </div>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              borderRadius: 999,
+              background: isAuthFailed ? AMBER_SOFT_BG : GREEN_BG,
+            }}
+          >
+            {isAuthFailed ? (
+              <AlertTriangle size={16} color={AMBER_SOFT_FG} strokeWidth={2.4} />
+            ) : (
+              <CheckCircle2 size={16} color={GREEN} strokeWidth={2.4} />
+            )}
             <span
               style={{
-                fontSize: 11,
+                fontSize: 13.5,
                 fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: INK_45,
+                color: isAuthFailed ? AMBER_SOFT_FG : GREEN,
               }}
             >
-              {r.label}
-            </span>
-            <span
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {r.value}
+              {isAuthFailed
+                ? 'Sync issue, try disconnect and reconnect'
+                : `Synced ${lastSyncedAt ? formatRelativeAgoLong(lastSyncedAt.toISOString()) : 'recently'}`}
             </span>
           </div>
-        ))}
-      </div>
+          <p style={{ fontSize: 13, color: INK_45, textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
+            Your handicap syncs automatically twice daily.
+          </p>
+        </div>
 
-      {/* Status pill */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {/* 2x2 tile grid */}
         <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 14px',
-            borderRadius: 999,
-            background: isAuthFailed ? AMBER_SOFT_BG : GREEN_BG,
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 10,
           }}
         >
-          {isAuthFailed ? (
-            <AlertTriangle size={15} color={AMBER_SOFT_FG} strokeWidth={2.4} />
-          ) : (
-            <CheckCircle2 size={15} color={GREEN} strokeWidth={2.4} />
-          )}
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: isAuthFailed ? AMBER_SOFT_FG : GREEN,
-            }}
-          >
-            {isAuthFailed
-              ? 'Sync issue, try disconnect and reconnect'
-              : `Synced ${lastSyncedAt ? formatRelativeAgoLong(lastSyncedAt.toISOString()) : 'recently'}`}
-          </span>
+          {tiles.map((t) => (
+            <div
+              key={t.label}
+              style={{
+                background: '#fff',
+                border: `1px solid ${HAIR}`,
+                borderRadius: 16,
+                padding: '18px 14px',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+                minWidth: 0,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: INK_45,
+                }}
+              >
+                {t.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 'clamp(16px, 4.6vw, 19px)',
+                  fontWeight: 800,
+                  color: INK,
+                  fontVariantNumeric: 'tabular-nums',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {t.value}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <p style={{ fontSize: 13, color: INK_45, textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
-        Your handicap syncs automatically twice daily.
-      </p>
+      {/* Pinned actions */}
+      <div style={{ padding: '14px 0 8px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <button
+          onClick={onDisconnect}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            minHeight: 54,
+            padding: '12px 16px',
+            borderRadius: 16,
+            background: '#fff',
+            color: INK,
+            border: `1px solid ${HAIR}`,
+            fontSize: 15.5,
+            fontWeight: 800,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
+        >
+          <Link2 size={18} color={INK} />
+          Disconnect
+        </button>
 
-      <button
-        onClick={onDisconnect}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-          minHeight: 52,
-          padding: '12px 16px',
-          borderRadius: 14,
-          background: '#fff',
-          color: INK,
-          border: `1px solid ${HAIR}`,
-          fontSize: 15,
-          fontWeight: 600,
-          fontFamily: FONT,
-          cursor: 'pointer',
-        }}
-      >
-        <Link2 size={16} color={INK} />
-        Disconnect
-      </button>
-
-      <button
-        onClick={onDelete}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 6,
-          padding: '12px 16px',
-          borderRadius: 12,
-          background: 'transparent',
-          color: DANGER,
-          border: 'none',
-          fontSize: 13,
-          fontWeight: 600,
-          fontFamily: FONT,
-          cursor: 'pointer',
-        }}
-      >
-        <Trash2 size={14} />
-        Delete all data
-      </button>
+        <button
+          onClick={onDelete}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            minHeight: 44,
+            padding: '10px 16px',
+            borderRadius: 12,
+            background: 'transparent',
+            color: DANGER,
+            border: 'none',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
+        >
+          <Trash2 size={16} />
+          Delete all data
+        </button>
+      </div>
     </div>
   );
 };

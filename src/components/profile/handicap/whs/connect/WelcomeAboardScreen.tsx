@@ -63,16 +63,17 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   return (
     <div
       className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '18px 0 8px', justifyContent: 'space-between' }}
+      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
     >
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 20 }}>
-        {/* Top block */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 24 }}>
+        {/* Celebration cluster */}
         <div
           style={{
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            gap: 12,
             animation: reduced ? 'none' : 'wcFadeUp 450ms ease 150ms both',
           }}
         >
@@ -85,7 +86,6 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 14,
               boxShadow: '0 8px 22px rgba(5,150,105,0.28)',
               animation: reduced ? 'none' : 'wcPopIn 500ms cubic-bezier(.34,1.56,.64,1) 250ms both',
             }}
@@ -99,27 +99,26 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               color: GREEN,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              marginBottom: 6,
             }}
           >
-            Holed it
+            You're in
           </div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: INK, margin: 0, letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 27, fontWeight: 800, color: INK, margin: 0, letterSpacing: '-0.02em' }}>
             Welcome aboard, {firstName}
           </h1>
-          <p style={{ fontSize: 13.5, color: DIM, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 300 }}>
+          <p style={{ fontSize: 14, color: DIM, margin: 0, lineHeight: 1.5, maxWidth: 300 }}>
             Your handicap now updates after every counting round.
           </p>
         </div>
 
-        {/* Index hero card (the only dark element) */}
+        {/* Index hero card */}
         <div
           style={{
             position: 'relative',
             width: '100%',
             background: 'linear-gradient(135deg, #15171F, #0F172A)',
             borderRadius: 20,
-            padding: '22px 20px',
+            padding: '26px 22px',
             color: '#fff',
             overflow: 'hidden',
             boxShadow: '0 12px 32px rgba(15,23,42,0.22)',
@@ -178,7 +177,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
             <div
               style={{
-                fontSize: 64,
+                fontSize: 76,
                 fontWeight: 800,
                 letterSpacing: '-0.05em',
                 lineHeight: 1.05,
@@ -216,13 +215,13 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                 background: '#fff',
                 border: `1px solid ${HAIR}`,
                 borderRadius: 16,
-                padding: '16px 14px',
+                padding: '20px 14px',
                 textAlign: 'center',
               }}
             >
               <div
                 style={{
-                  fontSize: 27,
+                  fontSize: 30,
                   fontWeight: 800,
                   color: INK,
                   lineHeight: 1,
@@ -234,7 +233,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               </div>
               <div
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: 600,
                   color: DIM,
                   letterSpacing: '0.06em',
@@ -246,6 +245,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
           ))}
         </div>
       </div>
+
 
       <div style={{ padding: '14px 0 8px' }}>
         <button

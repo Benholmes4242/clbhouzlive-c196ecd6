@@ -19,18 +19,28 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   return (
     <div
       className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '20px 0 8px', justifyContent: 'space-between' }}
+      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
     >
-      {/* Content zone */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 24 }}>
+      {/* Middle region - centered cluster */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 28,
+        }}
+      >
         {/* Headline */}
         <div>
           <h1
             style={{
-              fontSize: 36,
+              fontSize: 40,
               fontWeight: 900,
               letterSpacing: '-0.035em',
-              lineHeight: 1.06,
+              lineHeight: 1.05,
               color: INK,
               margin: 0,
             }}
@@ -40,11 +50,11 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
           </h1>
           <p
             style={{
-              fontSize: 15,
+              fontSize: 16,
               lineHeight: 1.55,
               color: DIM,
-              margin: '14px 0 0',
-              maxWidth: 300,
+              margin: '12px 0 0',
+              maxWidth: 320,
             }}
           >
             Link your official WHS index once. From then on it moves the moment your counting rounds land.
@@ -60,15 +70,15 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
                 display: 'flex',
                 alignItems: 'center',
                 gap: 14,
-                padding: '14px 0',
+                padding: '16px 0',
                 borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
               }}
             >
               <div
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 11,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 12,
                   background: GREEN_BG,
                   display: 'flex',
                   alignItems: 'center',
@@ -76,16 +86,17 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
                   flexShrink: 0,
                 }}
               >
-                <Check size={13} color={GREEN} strokeWidth={3} />
+                <Check size={15} color={GREEN} strokeWidth={3} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: INK }}>{f.title}</div>
-                <div style={{ fontSize: 12.5, color: DIM, marginTop: 1 }}>{f.sub}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: INK }}>{f.title}</div>
+                <div style={{ fontSize: 13.5, color: DIM, marginTop: 2 }}>{f.sub}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
 
       {/* Pinned CTA */}
       <div style={{ padding: '14px 0 8px' }}>

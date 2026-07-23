@@ -30,9 +30,9 @@ export interface ApproachStageDef {
 const DOT = '\u00B7';
 
 export const APPROACH_STAGES: Record<ApproachStage, ApproachStageDef> = {
-  intro:      { number: '320', unit: 'YDS OUT',       pos: 0.05, note: `Par 4 ${DOT} Let's play` },
+  intro:      { number: '400', unit: 'YDS OUT',       pos: 0.05, note: "Let's play" },
   comingSoon: { number: '260', unit: 'YDS OUT',       pos: 0.22, note: 'Not in play here yet' },
-  form:       { number: '140', unit: 'YDS OUT',       pos: 0.55, note: `Wedge in hand ${DOT} Your details` },
+  form:       { number: '150', unit: 'YDS OUT',       pos: 0.55, note: `9 iron in hand ${DOT} Your details` },
   sync:       { number: '15',  unit: 'FT TO THE PIN', pos: 0.88, note: `On the green ${DOT} Connecting` },
-  done:       { number: 'IN',  unit: 'THE HOLE',      pos: 1,    note: 'Holed it' },
+  done:       { number: 'IN',  unit: 'THE HOLE',      pos: 1,    note: "You're in" },
 };

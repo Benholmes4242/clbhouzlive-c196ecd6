@@ -103,7 +103,7 @@ export const ApproachTracker: React.FC<Props> = ({ stage }) => {
           style={{
             position: 'absolute',
             top: 10,
-            left: `calc(${pct}% - 7px)`,
+            left: done ? 'calc(100% - 14px)' : `calc(${pct}% - 7px)`,
             width: 14,
             height: 14,
             borderRadius: '50%',

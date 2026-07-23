@@ -17,15 +17,15 @@ const inputStyle: React.CSSProperties = {
   background: '#fff',
   border: `1px solid ${HAIR}`,
   borderRadius: 14,
-  padding: '15px 16px',
-  fontSize: 16,
+  padding: '16px 16px',
+  fontSize: 17,
   color: INK,
   fontFamily: FONT,
   outline: 'none',
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 700,
   color: DIM,
   marginBottom: 6,
@@ -59,9 +59,9 @@ export const EnglandGolfForm: React.FC<Props> = ({
         onSubmit(membershipNumber.trim(), password);
       }}
       className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '18px 0 8px', justifyContent: 'space-between' }}
+      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
     >
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 20 }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ transform: 'scale(1.15)', transformOrigin: 'left center' }}>
@@ -92,7 +92,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
         </div>
 
         {/* Fields */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 28 }}>
           <div>
             <label htmlFor="whs-membership" style={labelStyle}>Membership number</label>
             <input
@@ -150,28 +150,29 @@ export const EnglandGolfForm: React.FC<Props> = ({
             </div>
             <div style={helperStyle}>Same one you use for the MyEG app</div>
           </div>
-
-          {error && (
-            <div
-              role="alert"
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 10,
-                background: 'rgba(239,68,68,0.06)',
-                border: '1px solid rgba(239,68,68,0.20)',
-                padding: '12px 14px',
-                borderRadius: 12,
-                fontSize: 13,
-                color: DANGER,
-                lineHeight: 1.45,
-              }}
-            >
-              <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
-              <span style={{ fontWeight: 500 }}>{error}</span>
-            </div>
-          )}
         </div>
+
+        {error && (
+          <div
+            role="alert"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 10,
+              background: 'rgba(239,68,68,0.06)',
+              border: '1px solid rgba(239,68,68,0.20)',
+              padding: '12px 14px',
+              borderRadius: 12,
+              fontSize: 13,
+              color: DANGER,
+              lineHeight: 1.45,
+              marginTop: 16,
+            }}
+          >
+            <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
+            <span style={{ fontWeight: 500 }}>{error}</span>
+          </div>
+        )}
 
         {/* Trust panel */}
         <div
@@ -183,6 +184,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             border: '1px solid rgba(5,150,105,0.24)',
             padding: '12px 14px',
             borderRadius: 14,
+            marginTop: error ? 16 : 28,
           }}
         >
           <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
@@ -191,7 +193,10 @@ export const EnglandGolfForm: React.FC<Props> = ({
             Stored encrypted and used only to sync your handicap from England Golf. You can disconnect or delete it anytime.
           </div>
         </div>
+
+        <div style={{ flex: 1 }} />
       </div>
+
 
       <div style={{ padding: '14px 0 8px' }}>
         <button
