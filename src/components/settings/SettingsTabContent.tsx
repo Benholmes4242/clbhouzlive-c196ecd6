@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import {
   ChevronRight, Mail, Bell, Shield, UserX,
-  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus,
+  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus, BadgeCheck,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
