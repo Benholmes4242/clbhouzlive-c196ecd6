@@ -98,8 +98,8 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
+                fontSize: 10.5,
+                fontWeight: 800,
                 color: INK_45,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -108,7 +108,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
             >
               Select country
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 27, fontWeight: 900, color: INK, letterSpacing: '-0.03em' }}>
               Where do you golf?
             </div>
           </div>
@@ -175,14 +175,14 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
               <div
                 style={{
                   padding: '10px 20px 8px',
-                  fontSize: 11,
-                  fontWeight: 700,
+                  fontSize: 10.5,
+                  fontWeight: 800,
                   color: GREEN,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                 }}
               >
-                Connected · {supported.length} {supported.length === 1 ? 'Body' : 'Bodies'}
+                Ready to connect
               </div>
 
               <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -193,25 +193,28 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
                     style={{
                       width: '100%',
                       textAlign: 'left',
-                      padding: '12px 14px',
-                      background: GREEN_BG,
-                      border: `1px solid rgba(5,150,105,0.28)`,
-                      borderRadius: 14,
+                      padding: '14px 16px',
+                      background: '#fff',
+                      border: `1.5px solid ${GREEN}`,
+                      borderRadius: 18,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 12,
+                      gap: 14,
                       cursor: 'pointer',
                       fontFamily: FONT,
+                      boxShadow: '0 6px 20px rgba(5,150,105,0.14)',
                     }}
                   >
-                    <MiniFlag iso={c.iso} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 16, fontWeight: 700, color: INK }}>{c.name}</div>
-                      <div style={{ fontSize: 12.5, color: GREEN, fontWeight: 600 }}>
-                        {c.body}
+                    <div style={{ transform: 'scale(1.25)', transformOrigin: 'left center' }}>
+                      <MiniFlag iso={c.iso} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, marginLeft: 6 }}>
+                      <div style={{ fontSize: 17, fontWeight: 800, color: INK }}>{c.name}</div>
+                      <div style={{ fontSize: 12.5, color: GREEN, fontWeight: 700, marginTop: 2 }}>
+                        {c.body} {'\u00B7'} Ready to connect
                       </div>
                     </div>
-                    <ChevronRight size={18} color={GREEN} strokeWidth={2} />
+                    <ChevronRight size={18} color={GREEN} strokeWidth={2.4} />
                   </button>
                 ))}
               </div>
@@ -223,14 +226,14 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
               <div
                 style={{
                   padding: '18px 20px 8px',
-                  fontSize: 11,
-                  fontWeight: 700,
+                  fontSize: 10.5,
+                  fontWeight: 800,
                   color: INK_45,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                 }}
               >
-                Not yet supported
+                More countries on the way
               </div>
 
               <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>

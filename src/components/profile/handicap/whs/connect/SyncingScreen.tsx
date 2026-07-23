@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Check, Flag } from 'lucide-react';
-
-const INK = '#0F172A';
-const INK_30 = '#94A3B8';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const FIELD_FILL = '#F8FAFC';
-const GREEN = '#059669';
-const GREEN_BG = 'rgba(5,150,105,0.08)';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+import { Check } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { INK, DIM, FAINT, HAIR, GREEN, GREEN_BG, FONT } from './approachStages';
 
 const STEPS = [
   'Verifying with England Golf',
@@ -17,150 +10,158 @@ const STEPS = [
   'Finding your friends',
 ] as const;
 
+const PERCENTS = [15, 45, 75, 96] as const;
+
 export const SyncingScreen: React.FC = () => {
+  const reduced = usePrefersReducedMotion();
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
+    if (reduced) {
+      setActiveStep(STEPS.length - 1);
+      return;
+    }
     const timer = window.setInterval(() => {
       setActiveStep((s) => Math.min(s + 1, STEPS.length - 1));
-    }, 1800);
+    }, 1300);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [reduced]);
+
+  const percent = PERCENTS[activeStep];
+  const r = 50;
+  const c = 2 * Math.PI * r;
+  const offset = c * (1 - percent / 100);
 
   return (
     <div
-      style={{
-        background: '#fff',
-        border: `1px solid ${HAIR}`,
-        borderRadius: 16,
-        padding: '36px 22px 30px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        fontFamily: FONT,
-      }}
+      className="flex flex-col flex-1 min-h-0"
+      style={{ fontFamily: FONT, padding: '20px 0 8px', justifyContent: 'space-between' }}
     >
-      {/* Green ring orb */}
-      <div style={{ width: 92, height: 92, position: 'relative', marginBottom: 24 }}>
-        {/* static base ring */}
-        <svg width="92" height="92" viewBox="0 0 92 92">
-          <circle cx="46" cy="46" r="40" fill={GREEN_BG} />
-        </svg>
-        {/* spinning arc: the whole SVG rotates about its own center = reliable */}
-        <svg
-          width="92"
-          height="92"
-          viewBox="0 0 92 92"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            animation: 'whs-spin 0.9s linear infinite',
-          }}
-        >
-          <circle
-            cx="46"
-            cy="46"
-            r="40"
-            fill="none"
-            stroke={GREEN}
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray="70 252"
-            transform="rotate(-90 46 46)"
-          />
-        </svg>
-        {/* flag, centered */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Flag size={32} color={GREEN} strokeWidth={2.2} />
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 24, alignItems: 'center' }}>
+        {/* Status headline */}
+        <div style={{ textAlign: 'center', width: '100%' }}>
+          <div
+            key={activeStep}
+            style={{
+              fontSize: 24,
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              color: INK,
+              animation: reduced ? 'none' : 'wcFadeUp 450ms ease',
+            }}
+          >
+            {STEPS[activeStep]}
+            <span style={{ color: GREEN }}>{'\u2026'}</span>
+          </div>
+          <div style={{ fontSize: 13, color: FAINT, marginTop: 6 }}>
+            The ball's rolling. A few seconds.
+          </div>
+        </div>
+
+        {/* Progress ring */}
+        <div style={{ position: 'relative', width: 120, height: 120 }}>
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r={r} fill="rgba(5,150,105,0.07)" />
+            <circle
+              cx="60"
+              cy="60"
+              r={r}
+              fill="none"
+              stroke={GREEN}
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray={c}
+              strokeDashoffset={offset}
+              transform="rotate(-90 60 60)"
+              style={{ transition: reduced ? 'none' : 'stroke-dashoffset 900ms cubic-bezier(.22,1,.36,1)' }}
+            />
+          </svg>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 22,
+              fontWeight: 900,
+              color: INK,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {percent}%
+          </div>
+        </div>
+
+        {/* Step list */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {STEPS.map((label, i) => {
+            const isDone = i < activeStep;
+            const isActive = i === activeStep;
+            return (
+              <div
+                key={label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '10px 12px',
+                  background: isActive ? '#fff' : 'transparent',
+                  border: isActive ? `1px solid ${HAIR}` : '1px solid transparent',
+                  borderRadius: 13,
+                  transition: 'all 350ms ease',
+                }}
+              >
+                <div
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: isDone ? GREEN : isActive ? '#fff' : 'transparent',
+                    border: isDone
+                      ? `1.5px solid ${GREEN}`
+                      : isActive
+                      ? `1.5px solid ${GREEN}`
+                      : `1.5px solid ${HAIR}`,
+                    color: '#fff',
+                    transition: 'all 350ms ease',
+                  }}
+                >
+                  {isDone && <Check size={13} strokeWidth={3} />}
+                  {isActive && (
+                    <div
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        background: GREEN,
+                        animation: reduced ? 'none' : 'wcDotPulse 1.4s ease-in-out infinite',
+                      }}
+                    />
+                  )}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14.5,
+                    fontWeight: isActive ? 800 : 600,
+                    color: isActive ? INK : isDone ? INK : FAINT,
+                    transition: 'color 350ms ease',
+                  }}
+                >
+                  {label}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div style={{ fontSize: 17, fontWeight: 700, color: INK, marginBottom: 22, letterSpacing: '-0.01em' }}>
-        Connecting your official WHS handicap
-      </div>
-
-      <div style={{ width: '100%', maxWidth: 320, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {STEPS.map((label, i) => {
-          const isDone = i < activeStep;
-          const isActive = i === activeStep;
-          return (
-            <div
-              key={label}
-              style={{
-                display: 'flex',
-                gap: 12,
-                alignItems: 'center',
-                padding: '8px 0',
-              }}
-            >
-              <div
-                style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: '50%',
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: isDone ? GREEN : isActive ? GREEN_BG : FIELD_FILL,
-                  border: isDone
-                    ? `1.5px solid ${GREEN}`
-                    : isActive
-                    ? `1.5px solid ${GREEN}`
-                    : `1px solid ${HAIR}`,
-                  color: '#fff',
-                  transition: 'all 300ms ease',
-                }}
-              >
-                {isDone && <Check size={14} strokeWidth={3} />}
-                {isActive && (
-                  <div
-                    style={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: '50%',
-                      background: GREEN,
-                      animation: 'whs-pulse 1.4s ease-in-out infinite',
-                    }}
-                  />
-                )}
-              </div>
-              <div
-                style={{
-                  fontSize: 15.5,
-                  fontWeight: isActive ? 700 : isDone ? 500 : 500,
-                  color: isActive ? INK : isDone ? INK : INK_30,
-                  transition: 'color 300ms ease',
-                }}
-              >
-                {label}
-                {isActive && '...'}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ fontSize: 12.5, color: INK_45, marginTop: 22 }}>
-        This usually takes a few seconds.
-      </div>
-
-      <style>{`
-        @keyframes whs-spin { to { transform: rotate(360deg); } }
-        @keyframes whs-pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.3); opacity: 0.6; }
-        }
-      `}</style>
+      {/* No CTA on sync — hold */}
+      <div />
     </div>
   );
 };

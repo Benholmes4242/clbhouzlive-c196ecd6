@@ -1,13 +1,7 @@
-import React from 'react';
-import { ArrowRight, Check, TrendingUp } from 'lucide-react';
-
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const FIELD_FILL = '#F8FAFC';
-const GREEN = '#059669';
-const GREEN_TINT = 'rgba(5,150,105,0.16)';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Check } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { INK, DIM, HAIR, GREEN, FONT } from './approachStages';
 
 interface Props {
   firstName: string;
@@ -23,6 +17,37 @@ const formatHandicap = (h: number | null): string => {
   return h < 0 ? `+${Math.abs(h).toFixed(1)}` : h.toFixed(1);
 };
 
+const useCountUp = (target: number | null, durationMs = 1400, reduced = false): number | null => {
+  const [val, setVal] = useState<number | null>(reduced ? target : target === null ? null : 0);
+  const raf = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (target === null) {
+      setVal(null);
+      return;
+    }
+    if (reduced) {
+      setVal(target);
+      return;
+    }
+    const start = performance.now();
+    const from = 0;
+    const to = target;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(from + (to - from) * eased);
+      if (t < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => {
+      if (raf.current !== null) cancelAnimationFrame(raf.current);
+    };
+  }, [target, durationMs, reduced]);
+
+  return val;
+};
+
 export const WelcomeAboardScreen: React.FC<Props> = ({
   firstName,
   handicapIndex,
@@ -31,254 +56,222 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   friendsImported,
   onContinue,
 }) => {
+  const reduced = usePrefersReducedMotion();
+  const animated = useCountUp(handicapIndex, 1400, reduced);
+  const displayIndex = animated === null ? '--' : formatHandicap(Number(animated.toFixed(1)));
+
   return (
     <div
-      style={{
-        background: '#fff',
-        border: `1px solid ${HAIR}`,
-        borderRadius: 16,
-        padding: '30px 22px 24px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-        fontFamily: FONT,
-      }}
+      className="flex flex-col flex-1 min-h-0"
+      style={{ fontFamily: FONT, padding: '18px 0 8px', justifyContent: 'space-between' }}
     >
-      {/* Success mark: green check inside soft green ring */}
-      <div
-        style={{
-          width: 88,
-          height: 88,
-          borderRadius: '50%',
-          background: GREEN_TINT,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 18,
-        }}
-      >
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 20 }}>
+        {/* Top block */}
         <div
           style={{
-            width: 62,
-            height: 62,
-            borderRadius: '50%',
-            background: GREEN,
-            boxShadow: '0 10px 24px rgba(5,150,105,0.30)',
+            textAlign: 'center',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            animation: reduced ? 'none' : 'wcFadeUp 450ms ease 150ms both',
           }}
         >
-          <Check size={32} color="#fff" strokeWidth={3} />
-        </div>
-      </div>
-
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 800,
-          color: GREEN,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          marginBottom: 6,
-        }}
-      >
-        You're connected
-      </div>
-
-      <h2
-        style={{
-          fontSize: 25,
-          fontWeight: 800,
-          color: INK,
-          letterSpacing: '-0.02em',
-          margin: '0 0 18px',
-        }}
-      >
-        Welcome aboard, {firstName}
-      </h2>
-
-      {/* Hero handicap panel: charcoal gradient + green radial glow */}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 360,
-          background:
-            'linear-gradient(160deg, #12141c 0%, #1c2030 100%)',
-          borderRadius: 18,
-          padding: '22px 22px 20px',
-          color: '#fff',
-          marginBottom: 14,
-          textAlign: 'left',
-          overflow: 'hidden',
-          boxShadow: '0 12px 32px rgba(15,23,42,0.22)',
-        }}
-      >
-        {/* radial glow */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -60,
-            right: -60,
-            width: 200,
-            height: 200,
-            background:
-              'radial-gradient(circle, rgba(5,150,105,0.35) 0%, rgba(5,150,105,0) 70%)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        <div style={{ position: 'relative' }}>
           <div
             style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: GREEN,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 8,
+              justifyContent: 'center',
+              marginBottom: 14,
+              boxShadow: '0 8px 22px rgba(5,150,105,0.28)',
+              animation: reduced ? 'none' : 'wcPopIn 500ms cubic-bezier(.34,1.56,.64,1) 250ms both',
             }}
           >
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 800,
-                color: '#34d399',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Handicap index
-            </div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'rgba(52,211,153,0.16)',
-                color: '#34d399',
-                borderRadius: 999,
-                padding: '3px 8px',
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <TrendingUp size={11} strokeWidth={2.6} />
-              Live
-            </div>
+            <Check size={28} color="#fff" strokeWidth={3} />
           </div>
-
           <div
             style={{
-              fontSize: 58,
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: '-0.04em',
-              fontVariantNumeric: 'tabular-nums',
-              marginBottom: homeClub ? 10 : 0,
+              fontSize: 11,
+              fontWeight: 900,
+              color: GREEN,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              marginBottom: 6,
             }}
           >
-            {formatHandicap(handicapIndex)}
+            Holed it
           </div>
-          {homeClub && (
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-              at {homeClub}
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: INK, margin: 0, letterSpacing: '-0.02em' }}>
+            Welcome aboard, {firstName}
+          </h1>
+          <p style={{ fontSize: 13.5, color: DIM, margin: '8px 0 0', lineHeight: 1.5, maxWidth: 300 }}>
+            Your handicap now updates after every counting round.
+          </p>
+        </div>
+
+        {/* Index hero card (the only dark element) */}
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            background: 'linear-gradient(135deg, #15171F, #0F172A)',
+            borderRadius: 20,
+            padding: '22px 20px',
+            color: '#fff',
+            overflow: 'hidden',
+            boxShadow: '0 12px 32px rgba(15,23,42,0.22)',
+            animation: reduced ? 'none' : 'wcFadeUp 450ms ease 400ms both',
+          }}
+        >
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'radial-gradient(circle at 85% 15%, rgba(5,150,105,0.35), rgba(5,150,105,0) 60%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: '#34D399',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Handicap index
+              </div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'rgba(52,211,153,0.14)',
+                  color: '#34D399',
+                  borderRadius: 999,
+                  padding: '4px 10px',
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.10em',
+                }}
+              >
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#34D399',
+                    animation: reduced ? 'none' : 'wcDotPulse 1.4s ease-in-out infinite',
+                  }}
+                />
+                LIVE
+              </div>
             </div>
-          )}
+
+            <div
+              style={{
+                fontSize: 64,
+                fontWeight: 800,
+                letterSpacing: '-0.05em',
+                lineHeight: 1.05,
+                fontVariantNumeric: 'tabular-nums',
+                marginTop: 8,
+              }}
+            >
+              {displayIndex}
+            </div>
+            {homeClub && (
+              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
+                at {homeClub}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div
+          style={{
+            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 10,
+            animation: reduced ? 'none' : 'wcFadeUp 450ms ease 600ms both',
+          }}
+        >
+          {[
+            { val: scoresImported, label: 'Rounds imported' },
+            { val: friendsImported, label: 'Friends found' },
+          ].map((t) => (
+            <div
+              key={t.label}
+              style={{
+                background: '#fff',
+                border: `1px solid ${HAIR}`,
+                borderRadius: 16,
+                padding: '16px 14px',
+                textAlign: 'center',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 27,
+                  fontWeight: 800,
+                  color: INK,
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
+                  marginBottom: 6,
+                }}
+              >
+                {t.val}
+              </div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: DIM,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {t.label}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Stat tiles */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 360,
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 10,
-          marginBottom: 18,
-        }}
-      >
-        {[
-          { val: scoresImported, label: scoresImported === 1 ? 'Round' : 'Rounds' },
-          { val: friendsImported, label: friendsImported === 1 ? 'Friend' : 'Friends' },
-        ].map((t) => (
-          <div
-            key={t.label}
-            style={{
-              background: FIELD_FILL,
-              border: `1px solid ${HAIR}`,
-              borderRadius: 14,
-              padding: '14px 16px',
-              textAlign: 'left',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: INK,
-                lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
-                marginBottom: 4,
-              }}
-            >
-              {t.val}
-            </div>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: INK_45,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {t.label}
-            </div>
-          </div>
-        ))}
+      <div style={{ padding: '14px 0 8px' }}>
+        <button
+          onClick={() => onContinue()}
+          style={{
+            width: '100%',
+            minHeight: 56,
+            borderRadius: 16,
+            background: INK,
+            color: '#fff',
+            border: 'none',
+            fontFamily: FONT,
+            fontSize: 16.5,
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            boxShadow: '0 8px 22px rgba(15,23,42,0.22)',
+          }}
+        >
+          View my handicap
+          <ArrowRight size={18} strokeWidth={2.4} />
+        </button>
       </div>
-
-      <p
-        style={{
-          fontSize: 13.5,
-          color: INK_45,
-          lineHeight: 1.5,
-          margin: '0 0 18px',
-          maxWidth: 300,
-        }}
-      >
-        Everything's live. Your handicap updates automatically after every counting round.
-      </p>
-
-      <button
-        onClick={onContinue}
-        style={{
-          width: '100%',
-          maxWidth: 360,
-          minHeight: 54,
-          padding: '15px',
-          borderRadius: 14,
-          background: INK,
-          color: '#fff',
-          fontSize: 16,
-          fontWeight: 600,
-          border: 'none',
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-          fontFamily: FONT,
-        }}
-      >
-        View my handicap
-        <ArrowRight size={18} strokeWidth={2.4} />
-      </button>
     </div>
   );
 };
