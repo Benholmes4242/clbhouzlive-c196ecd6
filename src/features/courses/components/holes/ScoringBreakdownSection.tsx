@@ -164,15 +164,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     }
   }
 
-  // Projection card values — anchored on complete_rounds (rounds with all 18 holes)
-  const completeRounds = data?.complete_rounds ?? 0;
-  const avgGross = data?.avg_gross != null ? Number(data.avg_gross) : null;
-  const doublesPerCompleteRound = completeRounds > 0 ? sumDbl / completeRounds : 0;
-  const doublesPR1 = +doublesPerCompleteRound.toFixed(1);
-  const convertible = +(doublesPerCompleteRound / 2).toFixed(1);
-  const projected = avgGross != null ? +(avgGross - convertible).toFixed(1) : null;
-  const showProjection =
-    avgGross != null && completeRounds >= 5 && doublesPR1 >= 1 && projected != null;
+
+
 
 
   // Renderers
@@ -438,64 +431,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             );
           })()}
 
-          {/* Projection card — only when doubles-per-round >= 1 and we have an avg gross */}
-          {hasInterpretation && showProjection && avgGross != null && projected != null && (
-            <div
-              style={{
-                marginTop: 14,
-                background: 'linear-gradient(160deg,#FFFFFF,#FFF7EC)',
-                border: '1px solid rgba(247,147,30,0.28)',
-                borderRadius: 14,
-                padding: 14,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: AMBER,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('courses:holes.scoringBreakdown.projectionEyebrow')}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  flexWrap: 'wrap',
-                  gap: 10,
-                  marginTop: 8,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: INK_45,
-                    textDecoration: 'line-through',
-                    ...NUM,
-                  }}
-                >
-                  {avgGross.toFixed(1)}
-                </div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK_45 }}>→</div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: INK, letterSpacing: '-1px', ...NUM }}>
-                  {projected.toFixed(1)}
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 800, color: GREEN, ...NUM }}>
-                  {t('courses:holes.scoringBreakdown.projectionShotsSaved', { n: convertible.toFixed(1) })}
-                </div>
-              </div>
-              <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_60, marginTop: 8, lineHeight: 1.45 }}>
-                {t('courses:holes.scoringBreakdown.projectionBody', {
-                  avg: avgGross.toFixed(1),
-                  perRound: doublesPR1.toFixed(1),
-                })}
-              </div>
-            </div>
-          )}
+
 
           {topDoubles.length > 0 && (
             <>
@@ -556,11 +492,11 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               t('courses:holes.scoringBreakdown.s3Sub'),
             )}
             {(() => {
-              const MIN_H = 26;
-              const MAX_H = 78;
+              const MIN_H = 52;
+              const MAX_H = 92;
               const neutralAll = spread < 1.5;
               return (
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 130 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 150 }}>
                   {thirdSums.map((v, i) => {
                     const barH = MIN_H + (v / maxThird) * (MAX_H - MIN_H);
                     const color = neutralAll
