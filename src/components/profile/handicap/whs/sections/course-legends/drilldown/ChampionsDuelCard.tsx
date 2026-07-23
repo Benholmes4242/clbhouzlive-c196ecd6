@@ -177,6 +177,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   banded = false,
   titleOverride,
   chaseCta,
+  suppressTopBorder = false,
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
