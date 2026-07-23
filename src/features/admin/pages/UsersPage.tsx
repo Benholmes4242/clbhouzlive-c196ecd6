@@ -93,9 +93,9 @@ export default function UsersPage() {
 
 /* ─────────────────────── Members (roster) ─────────────────────── */
 
-const LEGACY_FILTER_VALUES = new Set(['verified', 'unverified', 'new_today']);
+const LEGACY_FILTER_VALUES = new Set(['unverified', 'new_today']);
 const VALID_FILTERS: UserFilterStatus[] = [
-  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'admin',
+  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'verified', 'admin',
 ];
 
 function MembersTab() {
