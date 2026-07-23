@@ -25,6 +25,8 @@ import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import TrophyRoomEntryRow from '@/components/profile/handicap/whs/sections/TrophyRoomEntryRow';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { ProfileGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
