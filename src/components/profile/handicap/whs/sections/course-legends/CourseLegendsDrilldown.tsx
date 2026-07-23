@@ -462,6 +462,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   theme={theme}
                   banded={false}
                   chaseCta={ctaLine}
+                  suppressTopBorder
                 />
               </div>
             );
