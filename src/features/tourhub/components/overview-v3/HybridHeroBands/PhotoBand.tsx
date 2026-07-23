@@ -103,6 +103,12 @@ export function PhotoBand({
   momentScore,
   onCtaTap,
   ctaLabel,
+  venueCourseName = null,
+  venueState = null,
+  venueCountry = null,
+  venuePar = null,
+  venueYardage = null,
+  purse = null,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   const useDusk =
