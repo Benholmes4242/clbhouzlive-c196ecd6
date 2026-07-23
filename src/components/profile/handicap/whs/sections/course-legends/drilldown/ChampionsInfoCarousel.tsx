@@ -4,6 +4,8 @@ import { ShieldCheck, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { ChampionsGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
