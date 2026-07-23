@@ -1212,7 +1212,6 @@ Return a JSON object with this exact structure:
       "country": "USA",
       "worldRanking": 1,
       "winProbability": 15.5,
-      "courseFitScore": 92,
       "reasons": [
         "MAX 50 CHARS. Recent form insight",
         "MAX 50 CHARS. Course fit or key stat",
