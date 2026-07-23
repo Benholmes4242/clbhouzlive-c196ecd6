@@ -159,10 +159,11 @@ serve(async (req) => {
       suspended,
       durationDays,
       newUsername,
+      adminNote,
     } = body;
 
     // Per-action gate
-    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username'];
+    const fullOnlyActions: AdminAction[] = ['delete_user', 'reset_password', 'delete_course', 'change_username', 'verify_golfer', 'unverify_golfer'];
     const moderationActions: AdminAction[] = [
       'suspend_user', 'unsuspend', 'warn_user', 'hide_post', 'unhide_post',
     ];
