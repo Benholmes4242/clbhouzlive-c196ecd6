@@ -714,6 +714,25 @@ function Member360Sheet({
         tone="danger"
         busy={busy}
       />
+      <ConfirmDialog
+        open={confirm === 'verify'}
+        onClose={() => setConfirm(null)}
+        onConfirm={runConfirmed}
+        title={`Verify ${name}?`}
+        description="They'll be notified."
+        confirmLabel="Verify golfer"
+        busy={busy}
+      />
+      <ConfirmDialog
+        open={confirm === 'unverify'}
+        onClose={() => setConfirm(null)}
+        onConfirm={runConfirmed}
+        title={`Remove verification from ${name}?`}
+        description="They will not be notified."
+        confirmLabel="Remove verification"
+        tone="danger"
+        busy={busy}
+      />
       {requestMode !== null && detail && (
         <div
           role="dialog" aria-modal="true"
