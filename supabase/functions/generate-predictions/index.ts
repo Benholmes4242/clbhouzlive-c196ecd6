@@ -1215,7 +1215,7 @@ For this course type (${courseType.type}), identify which strokes gained categor
 Each contender's reasons MUST reference specific strokes gained categories that match the course DNA.
 
 ## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue.
-Use them as a STRONG signal to inform your rankings and reasoning. **Do NOT include a `courseFitScore` field in your output** — the server attaches the calculated value. Reason from the numbers, do not restate them.
+Use them as a STRONG signal to inform your rankings and reasoning. **Do NOT include a courseFitScore field in your output** — the server attaches the calculated value. Reason from the numbers, do not restate them.
 
 ## ANALYSIS TASK
 
@@ -1284,8 +1284,8 @@ Return a JSON object with this exact structure:
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
-6. **Do NOT output a `courseFitScore` field** — the server attaches it
-7. **Do NOT output a `worldRanking` field** — the server attaches it from official rankings
+6. **Do NOT output a courseFitScore field** — the server attaches it
+7. **Do NOT output a worldRanking field** — the server attaches it from official rankings
 8. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
 9. **No gambling language**
 
