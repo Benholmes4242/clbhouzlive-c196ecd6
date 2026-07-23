@@ -171,6 +171,7 @@ function MembersTab() {
     { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
     { id: 'eg_issues',     label: 'EG issues',      count: counts.eg_issues },
     { id: 'suspended',     label: 'Suspended',      count: counts.suspended },
+    { id: 'verified',      label: 'Verified',       count: counts.verified },
     { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
 
