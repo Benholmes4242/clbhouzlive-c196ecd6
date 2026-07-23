@@ -49,6 +49,9 @@ interface ChampionsDuelCardProps {
   /** Optional CTA sentence rendered beneath the chase caption (used by
    *  the "Your closest duel" section to name the gap in category units). */
   chaseCta?: string;
+  /** Suppresses the top hairline border — used when the card sits directly
+   *  beneath an eyebrow/explainer block with no visual separation needed. */
+  suppressTopBorder?: boolean;
 }
 
 
