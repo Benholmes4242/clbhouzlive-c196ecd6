@@ -1,7 +1,7 @@
 import React from 'react';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
-import CourseFormCard from '../sections/trends/CourseFormCard';
+import GameEverywhereCard from '../sections/trends/GameEverywhereCard';
 
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
@@ -33,11 +33,6 @@ export const TrendsView: React.FC<Props> = ({
       className="[&>section:first-child]:!mt-0 [&>section:first-child>div:first-child]:!pt-0"
       style={{ paddingTop: 32 }}
     >
-
-
-
-
-
       {/* 3. Rounds That Count */}
       <RoundsThatCountCard
         connectionId={connectionId}
@@ -59,15 +54,8 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-
-      {/* 6. Course Form */}
-      <CourseFormCard
-        connectionId={connectionId}
-        currentHandicap={currentHandicap ?? undefined}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
-
+      {/* 6. Your game, everywhere */}
+      <GameEverywhereCard readOnly={readOnly} />
     </div>
   );
 };
