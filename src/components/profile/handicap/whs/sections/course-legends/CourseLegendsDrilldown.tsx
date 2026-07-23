@@ -472,7 +472,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
 
-          <div style={{ borderBottom: theme === 'light' ? '0.5px solid rgba(15,23,42,0.08)' : '0.5px solid rgba(255,255,255,0.06)' }}>
           {visibleCategories.map((cat, i) => {
             const entry = groupedWithTotals.get(cat);
             const banded = i % 2 === 1;
@@ -524,7 +523,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               </div>
             );
           })}
-          </div>
 
         </>
       )}
