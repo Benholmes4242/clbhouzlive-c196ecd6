@@ -13,6 +13,9 @@ import EnglandGolfForm from './connect/EnglandGolfForm';
 import ComingSoonScreen from './connect/ComingSoonScreen';
 import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
+import ApproachTracker from './connect/ApproachTracker';
+import type { ApproachStage } from './connect/approachStages';
+import { HAIR } from './connect/approachStages';
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: 'Please sign in to clbhouz first, then try again.',
@@ -27,9 +30,15 @@ const ERROR_MESSAGES: Record<string, string> = {
 interface Props {
   onConnected: () => void | Promise<void>;
   onDecline?: () => void;
+  /** 'page' fills viewport height and pins CTAs. 'embedded' sizes to content. */
+  layout?: 'page' | 'embedded';
 }
 
-export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onDecline }) => {
+export const WhsConnectScreen: React.FC<Props> = ({
+  onConnected,
+  onDecline,
+  layout = 'page',
+}) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -87,64 +96,71 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onDecline }) =>
     }
   };
 
-  if (successData) {
-    const firstName = (successData.name ?? '').split(' ')[0] || 'golfer';
-    return (
-      <WelcomeAboardScreen
-        firstName={firstName}
-        handicapIndex={successData.handicap_index ?? null}
-        homeClub={successData.home_club ?? null}
-        scoresImported={successData.scores_imported ?? 0}
-        friendsImported={successData.friends_imported ?? 0}
-        onContinue={async () => {
-          await onConnected();
-          setSuccessData(null);
-        }}
-      />
-    );
-  }
+  // Derive stage from render branches.
+  const stage: ApproachStage = successData
+    ? 'done'
+    : submitting
+    ? 'sync'
+    : !country
+    ? 'intro'
+    : !country.supported
+    ? 'comingSoon'
+    : 'form';
 
-  if (submitting) {
-    return <SyncingScreen />;
-  }
-
-  if (!country) {
-    return (
-      <>
-        <EmptyStateScreen onPickCountry={() => setPickerOpen(true)} onDecline={onDecline} />
-        <CountryPickerSheet
-          open={pickerOpen}
-          onClose={() => setPickerOpen(false)}
-          onSelect={handlePick}
+  const activeScreen = (() => {
+    if (successData) {
+      const firstName = (successData.name ?? '').split(' ')[0] || 'golfer';
+      return (
+        <WelcomeAboardScreen
+          firstName={firstName}
+          handicapIndex={successData.handicap_index ?? null}
+          homeClub={successData.home_club ?? null}
+          scoresImported={successData.scores_imported ?? 0}
+          friendsImported={successData.friends_imported ?? 0}
+          onContinue={async () => {
+            await onConnected();
+            setSuccessData(null);
+          }}
         />
-      </>
-    );
-  }
-
-  if (!country.supported) {
-    return (
-      <>
+      );
+    }
+    if (submitting) return <SyncingScreen />;
+    if (!country) {
+      return (
+        <EmptyStateScreen
+          onPickCountry={() => setPickerOpen(true)}
+          onDecline={onDecline}
+        />
+      );
+    }
+    if (!country.supported) {
+      return (
         <ComingSoonScreen
           country={country}
           onChangeCountry={handleChangeCountry}
         />
-        <CountryPickerSheet
-          open={pickerOpen}
-          onClose={() => setPickerOpen(false)}
-          onSelect={handlePick}
-        />
-      </>
-    );
-  }
-
-  return (
-    <>
+      );
+    }
+    return (
       <EnglandGolfForm
         onSubmit={handleSubmit}
         error={error}
         submitting={false}
         onChangeCountry={handleChangeCountry}
       />
+    );
+  })();
+
+  const wrapperClass =
+    layout === 'page' ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col';
+
+  return (
+    <>
+      <div className={wrapperClass}>
+        <ApproachTracker stage={stage} />
+        <div style={{ height: 1, background: HAIR, margin: '16px 0 0' }} />
+        {activeScreen}
+      </div>
       <CountryPickerSheet
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}

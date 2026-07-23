@@ -17,6 +17,9 @@ interface Props {
   onBack?: () => void;
   /** Renders inside the sticky header, below the title row. */
   belowTitle?: React.ReactNode;
+  /** When true, the children wrapper becomes a flex column so a child with
+   *  `flex-1` stretches to fill the viewport. Default false. */
+  fill?: boolean;
 }
 
 /**
@@ -30,7 +33,7 @@ interface Props {
  * on top of that. Do NOT snapshot safe-area here — it would double the
  * inset and open a visible gap under the notch on device.
  */
-export function ManagePageShell({ title, children, right, onBack, belowTitle }: Props) {
+export function ManagePageShell({ title, children, right, onBack, belowTitle, fill = false }: Props) {
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
@@ -75,7 +78,10 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
           {belowTitle}
         </div>
 
-        <div className="flex-1 pb-0" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 32px)' }}>
+        <div
+          className={fill ? 'flex-1 pb-0 flex flex-col' : 'flex-1 pb-0'}
+          style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 32px)' }}
+        >
           {children}
         </div>
       </div>
