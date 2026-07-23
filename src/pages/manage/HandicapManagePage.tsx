@@ -12,6 +12,7 @@ import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
+import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
