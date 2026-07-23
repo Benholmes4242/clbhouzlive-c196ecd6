@@ -24,7 +24,9 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
-import { ConnectHandicapCue } from './ConnectHandicapCue';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { AboutGhost } from '@/components/handicap/ConnectGhostPreviews';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import { PersonalSection } from '@/components/courses/phase5';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
@@ -80,6 +82,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const { user } = useSupabaseSession();
+  const { data: aboutConnection } = useWhsConnection(user?.id);
   
   
   const navigate = useNavigate();
@@ -189,7 +192,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </button>
           </div>
         )}
-        <ConnectHandicapCue variant="about" courseName={course.name} />
+        {user && !aboutConnection && (
+          <ConnectGhostPrompt
+            surface="about"
+            ghost={<AboutGhost />}
+            onConnect={() => navigate('/handicap')}
+          />
+        )}
       </div>
 
 

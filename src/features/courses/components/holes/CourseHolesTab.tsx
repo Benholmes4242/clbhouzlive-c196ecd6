@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
@@ -8,7 +9,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { HolesEmptyState } from './HolesEmptyState';
 import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
-import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { HoleDataSheet } from './HoleDataSheet';
 
 interface Props {
@@ -17,6 +19,7 @@ interface Props {
 
 export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
+  const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
   const { data: meta } = useCourseMeta(courseId);
   const { user } = useSupabaseSession();
@@ -82,10 +85,19 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     );
   }
 
+  const showGhost = Boolean(user) && !connection;
+  const ghost = showGhost ? (
+    <ConnectGhostPrompt
+      surface="holes"
+      ghost={<HolesGhost />}
+      onConnect={() => navigate('/handicap')}
+    />
+  ) : null;
+
   if (!data?.available || holes.length === 0) {
     return (
       <>
-        <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
+        {ghost}
         <HolesEmptyState courseName={meta?.course_name ?? null} />
       </>
     );
@@ -93,7 +105,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
 
   return (
     <>
-      <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
+      {ghost}
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}

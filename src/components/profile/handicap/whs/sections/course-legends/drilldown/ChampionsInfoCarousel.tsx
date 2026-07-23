@@ -4,6 +4,8 @@ import { ShieldCheck, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
+import { ChampionsGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
@@ -69,6 +71,18 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
 
   if (gone) return null;
 
+  // Unsynced users get the ghost prompt in place of the old sync CTA. It
+  // supersedes the info card entirely for this state - one prompt, one place.
+  if (!isSynced) {
+    return (
+      <ConnectGhostPrompt
+        surface="champions"
+        ghost={<ChampionsGhost />}
+        onConnect={() => navigate('/handicap')}
+      />
+    );
+  }
+
   return (
     <div style={{ margin: '12px 16px 0' }}>
       <CardShell
@@ -86,31 +100,6 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
           <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>{' '}
           count: no logged rounds, no crowns.
         </p>
-        {!isSynced && (
-          <button
-            type="button"
-            onClick={() => navigate('/handicap')}
-            style={{
-              marginTop: 11,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              minHeight: 36,
-              padding: '0 16px',
-              borderRadius: 999,
-              border: 'none',
-              background: 'rgba(251,188,46,0.18)',
-              color: 'var(--hcp-gold-text)',
-              fontSize: 12,
-              fontWeight: 800,
-              letterSpacing: '0.01em',
-              cursor: 'pointer',
-              fontFamily: FONT,
-            }}
-          >
-            Sync your handicap ›
-          </button>
-        )}
       </CardShell>
     </div>
   );
