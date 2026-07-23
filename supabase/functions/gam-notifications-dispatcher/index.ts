@@ -4,6 +4,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+export const FUNCTION_VERSION = '2026-07-23T05:12:00Z-v2-crown-templates';
+
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -27,7 +29,20 @@ type OutboxRow = {
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Ping — surfaces the deployed version without draining the outbox.
+  if (req.method === 'GET') {
+    return json({ version: FUNCTION_VERSION }, 200, corsHeaders);
+  }
+  if (req.method === 'POST') {
+    try {
+      const body = await req.clone().json();
+      if (body?.action === 'ping') return json({ version: FUNCTION_VERSION }, 200, corsHeaders);
+    } catch { /* fall through to drain */ }
+  }
+
   try {
+
     const result = await runOnce();
     return json(result, 200, corsHeaders);
   } catch (e) {
