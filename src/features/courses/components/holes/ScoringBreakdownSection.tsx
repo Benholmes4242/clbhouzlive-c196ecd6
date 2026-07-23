@@ -141,15 +141,17 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEven');
   } else {
     const bestLabel = thirdLabels[bestIdx].toLowerCase();
+    const worstLabel = thirdLabels[worstIdx].toLowerCase();
     if (worstIdx === 2) {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceLate', {
-        worst: thirdLabels[worstIdx].toLowerCase(),
+        worst: worstLabel,
         best: bestLabel,
         spread,
       });
     } else if (worstIdx === 0) {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEarly', {
         best: bestLabel,
+        worst: worstLabel,
         spread,
       });
     } else {
@@ -159,6 +161,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       });
     }
   }
+
+  // Projection card values
+  const avgGross = data?.avg_gross != null ? Number(data.avg_gross) : null;
+  const doublesPR1 = +doublesPerRound.toFixed(1);
+  const convertible = +(doublesPerRound / 2).toFixed(1);
+  const projected = avgGross != null ? +(avgGross - convertible).toFixed(1) : null;
+  const showProjection = avgGross != null && doublesPR1 >= 1 && projected != null;
+
 
   // Renderers
   const Sentence: React.FC<{ children: React.ReactNode }> = ({ children }) => (
