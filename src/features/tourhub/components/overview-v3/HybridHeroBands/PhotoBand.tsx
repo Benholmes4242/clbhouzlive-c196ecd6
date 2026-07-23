@@ -16,9 +16,10 @@
  * The dots row (rendered by OverviewHero) sits above the wire ticker below.
  */
 
-import React from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
+import { InsightSheet } from './InsightSheet';
 
 import {
   PHOTO_BAND_HEIGHT,
