@@ -23,8 +23,18 @@ import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
 // =============================================
+// LOGIC VERSION
+// =============================================
+// Bump this whenever prediction logic, prompt schema, or scoring maths change.
+// The client compares ai_predictions.logic_version against its own copy of this
+// number and forces a regeneration when the stored row is older. Keep the client
+// constant in src/features/tourhub/lib/predictionLogicVersion.ts IN SYNC.
+export const PREDICTION_LOGIC_VERSION = 1;
+
+// =============================================
 // TYPES
 // =============================================
+
 
 interface Tournament {
   id: string;
