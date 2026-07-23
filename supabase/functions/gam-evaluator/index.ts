@@ -1570,7 +1570,10 @@ const URGENCY: Record<string, string> = {
   status_reclaimed: "medium",
   level_up: "medium",
   level_near: "low",
+  crown_taken: "medium",   // gainer side — welcome, not urgent
+  crown_lost: "high",      // loss event, same tier as legend_lost
 };
+
 
 function dedupKey(type: string, userId: string, payload: any): string {
   switch (type) {
@@ -1585,6 +1588,9 @@ function dedupKey(type: string, userId: string, payload: any): string {
     case "status_reclaimed": return `status_reclaimed:${userId}:${payload.badge_id}:${new Date().toISOString().slice(0, 10)}`;
     case "level_up": return `level_up:${userId}:${payload.level}`;
     case "level_near": return `level_near:${userId}:${payload.level}`;
+    case "crown_taken": return `crown_taken:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+    case "crown_lost": return `crown_lost:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+
     default: return `${type}:${userId}`;
   }
 }
