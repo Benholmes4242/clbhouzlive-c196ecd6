@@ -15,8 +15,10 @@ export interface ScoringBreakdownHole {
 export interface ScoringBreakdown {
   rounds: number;
   total_over_par: number;
+  avg_gross: number | null;
   holes: ScoringBreakdownHole[];
 }
+
 
 export function useCourseScoringBreakdown(golfCourseId: string | undefined) {
   return useQuery<ScoringBreakdown | null>({
