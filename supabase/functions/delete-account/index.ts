@@ -17,7 +17,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
 
-export const FUNCTION_VERSION = '2026-07-21T14:00:00Z-v3';
+export const FUNCTION_VERSION = '2026-07-23T04:45:00Z-v4-admin-consolidated';
+
 
 // -------- URL parsing helpers (public storage URL convention). ----------
 // Public URL: {SUPABASE_URL}/storage/v1/object/public/{bucket}/{key...}
@@ -77,29 +78,59 @@ Deno.serve(async (req) => {
   } catch (_) { /* fall through */ }
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const admin = createClient(supabaseUrl, serviceKey);
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !user) {
-      return new Response(JSON.stringify({ error: 'Authentication failed' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    // -------- Resolve target: self-serve (JWT) OR admin-mode (internal secret) ----
+    // Admin mode: secure-admin-operations delegates the full erasure to us so
+    // there is exactly ONE code path that sweeps a user. Guarded by
+    // INTERNAL_FN_SECRET header (fail-closed).
+    let targetId: string;
+    let targetEmail: string | undefined;
+    let mode: 'self' | 'admin' = 'self';
+
+    const rawBody = await req.clone().json().catch(() => null) as any;
+    if (rawBody?.action === 'admin_delete') {
+      const expected = Deno.env.get('INTERNAL_FN_SECRET');
+      const provided = req.headers.get('x-internal-secret');
+      if (!expected || provided !== expected) {
+        return new Response(JSON.stringify({ error: 'Unauthorized (admin_delete)' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      if (!rawBody.targetUserId) {
+        return new Response(JSON.stringify({ error: 'Missing targetUserId' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      mode = 'admin';
+      targetId = rawBody.targetUserId as string;
+      try {
+        const { data: lookup } = await admin.auth.admin.getUserById(targetId);
+        targetEmail = lookup?.user?.email ?? undefined;
+      } catch (_) { /* proceed without email */ }
+    } else {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: 'Missing authorization header' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: userErr } = await userClient.auth.getUser();
+      if (userErr || !user) {
+        return new Response(JSON.stringify({ error: 'Authentication failed' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      targetId = user.id;
+      targetEmail = user.email ?? undefined;
     }
 
-    console.log(`[delete-account v3] user=${user.id}`);
-    const admin = createClient(supabaseUrl, serviceKey);
-    const targetId = user.id;
-    const deletedAt = new Date().toISOString();
+    // Shim so downstream code that referenced `user.id` / `user.email` keeps working.
+    const user = { id: targetId, email: targetEmail } as { id: string; email?: string };
+    console.log(`[delete-account v4] mode=${mode} user=${targetId}`);
+
 
     // ---------- Double-submit guard ----------
     try {
