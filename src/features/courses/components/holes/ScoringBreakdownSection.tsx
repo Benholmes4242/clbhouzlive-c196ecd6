@@ -366,67 +366,100 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             t('courses:holes.scoringBreakdown.s2Sub'),
           )}
           {(() => {
-            const played = Math.max(1, stratum2Total);
             const cols = [
-              { key: 'par', v: sumPar, pct: pctPar, label: t('courses:holes.scoringBreakdown.parOrBetter'), color: GREEN, bg: 'rgba(18,161,80,0.10)', fill: 'rgba(18,161,80,0.22)' },
-              { key: 'bog', v: sumBog, pct: pctBog, label: t('courses:holes.scoringBreakdown.bogey'), color: WARN, bg: 'rgba(232,137,12,0.12)', fill: 'rgba(232,137,12,0.26)' },
-              { key: 'dbl', v: sumDbl, pct: pctDbl, label: t('courses:holes.scoringBreakdown.doubleOrWorse'), color: RED, bg: 'rgba(229,72,77,0.10)', fill: 'rgba(229,72,77,0.24)' },
+              { key: 'par', v: sumPar, pct: pctPar, label: t('courses:holes.scoringBreakdown.parOrBetter'), color: GREEN },
+              { key: 'bog', v: sumBog, pct: pctBog, label: t('courses:holes.scoringBreakdown.bogey'), color: WARN },
+              { key: 'dbl', v: sumDbl, pct: pctDbl, label: t('courses:holes.scoringBreakdown.doubleOrWorse'), color: RED },
             ];
+            const SIZE = 96;
+            const STROKE = 9;
+            const R = (SIZE - STROKE) / 2;
+            const C = 2 * Math.PI * R;
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                {cols.map((c) => (
-                  <div key={c.key}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {cols.map((c) => {
+                  const dash = (c.pct / 100) * C;
+                  const trackColor = c.color + '21'; // ~0.13 alpha
+                  return (
                     <div
+                      key={c.key}
                       style={{
-                        height: 72,
-                        background: c.bg,
-                        borderRadius: 12,
-                        position: 'relative',
-                        overflow: 'hidden',
+                        flex: 1,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
                       }}
                     >
+                      <div style={{ position: 'relative', width: SIZE, height: SIZE }}>
+                        <svg
+                          width={SIZE}
+                          height={SIZE}
+                          style={{ transform: 'rotate(-90deg)' }}
+                        >
+                          <circle
+                            cx={SIZE / 2}
+                            cy={SIZE / 2}
+                            r={R}
+                            fill="none"
+                            stroke={trackColor}
+                            strokeWidth={STROKE}
+                          />
+                          <circle
+                            cx={SIZE / 2}
+                            cy={SIZE / 2}
+                            r={R}
+                            fill="none"
+                            stroke={c.color}
+                            strokeWidth={STROKE}
+                            strokeLinecap="round"
+                            strokeDasharray={`${dash} ${C - dash}`}
+                          />
+                        </svg>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          <span style={{ fontSize: 21, fontWeight: 800, color: INK, letterSpacing: '-0.5px', ...NUM }}>
+                            {c.pct}
+                          </span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: INK_45 }}>%</span>
+                        </div>
+                      </div>
                       <div
                         style={{
-                          position: 'absolute',
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          height: `${c.pct}%`,
-                          background: c.fill,
-                        }}
-                      />
-                      <span
-                        style={{
-                          position: 'relative',
-                          fontSize: 20,
+                          fontSize: 9.5,
                           fontWeight: 800,
+                          letterSpacing: '0.5px',
+                          color: INK_45,
+                          textAlign: 'center',
+                          marginTop: 8,
+                          whiteSpace: 'pre-line',
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        {c.label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
                           color: c.color,
-                          letterSpacing: '-0.5px',
+                          textAlign: 'center',
+                          marginTop: 4,
                           ...NUM,
                         }}
                       >
-                        {c.pct}%
-                      </span>
+                        {t('courses:holes.scoringBreakdown.nHoles', { count: c.v })}
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 800,
-                        letterSpacing: '0.5px',
-                        color: INK_45,
-                        textAlign: 'center',
-                        marginTop: 7,
-                        whiteSpace: 'pre-line',
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {c.label}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
           })()}
