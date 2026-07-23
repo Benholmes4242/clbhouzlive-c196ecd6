@@ -1,10 +1,10 @@
-// MediaStageV2 - full-bleed dark canvas for the active media item.
-// Empty state: "ghost collage" - three dashed drifting frames + amber add CTA.
+// MediaStageV2 - full-bleed canvas for the active media item.
+// Empty state: "The Clubhouse Wall" (see PostEmptyStage).
 
-import { Plus, Play } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
+import PostEmptyStage from './PostEmptyStage';
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
   original: null,
