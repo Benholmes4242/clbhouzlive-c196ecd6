@@ -164,12 +164,15 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     }
   }
 
-  // Projection card values
+  // Projection card values — anchored on complete_rounds (rounds with all 18 holes)
+  const completeRounds = data?.complete_rounds ?? 0;
   const avgGross = data?.avg_gross != null ? Number(data.avg_gross) : null;
-  const doublesPR1 = +doublesPerRound.toFixed(1);
-  const convertible = +(doublesPerRound / 2).toFixed(1);
+  const doublesPerCompleteRound = completeRounds > 0 ? sumDbl / completeRounds : 0;
+  const doublesPR1 = +doublesPerCompleteRound.toFixed(1);
+  const convertible = +(doublesPerCompleteRound / 2).toFixed(1);
   const projected = avgGross != null ? +(avgGross - convertible).toFixed(1) : null;
-  const showProjection = avgGross != null && doublesPR1 >= 1 && projected != null;
+  const showProjection =
+    avgGross != null && completeRounds >= 5 && doublesPR1 >= 1 && projected != null;
 
 
   // Renderers
