@@ -157,7 +157,13 @@ serve(async (req) => {
           }
         }
 
-        if (paired.length < 20) continue;
+        if (paired.length < 20) {
+          console.warn(
+            `[CourseDNA] Skipping "${venue}": insufficient stat-to-position pairs (${paired.length} < 20). No row written.`,
+          );
+          results.push({ venue, skipped: true, reason: 'insufficient_pairs', pairs: paired.length });
+          continue;
+        }
 
         // Calculate correlations for each stat
         const statKeys = [
@@ -173,10 +179,16 @@ serve(async (req) => {
         ];
 
         const correlations: StatCorrelation[] = [];
+        const perStatCounts: Record<string, number> = {};
+        const failedStats: string[] = [];
 
         for (const { key, name } of statKeys) {
           const validPairs = paired.filter((p) => p.stats[key] !== null);
-          if (validPairs.length < 15) continue;
+          perStatCounts[name] = validPairs.length;
+          if (validPairs.length < 15) {
+            failedStats.push(`${name}=${validPairs.length}`);
+            continue;
+          }
 
           const statValues = validPairs.map((p) => p.stats[key]);
           const positions = validPairs.map((p) => p.position);
@@ -189,6 +201,25 @@ serve(async (req) => {
             correlation: adjustedCorr,
             importance: Math.round(Math.max(0, Math.min(100, adjustedCorr * 100))),
           });
+        }
+
+        // Require ALL 9 stats to meet the per-stat threshold.
+        // A partial profile (with unknown stats defaulting to any value) would be
+        // indistinguishable from a placeholder in downstream course-fit maths.
+        if (correlations.length < statKeys.length) {
+          console.warn(
+            `[CourseDNA] Skipping "${venue}": insufficient per-stat coverage. ` +
+            `paired=${paired.length}, stats with <15 valid pairs: [${failedStats.join(', ')}]. ` +
+            `No row written; venue remains eligible for a future rebuild.`,
+          );
+          results.push({
+            venue,
+            skipped: true,
+            reason: 'insufficient_per_stat_coverage',
+            pairs: paired.length,
+            failedStats,
+          });
+          continue;
         }
 
         // Historical winners
