@@ -60,6 +60,7 @@ export type UserFilterStatus =
   | 'dormant_14d'
   | 'eg_issues'
   | 'suspended'
+  | 'verified'
   | 'admin';
 
 
