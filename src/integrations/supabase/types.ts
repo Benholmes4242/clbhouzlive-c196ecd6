@@ -473,6 +473,7 @@ export type Database = {
           expires_at: string | null
           generated_at: string | null
           id: string
+          logic_version: number
           model_version: string
           predictions: Json
           prompt_version: string | null
@@ -487,6 +488,7 @@ export type Database = {
           expires_at?: string | null
           generated_at?: string | null
           id?: string
+          logic_version?: number
           model_version: string
           predictions: Json
           prompt_version?: string | null
@@ -501,6 +503,7 @@ export type Database = {
           expires_at?: string | null
           generated_at?: string | null
           id?: string
+          logic_version?: number
           model_version?: string
           predictions?: Json
           prompt_version?: string | null
