@@ -1229,7 +1229,75 @@ async function applyCourseLegends(stats: any) {
     return;
   }
   for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
+  // G2 — crown_taken / crown_lost. Bounded, silent-fail; contract owned by
+  // Ben's SQL that populates `discover_rail_cache.course_regular:{course_id}`.
+  await maybeEmitCrownDelta(stats.course_id).catch((e) => {
+    console.warn('[gam-evaluator] maybeEmitCrownDelta failed', (e as Error).message);
+  });
 }
+
+/**
+ * Reads `discover_rail_cache.course_regular:{courseId}` and, if the payload
+ * exposes both a current `user_id` and a `previous_user_id` that differ,
+ * emits `crown_taken` to the new holder and `crown_lost` to the previous
+ * one. Payload contract per BRIEF_G2_CLIENT_AND_EDGE:
+ *   { user_id, display_name, username, rounds_90d, held_since,
+ *     previous_user_id? }
+ * If the row is missing / has no previous_user_id / user_id equals
+ * previous_user_id, this is a no-op. Course name is looked up from
+ * `golf_courses` (never from PII sources). User-facing copy is composed by
+ * the dispatcher — this function only routes identifiers.
+ */
+async function maybeEmitCrownDelta(courseId: string): Promise<void> {
+  const railKey = `course_regular:${courseId}`;
+  const { data: cacheRow } = await supabase
+    .from('discover_rail_cache')
+    .select('payload')
+    .eq('rail_key', railKey)
+    .maybeSingle();
+  const p: any = cacheRow?.payload ?? null;
+  if (!p) return;
+  const current: string | null = p.user_id ?? null;
+  const previous: string | null = p.previous_user_id ?? null;
+  if (!current || !previous || current === previous) return;
+
+  // Course name lookup — degrades gracefully to null so the dispatcher can
+  // fall back to generic copy. Never read whs_friends (PII).
+  let courseName: string | null = null;
+  try {
+    const { data: course } = await supabase
+      .from('golf_courses')
+      .select('name')
+      .eq('id', courseId)
+      .maybeSingle();
+    courseName = course?.name?.trim() || null;
+  } catch { /* non-fatal */ }
+
+  // New holder profile (display name for the "took your crown" copy on the
+  // loser's push). Same PII rules as legend_lost.
+  let newHolderName: string | null = null;
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('display_name, username')
+      .eq('id', current)
+      .maybeSingle();
+    newHolderName = (profile?.display_name?.trim() || profile?.username?.trim() || null);
+  } catch { /* non-fatal */ }
+
+  await enqueueNotification(current, 'crown_taken', {
+    course_id: courseId,
+    course_name: courseName,
+    previous_user_id: previous,
+  });
+  await enqueueNotification(previous, 'crown_lost', {
+    course_id: courseId,
+    course_name: courseName,
+    new_holder_id: current,
+    new_holder_name: newHolderName,
+  });
+}
+
 
 async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   // Current top 10
