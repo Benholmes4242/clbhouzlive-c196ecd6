@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
 import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
-import { ConnectHandicapTile } from '../../overview/sections/ConnectHandicapTile';
+import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { LazySection } from '../overview-v3/LazySection';
 
 import { TISlot } from '../overview-v3/TISlot';
