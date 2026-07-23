@@ -28,22 +28,22 @@ export const SyncingScreen: React.FC = () => {
   }, [reduced]);
 
   const percent = PERCENTS[activeStep];
-  const r = 50;
+  const r = 66;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - percent / 100);
 
   return (
     <div
       className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '20px 0 8px', justifyContent: 'space-between' }}
+      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
     >
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 24, alignItems: 'center' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 28, alignItems: 'center' }}>
         {/* Status headline */}
         <div style={{ textAlign: 'center', width: '100%' }}>
           <div
             key={activeStep}
             style={{
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: 900,
               letterSpacing: '-0.03em',
               color: INK,
@@ -53,26 +53,26 @@ export const SyncingScreen: React.FC = () => {
             {STEPS[activeStep]}
             <span style={{ color: GREEN }}>{'\u2026'}</span>
           </div>
-          <div style={{ fontSize: 13, color: FAINT, marginTop: 6 }}>
+          <div style={{ fontSize: 14, color: FAINT, marginTop: 6 }}>
             The ball's rolling. A few seconds.
           </div>
         </div>
 
         {/* Progress ring */}
-        <div style={{ position: 'relative', width: 120, height: 120 }}>
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r={r} fill="rgba(5,150,105,0.07)" />
+        <div style={{ position: 'relative', width: 168, height: 168 }}>
+          <svg width="168" height="168" viewBox="0 0 168 168">
+            <circle cx="84" cy="84" r={r} fill="rgba(5,150,105,0.07)" />
             <circle
-              cx="60"
-              cy="60"
+              cx="84"
+              cy="84"
               r={r}
               fill="none"
               stroke={GREEN}
-              strokeWidth="4"
+              strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={c}
               strokeDashoffset={offset}
-              transform="rotate(-90 60 60)"
+              transform="rotate(-90 84 84)"
               style={{ transition: reduced ? 'none' : 'stroke-dashoffset 900ms cubic-bezier(.22,1,.36,1)' }}
             />
           </svg>
@@ -83,7 +83,7 @@ export const SyncingScreen: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 22,
+              fontSize: 30,
               fontWeight: 900,
               color: INK,
               fontVariantNumeric: 'tabular-nums',
@@ -105,17 +105,17 @@ export const SyncingScreen: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '10px 12px',
+                  padding: '14px 16px',
                   background: isActive ? '#fff' : 'transparent',
                   border: isActive ? `1px solid ${HAIR}` : '1px solid transparent',
-                  borderRadius: 13,
+                  borderRadius: 14,
                   transition: 'all 350ms ease',
                 }}
               >
                 <div
                   style={{
-                    width: 24,
-                    height: 24,
+                    width: 28,
+                    height: 28,
                     borderRadius: '50%',
                     flexShrink: 0,
                     display: 'flex',
@@ -135,8 +135,8 @@ export const SyncingScreen: React.FC = () => {
                   {isActive && (
                     <div
                       style={{
-                        width: 8,
-                        height: 8,
+                        width: 9,
+                        height: 9,
                         borderRadius: '50%',
                         background: GREEN,
                         animation: reduced ? 'none' : 'wcDotPulse 1.4s ease-in-out infinite',
@@ -146,7 +146,7 @@ export const SyncingScreen: React.FC = () => {
                 </div>
                 <div
                   style={{
-                    fontSize: 14.5,
+                    fontSize: 16,
                     fontWeight: isActive ? 800 : 600,
                     color: isActive ? INK : isDone ? INK : FAINT,
                     transition: 'color 350ms ease',
@@ -160,7 +160,7 @@ export const SyncingScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* No CTA on sync — hold */}
+      {/* No CTA on sync */}
       <div />
     </div>
   );
