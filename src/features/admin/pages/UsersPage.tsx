@@ -501,6 +501,15 @@ function Member360Sheet({
               <>
                 <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
                 <DrawerBtn icon={<AtSign size={14} />} onClick={() => setRenameOpen(true)}>Change username</DrawerBtn>
+                {detail.is_verified ? (
+                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => setConfirm('unverify')}>
+                    Remove verification
+                  </DrawerBtn>
+                ) : (
+                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => setConfirm('verify')}>
+                    Verify golfer
+                  </DrawerBtn>
+                )}
                 <DrawerBtn
                   icon={<Ban size={14} />}
                   tone={detail.is_suspended ? undefined : 'warn'}
