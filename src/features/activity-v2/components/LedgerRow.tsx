@@ -6,7 +6,7 @@
 
 import React, { useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -199,6 +199,7 @@ const ResolvePill: React.FC = () => (
 
 export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const spec = resolveKind(row);
   const isUnread = !row.is_read;
   const body = row.message ?? row.title ?? '';
@@ -224,7 +225,13 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     if (heldRef.current) return;
     if (isUnread) onMarkRead(row.notif_id);
     const url = getActivityLink(row);
-    if (url) navigate(url);
+    if (!url) return;
+    const opensReviewWizard = url.startsWith('/rate-course-v2/') || /^\/courses\/[^/]+\/rate\/?$/.test(url.split('?')[0]);
+    if (opensReviewWizard) {
+      navigate(url, { state: { backgroundLocation: location } });
+      return;
+    }
+    navigate(url);
   };
 
   // ------- Left visual -------
