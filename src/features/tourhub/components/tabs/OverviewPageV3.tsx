@@ -102,7 +102,7 @@ export function OverviewPageV3() {
               <CollegeFranchise />
             </LazySection>
             <LazySection minHeight={90}>
-              <ConnectHandicapTile />
+              <ConnectHandicapCue variant="tour-venue" courseName="" />
             </LazySection>
           </div>
         </div>
