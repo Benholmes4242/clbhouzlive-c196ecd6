@@ -249,7 +249,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       data-category-section
       style={{
         background: banded ? bandBg : 'transparent',
-        borderTop: defending ? `2px solid ${GOLD}` : `0.5px solid ${hairline}`,
+        borderTop: suppressTopBorder
+          ? 'none'
+          : defending
+            ? `2px solid ${GOLD}`
+            : `0.5px solid ${hairline}`,
         padding: '12px 16px',
       }}
 
