@@ -262,6 +262,20 @@ async function processSingle(whsScoreId: string) {
     await applyCourseLegends(stats);
   }
 
+  // Rate-a-course prompt — self-contained, guarded, non-fatal.
+  // Fires only when a real playable gross exists (mirrors the
+  // notify_friend_content_recompute stub-row guard) and when the round is
+  // mapped to a named clbhouz course. See maybeEmitRateCoursePrompt for the
+  // full four-guard sequence and daylight-hour gate.
+  const grossForPrompt = scoreRow.adjusted_gross ?? scoreRow.actual_gross ?? null;
+  if (grossForPrompt != null && clbhouzCourseId && clbhouzCourseName) {
+    try {
+      await maybeEmitRateCoursePrompt(userId, clbhouzCourseId, clbhouzCourseName);
+    } catch (e) {
+      console.warn("[rate_course_prompt]", (e as Error).message);
+    }
+
+
   // Mark whs_scores evaluated
   await supabase
     .from("whs_scores")
@@ -1304,6 +1318,114 @@ async function maybeEmitCrownDelta(courseId: string): Promise<void> {
     new_holder_name: newHolderName,
   });
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rate-a-course prompt
+//
+// One-shot nudge that asks a player to rate a course after a WHS round lands
+// for a course they've never rated. Emits a `notifications` row (the existing
+// auto_queue_push_notification trigger fans it to push), and relies on two
+// partial unique indexes for correctness:
+//   idx_notifications_rate_course_prompt_unique — one prompt per (user,course) EVER
+//   idx_notifications_rate_course_prompt_recent — cheap 7-day cap lookup
+//
+// Copy is score-agnostic (no performance reference), per the standing rule
+// for analytics-derived notifications.
+// ─────────────────────────────────────────────────────────────────────────────
+function isDaylightHour(now: Date, tz: string): boolean {
+  // Emit only when it's 08:00–20:59 local. The notifications INSERT trigger
+  // pushes immediately, so we gate at the writer instead of the dispatcher
+  // (which doesn't touch the notifications table).
+  try {
+    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: tz });
+    const h = parseInt(fmt.format(now), 10);
+    return h >= 8 && h < 21;
+  } catch {
+    const h = now.getUTCHours();
+    return h >= 8 && h < 21;
+  }
+}
+
+async function maybeEmitRateCoursePrompt(
+  userId: string,
+  courseId: string,
+  courseName: string,
+): Promise<void> {
+  // Guard 1 — Not already rated. Mirrors get_played_unrated_courses's is_mock=false
+  // filter so this push agrees with the on-screen nudges (RateNudge et al.).
+  const { data: existingRating } = await supabase
+    .from("course_ratings")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("course_id", courseId)
+    .eq("is_mock", false)
+    .limit(1)
+    .maybeSingle();
+  if (existingRating) return;
+
+  // Guard 2 — Mappable + named. Enforced by the caller (clbhouzCourseId +
+  // clbhouzCourseName must both be non-null), but re-assert defensively.
+  const trimmedName = (courseName ?? "").trim();
+  if (!courseId || !trimmedName) return;
+
+  // Guard 4 — Weekly cap. Any rate_course_prompt in the last 7 days blocks this
+  // one. Stops a golf-trip week producing five prompts in three days. Guard 3
+  // (per-course, ever) is enforced by the unique partial index at insert time.
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
+  const { data: recent } = await supabase
+    .from("notifications")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("type", "rate_course_prompt")
+    .gte("created_at", sevenDaysAgo)
+    .limit(1)
+    .maybeSingle();
+  if (recent) return;
+
+  // Daylight gate — the notifications INSERT trigger pushes immediately, so
+  // if it's currently outside the user's local 08:00–20:59 window we skip and
+  // rely on the next round (or next evaluator pass) to re-check. Ledger dedup
+  // is preserved via the unique index if we later succeed.
+  let tz = "Europe/London";
+  try {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("preferred_timezone")
+      .eq("id", userId)
+      .maybeSingle();
+    tz = (profile as any)?.preferred_timezone ?? "Europe/London";
+  } catch { /* non-fatal */ }
+  if (!isDaylightHour(new Date(), tz)) return;
+
+  const route = `/rate-course-v2/${courseId}`;
+  const { error } = await supabase.from("notifications").insert({
+    user_id: userId,
+    type: "rate_course_prompt",
+    recipient_actor_type: "personal",
+    recipient_actor_id: userId,
+    actor_id: null,
+    entity_type: "course",
+    entity_id: courseId,
+    title: `How was ${trimmedName}?`,
+    message: "Rate your round and help other members.",
+    data: {
+      course_id: courseId,
+      course_name: trimmedName,
+      link: route,
+      route,
+    },
+  });
+  // Unique-index conflicts (23505) mean the per-course guard already fired —
+  // silently succeed. Everything else is warned but non-fatal so the round
+  // continues processing.
+  if (error && (error as any).code !== "23505") {
+    console.warn("[rate_course_prompt insert]", error.message);
+  }
+}
+
+
+
 
 
 async function recomputeLegend(courseId: string, cfg: LegendCfg) {

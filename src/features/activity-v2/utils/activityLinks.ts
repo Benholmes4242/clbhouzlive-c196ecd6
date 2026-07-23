@@ -201,6 +201,15 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (type === 'message') return '/messages';
   if (type === 'handicap_authority_live') return '/handicap';
 
+  // --- rate-a-course prompt ------------------------------------------
+  // System-authored nudge; entity_id is the course_id. Deep-link matches
+  // the push payload's route so in-app tap and push tap behave identically.
+  if (type === 'rate_course_prompt') {
+    const cid = (data.course_id as string | undefined) ?? entity_id;
+    if (cid) return `/rate-course-v2/${cid}`;
+  }
+
+
   // --- unknown ---------------------------------------------------------
   return actor_user_id ? `/profile/${actor_user_id}` : '/';
 }

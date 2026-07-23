@@ -263,6 +263,18 @@ export function resolveKind(row: {
       isSystem: true,
     };
   }
+  if (t === 'rate_course_prompt') {
+    // System-authored, no actor avatar — render the star tile that mirrors
+    // in-app "rate this course" nudges so tap target and iconography agree.
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Star, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      isSystem: true,
+      bold: 'course_name',
+    };
+  }
+
 
   // Unknown: safe fallback ----------------------------------------
   return { left: 'actor', right: 'none' };
