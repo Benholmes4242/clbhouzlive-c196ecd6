@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from './aiPredictionTypes';
+import { PREDICTION_LOGIC_VERSION } from '../lib/predictionLogicVersion';
 
 // =============================================
 // TYPES
@@ -465,11 +466,28 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     .eq('tournament_id', tournament.id)
     .maybeSingle();
 
-  if (!aiPredictions) {
+  // Treat a row whose logic_version is below the current expected version
+  // as a cache miss and regenerate — same handling as if no row existed.
+  // The shared constant lives in src/features/tourhub/lib/predictionLogicVersion.ts
+  // and MUST match PREDICTION_LOGIC_VERSION in generate-predictions/index.ts.
+  const storedLogicVersion =
+    typeof (aiPredictions as any)?.logic_version === 'number'
+      ? (aiPredictions as any).logic_version
+      : 0;
+  const isStaleLogic =
+    !!aiPredictions && storedLogicVersion < PREDICTION_LOGIC_VERSION;
+
+  if (!aiPredictions || isStaleLogic) {
+    if (isStaleLogic) {
+      console.log(
+        `[useAIPredictions] Cached row for tournament ${tournament.id} is stale ` +
+          `(logic_version ${storedLogicVersion} < ${PREDICTION_LOGIC_VERSION}) — regenerating.`,
+      );
+    }
     // Try to generate predictions
     try {
       const { data, error } = await supabase.functions.invoke('generate-predictions', {
-        body: { tournamentId: tournament.id },
+        body: { tournamentId: tournament.id, forceRegenerate: isStaleLogic },
       });
       if (!error && data?.predictions) {
         return formatPredictions(tournament, data.predictions, true);

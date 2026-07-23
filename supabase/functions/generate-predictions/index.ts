@@ -23,8 +23,18 @@ import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
 // =============================================
+// LOGIC VERSION
+// =============================================
+// Bump this whenever prediction logic, prompt schema, or scoring maths change.
+// The client compares ai_predictions.logic_version against its own copy of this
+// number and forces a regeneration when the stored row is older. Keep the client
+// constant in src/features/tourhub/lib/predictionLogicVersion.ts IN SYNC.
+export const PREDICTION_LOGIC_VERSION = 1;
+
+// =============================================
 // TYPES
 // =============================================
+
 
 interface Tournament {
   id: string;
@@ -637,7 +647,33 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
     }
 
-    // --- 4B: Extract detailed stats + derive SG proxies ---
+    // Defence in depth: a profile whose 9 importance fields are all identical
+    // (e.g. legacy placeholder rows written as flat 50s) is NOT usable for
+    // course fit — the weighted average degenerates into a plain average of
+    // player percentiles. Treat such a row as ABSENT so no course-fit score
+    // is derived from it. See BRIEF — three TI data-integrity fixes, FAULT 1.
+    if (courseDNA) {
+      const importances = [
+        courseDNA.driving_distance_importance,
+        courseDNA.driving_accuracy_importance,
+        courseDNA.gir_importance,
+        courseDNA.scrambling_importance,
+        courseDNA.putting_importance,
+        courseDNA.sg_off_tee_importance,
+        courseDNA.sg_approach_importance,
+        courseDNA.sg_around_green_importance,
+        courseDNA.sg_putting_importance,
+      ];
+      const allEqual = importances.every((v) => v === importances[0]);
+      if (allEqual) {
+        console.error(
+          `[generate-predictions] Course DNA for "${courseDNA.venue_name}" has all-identical importances (${importances[0]}) — treating as ABSENT. Course Fit will be omitted.`,
+        );
+        courseDNA = null;
+      }
+    }
+
+
     const recentFormMap = new Map(recentFormData.map(r => [r.playerId, r.results.map(res => ({
       tournament: res.tournament,
       position: res.position || 999,
@@ -923,6 +959,7 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         confidence: consensus.consensusConfidence,
         model_version: 'consensus_v1',
         prompt_version: 'v4',
+        logic_version: PREDICTION_LOGIC_VERSION,
         consensus_data: {
          pipeline: 'ti-9',
           method: consensus.consensusMethod,
@@ -1008,7 +1045,10 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
-  return false;
+  // A stored row is stale when its logic_version predates the current one.
+  // See PREDICTION_LOGIC_VERSION at the top of this file.
+  const stored = typeof prediction?.logic_version === 'number' ? prediction.logic_version : 0;
+  return stored < PREDICTION_LOGIC_VERSION;
 }
 
 function formatStoredPredictions(stored: any) {
@@ -1210,7 +1250,8 @@ Return a JSON object with this exact structure:
       "photoUrl": null,
       "pgaTourId": null,
       "country": "USA",
-      "worldRanking": 1,
+      // NOTE: Do NOT output worldRanking — the server attaches it from
+      // sr_world_rankings. Any value emitted here is ignored.
       "winProbability": 15.5,
       "reasons": [
         "MAX 50 CHARS. Recent form insight",
@@ -1239,8 +1280,9 @@ Return a JSON object with this exact structure:
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
 6. **Do NOT output a `courseFitScore` field** — the server attaches it
-7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
-8. **No gambling language**
+7. **Do NOT output a `worldRanking` field** — the server attaches it from official rankings
+8. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
+9. **No gambling language**
 
 Provide your analysis now:`;
 }
