@@ -438,9 +438,13 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                           letterSpacing: '0.5px',
                           color: INK_45,
                           textAlign: 'center',
-                          marginTop: 8,
+                          marginTop: 10,
                           whiteSpace: 'pre-line',
                           lineHeight: 1.35,
+                          minHeight: 26,
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'center',
                         }}
                       >
                         {c.label}
