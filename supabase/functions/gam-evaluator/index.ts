@@ -1486,7 +1486,7 @@ const URGENCY: Record<string, string> = {
   badge_earned: "low",
   legend_lost: "high",
   legend_earned: "medium",
-  streak_at_risk: "high",
+  streak_at_risk: "medium",
   streak_broken: "low",
   streak_freeze_applied: "medium",
   rival_played: "medium",
