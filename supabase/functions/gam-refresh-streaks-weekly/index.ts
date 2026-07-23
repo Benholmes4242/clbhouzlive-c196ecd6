@@ -14,6 +14,21 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Two modes on the same handler:
+  //   ?mode=at-risk  — Friday warning pass over the IN-FLIGHT week.
+  //   default        — Sunday end-of-week apply-freeze / break pass.
+  const url = new URL(req.url);
+  const mode = url.searchParams.get('mode');
+  if (mode === 'at-risk') {
+    try {
+      const result = await runAtRiskCheck();
+      return json({ ok: true, ...result }, 200, corsHeaders);
+    } catch (e) {
+      console.error("[refresh-streaks-weekly:at-risk]", e);
+      return json({ error: (e as Error).message }, 500, corsHeaders);
+    }
+  }
   try {
     // Week that just ended: ISO week starting on Monday containing (now - 1 day)
     const yesterday = new Date(Date.now() - 86400_000);
