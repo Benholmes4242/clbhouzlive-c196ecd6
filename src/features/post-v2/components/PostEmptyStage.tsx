@@ -11,7 +11,7 @@ interface Props {
 }
 
 const ROTATE_MS = 2600;
-const FADE_MS = 300;
+const FADE_MS = 150;
 
 interface Frame {
   x: number; y: number; w: number; h: number; r: number; fill: string; play?: boolean;
@@ -50,7 +50,11 @@ export default function PostEmptyStage({ onRequestAdd }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(BASE_W);
   const [phraseIdx, setPhraseIdx] = useState(0);
-  const [phraseVisible, setPhraseVisible] = useState(true);
+  // "out" = fading down to 0, "in" = fading up to 1. We only swap the
+  // string when the opacity transition has fully reached 0 — so the DOM
+  // never contains fragments of two phrases at once.
+  const [fade, setFade] = useState<'in' | 'out'>('in');
+  const pendingSwap = useRef(false);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -67,21 +71,23 @@ export default function PostEmptyStage({ onRequestAdd }: Props) {
 
   useEffect(() => {
     if (reduced) return;
-    let cancelled = false;
     const id = window.setInterval(() => {
-      if (cancelled) return;
-      setPhraseVisible(false);
-      window.setTimeout(() => {
-        if (cancelled) return;
-        setPhraseIdx((i) => (i + 1) % PHRASE_KEYS.length);
-        setPhraseVisible(true);
-      }, FADE_MS);
+      // Kick off the fade-out. The actual string swap + fade-in happens
+      // inside onTransitionEnd once opacity has landed on 0.
+      pendingSwap.current = true;
+      setFade('out');
     }, ROTATE_MS);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
+    return () => window.clearInterval(id);
   }, [reduced]);
+
+  const handleTransitionEnd = () => {
+    if (!pendingSwap.current) return;
+    if (fade === 'out') {
+      pendingSwap.current = false;
+      setPhraseIdx((i) => (i + 1) % PHRASE_KEYS.length);
+      setFade('in');
+    }
+  };
 
   const k = width / BASE_W;
 
@@ -213,13 +219,18 @@ export default function PostEmptyStage({ onRequestAdd }: Props) {
         </div>
         <div
           aria-hidden
+          onTransitionEnd={handleTransitionEnd}
           style={{
             marginTop: 5,
             fontSize: 13.5,
             color: 'rgba(30,58,43,0.62)',
-            height: 19,
-            lineHeight: '19px',
-            opacity: phraseVisible ? 1 : 0,
+            lineHeight: 1.35,
+            minHeight: 19,
+            width: '100%',
+            maxWidth: '100%',
+            whiteSpace: 'normal',
+            overflow: 'visible',
+            opacity: fade === 'in' ? 1 : 0,
             transition: `opacity ${FADE_MS}ms ease`,
           }}
         >
