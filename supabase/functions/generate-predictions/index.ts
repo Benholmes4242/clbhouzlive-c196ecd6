@@ -647,7 +647,33 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
       console.warn('[generate-predictions] Course DNA fetch failed:', err);
     }
 
-    // --- 4B: Extract detailed stats + derive SG proxies ---
+    // Defence in depth: a profile whose 9 importance fields are all identical
+    // (e.g. legacy placeholder rows written as flat 50s) is NOT usable for
+    // course fit — the weighted average degenerates into a plain average of
+    // player percentiles. Treat such a row as ABSENT so no course-fit score
+    // is derived from it. See BRIEF — three TI data-integrity fixes, FAULT 1.
+    if (courseDNA) {
+      const importances = [
+        courseDNA.driving_distance_importance,
+        courseDNA.driving_accuracy_importance,
+        courseDNA.gir_importance,
+        courseDNA.scrambling_importance,
+        courseDNA.putting_importance,
+        courseDNA.sg_off_tee_importance,
+        courseDNA.sg_approach_importance,
+        courseDNA.sg_around_green_importance,
+        courseDNA.sg_putting_importance,
+      ];
+      const allEqual = importances.every((v) => v === importances[0]);
+      if (allEqual) {
+        console.error(
+          `[generate-predictions] Course DNA for "${courseDNA.venue_name}" has all-identical importances (${importances[0]}) — treating as ABSENT. Course Fit will be omitted.`,
+        );
+        courseDNA = null;
+      }
+    }
+
+
     const recentFormMap = new Map(recentFormData.map(r => [r.playerId, r.results.map(res => ({
       tournament: res.tournament,
       position: res.position || 999,
