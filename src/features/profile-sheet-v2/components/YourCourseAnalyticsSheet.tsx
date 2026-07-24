@@ -97,6 +97,8 @@ function Row({
 
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const [q, setQ] = useState('');
+  const { t } = useTranslation('courses');
+
 
   const { data: myCourses = [], isLoading } = useUserAnalyticsCourses({ enabled: open });
   const { data: searchResults = [], isFetching: searching } = useCourseSearch(q);
