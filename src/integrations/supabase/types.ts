@@ -3797,6 +3797,45 @@ export type Database = {
           },
         ]
       }
+      course_tee_sets_history: {
+        Row: {
+          captured_at: string
+          course_rating: number
+          holes: Json
+          id: string
+          par_total: number
+          rounds_sampled: number
+          slope_rating: number
+          tee_label: string
+          total_yards: number | null
+          whs_course_id: string
+        }
+        Insert: {
+          captured_at?: string
+          course_rating: number
+          holes: Json
+          id?: string
+          par_total: number
+          rounds_sampled: number
+          slope_rating: number
+          tee_label: string
+          total_yards?: number | null
+          whs_course_id: string
+        }
+        Update: {
+          captured_at?: string
+          course_rating?: number
+          holes?: Json
+          id?: string
+          par_total?: number
+          rounds_sampled?: number
+          slope_rating?: number
+          tee_label?: string
+          total_yards?: number | null
+          whs_course_id?: string
+        }
+        Relationships: []
+      }
       course_top100_memberships: {
         Row: {
           added_at: string | null
@@ -8810,6 +8849,66 @@ export type Database = {
           },
         ]
       }
+      round_weather: {
+        Row: {
+          fetched_at: string
+          golf_course_id: string | null
+          latitude: number | null
+          longitude: number | null
+          play_date: string
+          precipitation_mm: number | null
+          temp_max_c: number | null
+          temp_min_c: number | null
+          weather_code: number | null
+          whs_score_id: string
+          wind_gusts_max_kmh: number | null
+          wind_speed_max_kmh: number | null
+        }
+        Insert: {
+          fetched_at?: string
+          golf_course_id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          play_date: string
+          precipitation_mm?: number | null
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          weather_code?: number | null
+          whs_score_id: string
+          wind_gusts_max_kmh?: number | null
+          wind_speed_max_kmh?: number | null
+        }
+        Update: {
+          fetched_at?: string
+          golf_course_id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          play_date?: string
+          precipitation_mm?: number | null
+          temp_max_c?: number | null
+          temp_min_c?: number | null
+          weather_code?: number | null
+          whs_score_id?: string
+          wind_gusts_max_kmh?: number | null
+          wind_speed_max_kmh?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_weather_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "round_weather_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_badges: {
         Row: {
           awarded_at: string | null
@@ -10037,6 +10136,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sr_player_statistics_snapshots: {
+        Row: {
+          created_at: string
+          player_id: string | null
+          season_id: string | null
+          snapshot_month: string
+          source_id: string
+          stats: Json
+        }
+        Insert: {
+          created_at?: string
+          player_id?: string | null
+          season_id?: string | null
+          snapshot_month: string
+          source_id: string
+          stats: Json
+        }
+        Update: {
+          created_at?: string
+          player_id?: string | null
+          season_id?: string | null
+          snapshot_month?: string
+          source_id?: string
+          stats?: Json
+        }
+        Relationships: []
       }
       sr_players: {
         Row: {
@@ -11451,6 +11577,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tour_season_rankings_snapshots: {
+        Row: {
+          country: string | null
+          created_at: string
+          player_id: string | null
+          player_name: string
+          points: number | null
+          position: number
+          season_year: number
+          snapshot_date: string
+          tour_code: string
+          tournaments_played: number | null
+          wins: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          player_id?: string | null
+          player_name: string
+          points?: number | null
+          position: number
+          season_year: number
+          snapshot_date: string
+          tour_code: string
+          tournaments_played?: number | null
+          wins?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          player_id?: string | null
+          player_name?: string
+          points?: number | null
+          position?: number
+          season_year?: number
+          snapshot_date?: string
+          tour_code?: string
+          tournaments_played?: number | null
+          wins?: number | null
+        }
+        Relationships: []
       }
       tourhub_event_enrichment: {
         Row: {
@@ -16558,6 +16726,7 @@ export type Database = {
       }
       canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
       capture_all_leaderboard_snapshots: { Args: never; Returns: undefined }
+      capture_course_tee_sets_history: { Args: never; Returns: Json }
       capture_courses_snapshot: { Args: { p_sort: string }; Returns: undefined }
       capture_global_snapshot: {
         Args: { p_metric: string }
@@ -20673,6 +20842,8 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       snapshot_daily_ranks: { Args: never; Returns: undefined }
+      snapshot_sr_player_statistics: { Args: never; Returns: Json }
+      snapshot_tour_season_rankings: { Args: never; Returns: Json }
       soft_delete_business: {
         Args: { _business_id: string }
         Returns: undefined
