@@ -16769,6 +16769,15 @@ export type Database = {
           streaks_deleted: number
         }[]
       }
+      gam_user_courses: {
+        Args: never
+        Returns: {
+          course_id: string
+          course_name: string
+          last_played: string
+          rounds_count: number
+        }[]
+      }
       generate_weekly_pickem: { Args: never; Returns: number }
       generate_whs_invite_code: { Args: never; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }

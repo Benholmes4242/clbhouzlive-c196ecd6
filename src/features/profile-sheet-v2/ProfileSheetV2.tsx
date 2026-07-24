@@ -20,7 +20,10 @@ import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
+import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 interface Profile {
   id: string;
@@ -101,6 +104,23 @@ export default function ProfileSheetV2({
   const handleInviteFriends = () => {
     onClose();
     setTimeout(() => openInviteSheet('profile_sheet'), 250);
+  };
+
+  // Course analytics entry state — only relevant for personal actor.
+  const [analyticsSheetOpen, setAnalyticsSheetOpen] = useState(false);
+  const analyticsUserId = currentActor.type === 'personal' ? currentActor.id : undefined;
+  const { data: whsConn } = useWhsConnection(analyticsUserId);
+  const whsSynced = !!whsConn && !(whsConn as { deleted_at?: string | null }).deleted_at;
+  const { data: userCourses } = useUserAnalyticsCourses({ enabled: open && whsSynced });
+  const analyticsState: 'ready' | 'building' | 'disconnected' = !whsSynced
+    ? 'disconnected'
+    : (userCourses?.length ?? 0) > 0
+      ? 'ready'
+      : 'building';
+  const handleOpenCourseAnalytics = () => setAnalyticsSheetOpen(true);
+  const handleAnalyticsNavigate = (route: string) => {
+    onClose();
+    setTimeout(() => onNavigate(route), 40);
   };
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
@@ -275,12 +295,22 @@ export default function ProfileSheetV2({
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
                 onInviteFriends={handleInviteFriends}
+                onOpenCourseAnalytics={
+                  currentActor.type === 'personal' ? handleOpenCourseAnalytics : undefined
+                }
+                analyticsState={analyticsState}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
           )}
         </motion.div>
       )}
+      <YourCourseAnalyticsSheet
+        open={analyticsSheetOpen}
+        onClose={() => setAnalyticsSheetOpen(false)}
+        onNavigate={handleAnalyticsNavigate}
+        synced={whsSynced}
+      />
     </>
   );
 

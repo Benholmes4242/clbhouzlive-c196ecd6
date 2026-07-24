@@ -19,11 +19,16 @@ const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CHEVRON = '\u203A';
 
+type AnalyticsState = 'ready' | 'building' | 'disconnected';
+
 interface Props {
   currentActor: { id: string; type: 'personal' | 'business' };
   isAdmin: boolean;
   onNavigate: (route: string) => void;
   onInviteFriends?: () => void;
+  /** Course analytics entry — omit to hide the row. */
+  onOpenCourseAnalytics?: () => void;
+  analyticsState?: AnalyticsState;
 }
 
 interface RowProps {
@@ -31,9 +36,11 @@ interface RowProps {
   onClick: () => void;
   trailing?: React.ReactNode;
   isLast?: boolean;
+  subLabel?: string;
+  disabled?: boolean;
 }
 
-function Row({ label, onClick, trailing, isLast }: RowProps) {
+function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps) {
   return (
     <button
       type="button"
@@ -50,15 +57,47 @@ function Row({ label, onClick, trailing, isLast }: RowProps) {
         borderBottom: isLast ? 0 : `0.5px solid ${HAIRLINE}`,
         cursor: 'pointer',
         transition: 'transform 120ms ease',
+        opacity: disabled ? 0.55 : 1,
+        textAlign: 'left',
       }}
     >
-      <span style={{ fontWeight: 600, fontSize: 13.5, color: INK }}>{label}</span>
+      <div style={{ minWidth: 0, flex: 1, paddingRight: 12 }}>
+        <div style={{ fontWeight: 600, fontSize: 13.5, color: INK }}>{label}</div>
+        {subLabel && (
+          <div style={{ fontWeight: 500, fontSize: 11.5, color: MUTED, marginTop: 2 }}>
+            {subLabel}
+          </div>
+        )}
+      </div>
       {trailing ?? <span style={{ color: MUTED, fontSize: 16 }}>{CHEVRON}</span>}
     </button>
   );
 }
 
-export default function SheetNavGroup({ currentActor, isAdmin, onNavigate, onInviteFriends }: Props) {
+export default function SheetNavGroup({
+  currentActor,
+  isAdmin,
+  onNavigate,
+  onInviteFriends,
+  onOpenCourseAnalytics,
+  analyticsState = 'disconnected',
+}: Props) {
+  const showAnalytics = currentActor.type === 'personal' && !!onOpenCourseAnalytics;
+  const analyticsSubLabel =
+    analyticsState === 'ready'
+      ? 'Your game, course by course'
+      : analyticsState === 'building'
+        ? 'Your analytics build as your rounds sync'
+        : 'Sync your official WHS handicap for live course analytics';
+  const analyticsDisabled = analyticsState === 'disconnected';
+  const handleAnalyticsTap = () => {
+    if (analyticsState === 'disconnected') {
+      onNavigate('/handicap');
+      return;
+    }
+    onOpenCourseAnalytics?.();
+  };
+
   return (
     <div
       style={{
@@ -73,6 +112,32 @@ export default function SheetNavGroup({ currentActor, isAdmin, onNavigate, onInv
         label="View profile"
         onClick={() => onNavigate(`/profile/${currentActor.id}`)}
       />
+      {showAnalytics && (
+        <Row
+          label="Course analytics"
+          subLabel={analyticsSubLabel}
+          onClick={handleAnalyticsTap}
+          disabled={analyticsDisabled}
+          trailing={
+            analyticsState === 'ready' ? (
+              <span
+                style={{
+                  fontWeight: 700,
+                  fontSize: 9,
+                  letterSpacing: '0.12em',
+                  color: AMBER,
+                  padding: '3px 7px',
+                  border: `1px solid ${AMBER}`,
+                  borderRadius: 999,
+                  textTransform: 'uppercase',
+                }}
+              >
+                NEW
+              </span>
+            ) : undefined
+          }
+        />
+      )}
       {currentActor.type === 'personal' && onInviteFriends && (
         <Row
           label="Invite friends"
