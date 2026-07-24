@@ -365,6 +365,8 @@ const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDee
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 import { InAppNotificationsMount } from '@/components/notifications/InAppNotificationsMount';
+import { GenderPromptSheet } from '@/components/profile/GenderPromptSheet';
+
 import { useSilentSwitchHint } from '@/audio/useSilentSwitchHint';
 
 
@@ -947,6 +949,9 @@ const AppInner: React.FC = () => {
                                         <MountSignal />
                                         <AuthWrapper>
                                           <InAppNotificationsMount />
+                                          <GenderPromptSheet />
+
+
 
                                           <FriendSheetProvider>
 

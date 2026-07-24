@@ -47,6 +47,10 @@ export const EVENT_LABELS: Record<string, string> = {
   morning_moment_viewed: 'Morning moment viewed',
   morning_moment_friends_tapped: 'Morning moment friends tapped',
   where_you_stand_viewed: 'Where you stand viewed',
+  gender_prompt_shown: 'Gender prompt shown',
+  gender_prompt_answered: 'Gender prompt answered',
+  gender_prompt_skipped: 'Gender prompt skipped',
+
   streaks_section_viewed: 'Streaks section viewed',
   all_streaks_open: 'All streaks opened',
   header_handicap_chip_tapped: 'Handicap chip tapped',
