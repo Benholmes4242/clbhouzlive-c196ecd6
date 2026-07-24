@@ -154,6 +154,12 @@
       "s2SentenceEarly": "You start slowly: holes {{best}} are {{spread}} shots better than holes 1-6. Hit a few balls and roll some putts before you tee off - your opening holes are doing your warm-up for you.",
       "s2SentenceMiddle": "Your middle six cost {{spread}} shots more than holes {{best}}. That's usually where focus drifts - pick a target on every shot through the turn.",
       "s2SentenceLate": "You fade late: the closing six cost {{spread}} shots more than holes {{best}}. Take on water and something to eat around the 12th, before the drop-off starts."
+    },
+    "yourCourses": {
+      "eyebrow": "Course by course",
+      "title": "Your courses",
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
     }
   },
   "scorecard": {
