@@ -140,7 +140,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
-            maxHeight: 360,
+            maxHeight: 'min(360px, 45dvh)',
             overflowY: 'auto',
           }}
         >
