@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v3-womens-record-idempotent-legends';
+export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v3-womens-record-prompt-guard-restore';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
@@ -257,6 +257,22 @@ async function processSingle(whsScoreId: string) {
         console.warn("[level_eval]", (e as Error).message);
       }
     }
+
+    // Rate-a-course prompt — self-contained, guarded, non-fatal.
+    // Fires only on a score's FIRST evaluation (alreadyAtVersion === false)
+    // so gender-change re-enqueued scores do not re-prompt. It fires only when
+    // a real playable gross exists (mirrors the notify_friend_content_recompute
+    // stub-row guard) and when the round is mapped to a named clbhouz course.
+    // See maybeEmitRateCoursePrompt for the full four-guard sequence and
+    // daylight-hour gate.
+    const grossForPrompt = scoreRow.adjusted_gross ?? scoreRow.actual_gross ?? null;
+    if (grossForPrompt != null && clbhouzCourseId && clbhouzCourseName) {
+      try {
+        await maybeEmitRateCoursePrompt(userId, clbhouzCourseId, clbhouzCourseName);
+      } catch (e) {
+        console.warn("[rate_course_prompt]", (e as Error).message);
+      }
+    }
   }
 
   // applyCourseLegends runs on EVERY evaluation, including re-enqueued
@@ -267,20 +283,6 @@ async function processSingle(whsScoreId: string) {
   // re-enqueues a member's latest score per course when their profile gender
   // changes, so the women's course record updates promptly in both directions).
   await applyCourseLegends(stats);
-
-  // Rate-a-course prompt — self-contained, guarded, non-fatal.
-  // Fires only when a real playable gross exists (mirrors the
-  // notify_friend_content_recompute stub-row guard) and when the round is
-  // mapped to a named clbhouz course. See maybeEmitRateCoursePrompt for the
-  // full four-guard sequence and daylight-hour gate.
-  const grossForPrompt = scoreRow.adjusted_gross ?? scoreRow.actual_gross ?? null;
-  if (grossForPrompt != null && clbhouzCourseId && clbhouzCourseName) {
-    try {
-      await maybeEmitRateCoursePrompt(userId, clbhouzCourseId, clbhouzCourseName);
-    } catch (e) {
-      console.warn("[rate_course_prompt]", (e as Error).message);
-    }
-  }
 
 
   // Mark whs_scores evaluated
