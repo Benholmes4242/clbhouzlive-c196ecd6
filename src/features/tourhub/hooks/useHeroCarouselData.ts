@@ -40,7 +40,7 @@ export interface HeroTournament {
   purse: number | null;
   winningShare: number | null;
   currency: string | null;
-  /** 'major' is a synthetic pseudo-tour used only for the pinned men's major slide. */
+  /** 'major' is a synthetic pseudo-tour used for pinned major slides (mens or womens). */
   tourSlug: TourId | 'major';
   tourName: string;
   defendingChampion: string | null;
@@ -49,8 +49,10 @@ export interface HeroTournament {
   championNarrative: string | null;
   isMajor: boolean;
   isSignature: boolean;
-  /** True when this slide is the pseudo-tour men's-major entry. */
+  /** True when this slide is the pseudo-tour major entry (mens or womens). */
   isPseudoMajorTour?: boolean;
+  /** For pseudo-major slides only: which major type this slide represents. */
+  majorGender?: 'mens' | 'womens';
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
