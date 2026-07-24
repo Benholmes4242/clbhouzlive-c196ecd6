@@ -962,12 +962,14 @@ const AppInner: React.FC = () => {
                                             <AchievementToastWrapper />
                                             <LevelUpGate />
                                             <Suspense fallback={null}>
-                                              <div className="app-depth">
-                                                {/* Global header for all pages except Clubhouse/Auth/Admin */}
-                                                <AppShellOnly><GlobalHeader /></AppShellOnly>
-                                                <AppRoutes />
-                                                
-                                              </div>
+                                              <UserStatsCoursesProvider>
+                                                <div className="app-depth">
+                                                  {/* Global header for all pages except Clubhouse/Auth/Admin */}
+                                                  <AppShellOnly><GlobalHeader /></AppShellOnly>
+                                                  <AppRoutes />
+                                                  
+                                                </div>
+                                              </UserStatsCoursesProvider>
                                             </Suspense>
                                             {/* Continue Watching mini-player - persists across navigation. Queue drawer removed in PR-5. */}
                                             <Suspense fallback={null}>
