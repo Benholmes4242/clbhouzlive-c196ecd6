@@ -222,5 +222,10 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'round' : 'rounds'}`;
     }
+    case 'lowest_gross_women_90d':
+    case 'lowest_gross_women_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
+    }
   }
 }
