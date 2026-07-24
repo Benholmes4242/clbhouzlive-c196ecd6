@@ -12,6 +12,7 @@ import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { HoleDataSheet } from './HoleDataSheet';
+import { CourseTeeCard } from './CourseTeeCard';
 
 interface Props {
   courseId: string | undefined;
