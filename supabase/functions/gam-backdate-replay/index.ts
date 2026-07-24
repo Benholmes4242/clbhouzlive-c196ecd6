@@ -46,10 +46,10 @@ Deno.serve(async (req) => {
       }
     }
     console.log(`[backdate-replay] reset ${ok} users, ${failed} failures`);
-    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors }, corsHeaders);
+    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors }, 200, corsHeaders);
   } catch (e) {
     console.error("[backdate-replay]", e);
-    return json({ error: (e as Error).message }, 500);
+    return json({ error: (e as Error).message }, 500, corsFor(req.headers.get('Origin')));
   }
 });
 
