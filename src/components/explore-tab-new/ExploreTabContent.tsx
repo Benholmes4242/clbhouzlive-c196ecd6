@@ -21,6 +21,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 
 import { TheRecordBook } from './TheRecordBook';
+import { FriendsRoundsSection } from './FriendsRoundsSection';
 
 import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
 import { EaglesLedger } from './EaglesLedger';
