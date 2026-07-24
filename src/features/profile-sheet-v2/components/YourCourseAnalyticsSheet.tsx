@@ -100,25 +100,64 @@ function Row({
   );
 }
 
+/** Category colour triplets drawn from the holes tab distribution chart
+ *  (HoleDataSheet.tsx L22-26). Rounded-rectangle data pills, not stadium chips. */
+const PILL_TONE = {
+  eagles: {
+    text: '#9A5B00',
+    bg: 'rgba(247,147,30,0.16)',
+    border: 'rgba(247,147,30,0.36)',
+  },
+  birdies: {
+    text: '#B26A00',
+    bg: 'rgba(247,147,30,0.10)',
+    border: 'rgba(247,147,30,0.26)',
+  },
+  pars: {
+    text: 'rgba(15,23,42,0.45)',
+    bg: 'rgba(15,23,42,0.04)',
+    border: 'rgba(15,23,42,0.10)',
+  },
+  bogeys: {
+    text: 'rgba(15,23,42,0.85)',
+    bg: 'rgba(15,23,42,0.07)',
+    border: 'rgba(15,23,42,0.16)',
+  },
+} as const;
+
+type PillTone = keyof typeof PILL_TONE;
+
 /** Compact pill for the scoring distribution: "{value}% {label}". */
-function ScoringPill({ pct, label }: { pct: number; label: string }) {
+function ScoringPill({
+  pct,
+  label,
+  tone,
+  narrow,
+}: {
+  pct: number;
+  label: string;
+  tone: PillTone;
+  narrow: boolean;
+}) {
+  const t = PILL_TONE[tone];
   return (
     <span
       style={{
         display: 'inline-flex',
         alignItems: 'baseline',
-        gap: 4,
-        padding: '3px 8px',
-        borderRadius: 999,
-        background: PILL_BG,
-        fontSize: 11,
+        gap: 3,
+        padding: narrow ? '2px 5px' : '2px 6px',
+        borderRadius: 5,
+        background: t.bg,
+        border: `1px solid ${t.border}`,
+        fontSize: 10,
         lineHeight: 1.2,
-        color: INK,
+        color: t.text,
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
-      <span style={{ fontWeight: 500, color: SOFT, textTransform: 'lowercase' }}>{label}</span>
+      <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+      <span style={{ fontWeight: 600, textTransform: 'lowercase' }}>{label}</span>
     </span>
   );
 }
