@@ -26,6 +26,15 @@ export interface UserAnalyticsCourse {
   birdies_pct: number | null;
   pars_pct: number | null;
   bogeys_plus_pct: number | null;
+  /**
+   * Raw hole counts backing the distribution percentages. Needed so rare
+   * outcomes (e.g. one eagle in 1,800 holes) can render "<1%" instead of
+   * being rounded away to 0%. NULL together when hole data is absent.
+   */
+  eagles_plus_count: number | null;
+  birdies_count: number | null;
+  pars_count: number | null;
+  bogeys_plus_count: number | null;
 }
 
 /**

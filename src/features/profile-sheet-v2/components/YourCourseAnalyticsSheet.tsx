@@ -127,19 +127,24 @@ const PILL_TONE = {
 
 type PillTone = keyof typeof PILL_TONE;
 
-/** Compact pill for the scoring distribution: "{value}% {label}". */
+/** Compact pill for the scoring distribution: "{value} {label}". Renders
+ *  "<1%" when the bucket has at least one hole but rounds to 0%. */
 function ScoringPill({
   pct,
+  count,
   label,
   tone,
   narrow,
 }: {
   pct: number;
+  count: number;
   label: string;
   tone: PillTone;
   narrow: boolean;
 }) {
   const t = PILL_TONE[tone];
+  // Rare-outcome rule: non-zero count that rounded to 0% renders "<1%".
+  const display = count > 0 && pct === 0 ? '<1%' : `${pct}%`;
   return (
     <span
       style={{
@@ -156,7 +161,7 @@ function ScoringPill({
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+      <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{display}</span>
       <span style={{ fontWeight: 600, textTransform: 'lowercase' }}>{label}</span>
     </span>
   );
@@ -192,11 +197,14 @@ function AnalyticsCourseRow({
   const triangleColor = overPar ? OVER_RED : underPar ? UNDER_GREEN : MUTED;
   const triangleGlyph = overPar ? '\u25B2' : underPar ? '\u25BC' : '\u25CF';
 
+  // Gate on counts, not percentages: a bucket with a non-zero count that
+  // rounds to 0% must still render (as "<1%"). Only fully absent hole data
+  // (all counts null) hides the whole row.
   const hasScoring =
-    course.eagles_plus_pct !== null &&
-    course.birdies_pct !== null &&
-    course.pars_pct !== null &&
-    course.bogeys_plus_pct !== null;
+    course.eagles_plus_count !== null &&
+    course.birdies_count !== null &&
+    course.pars_count !== null &&
+    course.bogeys_plus_count !== null;
 
   const pillKey = (kind: 'Eagles' | 'Birdies' | 'Pars' | 'Bogeys') =>
     `yourCourses.pill${kind}${narrow ? 'Short' : 'Long'}`;
@@ -278,12 +286,12 @@ function AnalyticsCourseRow({
             marginTop: 8,
           }}
         >
-          {(course.eagles_plus_pct as number) > 0 && (
-            <ScoringPill pct={course.eagles_plus_pct as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
+          {(course.eagles_plus_count as number) > 0 && (
+            <ScoringPill pct={course.eagles_plus_pct as number} count={course.eagles_plus_count as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
           )}
-          <ScoringPill pct={course.birdies_pct as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
-          <ScoringPill pct={course.pars_pct as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
-          <ScoringPill pct={course.bogeys_plus_pct as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
+          <ScoringPill pct={course.birdies_pct as number} count={course.birdies_count as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
+          <ScoringPill pct={course.pars_pct as number} count={course.pars_count as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
+          <ScoringPill pct={course.bogeys_plus_pct as number} count={course.bogeys_plus_count as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
         </div>
       )}
     </button>
