@@ -1450,6 +1450,26 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   const { data: rounds } = await q;
   if (!rounds) return;
 
+  // L4: women's-scoped categories only include rounds whose user is female.
+  // 'prefer_not_to_say' / null are EXCLUDED. One extra query total, chunked at
+  // 200 ids defensively. All other logic below is shared with the base cats.
+  let filteredRounds = rounds;
+  if (cfg.genderScope === 'female' && rounds.length > 0) {
+    const userIds = Array.from(new Set(rounds.map((r: any) => r.user_id)));
+    const female = new Set<string>();
+    for (let i = 0; i < userIds.length; i += 200) {
+      const chunk = userIds.slice(i, i + 200);
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, gender')
+        .in('id', chunk);
+      for (const p of profiles ?? []) {
+        if ((p as any).gender === 'female') female.add((p as any).id);
+      }
+    }
+    filteredRounds = rounds.filter((r: any) => female.has(r.user_id));
+  }
+
   // Aggregate
   const byUser = new Map<string, { value: number; attained_at: string }>();
   for (const r of rounds) {
