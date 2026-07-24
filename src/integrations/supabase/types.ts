@@ -3735,6 +3735,65 @@ export type Database = {
           },
         ]
       }
+      course_tee_sets: {
+        Row: {
+          course_rating: number
+          gender_scope: string
+          holes: Json
+          id: string
+          label_kind: string
+          last_played_at: string | null
+          par_total: number
+          refreshed_at: string
+          rounds_sampled: number
+          slope_rating: number
+          tee_label: string
+          total_yards: number | null
+          variants_merged: number
+          whs_course_id: string
+        }
+        Insert: {
+          course_rating: number
+          gender_scope?: string
+          holes: Json
+          id?: string
+          label_kind: string
+          last_played_at?: string | null
+          par_total: number
+          refreshed_at?: string
+          rounds_sampled: number
+          slope_rating: number
+          tee_label: string
+          total_yards?: number | null
+          variants_merged?: number
+          whs_course_id: string
+        }
+        Update: {
+          course_rating?: number
+          gender_scope?: string
+          holes?: Json
+          id?: string
+          label_kind?: string
+          last_played_at?: string | null
+          par_total?: number
+          refreshed_at?: string
+          rounds_sampled?: number
+          slope_rating?: number
+          tee_label?: string
+          total_yards?: number | null
+          variants_merged?: number
+          whs_course_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_tee_sets_whs_course_id_fkey"
+            columns: ["whs_course_id"]
+            isOneToOne: false
+            referencedRelation: "whs_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_top100_memberships: {
         Row: {
           added_at: string | null
@@ -17426,6 +17485,7 @@ export type Database = {
           sub_region_name: string
         }[]
       }
+      get_course_tee_sets: { Args: { p_golf_course_id: string }; Returns: Json }
       get_current_username: { Args: { _user_id: string }; Returns: string }
       get_deleted_message_ids_for_me: {
         Args: { p_conversation_id: string }
@@ -20233,6 +20293,14 @@ export type Database = {
           username: string
         }[]
       }
+      normalise_tee_marker: {
+        Args: { p_raw: string }
+        Returns: {
+          label_kind: string
+          name_scope: string
+          tee_label: string
+        }[]
+      }
       normalize_club_key: { Args: { p_name: string }; Returns: string }
       normalize_college_name: { Args: { name: string }; Returns: string }
       normalize_course_name: { Args: { name: string }; Returns: string }
@@ -20340,6 +20408,7 @@ export type Database = {
       }
       refresh_college_season_stats_auto: { Args: never; Returns: undefined }
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
+      refresh_course_tee_sets: { Args: never; Returns: Json }
       refresh_discover_feats: { Args: never; Returns: undefined }
       refresh_eagle_leaders: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }

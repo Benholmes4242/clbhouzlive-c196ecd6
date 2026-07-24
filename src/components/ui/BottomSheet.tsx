@@ -14,6 +14,8 @@ interface BottomSheetProps {
   variant?: 'light' | 'dark';
   /** Optional surface colour override for the dark variant. */
   surfaceColor?: string;
+  /** Optional max-height override (default '90vh'). Use e.g. '75dvh' for dvh-aware caps. */
+  maxHeight?: string;
 }
 
 export function BottomSheet({
@@ -26,6 +28,7 @@ export function BottomSheet({
   ariaLabelledBy,
   variant = 'light',
   surfaceColor,
+  maxHeight = '90vh',
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -124,7 +127,7 @@ export function BottomSheet({
         )}
         style={{
           zIndex: zIndexBase + 1,
-          maxHeight: '90vh',
+          maxHeight,
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
           ...(variant === 'dark' ? { background: surfaceColor ?? '#0F172A' } : null),
