@@ -576,7 +576,7 @@
     "friendsRounds": {
       "overline": "DEIN KREIS",
       "title": "Neueste Runden von Freunden",
-      "viewAll": "Alle ansehen ›",
+      "viewAll": "Alle ansehen",
       "entrySingular": "RUNDE",
       "entryPlural": "RUNDEN",
       "empty": "Noch keine kürzlichen Runden von Freunden."

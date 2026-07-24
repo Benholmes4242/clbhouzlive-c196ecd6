@@ -678,7 +678,7 @@
     "friendsRounds": {
       "overline": "YOUR CIRCLE",
       "title": "Friends' latest rounds",
-      "viewAll": "View all ›",
+      "viewAll": "View all",
       "entrySingular": "ROUND",
       "entryPlural": "ROUNDS",
       "empty": "No recent friend rounds yet."
