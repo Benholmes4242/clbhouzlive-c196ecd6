@@ -53,19 +53,28 @@ interface SheetContentProps
   VariantProps<typeof sheetVariants> {
     container?: HTMLElement | null;
     hideCloseButton?: boolean;
+    /**
+     * Opt-in: silence inline video audio while this sheet is mounted.
+     * Only "audio-suppressive" surfaces (comment sheets, mention pickers,
+     * action sheets, share sheets) should set this. Applying it wholesale
+     * to every shadcn sheet kills audio site-wide because the duck signal
+     * is a hard override in `VideoEngine.reconcileAudio`.
+     */
+    duckAudio?: boolean;
   }
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, container, hideCloseButton = false, ...props }, ref) => {
-  // Duck inline video audio for the sheet's entire mounted lifetime.
+>(({ side = "right", className, children, container, hideCloseButton = false, duckAudio = false, ...props }, ref) => {
+  // Duck inline video audio only when explicitly opted in.
   const duckKey = React.useId();
   React.useEffect(() => {
+    if (!duckAudio) return;
     const k = `sheet:${duckKey}`;
     audioDuck.hold(k);
     return () => audioDuck.release(k);
-  }, [duckKey]);
+  }, [duckAudio, duckKey]);
   return (
     <SheetPortal container={container}>
       <div data-filter-sheet className="fixed inset-0 z-[10050] pointer-events-none" />

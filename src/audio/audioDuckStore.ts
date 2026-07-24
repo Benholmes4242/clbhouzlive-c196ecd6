@@ -32,6 +32,15 @@ export const audioDuck = {
     if (!keys.delete(key)) return;
     emit();
   },
+  /** Force-clear every held key. Used on app boot to purge stale duck state
+   *  from a previous version that may have latched a key without releasing
+   *  it (e.g. after the old shadcn sheet-wide auto-duck). Never call from
+   *  product code — this is a safety valve, not a feature. */
+  reset() {
+    if (keys.size === 0) return;
+    keys.clear();
+    emit();
+  },
   isDucked(): boolean {
     return keys.size > 0;
   },
