@@ -85,6 +85,8 @@ const LEGEND_CATEGORY_LABEL: Record<LegendCategory, string> = {
   most_albatrosses_all_time: 'Most albatrosses',
   most_rounds_90d: 'Most rounds (90d)',
   most_rounds_all_time: 'Most rounds',
+  lowest_gross_women_90d: "Women's record (90d)",
+  lowest_gross_women_all_time: "Women's course record",
 };
 
 /** Amber legendary palette shim -- LegendImmersive uses GAM.AMBER as color. */

@@ -54,6 +54,8 @@ function categoryToIconKey(c: LegendCategory): string {
       return 'bird';
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time':
+    case 'lowest_gross_women_90d':
+    case 'lowest_gross_women_all_time':
       return 'trophy';
     case 'best_score_diff_90d':
     case 'best_score_diff_all_time':
@@ -67,6 +69,9 @@ function categoryToIconKey(c: LegendCategory): string {
     case 'most_aces_90d':
     case 'most_aces_all_time':
       return 'target';
+    case 'most_albatrosses_90d':
+    case 'most_albatrosses_all_time':
+      return 'bird';
     case 'most_rounds_90d':
     case 'most_rounds_all_time':
       return 'flag';

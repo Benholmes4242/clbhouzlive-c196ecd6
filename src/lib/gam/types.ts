@@ -54,7 +54,7 @@ export interface StreakRow {
 }
 
 
-// Course legends — 16 categories (8 stats × 2 windows)
+// Course legends — 16 mixed categories + 2 women's-division gross records (L4)
 export type LegendCategory =
   | 'lowest_gross_90d'         | 'lowest_gross_all_time'
   | 'best_score_diff_90d'      | 'best_score_diff_all_time'
@@ -63,7 +63,8 @@ export type LegendCategory =
   | 'most_eagles_90d'          | 'most_eagles_all_time'
   | 'most_aces_90d'            | 'most_aces_all_time'
   | 'most_albatrosses_90d'     | 'most_albatrosses_all_time'
-  | 'most_rounds_90d'          | 'most_rounds_all_time';
+  | 'most_rounds_90d'          | 'most_rounds_all_time'
+  | 'lowest_gross_women_90d'   | 'lowest_gross_women_all_time';
 
 export type LegendWindow = '90d' | 'all_time';
 

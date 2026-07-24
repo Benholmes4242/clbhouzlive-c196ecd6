@@ -47,8 +47,10 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   most_aces_all_time:       'Aces',
   most_albatrosses_90d:     'Albatross',
   most_albatrosses_all_time:'Albatross',
-  most_rounds_90d:          'Rounds',
-  most_rounds_all_time:     'Rounds',
+  most_rounds_90d:              'Rounds',
+  most_rounds_all_time:         'Rounds',
+  lowest_gross_women_90d:       "Women's record (90 days)",
+  lowest_gross_women_all_time:  "Women's course record",
 };
 
 
@@ -71,8 +73,10 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   most_aces_all_time:       Sparkles,
   most_albatrosses_90d:     Bird,
   most_albatrosses_all_time:Bird,
-  most_rounds_90d:          Flag,
-  most_rounds_all_time:     Flag,
+  most_rounds_90d:              Flag,
+  most_rounds_all_time:         Flag,
+  lowest_gross_women_90d:       Trophy,
+  lowest_gross_women_all_time:  Trophy,
 };
 
 /**
@@ -94,8 +98,10 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   most_aces_all_time:       'all_time',
   most_albatrosses_90d:     '90d',
   most_albatrosses_all_time:'all_time',
-  most_rounds_90d:          '90d',
-  most_rounds_all_time:     'all_time',
+  most_rounds_90d:              '90d',
+  most_rounds_all_time:         'all_time',
+  lowest_gross_women_90d:       '90d',
+  lowest_gross_women_all_time:  'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
@@ -134,6 +140,9 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
     case 'most_rounds_90d':
     case 'most_rounds_all_time':
       return `${value} round${value === 1 ? '' : 's'}`;
+    case 'lowest_gross_women_90d':
+    case 'lowest_gross_women_all_time':
+      return `${value}`;
   }
 }
 
@@ -212,6 +221,11 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
     case 'most_rounds_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'round' : 'rounds'}`;
+    }
+    case 'lowest_gross_women_90d':
+    case 'lowest_gross_women_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'stroke' : 'strokes'}`;
     }
   }
 }

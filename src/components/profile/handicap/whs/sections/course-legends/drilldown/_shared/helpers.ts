@@ -46,7 +46,9 @@ export function isLowerBetterCategory(cat: LegendCategory): boolean {
     cat === 'best_score_diff_90d' ||
     cat === 'best_score_diff_all_time' ||
     cat === 'lowest_gross_90d' ||
-    cat === 'lowest_gross_all_time'
+    cat === 'lowest_gross_all_time' ||
+    cat === 'lowest_gross_women_90d' ||
+    cat === 'lowest_gross_women_all_time'
   );
 }
 
