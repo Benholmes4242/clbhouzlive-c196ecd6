@@ -194,13 +194,15 @@ export function useFriendsLatestRounds(
         }
       }
 
-      // 7. Badges — one query for every surfaced friend, grouped client-side.
-      //    APPROXIMATION: gam_user_badges carries trigger_whs_score_id, but
-      //    per brief 1.4 we still match by DATE ONLY for v1. A badge earned
-      //    the same calendar day from a different round will attach to the
-      //    wrong one. Follow-up: switch to trigger_whs_score_id equality —
-      //    the column already exists on gam_user_badges.
-      const badgesByUserDay = new Map<string, Array<{ id: string; title: string; icon: string | null; earned_at: string }>>();
+      // 7. Badges — one query for every surfaced friend, grouped by
+      //    trigger_whs_score_id. Badges attach to a round by
+      //    trigger_whs_score_id equality. Cumulative and cross-round badges
+      //    (streaks, founder, rival sweeps, course legend) have a null
+      //    trigger_whs_score_id because no single round earned them — they
+      //    are intentionally NOT shown on round rows. If those should
+      //    surface in Discover, they need their own treatment rather than
+      //    being attributed to an arbitrary round.
+      const badgesByScoreId = new Map<string, Array<{ id: string; title: string; icon: string | null; earned_at: string }>>();
       if (surfacedFriendIds.length > 0) {
         const earliestDate = rowsWindow.reduce(
           (min, r) => (r.play_date < min ? r.play_date : min),
@@ -208,9 +210,10 @@ export function useFriendsLatestRounds(
         );
         const { data: badges } = await supabase
           .from('gam_user_badges' as never)
-          .select('id, user_id, badge_id, earned_at, gam_badge_catalogue:badge_id(title, icon_name)')
+          .select('id, user_id, badge_id, earned_at, trigger_whs_score_id, gam_badge_catalogue:badge_id(title, icon_name)')
           .in('user_id', surfacedFriendIds)
           .gte('earned_at', earliestDate)
+          .not('trigger_whs_score_id', 'is', null)
           .eq('is_visible', true)
           .order('earned_at', { ascending: false });
         for (const b of ((badges ?? []) as unknown) as Array<{
@@ -218,11 +221,11 @@ export function useFriendsLatestRounds(
           user_id: string;
           badge_id: string;
           earned_at: string;
+          trigger_whs_score_id: string | null;
           gam_badge_catalogue: { title: string | null; icon_name: string | null } | null;
         }>) {
-          const day = (b.earned_at ?? '').slice(0, 10);
-          const key = `${b.user_id}::${day}`;
-          const arr = badgesByUserDay.get(key) ?? [];
+          if (!b.trigger_whs_score_id) continue;
+          const arr = badgesByScoreId.get(b.trigger_whs_score_id) ?? [];
           if (arr.length < 2) {
             arr.push({
               id: b.id,
@@ -230,10 +233,11 @@ export function useFriendsLatestRounds(
               icon: b.gam_badge_catalogue?.icon_name ?? null,
               earned_at: b.earned_at,
             });
-            badgesByUserDay.set(key, arr);
+            badgesByScoreId.set(b.trigger_whs_score_id, arr);
           }
         }
       }
+
 
       // 8. Assemble rows.
       const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
