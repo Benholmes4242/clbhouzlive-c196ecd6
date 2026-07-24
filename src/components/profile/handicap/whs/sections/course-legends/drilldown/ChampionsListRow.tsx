@@ -95,7 +95,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
 
-  const avatarSize = compact ? 32 : 40;
+  const avatarSize = 34;
 
   const hairlineOverlay = (
     <div
