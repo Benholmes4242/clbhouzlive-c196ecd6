@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-25T00:00:00Z-v5-drain-logging';
+export const FUNCTION_VERSION = '2026-07-25T00:00:00Z-v6-stale-lock-reaper';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
     }
 
     // Cron drain
+    await reapStaleLocks();
     const rows = await fetchQueueBatch(BATCH_SIZE);
     console.log('[gam-evaluator] drain', { picked: rows.length, batchSize: BATCH_SIZE });
     const results: any[] = [];
@@ -114,6 +115,23 @@ function json(body: any, status = 200) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Queue
 // ─────────────────────────────────────────────────────────────────────────────
+async function reapStaleLocks() {
+  try {
+    const { data: reaped } = await supabase
+      .from('gam_evaluation_queue')
+      .update({ status: 'queued' })
+      .eq('status', 'processing')
+      .lt('enqueued_at', new Date(Date.now() - 30 * 60 * 1000).toISOString())
+      .select('id');
+
+    if (reaped?.length) {
+      console.log('[gam-evaluator] reaped stale locks', { count: reaped.length });
+    }
+  } catch (err) {
+    console.error('[gam-evaluator] reaper error', err);
+  }
+}
+
 async function fetchQueueBatch(limit: number) {
   const { data, error } = await supabase
     .from("gam_evaluation_queue")
