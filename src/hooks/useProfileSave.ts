@@ -97,6 +97,15 @@ export function useProfileSave(userId: string) {
         updatePayload.username_is_custom = true;
       }
 
+      // Capture prior gender so a changed gender value can trigger the same
+      // WHS percentile invalidation GenderPromptSheet performs
+      // (src/components/profile/GenderPromptSheet.tsx:121).
+      const { data: priorProfile } = await supabase
+        .from('user_profiles')
+        .select('gender')
+        .eq('id', userId)
+        .single();
+
       const { data: updated, error: profileError } = await supabase
         .from('user_profiles')
         .update(updatePayload as any)
