@@ -188,18 +188,6 @@ export function YourStandingStrip({ userId }: Props) {
           onClick={isLoading ? undefined : openHandicap}
           emphasize={hasHcp}
         />
-        {showStreak ? (
-          <>
-            <Divider />
-            <StandingCell
-              icon="🔥"
-              value={String(streakCount)}
-              label="week streak"
-              onClick={isLoading ? undefined : openHandicap}
-              emphasize
-            />
-          </>
-        ) : null}
       </div>
 
 
