@@ -35,10 +35,18 @@ const EMPTY: ViewerListContext = {
   empty: true,
 };
 
-export function useViewerListContext(railKey: string | null) {
+export interface UseViewerListContextOptions {
+  enabled?: boolean;
+}
+
+export function useViewerListContext(
+  railKey: string | null,
+  options: UseViewerListContextOptions = {},
+) {
+  const { enabled = true } = options;
   return useQuery<ViewerListContext>({
     queryKey: ['discover-viewer-context', railKey],
-    enabled: !!railKey,
+    enabled: !!railKey && enabled,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,

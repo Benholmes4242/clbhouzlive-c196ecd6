@@ -2,6 +2,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { YouStrip, type YouStripPreview, type YouStripVariant } from './YouStrip';
 import { useViewerListContext } from './hooks/useViewerListContext';
 import { DISCOVER_YOU_STRIP } from '@/config/featureFlags';
+import { FEATURE_FLAGS } from '@/config/featureFlags';
 
 /**
  * DiscoverYouStripMount — data-wired wrapper around `YouStrip`.
