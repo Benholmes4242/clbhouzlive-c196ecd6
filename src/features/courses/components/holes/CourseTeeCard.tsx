@@ -195,6 +195,13 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         padding: '20px 16px 8px',
         fontFamily: FONT,
         background: '#FFFFFF',
+        // minWidth:0 is the load-bearing rule here: without it a flex/grid
+        // child defaults to min-width:auto and will happily push its parent
+        // past the viewport regardless of maxWidth. maxWidth:100% then caps
+        // the card at its container so it can never overflow the page.
+        minWidth: 0,
+        maxWidth: '100%',
+        overflow: 'hidden',
       }}
       aria-label={t('courses:teeCard.a11yBlock') as string}
     >
