@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData } from '@/components/profile/profile-wizard/types';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { parseHcpFormString } from '@/lib/formatHcp';
+import { whsKeys } from '@/lib/whs/hooks';
 
 const INVALIDATE_KEYS = [
   'profile', 'profile-clubs', 'user-profile', 'home-clubs-map',
