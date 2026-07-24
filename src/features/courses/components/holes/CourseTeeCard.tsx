@@ -859,7 +859,7 @@ const SubtotalRow: React.FC<{ label: string; par: number; yards: number; strong?
     role="row"
     style={{
       display: 'grid',
-      gridTemplateColumns: '56px 1fr 1fr 1fr',
+      gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
       background: strong ? '#F1F5F9' : '#F8FAFC',
       borderTop: `1px solid ${HAIRLINE_INK_8}`,
