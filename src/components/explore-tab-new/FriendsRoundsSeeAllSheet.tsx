@@ -87,8 +87,10 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
               row={r}
               isLast={i === rounds.length - 1}
               onPress={() => {
+                // Do NOT close the sheet — leaving it mounted beneath the
+                // scorecard lets the user return to their scroll position on
+                // dismiss. Matches TierSeeAllSheet.tsx.
                 onRowPress(r.score_id, r.user_id);
-                onClose();
               }}
             />
           ))
