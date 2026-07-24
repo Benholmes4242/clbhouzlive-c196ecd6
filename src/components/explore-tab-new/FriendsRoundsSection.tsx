@@ -34,22 +34,35 @@ export function FriendsRoundsSection({ userId, opener }: Props) {
   if (!rounds || rounds.length === 0) return null;
 
   return (
-    <div style={{ marginTop: 8 }}>
-      <SectionHead
-        overline={t('discover.friendsRounds.overline', 'YOUR CIRCLE')}
-        title={t('discover.friendsRounds.title', "Friends' latest rounds")}
-        meta={t('discover.friendsRounds.viewAll', 'View all ›')}
-        onMeta={() => setSheetOpen(true)}
-      />
-      <div>
-        {rounds.map((r, i) => (
-          <FriendRoundRow
-            key={r.round_id}
-            row={r}
-            isLast={i === rounds.length - 1}
-            onPress={() => handleRowPress(r.score_id, r.user_id)}
-          />
-        ))}
+    <section style={{ padding: '0 16px', marginTop: 8 }}>
+      <div
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.08)',
+          borderRadius: 16,
+          boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
+          overflow: 'hidden',
+        }}
+      >
+        <SectionHead
+          overline={t('discover.friendsRounds.overline', 'YOUR CIRCLE')}
+          title={t('discover.friendsRounds.title', "Friends' latest rounds")}
+          meta={t('discover.friendsRounds.viewAll', 'View all')}
+          onMeta={() => setSheetOpen(true)}
+          paddingX={14}
+          paddingTop={12}
+          paddingBottom={10}
+        />
+        <div>
+          {rounds.map((r, i) => (
+            <FriendRoundRow
+              key={r.round_id}
+              row={r}
+              isLast={i === rounds.length - 1}
+              onPress={() => handleRowPress(r.score_id, r.user_id)}
+            />
+          ))}
+        </div>
       </div>
       <FriendsRoundsSeeAllSheet
         open={sheetOpen}
@@ -57,7 +70,7 @@ export function FriendsRoundsSection({ userId, opener }: Props) {
         userId={userId}
         onRowPress={handleRowPress}
       />
-    </div>
+    </section>
   );
 }
 
