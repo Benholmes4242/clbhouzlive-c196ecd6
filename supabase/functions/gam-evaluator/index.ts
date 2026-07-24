@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v3-womens-record';
+export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v3-womens-record-idempotent-legends';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
@@ -235,7 +235,6 @@ async function processSingle(whsScoreId: string) {
     earned = await applyBadges(userId, stats, whsScoreId);
     await applyStatusTransitions(userId, stats, whsScoreId);
     await applyStreaks(userId, stats);
-    await applyCourseLegends(stats);
     await applyRivalryResults(userId, stats, whsScoreId);
 
     // Seasonal medal award. Own try/catch: never breaks round processing.
@@ -258,10 +257,16 @@ async function processSingle(whsScoreId: string) {
         console.warn("[level_eval]", (e as Error).message);
       }
     }
-  } else {
-    // Refresh course legends — idempotent recompute, safe to re-run
-    await applyCourseLegends(stats);
   }
+
+  // applyCourseLegends runs on EVERY evaluation, including re-enqueued
+  // already-evaluated scores. It is delete-and-replace from gam_round_stats,
+  // fully idempotent; its legend_earned/legend_lost notifications fire only
+  // when the top holder CHANGES, so re-running with unchanged data emits
+  // nothing. This enables gender-change re-evaluation (a DB trigger now
+  // re-enqueues a member's latest score per course when their profile gender
+  // changes, so the women's course record updates promptly in both directions).
+  await applyCourseLegends(stats);
 
   // Rate-a-course prompt — self-contained, guarded, non-fatal.
   // Fires only when a real playable gross exists (mirrors the
@@ -275,6 +280,7 @@ async function processSingle(whsScoreId: string) {
     } catch (e) {
       console.warn("[rate_course_prompt]", (e as Error).message);
     }
+  }
 
 
   // Mark whs_scores evaluated
