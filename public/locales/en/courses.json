@@ -52,9 +52,9 @@
     "a11yPills": "Choose tee",
     "a11yTable": "Holes for selected tee",
     "a11yToggle": "Toggle course card details",
-    "ladiesNote": {
-      "heading": "Red tees are on their way.",
-      "body": "These tee cards are built from members' synced rounds. The more women who sync their WHS handicap and log rounds here, the sooner we can show red tees and full analytics for them."
+    "syncNote": {
+      "heading": "Play here?",
+      "body": "Tee cards are built from members' synced rounds. Sync your WHS handicap and the tees you play will appear."
     }
   },
   "holes": {

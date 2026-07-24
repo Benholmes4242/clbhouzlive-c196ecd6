@@ -11,6 +11,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import { useCourseTeeSets, type TeeSet } from '../../hooks/useCourseTeeSets';
 import { AMBER, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { FONT } from './_constants';
@@ -75,6 +77,8 @@ function resolveDefaultTee(
 export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
+  const { user } = useSupabaseSession();
+  const { data: connection } = useWhsConnection(user?.id);
   const { data, isLoading, isError } = useCourseTeeSets(courseId);
 
   const tees = useMemo<TeeSet[]>(() => data ?? [], [data]);
@@ -128,7 +132,6 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const active = tees.find((t) => t.tee_label === selected) ?? tees[0];
   const colours = tees.filter((t) => t.label_kind === 'colour');
   const specials = tees.filter((t) => t.label_kind === 'special');
-  const hasLadiesTee = tees.some((tt) => tt.gender_scope === 'ladies');
 
   const handlePick = (label: string) => {
     if (label === selected) return;
@@ -335,8 +338,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             })}
           </div>
 
-          {/* Ladies-tee absence note. Not gated on viewer gender. */}
-          {!hasLadiesTee && (
+          {/* Sync prompt for viewers without a WHS connection. */}
+          {!connection && (
             <div
               role="note"
               style={{
@@ -348,10 +351,10 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
-                {t('courses:teeCard.ladiesNote.heading')}
+                {t('courses:teeCard.syncNote.heading')}
               </div>
               <div style={{ fontSize: 12.5, color: INK_MUTE, lineHeight: 1.5 }}>
-                {t('courses:teeCard.ladiesNote.body')}
+                {t('courses:teeCard.syncNote.body')}
               </div>
             </div>
           )}
