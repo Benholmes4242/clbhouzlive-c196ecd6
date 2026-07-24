@@ -66,8 +66,9 @@ function statePillText(
   t: (k: string) => string,
 ): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
+    // Match tournament details hero chip: "LIVE · R{n}".
     return {
-      text: roundLabel(state.round, state.totalRounds).toUpperCase(),
+      text: `${t('status.live')} \u00B7 R${state.round}`.toUpperCase(),
       tone: 'live',
     };
   }
