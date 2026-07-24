@@ -76,8 +76,10 @@ const UNITS: Record<LegendCategory, string> = {
   most_aces_all_time:       '',
   most_albatrosses_90d:     '',
   most_albatrosses_all_time:'',
-  most_rounds_90d:          '',
-  most_rounds_all_time:     '',
+  most_rounds_90d:              '',
+  most_rounds_all_time:         '',
+  lowest_gross_women_90d:       '',
+  lowest_gross_women_all_time:  '',
 };
 
 
