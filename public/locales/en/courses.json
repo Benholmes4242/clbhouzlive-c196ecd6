@@ -15,31 +15,6 @@
     "filterVideos": "Videos",
     "filterA11y": "Media filter",
     "addMediaA11y": "Add media",
-  "teeCard": {
-    "eyebrow": "The course card",
-    "subhead": "{{tee}} tees, {{yards}} yards",
-    "competitionTees": "Competition tees ({{count}})",
-    "reconstructedOne": "Reconstructed from 1 member round",
-    "reconstructedMany": "Reconstructed from {{count}} member rounds",
-    "out": "Out",
-    "in": "In",
-    "total": "Total",
-    "stat": {
-      "par": "Par",
-      "cr": "CR",
-      "slope": "Slope",
-      "yards": "Yards"
-    },
-    "col": {
-      "hole": "Hole",
-      "par": "Par",
-      "si": "SI",
-      "yards": "Yards"
-    },
-    "a11yBlock": "Course card",
-    "a11yPills": "Choose tee",
-    "a11yTable": "Holes for selected tee"
-  },
     "guide": {
       "kicker": "What to share",
       "signatureHoles": "Signature holes",
