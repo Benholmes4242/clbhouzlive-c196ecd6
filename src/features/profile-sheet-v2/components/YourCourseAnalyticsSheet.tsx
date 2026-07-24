@@ -270,6 +270,24 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
   const listItems = useMemo<UserAnalyticsCourse[]>(() => myCourses, [myCourses]);
 
+  // Watch the list container width so the scoring pills can switch to short
+  // labels ("EAG+") when the sheet is narrower than 360px. Keeps the four
+  // pills on a single row on the top three cards.
+  const listContainerRef = useRef<HTMLDivElement | null>(null);
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const el = listContainerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setNarrow(entry.contentRect.width < NARROW_BREAKPOINT);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [open, showList]);
+
   return (
     <BottomSheet
       open={open}
