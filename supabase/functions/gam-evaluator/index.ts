@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v4-cleanup-trio';
+export const FUNCTION_VERSION = '2026-07-25T00:00:00Z-v5-drain-logging';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
 
     // Cron drain
     const rows = await fetchQueueBatch(BATCH_SIZE);
+    console.log('[gam-evaluator] drain', { picked: rows.length, batchSize: BATCH_SIZE });
     const results: any[] = [];
     for (const row of rows) {
       try {
@@ -86,6 +87,9 @@ Deno.serve(async (req) => {
         results.push({ id: row.whs_score_id, error: (err as Error).message });
       }
     }
+    const succeeded = results.filter((r) => !r.error).length;
+    const failed = results.filter((r) => r.error).length;
+    console.log('[gam-evaluator] drain complete', { picked: rows.length, succeeded, failed });
     return json({ ok: true, drained: rows.length, results });
   } catch (e) {
     console.error("[evaluator] fatal", e);
