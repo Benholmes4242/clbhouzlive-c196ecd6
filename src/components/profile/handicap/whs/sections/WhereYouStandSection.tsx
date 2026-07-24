@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
+import { useProfileData } from '@/hooks/useProfileData';
 import type {
   HandicapPercentileResult,
   HandicapPercentileBucket,
@@ -8,6 +9,7 @@ import type {
 } from '@/lib/whs/types';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
+
 
 const AMBER     = '#F7931E';
 const AMBER_14  = 'rgba(247,147,30,0.14)';
