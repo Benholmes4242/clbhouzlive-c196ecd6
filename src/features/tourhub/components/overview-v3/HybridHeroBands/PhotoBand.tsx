@@ -30,7 +30,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
-import { type HeroState, roundLabel } from '../HybridHero.utils';
+import { type HeroState } from '../HybridHero.utils';
 
 export interface PhotoBandProps {
   title: string;
@@ -66,8 +66,9 @@ function statePillText(
   t: (k: string) => string,
 ): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
+    // Match tournament details hero chip: "LIVE · R{n}".
     return {
-      text: roundLabel(state.round, state.totalRounds).toUpperCase(),
+      text: `${t('status.live')} \u00B7 R${state.round}`.toUpperCase(),
       tone: 'live',
     };
   }
@@ -116,12 +117,38 @@ export function PhotoBand({
   const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
 
+  // Live tone mirrors the tournament details hero chip (LIVE · R{n}):
+  // green tint, rectangular, no pulsing dot. Other tones unchanged.
   const pillTone =
     pill.tone === 'live'
-      ? { bg: 'rgba(255,255,255,0.16)', color: 'rgba(255,255,255,0.95)', dot: '#EF4444' }
+      ? {
+          bg: 'rgba(16,185,129,0.14)',
+          color: '#6EE7B7',
+          border: 'rgba(110,231,183,0.55)',
+          radius: 4,
+          padding: '4px 8px',
+          fontSize: 9.5,
+          letterSpacing: '0.10em',
+        }
       : pill.tone === 'final'
-        ? { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' }
-        : { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' };
+        ? {
+            bg: 'rgba(255,255,255,0.14)',
+            color: 'rgba(255,255,255,0.95)',
+            border: 'transparent',
+            radius: 999,
+            padding: '4px 9px',
+            fontSize: 10,
+            letterSpacing: '0.14em',
+          }
+        : {
+            bg: 'rgba(255,255,255,0.14)',
+            color: 'rgba(255,255,255,0.95)',
+            border: 'transparent',
+            radius: 999,
+            padding: '4px 9px',
+            fontSize: 10,
+            letterSpacing: '0.14em',
+          };
 
   // Insight overflow detection — only render "Read more" when the clamped
   // insight actually overflows its 2-line box. Re-measures on value + resize.
@@ -235,21 +262,22 @@ export function PhotoBand({
           <span
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '4px 9px', borderRadius: 999,
-              background: pillTone.bg, color: pillTone.color,
-              fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
+              padding: pillTone.padding,
+              borderRadius: pillTone.radius,
+              background: pillTone.bg,
+              color: pillTone.color,
+              border: pillTone.border === 'transparent'
+                ? undefined
+                : `1px solid ${pillTone.border}`,
+              fontSize: pillTone.fontSize,
+              fontWeight: 800,
+              letterSpacing: pillTone.letterSpacing,
               textTransform: 'uppercase',
               ...NUMERIC_STYLE,
               backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
             }}
           >
-            {pill.tone === 'live' && (
-              <span
-                className="hybrid-live-pulse"
-                style={{ width: 6, height: 6, borderRadius: 999, background: pillTone.dot }}
-              />
-            )}
             {pill.text}
           </span>
         </div>
