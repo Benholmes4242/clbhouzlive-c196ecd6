@@ -122,6 +122,7 @@ export function AcesAlbatrossesPodium({
               statLabel={count === 1 ? singular : plural}
               showWatermark={i === 0}
               isLast={i === leaders.length - 1}
+              density="compact"
               onPress={r.user_id && onRowTap ? () => onRowTap(r.user_id!) : undefined}
             />
           );
@@ -147,6 +148,7 @@ export function AcesAlbatrossesPodium({
             chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
             timestamp={when ? relativeTime(when) : undefined}
             isLast={i === merged.length - 1}
+            density="compact"
             onPress={
               canTap && onLatestRowTap
                 ? () => onLatestRowTap(row)

@@ -298,6 +298,7 @@ function RecordStatRow({
       statSubLabel={grossText ? `${grossText} GROSS` : undefined}
       isLast={isLast}
       onPress={onTap}
+      density="compact"
     />
   );
 }
