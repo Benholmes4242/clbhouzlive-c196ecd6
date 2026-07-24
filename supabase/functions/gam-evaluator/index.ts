@@ -1202,40 +1202,39 @@ async function checkStreakBadges(userId: string, streakType: string, count: numb
 // ─────────────────────────────────────────────────────────────────────────────
 // apply_course_legends
 // ─────────────────────────────────────────────────────────────────────────────
-type LegendCfg = { category: string; windowDays: number | null; sortDir: "asc" | "desc"; metric: string; aggregate: "value" | "sum" | "count" };
+type LegendCfg = {
+  category: string;
+  windowDays: number | null;
+  sortDir: "asc" | "desc";
+  metric: string;
+  aggregate: "value" | "sum" | "count";
+  // L4: when set, only include rounds whose user_profiles.gender matches.
+  // 'prefer_not_to_say' and null are EXCLUDED from women's-scoped categories.
+  genderScope?: 'female';
+};
 
-// 8 stats × 2 windows (90D + All Time) = 16 legend categories.
-// Naming convention: <stat>_90d for the rolling window, <stat>_all_time for permanent records.
-// NOTE: legacy names `best_score_diff`, `lowest_gross` were renamed for consistency.
-// Run `gam_reset_user` (via gam-backdate-replay) to wipe old rows and rebuild with the new names.
+// 8 stats × 2 windows (90D + All Time) = 16 base legend categories,
+// plus the women's-division gross record (2 categories) added in L4.
 const LEGEND_CATS: LegendCfg[] = [
-  // ── Lowest gross score ──
   { category: "lowest_gross_90d",         windowDays: 90,   sortDir: "asc",  metric: "gross_score",       aggregate: "value" },
   { category: "lowest_gross_all_time",    windowDays: null, sortDir: "asc",  metric: "gross_score",       aggregate: "value" },
-  // ── Best score differential ──
   { category: "best_score_diff_90d",      windowDays: 90,   sortDir: "asc",  metric: "score_diff",        aggregate: "value" },
   { category: "best_score_diff_all_time", windowDays: null, sortDir: "asc",  metric: "score_diff",        aggregate: "value" },
-  // ── Most birdies ──
   { category: "most_birdies_90d",         windowDays: 90,   sortDir: "desc", metric: "birdies",           aggregate: "sum" },
   { category: "most_birdies_all_time",    windowDays: null, sortDir: "desc", metric: "birdies",           aggregate: "sum" },
-  // ── Best Stableford ──
   { category: "best_stableford_90d",      windowDays: 90,   sortDir: "desc", metric: "stableford_points", aggregate: "value" },
   { category: "best_stableford_all_time", windowDays: null, sortDir: "desc", metric: "stableford_points", aggregate: "value" },
-  // ── Most eagles ──
   { category: "most_eagles_90d",          windowDays: 90,   sortDir: "desc", metric: "eagles",            aggregate: "sum" },
   { category: "most_eagles_all_time",     windowDays: null, sortDir: "desc", metric: "eagles",            aggregate: "sum" },
-  // ── Most albatrosses ──
   { category: "most_albatrosses_90d",     windowDays: 90,   sortDir: "desc", metric: "albatrosses",       aggregate: "sum" },
   { category: "most_albatrosses_all_time",windowDays: null, sortDir: "desc", metric: "albatrosses",       aggregate: "sum" },
-  // ── Most hole-in-ones ──
   { category: "most_aces_90d",            windowDays: 90,   sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
   { category: "most_aces_all_time",       windowDays: null, sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
-  // ── Most rounds played ──
-  // NOTE: 'rounds' is NOT a column on gam_round_stats — recomputeLegend
-  // special-cases cfg.metric === 'rounds' to contribute 1 per qualifying row.
-  // Do NOT add 'rounds' to the SELECT list below; the column doesn't exist.
   { category: "most_rounds_90d",          windowDays: 90,   sortDir: "desc", metric: "rounds",            aggregate: "sum" },
   { category: "most_rounds_all_time",     windowDays: null, sortDir: "desc", metric: "rounds",            aggregate: "sum" },
+  // L4: women's division — gross record only, 90d + all-time.
+  { category: "lowest_gross_women_90d",      windowDays: 90,   sortDir: "asc", metric: "gross_score", aggregate: "value", genderScope: 'female' },
+  { category: "lowest_gross_women_all_time", windowDays: null, sortDir: "asc", metric: "gross_score", aggregate: "value", genderScope: 'female' },
 ];
 
 async function applyCourseLegends(stats: any) {
