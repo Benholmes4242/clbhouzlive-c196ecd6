@@ -44,7 +44,7 @@ const GENDER_OPTIONS = [
  */
 export const GenderPromptSheet: React.FC = () => {
   const { user } = useSupabaseSession();
-  const { profile, isLoading: profileLoading } = useProfileData();
+  const { profile, loading: profileLoading } = useProfileData();
   const location = useLocation();
   const queryClient = useQueryClient();
 
