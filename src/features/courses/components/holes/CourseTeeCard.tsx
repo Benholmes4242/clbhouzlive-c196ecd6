@@ -623,10 +623,15 @@ const TeePillsRow: React.FC<{
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
+          overflowY: 'hidden',
           paddingBottom: 4,
           scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
+          // Bias the browser to horizontal panning so a swipe on the pills
+          // row scrolls the chips instead of the page/tab.
+          touchAction: 'pan-x',
+          overscrollBehaviorX: 'contain',
         }}
       >
         {tees.map((tee) => {
