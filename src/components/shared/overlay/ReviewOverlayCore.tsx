@@ -51,6 +51,8 @@ export interface ReviewOverlayCoreProps {
   reviewerStats?: {
     coursesRated?: number | null;
   } | null;
+  /** L6 - Optional tee played (e.g. "Red"). Renders a small outline badge in meta area. */
+  teeLabel?: string | null;
   className?: string;
 }
 
@@ -67,6 +69,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   onCourseTap,
   courseSubtitle,
   reviewerStats,
+  teeLabel,
   className,
 }) => {
   const navigate = useNavigate();
@@ -401,6 +404,24 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                     }}
                   >
                     {coursesRated} rated
+                  </span>
+                </>
+              )}
+              {teeLabel && (
+                <>
+                  <span style={{ color: FROST.inkFaint, fontSize: 12 }}>·</span>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '1px 7px',
+                      borderRadius: 999,
+                      border: `1px solid ${FROST.inkFaint}`,
+                      color: FROST.inkMuter,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {teeLabel} tees
                   </span>
                 </>
               )}

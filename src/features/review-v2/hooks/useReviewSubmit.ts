@@ -45,7 +45,9 @@ export function useReviewSubmit() {
         p_review: state.reviewText || undefined,
         p_verdict: state.verdict,
         p_share_to_feed: state.shareToFeed,
-      });
+        // L6 - optional tee played. RPC accepts null/undefined (backwards-compatible).
+        p_tee_label: state.teeLabel ?? undefined,
+      } as never);
       if (error) throw error;
 
       // Award regional Top 100 badges immediately if this rating

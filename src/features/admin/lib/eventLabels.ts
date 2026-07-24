@@ -120,6 +120,10 @@ export const EVENT_LABELS: Record<string, string> = {
   // Course card (course Holes tab, Phase L3)
   tee_card_viewed: 'Course card viewed',
   tee_card_tee_changed: 'Course card tee changed',
+
+  // Review tee context (Phase L6)
+  review_tee_selected: 'Review tee selected',
+  review_tee_filter_toggled: 'Review tee filter toggled',
 };
 
 export function titleize(name: string): string {

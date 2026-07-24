@@ -26,6 +26,8 @@ export type CourseReview = {
   unhelpful_count: number | null;
   current_user_vote?: 'helpful' | 'unhelpful' | null;
   is_mock: boolean;
+  // L6 - tee played (optional). May be absent on old reviews.
+  tee_label?: string | null;
   user_profiles?: {
     id: string;
     username: string | null;
@@ -86,6 +88,7 @@ export function useCourseReviews(
           helpful_count,
           unhelpful_count,
           is_mock,
+          tee_label,
           user_profiles:user_id (
             id,
             username,

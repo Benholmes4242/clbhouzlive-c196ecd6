@@ -36,6 +36,8 @@ import { SuccessScreenV2 } from './components/SuccessScreenV2';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
+import { useCourseTeeSets, type TeeSet } from '@/features/courses/hooks/useCourseTeeSets';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -55,6 +57,103 @@ function Section({ eyebrow, children }: { eyebrow: string; children: React.React
         {eyebrow}
       </div>
       {children}
+    </section>
+  );
+}
+
+// L6 - Optional tee chip row. Renders only when at least one colour tee exists.
+// Reuses useCourseTeeSets (no new fetch path). Selected chip filled ink; tapping
+// the selected chip clears the selection back to null.
+function TeeChipRow({
+  courseId,
+  value,
+  onChange,
+}: {
+  courseId: string;
+  value: string | null;
+  onChange: (label: string | null) => void;
+}) {
+  const { t } = useTranslation('courses');
+  const { data } = useCourseTeeSets(courseId);
+  const colourTees = useMemo<TeeSet[]>(
+    () => (data ?? []).filter((tee) => tee.label_kind === 'colour'),
+    [data],
+  );
+
+  // Preselect from L3 continuity key when nothing is picked yet and the stored
+  // label matches a returned colour tee. Never required. One-shot per mount.
+  const preseededRef = useRef(false);
+  useEffect(() => {
+    if (preseededRef.current) return;
+    if (colourTees.length === 0) return;
+    if (value != null) { preseededRef.current = true; return; }
+    let stored: string | null = null;
+    try {
+      stored = typeof window !== 'undefined'
+        ? window.localStorage.getItem(`tee-card:${courseId}`)
+        : null;
+    } catch {
+      stored = null;
+    }
+    if (stored && colourTees.some((tee) => tee.tee_label === stored)) {
+      onChange(stored);
+    }
+    preseededRef.current = true;
+  }, [colourTees, courseId, value, onChange]);
+
+  if (colourTees.length === 0) return null;
+
+  return (
+    <section style={{ padding: '0 16px 12px' }}>
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 700,
+          color: RV2.amber,
+          textTransform: 'uppercase',
+          letterSpacing: '0.14em',
+          marginBottom: 10,
+        }}
+      >
+        {t('review.teesPlayed.eyebrow', { defaultValue: 'TEES PLAYED (OPTIONAL)' })}
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {colourTees.map((tee) => {
+          const selected = value === tee.tee_label;
+          return (
+            <button
+              key={tee.tee_label}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => {
+                if (selected) {
+                  onChange(null);
+                } else {
+                  onChange(tee.tee_label);
+                  // review_tee_selected - composer chip select
+                  analyticsEvents.track('review_tee_selected', {
+                    course_id: courseId,
+                    tee_label: tee.tee_label,
+                  });
+                }
+              }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 999,
+                border: selected ? `1px solid ${RV2.ink}` : `1px solid ${RV2.hairlineStrong}`,
+                background: selected ? RV2.ink : '#FFFFFF',
+                color: selected ? '#FFFFFF' : RV2.ink,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: '0.01em',
+                cursor: 'pointer',
+              }}
+            >
+              {tee.tee_label}
+            </button>
+          );
+        })}
+      </div>
     </section>
   );
 }
@@ -86,9 +185,9 @@ function InnerComposer() {
     queryKey: ['rv2-existing', courseId, userId],
     enabled: !!courseId && !!userId,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('course_ratings')
-        .select('id, rating, design_score, condition_score, clubhouse_score, facilities_score, review, verdict, share_to_feed')
+      // L6: 'tee_label' column may not yet exist in generated types until DB migration ships.
+      const { data } = await (supabase.from('course_ratings') as any)
+        .select('id, rating, design_score, condition_score, clubhouse_score, facilities_score, review, verdict, share_to_feed, tee_label')
         .eq('course_id', courseId!)
         .eq('user_id', userId!)
         .maybeSingle();
@@ -565,6 +664,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       <Section eyebrow="Category scores">
         <CategoryGrid values={composer.state.scores} onChange={composer.setCategory} />
       </Section>
+
+      {/* L6 - Optional tees played (renders only when colour tees exist for this course) */}
+      <TeeChipRow
+        courseId={course.id}
+        value={composer.state.teeLabel}
+        onChange={composer.setTeeLabel}
+      />
 
       {/* Words */}
       <section style={{ padding: '0 16px 12px' }}>
