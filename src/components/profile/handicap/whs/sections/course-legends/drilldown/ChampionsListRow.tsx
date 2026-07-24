@@ -138,8 +138,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       : '';
 
   const padY = compact ? '7px' : '10px';
-  const nameSize = compact ? 14 : 15;
-  const valueSize = compact ? 14.5 : 16;
+  const nameSize = 14.5;
+  const valueSize = 17;
 
   return (
     <div
