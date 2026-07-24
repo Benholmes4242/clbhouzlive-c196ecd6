@@ -55,27 +55,22 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
-  // Candidate selection: whs_scores with no round_weather row, whose
-  // course maps to a golf_courses row with non-null lat/lng.
-  // Newest play_date first so fresh rounds cover immediately.
-  const CANDIDATE_SQL = `
-    SELECT ws.id AS whs_score_id,
-           ws.play_date::text AS play_date,
-           gc.id AS golf_course_id,
-           gc.latitude::float8 AS latitude,
-           gc.longitude::float8 AS longitude
-      FROM public.whs_scores ws
-      JOIN public.whs_to_golf_course_map m ON m.whs_course_id = ws.course_id
-      JOIN public.golf_courses gc ON gc.id = m.golf_course_id
-     WHERE gc.latitude IS NOT NULL
-       AND gc.longitude IS NOT NULL
-       AND ws.play_date IS NOT NULL
-       AND NOT EXISTS (
-         SELECT 1 FROM public.round_weather rw WHERE rw.whs_score_id = ws.id
-       )
-     ORDER BY ws.play_date DESC
-     LIMIT ${BATCH_LIMIT}
-  `;
+  // Candidate selection (executed via PostgREST steps below; logical SQL):
+  //
+  //   SELECT ws.id AS whs_score_id, ws.play_date, gc.id AS golf_course_id,
+  //          gc.latitude, gc.longitude
+  //     FROM public.whs_scores ws
+  //     JOIN public.whs_to_golf_course_map m ON m.whs_course_id = ws.course_id
+  //     JOIN public.golf_courses gc ON gc.id = m.golf_course_id
+  //    WHERE gc.latitude IS NOT NULL
+  //      AND gc.longitude IS NOT NULL
+  //      AND ws.play_date IS NOT NULL
+  //      AND NOT EXISTS (
+  //        SELECT 1 FROM public.round_weather rw WHERE rw.whs_score_id = ws.id
+  //      )
+  //    ORDER BY ws.play_date DESC
+  //    LIMIT 200;
+
 
   // Step 1: fetch newest whs_scores (over-fetch, we filter next).
   const OVERFETCH = BATCH_LIMIT * 6;
