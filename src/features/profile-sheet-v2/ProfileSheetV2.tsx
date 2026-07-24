@@ -105,6 +105,23 @@ export default function ProfileSheetV2({
     onClose();
     setTimeout(() => openInviteSheet('profile_sheet'), 250);
   };
+
+  // Course analytics entry state — only relevant for personal actor.
+  const [analyticsSheetOpen, setAnalyticsSheetOpen] = useState(false);
+  const analyticsUserId = currentActor.type === 'personal' ? currentActor.id : undefined;
+  const { data: whsConn } = useWhsConnection(analyticsUserId);
+  const whsSynced = !!whsConn && !(whsConn as { deleted_at?: string | null }).deleted_at;
+  const { data: userCourses } = useUserAnalyticsCourses({ enabled: open && whsSynced });
+  const analyticsState: 'ready' | 'building' | 'disconnected' = !whsSynced
+    ? 'disconnected'
+    : (userCourses?.length ?? 0) > 0
+      ? 'ready'
+      : 'building';
+  const handleOpenCourseAnalytics = () => setAnalyticsSheetOpen(true);
+  const handleAnalyticsNavigate = (route: string) => {
+    onClose();
+    setTimeout(() => onNavigate(route), 40);
+  };
   const panelRef = useRef<HTMLDivElement | null>(null);
   const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
   const ovlId = useRef<number>(-1);
