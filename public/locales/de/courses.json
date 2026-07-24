@@ -121,7 +121,8 @@
     "noFriendsPlayed": "No friends played yet",
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
-    "experiencePoints": "Experience Points Earned"
+    "experiencePoints": "Experience Points Earned",
+    "yourStats": "Your stats"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
