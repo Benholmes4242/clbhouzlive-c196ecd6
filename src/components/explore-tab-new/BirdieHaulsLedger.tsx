@@ -16,7 +16,7 @@ import { DiscoverYouStripMount } from './DiscoverYouStripMount';
 import { slugToCacheRegion } from './regionScope';
 
 
-const ROWS = 5;
+const ROWS = 3;
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -43,37 +43,60 @@ interface Props {
   regionUpper: string;
   mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
+  /** Parent (FeatsSection) owns the SectionHead + section spacing. */
+  embedded?: boolean;
+  /** Controlled sheet (used when embedded). */
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
 }
 
-export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
+export function BirdieHaulsLedger({
+  region,
+  mode,
+  onRowTap,
+  embedded = false,
+  sheetOpen: sheetOpenProp,
+  onSheetOpenChange,
+}: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
   const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [localSheetOpen, setLocalSheetOpen] = useState(false);
+
+  const controlled = typeof onSheetOpenChange === 'function';
+  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
+  const setSheetOpen = (open: boolean) => {
+    if (controlled) onSheetOpenChange!(open);
+    else setLocalSheetOpen(open);
+  };
 
   const display = rows.slice(0, ROWS);
   const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
+  const sectionStyle = { marginTop: embedded ? 0 : 32, fontFamily: FONT } as const;
 
   if (!isLoading && display.length === 0) {
     if (region == null) return null;
     return (
-      <section style={{ marginTop: 32, fontFamily: FONT }}>
-        <SectionHead overline={overlineLabel} paddingX={14} />
+      <section style={sectionStyle}>
+        {!embedded && <SectionHead overline={overlineLabel} paddingX={14} />}
         <EmptyScopeCard
           title={`No birdie hauls ${regionScopePhrase(region)} yet.`}
-          subline="This region is unconquered — be the first."
+          subline={'This region is unconquered \u2014 be the first.'}
         />
       </section>
     );
   }
 
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHead
-        overline={overlineLabel}
-        meta="View all"
-        onMeta={() => setSheetOpen(true)}
-        paddingX={14}
-      />
+    <section style={sectionStyle}>
+      {!embedded && (
+        <SectionHead
+          overline={overlineLabel}
+          meta="View all"
+          onMeta={() => setSheetOpen(true)}
+          paddingX={14}
+        />
+      )}
+
 
       <div>
         {display.map((row, i) => {

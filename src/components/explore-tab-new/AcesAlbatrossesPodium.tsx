@@ -10,7 +10,7 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { StatRow } from './StatRow';
 import { formatHcp } from '@/lib/formatHcp';
 
-const MAX_ROWS = 10;
+const MAX_ROWS = 3;
 const INK_MUTE = 'rgba(15,23,42,0.55)';
 const PAGE_PAD = 14;
 
