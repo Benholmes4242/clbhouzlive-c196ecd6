@@ -53,9 +53,10 @@ Deno.serve(async (req) => {
   }
 });
 
-function json(body: any, status = 200) {
+function json(body: any, status = 200, corsHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status,
   });
 }
+
