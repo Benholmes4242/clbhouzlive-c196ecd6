@@ -8,7 +8,7 @@
 //
 // ASCII only. No em dashes in comments (house rule per Phase L2).
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
