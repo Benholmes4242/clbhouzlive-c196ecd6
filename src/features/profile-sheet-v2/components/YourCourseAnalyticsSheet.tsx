@@ -20,7 +20,12 @@ const MUTED = '#94A3B8';
 const SOFT = '#475569';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
+const OVER_RED = '#D2222D';
+const UNDER_GREEN = '#059669';
+const PILL_BG = 'rgba(15,23,42,0.04)';
 const CHEVRON = '\u203A';
+/** Toggle pill labels between long ("eagles+") and short ("EAG+") at this width. */
+const NARROW_BREAKPOINT = 360;
 
 interface Props {
   open: boolean;
