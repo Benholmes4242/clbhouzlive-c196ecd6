@@ -839,7 +839,7 @@ const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: numb
     role="row"
     style={{
       display: 'grid',
-      gridTemplateColumns: '56px 1fr 1fr 1fr',
+      gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
       background: zebra ? 'rgba(15,23,42,0.02)' : '#FFFFFF',
       fontSize: 13,
