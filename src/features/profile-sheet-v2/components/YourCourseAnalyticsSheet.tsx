@@ -262,15 +262,61 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                 overflow: 'hidden',
               }}
             >
-              {listItems.map((c, i) => (
-                <Row
-                  key={c.course_id}
-                  title={c.course_name}
-                  subtitle={`${c.rounds_count} ${c.rounds_count === 1 ? 'round' : 'rounds'}`}
-                  onClick={() => go(c.course_id)}
-                  isLast={i === listItems.length - 1}
-                />
-              ))}
+              {listItems.map((c, i) => {
+                const roundsLabel = t('yourCourses.roundsCount', { count: c.rounds_count });
+                const hasAvg = c.avg_to_par !== null && c.avg_to_par !== undefined;
+                const showToughest =
+                  i < 3 &&
+                  c.hardest_hole_no !== null &&
+                  c.hardest_hole_no !== undefined &&
+                  c.hardest_hole_avg !== null &&
+                  c.hardest_hole_avg !== undefined;
+
+                const subtitle = (
+                  <>
+                    <div>
+                      <span style={{ color: SOFT }}>{roundsLabel}</span>
+                      {hasAvg && (
+                        <>
+                          <span style={{ color: MUTED, margin: '0 6px' }}>{'\u00B7'}</span>
+                          <span
+                            style={{
+                              color: AMBER,
+                              fontWeight: 700,
+                              fontVariantNumeric: 'tabular-nums',
+                            }}
+                          >
+                            {t('yourCourses.avgHere', {
+                              avg: fmtSigned(c.avg_to_par as number, 1),
+                            })}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {showToughest && (
+                      <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>
+                        {t('yourCourses.toughestHole', { hole: c.hardest_hole_no })}
+                        <span style={{ margin: '0 6px' }}>{'\u00B7'}</span>
+                        <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          {t('yourCourses.perRound', {
+                            avg: fmtSigned(c.hardest_hole_avg as number, 2),
+                          })}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+
+                return (
+                  <Row
+                    key={c.course_id}
+                    title={c.course_name}
+                    subtitle={subtitle}
+                    onClick={() => go(c.course_id)}
+                    isLast={i === listItems.length - 1}
+                  />
+                );
+              })}
             </div>
           ) : null}
 
