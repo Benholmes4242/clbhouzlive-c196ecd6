@@ -41,12 +41,6 @@ export interface StatRowProps {
   showWatermark?: boolean;
   isLast?: boolean;
   onPress?: () => void;
-  /**
-   * Row density. 'default' preserves legacy sizing for the 14 existing
-   * consumers. 'compact' is the canonical Discover + Champions density:
-   * 56 min-height, 8x16 padding, 34 avatar, 14.5/12.5 text, 17/9.5 stat.
-   */
-  density?: 'default' | 'compact';
 }
 
 
@@ -152,20 +146,9 @@ export function StatRow({
   showWatermark = false,
   isLast = false,
   onPress,
-  density = 'default',
 }: StatRowProps) {
   const hasStat = statValue != null && statValue !== '';
   const rightTimestamp = !hasStat && !chip && timestamp;
-
-  const compact = density === 'compact';
-  const rowMinHeight = compact ? 56 : 64;
-  const rowPadding = compact ? '8px 16px' : '10px 16px';
-  const rowGap = compact ? 10 : 12;
-  const avatarSize = compact ? 34 : 40;
-  const nameSize = compact ? 14.5 : 15;
-  const sublineSize = compact ? 12.5 : 13;
-  const statValueSize = compact ? 17 : 20;
-  const statLabelSize = compact ? 9.5 : 10;
 
   return (
     <button
@@ -176,10 +159,10 @@ export function StatRow({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: rowGap,
+        gap: 12,
         width: '100%',
-        minHeight: rowMinHeight,
-        padding: rowPadding,
+        minHeight: 64,
+        padding: '10px 16px',
         background: 'transparent',
         border: 'none',
         borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
@@ -209,7 +192,7 @@ export function StatRow({
 
       <div style={{ flexShrink: 0 }}>
         <SquircleAvatar
-          size={avatarSize}
+          size={40}
           srcCandidates={avatarUrl ? [avatarUrl] : []}
           alt={name}
           fallback={getInitialsFromName(name)}
@@ -221,7 +204,7 @@ export function StatRow({
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <div
           style={{
-            fontSize: nameSize,
+            fontSize: 15,
             fontWeight: 600,
             color: INK,
             letterSpacing: '-0.01em',
@@ -236,7 +219,7 @@ export function StatRow({
         {subline ? (
           <div
             style={{
-              fontSize: sublineSize,
+              fontSize: 13,
               fontWeight: 500,
               color: SLATE_500,
               lineHeight: 1.2,
@@ -263,7 +246,7 @@ export function StatRow({
         {(chip || rightTimestamp) && timestamp ? (
           <span
             style={{
-              fontSize: sublineSize,
+              fontSize: 13,
               fontWeight: 500,
               color: SLATE_400,
               lineHeight: 1.2,
@@ -286,7 +269,7 @@ export function StatRow({
             <div
               className="tabular-nums"
               style={{
-                fontSize: statValueSize,
+                fontSize: 20,
                 fontWeight: 700,
                 lineHeight: 1,
                 color: statColor ?? INK,
@@ -298,7 +281,7 @@ export function StatRow({
             {statLabel ? (
               <div
                 style={{
-                  fontSize: statLabelSize,
+                  fontSize: 10,
                   fontWeight: 600,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -312,7 +295,7 @@ export function StatRow({
             {statSubLabel ? (
               <div
                 style={{
-                  fontSize: statLabelSize,
+                  fontSize: 10,
                   fontWeight: 600,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',

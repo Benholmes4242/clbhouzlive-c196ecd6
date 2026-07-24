@@ -34,7 +34,7 @@ import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
 import ExploreGrid from './ExploreGrid';
 import WeekInGolfRail from './WeekInGolfRail';
-
+import { RivalryCard } from './RivalryCard';
 import { SeasonRaceCard } from './SeasonRaceCard';
 import { YourStandingStrip } from './YourStandingStrip';
 import { AttackDefendBand } from './AttackDefendBand';
@@ -127,6 +127,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
 
+        {/* Rivalry — sits directly below the Attack/Defend band */}
+        <RivalryCard userId={userId} />
 
         {/* This week in golf — honours rail */}
         <WeekInGolfRail region={activeRegion} />

@@ -38,15 +38,13 @@ interface Props {
   bestToPar?: number | null;
   maxCount?: number | null;
   isLast?: boolean;
-  /** Forwarded to StatRow. Default preserves legacy sizing. */
-  density?: 'default' | 'compact';
 }
 
 /**
  * FeatListRow — delegates to the canonical StatRow for the TierSeeAllSheet.
  * Preserves per-tier semantics (to-par red, ACE/ALBATROSS chip, rank-1 watermark).
  */
-export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false, density }: Props) {
+export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false }: Props) {
   const holder = useMemo(() => formatHolderName(row.holder_name), [row.holder_name]);
   const rank = index + 1;
   const isRecordsRow = tier === 'records';
@@ -116,7 +114,6 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       showWatermark={showWatermark}
       isLast={isLast}
       onPress={onTap}
-      density={density}
     />
   );
 }

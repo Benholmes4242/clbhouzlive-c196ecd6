@@ -153,7 +153,6 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
           statColor={statColor}
           showWatermark={r.rank === 1}
           isLast={isLast}
-          density="compact"
         />
       </div>
     );

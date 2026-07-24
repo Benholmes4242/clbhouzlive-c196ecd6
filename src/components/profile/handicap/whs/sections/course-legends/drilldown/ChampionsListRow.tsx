@@ -95,7 +95,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
 
-  const avatarSize = 34;
+  const avatarSize = compact ? 32 : 40;
 
   const hairlineOverlay = (
     <div
@@ -138,8 +138,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       : '';
 
   const padY = compact ? '7px' : '10px';
-  const nameSize = 14.5;
-  const valueSize = 17;
+  const nameSize = compact ? 14 : 15;
+  const valueSize = compact ? 14.5 : 16;
 
   return (
     <div
@@ -194,7 +194,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
         <div
           style={{
-            fontSize: 12.5,
+            fontSize: 11,
             color: subColor,
             fontWeight: 500,
             letterSpacing: '-0.003em',
