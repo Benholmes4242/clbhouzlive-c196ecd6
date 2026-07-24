@@ -351,7 +351,7 @@ export function useHeroCarouselData() {
       // active it OWNS a synthetic 'major' pseudo-tour slide and is evicted
       // from its native tour bucket. This applies to BOTH mens majors (evicted
       // from PGA/EURO/etc.) and womens majors (evicted from LPGA). The
-      // cross-tour PGA injection block below still filters on 'mens' only —
+      // cross-tour PGA injection block below still filters on 'mens' only -
       // womens majors are never promoted onto the PGA tab.
       //
       // Either, both, or neither major can be active at once. When both are
@@ -383,7 +383,7 @@ export function useHeroCarouselData() {
       const activeMajorId = activeMajorRow?.id ?? null;
       const activeWomensMajorId = activeWomensMajorRow?.id ?? null;
 
-      // Cross-tour major promotion (existing behaviour) — mens only. SKIP the
+      // Cross-tour major promotion (existing behaviour) - mens only. SKIP the
       // active mens major so it doesn't evict the true PGA next event. Womens
       // majors are never promoted onto PGA.
       const crossTourMajors = upcomingTournaments
@@ -402,7 +402,7 @@ export function useHeroCarouselData() {
         (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       );
 
-      // Evict every active major from every native tour bucket — each lives
+      // Evict every active major from every native tour bucket - each lives
       // only in its synthetic 'major' slide below. Symmetric for mens/womens.
       const evictIds = new Set<string>();
       if (activeMajorId) evictIds.add(activeMajorId);
