@@ -298,11 +298,11 @@ function AnalyticsCourseRow({
           }}
         >
           {(course.eagles_plus_count as number) > 0 && (
-            <ScoringPill pct={course.eagles_plus_pct as number} count={course.eagles_plus_count as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
+            <ScoringPill pct={course.eagles_plus_pct as number} pctExact={course.eagles_plus_pct_exact as number} count={course.eagles_plus_count as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
           )}
-          <ScoringPill pct={course.birdies_pct as number} count={course.birdies_count as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
-          <ScoringPill pct={course.pars_pct as number} count={course.pars_count as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
-          <ScoringPill pct={course.bogeys_plus_pct as number} count={course.bogeys_plus_count as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
+          <ScoringPill pct={course.birdies_pct as number} pctExact={course.birdies_pct_exact as number} count={course.birdies_count as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
+          <ScoringPill pct={course.pars_pct as number} pctExact={course.pars_pct_exact as number} count={course.pars_count as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
+          <ScoringPill pct={course.bogeys_plus_pct as number} pctExact={course.bogeys_plus_pct_exact as number} count={course.bogeys_plus_count as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
         </div>
       )}
     </button>
