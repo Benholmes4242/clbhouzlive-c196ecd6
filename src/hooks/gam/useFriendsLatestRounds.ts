@@ -252,7 +252,7 @@ export function useFriendsLatestRounds(
           current != null && r.hcp_at_time != null
             ? Math.round((current - Number(r.hcp_at_time)) * 10) / 10
             : null;
-        const badges = badgesByUserDay.get(`${r.user_id}::${r.play_date}`) ?? [];
+        const badges = r.whs_score_id ? (badgesByScoreId.get(r.whs_score_id) ?? []) : [];
         return {
           round_id: r.whs_score_id ?? `${r.user_id}-${r.play_date}`,
           score_id: r.whs_score_id,
