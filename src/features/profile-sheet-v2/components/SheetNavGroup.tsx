@@ -19,11 +19,16 @@ const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const CHEVRON = '\u203A';
 
+type AnalyticsState = 'ready' | 'building' | 'disconnected';
+
 interface Props {
   currentActor: { id: string; type: 'personal' | 'business' };
   isAdmin: boolean;
   onNavigate: (route: string) => void;
   onInviteFriends?: () => void;
+  /** Course analytics entry — omit to hide the row. */
+  onOpenCourseAnalytics?: () => void;
+  analyticsState?: AnalyticsState;
 }
 
 interface RowProps {
@@ -31,6 +36,8 @@ interface RowProps {
   onClick: () => void;
   trailing?: React.ReactNode;
   isLast?: boolean;
+  subLabel?: string;
+  disabled?: boolean;
 }
 
 function Row({ label, onClick, trailing, isLast }: RowProps) {
