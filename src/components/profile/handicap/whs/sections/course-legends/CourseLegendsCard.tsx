@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { CourseEyebrow } from './_shared/CourseEyebrow';
 import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
-import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
+import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { GAM } from '../../gam/tokens';
 
 const FONT = GAM.FONT_GEIST;
@@ -24,23 +24,53 @@ const FONT = GAM.FONT_GEIST;
  * source of truth for the exclusion.
  */
 const SLOT_META: Record<string, { short: string }> = {
-  lowest_gross:     { short: 'GROSS' },
-  best_stableford:  { short: 'STBL' },
-  most_aces:        { short: 'ACE' },
-  most_albatrosses: { short: 'ALB' },
-  most_eagles:      { short: 'EAGLE' },
-  most_birdies:     { short: 'BIRDIE' },
-  best_score_diff:  { short: 'SCORE' },
+  lowest_gross:       { short: 'GROSS' },
+  lowest_gross_women: { short: "WOMEN'S" },
+  best_stableford:    { short: 'STBL' },
+  most_aces:          { short: 'ACE' },
+  most_albatrosses:   { short: 'ALB' },
+  most_eagles:        { short: 'EAGLE' },
+  most_birdies:       { short: 'BIRDIE' },
+  best_score_diff:    { short: 'SCORE' },
 };
 
-const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string }> =
-  CHAMPIONS_ORDER_90D
-    .map((key, i) => ({ key, alt: CHAMPIONS_ORDER_ALL_TIME[i] }))
-    .filter(({ key }) => !key.startsWith('most_rounds'))
-    .map(({ key, alt }) => {
-      const base = key.replace(/_90d$/, '');
-      return { key, alt, short: SLOT_META[base].short };
-    });
+type Slot = { key: LegendCategory; alt: LegendCategory; short: string };
+
+/**
+ * Build the slot list from the (window-filtered) holder map so that the
+ * women's-division gross record slot only appears when a woman holds it.
+ *
+ * The map is pre-filtered to a single window (90d OR all_time), but the
+ * rendered grid still pairs each 90d key with its all_time twin via
+ * `alt` so `HolderCell` can look up whichever window has the row. To keep
+ * both ordered arrays index-aligned after the women's record is spliced
+ * (present in one window but not the other), we augment the `present`
+ * set with the sibling variant before computing each order. This is a
+ * pairing-only mirror; the underlying data is unchanged, so the alt
+ * lookup will simply miss when the sibling window has no row.
+ */
+function buildSlots(holdersByCategory: Map<LegendCategory, unknown>): Slot[] {
+  const present = new Set<LegendCategory>(holdersByCategory.keys() as Iterable<LegendCategory>);
+  const augmented = new Set<LegendCategory>(present);
+  if (present.has('lowest_gross_women_90d')) augmented.add('lowest_gross_women_all_time');
+  if (present.has('lowest_gross_women_all_time')) augmented.add('lowest_gross_women_90d');
+
+  const ordered90 = orderWithWomensRecord(CHAMPIONS_ORDER_90D, augmented);
+  const orderedAll = orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, augmented);
+
+  const slots: Slot[] = [];
+  const len = Math.min(ordered90.length, orderedAll.length);
+  for (let i = 0; i < len; i++) {
+    const key = ordered90[i];
+    const alt = orderedAll[i];
+    if (key.startsWith('most_rounds')) continue;
+    const base = key.replace(/_90d$/, '');
+    const meta = SLOT_META[base];
+    if (!meta) continue;
+    slots.push({ key, alt, short: meta.short });
+  }
+  return slots;
+}
 
 interface HolderCellProps {
   short: string;
@@ -198,8 +228,12 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
+  // Slots are derived from the (window-filtered) holder map so the women's
+  // record slot only materialises when a woman actually holds the crown.
+  const slots = useMemo(() => buildSlots(holdersByCategory), [holdersByCategory]);
+
   // Resolve each slot to whichever window key has data.
-  const resolved = SLOTS.map((slot) => {
+  const resolved = slots.map((slot) => {
     const row =
       holdersByCategory.get(slot.key) ??
       holdersByCategory.get(slot.alt) ??
@@ -214,7 +248,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
   });
 
   const heldCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
-  const totalSlots = SLOTS.length;
+  const totalSlots = slots.length;
 
   if (visibleHolders.size === 0) return null;
 

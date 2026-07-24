@@ -31,14 +31,10 @@ import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { chaseCtaLine } from './drilldown/_shared/duelTension';
-import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
+import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
 import { useProfileData } from '@/hooks/useProfileData';
-
-
-const CATEGORIES_ORDER_90D: LegendCategory[] = CHAMPIONS_ORDER_90D.filter(c => c !== 'best_score_diff_90d');
-const CATEGORIES_ORDER_ALL_TIME: LegendCategory[] = CHAMPIONS_ORDER_ALL_TIME.filter(c => c !== 'best_score_diff_all_time');
 
 const SHORT_LABELS: Record<LegendCategory, string> = {
   best_score_diff_90d:      'Score',
@@ -189,7 +185,22 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     };
   }, [ctx.courseName]);
 
-  const visibleCategories = window === '90d' ? CATEGORIES_ORDER_90D : CATEGORIES_ORDER_ALL_TIME;
+  // Derive the visible category order from the holder data returned by
+  // useCourseLegends (data). The women's-division gross record is spliced
+  // in by orderWithWomensRecord ONLY when a woman actually holds a card
+  // on this course — no unclaimed slot, no visual change otherwise.
+  // best_score_diff_* is intentionally excluded from the drilldown grid.
+  const { visibleCategories90d, visibleCategoriesAllTime } = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const present = new Set<LegendCategory>((data ?? []).map((r: any) => r.category as LegendCategory));
+    const list90: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_90D, present)
+      .filter((c): c is LegendCategory => c !== 'best_score_diff_90d');
+    const listAll: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, present)
+      .filter((c): c is LegendCategory => c !== 'best_score_diff_all_time');
+    return { visibleCategories90d: list90, visibleCategoriesAllTime: listAll };
+  }, [data]);
+
+  const visibleCategories = window === '90d' ? visibleCategories90d : visibleCategoriesAllTime;
 
   const groupedWithTotals = useMemo(() => {
     const m = new Map<LegendCategory, { rows: SectionRow[]; total: number }>();
