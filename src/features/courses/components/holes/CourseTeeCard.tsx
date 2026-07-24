@@ -27,6 +27,16 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"tnum" 1, "kern" 1',
 };
 
+// Shared grid template for the hole table (header, Row, SubtotalRow). The
+// hole-number track may shrink to 40px on narrow devices; the three data
+// tracks use minmax(0, 1fr) so they can shrink below their intrinsic content
+// width and never push the card past the viewport edge.
+const HOLE_GRID_COLUMNS =
+  'minmax(40px, 56px) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)';
+// Minimum table width when wrapped in the horizontal scroll fallback so
+// numbers remain readable at 320dp rather than being crushed together.
+const HOLE_TABLE_MIN_WIDTH = 280;
+
 function storageKey(courseId: string) {
   return `tee-card:${courseId}`;
 }
@@ -185,6 +195,13 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         padding: '20px 16px 8px',
         fontFamily: FONT,
         background: '#FFFFFF',
+        // minWidth:0 is the load-bearing rule here: without it a flex/grid
+        // child defaults to min-width:auto and will happily push its parent
+        // past the viewport regardless of maxWidth. maxWidth:100% then caps
+        // the card at its container so it can never overflow the page.
+        minWidth: 0,
+        maxWidth: '100%',
+        overflow: 'hidden',
       }}
       aria-label={t('courses:teeCard.a11yBlock') as string}
     >
@@ -317,9 +334,11 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           gridTemplateRows: expanded ? '1fr' : '0fr',
           transition: reducedMotion ? 'none' : 'grid-template-rows 220ms ease',
           overflow: 'hidden',
+          minWidth: 0,
+          maxWidth: '100%',
         }}
       >
-        <div style={{ minHeight: 0 }} aria-hidden={!expanded}>
+        <div style={{ minHeight: 0, minWidth: 0, maxWidth: '100%' }} aria-hidden={!expanded}>
           <div style={{ height: 12 }} />
 
           {/* Colour tee pills — horizontal carousel with edge fades. */}
@@ -463,7 +482,23 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           </div>
 
 
-          {/* Holes table */}
+          {/* Holes table — wrapped in a horizontal scroll container so at
+              very narrow widths (320dp) the table can scroll internally
+              without ever dragging the page or the card sideways. */}
+          <style>{`.tee-holes-scroll::-webkit-scrollbar{display:none}`}</style>
+          <div
+            className="tee-holes-scroll"
+            style={{
+              maxWidth: '100%',
+              minWidth: 0,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              overscrollBehaviorX: 'contain',
+              borderRadius: 10,
+            }}
+          >
           <div
             role="table"
             aria-label={t('courses:teeCard.a11yTable') as string}
@@ -471,13 +506,14 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               border: `1px solid ${HAIRLINE_INK_8}`,
               borderRadius: 10,
               overflow: 'hidden',
+              minWidth: HOLE_TABLE_MIN_WIDTH,
             }}
           >
             <div
               role="row"
               style={{
                 display: 'grid',
-                gridTemplateColumns: '56px 1fr 1fr 1fr',
+                gridTemplateColumns: HOLE_GRID_COLUMNS,
                 padding: '8px 12px',
                 background: '#F8FAFC',
                 borderBottom: `1px solid ${HAIRLINE_INK_8}`,
@@ -520,6 +556,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               yards={totalYards}
               strong
             />
+          </div>
           </div>
 
           {/* Honesty caption */}
@@ -802,7 +839,7 @@ const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: numb
     role="row"
     style={{
       display: 'grid',
-      gridTemplateColumns: '56px 1fr 1fr 1fr',
+      gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
       background: zebra ? 'rgba(15,23,42,0.02)' : '#FFFFFF',
       fontSize: 13,
@@ -822,7 +859,7 @@ const SubtotalRow: React.FC<{ label: string; par: number; yards: number; strong?
     role="row"
     style={{
       display: 'grid',
-      gridTemplateColumns: '56px 1fr 1fr 1fr',
+      gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
       background: strong ? '#F1F5F9' : '#F8FAFC',
       borderTop: `1px solid ${HAIRLINE_INK_8}`,
