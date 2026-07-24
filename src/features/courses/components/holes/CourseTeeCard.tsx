@@ -564,6 +564,14 @@ const TeePillsRow: React.FC<{
 }> = ({ tees, activeLabel, onPick, ariaLabel, reducedMotion }) => {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const chipRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const dragStateRef = useRef<{
+    startX: number;
+    startY: number;
+    startScrollLeft: number;
+    axis: 'x' | 'y' | null;
+    dragged: boolean;
+  }>({ startX: 0, startY: 0, startScrollLeft: 0, axis: null, dragged: false });
+  const suppressNextClickRef = useRef(false);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(true);
   const rawId = React.useId();
@@ -600,6 +608,81 @@ const TeePillsRow: React.FC<{
     };
   }, [updateFades, tees.length]);
 
+  // Native horizontal overflow scrolling can be swallowed by the course page's
+  // vertical scroll container on iOS when the gesture starts on a button. Own
+  // horizontal drags here, while leaving vertical drags to the page.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    let clickTimer: number | null = null;
+
+    const clearClickSuppression = () => {
+      if (clickTimer != null) window.clearTimeout(clickTimer);
+      clickTimer = window.setTimeout(() => {
+        suppressNextClickRef.current = false;
+        clickTimer = null;
+      }, 180);
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      dragStateRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startScrollLeft: el.scrollLeft,
+        axis: null,
+        dragged: false,
+      };
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const state = dragStateRef.current;
+      const deltaX = touch.clientX - state.startX;
+      const deltaY = touch.clientY - state.startY;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+
+      if (!state.axis) {
+        if (absX < 6 && absY < 6) return;
+        state.axis = absX > absY + 4 ? 'x' : 'y';
+      }
+
+      if (state.axis !== 'x') return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      el.scrollLeft = state.startScrollLeft - deltaX;
+      state.dragged = true;
+      updateFades();
+    };
+
+    const handleTouchEnd = () => {
+      if (dragStateRef.current.dragged) {
+        suppressNextClickRef.current = true;
+        clearClickSuppression();
+      }
+      dragStateRef.current.axis = null;
+      dragStateRef.current.dragged = false;
+    };
+
+    el.addEventListener('touchstart', handleTouchStart, { passive: true });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    el.addEventListener('touchend', handleTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+    return () => {
+      if (clickTimer != null) window.clearTimeout(clickTimer);
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('touchend', handleTouchEnd);
+      el.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [updateFades]);
+
   // Bring the active chip into view on mount and when it changes.
   useEffect(() => {
     const btn = chipRefs.current.get(activeLabel);
@@ -621,6 +704,9 @@ const TeePillsRow: React.FC<{
         aria-label={ariaLabel}
         style={{
           display: 'flex',
+          width: '100%',
+          maxWidth: '100%',
+          minWidth: 0,
           gap: 8,
           overflowX: 'auto',
           overflowY: 'hidden',
@@ -628,9 +714,9 @@ const TeePillsRow: React.FC<{
           scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
-          // Bias the browser to horizontal panning so a swipe on the pills
-          // row scrolls the chips instead of the page/tab.
-          touchAction: 'pan-x',
+          // Let vertical swipes keep scrolling the page; horizontal swipes are
+          // owned by the manual drag handler above for reliable iOS carousels.
+          touchAction: 'pan-y pinch-zoom',
           overscrollBehaviorX: 'contain',
         }}
       >
@@ -646,7 +732,14 @@ const TeePillsRow: React.FC<{
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => onPick(tee.tee_label)}
+              onClick={(event) => {
+                if (suppressNextClickRef.current) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  return;
+                }
+                onPick(tee.tee_label);
+              }}
               style={{
                 // flexShrink:0 keeps the chip at its natural width so the row
                 // scrolls instead of chips squeezing mid-word.
