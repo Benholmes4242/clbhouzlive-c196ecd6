@@ -86,6 +86,13 @@ export function routeForNotif(input: NotifRouteInput): string {
     if (cid) return `/rate-course-v2/${cid}`;
   }
 
+  // course analytics updated (WHS post-sync deep link — Phase D)
+  if (type === 'course_analytics_updated') {
+    const cid = (data.course_id as string | undefined) ?? (entity_type === 'course' ? entity_id : null);
+    if (cid) return `/courses/${cid}?tab=holes`;
+  }
+
+
   // course reviews / responses
   if (
     type === 'friend_course_review' ||

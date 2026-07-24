@@ -41,6 +41,7 @@ interface ConnectionRow {
   membership_number: string;
   vault_secret_id: string;
   consecutive_failures: number;
+  initial_sync_complete: boolean | null;
 }
 
 interface SyncResult {
@@ -51,8 +52,11 @@ interface SyncResult {
   friendsUpserted?: number;
   handicapChanged?: boolean;
   holesEnriched?: number;
+  newRoundsImported?: number;
+  analyticsPushEnqueued?: boolean;
   error?: string;
 }
+
 
 function adminClient(): SupabaseClient {
   return createClient(
@@ -171,6 +175,21 @@ async function syncOneConnection(
     handicapChanged = await insertHandicapSnapshotIfChanged(admin, conn.id, handicapIndex);
   }
 
+  // Snapshot existing upstream_score_ids BEFORE upsert so we can detect
+  // genuinely-new rounds (insert-only) after. upsertScores() may re-write
+  // existing rows and its returned count cannot be trusted for newness —
+  // this diff is the source of truth. See Phase D brief.
+  let beforeIds = new Set<string>();
+  try {
+    const { data: beforeRows } = await admin
+      .from("whs_scores")
+      .select("upstream_score_id")
+      .eq("connection_id", conn.id);
+    beforeIds = new Set((beforeRows ?? []).map((r: any) => String(r.upstream_score_id)));
+  } catch (err) {
+    console.warn(`[sync] pre-upsert snapshot failed for ${conn.id} (non-fatal):`, err);
+  }
+
   const scoresUpserted = scores ? await upsertScores(admin, conn.id, scores.Scores) : 0;
   const friendsUpserted = friends ? await upsertFriends(admin, conn.id, friends.Friends) : 0;
 
@@ -198,6 +217,29 @@ async function syncOneConnection(
     console.warn(`[sync] hole enrichment partial-failed for ${conn.id} (non-fatal):`, err);
   }
 
+  // Post-upsert newness diff. Insert-only rows are those whose
+  // upstream_score_id is present now but was absent before.
+  let newRoundsImported = 0;
+  let analyticsPushEnqueued = false;
+  try {
+    const { data: afterRows } = await admin
+      .from("whs_scores")
+      .select("upstream_score_id, course_id, play_date")
+      .eq("connection_id", conn.id)
+      .order("play_date", { ascending: false });
+    const newRows = (afterRows ?? []).filter(
+      (r: any) => !beforeIds.has(String(r.upstream_score_id)),
+    );
+    newRoundsImported = newRows.length;
+    // Skip the push entirely on the first-ever sync for this connection —
+    // the user is already looking at their new analytics.
+    if (newRows.length > 0 && conn.initial_sync_complete === true) {
+      analyticsPushEnqueued = await maybeEnqueueAnalyticsPush(admin, conn, newRows);
+    }
+  } catch (err) {
+    console.error(`[sync] analytics-push detection failed for ${conn.id} (non-fatal):`, err);
+  }
+
   // Mark success
   await admin
     .from("whs_connections")
@@ -217,8 +259,86 @@ async function syncOneConnection(
   result.friendsUpserted = friendsUpserted;
   result.handicapChanged = handicapChanged;
   result.holesEnriched = holesEnriched;
+  result.newRoundsImported = newRoundsImported;
+  result.analyticsPushEnqueued = analyticsPushEnqueued;
   return result;
 }
+
+/**
+ * Enqueue at most ONE course_analytics_updated notification per sync run.
+ * Chooses the course of the most recent new round by play_date. Respects
+ * a 24h rolling per-user cap read from the notifications ledger. Skips
+ * silently if the course cannot be resolved to a golf_courses row — an
+ * un-tappable push is worse than none. Returns true iff a row was inserted.
+ *
+ * Wrapped by the caller in try/catch: any failure here MUST NOT roll back
+ * the sync run.
+ */
+async function maybeEnqueueAnalyticsPush(
+  admin: SupabaseClient,
+  conn: ConnectionRow,
+  newRows: Array<{ upstream_score_id: unknown; course_id: string | null; play_date: string | null }>,
+): Promise<boolean> {
+  // Pick the most recent new round with a resolved course_id. newRows is
+  // already ordered by play_date desc.
+  const latest = newRows.find((r) => !!r.course_id);
+  if (!latest || !latest.course_id) {
+    console.warn(
+      `[analytics-push] skip: no mapped course_id among ${newRows.length} new rows conn=${conn.id}`,
+    );
+    return false;
+  }
+
+  // 24h cap via the notifications ledger — cheap, indexed by user_id.
+  const dayAgo = new Date(Date.now() - 24 * 3600_000).toISOString();
+  const { data: recent } = await admin
+    .from("notifications")
+    .select("id")
+    .eq("user_id", conn.user_id)
+    .eq("type", "course_analytics_updated")
+    .gte("created_at", dayAgo)
+    .limit(1)
+    .maybeSingle();
+  if (recent) return false;
+
+  const { data: course } = await admin
+    .from("golf_courses")
+    .select("name")
+    .eq("id", latest.course_id)
+    .maybeSingle();
+  const courseName = (course as any)?.name?.toString().trim();
+  if (!courseName) {
+    console.warn(
+      `[analytics-push] skip: unresolved course name conn=${conn.id} course=${latest.course_id}`,
+    );
+    return false;
+  }
+
+  const route = `/courses/${latest.course_id}?tab=holes`;
+  const { error } = await admin.from("notifications").insert({
+    user_id: conn.user_id,
+    type: "course_analytics_updated",
+    recipient_actor_type: "personal",
+    recipient_actor_id: conn.user_id,
+    actor_id: null,
+    entity_type: "course",
+    entity_id: latest.course_id,
+    title: `${courseName} analytics updated`,
+    message: "See where the shots go.",
+    data: {
+      course_id: latest.course_id,
+      course_name: courseName,
+      link: route,
+      route,
+    },
+  });
+  if (error) {
+    console.error(`[analytics-push] insert failed conn=${conn.id}:`, error.message);
+    return false;
+  }
+  return true;
+}
+
 
 async function markFailure(
   admin: SupabaseClient,
@@ -268,7 +388,7 @@ Deno.serve(async (req) => {
   const nowIso = new Date().toISOString();
   let query = admin
     .from("whs_connections")
-    .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures")
+    .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures, initial_sync_complete")
     .is("deleted_at", null)
     .lt("consecutive_failures", MAX_CONSECUTIVE_FAILURES)
     .order("last_synced_at", { ascending: true, nullsFirst: true })
