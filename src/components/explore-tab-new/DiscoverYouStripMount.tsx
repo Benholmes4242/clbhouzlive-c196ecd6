@@ -41,7 +41,9 @@ export function DiscoverYouStripMount({
 }: DiscoverYouStripMountProps) {
   const { user } = useSupabaseSession();
   const userId = user?.id ?? null;
-  const { data } = useViewerListContext(userId ? railKey : null);
+  const { data } = useViewerListContext(userId ? railKey : null, {
+    enabled: FEATURE_FLAGS.DISCOVER_YOU_STRIP,
+  });
 
   // Signed-out → render nothing (no empty state on Discover for anon).
   if (!userId) return null;
