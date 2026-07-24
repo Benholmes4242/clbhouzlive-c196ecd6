@@ -87,7 +87,13 @@
     "legendEveryone": "Everyone",
     "legendYou": "You",
     "theBeastSuffix": " · the beast",
-    "youAvg": "You {{avg}}"
+    "youAvg": "You {{avg}}",
+    "yourCourses": {
+      "eyebrow": "Course by course",
+      "title": "Your courses",
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
+    }
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
