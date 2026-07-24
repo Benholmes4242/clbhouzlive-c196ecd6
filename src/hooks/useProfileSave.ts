@@ -178,6 +178,17 @@ export function useProfileSave(userId: string) {
       // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
       queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
 
+      // When gender changes, the WHS percentile benchmark (men's vs women's
+      // pro distribution) must recompute. Invalidation matches
+      // GenderPromptSheet at src/components/profile/GenderPromptSheet.tsx:121.
+      const priorGender = priorProfile?.gender ?? null;
+      const nextGender = form.gender || null;
+      if (priorGender !== nextGender) {
+        await queryClient.invalidateQueries({
+          queryKey: whsKeys.percentile(userId),
+          refetchType: 'all',
+        });
+      }
 
       return true;
     } catch (err: any) {
