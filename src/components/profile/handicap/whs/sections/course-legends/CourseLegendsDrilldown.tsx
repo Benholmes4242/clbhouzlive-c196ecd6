@@ -126,7 +126,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { activeActor } = useActiveActor();
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
   const { data: meta } = useCourseMeta(ctx.courseId);
-  const { data: pros } = useProBenchmarks();
+  const { data: prosRaw } = useProBenchmarks();
+  const { profile } = useProfileData();
+  const viewerGender = (profile as any)?.gender as 'male' | 'female' | 'prefer_not_to_say' | null | undefined;
+  const pros = useMemo(() => filterProsForViewer(prosRaw ?? [], viewerGender), [prosRaw, viewerGender]);
   const [window, setWindow] = useState<LegendWindow>('all_time');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
