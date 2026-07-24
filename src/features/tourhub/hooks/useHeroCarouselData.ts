@@ -383,7 +383,7 @@ export function useHeroCarouselData() {
       const activeMajorId = activeMajorRow?.id ?? null;
       const activeWomensMajorId = activeWomensMajorRow?.id ?? null;
 
-      // Cross-tour major promotion (existing behaviour) — mens only. SKIP the
+      // Cross-tour major promotion (existing behaviour) - mens only. SKIP the
       // active mens major so it doesn't evict the true PGA next event. Womens
       // majors are never promoted onto PGA.
       const crossTourMajors = upcomingTournaments
