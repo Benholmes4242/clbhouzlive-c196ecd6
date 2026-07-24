@@ -2,6 +2,7 @@ import React from 'react';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import GameEverywhereCard from '../sections/trends/GameEverywhereCard';
+import YourCoursesRail from '../sections/trends/YourCoursesRail';
 
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
@@ -56,6 +57,9 @@ export const TrendsView: React.FC<Props> = ({
 
       {/* 6. Your game, everywhere */}
       <GameEverywhereCard readOnly={readOnly} />
+
+      {/* 7. Your courses — cross-link rail to each course's Analytics tab */}
+      <YourCoursesRail readOnly={readOnly} />
     </div>
   );
 };
