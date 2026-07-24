@@ -23,8 +23,10 @@ const CAT_LABEL: Record<LegendCategory, string> = {
   most_aces_all_time:       'Ace',
   most_albatrosses_90d:     'Albatross',
   most_albatrosses_all_time:'Albatross',
-  most_rounds_90d:          'Rounds',
-  most_rounds_all_time:     'Rounds',
+  most_rounds_90d:              'Rounds',
+  most_rounds_all_time:         'Rounds',
+  lowest_gross_women_90d:       "Women's",
+  lowest_gross_women_all_time:  "Women's",
 };
 
 function isAlbatrosses(c: LegendCategory): boolean {
