@@ -40,8 +40,12 @@ const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[]
   { key: 'gamification', label: 'Streaks and achievements',
     sub: 'Badges, streaks, crowns, rivals and rate-a-course prompts',
     types: ['badge_earned', 'legend_earned', 'legend_lost', 'rival_played', 'streak_at_risk', 'streak_broken', 'streak_freeze_applied', 'crown_taken', 'crown_lost', 'rate_course_prompt'] },
+  { key: 'analytics',    label: 'Course analytics',
+    sub: "When your rounds update a course's analytics",
+    types: ['course_analytics_updated'] },
 
 ];
+
 
 export default function NotificationsPage() {
   const { user } = useSupabaseSession();
