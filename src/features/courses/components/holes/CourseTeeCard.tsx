@@ -683,7 +683,7 @@ const TeePillsRow: React.FC<{
       el.removeEventListener('touchend', handleTouchEnd);
       el.removeEventListener('touchcancel', handleTouchEnd);
     };
-  }, [updateFades]);
+  }, []);
 
   // Bring the active chip into view on mount and when it changes.
   useEffect(() => {
