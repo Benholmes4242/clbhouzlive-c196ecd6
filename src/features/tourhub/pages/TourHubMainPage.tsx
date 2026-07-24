@@ -192,6 +192,7 @@ export function TourHubMainPage() {
             island HEADER_H (see ChromeIsland.tsx). */}
         <GlassHeaderPlate visible={activeTab !== 'overview'} />
         <div>{renderTab()}</div>
+        <TourFollowPrompt />
       </TourHubShell>
     </TourSelectionProvider>
   );
