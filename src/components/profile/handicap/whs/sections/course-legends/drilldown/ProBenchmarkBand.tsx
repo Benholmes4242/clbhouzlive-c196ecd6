@@ -140,7 +140,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
           lineHeight: 1.5,
           color: 'var(--hcp-t-70)',
         }}>
-          {EXPLAINER[base].replace('{first}', first)}
+          {buildExplainer(base, pro)}
         </div>
       )}
     </div>
