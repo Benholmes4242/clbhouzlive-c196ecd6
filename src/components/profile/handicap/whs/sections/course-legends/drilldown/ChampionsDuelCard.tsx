@@ -564,6 +564,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 subline={row.gapToChampion ?? undefined}
                 statValue={row.valueDisplay}
                 isLast={i === inlineRows.length - 1}
+                density="compact"
               />
             ))}
           </>
