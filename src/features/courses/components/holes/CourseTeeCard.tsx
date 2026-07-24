@@ -557,6 +557,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               strong
             />
           </div>
+          </div>
 
           {/* Honesty caption */}
           <div
