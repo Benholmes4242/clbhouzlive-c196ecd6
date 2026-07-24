@@ -193,10 +193,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { visibleCategories90d, visibleCategoriesAllTime } = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const present = new Set<LegendCategory>((data ?? []).map((r: any) => r.category as LegendCategory));
-    const list90 = orderWithWomensRecord(CHAMPIONS_ORDER_90D, present)
-      .filter((c) => c !== 'best_score_diff_90d');
-    const listAll = orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, present)
-      .filter((c) => c !== 'best_score_diff_all_time');
+    const list90: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_90D, present)
+      .filter((c): c is LegendCategory => c !== 'best_score_diff_90d');
+    const listAll: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, present)
+      .filter((c): c is LegendCategory => c !== 'best_score_diff_all_time');
     return { visibleCategories90d: list90, visibleCategoriesAllTime: listAll };
   }, [data]);
 
