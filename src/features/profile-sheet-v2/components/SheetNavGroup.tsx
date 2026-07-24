@@ -112,6 +112,32 @@ export default function SheetNavGroup({
         label="View profile"
         onClick={() => onNavigate(`/profile/${currentActor.id}`)}
       />
+      {showAnalytics && (
+        <Row
+          label="Course analytics"
+          subLabel={analyticsSubLabel}
+          onClick={handleAnalyticsTap}
+          disabled={analyticsDisabled}
+          trailing={
+            analyticsState === 'ready' ? (
+              <span
+                style={{
+                  fontWeight: 700,
+                  fontSize: 9,
+                  letterSpacing: '0.12em',
+                  color: AMBER,
+                  padding: '3px 7px',
+                  border: `1px solid ${AMBER}`,
+                  borderRadius: 999,
+                  textTransform: 'uppercase',
+                }}
+              >
+                NEW
+              </span>
+            ) : undefined
+          }
+        />
+      )}
       {currentActor.type === 'personal' && onInviteFriends && (
         <Row
           label="Invite friends"
