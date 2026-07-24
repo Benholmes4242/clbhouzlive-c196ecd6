@@ -351,7 +351,7 @@ export function useHeroCarouselData() {
       // active it OWNS a synthetic 'major' pseudo-tour slide and is evicted
       // from its native tour bucket. This applies to BOTH mens majors (evicted
       // from PGA/EURO/etc.) and womens majors (evicted from LPGA). The
-      // cross-tour PGA injection block below still filters on 'mens' only —
+      // cross-tour PGA injection block below still filters on 'mens' only -
       // womens majors are never promoted onto the PGA tab.
       //
       // Either, both, or neither major can be active at once. When both are
