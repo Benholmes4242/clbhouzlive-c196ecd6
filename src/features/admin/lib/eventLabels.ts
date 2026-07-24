@@ -113,6 +113,10 @@ export const EVENT_LABELS: Record<string, string> = {
 
   // ─── Admin operations ─────────────────────────────────────────
   admin_username_changed: 'Username changed by admin',
+
+  // Course card (course Holes tab, Phase L3)
+  tee_card_viewed: 'Course card viewed',
+  tee_card_tee_changed: 'Course card tee changed',
 };
 
 export function titleize(name: string): string {
