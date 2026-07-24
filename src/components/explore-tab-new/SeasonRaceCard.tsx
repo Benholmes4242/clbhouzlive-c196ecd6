@@ -59,11 +59,10 @@ interface Props {
   userId: string | undefined;
 }
 
-export function SeasonRaceCard({ userId }: Props) {
-  const hemi = useViewerHemisphere();
-  const [sheetOpen, setSheetOpen] = useState(false);
-
-  const { data } = useQuery({
+// Shared with the "Where you stand" personal block. Same query key, so the
+// two consumers de-duplicate into a single request.
+export function useSeasonRace(userId: string | undefined) {
+  return useQuery({
     queryKey: ['discover', 'season-race', userId ?? 'anon'],
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
@@ -77,6 +76,13 @@ export function SeasonRaceCard({ userId }: Props) {
       return (data ?? []) as SeasonRow[];
     },
   });
+}
+
+export function SeasonRaceCard({ userId }: Props) {
+  const hemi = useViewerHemisphere();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { data } = useSeasonRace(userId);
 
   const { podium, viewer, header } = useMemo(() => {
     const rows = data ?? [];

@@ -17,7 +17,7 @@ import type { ScorecardOpener } from './useScorecardOpener';
 import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
-import { StatRow } from './StatRow';
+import { RecordRow } from './RecordRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
@@ -110,7 +110,7 @@ interface Props {
   userId: string | undefined;
 }
 
-const LEDGER_ROWS = 5;
+const LEDGER_ROWS = 3;
 const CONQUEST_CAP = 6;
 
 export function TheRecordBook({ region, mode, opener, userId }: Props) {
@@ -286,19 +286,18 @@ function RecordStatRow({
   const toParDisplay = showToPar ? toParText(par!) : '—';
   // Canonical to-par colour: red under par on the light Discover surface.
   const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
-  const sub = [row.course_name, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
   return (
-    <StatRow
+    <RecordRow
+      toPar={toParDisplay}
+      gross={grossText ? `${grossText} GROSS` : undefined}
+      statColor={statColor}
+      courseName={row.course_name ?? 'Course'}
+      playerName={holder}
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id}
-      name={holder}
-      subline={sub}
-      statValue={toParDisplay}
-      statColor={statColor}
-      statSubLabel={grossText ? `${grossText} GROSS` : undefined}
+      timestamp={when ? relativeTime(when) : null}
       isLast={isLast}
       onPress={onTap}
-      density="compact"
     />
   );
 }
