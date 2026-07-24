@@ -5,10 +5,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-25T00:00:00Z-v6-stale-lock-reaper';
+export const FUNCTION_VERSION = '2026-07-25T00:00:00Z-v7-time-boxed-drain';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 15;
+const DRAIN_BUDGET_MS = 25000;
 const MAX_ATTEMPTS = 5;
 
 
@@ -79,7 +80,20 @@ Deno.serve(async (req) => {
     const rows = await fetchQueueBatch(BATCH_SIZE);
     console.log('[gam-evaluator] drain', { picked: rows.length, batchSize: BATCH_SIZE });
     const results: any[] = [];
-    for (const row of rows) {
+    const startedAt = Date.now();
+    let budgetReached = false;
+    let remaining = 0;
+    for (let i = 0; i < rows.length; i++) {
+      if (Date.now() - startedAt > DRAIN_BUDGET_MS) {
+        remaining = rows.length - i;
+        budgetReached = true;
+        console.log('[gam-evaluator] drain budget reached', {
+          processed: results.length,
+          remaining,
+        });
+        break;
+      }
+      const row = rows[i];
       try {
         const r = await processSingle(row.whs_score_id);
         results.push({ id: row.whs_score_id, ...r });
@@ -90,8 +104,14 @@ Deno.serve(async (req) => {
     }
     const succeeded = results.filter((r) => !r.error).length;
     const failed = results.filter((r) => r.error).length;
-    console.log('[gam-evaluator] drain complete', { picked: rows.length, succeeded, failed });
-    return json({ ok: true, drained: rows.length, results });
+    console.log('[gam-evaluator] drain complete', {
+      picked: rows.length,
+      succeeded,
+      failed,
+      budgetReached,
+      remaining,
+    });
+    return json({ ok: true, drained: results.length, results, budgetReached, remaining });
   } catch (e) {
     console.error("[evaluator] fatal", e);
     return json({ error: (e as Error).message }, 500);
