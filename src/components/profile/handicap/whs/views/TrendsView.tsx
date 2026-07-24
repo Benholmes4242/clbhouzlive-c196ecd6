@@ -57,6 +57,9 @@ export const TrendsView: React.FC<Props> = ({
 
       {/* 6. Your game, everywhere */}
       <GameEverywhereCard readOnly={readOnly} />
+
+      {/* 7. Your courses — cross-link rail to each course's Analytics tab */}
+      <YourCoursesRail readOnly={readOnly} />
     </div>
   );
 };
