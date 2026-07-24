@@ -3470,6 +3470,7 @@ export type Database = {
           review_date: string | null
           review_of_week_week: string | null
           share_to_feed: boolean
+          tee_label: string | null
           title: string | null
           unhelpful_count: number | null
           updated_at: string
@@ -3492,6 +3493,7 @@ export type Database = {
           review_date?: string | null
           review_of_week_week?: string | null
           share_to_feed?: boolean
+          tee_label?: string | null
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
@@ -3514,6 +3516,7 @@ export type Database = {
           review_date?: string | null
           review_of_week_week?: string | null
           share_to_feed?: boolean
+          tee_label?: string | null
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
@@ -21276,6 +21279,7 @@ export type Database = {
           p_rating: number
           p_review?: string
           p_share_to_feed?: boolean
+          p_tee_label?: string
           p_verdict?: string
         }
         Returns: Json
