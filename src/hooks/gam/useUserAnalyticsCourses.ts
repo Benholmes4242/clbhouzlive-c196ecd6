@@ -17,6 +17,15 @@ export interface UserAnalyticsCourse {
   hardest_hole_no: number | null;
   /** That hole's average to par (matches per-hole avg_to_par on Analytics tab). */
   hardest_hole_avg: number | null;
+  /**
+   * Personal scoring distribution: the user's own hole outcomes at this course,
+   * as whole-number percentages that sum to exactly 100. NULL together when the
+   * course has rounds but no hole data.
+   */
+  eagles_plus_pct: number | null;
+  birdies_pct: number | null;
+  pars_pct: number | null;
+  bogeys_plus_pct: number | null;
 }
 
 /**

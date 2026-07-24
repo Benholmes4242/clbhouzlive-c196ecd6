@@ -16832,11 +16832,15 @@ export type Database = {
         Args: never
         Returns: {
           avg_to_par: number
+          birdies_pct: number
+          bogeys_plus_pct: number
           course_id: string
           course_name: string
+          eagles_plus_pct: number
           hardest_hole_avg: number
           hardest_hole_no: number
           last_played: string
+          pars_pct: number
           rounds_count: number
         }[]
       }

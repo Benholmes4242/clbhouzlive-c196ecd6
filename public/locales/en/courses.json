@@ -659,7 +659,14 @@
     "roundsCount_one": "{{count}} round",
     "roundsCount_other": "{{count}} rounds",
     "avgHere": "{{avg}} here",
-    "toughestHole": "Hole {{hole}} is your toughest",
-    "perRound": "{{avg}} a round"
+    "avgHereOnAverage": "{{avg}} here on average",
+    "pillEaglesLong": "eagles+",
+    "pillEaglesShort": "EAG+",
+    "pillBirdiesLong": "birdies",
+    "pillBirdiesShort": "BIRD",
+    "pillParsLong": "pars",
+    "pillParsShort": "PAR",
+    "pillBogeysLong": "bogeys+",
+    "pillBogeysShort": "BOG+"
   }
 }
