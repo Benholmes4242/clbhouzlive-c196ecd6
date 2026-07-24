@@ -5,7 +5,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
-export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v3-womens-record-prompt-guard-restore';
+export const FUNCTION_VERSION = '2026-07-24T00:00:00Z-v4-cleanup-trio';
 console.log('[gam-evaluator] boot', { FUNCTION_VERSION });
 const EVALUATOR_VERSION = parseInt(Deno.env.get("GAM_EVALUATOR_VERSION") ?? "1", 10);
 const BATCH_SIZE = 50;
