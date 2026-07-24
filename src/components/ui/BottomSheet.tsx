@@ -127,7 +127,7 @@ export function BottomSheet({
         )}
         style={{
           zIndex: zIndexBase + 1,
-          maxHeight: '90vh',
+          maxHeight,
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
           ...(variant === 'dark' ? { background: surfaceColor ?? '#0F172A' } : null),
