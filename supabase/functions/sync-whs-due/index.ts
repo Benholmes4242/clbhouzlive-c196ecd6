@@ -41,6 +41,7 @@ interface ConnectionRow {
   membership_number: string;
   vault_secret_id: string;
   consecutive_failures: number;
+  initial_sync_complete: boolean | null;
 }
 
 interface SyncResult {
@@ -51,8 +52,11 @@ interface SyncResult {
   friendsUpserted?: number;
   handicapChanged?: boolean;
   holesEnriched?: number;
+  newRoundsImported?: number;
+  analyticsPushEnqueued?: boolean;
   error?: string;
 }
+
 
 function adminClient(): SupabaseClient {
   return createClient(
