@@ -482,7 +482,23 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           </div>
 
 
-          {/* Holes table */}
+          {/* Holes table — wrapped in a horizontal scroll container so at
+              very narrow widths (320dp) the table can scroll internally
+              without ever dragging the page or the card sideways. */}
+          <style>{`.tee-holes-scroll::-webkit-scrollbar{display:none}`}</style>
+          <div
+            className="tee-holes-scroll"
+            style={{
+              maxWidth: '100%',
+              minWidth: 0,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              overscrollBehaviorX: 'contain',
+              borderRadius: 10,
+            }}
+          >
           <div
             role="table"
             aria-label={t('courses:teeCard.a11yTable') as string}
@@ -490,13 +506,14 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               border: `1px solid ${HAIRLINE_INK_8}`,
               borderRadius: 10,
               overflow: 'hidden',
+              minWidth: HOLE_TABLE_MIN_WIDTH,
             }}
           >
             <div
               role="row"
               style={{
                 display: 'grid',
-                gridTemplateColumns: '56px 1fr 1fr 1fr',
+                gridTemplateColumns: HOLE_GRID_COLUMNS,
                 padding: '8px 12px',
                 background: '#F8FAFC',
                 borderBottom: `1px solid ${HAIRLINE_INK_8}`,
