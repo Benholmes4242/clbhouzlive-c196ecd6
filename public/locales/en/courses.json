@@ -673,5 +673,15 @@
     "pillParsShort": "PAR",
     "pillBogeysLong": "bogeys+",
     "pillBogeysShort": "BOG+"
+  },
+  "discover": {
+    "friendsRounds": {
+      "overline": "YOUR CIRCLE",
+      "title": "Friends' latest rounds",
+      "viewAll": "View all ›",
+      "entrySingular": "ROUND",
+      "entryPlural": "ROUNDS",
+      "empty": "No recent friend rounds yet."
+    }
   }
 }

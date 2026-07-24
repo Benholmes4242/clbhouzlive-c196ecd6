@@ -571,5 +571,15 @@
       "heading": "Play here?",
       "body": "Tee cards are built from members' synced rounds. Sync your WHS handicap and the tees you play will appear."
     }
+  },
+  "discover": {
+    "friendsRounds": {
+      "overline": "DEIN KREIS",
+      "title": "Neueste Runden von Freunden",
+      "viewAll": "Alle ansehen ›",
+      "entrySingular": "RUNDE",
+      "entryPlural": "RUNDEN",
+      "empty": "Noch keine kürzlichen Runden von Freunden."
+    }
   }
 }

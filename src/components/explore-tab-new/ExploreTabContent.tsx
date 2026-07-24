@@ -21,6 +21,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 
 import { TheRecordBook } from './TheRecordBook';
+import { FriendsRoundsSection } from './FriendsRoundsSection';
 
 import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
 import { EaglesLedger } from './EaglesLedger';
@@ -121,6 +122,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         />
 
         <AlmanacEmptyCard region={activeRegion} />
+
+        <FriendsRoundsSection userId={userId} opener={opener} />
 
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
 
