@@ -77,6 +77,8 @@ function resolveDefaultTee(
 export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
+  const { user } = useSupabaseSession();
+  const { data: connection } = useWhsConnection(user?.id);
   const { data, isLoading, isError } = useCourseTeeSets(courseId);
 
   const tees = useMemo<TeeSet[]>(() => data ?? [], [data]);
