@@ -197,11 +197,14 @@ function AnalyticsCourseRow({
   const triangleColor = overPar ? OVER_RED : underPar ? UNDER_GREEN : MUTED;
   const triangleGlyph = overPar ? '\u25B2' : underPar ? '\u25BC' : '\u25CF';
 
+  // Gate on counts, not percentages: a bucket with a non-zero count that
+  // rounds to 0% must still render (as "<1%"). Only fully absent hole data
+  // (all counts null) hides the whole row.
   const hasScoring =
-    course.eagles_plus_pct !== null &&
-    course.birdies_pct !== null &&
-    course.pars_pct !== null &&
-    course.bogeys_plus_pct !== null;
+    course.eagles_plus_count !== null &&
+    course.birdies_count !== null &&
+    course.pars_count !== null &&
+    course.bogeys_plus_count !== null;
 
   const pillKey = (kind: 'Eagles' | 'Birdies' | 'Pars' | 'Bogeys') =>
     `yourCourses.pill${kind}${narrow ? 'Short' : 'Long'}`;
