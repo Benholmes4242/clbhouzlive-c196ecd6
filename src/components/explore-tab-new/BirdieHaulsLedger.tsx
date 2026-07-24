@@ -95,6 +95,7 @@ export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
               statLabel="BIRDIES"
               showWatermark={mode === 'alltime' && i === 0}
               isLast={i === display.length - 1}
+              density="compact"
               onPress={() => onRowTap?.(row)}
             />
           );

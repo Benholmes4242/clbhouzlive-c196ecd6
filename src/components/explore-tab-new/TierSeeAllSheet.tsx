@@ -442,6 +442,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 mode={mode}
                 bestToPar={bestToPar}
                 maxCount={birdieMaxCount}
+                density="compact"
               />
 
             ))}
@@ -528,6 +529,7 @@ function CountLeaderSheetRow({
       showWatermark={rank === 1}
       isLast={isLast}
       onPress={onTap}
+      density="compact"
     />
   );
 }

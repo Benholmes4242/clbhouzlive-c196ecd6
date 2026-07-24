@@ -107,6 +107,7 @@ export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
                   statLabel="EAGLES"
                   showWatermark={i === 0}
                   isLast={i === leaders.length - 1}
+                  density="compact"
                   onPress={() => {
                     if (r.user_id && onLeaderTap) onLeaderTap(r.user_id);
                   }}
@@ -129,6 +130,7 @@ export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
                   statValue={extractHoleNo(row)}
                   statLabel="HOLE"
                   isLast={i === arr.length - 1}
+                  density="compact"
                   onPress={() => onRowTap?.(row)}
                 />
               );
