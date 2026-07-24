@@ -41,7 +41,7 @@ interface CrownRow {
   gap: number | null;
 }
 
-export function useCrownsHeld(userId: string | undefined) {
+function useCrownsHeld(userId: string | undefined) {
   return useQuery({
     queryKey: ['discover', 'crowns-held', userId ?? 'anon'],
     enabled: !!userId,

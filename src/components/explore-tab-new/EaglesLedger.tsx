@@ -10,11 +10,10 @@ import { SectionHead } from './SectionHead';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
-import { HoleRow } from './HoleRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 
-const ROWS = 3;
+const ROWS = 5;
 
 function formatHolderName(raw?: string | null): string {
   const s = (raw ?? '').trim();
@@ -50,33 +49,13 @@ interface Props {
   mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
   onLeaderTap?: (userId: string) => void;
-  /** Parent (FeatsSection) owns the SectionHead + section spacing. */
-  embedded?: boolean;
-  /** Controlled sheet (used when embedded). */
-  sheetOpen?: boolean;
-  onSheetOpenChange?: (open: boolean) => void;
 }
 
-export function EaglesLedger({
-  region,
-  mode,
-  onRowTap,
-  onLeaderTap,
-  embedded = false,
-  sheetOpen: sheetOpenProp,
-  onSheetOpenChange,
-}: Props) {
+export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
   const feats = useMemo(() => featsData ?? [], [featsData]);
-  const [localSheetOpen, setLocalSheetOpen] = useState(false);
-
-  const controlled = typeof onSheetOpenChange === 'function';
-  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
-  const setSheetOpen = (open: boolean) => {
-    if (controlled) onSheetOpenChange!(open);
-    else setLocalSheetOpen(open);
-  };
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const leaders = useMemo(
     () =>
@@ -89,32 +68,28 @@ export function EaglesLedger({
 
   const hasData = mode === 'alltime' ? leaders.length > 0 : feats.length > 0;
   const overlineLabel = mode === 'alltime' ? 'All-time eagles' : 'Latest eagles';
-  const sectionStyle = { marginTop: embedded ? 0 : 32, fontFamily: FONT } as const;
 
   if (!isLoading && !hasData) {
     if (region == null) return null;
     return (
-      <section style={sectionStyle}>
-        {!embedded && <SectionHead overline={overlineLabel} paddingX={14} />}
+      <section style={{ marginTop: 32, fontFamily: FONT }}>
+        <SectionHead overline={overlineLabel} paddingX={14} />
         <EmptyScopeCard
           title={`No eagles ${regionScopePhrase(region)} yet.`}
-          subline={'This region is unconquered \u2014 be the first.'}
+          subline="This region is unconquered — be the first."
         />
       </section>
     );
   }
 
   return (
-    <section style={sectionStyle}>
-      {!embedded && (
-        <SectionHead
-          overline={overlineLabel}
-          meta="View all"
-          onMeta={() => setSheetOpen(true)}
-          paddingX={14}
-        />
-      )}
-
+    <section style={{ marginTop: 32, fontFamily: FONT }}>
+      <SectionHead
+        overline={overlineLabel}
+        meta="View all"
+        onMeta={() => setSheetOpen(true)}
+        paddingX={14}
+      />
 
       <div>
         {mode === 'alltime'
@@ -146,14 +121,16 @@ export function EaglesLedger({
                 .filter(Boolean)
                 .join(' · ');
               return (
-                <HoleRow
+                <StatRow
                   key={`${row.score_id ?? row.course_id ?? i}-${i}`}
-                  holeNo={extractHoleNo(row)}
-                  name={name}
-                  subline={sub}
                   avatarUrl={row.holder_avatar}
                   avatarUserId={row.user_id}
+                  name={name}
+                  subline={sub}
+                  statValue={extractHoleNo(row)}
+                  statLabel="HOLE"
                   isLast={i === arr.length - 1}
+                  density="compact"
                   onPress={() => onRowTap?.(row)}
                 />
               );

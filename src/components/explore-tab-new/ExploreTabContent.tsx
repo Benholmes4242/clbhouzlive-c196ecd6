@@ -10,7 +10,12 @@ import { useExploreRegion } from './hooks/useExploreRegion';
 
 
 import { AlmanacLens, REGION_TABS } from './AlmanacSections';
-import { type FeatRow, type RecordsMode } from './hooks/useRegionFeats';
+import {
+  useRegionFeats,
+  type FeatRow,
+  type RecordsMode,
+} from './hooks/useRegionFeats';
+import { TierSeeAllSheet } from './TierSeeAllSheet';
 
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
@@ -18,10 +23,12 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { TheRecordBook } from './TheRecordBook';
 import { FriendsRoundsSection } from './FriendsRoundsSection';
 
-import { FeatsSection } from './FeatsSection';
+import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
+import { EaglesLedger } from './EaglesLedger';
+import { BirdieHaulsLedger } from './BirdieHaulsLedger';
 import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
-import { YourGameBlock } from './YourGameBlock';
+import { NemesisHolesStrip } from './NemesisHolesStrip';
 import { SectionHead } from './SectionHead';
 
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
@@ -38,6 +45,8 @@ import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { SPACE } from '@/lib/spacing';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { regionScopePhrase } from './regionScope';
+import { EmptyScopeCard } from './EmptyScopeCard';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -114,7 +123,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <AlmanacEmptyCard region={activeRegion} />
 
-        <YourGameBlock userId={userId} region={activeRegion} />
         <FriendsRoundsSection userId={userId} opener={opener} />
 
         <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
@@ -132,8 +140,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SeasonRaceCard userId={userId} />
         </div>
 
-        {/* Feats of the game — merged Moments / Eagles / Birdie hauls */}
-        <FeatsSection
+        {/* Feats: header + aces/albatrosses podium pair */}
+        <LegendarySection
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
@@ -142,6 +150,23 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         />
 
 
+        {/* Eagles ledger card */}
+        <EaglesLedger
+          region={activeRegion}
+          regionUpper={regionUpper}
+          mode={scope}
+          onRowTap={handleFeatRowTap}
+          onLeaderTap={handleLeaderTap}
+        />
+
+        {/* Birdie hauls ledger card */}
+        <BirdieHaulsLedger
+          region={activeRegion}
+          regionUpper={regionUpper}
+          mode={scope}
+          onRowTap={handleFeatRowTap}
+        />
+
         {/* Toughest courses index */}
         <ToughestIndex region={activeRegion} />
 
@@ -149,6 +174,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <HardestHolesRail region={activeRegion} />
 
         {/* Your nemesis holes — signed-in + WHS gated; filters by course_country */}
+        <NemesisHolesStrip userId={userId} region={activeRegion} />
 
 
 
@@ -191,5 +217,124 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         profileUserId={opener.target?.profileUserId ?? null}
       />
     </div>
+  );
+}
+
+function LegendarySection({
+  region,
+  regionUpper,
+  mode,
+  onRowTap,
+  onLeaderTap,
+}: {
+  region: string | null;
+  regionUpper: string;
+  mode: RecordsMode;
+  onRowTap: (row: FeatRow) => void;
+  onLeaderTap: (uid: string) => void;
+}) {
+  const { data } = useRegionFeats(region, 'legendary');
+  const rows = useMemo(() => data ?? [], [data]);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
+
+  const openSheet = (metric: 'aces' | 'albatrosses') => {
+    setSheetMetric(metric);
+    setSheetOpen(true);
+  };
+
+  const overline = mode === 'alltime' ? 'All-time honours' : 'Latest honours';
+
+  // Scoped-empty: render the unconquered empty-state.
+  if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
+    return (
+      <section style={{ marginTop: 32 }}>
+        <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
+        <EmptyScopeCard
+          title={`No moments ${regionScopePhrase(region)} yet.`}
+          subline="This region is unconquered — be the first."
+        />
+      </section>
+    );
+  }
+
+  // Suppress region-only used prop lint
+  void regionUpper;
+
+  return (
+    <section style={{ marginTop: 32 }}>
+      <SectionHead
+        overline={overline}
+        title="Moments of the game"
+        meta="View all"
+        onMeta={() => openSheet(sheetMetric)}
+        paddingX={14}
+      />
+
+      {mode === 'alltime' && (
+        <div
+          role="tablist"
+          aria-label="Metric"
+          style={{
+            margin: '0 14px 8px',
+            display: 'inline-flex',
+            gap: 2,
+            padding: 2,
+            background: '#FFFFFF',
+            border: '1px solid rgba(15,23,42,0.08)',
+            borderRadius: 999,
+          }}
+        >
+          {([
+            { v: 'aces', label: 'Aces' },
+            { v: 'albatrosses', label: 'Albatrosses' },
+          ] as const).map((o) => {
+            const active = sheetMetric === o.v;
+            return (
+              <button
+                key={o.v}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSheetMetric(o.v)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  background: active ? '#15171F' : 'transparent',
+                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+                  border: 'none',
+                  fontFamily: 'inherit',
+                  fontSize: 10,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all .15s',
+                }}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <AcesAlbatrossesPodium
+        region={region}
+        mode={mode}
+        metric={sheetMetric}
+        onRowTap={onLeaderTap}
+        onLatestRowTap={onRowTap}
+      />
+      <TierSeeAllSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        tier="legendary"
+        region={region}
+        rows={rows}
+        onRowTap={onRowTap}
+        initialMode={mode}
+        initialMetric={sheetMetric}
+      />
+    </section>
   );
 }

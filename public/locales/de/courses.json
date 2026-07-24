@@ -580,25 +580,6 @@
       "entrySingular": "RUNDE",
       "entryPlural": "RUNDEN",
       "empty": "Noch keine kürzlichen Runden von Freunden."
-    },
-    "feats": {
-      "overlineLatest": "Latest honours",
-      "overlineAllTime": "All-time honours",
-      "title": "Feats of the game",
-      "viewAll": "View all",
-      "tabs": {
-        "moments": "Moments",
-        "eagles": "Eagles",
-        "birdieHauls": "Birdie hauls"
-      }
-    },
-    "yourGame": {
-      "overline": "Your game",
-      "title": "Where you stand",
-      "crowns": "Crowns held",
-      "hcp": "Handicap index",
-      "season": "Season position",
-      "nemesis": "Your nemesis holes"
     }
   }
 }
