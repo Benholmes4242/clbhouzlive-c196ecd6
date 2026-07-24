@@ -119,6 +119,7 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
+import { UserStatsCoursesProvider } from "@/contexts/UserStatsCoursesContext";
 
 
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
