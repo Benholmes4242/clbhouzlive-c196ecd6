@@ -2,7 +2,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { YouStrip, type YouStripPreview, type YouStripVariant } from './YouStrip';
 import { useViewerListContext } from './hooks/useViewerListContext';
 import { DISCOVER_YOU_STRIP } from '@/config/featureFlags';
-import { FEATURE_FLAGS } from '@/config/featureFlags';
 
 /**
  * DiscoverYouStripMount — data-wired wrapper around `YouStrip`.
@@ -42,7 +41,7 @@ export function DiscoverYouStripMount({
   const { user } = useSupabaseSession();
   const userId = user?.id ?? null;
   const { data } = useViewerListContext(userId ? railKey : null, {
-    enabled: FEATURE_FLAGS.DISCOVER_YOU_STRIP,
+    enabled: DISCOVER_YOU_STRIP,
   });
 
   // Signed-out → render nothing (no empty state on Discover for anon).
