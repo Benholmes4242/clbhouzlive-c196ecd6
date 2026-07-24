@@ -140,8 +140,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SeasonRaceCard userId={userId} />
         </div>
 
-        {/* Feats: header + aces/albatrosses podium pair */}
-        <LegendarySection
+        {/* Merged Moments: Honours / Eagles / Birdies */}
+        <MomentsSection
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
@@ -149,23 +149,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onLeaderTap={handleLeaderTap}
         />
 
-
-        {/* Eagles ledger card */}
-        <EaglesLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-          onLeaderTap={handleLeaderTap}
-        />
-
-        {/* Birdie hauls ledger card */}
-        <BirdieHaulsLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-        />
 
         {/* Toughest courses index */}
         <ToughestIndex region={activeRegion} />
