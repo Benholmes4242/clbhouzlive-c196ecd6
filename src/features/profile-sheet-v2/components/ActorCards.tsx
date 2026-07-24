@@ -128,7 +128,7 @@ export default function ActorCards({
                 alignItems: 'center',
                 cursor: active ? 'default' : 'pointer',
                 border: active
-                  ? `2px solid ${AMBER}`
+                  ? `1px solid ${AMBER}`
                   : `1px solid ${HAIRLINE}`,
                 opacity: switchingId === p.id ? 0.55 : 1,
                 transition: 'opacity 120ms ease',
