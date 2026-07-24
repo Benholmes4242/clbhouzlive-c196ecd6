@@ -100,6 +100,155 @@ function Row({
   );
 }
 
+/** Compact pill for the scoring distribution: "{value}% {label}". */
+function ScoringPill({ pct, label }: { pct: number; label: string }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        gap: 4,
+        padding: '3px 8px',
+        borderRadius: 999,
+        background: PILL_BG,
+        fontSize: 11,
+        lineHeight: 1.2,
+        color: INK,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+      <span style={{ fontWeight: 500, color: SOFT, textTransform: 'lowercase' }}>{label}</span>
+    </span>
+  );
+}
+
+/**
+ * Row for the "my courses" list: chevron sits on the title line so the
+ * data rows below can breathe. Line 1 uses a coloured triangle to signal
+ * over-/under-par at a glance. Line 2 (top three courses only) shows the
+ * user's personal scoring distribution as four pills.
+ */
+function AnalyticsCourseRow({
+  course,
+  isLast,
+  showScoringPills,
+  narrow,
+  onClick,
+}: {
+  course: UserAnalyticsCourse;
+  isLast: boolean;
+  showScoringPills: boolean;
+  narrow: boolean;
+  onClick: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const roundsLabel = t('yourCourses.roundsCount', { count: course.rounds_count });
+  const hasAvg = course.avg_to_par !== null && course.avg_to_par !== undefined;
+  const avgVal = hasAvg ? (course.avg_to_par as number) : 0;
+  // Positive avg_to_par = plays over par (worse) → red up triangle.
+  // Negative = plays under par (better) → green down triangle.
+  const overPar = avgVal > 0;
+  const underPar = avgVal < 0;
+  const triangleColor = overPar ? OVER_RED : underPar ? UNDER_GREEN : MUTED;
+  const triangleGlyph = overPar ? '\u25B2' : underPar ? '\u25BC' : '\u25CF';
+
+  const hasScoring =
+    course.eagles_plus_pct !== null &&
+    course.birdies_pct !== null &&
+    course.pars_pct !== null &&
+    course.bogeys_plus_pct !== null;
+
+  const pillKey = (kind: 'Eagles' | 'Birdies' | 'Pars' | 'Bogeys') =>
+    `yourCourses.pill${kind}${narrow ? 'Short' : 'Long'}`;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="active:scale-[0.99]"
+      style={{
+        display: 'block',
+        width: '100%',
+        padding: '14px 16px',
+        background: 'transparent',
+        border: 0,
+        borderBottom: isLast ? 0 : `0.5px solid ${HAIRLINE}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+        fontFamily: FONT,
+      }}
+    >
+      {/* Title line — chevron on the right, on the SAME line as course name. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontWeight: 600,
+            fontSize: 14,
+            color: INK,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {course.course_name}
+        </div>
+        <span style={{ color: MUTED, fontSize: 16, flexShrink: 0 }}>{CHEVRON}</span>
+      </div>
+
+      {/* Line 1 — rounds · [▲/▼] avg here on average */}
+      <div style={{ marginTop: 3, fontSize: 12, color: SOFT }}>
+        <span>{roundsLabel}</span>
+        {hasAvg && (
+          <>
+            <span style={{ color: MUTED, margin: '0 6px' }}>{DOT}</span>
+            <span
+              aria-hidden
+              style={{
+                color: triangleColor,
+                fontSize: 9,
+                marginRight: 4,
+                position: 'relative',
+                top: -1,
+              }}
+            >
+              {triangleGlyph}
+            </span>
+            <span
+              style={{
+                color: INK,
+                fontWeight: 600,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {t('yourCourses.avgHereOnAverage', { avg: fmtSigned(avgVal, 1) })}
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Line 2 — scoring pills (top three only, when data exists) */}
+      {showScoringPills && hasScoring && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 6,
+            marginTop: 8,
+          }}
+        >
+          <ScoringPill pct={course.eagles_plus_pct as number} label={t(pillKey('Eagles'))} />
+          <ScoringPill pct={course.birdies_pct as number} label={t(pillKey('Birdies'))} />
+          <ScoringPill pct={course.pars_pct as number} label={t(pillKey('Pars'))} />
+          <ScoringPill pct={course.bogeys_plus_pct as number} label={t(pillKey('Bogeys'))} />
+        </div>
+      )}
+    </button>
+  );
+}
+
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const [q, setQ] = useState('');
   const { t } = useTranslation('courses');
