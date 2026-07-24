@@ -117,12 +117,38 @@ export function PhotoBand({
   const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
 
+  // Live tone mirrors the tournament details hero chip (LIVE · R{n}):
+  // green tint, rectangular, no pulsing dot. Other tones unchanged.
   const pillTone =
     pill.tone === 'live'
-      ? { bg: 'rgba(255,255,255,0.16)', color: 'rgba(255,255,255,0.95)', dot: '#EF4444' }
+      ? {
+          bg: 'rgba(16,185,129,0.14)',
+          color: '#6EE7B7',
+          border: 'rgba(110,231,183,0.55)',
+          radius: 4,
+          padding: '4px 8px',
+          fontSize: 9.5,
+          letterSpacing: '0.10em',
+        }
       : pill.tone === 'final'
-        ? { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' }
-        : { bg: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.95)', dot: 'rgba(255,255,255,0.6)' };
+        ? {
+            bg: 'rgba(255,255,255,0.14)',
+            color: 'rgba(255,255,255,0.95)',
+            border: 'transparent',
+            radius: 999,
+            padding: '4px 9px',
+            fontSize: 10,
+            letterSpacing: '0.14em',
+          }
+        : {
+            bg: 'rgba(255,255,255,0.14)',
+            color: 'rgba(255,255,255,0.95)',
+            border: 'transparent',
+            radius: 999,
+            padding: '4px 9px',
+            fontSize: 10,
+            letterSpacing: '0.14em',
+          };
 
   // Insight overflow detection — only render "Read more" when the clamped
   // insight actually overflows its 2-line box. Re-measures on value + resize.
