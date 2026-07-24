@@ -35,6 +35,16 @@ export interface UserAnalyticsCourse {
   birdies_count: number | null;
   pars_count: number | null;
   bogeys_plus_count: number | null;
+  /**
+   * Unrounded bucket percentages (0..100, full numeric precision). Used to
+   * render one-decimal values like "0.1%" when the rounded whole-number
+   * percentage would misleadingly read 0 for a bucket that actually has
+   * hits. NULL together with the counts when hole data is absent.
+   */
+  eagles_plus_pct_exact: number | null;
+  birdies_pct_exact: number | null;
+  pars_pct_exact: number | null;
+  bogeys_plus_pct_exact: number | null;
 }
 
 /**
