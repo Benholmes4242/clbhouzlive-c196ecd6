@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { formatLegendValueCompact } from '@/lib/gam/visuals';
