@@ -280,6 +280,7 @@ async function processSingle(whsScoreId: string) {
     } catch (e) {
       console.warn("[rate_course_prompt]", (e as Error).message);
     }
+  }
 
 
   // Mark whs_scores evaluated
