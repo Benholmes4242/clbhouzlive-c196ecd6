@@ -12,6 +12,7 @@ import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { HoleDataSheet } from './HoleDataSheet';
+import { CourseTeeCard } from './CourseTeeCard';
 
 interface Props {
   courseId: string | undefined;
@@ -98,6 +99,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     return (
       <>
         {ghost}
+        <CourseTeeCard courseId={courseId} />
         <HolesEmptyState courseName={meta?.course_name ?? null} />
       </>
     );
@@ -106,6 +108,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   return (
     <>
       {ghost}
+      <CourseTeeCard courseId={courseId} />
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}
