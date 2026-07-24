@@ -128,23 +128,34 @@ const PILL_TONE = {
 type PillTone = keyof typeof PILL_TONE;
 
 /** Compact pill for the scoring distribution: "{value} {label}". Renders
- *  "<1%" when the bucket has at least one hole but rounds to 0%. */
+ *  the whole-number percentage normally, but drops to ONE decimal place
+ *  (clamped to a minimum of 0.1%) when a bucket has real hits that would
+ *  otherwise round away to 0%. */
 function ScoringPill({
   pct,
+  pctExact,
   count,
   label,
   tone,
   narrow,
 }: {
   pct: number;
+  pctExact: number;
   count: number;
   label: string;
   tone: PillTone;
   narrow: boolean;
 }) {
   const t = PILL_TONE[tone];
-  // Rare-outcome rule: non-zero count that rounded to 0% renders "<1%".
-  const display = count > 0 && pct === 0 ? '<1%' : `${pct}%`;
+  // Rare-outcome rule: non-zero count that rounded to 0% renders one decimal
+  // place. Clamp so we never show "0.0%" for a bucket that actually has hits.
+  let display: string;
+  if (count > 0 && pct === 0) {
+    const oneDec = Math.max(0.1, Number(pctExact.toFixed(1)));
+    display = `${oneDec.toFixed(1)}%`;
+  } else {
+    display = `${pct}%`;
+  }
   return (
     <span
       style={{
@@ -287,11 +298,11 @@ function AnalyticsCourseRow({
           }}
         >
           {(course.eagles_plus_count as number) > 0 && (
-            <ScoringPill pct={course.eagles_plus_pct as number} count={course.eagles_plus_count as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
+            <ScoringPill pct={course.eagles_plus_pct as number} pctExact={course.eagles_plus_pct_exact as number} count={course.eagles_plus_count as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
           )}
-          <ScoringPill pct={course.birdies_pct as number} count={course.birdies_count as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
-          <ScoringPill pct={course.pars_pct as number} count={course.pars_count as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
-          <ScoringPill pct={course.bogeys_plus_pct as number} count={course.bogeys_plus_count as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
+          <ScoringPill pct={course.birdies_pct as number} pctExact={course.birdies_pct_exact as number} count={course.birdies_count as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
+          <ScoringPill pct={course.pars_pct as number} pctExact={course.pars_pct_exact as number} count={course.pars_count as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
+          <ScoringPill pct={course.bogeys_plus_pct as number} pctExact={course.bogeys_plus_pct_exact as number} count={course.bogeys_plus_count as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
         </div>
       )}
     </button>

@@ -16837,17 +16837,21 @@ export type Database = {
           avg_to_par: number
           birdies_count: number
           birdies_pct: number
+          birdies_pct_exact: number
           bogeys_plus_count: number
           bogeys_plus_pct: number
+          bogeys_plus_pct_exact: number
           course_id: string
           course_name: string
           eagles_plus_count: number
           eagles_plus_pct: number
+          eagles_plus_pct_exact: number
           hardest_hole_avg: number
           hardest_hole_no: number
           last_played: string
           pars_count: number
           pars_pct: number
+          pars_pct_exact: number
           rounds_count: number
         }[]
       }
