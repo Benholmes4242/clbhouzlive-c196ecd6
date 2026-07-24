@@ -30,6 +30,17 @@ interface Props {
   synced: boolean;
 }
 
+const DOT = '\u00B7';
+
+/** Format a signed number to N decimal places: "+1.2", "-0.4", "0.0". */
+function fmtSigned(n: number, digits: number): string {
+  const rounded = Number(n.toFixed(digits));
+  const abs = Math.abs(rounded).toFixed(digits);
+  if (rounded > 0) return `+${abs}`;
+  if (rounded < 0) return `-${abs}`;
+  return abs; // exact zero: no sign
+}
+
 function Row({
   title,
   subtitle,
@@ -37,7 +48,7 @@ function Row({
   isLast,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   onClick: () => void;
   isLast?: boolean;
 }) {
