@@ -649,5 +649,12 @@
     },
     "videoMomentAlt": "Video moment",
     "courseMomentAlt": "Course moment"
+  },
+  "yourCourses": {
+    "roundsCount_one": "{{count}} round",
+    "roundsCount_other": "{{count}} rounds",
+    "avgHere": "{{avg}} here",
+    "toughestHole": "Hole {{hole}} is your toughest",
+    "perRound": "{{avg}} a round"
   }
 }
