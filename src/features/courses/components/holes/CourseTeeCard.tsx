@@ -11,6 +11,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import { useCourseTeeSets, type TeeSet } from '../../hooks/useCourseTeeSets';
 import { AMBER, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { FONT } from './_constants';
