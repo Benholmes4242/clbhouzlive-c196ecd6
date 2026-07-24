@@ -322,47 +322,14 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         <div style={{ minHeight: 0 }} aria-hidden={!expanded}>
           <div style={{ height: 12 }} />
 
-          {/* Colour tee pills */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 4,
-              marginBottom: 12,
-              WebkitOverflowScrolling: 'touch',
-            }}
-            role="tablist"
-            aria-label={t('courses:teeCard.a11yPills') as string}
-          >
-            {colours.map((tee) => {
-              const isActive = tee.tee_label === active.tee_label;
-              return (
-                <button
-                  key={tee.tee_label}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => handlePick(tee.tee_label)}
-                  style={{
-                    minHeight: 44,
-                    padding: '0 14px',
-                    borderRadius: 999,
-                    border: `1px solid ${isActive ? INK : HAIRLINE_INK_8}`,
-                    background: isActive ? INK : '#FFFFFF',
-                    color: isActive ? '#FFFFFF' : INK,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    ...NUM,
-                  }}
-                >
-                  {tee.tee_label} {fmtInt(tee.total_yards ?? 0)}
-                </button>
-              );
-            })}
-          </div>
+          {/* Colour tee pills — horizontal carousel with edge fades. */}
+          <TeePillsRow
+            tees={colours}
+            activeLabel={active.tee_label}
+            onPick={handlePick}
+            ariaLabel={t('courses:teeCard.a11yPills') as string}
+            reducedMotion={reducedMotion}
+          />
 
           {/* Sync prompt for viewers without a WHS connection. */}
           {!connection && (
