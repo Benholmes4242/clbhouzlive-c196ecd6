@@ -32,7 +32,7 @@ export const STAT_OF_WEEK_FALLBACK = {
   chasers: [
     { rank: 2, name: 'Rory McIlroy', value: '323.5' },
     { rank: 3, name: 'Cameron Young', value: '321.8' },
-    { rank: 4, name: 'Gary Woodland', value: '320.4' },
+    { rank: 4, name: 'Nelly Korda', value: '320.4' },
   ],
   categories: ['Earnings', 'SG Total', 'Scoring', 'Putting', 'GIR', 'Sand'],
 };
@@ -71,7 +71,7 @@ export const INTELLIGENCE_QUOTE_FALLBACK = {
   thisWeekPicks: [
     { rank: 1, name: 'Scottie Scheffler', tier: 'Top Pick', position: '−5', positionLabel: 'T1 LIVE' },
     { rank: 2, name: 'Rory McIlroy', tier: 'Strong Contender', position: '−3', positionLabel: 'T6' },
-    { rank: 3, name: 'Tommy Fleetwood', tier: 'In Contention', position: '−2', positionLabel: 'T11' },
+    { rank: 3, name: 'Jeeno Thitikul', tier: 'In Contention', position: '−2', positionLabel: 'T11' },
   ],
 };
 

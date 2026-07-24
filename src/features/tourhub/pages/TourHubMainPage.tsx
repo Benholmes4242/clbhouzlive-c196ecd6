@@ -14,6 +14,7 @@ import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
+import { TourFollowPrompt } from '../components/TourFollowPrompt';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
@@ -191,6 +192,7 @@ export function TourHubMainPage() {
             island HEADER_H (see ChromeIsland.tsx). */}
         <GlassHeaderPlate visible={activeTab !== 'overview'} />
         <div>{renderTab()}</div>
+        <TourFollowPrompt />
       </TourHubShell>
     </TourSelectionProvider>
   );
