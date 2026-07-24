@@ -10,7 +10,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { whsKeys } from '@/lib/whs/hooks';
 import { toast } from '@/lib/toast';
 
-// Daylight tokens — kept in-file so this component never depends on a
+// Daylight tokens - kept in-file so this component never depends on a
 // section-scoped stylesheet.
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
@@ -40,7 +40,7 @@ const GENDER_OPTIONS = [
  *
  * The write path mirrors useProfileSave (src/hooks/useProfileSave.ts:79):
  * `supabase.from('user_profiles').update({ gender }).eq('id', userId)`.
- * Column, enum values, and update shape are identical — no new mutation.
+ * Column, enum values, and update shape are identical - no new mutation.
  */
 export const GenderPromptSheet: React.FC = () => {
   const { user } = useSupabaseSession();
@@ -64,7 +64,7 @@ export const GenderPromptSheet: React.FC = () => {
     if (location.pathname.startsWith('/auth')) return false;
     try {
       if (localStorage.getItem(STORAGE_KEY)) return false;
-    } catch { /* private mode — treat as unseen */ }
+    } catch { /* private mode - treat as unseen */ }
     return true;
   }, [user, profile, profileLoading, currentGender, location.pathname]);
 
@@ -123,7 +123,7 @@ export const GenderPromptSheet: React.FC = () => {
       setOpen(false);
     } catch (err) {
       toast.error('Could not save that. Try again.');
-      // Non-fatal — sheet stays open so the user can retry.
+      // Non-fatal - sheet stays open so the user can retry.
     } finally {
       setSaving(false);
     }
@@ -136,7 +136,7 @@ export const GenderPromptSheet: React.FC = () => {
       open={open}
       onOpenChange={(next) => {
         // Swipe-down / backdrop dismiss is treated as a skip (same rule
-        // as the explicit button — write nothing, mark seen, do not
+        // as the explicit button - write nothing, mark seen, do not
         // re-prompt on this device).
         if (!next && open) {
           analyticsEvents.track('gender_prompt_skipped');

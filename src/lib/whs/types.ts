@@ -530,7 +530,7 @@ export type HandicapPercentileResult =
       user_handicap: number;
       cohort_size: number;
       buckets: HandicapPercentileBucket[];
-      // Phase L1 — gender-aware cohort. RPC v2 returns which cohort was
+      // Phase L1 - gender-aware cohort. RPC v2 returns which cohort was
       // used to compute the percentile ('women' | 'men' | 'all') and
       // whether the member's gendered cohort was too small (< 20) and
       // we fell back to the all-golfers pool.

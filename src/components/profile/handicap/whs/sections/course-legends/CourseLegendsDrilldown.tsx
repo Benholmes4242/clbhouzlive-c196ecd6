@@ -33,7 +33,8 @@ import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { chaseCtaLine } from './drilldown/_shared/duelTension';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
-import { pickProBenchmark, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
+import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
+import { useProfileData } from '@/hooks/useProfileData';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = CHAMPIONS_ORDER_90D.filter(c => c !== 'best_score_diff_90d');
@@ -125,7 +126,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { activeActor } = useActiveActor();
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
   const { data: meta } = useCourseMeta(ctx.courseId);
-  const { data: pros } = useProBenchmarks();
+  const { data: prosRaw } = useProBenchmarks();
+  const { profile } = useProfileData();
+  const viewerGender = (profile as any)?.gender as 'male' | 'female' | 'prefer_not_to_say' | null | undefined;
+  const pros = useMemo(() => filterProsForViewer(prosRaw ?? [], viewerGender), [prosRaw, viewerGender]);
   const [window, setWindow] = useState<LegendWindow>('all_time');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
