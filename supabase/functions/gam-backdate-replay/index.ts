@@ -10,13 +10,14 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-const ADMIN_SECRET = Deno.env.get("GAM_ADMIN_SECRET");
+const ADMIN_SECRET = Deno.env.get("GAM_INTERNAL_SECRET");
 
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    // Require admin secret to invoke
+    // Require admin secret to invoke — hard fail (401) if the secret is
+    // unset or does not match. Never fall through to unauthenticated execution.
     const provided = req.headers.get("x-admin-secret") ?? "";
     if (!ADMIN_SECRET || provided !== ADMIN_SECRET) {
       return json({ error: "unauthorized" }, 401);
