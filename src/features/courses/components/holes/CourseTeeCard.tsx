@@ -8,7 +8,7 @@
 //
 // ASCII only. No em dashes in comments (house rule per Phase L2).
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -582,11 +582,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
 // Fixes the "Yellow chip clips mid-word" bug at Hanbury Manor (4+ tees):
 //   - flexShrink:0 on every chip so chips keep their natural width and the
 //     ROW scrolls instead of the chips squeezing.
-//   - scrollSnapType:'x proximity' with scrollSnapAlign:'start' per chip so
-//     flicks settle on a chip edge without fighting short swipes.
-//   - Right/left edge fades — only when the row actually overflows and is
-//     not scrolled to that edge — so users read the row as scrollable
-//     instead of as a layout bug.
+//   - Native horizontal overflow scroll; no snap so swipes feel continuous.
+//   - No edge fades — the row sits flush against the viewport edges.
 //   - Scrollbar hidden via a scoped ::-webkit-scrollbar rule (no global
 //     leakage). Keyboard/AT scrollability is preserved.
 //   - Active chip is scrolled into view on mount and on active-change so a
@@ -609,41 +606,10 @@ const TeePillsRow: React.FC<{
     dragged: boolean;
   }>({ startX: 0, startY: 0, startScrollLeft: 0, axis: null, dragged: false });
   const suppressNextClickRef = useRef(false);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(true);
   const rawId = React.useId();
   // useId returns a string containing ':' which is invalid in CSS class
   // selectors; sanitize before injecting into the scoped <style>.
   const scrollerClass = `tee-pills-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
-
-  const updateFades = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const overflow = el.scrollWidth - el.clientWidth;
-    if (overflow <= 1) {
-      setAtStart(true);
-      setAtEnd(true);
-      return;
-    }
-    setAtStart(el.scrollLeft <= 1);
-    setAtEnd(el.scrollLeft >= overflow - 1);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    updateFades();
-    el.addEventListener('scroll', updateFades, { passive: true });
-    let ro: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(updateFades);
-      ro.observe(el);
-    }
-    return () => {
-      el.removeEventListener('scroll', updateFades);
-      ro?.disconnect();
-    };
-  }, [updateFades, tees.length]);
 
   // Native horizontal overflow scrolling can be swallowed by the course page's
   // vertical scroll container on iOS when the gesture starts on a button. Own
@@ -694,7 +660,6 @@ const TeePillsRow: React.FC<{
       event.stopPropagation();
       el.scrollLeft = state.startScrollLeft - deltaX;
       state.dragged = true;
-      updateFades();
     };
 
     const handleTouchEnd = () => {
@@ -718,7 +683,7 @@ const TeePillsRow: React.FC<{
       el.removeEventListener('touchend', handleTouchEnd);
       el.removeEventListener('touchcancel', handleTouchEnd);
     };
-  }, [updateFades]);
+  }, []);
 
   // Bring the active chip into view on mount and when it changes.
   useEffect(() => {
@@ -748,7 +713,6 @@ const TeePillsRow: React.FC<{
           overflowX: 'auto',
           overflowY: 'hidden',
           paddingBottom: 4,
-          scrollSnapType: 'x proximity',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           // Let vertical swipes keep scrolling the page; horizontal swipes are
@@ -781,7 +745,6 @@ const TeePillsRow: React.FC<{
                 // flexShrink:0 keeps the chip at its natural width so the row
                 // scrolls instead of chips squeezing mid-word.
                 flexShrink: 0,
-                scrollSnapAlign: 'start',
                 minHeight: 44,
                 padding: '0 14px',
                 borderRadius: 999,
@@ -800,34 +763,6 @@ const TeePillsRow: React.FC<{
           );
         })}
       </div>
-      {!atStart && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 4,
-            left: 0,
-            width: 24,
-            background: 'linear-gradient(to left, rgba(255,255,255,0), #FFFFFF)',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-      {!atEnd && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 4,
-            right: 0,
-            width: 24,
-            background: 'linear-gradient(to right, rgba(255,255,255,0), #FFFFFF)',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
     </div>
   );
 };
