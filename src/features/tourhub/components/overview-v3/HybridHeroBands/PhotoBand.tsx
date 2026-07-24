@@ -262,21 +262,22 @@ export function PhotoBand({
           <span
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '4px 9px', borderRadius: 999,
-              background: pillTone.bg, color: pillTone.color,
-              fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
+              padding: pillTone.padding,
+              borderRadius: pillTone.radius,
+              background: pillTone.bg,
+              color: pillTone.color,
+              border: pillTone.border === 'transparent'
+                ? undefined
+                : `1px solid ${pillTone.border}`,
+              fontSize: pillTone.fontSize,
+              fontWeight: 800,
+              letterSpacing: pillTone.letterSpacing,
               textTransform: 'uppercase',
               ...NUMERIC_STYLE,
               backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
             }}
           >
-            {pill.tone === 'live' && (
-              <span
-                className="hybrid-live-pulse"
-                style={{ width: 6, height: 6, borderRadius: 999, background: pillTone.dot }}
-              />
-            )}
             {pill.text}
           </span>
         </div>
