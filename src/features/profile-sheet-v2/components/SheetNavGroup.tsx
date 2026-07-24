@@ -141,20 +141,8 @@ export default function SheetNavGroup({
       {currentActor.type === 'personal' && onInviteFriends && (
         <Row
           label="Invite friends"
+          subLabel="Share clbhouz and build your circle"
           onClick={onInviteFriends}
-          trailing={
-            <span
-              style={{
-                fontWeight: 500,
-                fontSize: 10.5,
-                color: AMBER,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {'Share \u203A'}
-            </span>
-          }
         />
       )}
       <Row
