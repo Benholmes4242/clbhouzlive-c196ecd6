@@ -103,10 +103,29 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const listItems = useMemo<UserAnalyticsCourse[]>(() => myCourses, [myCourses]);
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="your-course-analytics-title" zIndexBase={10000} maxHeight="75dvh">
-      <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
-        {/* Header */}
-        <div style={{ padding: '8px 20px 12px' }}>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy="your-course-analytics-title"
+      zIndexBase={10000}
+      maxHeight="75dvh"
+      // Make the sheet panel a flex column so we can pin the header and
+      // scroll only the list. `overflow: hidden` keeps the rounded top
+      // corners clipping the scroll region. Scoped to this sheet only —
+      // merged via BottomSheet's existing `...style` spread (BottomSheet.tsx:134).
+      style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+    >
+      <div
+        style={{
+          fontFamily: FONT,
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
+        {/* Fixed header (does NOT scroll) */}
+        <div style={{ padding: '8px 20px 12px', flexShrink: 0 }}>
           <div
             style={{
               fontSize: 10.5,
@@ -132,31 +151,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           </h2>
         </div>
 
-        {/* Building state */}
-        {showBuildingState && (
-          <div style={{ padding: '4px 20px 20px' }}>
-            <div
-              style={{
-                background: '#fff',
-                border: `1px solid ${HAIRLINE}`,
-                borderRadius: 16,
-                padding: 20,
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: 15, fontWeight: 700, color: INK }}>
-                Your analytics build as your rounds sync
-              </div>
-              <div style={{ marginTop: 6, fontSize: 13, color: SOFT, lineHeight: 1.4 }}>
-                Play a counting round and this fills up.
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Search field (only when we already have a list) */}
+        {/* Fixed search field (only when we already have a list) */}
         {showSearchField && (
-          <div style={{ padding: '0 20px 12px' }}>
+          <div style={{ padding: '0 20px 12px', flexShrink: 0 }}>
             <input
               type="text"
               value={q}
@@ -177,80 +174,118 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           </div>
         )}
 
-        {/* Search results override list when active */}
-        {searchActive ? (
-          <div
-            style={{
-              margin: '0 20px',
-              background: '#fff',
-              border: `1px solid ${HAIRLINE}`,
-              borderRadius: 16,
-              overflow: 'hidden',
-            }}
-          >
-            {searching && searchResults.length === 0 ? (
-              <div style={{ padding: 16, fontSize: 13, color: MUTED }}>Searching…</div>
-            ) : searchResults.length === 0 ? (
-              <div style={{ padding: 16, fontSize: 13, color: MUTED }}>No courses found.</div>
-            ) : (
-              searchResults.map((c, i) => (
-                <Row
-                  key={c.id}
-                  title={c.name}
-                  subtitle={[c.region, c.country].filter(Boolean).join(' · ') || undefined}
-                  onClick={() => go(c.id)}
-                  isLast={i === searchResults.length - 1}
-                />
-              ))
-            )}
-          </div>
-        ) : showList ? (
-          <div
-            style={{
-              margin: '0 20px',
-              background: '#fff',
-              border: `1px solid ${HAIRLINE}`,
-              borderRadius: 16,
-              overflow: 'hidden',
-            }}
-          >
-            {listItems.map((c, i) => (
-              <Row
-                key={c.course_id}
-                title={c.course_name}
-                subtitle={`${c.rounds_count} ${c.rounds_count === 1 ? 'round' : 'rounds'}`}
-                onClick={() => go(c.course_id)}
-                isLast={i === listItems.length - 1}
-              />
-            ))}
-          </div>
-        ) : null}
+        {/* Scrollable region — flex:1 + minHeight:0 lets it shrink so
+            overflowY actually engages. overscrollBehavior: contain stops
+            scroll chaining into the profile sheet behind. Panel already
+            applies safe-area padding-bottom (BottomSheet.tsx:132) so we
+            do NOT re-add it here. */}
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            padding: '0 0 8px',
+          }}
+        >
+          {/* Building state */}
+          {showBuildingState && (
+            <div style={{ padding: '4px 20px 20px' }}>
+              <div
+                style={{
+                  background: '#fff',
+                  border: `1px solid ${HAIRLINE}`,
+                  borderRadius: 16,
+                  padding: 20,
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontSize: 15, fontWeight: 700, color: INK }}>
+                  Your analytics build as your rounds sync
+                </div>
+                <div style={{ marginTop: 6, fontSize: 13, color: SOFT, lineHeight: 1.4 }}>
+                  Play a counting round and this fills up.
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Loading skeleton for first paint */}
-        {isLoading && !showBuildingState && !showList && (
-          <div style={{ padding: '0 20px' }}>
+          {/* Search results override list when active */}
+          {searchActive ? (
             <div
               style={{
+                margin: '0 20px',
                 background: '#fff',
                 border: `1px solid ${HAIRLINE}`,
                 borderRadius: 16,
                 overflow: 'hidden',
               }}
             >
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: 52,
-                    borderBottom: i < 2 ? `0.5px solid ${HAIRLINE}` : 0,
-                    background:
-                      'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
-                  }}
+              {searching && searchResults.length === 0 ? (
+                <div style={{ padding: 16, fontSize: 13, color: MUTED }}>Searching…</div>
+              ) : searchResults.length === 0 ? (
+                <div style={{ padding: 16, fontSize: 13, color: MUTED }}>No courses found.</div>
+              ) : (
+                searchResults.map((c, i) => (
+                  <Row
+                    key={c.id}
+                    title={c.name}
+                    subtitle={[c.region, c.country].filter(Boolean).join(' · ') || undefined}
+                    onClick={() => go(c.id)}
+                    isLast={i === searchResults.length - 1}
+                  />
+                ))
+              )}
+            </div>
+          ) : showList ? (
+            <div
+              style={{
+                margin: '0 20px',
+                background: '#fff',
+                border: `1px solid ${HAIRLINE}`,
+                borderRadius: 16,
+                overflow: 'hidden',
+              }}
+            >
+              {listItems.map((c, i) => (
+                <Row
+                  key={c.course_id}
+                  title={c.course_name}
+                  subtitle={`${c.rounds_count} ${c.rounds_count === 1 ? 'round' : 'rounds'}`}
+                  onClick={() => go(c.course_id)}
+                  isLast={i === listItems.length - 1}
                 />
               ))}
             </div>
-          </div>
-        )}
+          ) : null}
+
+          {/* Loading skeleton for first paint */}
+          {isLoading && !showBuildingState && !showList && (
+            <div style={{ padding: '0 20px' }}>
+              <div
+                style={{
+                  background: '#fff',
+                  border: `1px solid ${HAIRLINE}`,
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      height: 52,
+                      borderBottom: i < 2 ? `0.5px solid ${HAIRLINE}` : 0,
+                      background:
+                        'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </BottomSheet>
   );
