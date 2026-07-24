@@ -99,6 +99,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
     return (
       <>
         {ghost}
+        <CourseTeeCard courseId={courseId} />
         <HolesEmptyState courseName={meta?.course_name ?? null} />
       </>
     );
@@ -107,6 +108,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   return (
     <>
       {ghost}
+      <CourseTeeCard courseId={courseId} />
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}
