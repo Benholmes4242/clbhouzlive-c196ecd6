@@ -402,7 +402,7 @@ export function useHeroCarouselData() {
         (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       );
 
-      // Evict every active major from every native tour bucket — each lives
+      // Evict every active major from every native tour bucket - each lives
       // only in its synthetic 'major' slide below. Symmetric for mens/womens.
       const evictIds = new Set<string>();
       if (activeMajorId) evictIds.add(activeMajorId);
