@@ -257,7 +257,7 @@ function AnalyticsCourseRow({
             </span>
             <span
               style={{
-                color: INK,
+                color: triangleColor,
                 fontWeight: 600,
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -278,10 +278,12 @@ function AnalyticsCourseRow({
             marginTop: 8,
           }}
         >
-          <ScoringPill pct={course.eagles_plus_pct as number} label={t(pillKey('Eagles'))} />
-          <ScoringPill pct={course.birdies_pct as number} label={t(pillKey('Birdies'))} />
-          <ScoringPill pct={course.pars_pct as number} label={t(pillKey('Pars'))} />
-          <ScoringPill pct={course.bogeys_plus_pct as number} label={t(pillKey('Bogeys'))} />
+          {(course.eagles_plus_pct as number) > 0 && (
+            <ScoringPill pct={course.eagles_plus_pct as number} label={t(pillKey('Eagles'))} tone="eagles" narrow={narrow} />
+          )}
+          <ScoringPill pct={course.birdies_pct as number} label={t(pillKey('Birdies'))} tone="birdies" narrow={narrow} />
+          <ScoringPill pct={course.pars_pct as number} label={t(pillKey('Pars'))} tone="pars" narrow={narrow} />
+          <ScoringPill pct={course.bogeys_plus_pct as number} label={t(pillKey('Bogeys'))} tone="bogeys" narrow={narrow} />
         </div>
       )}
     </button>
