@@ -16831,8 +16831,11 @@ export type Database = {
       gam_user_courses: {
         Args: never
         Returns: {
+          avg_to_par: number
           course_id: string
           course_name: string
+          hardest_hole_avg: number
+          hardest_hole_no: number
           last_played: string
           rounds_count: number
         }[]
