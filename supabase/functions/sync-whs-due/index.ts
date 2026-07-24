@@ -388,7 +388,7 @@ Deno.serve(async (req) => {
   const nowIso = new Date().toISOString();
   let query = admin
     .from("whs_connections")
-    .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures")
+    .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures, initial_sync_complete")
     .is("deleted_at", null)
     .lt("consecutive_failures", MAX_CONSECUTIVE_FAILURES)
     .order("last_synced_at", { ascending: true, nullsFirst: true })
