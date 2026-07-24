@@ -27,6 +27,16 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"tnum" 1, "kern" 1',
 };
 
+// Shared grid template for the hole table (header, Row, SubtotalRow). The
+// hole-number track may shrink to 40px on narrow devices; the three data
+// tracks use minmax(0, 1fr) so they can shrink below their intrinsic content
+// width and never push the card past the viewport edge.
+const HOLE_GRID_COLUMNS =
+  'minmax(40px, 56px) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)';
+// Minimum table width when wrapped in the horizontal scroll fallback so
+// numbers remain readable at 320dp rather than being crushed together.
+const HOLE_TABLE_MIN_WIDTH = 280;
+
 function storageKey(courseId: string) {
   return `tee-card:${courseId}`;
 }
