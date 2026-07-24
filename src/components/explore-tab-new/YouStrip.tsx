@@ -75,11 +75,11 @@ export function YouStrip({ preview }: Props) {
       onClick={preview.onPress}
       style={{
         width: '100%',
-        minHeight: 64,
+        minHeight: 56,
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
-        padding: '0 16px',
+        gap: 10,
+        padding: '8px 16px',
         background,
         borderTop,
         borderBottom,
@@ -95,7 +95,7 @@ export function YouStrip({ preview }: Props) {
         <div
           style={{
             flex: 1,
-            fontSize: 13,
+            fontSize: 12.5,
             fontWeight: 600,
             color: SLATE_500,
           }}
@@ -123,13 +123,13 @@ export function YouStrip({ preview }: Props) {
           <SquircleAvatar
             src={preview.avatarUrl ?? null}
             fallback={initials(preview.name)}
-            size={40}
+            size={34}
           />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 14.5,
                 fontWeight: 700,
                 color: INK,
                 whiteSpace: 'nowrap',
@@ -143,7 +143,7 @@ export function YouStrip({ preview }: Props) {
               <div
                 style={{
                   marginTop: 2,
-                  fontSize: 12,
+                  fontSize: 12.5,
                   fontWeight: 600,
                   color: SLATE_500,
                 }}
@@ -158,7 +158,7 @@ export function YouStrip({ preview }: Props) {
               <div
                 className="tabular-nums"
                 style={{
-                  fontSize: 15,
+                  fontSize: 17,
                   fontWeight: 800,
                   color: INK,
                   lineHeight: 1,
@@ -170,7 +170,7 @@ export function YouStrip({ preview }: Props) {
                 <div
                   style={{
                     marginTop: 4,
-                    fontSize: 9,
+                    fontSize: 9.5,
                     fontWeight: 700,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
