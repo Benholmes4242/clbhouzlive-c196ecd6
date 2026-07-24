@@ -456,6 +456,9 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
 
 export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useHandicapPercentile(userId);
+  const { profile } = useProfileData();
+  const ownGender = (profile as any)?.gender as
+    | 'male' | 'female' | 'prefer_not_to_say' | null | undefined;
 
   const fired = useRef(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -475,6 +478,8 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
               reason: d.available ? null : d.reason,
               percentile_top: d.available ? d.percentile_top : null,
               cohort_size: d.cohort_size ?? null,
+              cohort: d.available ? d.cohort ?? null : null,
+              cohort_fallback: d.available ? !!d.cohort_fallback : null,
             });
           }
         });
@@ -485,10 +490,19 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
     return () => obs.disconnect();
   }, [data, userId]);
 
+  // Cohort-driven title (Phase L1). Falls back to the historical string
+  // whenever the RPC has not (yet) supplied a cohort — safe against a
+  // pre-v2 response shape.
+  const cohort = data && (data as any).available ? (data as any).cohort as 'women' | 'men' | 'all' | undefined : undefined;
+  const title =
+    cohort === 'women' ? 'Among women golfers'
+    : cohort === 'men' ? 'Among men golfers'
+    : 'Among active golfers';
+
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader surface="dark" kicker="WHERE YOU STAND" title="Among active golfers" paddingX={16} />
+        <SectionHeader surface="dark" kicker="WHERE YOU STAND" title={title} paddingX={16} />
         <div
           style={{
             margin: '0 16px',
@@ -507,11 +521,36 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
     return null;
   }
 
+  // Fallback caption — only render when the RPC signalled a fallback AND
+  // we can name a cohort word derived from the member's own profile.
+  // prefer_not_to_say / null gender: omit the line entirely (per brief).
+  const cohortWord =
+    ownGender === 'female' ? 'women'
+    : ownGender === 'male' ? 'men'
+    : null;
+  const showFallback = d.available === true && d.cohort_fallback === true && !!cohortWord;
+
   return (
     <section ref={sectionRef} style={{ marginTop: 32 }}>
-      <SectionHeader surface="dark" kicker="WHERE YOU STAND" title="Among active golfers" paddingX={16} />
+      <SectionHeader surface="dark" kicker="WHERE YOU STAND" title={title} paddingX={16} />
       {d.available === true ? (
-        <AvailableCard data={d} />
+        <>
+          <AvailableCard data={d} />
+          {showFallback && (
+            <p
+              style={{
+                fontFamily: FONT_GEIST,
+                fontSize: 12,
+                color: INK_55,
+                padding: '4px 16px 0',
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              We will compare you with {cohortWord} golfers once enough have joined.
+            </p>
+          )}
+        </>
       ) : (
         <UnavailableCard reason="cohort_unavailable" />
       )}
@@ -520,3 +559,4 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 };
 
 export default WhereYouStandSection;
+
