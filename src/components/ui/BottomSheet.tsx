@@ -28,6 +28,7 @@ export function BottomSheet({
   ariaLabelledBy,
   variant = 'light',
   surfaceColor,
+  maxHeight = '90vh',
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
