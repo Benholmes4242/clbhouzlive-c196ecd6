@@ -10,16 +10,17 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-const ADMIN_SECRET = Deno.env.get("GAM_ADMIN_SECRET");
+const ADMIN_SECRET = Deno.env.get("GAM_INTERNAL_SECRET");
 
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    // Require admin secret to invoke
+    // Require admin secret to invoke — hard fail (401) if the secret is
+    // unset or does not match. Never fall through to unauthenticated execution.
     const provided = req.headers.get("x-admin-secret") ?? "";
     if (!ADMIN_SECRET || provided !== ADMIN_SECRET) {
-      return json({ error: "unauthorized" }, 401);
+      return json({ error: "unauthorized" }, 401, corsHeaders);
     }
 
     let body: any = {};
@@ -45,16 +46,17 @@ Deno.serve(async (req) => {
       }
     }
     console.log(`[backdate-replay] reset ${ok} users, ${failed} failures`);
-    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors });
+    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors }, 200, corsHeaders);
   } catch (e) {
     console.error("[backdate-replay]", e);
-    return json({ error: (e as Error).message }, 500);
+    return json({ error: (e as Error).message }, 500, corsFor(req.headers.get('Origin')));
   }
 });
 
-function json(body: any, status = 200) {
+function json(body: any, status = 200, corsHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status,
   });
 }
+
