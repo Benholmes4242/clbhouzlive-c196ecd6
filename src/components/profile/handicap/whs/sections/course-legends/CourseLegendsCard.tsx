@@ -5,7 +5,7 @@ import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { CourseEyebrow } from './_shared/CourseEyebrow';
 import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
-import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
+import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { GAM } from '../../gam/tokens';
 
 const FONT = GAM.FONT_GEIST;
