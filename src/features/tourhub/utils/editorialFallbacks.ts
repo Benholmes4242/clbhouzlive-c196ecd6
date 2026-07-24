@@ -32,7 +32,7 @@ export const STAT_OF_WEEK_FALLBACK = {
   chasers: [
     { rank: 2, name: 'Rory McIlroy', value: '323.5' },
     { rank: 3, name: 'Cameron Young', value: '321.8' },
-    { rank: 4, name: 'Gary Woodland', value: '320.4' },
+    { rank: 4, name: 'Nelly Korda', value: '320.4' },
   ],
   categories: ['Earnings', 'SG Total', 'Scoring', 'Putting', 'GIR', 'Sand'],
 };
