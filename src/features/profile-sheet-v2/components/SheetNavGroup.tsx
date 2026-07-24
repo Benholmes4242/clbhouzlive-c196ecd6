@@ -40,7 +40,7 @@ interface RowProps {
   disabled?: boolean;
 }
 
-function Row({ label, onClick, trailing, isLast }: RowProps) {
+function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps) {
   return (
     <button
       type="button"
@@ -57,15 +57,47 @@ function Row({ label, onClick, trailing, isLast }: RowProps) {
         borderBottom: isLast ? 0 : `0.5px solid ${HAIRLINE}`,
         cursor: 'pointer',
         transition: 'transform 120ms ease',
+        opacity: disabled ? 0.55 : 1,
+        textAlign: 'left',
       }}
     >
-      <span style={{ fontWeight: 600, fontSize: 13.5, color: INK }}>{label}</span>
+      <div style={{ minWidth: 0, flex: 1, paddingRight: 12 }}>
+        <div style={{ fontWeight: 600, fontSize: 13.5, color: INK }}>{label}</div>
+        {subLabel && (
+          <div style={{ fontWeight: 500, fontSize: 11.5, color: MUTED, marginTop: 2 }}>
+            {subLabel}
+          </div>
+        )}
+      </div>
       {trailing ?? <span style={{ color: MUTED, fontSize: 16 }}>{CHEVRON}</span>}
     </button>
   );
 }
 
-export default function SheetNavGroup({ currentActor, isAdmin, onNavigate, onInviteFriends }: Props) {
+export default function SheetNavGroup({
+  currentActor,
+  isAdmin,
+  onNavigate,
+  onInviteFriends,
+  onOpenCourseAnalytics,
+  analyticsState = 'disconnected',
+}: Props) {
+  const showAnalytics = currentActor.type === 'personal' && !!onOpenCourseAnalytics;
+  const analyticsSubLabel =
+    analyticsState === 'ready'
+      ? 'Your game, course by course'
+      : analyticsState === 'building'
+        ? 'Your analytics build as your rounds sync'
+        : 'Sync your official WHS handicap for live course analytics';
+  const analyticsDisabled = analyticsState === 'disconnected';
+  const handleAnalyticsTap = () => {
+    if (analyticsState === 'disconnected') {
+      onNavigate('/handicap');
+      return;
+    }
+    onOpenCourseAnalytics?.();
+  };
+
   return (
     <div
       style={{
