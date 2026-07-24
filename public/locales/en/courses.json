@@ -352,7 +352,8 @@
       "optionExcellent": "Excellent",
       "optionGood": "Good",
       "optionFair": "Fair",
-      "optionPoor": "Poor"
+      "optionPoor": "Poor",
+      "yourTees": "Your tees"
     },
     "subscore": {
       "design": "Design",
@@ -442,7 +443,11 @@
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses",
       "voteFailed": "Couldn't save your vote"
-    }
+    },
+    "teesPlayed": {
+      "eyebrow": "TEES PLAYED (OPTIONAL)"
+    },
+    "teeBadge": "{{label}} tees"
   },
   "courseDetail": {
     "claim": {

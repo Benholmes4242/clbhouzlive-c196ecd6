@@ -12,6 +12,8 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type ReviewsRatingFilter, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
+import { useCourseTeeSets } from '@/features/courses/hooks/useCourseTeeSets';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
@@ -106,6 +108,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
+  // L6 - "Your tees" filter (only renders when gate conditions hold; see below)
+  const [teeFilterOn, setTeeFilterOn] = useState(false);
   
   const hookRatingFilter: ReviewsRatingFilter =
     ratingFilter === 'exceptional' ? '10-9'
@@ -260,15 +264,45 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
-  
+
+  // L6 - "Your tees" filter gating
+  //   1) viewer has a remembered tee in localStorage 'tee-card:{courseId}' AND
+  //   2) that stored label matches a returned colour tee for this course AND
+  //   3) at least 3 of the loaded reviews carry any tee_label.
+  const { data: teeSetsData } = useCourseTeeSets(courseId);
+  const rememberedTeeLabel = useMemo<string | null>(() => {
+    try {
+      const stored = typeof window !== 'undefined'
+        ? window.localStorage.getItem(`tee-card:${courseId}`)
+        : null;
+      if (!stored) return null;
+      const colours = (teeSetsData ?? []).filter((tee) => tee.label_kind === 'colour');
+      return colours.some((tee) => tee.tee_label === stored) ? stored : null;
+    } catch {
+      return null;
+    }
+  }, [courseId, teeSetsData]);
+  const reviewsWithTeeCount = useMemo(
+    () => reviews.reduce((n, r) => n + (r.tee_label ? 1 : 0), 0),
+    [reviews],
+  );
+  const teeFilterAvailable = !!rememberedTeeLabel && reviewsWithTeeCount >= 3;
+  // Reset the toggle if the chip's gate becomes unavailable (data changes).
+  useEffect(() => {
+    if (!teeFilterAvailable && teeFilterOn) setTeeFilterOn(false);
+  }, [teeFilterAvailable, teeFilterOn]);
+
   const filteredReviews = useMemo(() => {
-    if (!ratingFilter) return reviews;
-    return reviews.filter((r) => {
-      const tierData = getScoreTier(r.rating);
-      return tierData.tier === ratingFilter;
-    });
-  }, [reviews, ratingFilter]);
-  
+    let out = reviews;
+    if (ratingFilter) {
+      out = out.filter((r) => getScoreTier(r.rating).tier === ratingFilter);
+    }
+    if (teeFilterAvailable && teeFilterOn && rememberedTeeLabel) {
+      out = out.filter((r) => r.tee_label === rememberedTeeLabel);
+    }
+    return out;
+  }, [reviews, ratingFilter, teeFilterAvailable, teeFilterOn, rememberedTeeLabel]);
+
   const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
   const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
 
@@ -433,6 +467,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       clubhouse_score: review.clubhouse_score,
       facilities_score: review.facilities_score,
       media: review.media || [],
+      teeLabel: review.tee_label ?? null,
       isHighlighted,
     };
   };
@@ -678,6 +713,38 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
                   triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-white !border !border-input !text-foreground hover:!bg-accent gap-0 [&>span]:text-foreground"
                 />
+
+                {teeFilterAvailable && (
+                  <button
+                    type="button"
+                    aria-pressed={teeFilterOn}
+                    onClick={() => {
+                      const next = !teeFilterOn;
+                      setTeeFilterOn(next);
+                      analyticsEvents.track('review_tee_filter_toggled', {
+                        course_id: courseId,
+                        on: next,
+                      });
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      height: 34,
+                      padding: '0 12px',
+                      borderRadius: 17,
+                      background: teeFilterOn ? '#0F172A' : '#FFFFFF',
+                      color: teeFilterOn ? '#FFFFFF' : '#0F172A',
+                      border: `1px solid ${teeFilterOn ? '#0F172A' : HAIRLINE_INK_10}`,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {t('review.filter.yourTees', { defaultValue: 'Your tees' })}
+                  </button>
+                )}
+
 
                 {myReview && (
                   <button

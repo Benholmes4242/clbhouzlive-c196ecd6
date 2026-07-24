@@ -35,6 +35,8 @@ interface Review {
   clubhouse_score?: number | null;
   facilities_score?: number | null;
   media?: ReviewMediaItem[];
+  // L6 - tee played (optional). Renders a small outline badge on the meta row.
+  teeLabel?: string | null;
 }
 
 interface ReviewBlockFlatProps {
@@ -231,7 +233,28 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', lineHeight: 1.3 }}>{user.name}</div>
-          <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>{formatDate(createdAt)}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 1, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 11, color: '#94A3B8' }}>{formatDate(createdAt)}</span>
+            {review.teeLabel && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '1px 7px',
+                  borderRadius: 999,
+                  border: '1px solid rgba(15,23,42,0.14)',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: '#475569',
+                  textTransform: 'none',
+                  letterSpacing: '0.01em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('review.teeBadge', { label: review.teeLabel, defaultValue: '{{label}} tees' })}
+              </span>
+            )}
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

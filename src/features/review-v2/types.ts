@@ -21,6 +21,8 @@ export interface ExistingReview {
   review: string | null;
   verdict: string | null;
   share_to_feed: boolean | null;
+  // L6 - tee played (optional)
+  tee_label?: string | null;
 }
 
 export interface ExistingMedia {
@@ -37,6 +39,8 @@ export interface ReviewComposerState {
   scores: Record<CategoryKey, number | null>;
   reviewText: string;
   shareToFeed: boolean;
+  // L6 - tee played (optional). null = not selected.
+  teeLabel: string | null;
 }
 
 export type MediaItemStatus = 'pending' | 'uploading' | 'ready' | 'failed' | 'existing';

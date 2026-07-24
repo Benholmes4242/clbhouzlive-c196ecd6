@@ -23,6 +23,7 @@ const EMPTY_STATE: ReviewComposerState = {
   },
   reviewText: '',
   shareToFeed: true,
+  teeLabel: null,
 };
 
 function seedFromExisting(existing: ExistingReview | null | undefined): ReviewComposerState {
@@ -40,6 +41,7 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
     reviewText: existing.review ?? '',
     // share_to_feed is the source of truth for feed visibility (v2 RPC).
     shareToFeed: existing.share_to_feed !== false,
+    teeLabel: existing.tee_label ?? null,
   };
 }
 
@@ -67,6 +69,10 @@ export function useReviewComposer(existing?: ExistingReview | null, hasNewMedia?
 
   const setShareToFeed = useCallback((v: boolean) => {
     setState((s) => ({ ...s, shareToFeed: v }));
+  }, []);
+
+  const setTeeLabel = useCallback((label: string | null) => {
+    setState((s) => ({ ...s, teeLabel: label }));
   }, []);
 
   const allCategoriesSet = useMemo(
@@ -101,6 +107,7 @@ export function useReviewComposer(existing?: ExistingReview | null, hasNewMedia?
     setCategory,
     setReviewText,
     setShareToFeed,
+    setTeeLabel,
     canSubmit,
     allCategoriesSet,
     progressPct,
