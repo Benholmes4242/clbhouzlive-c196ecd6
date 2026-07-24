@@ -15,6 +15,18 @@
     "filterVideos": "Videos",
     "filterA11y": "Media filter",
     "addMediaA11y": "Add media",
+    "guide": {
+      "kicker": "What to share",
+      "signatureHoles": "Signature holes",
+      "signatureHolesSub": "Show the world what makes this course special",
+      "shots": "Shots from your round",
+      "shotsSub": "Short clips of your best moments on the course",
+      "views": "Views & atmosphere",
+      "viewsSub": "Sunsets, landscapes, the feeling of being there",
+      "clubhouse": "Clubhouse & facilities",
+      "clubhouseSub": "Help others know what to expect before they visit"
+    }
+  },
   "teeCard": {
     "eyebrow": "The course card",
     "subhead": "{{tee}} tees, {{yards}} yards",
@@ -39,18 +51,6 @@
     "a11yBlock": "Course card",
     "a11yPills": "Choose tee",
     "a11yTable": "Holes for selected tee"
-  },
-    "guide": {
-      "kicker": "What to share",
-      "signatureHoles": "Signature holes",
-      "signatureHolesSub": "Show the world what makes this course special",
-      "shots": "Shots from your round",
-      "shotsSub": "Short clips of your best moments on the course",
-      "views": "Views & atmosphere",
-      "viewsSub": "Sunsets, landscapes, the feeling of being there",
-      "clubhouse": "Clubhouse & facilities",
-      "clubhouseSub": "Help others know what to expect before they visit"
-    }
   },
   "holes": {
     "detailsA11y": "Hole {{holeNo}} details",
