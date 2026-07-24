@@ -14,6 +14,8 @@ interface BottomSheetProps {
   variant?: 'light' | 'dark';
   /** Optional surface colour override for the dark variant. */
   surfaceColor?: string;
+  /** Optional max-height override (default '90vh'). Use e.g. '75dvh' for dvh-aware caps. */
+  maxHeight?: string;
 }
 
 export function BottomSheet({
