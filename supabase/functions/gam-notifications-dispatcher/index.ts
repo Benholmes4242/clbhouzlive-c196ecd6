@@ -256,6 +256,8 @@ const LEGEND_LABELS: Record<string, string> = {
   most_albatrosses_all_time: "Most Albatrosses (all-time)",
   most_rounds_90d: "Most Rounds (90-day)",
   most_rounds_all_time: "Most Rounds (all-time)",
+  lowest_gross_women_90d: "Women's record (90 days)",
+  lowest_gross_women_all_time: "Women's course record",
 };
 const legendLabel = (c?: string) => (c && LEGEND_LABELS[c]) || "course record";
 
