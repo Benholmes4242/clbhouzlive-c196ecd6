@@ -140,8 +140,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SeasonRaceCard userId={userId} />
         </div>
 
-        {/* Merged Moments: Honours / Eagles / Birdies */}
-        <MomentsSection
+        {/* Feats: header + aces/albatrosses podium pair */}
+        <LegendarySection
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
@@ -149,6 +149,23 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           onLeaderTap={handleLeaderTap}
         />
 
+
+        {/* Eagles ledger card */}
+        <EaglesLedger
+          region={activeRegion}
+          regionUpper={regionUpper}
+          mode={scope}
+          onRowTap={handleFeatRowTap}
+          onLeaderTap={handleLeaderTap}
+        />
+
+        {/* Birdie hauls ledger card */}
+        <BirdieHaulsLedger
+          region={activeRegion}
+          regionUpper={regionUpper}
+          mode={scope}
+          onRowTap={handleFeatRowTap}
+        />
 
         {/* Toughest courses index */}
         <ToughestIndex region={activeRegion} />
@@ -321,102 +338,3 @@ function LegendarySection({
     </section>
   );
 }
-
-type MomentsTab = 'honours' | 'eagles' | 'birdies';
-
-function MomentsSection({
-  region,
-  regionUpper,
-  mode,
-  onRowTap,
-  onLeaderTap,
-}: {
-  region: string | null;
-  regionUpper: string;
-  mode: RecordsMode;
-  onRowTap: (row: FeatRow) => void;
-  onLeaderTap: (uid: string) => void;
-}) {
-  const [tab, setTab] = useState<MomentsTab>('honours');
-
-  const tabs: { id: MomentsTab; label: string }[] = [
-    { id: 'honours', label: 'Honours' },
-    { id: 'eagles', label: 'Eagles' },
-    { id: 'birdies', label: 'Birdies' },
-  ];
-
-  return (
-    <section style={{ marginTop: 32 }}>
-      <div
-        role="tablist"
-        aria-label="Moments"
-        style={{
-          margin: '0 14px 4px',
-          display: 'inline-flex',
-          gap: 2,
-          padding: 2,
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.08)',
-          borderRadius: 999,
-        }}
-      >
-        {tabs.map((t) => {
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(t.id)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 999,
-                background: active ? '#15171F' : 'transparent',
-                color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                border: 'none',
-                fontFamily: 'inherit',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0.2,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                transition: 'all .15s',
-              }}
-            >
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {tab === 'honours' && (
-        <LegendarySection
-          region={region}
-          regionUpper={regionUpper}
-          mode={mode}
-          onRowTap={onRowTap}
-          onLeaderTap={onLeaderTap}
-        />
-      )}
-      {tab === 'eagles' && (
-        <EaglesLedger
-          region={region}
-          regionUpper={regionUpper}
-          mode={mode}
-          onRowTap={onRowTap}
-          onLeaderTap={onLeaderTap}
-        />
-      )}
-      {tab === 'birdies' && (
-        <BirdieHaulsLedger
-          region={region}
-          regionUpper={regionUpper}
-          mode={mode}
-          onRowTap={onRowTap}
-        />
-      )}
-    </section>
-  );
-}
-
