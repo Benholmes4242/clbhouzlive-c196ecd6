@@ -2,17 +2,29 @@ import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
+import { tourYards } from './_shared/proBenchmark';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 
 
-const EXPLAINER: Record<ProBandBase, string> = {
-  lowest_gross:
-    "Projected from {first}'s current tour scoring average, measured against the difficulty of the courses they play. We take that edge and apply it to this course's Course Rating, then adjust for relative length — a course playing shorter than tour distance (≈7,200 yds) adds a fractional stroke of scoring advantage, capped to keep the estimate realistic. The result is their expected single-round gross here.",
-  most_birdies:
-    "Built from {first}'s tour birdie rate per round, then scaled by how much easier this course rates than the courses they typically face — derived from the gap between tour Course Rating and this course's, plus a length adjustment. That per-round figure is multiplied across the number of rounds you've logged here, giving their projected birdie total over the same sample.",
-  most_eagles:
-    "Based on {first}'s tour eagle rate per round, amplified by this course's relative ease versus tour setups — a function of the Course Rating differential and playing length. Scaled across your round count at this course, it estimates how many eagles they'd be expected to make over the same number of plays.",
-};
+const formatYards = (y: number): string => y.toLocaleString('en-US');
+
+/**
+ * ASCII-only, per-pro explainer copy. The tour-distance figure is
+ * interpolated from tourYards(pro.tour_code) so LPGA pros correctly
+ * say approx 6,500 yards while others say approx 7,200 yards.
+ */
+function buildExplainer(base: ProBandBase, pro: ProProfile): string {
+  const first = pro.full_name.split(' ')[0];
+  const yds = formatYards(tourYards(pro.tour_code));
+  switch (base) {
+    case 'lowest_gross':
+      return `Projected from ${first}'s current tour scoring average, measured against the difficulty of the courses they play. We take that edge and apply it to this course's Course Rating, then adjust for relative length. A course playing shorter than tour distance (approx ${yds} yds) adds a fractional stroke of scoring advantage, capped to keep the estimate realistic. The result is their expected single-round gross here.`;
+    case 'most_birdies':
+      return `Built from ${first}'s tour birdie rate per round, then scaled by how much easier this course rates than the courses they typically face, derived from the gap between tour Course Rating and this course's, plus a length adjustment against approx ${yds} yds. That per-round figure is multiplied across the number of rounds you've logged here, giving their projected birdie total over the same sample.`;
+    case 'most_eagles':
+      return `Based on ${first}'s tour eagle rate per round, amplified by this course's relative ease versus tour setups, a function of the Course Rating differential and playing length against approx ${yds} yds. Scaled across your round count at this course, it estimates how many eagles they'd be expected to make over the same number of plays.`;
+  }
+}
 
 interface Props {
   pro: ProProfile;
@@ -23,7 +35,6 @@ interface Props {
 
 export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => {
   const [explainerOpen, setExplainerOpen] = useState(false);
-  const first = pro.full_name.split(' ')[0];
   const avatarCandidates = resolvePlayerAvatarCandidates({
     name: pro.full_name,
     photoUrl: (pro as { photo_url?: string | null }).photo_url ?? null,
