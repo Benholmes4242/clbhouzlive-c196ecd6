@@ -26,19 +26,26 @@ export type ProBandBase = (typeof PRO_BAND_BASES)[number];
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 
-const TOUR_YARDS = 7200;
+// Phase L2: per-tour setup length. LPGA rows carry a tour_cr_baseline
+// measured on ~6,500-yard setups, so applying a 7,200-yard shortness
+// baseline to them would double-count length advantage.
+const TOUR_YARDS_BY_TOUR: Record<string, number> = { lpga: 6500 };
+const TOUR_YARDS_DEFAULT = 7200;
+export function tourYards(tourCode: string): number {
+  return TOUR_YARDS_BY_TOUR[tourCode] ?? TOUR_YARDS_DEFAULT;
+}
 
 /** Extra strokes of edge from course shortness: 1 stroke per 450 yards under
- *  tour length, capped at 2.5. Null/short data → 0 (current behaviour). */
-export function lengthBonus(courseYards: number | null): number {
+ *  tour length, capped at 2.5. Null/short data returns 0 (current behaviour). */
+export function lengthBonus(courseYards: number | null, tourYardsBase = TOUR_YARDS_DEFAULT): number {
   if (courseYards == null || courseYards < 4000) return 0;
-  return clamp((TOUR_YARDS - courseYards) / 450, 0, 2.5);
+  return clamp((tourYardsBase - courseYards) / 450, 0, 2.5);
 }
 
 /** Predicted single-round gross. Clamped to sane bounds so bad data can't print a 51. */
 export function estGross(pro: ProProfile, c: Required<CourseInputs>): number {
   const raw = Math.round(
-    c.cr - ((pro.tour_cr_baseline - pro.scoring_avg) + lengthBonus(c.yards)),
+    c.cr - ((pro.tour_cr_baseline - pro.scoring_avg) + lengthBonus(c.yards, tourYards(pro.tour_code))),
   );
   return clamp(raw, c.par - 9, Math.round(pro.scoring_avg) + 5);
 }
@@ -50,7 +57,7 @@ export function estBirdiesTotal(
   c: Required<CourseInputs>,
   viewerRounds: number,
 ): number {
-  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards);
+  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards, tourYards(pro.tour_code));
   return Math.round((pro.birdies_per_round + effEase / 6) * viewerRounds);
 }
 export function estEaglesTotal(
@@ -58,11 +65,35 @@ export function estEaglesTotal(
   c: Required<CourseInputs>,
   viewerRounds: number,
 ): number {
-  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards);
+  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards, tourYards(pro.tour_code));
   return Math.max(
     0,
     Math.round(pro.eagles_per_round * (1 + effEase / 12) * viewerRounds),
   );
+}
+
+/**
+ * Phase L2: gender-keyed pro pool filter. Applied by callers BEFORE
+ * pickProBenchmark so rotation stays per-viewer honest.
+ *
+ *   female: LPGA rows only; if that yields zero, fall back to full list
+ *           so the band never disappears due to missing seeds.
+ *   male:   non-LPGA rows only.
+ *   other:  full list (mixed rotation).
+ */
+export function filterProsForViewer(
+  pros: ProProfile[],
+  gender: 'male' | 'female' | 'prefer_not_to_say' | null | undefined,
+): ProProfile[] {
+  if (!pros || pros.length === 0) return pros ?? [];
+  if (gender === 'female') {
+    const lpga = pros.filter((p) => p.tour_code === 'lpga');
+    return lpga.length > 0 ? lpga : pros;
+  }
+  if (gender === 'male') {
+    return pros.filter((p) => p.tour_code !== 'lpga');
+  }
+  return pros;
 }
 
 /** Deterministic daily seed: same course + same UTC day = same pick for everyone. */
