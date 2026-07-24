@@ -132,7 +132,6 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const active = tees.find((t) => t.tee_label === selected) ?? tees[0];
   const colours = tees.filter((t) => t.label_kind === 'colour');
   const specials = tees.filter((t) => t.label_kind === 'special');
-  const hasLadiesTee = tees.some((tt) => tt.gender_scope === 'ladies');
 
   const handlePick = (label: string) => {
     if (label === selected) return;
