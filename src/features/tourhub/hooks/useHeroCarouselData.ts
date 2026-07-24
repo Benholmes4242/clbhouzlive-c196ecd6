@@ -346,22 +346,30 @@ export function useHeroCarouselData() {
         if (upcomingByTour[tournament.tourSlug]) upcomingByTour[tournament.tourSlug].push(tournament);
       });
 
-      // ---- Active men's-major routing (MAJ-1) ----
-      // A men's major is "active" when it's live OR starts within 10 days.
-      // While active, it OWNS a synthetic 'major' pseudo-tour slide and is
-      // evicted from its native tour bucket AND from cross-tour PGA injection.
-      // This restores each native tour's real next event (e.g. 3M Open on PGA,
-      // Scottish Open on EURO during Open week) and gives the major a
-      // correctly-labelled hero card instead of a mis-tagged one.
+      // ---- Active major routing (MAJ-1, generalised) ----
+      // A major is "active" when it is live OR starts within 10 days. While
+      // active it OWNS a synthetic 'major' pseudo-tour slide and is evicted
+      // from its native tour bucket. This applies to BOTH mens majors (evicted
+      // from PGA/EURO/etc.) and womens majors (evicted from LPGA). The
+      // cross-tour PGA injection block below still filters on 'mens' only —
+      // womens majors are never promoted onto the PGA tab.
+      //
+      // Either, both, or neither major can be active at once. When both are
+      // active, ordering rule: mens-live > womens-live > by start_date asc.
+      // A live major always beats an upcoming one regardless of type; that
+      // falls out naturally because live slides render before upcoming slides.
       const nowMs = Date.now();
       const MAJOR_WINDOW_MS = 10 * 86_400_000;
-      const findActiveMensMajor = (rows: CachedTournament[]): CachedTournament | null => {
+      const findActiveMajor = (
+        rows: CachedTournament[],
+        type: 'mens' | 'womens',
+      ): CachedTournament | null => {
         const live = rows.find(
-          t => t.status === 'inprogress' && getMajorType(t.name || '') === 'mens',
+          t => t.status === 'inprogress' && getMajorType(t.name || '') === type,
         );
         if (live) return live;
         const soon = [...rows]
-          .filter(t => t.status !== 'inprogress' && getMajorType(t.name || '') === 'mens')
+          .filter(t => t.status !== 'inprogress' && getMajorType(t.name || '') === type)
           .sort((a, b) => a.start_date.localeCompare(b.start_date))
           .find(t => {
             const s = new Date(t.start_date + 'T12:00:00Z').getTime();
@@ -369,11 +377,15 @@ export function useHeroCarouselData() {
           });
         return soon ?? null;
       };
-      const activeMajorRow = findActiveMensMajor([...liveTournaments, ...upcomingTournaments]);
+      const allRows = [...liveTournaments, ...upcomingTournaments];
+      const activeMajorRow = findActiveMajor(allRows, 'mens');
+      const activeWomensMajorRow = findActiveMajor(allRows, 'womens');
       const activeMajorId = activeMajorRow?.id ?? null;
+      const activeWomensMajorId = activeWomensMajorRow?.id ?? null;
 
-      // Cross-tour major promotion (existing behaviour) — but SKIP the active
-      // major so it doesn't evict the true PGA next event.
+      // Cross-tour major promotion (existing behaviour) — mens only. SKIP the
+      // active mens major so it doesn't evict the true PGA next event. Womens
+      // majors are never promoted onto PGA.
       const crossTourMajors = upcomingTournaments
         .map(t => transformTournament(t, false))
         .filter(t => getMajorType(t.name || '') === 'mens' && t.tourSlug !== 'pga' && t.id !== activeMajorId);
@@ -390,12 +402,15 @@ export function useHeroCarouselData() {
         (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       );
 
-      // Evict the active major from every native tour bucket — it lives only
-      // in the synthetic 'major' slide below.
-      if (activeMajorId) {
+      // Evict every active major from every native tour bucket — each lives
+      // only in its synthetic 'major' slide below. Symmetric for mens/womens.
+      const evictIds = new Set<string>();
+      if (activeMajorId) evictIds.add(activeMajorId);
+      if (activeWomensMajorId) evictIds.add(activeWomensMajorId);
+      if (evictIds.size > 0) {
         TOUR_PRIORITY.forEach(tour => {
-          liveByTour[tour] = liveByTour[tour].filter(t => t.id !== activeMajorId);
-          upcomingByTour[tour] = upcomingByTour[tour].filter(t => t.id !== activeMajorId);
+          liveByTour[tour] = liveByTour[tour].filter(t => !evictIds.has(t.id));
+          upcomingByTour[tour] = upcomingByTour[tour].filter(t => !evictIds.has(t.id));
         });
       }
 
