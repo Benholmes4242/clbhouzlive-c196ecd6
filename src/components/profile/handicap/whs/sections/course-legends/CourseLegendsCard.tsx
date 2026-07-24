@@ -228,8 +228,12 @@ export const CourseLegendsCard: React.FC<Props> = ({
 }) => {
   const [pressed, setPressed] = useState(false);
 
+  // Slots are derived from the (window-filtered) holder map so the women's
+  // record slot only materialises when a woman actually holds the crown.
+  const slots = useMemo(() => buildSlots(holdersByCategory), [holdersByCategory]);
+
   // Resolve each slot to whichever window key has data.
-  const resolved = SLOTS.map((slot) => {
+  const resolved = slots.map((slot) => {
     const row =
       holdersByCategory.get(slot.key) ??
       holdersByCategory.get(slot.alt) ??
@@ -244,7 +248,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
   });
 
   const heldCount = Array.from(visibleHolders.values()).filter((r) => r.is_self).length;
-  const totalSlots = SLOTS.length;
+  const totalSlots = slots.length;
 
   if (visibleHolders.size === 0) return null;
 
