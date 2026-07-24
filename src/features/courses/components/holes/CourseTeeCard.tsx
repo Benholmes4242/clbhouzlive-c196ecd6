@@ -8,7 +8,7 @@
 //
 // ASCII only. No em dashes in comments (house rule per Phase L2).
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -259,7 +259,11 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            // minmax(0, 1fr) lets columns shrink below their content width so
+            // long localized labels / large numbers cannot push the row past
+            // the card edge. Cells below opt in with minWidth:0 so they can
+            // truncate cleanly inside their track.
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
             gap: 8,
             padding: '10px 12px',
             border: `1px solid ${HAIRLINE_INK_8}`,
@@ -271,11 +275,33 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             { k: t('courses:teeCard.stat.cr'), v: fmtRating(active.course_rating) },
             { k: t('courses:teeCard.stat.slope'), v: fmtInt(active.slope_rating) },
           ].map((cell) => (
-            <div key={cell.k as string} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: INK_FAINT }}>
+            <div key={cell.k as string} style={{ textAlign: 'center', minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: INK_FAINT,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {cell.k}
               </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: INK, marginTop: 2, ...NUM }}>
+              <div
+                style={{
+                  // Clamp so a 5-digit yardage / long value never clips the
+                  // number. Labels may ellipsis (above); values never do.
+                  fontSize: 'clamp(13px, 3.6vw, 15px)',
+                  fontWeight: 700,
+                  color: INK,
+                  marginTop: 2,
+                  whiteSpace: 'nowrap',
+                  ...NUM,
+                }}
+              >
                 {cell.v}
               </div>
             </div>
@@ -296,47 +322,14 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         <div style={{ minHeight: 0 }} aria-hidden={!expanded}>
           <div style={{ height: 12 }} />
 
-          {/* Colour tee pills */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 4,
-              marginBottom: 12,
-              WebkitOverflowScrolling: 'touch',
-            }}
-            role="tablist"
-            aria-label={t('courses:teeCard.a11yPills') as string}
-          >
-            {colours.map((tee) => {
-              const isActive = tee.tee_label === active.tee_label;
-              return (
-                <button
-                  key={tee.tee_label}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => handlePick(tee.tee_label)}
-                  style={{
-                    minHeight: 44,
-                    padding: '0 14px',
-                    borderRadius: 999,
-                    border: `1px solid ${isActive ? INK : HAIRLINE_INK_8}`,
-                    background: isActive ? INK : '#FFFFFF',
-                    color: isActive ? '#FFFFFF' : INK,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    ...NUM,
-                  }}
-                >
-                  {tee.tee_label} {fmtInt(tee.total_yards ?? 0)}
-                </button>
-              );
-            })}
-          </div>
+          {/* Colour tee pills — horizontal carousel with edge fades. */}
+          <TeePillsRow
+            tees={colours}
+            activeLabel={active.tee_label}
+            onPick={handlePick}
+            ariaLabel={t('courses:teeCard.a11yPills') as string}
+            reducedMotion={reducedMotion}
+          />
 
           {/* Sync prompt for viewers without a WHS connection. */}
           {!connection && (
@@ -415,7 +408,11 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              // minmax(0, 1fr) is the fix: plain 1fr = minmax(auto, 1fr) which
+              // refuses to shrink below content width, so PAR/CR/SLOPE/YARDS
+              // spilled past the card at 390dp. minmax(0, 1fr) lets tracks
+              // shrink; cells opt in with minWidth:0 below.
+              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
               gap: 8,
               padding: '10px 12px',
               border: `1px solid ${HAIRLINE_INK_8}`,
@@ -429,16 +426,42 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               { k: t('courses:teeCard.stat.slope'), v: fmtInt(active.slope_rating) },
               { k: t('courses:teeCard.stat.yards'), v: fmtInt(totalYards) },
             ].map((cell) => (
-              <div key={cell.k as string} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: INK_FAINT }}>
+              <div key={cell.k as string} style={{ textAlign: 'center', minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: INK_FAINT,
+                    // Labels may truncate with an ellipsis at narrow widths;
+                    // values (below) never do — a clipped number is worse
+                    // than a clipped label.
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {cell.k}
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: INK, marginTop: 2, ...NUM }}>
+                <div
+                  style={{
+                    // Value scales with viewport so 4- and 5-digit yardages
+                    // stay fully readable at 320-390dp. Never truncates.
+                    fontSize: 'clamp(13px, 3.6vw, 15px)',
+                    fontWeight: 700,
+                    color: INK,
+                    marginTop: 2,
+                    whiteSpace: 'nowrap',
+                    ...NUM,
+                  }}
+                >
                   {cell.v}
                 </div>
               </div>
             ))}
           </div>
+
 
           {/* Holes table */}
           <div
@@ -515,6 +538,166 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
     </section>
   );
 };
+
+// -----------------------------------------------------------------------------
+// TeePillsRow — horizontal chip carousel for colour tees.
+//
+// Fixes the "Yellow chip clips mid-word" bug at Hanbury Manor (4+ tees):
+//   - flexShrink:0 on every chip so chips keep their natural width and the
+//     ROW scrolls instead of the chips squeezing.
+//   - scrollSnapType:'x proximity' with scrollSnapAlign:'start' per chip so
+//     flicks settle on a chip edge without fighting short swipes.
+//   - Right/left edge fades — only when the row actually overflows and is
+//     not scrolled to that edge — so users read the row as scrollable
+//     instead of as a layout bug.
+//   - Scrollbar hidden via a scoped ::-webkit-scrollbar rule (no global
+//     leakage). Keyboard/AT scrollability is preserved.
+//   - Active chip is scrolled into view on mount and on active-change so a
+//     user whose default tee is the 5th chip does not have to hunt for it.
+// -----------------------------------------------------------------------------
+const TeePillsRow: React.FC<{
+  tees: TeeSet[];
+  activeLabel: string;
+  onPick: (label: string) => void;
+  ariaLabel: string;
+  reducedMotion: boolean;
+}> = ({ tees, activeLabel, onPick, ariaLabel, reducedMotion }) => {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const chipRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(true);
+  const rawId = React.useId();
+  // useId returns a string containing ':' which is invalid in CSS class
+  // selectors; sanitize before injecting into the scoped <style>.
+  const scrollerClass = `tee-pills-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
+  const updateFades = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const overflow = el.scrollWidth - el.clientWidth;
+    if (overflow <= 1) {
+      setAtStart(true);
+      setAtEnd(true);
+      return;
+    }
+    setAtStart(el.scrollLeft <= 1);
+    setAtEnd(el.scrollLeft >= overflow - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    updateFades();
+    el.addEventListener('scroll', updateFades, { passive: true });
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(updateFades);
+      ro.observe(el);
+    }
+    return () => {
+      el.removeEventListener('scroll', updateFades);
+      ro?.disconnect();
+    };
+  }, [updateFades, tees.length]);
+
+  // Bring the active chip into view on mount and when it changes.
+  useEffect(() => {
+    const btn = chipRefs.current.get(activeLabel);
+    if (!btn) return;
+    btn.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: reducedMotion ? 'auto' : 'smooth',
+    });
+  }, [activeLabel, reducedMotion, tees.length]);
+
+  return (
+    <div style={{ position: 'relative', marginBottom: 12 }}>
+      <style>{`.${scrollerClass}::-webkit-scrollbar{display:none}`}</style>
+      <div
+        ref={scrollerRef}
+        className={scrollerClass}
+        role="tablist"
+        aria-label={ariaLabel}
+        style={{
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          paddingBottom: 4,
+          scrollSnapType: 'x proximity',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {tees.map((tee) => {
+          const isActive = tee.tee_label === activeLabel;
+          return (
+            <button
+              key={tee.tee_label}
+              ref={(node) => {
+                if (node) chipRefs.current.set(tee.tee_label, node);
+                else chipRefs.current.delete(tee.tee_label);
+              }}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onPick(tee.tee_label)}
+              style={{
+                // flexShrink:0 keeps the chip at its natural width so the row
+                // scrolls instead of chips squeezing mid-word.
+                flexShrink: 0,
+                scrollSnapAlign: 'start',
+                minHeight: 44,
+                padding: '0 14px',
+                borderRadius: 999,
+                border: `1px solid ${isActive ? INK : HAIRLINE_INK_8}`,
+                background: isActive ? INK : '#FFFFFF',
+                color: isActive ? '#FFFFFF' : INK,
+                fontSize: 13,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                ...NUM,
+              }}
+            >
+              {tee.tee_label} {fmtInt(tee.total_yards ?? 0)}
+            </button>
+          );
+        })}
+      </div>
+      {!atStart && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 4,
+            left: 0,
+            width: 24,
+            background: 'linear-gradient(to left, rgba(255,255,255,0), #FFFFFF)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {!atEnd && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 4,
+            right: 0,
+            width: 24,
+            background: 'linear-gradient(to right, rgba(255,255,255,0), #FFFFFF)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+
 
 const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: number }; zebra: boolean }> = ({ h, zebra }) => (
   <div
