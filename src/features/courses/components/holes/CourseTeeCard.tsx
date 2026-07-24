@@ -338,8 +338,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             })}
           </div>
 
-          {/* Ladies-tee absence note. Not gated on viewer gender. */}
-          {!hasLadiesTee && (
+          {/* Sync prompt for viewers without a WHS connection. */}
+          {!connection && (
             <div
               role="note"
               style={{
@@ -351,10 +351,10 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
-                {t('courses:teeCard.ladiesNote.heading')}
+                {t('courses:teeCard.syncNote.heading')}
               </div>
               <div style={{ fontSize: 12.5, color: INK_MUTE, lineHeight: 1.5 }}>
-                {t('courses:teeCard.ladiesNote.body')}
+                {t('courses:teeCard.syncNote.body')}
               </div>
             </div>
           )}
