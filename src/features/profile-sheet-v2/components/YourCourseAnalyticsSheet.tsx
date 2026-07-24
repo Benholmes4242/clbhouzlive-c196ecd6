@@ -127,19 +127,24 @@ const PILL_TONE = {
 
 type PillTone = keyof typeof PILL_TONE;
 
-/** Compact pill for the scoring distribution: "{value}% {label}". */
+/** Compact pill for the scoring distribution: "{value} {label}". Renders
+ *  "<1%" when the bucket has at least one hole but rounds to 0%. */
 function ScoringPill({
   pct,
+  count,
   label,
   tone,
   narrow,
 }: {
   pct: number;
+  count: number;
   label: string;
   tone: PillTone;
   narrow: boolean;
 }) {
   const t = PILL_TONE[tone];
+  // Rare-outcome rule: non-zero count that rounded to 0% renders "<1%".
+  const display = count > 0 && pct === 0 ? '<1%' : `${pct}%`;
   return (
     <span
       style={{
@@ -156,7 +161,7 @@ function ScoringPill({
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+      <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{display}</span>
       <span style={{ fontWeight: 600, textTransform: 'lowercase' }}>{label}</span>
     </span>
   );
