@@ -181,12 +181,9 @@ const RootGate: React.FC = () => {
     return <SuspendedScreen suspension={suspension.suspension} />;
   }
 
-  return (
-    <UserStatsCoursesProvider>
-      <ClubhouseWrapped />
-    </UserStatsCoursesProvider>
-  );
+  return <ClubhouseWrapped />;
 };
+
 
 /** Renders app chrome (header/bottom-nav) only when the gate has resolved
  *  to the real app shell. Prevents chrome from flashing under BootHold or
