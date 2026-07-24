@@ -116,6 +116,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       showWatermark={showWatermark}
       isLast={isLast}
       onPress={onTap}
+      density={density}
     />
   );
 }
