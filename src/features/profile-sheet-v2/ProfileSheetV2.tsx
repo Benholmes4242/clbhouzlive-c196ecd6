@@ -20,7 +20,10 @@ import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
+import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 interface Profile {
   id: string;
