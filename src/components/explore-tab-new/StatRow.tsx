@@ -41,6 +41,12 @@ export interface StatRowProps {
   showWatermark?: boolean;
   isLast?: boolean;
   onPress?: () => void;
+  /**
+   * Row density. 'default' preserves legacy sizing for the 14 existing
+   * consumers. 'compact' is the canonical Discover + Champions density:
+   * 56 min-height, 8x16 padding, 34 avatar, 14.5/12.5 text, 17/9.5 stat.
+   */
+  density?: 'default' | 'compact';
 }
 
 
