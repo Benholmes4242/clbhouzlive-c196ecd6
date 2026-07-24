@@ -194,7 +194,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12.5,
             color: subColor,
             fontWeight: 500,
             letterSpacing: '-0.003em',
