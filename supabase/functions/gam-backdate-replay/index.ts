@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
     // unset or does not match. Never fall through to unauthenticated execution.
     const provided = req.headers.get("x-admin-secret") ?? "";
     if (!ADMIN_SECRET || provided !== ADMIN_SECRET) {
-      return json({ error: "unauthorized" }, 401);
+      return json({ error: "unauthorized" }, 401, corsHeaders);
     }
 
     let body: any = {};
@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
       }
     }
     console.log(`[backdate-replay] reset ${ok} users, ${failed} failures`);
-    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors });
+    return json({ ok: true, processed: users?.length ?? 0, succeeded: ok, failed, errors }, corsHeaders);
   } catch (e) {
     console.error("[backdate-replay]", e);
     return json({ error: (e as Error).message }, 500);
