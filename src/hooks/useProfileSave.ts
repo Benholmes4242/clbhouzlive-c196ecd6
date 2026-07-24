@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData } from '@/components/profile/profile-wizard/types';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { parseHcpFormString } from '@/lib/formatHcp';
+import { whsKeys } from '@/lib/whs/hooks';
 
 const INVALIDATE_KEYS = [
   'profile', 'profile-clubs', 'user-profile', 'home-clubs-map',
@@ -96,6 +97,15 @@ export function useProfileSave(userId: string) {
         updatePayload.username_is_custom = true;
       }
 
+      // Capture prior gender so a changed gender value can trigger the same
+      // WHS percentile invalidation GenderPromptSheet performs
+      // (src/components/profile/GenderPromptSheet.tsx:121).
+      const { data: priorProfile } = await supabase
+        .from('user_profiles')
+        .select('gender')
+        .eq('id', userId)
+        .single();
+
       const { data: updated, error: profileError } = await supabase
         .from('user_profiles')
         .update(updatePayload as any)
@@ -168,6 +178,17 @@ export function useProfileSave(userId: string) {
       // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
       queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
 
+      // When gender changes, the WHS percentile benchmark (men's vs women's
+      // pro distribution) must recompute. Invalidation matches
+      // GenderPromptSheet at src/components/profile/GenderPromptSheet.tsx:121.
+      const priorGender = priorProfile?.gender ?? null;
+      const nextGender = form.gender || null;
+      if (priorGender !== nextGender) {
+        await queryClient.invalidateQueries({
+          queryKey: whsKeys.percentile(userId),
+          refetchType: 'all',
+        });
+      }
 
       return true;
     } catch (err: any) {
