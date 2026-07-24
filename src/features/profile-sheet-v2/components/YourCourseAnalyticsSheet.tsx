@@ -103,7 +103,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const listItems = useMemo<UserAnalyticsCourse[]>(() => myCourses, [myCourses]);
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="your-course-analytics-title">
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="your-course-analytics-title" zIndexBase={10000} maxHeight="75dvh">
       <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
         {/* Header */}
         <div style={{ padding: '8px 20px 12px' }}>
