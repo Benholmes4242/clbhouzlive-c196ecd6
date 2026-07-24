@@ -4,6 +4,7 @@ import { formatLegendGap } from '@/lib/gam/visuals';
 /** Gap window that maps to "full tension" for value categories. */
 const VALUE_CAP: Partial<Record<LegendCategory, number>> = {
   lowest_gross_90d: 10, lowest_gross_all_time: 10,
+  lowest_gross_women_90d: 10, lowest_gross_women_all_time: 10,
   best_stableford_90d: 15, best_stableford_all_time: 15,
   best_score_diff_90d: 8, best_score_diff_all_time: 8,
 };
