@@ -41,6 +41,10 @@ export const TourFollowPrompt: React.FC = () => {
   const [selected, setSelected] = useState<CanonicalTourSlug | ''>('');
   const shownFiredRef = useRef(false);
   const skipFiredRef = useRef(false);
+  const dismissedRef = useRef(
+    (() => { try { return !!localStorage.getItem(STORAGE_KEY); } catch { return false; } })()
+  );
+
 
   const eligible = useMemo(() => {
     if (!user) return false;
@@ -54,7 +58,8 @@ export const TourFollowPrompt: React.FC = () => {
   }, [user, profile, profileLoading]);
 
   useEffect(() => {
-    if (!eligible || open) return;
+    if (!eligible || open || dismissedRef.current) return;
+
     const t = setTimeout(() => {
       try {
         const anyOpen = document.querySelector('[role="dialog"][data-state="open"]');
@@ -74,8 +79,10 @@ export const TourFollowPrompt: React.FC = () => {
   }, [open]);
 
   const markSeen = () => {
+    dismissedRef.current = true;
     try { localStorage.setItem(STORAGE_KEY, '1'); } catch { /* noop */ }
   };
+
 
   const fireSkip = () => {
     if (skipFiredRef.current) return;
