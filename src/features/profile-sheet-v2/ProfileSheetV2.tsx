@@ -295,12 +295,22 @@ export default function ProfileSheetV2({
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
                 onInviteFriends={handleInviteFriends}
+                onOpenCourseAnalytics={
+                  currentActor.type === 'personal' ? handleOpenCourseAnalytics : undefined
+                }
+                analyticsState={analyticsState}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
           )}
         </motion.div>
       )}
+      <YourCourseAnalyticsSheet
+        open={analyticsSheetOpen}
+        onClose={() => setAnalyticsSheetOpen(false)}
+        onNavigate={handleAnalyticsNavigate}
+        synced={whsSynced}
+      />
     </>
   );
 
