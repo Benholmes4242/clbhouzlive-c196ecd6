@@ -77,72 +77,82 @@ Deno.serve(async (req) => {
      LIMIT ${BATCH_LIMIT}
   `;
 
-  const { data: candidates, error: candErr } = await supabase.rpc(
-    'exec_sql_readonly_json',
-    { p_sql: CANDIDATE_SQL },
-  ).then((r) => r).catch(() => ({ data: null, error: null }));
+  // Step 1: fetch newest whs_scores (over-fetch, we filter next).
+  const OVERFETCH = BATCH_LIMIT * 6;
+  const { data: scores, error: scoresErr } = await supabase
+    .from('whs_scores')
+    .select('id, play_date, course_id')
+    .not('play_date', 'is', null)
+    .not('course_id', 'is', null)
+    .order('play_date', { ascending: false })
+    .limit(OVERFETCH);
 
-  // The above rpc may not exist in this project; use direct query builder
-  // as the real path. Kept as a safety no-op if a helper is added later.
-  let rows: Candidate[] = Array.isArray(candidates) ? (candidates as Candidate[]) : [];
-  if (!rows.length) {
-    // Direct: use PostgREST for the JOIN via a view-like nested select.
-    // whs_scores -> whs_to_golf_course_map(whs_course_id) -> golf_courses.
-    const { data, error } = await supabase
-      .from('whs_scores')
-      .select(`
-        id,
-        play_date,
-        course_id,
-        whs_to_golf_course_map:whs_to_golf_course_map!inner (
-          golf_course_id,
-          golf_courses:golf_courses!inner ( id, latitude, longitude )
-        )
-      `)
-      .not('play_date', 'is', null)
-      .order('play_date', { ascending: false })
-      .limit(BATCH_LIMIT * 3); // over-fetch, filter unmapped and existing below
+  if (scoresErr) {
+    console.error('[weather-backfill-rounds] scores query failed', scoresErr);
+    return new Response(
+      JSON.stringify({ error: 'candidate_query_failed', detail: scoresErr.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
 
-    if (error) {
-      console.error('[weather-backfill-rounds] candidate query failed', error);
-      return new Response(
-        JSON.stringify({ error: 'candidate_query_failed', detail: error.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+  const scoreRows = (scores ?? []) as Array<{ id: string; play_date: string; course_id: string }>;
+  let rows: Candidate[] = [];
+
+  if (scoreRows.length) {
+    // Step 2: filter out ones that already have a round_weather row.
+    const scoreIds = scoreRows.map((s) => s.id);
+    const { data: existing } = await supabase
+      .from('round_weather')
+      .select('whs_score_id')
+      .in('whs_score_id', scoreIds);
+    const have = new Set((existing ?? []).map((e: any) => e.whs_score_id));
+    const remaining = scoreRows.filter((s) => !have.has(s.id));
+
+    // Step 3: resolve whs_course_id -> golf_course_id.
+    const whsCourseIds = Array.from(new Set(remaining.map((r) => r.course_id)));
+    const mapById = new Map<string, string>();
+    if (whsCourseIds.length) {
+      const { data: maps } = await supabase
+        .from('whs_to_golf_course_map')
+        .select('whs_course_id, golf_course_id')
+        .in('whs_course_id', whsCourseIds)
+        .not('golf_course_id', 'is', null);
+      for (const m of (maps ?? []) as any[]) {
+        mapById.set(m.whs_course_id, m.golf_course_id);
+      }
     }
 
-    const raw = (data ?? []) as any[];
-    // whs_to_golf_course_map keys on whs_course_id, which equals whs_scores.course_id.
-    // PostgREST returned nested only if that FK is defined; if it's returned as an
-    // array (many-side), take the first entry.
-    const shaped: Candidate[] = [];
-    for (const r of raw) {
-      const map = Array.isArray(r.whs_to_golf_course_map)
-        ? r.whs_to_golf_course_map[0]
-        : r.whs_to_golf_course_map;
-      const gc = map?.golf_courses;
-      const gcRow = Array.isArray(gc) ? gc[0] : gc;
-      if (!gcRow?.latitude || !gcRow?.longitude) continue;
-      shaped.push({
-        whs_score_id: r.id,
-        play_date: r.play_date,
-        golf_course_id: gcRow.id,
-        latitude: Number(gcRow.latitude),
-        longitude: Number(gcRow.longitude),
+    // Step 4: resolve golf_course_id -> lat/lng.
+    const golfCourseIds = Array.from(new Set(Array.from(mapById.values())));
+    const gcById = new Map<string, { latitude: number; longitude: number }>();
+    if (golfCourseIds.length) {
+      const { data: gcs } = await supabase
+        .from('golf_courses')
+        .select('id, latitude, longitude')
+        .in('id', golfCourseIds)
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
+      for (const g of (gcs ?? []) as any[]) {
+        gcById.set(g.id, { latitude: Number(g.latitude), longitude: Number(g.longitude) });
+      }
+    }
+
+    for (const s of remaining) {
+      const gcId = mapById.get(s.course_id);
+      if (!gcId) continue;
+      const coords = gcById.get(gcId);
+      if (!coords) continue;
+      rows.push({
+        whs_score_id: s.id,
+        play_date: s.play_date,
+        golf_course_id: gcId,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
       });
-    }
-
-    // Filter out whs_scores that already have a round_weather row.
-    if (shaped.length) {
-      const ids = shaped.map((s) => s.whs_score_id);
-      const { data: existing } = await supabase
-        .from('round_weather')
-        .select('whs_score_id')
-        .in('whs_score_id', ids);
-      const have = new Set((existing ?? []).map((e: any) => e.whs_score_id));
-      rows = shaped.filter((s) => !have.has(s.whs_score_id)).slice(0, BATCH_LIMIT);
+      if (rows.length >= BATCH_LIMIT) break;
     }
   }
+
 
   const candidateCount = rows.length;
   console.log(`[weather-backfill-rounds] candidates=${candidateCount}`);
