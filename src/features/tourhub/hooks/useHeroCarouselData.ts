@@ -473,25 +473,42 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Inject the synthetic MAJOR slide (pinned first within its status bucket).
-      if (activeMajorRow) {
+      // Inject synthetic MAJOR slide(s) — one per active major (mens/womens).
+      const injectMajorSlide = (row: CachedTournament, gender: 'mens' | 'womens') => {
         const majorTournament: HeroTournament = {
-          ...transformTournament(activeMajorRow, activeMajorRow.status !== 'inprogress' ? false : false),
+          ...transformTournament(row, false),
           tourSlug: 'major',
           tourName: 'The Majors',
           isPseudoMajorTour: true,
+          majorGender: gender,
         };
-        if (activeMajorRow.status === 'inprogress') {
+        if (row.status === 'inprogress') {
           liveSlides.unshift({ tournament: majorTournament, type: 'live' });
         } else {
           upcomingSlides.unshift({ tournament: majorTournament, type: 'upcoming' });
         }
-      }
+      };
+      if (activeMajorRow) injectMajorSlide(activeMajorRow, 'mens');
+      if (activeWomensMajorRow) injectMajorSlide(activeWomensMajorRow, 'womens');
 
-      // Sort within categories — majors first within live (pseudo-major stays first).
+      // Sort within categories. When two pseudo-'major' slides coexist (both
+      // majors active), order them: mens > womens; otherwise by start_date asc.
+      // A live major always beats an upcoming one because live slides render
+      // before upcoming slides in the return concat below.
+      const majorSlideRank = (t: HeroTournament): number => {
+        if (t.tourSlug !== 'major') return 2;
+        return t.majorGender === 'mens' ? 0 : 1;
+      };
       liveSlides.sort((a, b) => {
-        if (a.tournament.tourSlug === 'major') return -1;
-        if (b.tournament.tourSlug === 'major') return 1;
+        const aMajor = a.tournament.tourSlug === 'major';
+        const bMajor = b.tournament.tourSlug === 'major';
+        if (aMajor && bMajor) {
+          const rankDiff = majorSlideRank(a.tournament) - majorSlideRank(b.tournament);
+          if (rankDiff !== 0) return rankDiff;
+          return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
+        }
+        if (aMajor) return -1;
+        if (bMajor) return 1;
         if (a.tournament.isMajor !== b.tournament.isMajor) return a.tournament.isMajor ? -1 : 1;
         const ai = TOUR_PRIORITY.indexOf(a.tournament.tourSlug as TourId);
         const bi = TOUR_PRIORITY.indexOf(b.tournament.tourSlug as TourId);
@@ -503,8 +520,15 @@ export function useHeroCarouselData() {
         return (b.tournament.purse || 0) - (a.tournament.purse || 0);
       });
       upcomingSlides.sort((a, b) => {
-        if (a.tournament.tourSlug === 'major') return -1;
-        if (b.tournament.tourSlug === 'major') return 1;
+        const aMajor = a.tournament.tourSlug === 'major';
+        const bMajor = b.tournament.tourSlug === 'major';
+        if (aMajor && bMajor) {
+          const rankDiff = majorSlideRank(a.tournament) - majorSlideRank(b.tournament);
+          if (rankDiff !== 0) return rankDiff;
+          return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
+        }
+        if (aMajor) return -1;
+        if (bMajor) return 1;
         return new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime();
       });
 
