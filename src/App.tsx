@@ -180,7 +180,11 @@ const RootGate: React.FC = () => {
     return <SuspendedScreen suspension={suspension.suspension} />;
   }
 
-  return <ClubhouseWrapped />;
+  return (
+    <UserStatsCoursesProvider>
+      <ClubhouseWrapped />
+    </UserStatsCoursesProvider>
+  );
 };
 
 /** Renders app chrome (header/bottom-nav) only when the gate has resolved

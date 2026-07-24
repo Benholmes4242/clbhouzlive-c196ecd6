@@ -5,6 +5,8 @@ import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { FlagChip } from './FlagChip';
+import { YourStatsChip } from './YourStatsChip';
+import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 
@@ -88,6 +90,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+  const yourStatsRounds = useUserStatsRoundsForCourse(course.id);
 
 
   const handleClick = () => {
@@ -301,6 +304,22 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 
           {/* Left: name + location */}
           <div className="flex-1 min-w-0">
+            {/* Phase E: "Your stats {DOT} N" chip — sits above the course name,
+                deep-links to the Analytics (holes) tab. stopPropagation so the
+                card's own onClick to /courses/:id (About) does not win. */}
+            {yourStatsRounds != null && (
+              <div style={{ marginBottom: 6 }}>
+                <YourStatsChip
+                  count={yourStatsRounds}
+                  tone="dark"
+                  ariaLabel={`View your analytics for ${course.name}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/courses/${course.id}?tab=holes`);
+                  }}
+                />
+              </div>
+            )}
             <h3
               className="text-[15px] font-bold text-white truncate leading-tight"
               style={{ textShadow: '0 1px 5px rgba(0,0,0,0.55)' }}

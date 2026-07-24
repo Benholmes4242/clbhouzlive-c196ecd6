@@ -131,7 +131,6 @@
       "s3SentenceEarly": "You start slowly: {{best}} are {{spread}} shots better than {{worst}}. Hit a few balls and roll some putts before you tee off - your opening holes are doing your warm-up for you.",
       "s3SentenceMiddle": "Your middle six cost {{spread}} shots more than {{best}}. That's usually where focus drifts - pick a target on every shot through the turn.",
       "s3SentenceEven": "You score evenly across the round - no weak stretch. To go lower, warm up properly before the first tee and keep eating and drinking every few holes so it stays that way."
-
     },
     "gameEverywhere": {
       "eyebrow": "Your scoring breakdown",
@@ -188,7 +187,8 @@
     "noFriendsPlayed": "No friends played yet",
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
-    "experiencePoints": "Experience Points Earned"
+    "experiencePoints": "Experience Points Earned",
+    "yourStats": "Your stats"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
