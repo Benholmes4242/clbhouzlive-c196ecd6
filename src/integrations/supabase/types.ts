@@ -15516,6 +15516,50 @@ export type Database = {
           },
         ]
       }
+      whs_unmatched_courses: {
+        Row: {
+          echo_suggestion: string | null
+          first_seen_at: string
+          last_attempt_at: string
+          last_tier_tried: string | null
+          member_count: number
+          round_count: number
+          status: string
+          whs_course_id: string
+          whs_course_name: string | null
+        }
+        Insert: {
+          echo_suggestion?: string | null
+          first_seen_at?: string
+          last_attempt_at?: string
+          last_tier_tried?: string | null
+          member_count?: number
+          round_count?: number
+          status?: string
+          whs_course_id: string
+          whs_course_name?: string | null
+        }
+        Update: {
+          echo_suggestion?: string | null
+          first_seen_at?: string
+          last_attempt_at?: string
+          last_tier_tried?: string | null
+          member_count?: number
+          round_count?: number
+          status?: string
+          whs_course_id?: string
+          whs_course_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whs_unmatched_courses_whs_course_id_fkey"
+            columns: ["whs_course_id"]
+            isOneToOne: true
+            referencedRelation: "whs_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       admin_audit_feed: {
