@@ -2,6 +2,7 @@ import React from 'react';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import GameEverywhereCard from '../sections/trends/GameEverywhereCard';
+import YourCoursesRail from '../sections/trends/YourCoursesRail';
 
 import TrendCardsStack from '../sections/trends/TrendCardsStack';
 
