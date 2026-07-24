@@ -408,7 +408,11 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              // minmax(0, 1fr) is the fix: plain 1fr = minmax(auto, 1fr) which
+              // refuses to shrink below content width, so PAR/CR/SLOPE/YARDS
+              // spilled past the card at 390dp. minmax(0, 1fr) lets tracks
+              // shrink; cells opt in with minWidth:0 below.
+              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
               gap: 8,
               padding: '10px 12px',
               border: `1px solid ${HAIRLINE_INK_8}`,
@@ -422,16 +426,42 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               { k: t('courses:teeCard.stat.slope'), v: fmtInt(active.slope_rating) },
               { k: t('courses:teeCard.stat.yards'), v: fmtInt(totalYards) },
             ].map((cell) => (
-              <div key={cell.k as string} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: INK_FAINT }}>
+              <div key={cell.k as string} style={{ textAlign: 'center', minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: INK_FAINT,
+                    // Labels may truncate with an ellipsis at narrow widths;
+                    // values (below) never do — a clipped number is worse
+                    // than a clipped label.
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {cell.k}
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: INK, marginTop: 2, ...NUM }}>
+                <div
+                  style={{
+                    // Value scales with viewport so 4- and 5-digit yardages
+                    // stay fully readable at 320-390dp. Never truncates.
+                    fontSize: 'clamp(13px, 3.6vw, 15px)',
+                    fontWeight: 700,
+                    color: INK,
+                    marginTop: 2,
+                    whiteSpace: 'nowrap',
+                    ...NUM,
+                  }}
+                >
                   {cell.v}
                 </div>
               </div>
             ))}
           </div>
+
 
           {/* Holes table */}
           <div
