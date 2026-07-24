@@ -334,9 +334,11 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           gridTemplateRows: expanded ? '1fr' : '0fr',
           transition: reducedMotion ? 'none' : 'grid-template-rows 220ms ease',
           overflow: 'hidden',
+          minWidth: 0,
+          maxWidth: '100%',
         }}
       >
-        <div style={{ minHeight: 0 }} aria-hidden={!expanded}>
+        <div style={{ minHeight: 0, minWidth: 0, maxWidth: '100%' }} aria-hidden={!expanded}>
           <div style={{ height: 12 }} />
 
           {/* Colour tee pills — horizontal carousel with edge fades. */}
