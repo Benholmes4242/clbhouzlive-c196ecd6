@@ -106,10 +106,10 @@ export function AcesAlbatrossesPodium({
                 ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
                 : `+${other} ${other === 1 ? 'ace' : 'aces'}`
               : null;
-          const parts: string[] = [];
-          if (otherLabel) parts.push(otherLabel);
-          if (r.holder_club) parts.push(r.holder_club);
-          const combined = parts.join(' \u00B7 ');
+          const combined =
+            r.holder_club || otherLabel ? (
+              <LedgerSubline courseName={r.holder_club} when={otherLabel} />
+            ) : null;
           const name = formatHolderName(r.holder_name) || 'A member';
           return (
             <StatRow
@@ -118,7 +118,7 @@ export function AcesAlbatrossesPodium({
               avatarUrl={r.holder_avatar}
               avatarUserId={r.user_id ?? null}
               name={name}
-              subline={combined || undefined}
+              subline={combined ?? undefined}
               statValue={count}
               statLabel={count === 1 ? singular : plural}
               showWatermark={i === 0}
