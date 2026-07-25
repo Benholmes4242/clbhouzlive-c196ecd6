@@ -241,7 +241,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 
   // Section band tone — mirrors The Record Book's alternating ledger on
   // the discover page (light BAND_BG on light theme, faint white on dark).
-  const bandBg = isLight ? 'rgba(15,23,42,0.035)' : 'rgba(255,255,255,0.025)';
+  const bandBg = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.025)';
   const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
 
   return (
@@ -254,7 +254,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           : defending
             ? `2px solid ${GOLD}`
             : `0.5px solid ${hairline}`,
-        padding: '12px 16px',
+        padding: '18px 16px',
       }}
 
     >
@@ -284,15 +284,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           {pillText}
         </span>
       </div>
-
-      {proBenchmark && (
-        <ProBenchmarkBand
-          pro={proBenchmark.pro}
-          base={proBenchmark.base}
-          value={proBenchmark.value}
-          sub={proBenchmark.sub}
-        />
-      )}
 
       {/* Duel row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
