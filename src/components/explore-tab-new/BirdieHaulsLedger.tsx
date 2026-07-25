@@ -13,6 +13,8 @@ import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
+import { LedgerSubline } from './PinIcon';
+
 import { slugToCacheRegion } from './regionScope';
 
 
@@ -99,9 +101,10 @@ export function BirdieHaulsLedger({
           const name = displayIdentity(row);
           const count = birdieCount(row);
           const when = row.play_date ?? row.attained_at ?? null;
-          const sub = [row.course_name, when ? relativeTime(when) : null]
-            .filter(Boolean)
-            .join(' · ');
+          const sub = (
+            <LedgerSubline courseName={row.course_name} when={when ? relativeTime(when) : null} />
+          );
+
           return (
             <StatRow
               key={`${row.score_id ?? row.course_id ?? i}-${i}`}

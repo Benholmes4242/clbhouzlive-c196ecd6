@@ -290,7 +290,7 @@ function RecordStatRow({
   const toParDisplay = showToPar ? toParText(par!) : '—';
   // Canonical to-par colour: red under par on the light Discover surface.
   const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
-  const sub = [row.course_name, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
+  const sub = <LedgerSubline courseName={row.course_name} when={when ? relativeTime(when) : null} />;
   return (
     <StatRow
       avatarUrl={row.holder_avatar}
