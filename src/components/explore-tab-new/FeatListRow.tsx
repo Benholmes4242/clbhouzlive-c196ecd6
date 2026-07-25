@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { StatRow, type StatRowChip } from './StatRow';
+import { LedgerSubline } from './PinIcon';
+
 import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 
@@ -97,9 +99,10 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
   const isRanked = isBirdieHauls && mode === 'alltime';
   const showWatermark = isRanked && rank === 1;
 
-  // Subline: course name (+ date for non-ranked latest views).
+  // Subline: pin + course name (+ date for non-ranked latest views).
   const showDate = !!when && !isRanked;
-  const subline = showDate ? `${row.course_name} · ${when}` : row.course_name;
+  const subline = <LedgerSubline courseName={row.course_name} when={showDate ? when : null} />;
+
 
   return (
     <StatRow

@@ -17037,6 +17037,7 @@ export type Database = {
       friend_content_nightly: { Args: never; Returns: Json }
       gam_lock_for_eval: { Args: { p_whs_score_id: string }; Returns: boolean }
       gam_mark_badge_seen: { Args: { p_badge_id: string }; Returns: undefined }
+      gam_requeue_scores: { Args: { p_score_ids: string[] }; Returns: number }
       gam_reset_user: {
         Args: { p_user_id: string }
         Returns: {

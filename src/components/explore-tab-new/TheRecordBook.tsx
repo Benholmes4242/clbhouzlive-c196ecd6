@@ -18,6 +18,8 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
+import { LedgerSubline } from './PinIcon';
+
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
@@ -290,7 +292,7 @@ function RecordStatRow({
   const toParDisplay = showToPar ? toParText(par!) : '—';
   // Canonical to-par colour: red under par on the light Discover surface.
   const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
-  const sub = [row.course_name, when ? relativeTime(when) : null].filter(Boolean).join(' · ');
+  const sub = <LedgerSubline courseName={row.course_name} when={when ? relativeTime(when) : null} />;
   return (
     <StatRow
       avatarUrl={row.holder_avatar}
