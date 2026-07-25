@@ -70,11 +70,12 @@ export function TournamentPage() {
 
 
 
-  const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } = useTournamentMeta(tournamentId);
+  const pulse = useTournamentPulse(tournamentId);
+
+  const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } =
+    useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   const { data: liveList = [] } = useLiveTournaments();
-
-  const pulse = useTournamentPulse(tournamentId);
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
   useLeaderboardRealtime(pulse.state === 'live' ? tournamentId : null);
