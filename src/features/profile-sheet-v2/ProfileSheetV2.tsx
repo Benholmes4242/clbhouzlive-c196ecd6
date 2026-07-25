@@ -11,7 +11,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useMotionValue, animate } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, animate, useDragControls } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
@@ -100,6 +100,8 @@ export default function ProfileSheetV2({
   isLoading,
 }: ProfileSheetV2Props) {
   const sheetY = useMotionValue(0);
+  // Drag is grab-handle only so the body below can scroll internally.
+  const dragControls = useDragControls();
   const { openInviteSheet } = useInviteSheet();
   const handleInviteFriends = () => {
     onClose();
@@ -228,6 +230,8 @@ export default function ProfileSheetV2({
         <motion.div
           ref={panelRef}
           drag="y"
+          dragListener={false}
+          dragControls={dragControls}
           dragConstraints={{ top: 0, bottom: 0 }}
           dragElastic={{ top: 0, bottom: 0.4 }}
           onDragStart={() => { openTweenRef.current?.stop(); }}
@@ -243,13 +247,14 @@ export default function ProfileSheetV2({
             borderRadius: '24px 24px 0 0',
             boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
             maxHeight: '75dvh',
-            overflowY: 'auto',
+            overflow: 'hidden',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           <div
+            onPointerDown={(e) => dragControls.start(e)}
             style={{
               display: 'flex',
               justifyContent: 'center',
@@ -270,6 +275,15 @@ export default function ProfileSheetV2({
             />
           </div>
 
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
           {isLoading ? (
             <SheetSkeleton />
           ) : (
@@ -303,6 +317,7 @@ export default function ProfileSheetV2({
               <SignOutRow onNavigate={onNavigate} />
             </div>
           )}
+          </div>
         </motion.div>
       )}
       <YourCourseAnalyticsSheet
