@@ -110,12 +110,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id ?? null}
       name={holder}
+      nameMeta={when || undefined}
       subline={subline}
       statValue={legendaryChip ? undefined : value}
       statLabel={legendaryChip ? undefined : label}
       statColor={statColor}
       chip={legendaryChip}
-      timestamp={legendaryChip || isEagles ? when || undefined : undefined}
       showWatermark={showWatermark}
       isLast={isLast}
       onPress={onTap}
