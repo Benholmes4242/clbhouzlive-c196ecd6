@@ -20,7 +20,7 @@ import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
-import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
+import { BoardTable, BoardHeaderCells, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
@@ -455,9 +455,11 @@ export function LeaderboardTab() {
       >
         <div style={{ width: 52, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
         <div style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.thru')}</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.today')}</div>
-        <div style={{ width: 44, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{t('board.columns.tot')}</div>
+        <BoardHeaderCells
+          columns={computeBoardColumns(filteredEntries, currentRound)}
+          thruLabel={t('board.columns.thru')}
+          totLabel={t('board.columns.tot')}
+        />
       </div>
 
       {/* BOARD */}

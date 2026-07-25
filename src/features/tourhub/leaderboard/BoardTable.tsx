@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import { countryFlag, countryFallback } from './countryFlag';
 import { getScoreColor } from '../_shared/scoreColor';
-import { TREND_UP, TREND_DOWN } from '../_shared/tokens';
+import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
@@ -39,6 +39,7 @@ const CANVAS = '#F8FAFC';
 const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
 const NUM_W = 44;
+const EMPTY_CELL = 'rgba(15,23,42,0.22)';
 
 const F = 'Geist, system-ui, sans-serif';
 
@@ -133,17 +134,77 @@ export function todayFromEntry(
   return active ?? null;
 }
 
-function roundsLine(e: BoardEntry): string | null {
-  const rs = [e.round_1, e.round_2, e.round_3, e.round_4];
-  const parts: string[] = [];
-  for (let i = 0; i < 4; i++) {
-    const r = rs[i];
-    if (r == null) continue;
-    const disp = r === 0 ? 'E' : r > 0 ? `+${r}` : String(r);
-    parts.push(`R${i + 1} ${disp}`);
-  }
-  return parts.length ? parts.join(' \u00B7 ') : null;
+export interface BoardColumns {
+  rounds: number[];
+  cellW: number;
+  gap: number;
+  liveRound: number | null;
 }
+
+/**
+ * Adaptive per-round column spec. ONE source of truth shared by the row
+ * renderer and by every parent-rendered column header, so the two can
+ * never drift.
+ */
+export function computeBoardColumns(
+  entries: BoardEntry[],
+  currentRound?: number | null,
+): BoardColumns {
+  let highest = 0;
+  for (const e of entries) {
+    const rs = [e.round_1, e.round_2, e.round_3, e.round_4];
+    for (let i = 0; i < 4; i++) if (rs[i] != null) highest = Math.max(highest, i + 1);
+  }
+  const n = Math.max(1, Math.min(4, Math.max(highest, currentRound ?? 0)));
+  const rounds = Array.from({ length: n }, (_, i) => i + 1);
+  const cellW = n >= 4 ? 24 : n === 3 ? 27 : 30;
+  const gap = n >= 4 ? 4 : 6;
+  // "Live" only once play has actually started in the current round.
+  const started =
+    currentRound != null &&
+    entries.some((e) => todayFromEntry(e, currentRound) != null);
+  return { rounds, cellW, gap, liveRound: started ? currentRound! : null };
+}
+
+export const BOARD_NUM_W = NUM_W;
+
+/**
+ * Header cells for the numeric block (R1..Rn | THRU | TOT). Rendered by the
+ * parents inside their own header bar so typography stays theirs, while the
+ * widths/centring come from computeBoardColumns.
+ */
+export function BoardHeaderCells({
+  columns,
+  thruLabel,
+  totLabel,
+}: {
+  columns: BoardColumns;
+  thruLabel: string;
+  totLabel: string;
+}) {
+  return (
+    <>
+      <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+        {columns.rounds.map((r) => (
+          <div
+            key={r}
+            style={{
+              width: columns.cellW,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              color: columns.liveRound === r ? AMBER : undefined,
+            }}
+          >
+            {`R${r}`}
+          </div>
+        ))}
+      </div>
+      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{thruLabel}</div>
+      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{totLabel}</div>
+    </>
+  );
+}
+
 
 function isDemoted(s?: string | null): boolean {
   if (!s) return false;
@@ -161,6 +222,12 @@ function statusWord(s?: string | null): string {
 export function BoardTable({ entries, cutState, currentRound, onRowClick }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
+
+  const columns = useMemo(
+    () => computeBoardColumns(entries, currentRound),
+    [entries, currentRound],
+  );
+
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
@@ -246,13 +313,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
-    // THRU must agree with TODAY: if the active round has not started for this
-    // player, the stale top-level thru (yesterday's "F") must not be shown.
+    // THRU must agree with the live round: if the active round has not started
+    // for this player, the stale top-level thru (yesterday's "F") is hidden.
     const thruDisplay = todayVal == null ? '-' : fmtThru(e.thru);
-    const todayDisplay = fmtScore(todayVal);
-    const todayColor = demotedRow ? SECONDARY : houseColor(todayVal);
-    const rounds = roundsLine(e);
+    const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const cc = e.player?.country_code || e.player?.country || '';
+
 
     return (
       <div
@@ -335,7 +401,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         </div>
 
 
-        {/* PLAYER — two lines */}
+        {/* PLAYER — single line */}
         <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>
           <div
             style={{
@@ -385,18 +451,33 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
               );
             })()}
           </div>
-          {rounds && (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 9,
-                color: MUTED,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {rounds}
-            </div>
-          )}
+        </div>
+
+        {/* R1..Rn */}
+        <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+          {columns.rounds.map((r) => {
+            const isLive = columns.liveRound === r;
+            const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
+            const empty = val == null || demotedRow;
+            return (
+              <div
+                key={r}
+                style={{
+                  width: columns.cellW,
+                  textAlign: 'center',
+                  fontSize: 12.5,
+                  fontWeight: isLive ? 800 : 700,
+                  color: empty ? EMPTY_CELL : demotedRow ? SECONDARY : houseColor(val),
+                  fontVariantNumeric: 'tabular-nums',
+                  background: isLive ? 'rgba(247,147,30,0.07)' : undefined,
+                  borderRadius: isLive ? 4 : undefined,
+                  padding: '1px 0',
+                }}
+              >
+                {empty ? '\u2014' : fmtScore(val)}
+              </div>
+            );
+          })}
         </div>
 
         {/* THRU */}
@@ -413,20 +494,6 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           {demotedRow ? '-' : thruDisplay}
         </div>
 
-        {/* TODAY */}
-        <div
-          style={{
-            width: NUM_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: todayColor,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {demotedRow ? '-' : todayDisplay}
-        </div>
 
         {/* TOT */}
         <div
