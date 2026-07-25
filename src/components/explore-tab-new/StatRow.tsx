@@ -31,6 +31,8 @@ export interface StatRowProps {
   avatarUrl?: string | null;
   avatarUserId?: string | null;
   name: string;
+  /** Small muted meta shown on the name line (e.g. relative age). */
+  nameMeta?: ReactNode;
   subline?: ReactNode;
   statValue?: ReactNode;
   statLabel?: string;
