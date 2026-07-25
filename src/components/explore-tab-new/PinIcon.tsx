@@ -44,7 +44,7 @@ export function LedgerSubline({
         verticalAlign: 'middle',
       }}
     >
-      <PinIcon />
+      
       <span
         style={{
           color: SOFT,
