@@ -36,6 +36,8 @@ interface CrownCabinetProps {
   window: LegendWindow;
   onWindowChange: (w: LegendWindow) => void;
   toggleVariant?: WindowToggleVariant;
+  /** Render only the squircle strip, without card chrome / header / window toggle. */
+  bare?: boolean;
 }
 
 const HELD_LABEL = 'var(--hcp-gold-text)';
@@ -47,9 +49,101 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   window,
   onWindowChange,
   toggleVariant = 'dark',
+  bare = false,
 }) => {
   const cols = slots.length || 6;
   const orderedSlots = [...slots].sort((a, b) => Number(b.held) - Number(a.held));
+
+  const strip = (
+    <div
+      className="no-scrollbar"
+      style={{
+        display: 'flex',
+        gap: 16,
+        overflowX: 'auto',
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: 4,
+        scrollbarWidth: 'none',
+      }}
+    >
+      {orderedSlots.map((slot) => {
+        const SlotIcon = slot.icon;
+        const held = slot.held;
+        const reignDays = held ? daysHeld(slot.attainedAt) : null;
+        return (
+          <div
+            key={slot.key}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0,
+              width: 64,
+              scrollSnapAlign: 'start',
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: held
+                  ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
+                  : 'var(--hcp-tint-3)',
+                border: held ? 'none' : '1.5px dashed var(--hcp-dash)',
+                boxShadow: held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
+              }}
+            >
+              {held ? (
+                <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
+              ) : (
+                <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
+              )}
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: held ? HELD_LABEL : 'var(--hcp-t-40)',
+                textAlign: 'center',
+                lineHeight: 1.15,
+              }}
+            >
+              {slot.short}
+            </span>
+            {held && reignDays != null && (
+              <span
+                className="tabular-nums"
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-55)',
+                  letterSpacing: '-0.005em',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {reignLabel(reignDays)}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  if (bare) {
+    if (slots.length === 0) return null;
+    return strip;
+  }
+
 
   return (
     <div
