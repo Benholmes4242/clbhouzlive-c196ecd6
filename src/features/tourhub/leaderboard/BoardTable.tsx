@@ -400,7 +400,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         </div>
 
 
-        {/* PLAYER — two lines */}
+        {/* PLAYER — single line */}
         <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>
           <div
             style={{
@@ -450,18 +450,33 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
               );
             })()}
           </div>
-          {rounds && (
-            <div
-              style={{
-                marginTop: 2,
-                fontSize: 9,
-                color: MUTED,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {rounds}
-            </div>
-          )}
+        </div>
+
+        {/* R1..Rn */}
+        <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+          {columns.rounds.map((r) => {
+            const isLive = columns.liveRound === r;
+            const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
+            const empty = val == null || demotedRow;
+            return (
+              <div
+                key={r}
+                style={{
+                  width: columns.cellW,
+                  textAlign: 'center',
+                  fontSize: 12.5,
+                  fontWeight: isLive ? 800 : 700,
+                  color: empty ? EMPTY_CELL : demotedRow ? SECONDARY : houseColor(val),
+                  fontVariantNumeric: 'tabular-nums',
+                  background: isLive ? 'rgba(247,147,30,0.07)' : undefined,
+                  borderRadius: isLive ? 4 : undefined,
+                  padding: '1px 0',
+                }}
+              >
+                {empty ? '\u2014' : fmtScore(val)}
+              </div>
+            );
+          })}
         </div>
 
         {/* THRU */}
@@ -478,20 +493,6 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           {demotedRow ? '-' : thruDisplay}
         </div>
 
-        {/* TODAY */}
-        <div
-          style={{
-            width: NUM_W,
-            flexShrink: 0,
-            textAlign: 'center',
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: todayColor,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {demotedRow ? '-' : todayDisplay}
-        </div>
 
         {/* TOT */}
         <div
