@@ -145,7 +145,7 @@ export function AcesAlbatrossesPodium({
             avatarUrl={row.holder_avatar}
             avatarUserId={row.user_id}
             name={name}
-            subline={row.course_name ?? undefined}
+            subline={row.course_name ? <LedgerSubline courseName={row.course_name} /> : undefined}
             chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
             timestamp={when ? relativeTime(when) : undefined}
             isLast={i === merged.length - 1}
