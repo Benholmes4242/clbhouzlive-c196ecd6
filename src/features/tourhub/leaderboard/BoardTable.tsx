@@ -39,6 +39,7 @@ const CANVAS = '#F8FAFC';
 const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
 const NUM_W = 44;
+const EMPTY_CELL = 'rgba(15,23,42,0.22)';
 
 const F = 'Geist, system-ui, sans-serif';
 
