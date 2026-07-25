@@ -505,7 +505,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                   padding: '1px 0',
                 }}
               >
-                {empty ? '\u2014' : fmtScore(val)}
+                {empty ? EMPTY_DASH : fmtScore(val)}
               </div>
             );
           })}
@@ -518,11 +518,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             flexShrink: 0,
             textAlign: 'center',
             fontSize: 11.5,
-            color: SECONDARY,
+            color: thruEmpty ? EMPTY_CELL : SECONDARY,
+            fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {demotedRow ? '-' : thruDisplay}
+          {thruDisplay}
         </div>
 
 
