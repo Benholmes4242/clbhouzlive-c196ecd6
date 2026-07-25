@@ -95,6 +95,11 @@ export function TournamentPage() {
   // the tournament's current_round so the tab=tee-times deep link never
   // shows Thursday's times on Sunday (Brief F-TD-3 §3).
   const currentRound = pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? 1);
+  // Tee-time availability is data-driven: a draw publishes hours before the
+  // round rolls over at venue-local midnight.
+  const { data: drawnRoundsData } = useDrawnRounds(tournamentId);
+  const drawnRounds = drawnRoundsData ?? [];
+  const highestDrawnRound = drawnRounds.length ? Math.max(...drawnRounds) : null;
   // Lazy fetch: skip the sr_tee_times request on completed events unless
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
   const teeTimesRequested = searchParams.get('tab') === 'tee-times';
