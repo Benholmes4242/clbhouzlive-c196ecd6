@@ -245,8 +245,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
-    const thruDisplay = fmtThru(e.thru);
     const todayVal = todayFromEntry(e, currentRound);
+    // THRU must agree with TODAY: if the active round has not started for this
+    // player, the stale top-level thru (yesterday's "F") must not be shown.
+    const thruDisplay = todayVal == null ? '-' : fmtThru(e.thru);
     const todayDisplay = fmtScore(todayVal);
     const todayColor = demotedRow ? SECONDARY : houseColor(todayVal);
     const rounds = roundsLine(e);
