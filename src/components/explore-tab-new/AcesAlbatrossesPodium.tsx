@@ -8,6 +8,7 @@ import {
 import { FONT } from './gamingLightTokens';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { StatRow } from './StatRow';
+import { LedgerSubline } from './PinIcon';
 import { formatHcp } from '@/lib/formatHcp';
 
 const MAX_ROWS = 10;
