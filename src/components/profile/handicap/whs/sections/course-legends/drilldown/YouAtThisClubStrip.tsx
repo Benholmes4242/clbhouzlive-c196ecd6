@@ -57,9 +57,12 @@ interface Props {
   theme?: 'light' | 'dark';
   /** When provided, overrides the strip's own RPC-derived crown count so it stays in sync with the cabinet's window-scoped fraction. */
   heldCountOverride?: number;
+  /** Render without its own card chrome (used inside the combined "you" card). */
+  bare?: boolean;
 }
 
-export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride }) => {
+export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride, bare = false }) => {
+
 
   const { data: crowns } = useQuery({
     queryKey: ['course-legends', 'crowns-held-here', userId ?? 'anon', courseId],
