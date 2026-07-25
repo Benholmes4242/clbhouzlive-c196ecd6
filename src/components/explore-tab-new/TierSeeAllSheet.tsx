@@ -513,10 +513,7 @@ function CountLeaderSheetRow({
   const isGold = variant === 'gold';
   const name = formatLeaderName(holderName);
   const countLabel = count === 1 ? countLabelSingular : countLabelPlural;
-  const combined =
-    holderClub || subline ? (
-      <LedgerSubline courseName={holderClub} when={subline} />
-    ) : null;
+  const combined = holderClub ? <LedgerSubline courseName={holderClub} /> : null;
 
   return (
     <StatRow
@@ -524,6 +521,7 @@ function CountLeaderSheetRow({
       avatarUrl={holderAvatar}
       avatarUserId={userId ?? null}
       name={name}
+      nameMeta={subline ?? undefined}
       subline={combined ?? undefined}
       statValue={count}
       statLabel={countLabel}
