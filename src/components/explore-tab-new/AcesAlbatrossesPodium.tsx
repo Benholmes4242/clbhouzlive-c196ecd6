@@ -146,7 +146,7 @@ export function AcesAlbatrossesPodium({
             nameMeta={when ? relativeTime(when) : undefined}
             subline={row.course_name ? <LedgerSubline courseName={row.course_name} /> : undefined}
             chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
-            timestamp={when ? relativeTime(when) : undefined}
+            
             isLast={i === merged.length - 1}
             density="compact"
             onPress={
