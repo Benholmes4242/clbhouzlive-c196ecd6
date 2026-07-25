@@ -34,11 +34,26 @@ export interface TournamentMeta {
   tour_full_name: string | null;
 }
 
-export function useTournamentMeta(tournamentId: string | null | undefined) {
+interface MetaOptions {
+  /**
+   * Live tournaments poll: current_round now flips at venue midnight AND
+   * again when play starts, and those drive the hero pill, TODAY column and
+   * tee-time availability. Scoped here only - global defaults are untouched.
+   */
+  live?: boolean;
+}
+
+export function useTournamentMeta(
+  tournamentId: string | null | undefined,
+  options: MetaOptions = {},
+) {
+  const live = options.live === true;
   return useQuery({
     queryKey: ['tourhub', 'tournament-meta', 'v2', tournamentId],
     enabled: !!tournamentId,
-    staleTime: 5 * 60_000,
+    staleTime: live ? 30_000 : 5 * 60_000,
+    refetchInterval: live ? 60_000 : false,
+    refetchOnWindowFocus: live,
     queryFn: async (): Promise<TournamentMeta | null> => {
       const { data, error } = await supabase
         .from('sr_tournaments')

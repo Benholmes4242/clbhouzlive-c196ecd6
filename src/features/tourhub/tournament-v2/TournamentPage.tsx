@@ -44,6 +44,7 @@ import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { TeeTimesRail } from './sections/TeeTimesRail';
 import { CourseSection } from './sections/CourseSection';
+import { useDrawnRounds } from './data/useDrawnRounds';
 import { MomentsSection } from './sections/MomentsSection';
 import { EventInfoSection } from './sections/EventInfoSection';
 import { StorySection } from './sections/StorySection';
@@ -69,11 +70,12 @@ export function TournamentPage() {
 
 
 
-  const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } = useTournamentMeta(tournamentId);
+  const pulse = useTournamentPulse(tournamentId);
+
+  const { data: meta, isLoading, isError: isMetaError, refetch: refetchMeta } =
+    useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   const { data: liveList = [] } = useLiveTournaments();
-
-  const pulse = useTournamentPulse(tournamentId);
 
   // Realtime (equivalent to legacy TournamentDetailPage): board + status.
   useLeaderboardRealtime(pulse.state === 'live' ? tournamentId : null);
@@ -94,6 +96,11 @@ export function TournamentPage() {
   // the tournament's current_round so the tab=tee-times deep link never
   // shows Thursday's times on Sunday (Brief F-TD-3 §3).
   const currentRound = pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? 1);
+  // Tee-time availability is data-driven: a draw publishes hours before the
+  // round rolls over at venue-local midnight.
+  const { data: drawnRoundsData } = useDrawnRounds(tournamentId);
+  const drawnRounds = drawnRoundsData ?? [];
+  const highestDrawnRound = drawnRounds.length ? Math.max(...drawnRounds) : null;
   // Lazy fetch: skip the sr_tee_times request on completed events unless
   // the tab=tee-times deep link is present (Brief F-TD-3 §4).
   const teeTimesRequested = searchParams.get('tab') === 'tee-times';
@@ -282,7 +289,8 @@ export function TournamentPage() {
         tournamentId={tournamentId!}
         tournamentName={meta.name}
         defaultRound={currentRound}
-        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? currentRound)}
+        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (highestDrawnRound ?? meta?.current_round ?? currentRound)}
+        drawnRounds={pulse.state === 'upcoming' && drawnRounds.length === 0 ? [1] : drawnRounds}
       />
       <FullBoardSheet
         open={fullBoardOpen}
