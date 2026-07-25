@@ -187,12 +187,10 @@ export function SeasonRaceCard({ userId }: Props) {
             <PodiumRow key={row.user_id + idx} row={row} isLast={idx === podium.length - 1 && !viewer} />
           ))}
 
-          {viewer ? (
-            <>
-              <div style={{ height: 1, background: HAIRLINE, margin: '0 14px' }} />
-              <PodiumRow row={viewer} isLast highlighted />
-            </>
-          ) : null}
+          {/* Viewer row — same row metrics as the podium rows; the amber top
+              border replaces (rather than adds to) the usual hairline. */}
+          {viewer ? <PodiumRow row={viewer} isLast highlighted /> : null}
+
 
           {/* Footer count label */}
           <div
