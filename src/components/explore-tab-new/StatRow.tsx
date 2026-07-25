@@ -144,6 +144,7 @@ export function StatRow({
   avatarUrl,
   avatarUserId,
   name,
+  nameMeta,
   subline,
   statValue,
   statLabel,
