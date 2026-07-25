@@ -389,9 +389,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         >
           {posText}
         </div>
+        {columns.moveW > 0 && (
         <div
           style={{
-            width: POS_MOVE_W,
+            width: columns.moveW,
             flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
