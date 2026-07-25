@@ -261,6 +261,19 @@ Deno.serve(async (req) => {
           tier: "tier_4_echo",
           match_method: echoMethod,
         }));
+
+        // ---- Ladder gave up: surface for a human --------------------------
+        if (echoMethod !== "echo_consensus") {
+          if (!(await isAlreadyMapped(supabase, whsCourseId))) {
+            const suggestion =
+              (echoBody?.echo_suggested_name as string | undefined) ??
+              (echoBody?.suggested_course_name as string | undefined) ??
+              (echoBody?.suggestion as string | undefined) ??
+              null;
+            await recordUnmatched(supabase, whsCourseId, echoMethod, suggestion);
+          }
+        }
+
       } catch (e) {
         counts.errored++;
         const msg = e instanceof Error ? e.message : String(e);
