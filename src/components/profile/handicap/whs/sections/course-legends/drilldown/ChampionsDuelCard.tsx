@@ -430,7 +430,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 
       {/* Chase track: champion at the finish, chaser travelling toward them */}
       {showTrack && (
-        <div style={{ position: 'relative', height: 30, marginTop: 11 }}>
+        <div style={{ position: 'relative', height: 24, marginTop: 10 }}>
           {/* rail */}
           <div
             style={{
@@ -444,7 +444,8 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               background: 'var(--hcp-bar-neutral)',
             }}
           />
-          {/* progress fill behind the chaser */}
+          {/* progress fill behind the chaser — flat, reduced-strength amber so it
+              never competes with the 2px gold defending border. */}
           <div
             style={{
               position: 'absolute',
@@ -454,25 +455,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               width: `${pos * 100}%`,
               transform: 'translateY(-50%)',
               borderRadius: 999,
-              background: 'linear-gradient(90deg, #FBBC2E, #F7931E)',
+              background: 'rgba(247,147,30,0.55)',
               transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
             }}
           />
-          {/* quarter notches */}
-          {[0.25, 0.5, 0.75].map((p) => (
-            <div
-              key={p}
-              style={{
-                position: 'absolute',
-                left: `${p * 100}%`,
-                top: '50%',
-                width: 1,
-                height: 8,
-                transform: 'translate(-50%,-50%)',
-                background: 'var(--hcp-line)',
-              }}
-            />
-          ))}
           {/* chaser mini-avatar */}
           <TrackFace
             entry={trackChaser}
