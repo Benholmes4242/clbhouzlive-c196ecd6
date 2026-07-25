@@ -67,17 +67,14 @@ export async function linkUnmatchedCourse(
 
   const { error } = await sb
     .from('whs_to_golf_course_map')
-    .upsert(
-      {
-        whs_course_id: whsCourseId,
-        golf_course_id: golfCourseId,
-        match_method: 'manual_admin',
-        match_confidence: 1.0,
-        reviewed_at: new Date().toISOString(),
-        reviewed_by: uid,
-      },
-      { onConflict: 'whs_course_id' },
-    );
+    .update({
+      golf_course_id: golfCourseId,
+      match_method: 'manual_admin',
+      match_confidence: 1.0,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: uid,
+    })
+    .eq('whs_course_id', whsCourseId);
   if (error) throw error;
 }
 
