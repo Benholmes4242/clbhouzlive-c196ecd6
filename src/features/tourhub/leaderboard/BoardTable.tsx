@@ -335,14 +335,16 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const posText = demotedRow
       ? statusWord(e.status)
       : e.position == null
-      ? '-'
+      ? EMPTY_DASH
       : `${e.position_tied ? 'T' : ''}${e.position}`;
-    const totColor = demotedRow ? SECONDARY : houseColor(e.score);
+    const totEmpty = !demotedRow && e.score == null;
+    const totColor = demotedRow ? SECONDARY : totEmpty ? EMPTY_CELL : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started
     // for this player, the stale top-level thru (yesterday's "F") is hidden.
-    const thruDisplay = todayVal == null ? '-' : fmtThru(e.thru);
+    const thruEmpty = demotedRow || todayVal == null;
+    const thruDisplay = thruEmpty ? EMPTY_DASH : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const cc = e.player?.country_code || e.player?.country || '';
 
