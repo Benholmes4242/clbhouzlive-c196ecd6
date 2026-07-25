@@ -222,6 +222,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
 
+  const columns = useMemo(
+    () => computeBoardColumns(entries, currentRound),
+    [entries, currentRound],
+  );
+
+
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
     () =>
