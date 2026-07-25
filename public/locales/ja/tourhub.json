@@ -443,7 +443,8 @@
     "hero": {
       "chip": {
         "majorStarts": "MAJOR · STARTS {{date}}",
-        "starts": "STARTS {{date}}"
+        "starts": "STARTS {{date}}",
+        "roundN": "Round {{round}}"
       },
       "leaderLabel": "Leader",
       "daysLabel": "Days",
