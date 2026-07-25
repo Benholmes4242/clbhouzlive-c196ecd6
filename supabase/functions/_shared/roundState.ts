@@ -19,10 +19,17 @@
 //    events because the leaderboard rows are more reliable.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type ActiveRoundSource = 'leaderboard' | 'fallback';
+export type ActiveRoundSource = 'leaderboard' | 'scheduled' | 'fallback';
 
 export interface ActiveRoundResult {
+  /** What to display. */
   round: number;
+  /** Date-math, venue-local: which round is scheduled for today. */
+  scheduledRound: number;
+  /** Leaderboard-derived: which round has actually been played into. */
+  playingRound: number;
+  /** Is any competitor mid-round right now. */
+  inProgress: boolean;
   source: ActiveRoundSource;
   confident: boolean;
 }
@@ -41,53 +48,22 @@ interface TournamentMeta {
 const MIN_FRACTION = 0.10;
 const MIN_PLAYERS = 5;
 
-/**
- * Resolve the active round for a tournament.
- *
- * Reads the full field (no LIMIT) from sr_leaderboards. Falls back to
- * venue-local date math ONLY if the leaderboard table has no rows yet —
- * the fallback can never override a confident leaderboard-derived round.
- *
- * @param tournament Optional pre-fetched tournament row (saves a roundtrip).
- *                   Used only for the fallback path.
- */
-export async function getActiveRound(
+async function loadMeta(
   supabase: any,
   tournamentId: string,
   tournament?: TournamentMeta | null,
-): Promise<ActiveRoundResult> {
-  // ── PRIMARY: leaderboard participation threshold ─────────────────────
-  const { data: rows } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('strokes', 'is', null);
+): Promise<TournamentMeta | null> {
+  if (tournament) return tournament;
+  const { data } = await supabase
+    .from('sr_tournaments')
+    .select('start_date, timezone, total_rounds')
+    .eq('id', tournamentId)
+    .maybeSingle();
+  return data ?? null;
+}
 
-  if (rows && rows.length > 0) {
-    const fieldSize = rows.length;
-    const threshold = Math.max(MIN_PLAYERS, Math.ceil(fieldSize * MIN_FRACTION));
-    const recorded = (r: number) =>
-      rows.filter((e: any) => e[`round_${r}`] != null).length;
-
-    let active = 1;
-    for (let r = 1; r <= 4; r++) {
-      if (recorded(r) >= threshold) active = r;
-      else break;
-    }
-    return { round: active, source: 'leaderboard', confident: true };
-  }
-
-  // ── FALLBACK: pre-play only. Never overrides leaderboard data. ───────
-  let meta: TournamentMeta | null | undefined = tournament;
-  if (!meta) {
-    const { data } = await supabase
-      .from('sr_tournaments')
-      .select('start_date, timezone, total_rounds')
-      .eq('id', tournamentId)
-      .maybeSingle();
-    meta = data ?? null;
-  }
-
+/** Venue-local date math: which round is scheduled for today. Capped at total_rounds. */
+function computeScheduledRound(meta: TournamentMeta | null): number {
   let round = 1;
   if (meta?.start_date && meta?.timezone) {
     try {
@@ -103,7 +79,83 @@ export async function getActiveRound(
       // Keep round = 1.
     }
   }
-  return { round, source: 'fallback', confident: false };
+  return round;
+}
+
+/**
+ * Resolve the active round for a tournament.
+ *
+ * Two signals answer two different questions:
+ *   - leaderboard participation -> which round is underway (playingRound)
+ *   - venue-local date math     -> which round is scheduled today (scheduledRound)
+ *
+ * Resolution: when the calendar has rolled over AND nobody is mid-round, we
+ * are between rounds and show the scheduled round. Otherwise the leaderboard
+ * wins — which preserves the Italian Open case (a delayed round finishing on
+ * the next calendar day must not be advanced by date math).
+ *
+ * @param tournament Optional pre-fetched tournament row (saves a roundtrip).
+ */
+export async function getActiveRound(
+  supabase: any,
+  tournamentId: string,
+  tournament?: TournamentMeta | null,
+): Promise<ActiveRoundResult> {
+  const { data: rows } = await supabase
+    .from('sr_leaderboards')
+    .select('round_1, round_2, round_3, round_4, thru')
+    .eq('tournament_id', tournamentId)
+    .not('strokes', 'is', null);
+
+  const meta = await loadMeta(supabase, tournamentId, tournament);
+  const scheduledRound = computeScheduledRound(meta);
+
+  if (!rows || rows.length === 0) {
+    // No play at all yet: date math is all we have.
+    return {
+      round: scheduledRound,
+      scheduledRound,
+      playingRound: 1,
+      inProgress: false,
+      source: 'fallback',
+      confident: false,
+    };
+  }
+
+  const fieldSize = rows.length;
+  const threshold = Math.max(MIN_PLAYERS, Math.ceil(fieldSize * MIN_FRACTION));
+  const recorded = (r: number) =>
+    rows.filter((e: any) => e[`round_${r}`] != null).length;
+
+  let playingRound = 1;
+  for (let r = 1; r <= 4; r++) {
+    if (recorded(r) >= threshold) playingRound = r;
+    else break;
+  }
+
+  const inProgress = rows.some(
+    (r: any) => r.thru != null && r.thru > 0 && r.thru < 18,
+  );
+
+  if (scheduledRound > playingRound && !inProgress) {
+    return {
+      round: scheduledRound,
+      scheduledRound,
+      playingRound,
+      inProgress,
+      source: 'scheduled',
+      confident: true,
+    };
+  }
+
+  return {
+    round: playingRound,
+    scheduledRound,
+    playingRound,
+    inProgress,
+    source: 'leaderboard',
+    confident: true,
+  };
 }
 
 /**
