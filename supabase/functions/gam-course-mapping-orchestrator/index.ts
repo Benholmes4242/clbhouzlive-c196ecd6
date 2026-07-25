@@ -20,6 +20,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 import { corsFor } from '../_shared/cors.ts';
+const FUNCTION_VERSION = "2026-07-25-unmatched-queue-v1";
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
 const TIER_1_3_METHODS = new Set([
@@ -36,8 +37,10 @@ type TierResult = {
   error?: string;
 };
 
+let corsHeaders: Record<string, string> = corsFor(null);
+
 Deno.serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -52,12 +55,28 @@ Deno.serve(async (req) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
+  // ---- Optional one-time / repeatable backfill mode -----------------------
+  let body: any = {};
+  try { body = await req.json(); } catch { body = {}; }
+  if (body?.mode === "backfill_unmatched") {
+    const seeded = await backfillUnmatched(supabase);
+    console.log(JSON.stringify({
+      event: "unmatched_backfill_complete",
+      version: FUNCTION_VERSION,
+      seeded,
+    }));
+    return json({ mode: "backfill_unmatched", seeded, version: FUNCTION_VERSION });
+  }
+
   const runStartedAt = new Date().toISOString();
   console.log(JSON.stringify({
     event: "orchestrator_run_start",
+    version: FUNCTION_VERSION,
     run_started_at: runStartedAt,
     batch_size: BATCH_SIZE,
   }));
+
+
 
   // ---- Advisory lock ------------------------------------------------------
   const { data: lockAcquired, error: lockErr } = await supabase.rpc(
@@ -242,6 +261,26 @@ Deno.serve(async (req) => {
           tier: "tier_4_echo",
           match_method: echoMethod,
         }));
+
+        // ---- Ladder gave up: surface for a human --------------------------
+        if (echoMethod !== "echo_consensus") {
+          if (!(await isAlreadyMapped(supabase, whsCourseId))) {
+            const suggestedId = (echoBody?.consensus?.golf_course_id ?? null) as
+              | string
+              | null;
+            let suggestion: string | null = null;
+            if (suggestedId) {
+              const { data: sc } = await supabase
+                .from("golf_courses")
+                .select("name")
+                .eq("id", suggestedId)
+                .maybeSingle();
+              suggestion = (sc?.name as string | undefined) ?? null;
+            }
+            await recordUnmatched(supabase, whsCourseId, echoMethod, suggestion);
+          }
+        }
+
       } catch (e) {
         counts.errored++;
         const msg = e instanceof Error ? e.message : String(e);
@@ -289,6 +328,139 @@ Deno.serve(async (req) => {
     if (unlockErr) console.error("unlock_rpc_error", unlockErr);
   }
 });
+
+// ---- Unmatched-course queue ------------------------------------------------
+
+type UsageCounts = { round_count: number; member_count: number };
+
+// round_count / member_count for a WHS course, from whs_scores joined to
+// whs_connections (distinct users for the member count).
+async function courseUsage(
+  supabase: any,
+  whsCourseId: string,
+): Promise<UsageCounts> {
+  const { data, error } = await supabase
+    .from("whs_scores")
+    .select("connection_id, whs_connections!inner(user_id)")
+    .eq("course_id", whsCourseId)
+    .limit(5000);
+  if (error) {
+    console.error("usage_error", whsCourseId, error.message);
+    return { round_count: 0, member_count: 0 };
+  }
+  const rows = (data ?? []) as any[];
+  const users = new Set<string>();
+  for (const r of rows) {
+    const uid = r?.whs_connections?.user_id ?? null;
+    if (uid) users.add(uid);
+  }
+  return { round_count: rows.length, member_count: users.size };
+}
+
+async function recordUnmatched(
+  supabase: any,
+  whsCourseId: string,
+  lastTierTried: string,
+  echoSuggestion: string | null,
+): Promise<void> {
+  const { data: course } = await supabase
+    .from("whs_courses")
+    .select("name")
+    .eq("id", whsCourseId)
+    .maybeSingle();
+
+  const usage = await courseUsage(supabase, whsCourseId);
+
+  const { error } = await supabase
+    .from("whs_unmatched_courses")
+    .upsert(
+      {
+        whs_course_id: whsCourseId,
+        whs_course_name: (course?.name as string | undefined) ?? null,
+        round_count: usage.round_count,
+        member_count: usage.member_count,
+        last_tier_tried: lastTierTried,
+        echo_suggestion: echoSuggestion,
+        last_attempt_at: new Date().toISOString(),
+      },
+      { onConflict: "whs_course_id" },
+    );
+  if (error) {
+    console.error("unmatched_upsert_error", whsCourseId, error.message);
+    return;
+  }
+  console.log(JSON.stringify({
+    event: "unmatched_course_recorded",
+    whs_course_id: whsCourseId,
+    last_tier_tried: lastTierTried,
+    round_count: usage.round_count,
+    member_count: usage.member_count,
+  }));
+}
+
+// One-time (idempotent) seed: every WHS course with rounds but no resolved
+// mapping gets an open queue row.
+async function backfillUnmatched(supabase: any): Promise<number> {
+  const { data: mapRows, error: mapErr } = await supabase
+    .from("whs_to_golf_course_map")
+    .select("whs_course_id, golf_course_id")
+    .limit(50000);
+  if (mapErr) throw mapErr;
+  const mapped = new Set<string>();
+  for (const r of mapRows ?? []) {
+    if (r.golf_course_id) mapped.add(r.whs_course_id as string);
+  }
+
+  const { data: scoreRows, error: scoreErr } = await supabase
+    .from("whs_scores")
+    .select("course_id, whs_connections!inner(user_id)")
+    .not("course_id", "is", null)
+    .limit(50000);
+  if (scoreErr) throw scoreErr;
+
+  const usage = new Map<string, { rounds: number; users: Set<string> }>();
+  for (const r of (scoreRows ?? []) as any[]) {
+    const cid = r.course_id as string;
+    if (!cid || mapped.has(cid)) continue;
+    let entry = usage.get(cid);
+    if (!entry) { entry = { rounds: 0, users: new Set<string>() }; usage.set(cid, entry); }
+    entry.rounds++;
+    const uid = r?.whs_connections?.user_id ?? null;
+    if (uid) entry.users.add(uid);
+  }
+
+  const ids = [...usage.keys()];
+  if (ids.length === 0) return 0;
+
+  const names = new Map<string, string | null>();
+  for (let i = 0; i < ids.length; i += 200) {
+    const chunk = ids.slice(i, i + 200);
+    const { data: courses } = await supabase
+      .from("whs_courses")
+      .select("id, name")
+      .in("id", chunk);
+    for (const c of (courses ?? []) as any[]) names.set(c.id, c.name ?? null);
+  }
+
+  const now = new Date().toISOString();
+  const payload = ids.map((id) => ({
+    whs_course_id: id,
+    whs_course_name: names.get(id) ?? null,
+    round_count: usage.get(id)!.rounds,
+    member_count: usage.get(id)!.users.size,
+    last_tier_tried: "backfill",
+    echo_suggestion: null,
+    last_attempt_at: now,
+  }));
+
+  const { error } = await supabase
+    .from("whs_unmatched_courses")
+    .upsert(payload, { onConflict: "whs_course_id" });
+  if (error) throw error;
+  return payload.length;
+}
+
+
 
 async function isAlreadyMapped(
   supabase: any,
