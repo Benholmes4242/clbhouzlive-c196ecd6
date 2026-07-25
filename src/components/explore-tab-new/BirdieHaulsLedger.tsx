@@ -111,6 +111,7 @@ export function BirdieHaulsLedger({
               avatarUrl={row.holder_avatar}
               avatarUserId={row.user_id}
               name={name}
+              nameMeta={age ?? undefined}
               subline={sub}
               statValue={count}
               statLabel="BIRDIES"
