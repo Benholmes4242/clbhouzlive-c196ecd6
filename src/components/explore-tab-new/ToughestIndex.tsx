@@ -153,7 +153,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
 
   return (
     <section style={{ marginTop: 32 }}>
-      <div style={{ padding: '0 16px 8px' }}>
+      <div style={{ padding: '0 30px 8px' }}>
         <SectionHead
           overline="Official WHS"
           title={title}

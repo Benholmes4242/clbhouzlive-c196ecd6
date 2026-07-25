@@ -1,4 +1,5 @@
 import { useCallback, useRef, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
@@ -30,6 +31,8 @@ import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
 import { NemesisHolesStrip } from './NemesisHolesStrip';
 import { SectionHead } from './SectionHead';
+import { DiscoverCard } from './DiscoverCard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
@@ -125,7 +128,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <FriendsRoundsSection userId={userId} opener={opener} />
 
-        <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
+        <DiscoverCard>
+          <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
+        </DiscoverCard>
 
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
@@ -136,35 +141,17 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
 
         {/* Season race */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: SPACE.sectionSection }}>
           <SeasonRaceCard userId={userId} />
         </div>
 
-        {/* Feats: header + aces/albatrosses podium pair */}
-        <LegendarySection
+        {/* Merged Moments: Honours / Eagles / Birdies */}
+        <MomentsSection
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
           onRowTap={handleFeatRowTap}
           onLeaderTap={handleLeaderTap}
-        />
-
-
-        {/* Eagles ledger card */}
-        <EaglesLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-          onLeaderTap={handleLeaderTap}
-        />
-
-        {/* Birdie hauls ledger card */}
-        <BirdieHaulsLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
         />
 
         {/* Toughest courses index */}
@@ -174,7 +161,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <HardestHolesRail region={activeRegion} />
 
         {/* Your nemesis holes — signed-in + WHS gated; filters by course_country */}
-        <NemesisHolesStrip userId={userId} region={activeRegion} />
+        <DiscoverCard>
+          <NemesisHolesStrip userId={userId} region={activeRegion} inCard />
+        </DiscoverCard>
 
 
 
@@ -190,6 +179,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SectionHead
             overline="The feed"
             title="On the course"
+            paddingX={30}
           />
 
 
@@ -226,16 +216,26 @@ function LegendarySection({
   mode,
   onRowTap,
   onLeaderTap,
+  hideHeader = false,
+  sheetOpen: sheetOpenProp,
+  onSheetOpenChange,
 }: {
   region: string | null;
   regionUpper: string;
   mode: RecordsMode;
   onRowTap: (row: FeatRow) => void;
   onLeaderTap: (uid: string) => void;
+  hideHeader?: boolean;
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
   const rows = useMemo(() => data ?? [], [data]);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [localSheetOpen, setLocalSheetOpen] = useState(false);
+  const controlled = onSheetOpenChange !== undefined;
+  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
+  const setSheetOpen = controlled ? onSheetOpenChange : setLocalSheetOpen;
+  const sectionMarginTop = hideHeader ? 0 : 32;
   const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
 
   const openSheet = (metric: 'aces' | 'albatrosses') => {
@@ -248,8 +248,10 @@ function LegendarySection({
   // Scoped-empty: render the unconquered empty-state.
   if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
     return (
-      <section style={{ marginTop: 32 }}>
-        <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
+      <section style={{ marginTop: sectionMarginTop }}>
+        {hideHeader ? null : (
+          <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
+        )}
         <EmptyScopeCard
           title={`No moments ${regionScopePhrase(region)} yet.`}
           subline="This region is unconquered — be the first."
@@ -262,21 +264,23 @@ function LegendarySection({
   void regionUpper;
 
   return (
-    <section style={{ marginTop: 32 }}>
-      <SectionHead
-        overline={overline}
-        title="Moments of the game"
-        meta="View all"
-        onMeta={() => openSheet(sheetMetric)}
-        paddingX={14}
-      />
+    <section style={{ marginTop: sectionMarginTop }}>
+      {hideHeader ? null : (
+        <SectionHead
+          overline={overline}
+          title="Moments of the game"
+          meta="View all"
+          onMeta={() => openSheet(sheetMetric)}
+          paddingX={14}
+        />
+      )}
 
       {mode === 'alltime' && (
         <div
           role="tablist"
           aria-label="Metric"
           style={{
-            margin: '0 14px 8px',
+            margin: `${hideHeader ? 4 : 0}px 14px 8px`,
             display: 'inline-flex',
             gap: 2,
             padding: 2,
@@ -336,5 +340,141 @@ function LegendarySection({
         initialMetric={sheetMetric}
       />
     </section>
+  );
+}
+
+type MomentsTab = 'honours' | 'eagles' | 'birdies';
+
+/**
+ * Merged "Moments of the game" — Honours / Eagles / Birdies behind one header.
+ * Both page toggles (mode = Recent/All-time, region) are threaded into every
+ * tab body; the selected tab is component-local and never resets on toggle.
+ */
+function MomentsSection({
+  region,
+  regionUpper,
+  mode,
+  onRowTap,
+  onLeaderTap,
+}: {
+  region: string | null;
+  regionUpper: string;
+  mode: RecordsMode;
+  onRowTap: (row: FeatRow) => void;
+  onLeaderTap: (uid: string) => void;
+}) {
+  const { t } = useTranslation('courses');
+  const [tab, setTab] = useState<MomentsTab>('honours');
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const tabs: { id: MomentsTab; label: string }[] = [
+    { id: 'honours', label: t('discover.moments.tabs.honours', 'Honours') },
+    { id: 'eagles', label: t('discover.moments.tabs.eagles', 'Eagles') },
+    { id: 'birdies', label: t('discover.moments.tabs.birdies', 'Birdies') },
+  ];
+
+  const handleTab = (id: MomentsTab) => {
+    if (id === tab) return;
+    setTab(id);
+    analyticsEvents.track('discover_feats_tab', { tier: id, mode });
+  };
+
+  return (
+    <DiscoverCard>
+      <SectionHead
+        overline={
+          mode === 'alltime'
+            ? t('discover.moments.overlineAllTime', 'All-time honours')
+            : t('discover.moments.overlineLatest', 'Latest honours')
+        }
+        title={t('discover.moments.title', 'Moments of the game')}
+        meta={t('discover.moments.viewAll', 'View all')}
+        onMeta={() => setSheetOpen(true)}
+        paddingX={14}
+        paddingTop={12}
+        paddingBottom={10}
+      />
+
+      <div
+        role="tablist"
+        aria-label={t('discover.moments.title', 'Moments of the game')}
+        style={{
+          margin: '0 14px 4px',
+          display: 'inline-flex',
+          gap: 2,
+          padding: 2,
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.08)',
+          borderRadius: 999,
+        }}
+      >
+        {tabs.map((o) => {
+          const active = tab === o.id;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => handleTab(o.id)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 999,
+                background: active ? '#15171F' : 'transparent',
+                color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+                border: 'none',
+                fontFamily: 'inherit',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: 0.2,
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                transition: 'all .15s',
+              }}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ paddingBottom: 4 }}>
+        {tab === 'honours' ? (
+          <LegendarySection
+            region={region}
+            regionUpper={regionUpper}
+            mode={mode}
+            onRowTap={onRowTap}
+            onLeaderTap={onLeaderTap}
+            hideHeader
+            sheetOpen={sheetOpen}
+            onSheetOpenChange={setSheetOpen}
+          />
+        ) : null}
+        {tab === 'eagles' ? (
+          <EaglesLedger
+            region={region}
+            regionUpper={regionUpper}
+            mode={mode}
+            onRowTap={onRowTap}
+            onLeaderTap={onLeaderTap}
+            hideHeader
+            sheetOpen={sheetOpen}
+            onSheetOpenChange={setSheetOpen}
+          />
+        ) : null}
+        {tab === 'birdies' ? (
+          <BirdieHaulsLedger
+            region={region}
+            regionUpper={regionUpper}
+            mode={mode}
+            onRowTap={onRowTap}
+            hideHeader
+            sheetOpen={sheetOpen}
+            onSheetOpenChange={setSheetOpen}
+          />
+        ) : null}
+      </div>
+    </DiscoverCard>
   );
 }

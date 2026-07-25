@@ -580,6 +580,17 @@
       "entrySingular": "RUNDE",
       "entryPlural": "RUNDEN",
       "empty": "Noch keine kürzlichen Runden von Freunden."
+    },
+    "moments": {
+      "title": "Moments of the game",
+      "overlineLatest": "Latest honours",
+      "overlineAllTime": "All-time honours",
+      "viewAll": "View all",
+      "tabs": {
+        "honours": "Honours",
+        "eagles": "Eagles",
+        "birdies": "Birdies"
+      }
     }
   }
 }

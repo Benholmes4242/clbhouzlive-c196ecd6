@@ -23,6 +23,8 @@ const CARD_BG = '#FFFFFF';
 const CARD_SHADOW = '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)';
 const TRACK_BG = 'rgba(15,23,42,0.08)';
 const PAGE_PAD = 16;
+// Header gutter matches the carded sections (16 page + 14 card inset).
+const HEADER_PAD = 30;
 const RED = '#DC2626';
 const GREEN = '#16A34A';
 const GREEN_DEEP = '#15803D';
@@ -183,7 +185,7 @@ export function AttackDefendBand({ userId, region = null }: Props) {
         id="discover-defend-rail"
         style={{ marginTop: SPACE?.sectionSection ?? 24, fontFamily: FONT, color: INK, scrollMarginTop: 96 }}
       >
-        <div style={{ padding: `0 ${PAGE_PAD}px` }}>
+        <div style={{ padding: `0 ${HEADER_PAD}px` }}>
           <div style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: MUTE, lineHeight: 1 }}>
             The board
           </div>
@@ -216,7 +218,7 @@ export function AttackDefendBand({ userId, region = null }: Props) {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 12,
-          padding: `0 ${PAGE_PAD}px`,
+          padding: `0 ${HEADER_PAD}px`,
         }}
       >
         <div style={{ minWidth: 0, flex: 1 }}>
