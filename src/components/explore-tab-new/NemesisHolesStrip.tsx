@@ -25,9 +25,14 @@ const numFmt = (n: number | null | undefined, d = 1) =>
 interface Props {
   userId: string | undefined;
   region?: string | null;
+  /** Rendered inside the canonical Discover containment card. */
+  inCard?: boolean;
 }
 
-export function NemesisHolesStrip({ userId, region = null }: Props) {
+export function NemesisHolesStrip({ userId, region = null, inCard = false }: Props) {
+  const sectionMarginTop = inCard ? 0 : 32;
+  const headerPaddingX = inCard ? 14 : 16;
+  const rowsPaddingX = inCard ? 14 : 16;
   const navigate = useNavigate();
   const { data: connection } = useWhsConnection(userId);
   const hasWhs = !!connection;
@@ -51,8 +56,13 @@ export function NemesisHolesStrip({ userId, region = null }: Props) {
   if (rows.length === 0) {
     if (region == null) return null;
     return (
-      <section style={{ marginTop: 32 }}>
-        <SectionHead overline="Personal statistics" title="Your nemesis holes" />
+      <section style={{ marginTop: sectionMarginTop }}>
+        <SectionHead
+          overline="Personal statistics"
+          title="Your nemesis holes"
+          paddingX={headerPaddingX}
+          paddingTop={inCard ? 12 : 0}
+        />
         <EmptyScopeCard
           title={`No history ${regionScopePhrase(region)} yet — your nemesis awaits.`}
         />
@@ -61,14 +71,19 @@ export function NemesisHolesStrip({ userId, region = null }: Props) {
   }
 
   return (
-    <section style={{ marginTop: 32 }}>
-      <SectionHead overline="Personal statistics" title="Your nemesis holes" />
+    <section style={{ marginTop: sectionMarginTop }}>
+      <SectionHead
+        overline="Personal statistics"
+        title="Your nemesis holes"
+        paddingX={headerPaddingX}
+        paddingTop={inCard ? 12 : 0}
+      />
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
-          padding: '0 16px',
+          padding: `0 ${rowsPaddingX}px ${inCard ? 12 : 0}px`,
           fontFamily: FONT,
         }}
       >
