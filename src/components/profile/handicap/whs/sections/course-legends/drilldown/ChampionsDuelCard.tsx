@@ -567,6 +567,17 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
       </div>
 
+      {/* Pro benchmark — section footer. Sits last so the path from the section
+          title to the champion is uninterrupted. */}
+      {proBenchmark && (
+        <ProBenchmarkBand
+          pro={proBenchmark.pro}
+          base={proBenchmark.base}
+          value={proBenchmark.value}
+          sub={proBenchmark.sub}
+        />
+      )}
+
     </div>
   );
 };
