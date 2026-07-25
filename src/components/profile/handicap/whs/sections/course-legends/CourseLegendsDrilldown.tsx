@@ -17,7 +17,10 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
-import { CrownCabinet } from './drilldown/CrownCabinet';
+import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
+import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
+import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
+
 
 
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
