@@ -101,9 +101,8 @@ export function BirdieHaulsLedger({
           const name = displayIdentity(row);
           const count = birdieCount(row);
           const when = row.play_date ?? row.attained_at ?? null;
-          const sub = (
-            <LedgerSubline courseName={row.course_name} when={when ? relativeTime(when) : null} />
-          );
+          const sub = <LedgerSubline courseName={row.course_name} />;
+          const age = when ? relativeTime(when) : null;
 
           return (
             <StatRow
