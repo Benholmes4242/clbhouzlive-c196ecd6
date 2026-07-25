@@ -1,4 +1,5 @@
 import { useCallback, useRef, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
@@ -30,6 +31,8 @@ import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
 import { NemesisHolesStrip } from './NemesisHolesStrip';
 import { SectionHead } from './SectionHead';
+import { DiscoverCard } from './DiscoverCard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
 
@@ -125,7 +128,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <FriendsRoundsSection userId={userId} opener={opener} />
 
-        <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} />
+        <DiscoverCard>
+          <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
+        </DiscoverCard>
 
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
@@ -140,31 +145,13 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SeasonRaceCard userId={userId} />
         </div>
 
-        {/* Feats: header + aces/albatrosses podium pair */}
-        <LegendarySection
+        {/* Merged Moments: Honours / Eagles / Birdies */}
+        <MomentsSection
           region={activeRegion}
           regionUpper={regionUpper}
           mode={scope}
           onRowTap={handleFeatRowTap}
           onLeaderTap={handleLeaderTap}
-        />
-
-
-        {/* Eagles ledger card */}
-        <EaglesLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-          onLeaderTap={handleLeaderTap}
-        />
-
-        {/* Birdie hauls ledger card */}
-        <BirdieHaulsLedger
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
         />
 
         {/* Toughest courses index */}
@@ -174,7 +161,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         <HardestHolesRail region={activeRegion} />
 
         {/* Your nemesis holes — signed-in + WHS gated; filters by course_country */}
-        <NemesisHolesStrip userId={userId} region={activeRegion} />
+        <DiscoverCard>
+          <NemesisHolesStrip userId={userId} region={activeRegion} inCard />
+        </DiscoverCard>
 
 
 
@@ -190,6 +179,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           <SectionHead
             overline="The feed"
             title="On the course"
+            paddingX={30}
           />
 
 
