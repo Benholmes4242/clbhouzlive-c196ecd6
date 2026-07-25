@@ -55,12 +55,28 @@ Deno.serve(async (req) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
+  // ---- Optional one-time / repeatable backfill mode -----------------------
+  let body: any = {};
+  try { body = await req.json(); } catch { body = {}; }
+  if (body?.mode === "backfill_unmatched") {
+    const seeded = await backfillUnmatched(supabase);
+    console.log(JSON.stringify({
+      event: "unmatched_backfill_complete",
+      version: FUNCTION_VERSION,
+      seeded,
+    }));
+    return json({ mode: "backfill_unmatched", seeded, version: FUNCTION_VERSION });
+  }
+
   const runStartedAt = new Date().toISOString();
   console.log(JSON.stringify({
     event: "orchestrator_run_start",
+    version: FUNCTION_VERSION,
     run_started_at: runStartedAt,
     batch_size: BATCH_SIZE,
   }));
+
+
 
   // ---- Advisory lock ------------------------------------------------------
   const { data: lockAcquired, error: lockErr } = await supabase.rpc(
