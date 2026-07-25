@@ -31,6 +31,11 @@ interface Props {
    * empty state if tapped. Defaults to defaultRound.
    */
   maxAvailableRound?: number;
+  /**
+   * Exact set of rounds that have tee-time rows. When provided this wins over
+   * maxAvailableRound, so a gap (R1, R2, R4 drawn) is handled correctly.
+   */
+  drawnRounds?: readonly number[];
 }
 
 export function AllTeeTimesSheet({
@@ -40,9 +45,30 @@ export function AllTeeTimesSheet({
   tournamentName,
   defaultRound = 1,
   maxAvailableRound,
+  drawnRounds,
 }: Props) {
   const { t } = useTranslation('tourhub');
-  const initial = String(Math.min(4, Math.max(1, defaultRound))) as RoundKey;
+  const maxDrawn = Math.min(4, Math.max(1, maxAvailableRound ?? defaultRound));
+
+  // Availability comes from the data when we have it; otherwise fall back to
+  // the max-round behaviour so nothing regresses on an error / empty query.
+  const drawnSet = useMemo(() => {
+    const list = (drawnRounds ?? []).filter((n) => n >= 1 && n <= 4);
+    if (list.length > 0) return new Set<number>(list);
+    const fallback = new Set<number>();
+    for (let r = 1; r <= maxDrawn; r++) fallback.add(r);
+    return fallback;
+  }, [drawnRounds, maxDrawn]);
+
+  // Open on the current round, clamped to a round that actually has data.
+  const initial = useMemo(() => {
+    const wanted = Math.min(4, Math.max(1, defaultRound));
+    if (drawnSet.has(wanted)) return String(wanted) as RoundKey;
+    const available = [...drawnSet].sort((a, b) => a - b);
+    const atOrBelow = available.filter((n) => n <= wanted).pop();
+    return String(atOrBelow ?? available[0] ?? wanted) as RoundKey;
+  }, [defaultRound, drawnSet]);
+
   const [round, setRound] = useState<RoundKey>(initial);
 
   // Reset to the current round each time the sheet opens.
@@ -50,9 +76,8 @@ export function AllTeeTimesSheet({
     if (open) setRound(initial);
   }, [open, initial]);
 
-  const maxDrawn = Math.min(4, Math.max(1, maxAvailableRound ?? defaultRound));
   const roundNum = Number(round);
-  const isDrawn = roundNum <= maxDrawn;
+  const isDrawn = drawnSet.has(roundNum);
 
   const teeQuery = useTeeTimesAll(tournamentId, roundNum, { enabled: open && isDrawn });
   const groups = teeQuery.data ?? [];
@@ -62,9 +87,9 @@ export function AllTeeTimesSheet({
       (['1', '2', '3', '4'] as RoundKey[]).map((r) => ({
         value: r,
         label: t('tournament.allTeeTimes.roundShort', { round: r, defaultValue: `R${r}` }),
-        disabled: Number(r) > maxDrawn,
+        disabled: !drawnSet.has(Number(r)),
       })),
-    [t, maxDrawn],
+    [t, drawnSet],
   );
 
   return (

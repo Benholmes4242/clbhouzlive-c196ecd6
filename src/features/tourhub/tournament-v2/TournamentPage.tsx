@@ -44,6 +44,7 @@ import { TeeTimesFirstGroups } from './sections/TeeTimesFirstGroups';
 import { AllTeeTimesSheet } from './sections/AllTeeTimesSheet';
 import { TeeTimesRail } from './sections/TeeTimesRail';
 import { CourseSection } from './sections/CourseSection';
+import { useDrawnRounds } from './data/useDrawnRounds';
 import { MomentsSection } from './sections/MomentsSection';
 import { EventInfoSection } from './sections/EventInfoSection';
 import { StorySection } from './sections/StorySection';
@@ -282,7 +283,8 @@ export function TournamentPage() {
         tournamentId={tournamentId!}
         tournamentName={meta.name}
         defaultRound={currentRound}
-        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (meta?.current_round ?? currentRound)}
+        maxAvailableRound={pulse.state === 'upcoming' ? 1 : (highestDrawnRound ?? meta?.current_round ?? currentRound)}
+        drawnRounds={pulse.state === 'upcoming' && drawnRounds.length === 0 ? [1] : drawnRounds}
       />
       <FullBoardSheet
         open={fullBoardOpen}
