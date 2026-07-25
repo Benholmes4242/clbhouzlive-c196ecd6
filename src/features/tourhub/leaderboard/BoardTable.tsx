@@ -429,10 +429,11 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             );
           })()}
         </div>
+        )}
 
 
         {/* PLAYER — single line */}
-        <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingLeft: 4 }}>
           <div
             style={{
               display: 'flex',
