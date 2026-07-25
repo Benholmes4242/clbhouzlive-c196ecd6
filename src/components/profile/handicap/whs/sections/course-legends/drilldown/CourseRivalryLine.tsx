@@ -25,7 +25,10 @@ interface Props {
   userId: string | undefined;
   courseId: string;
   theme?: 'light' | 'dark';
+  /** Render as a footer row inside the combined "you" card. */
+  bare?: boolean;
 }
+
 
 function initials(name: string | null | undefined): string {
   return (
@@ -38,7 +41,7 @@ function initials(name: string | null | undefined): string {
   );
 }
 
-export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId }) => {
+export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = false }) => {
   const navigate = useNavigate();
 
   const { data } = useQuery({
@@ -68,12 +71,13 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        width: 'calc(100% - 32px)',
-        margin: '8px 16px 4px',
-        padding: '8px 12px',
-        background: 'transparent',
-        border: `0.5px solid ${HAIRLINE}`,
-        borderRadius: 12,
+        width: bare ? '100%' : 'calc(100% - 32px)',
+        margin: bare ? 0 : '8px 16px 4px',
+        padding: bare ? '10px 16px' : '8px 12px',
+        background: bare ? 'var(--hcp-tint-1)' : 'transparent',
+        border: bare ? 'none' : `0.5px solid ${HAIRLINE}`,
+        borderTop: bare ? `0.5px solid ${HAIRLINE}` : undefined,
+        borderRadius: bare ? '0 0 16px 16px' : 12,
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',

@@ -42,7 +42,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
   });
 
   return (
-    <div style={{ marginBottom: 12 }}>
+    <div style={{ marginTop: 12 }}>
       <div
         style={{
           display: 'grid',

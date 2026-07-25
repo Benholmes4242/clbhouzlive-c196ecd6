@@ -57,9 +57,12 @@ interface Props {
   theme?: 'light' | 'dark';
   /** When provided, overrides the strip's own RPC-derived crown count so it stays in sync with the cabinet's window-scoped fraction. */
   heldCountOverride?: number;
+  /** Render without its own card chrome (used inside the combined "you" card). */
+  bare?: boolean;
 }
 
-export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride }) => {
+export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 'dark', heldCountOverride, bare = false }) => {
+
 
   const { data: crowns } = useQuery({
     queryKey: ['course-legends', 'crowns-held-here', userId ?? 'anon', courseId],
@@ -127,17 +130,8 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
   const bg = isLight ? 'rgba(15,23,42,0.02)' : 'rgba(255,255,255,0.02)';
 
 
-  return (
-    <div
-      style={{
-        margin: '16px 16px 4px',
-        padding: '10px 14px 10px',
-        background: bg,
-        border: `0.5px solid ${HAIRLINE}`,
-        borderRadius: 14,
-        fontFamily: FONT,
-      }}
-    >
+  const body = (
+    <>
       <div
         style={{
           fontSize: 9.5,
@@ -178,9 +172,28 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
           wide
         />
       </div>
+    </>
+  );
 
+  if (bare) {
+    return <div style={{ fontFamily: FONT, minWidth: 0 }}>{body}</div>;
+  }
+
+  return (
+    <div
+      style={{
+        margin: '16px 16px 4px',
+        padding: '10px 14px 10px',
+        background: bg,
+        border: `0.5px solid ${HAIRLINE}`,
+        borderRadius: 14,
+        fontFamily: FONT,
+      }}
+    >
+      {body}
     </div>
   );
+
 
   function Divider() {
     return (

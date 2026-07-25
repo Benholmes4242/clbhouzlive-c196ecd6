@@ -27,13 +27,13 @@ export const ChampionsUnclaimedCard: React.FC<ChampionsUnclaimedCardProps> = ({
     ? 'No champion yet — your first albatross takes the crown'
     : 'No champion yet — be the first to claim this crown';
 
-  const bandBg = isLight ? 'rgba(15,23,42,0.035)' : 'rgba(255,255,255,0.025)';
+  const bandBg = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.025)';
   const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
 
   return (
     <div
       style={{
-        padding: '14px 16px',
+        padding: '18px 16px',
         borderTop: `0.5px solid ${hairline}`,
         background: banded ? bandBg : 'transparent',
         textAlign: 'center',

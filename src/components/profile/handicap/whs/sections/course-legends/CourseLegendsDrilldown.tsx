@@ -17,11 +17,11 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
-import { CrownCabinet } from './drilldown/CrownCabinet';
+import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
 import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
 import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
-import { YouAtThisClubStrip } from './drilldown/YouAtThisClubStrip';
-import { CourseRivalryLine } from './drilldown/CourseRivalryLine';
+
+
 
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
@@ -402,8 +402,11 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
-          <YouAtThisClubStrip userId={activeActor?.id} courseId={ctx.courseId} theme={theme} heldCountOverride={youOwnedCount} />
-          <CrownCabinet
+          {/* One card: you-at-this-club stats + crown cabinet, rivalry line as footer. */}
+          <ChampionsYouCard
+            userId={activeActor?.id}
+            courseId={ctx.courseId}
+            theme={theme}
             slots={visibleCategories.map((cat) => ({
               key: cat,
               short: SHORT_LABELS[cat],
@@ -487,7 +490,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             );
           })()}
 
-          <CourseRivalryLine userId={activeActor?.id} courseId={ctx.courseId} theme={theme} />
+          
 
 
 

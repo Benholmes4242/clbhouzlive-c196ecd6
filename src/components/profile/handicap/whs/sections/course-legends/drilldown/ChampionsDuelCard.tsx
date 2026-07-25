@@ -241,7 +241,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 
   // Section band tone — mirrors The Record Book's alternating ledger on
   // the discover page (light BAND_BG on light theme, faint white on dark).
-  const bandBg = isLight ? 'rgba(15,23,42,0.035)' : 'rgba(255,255,255,0.025)';
+  const bandBg = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.025)';
   const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
 
   return (
@@ -254,7 +254,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           : defending
             ? `2px solid ${GOLD}`
             : `0.5px solid ${hairline}`,
-        padding: '12px 16px',
+        padding: '18px 16px',
       }}
 
     >
@@ -284,15 +284,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           {pillText}
         </span>
       </div>
-
-      {proBenchmark && (
-        <ProBenchmarkBand
-          pro={proBenchmark.pro}
-          base={proBenchmark.base}
-          value={proBenchmark.value}
-          sub={proBenchmark.sub}
-        />
-      )}
 
       {/* Duel row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
@@ -439,7 +430,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 
       {/* Chase track: champion at the finish, chaser travelling toward them */}
       {showTrack && (
-        <div style={{ position: 'relative', height: 30, marginTop: 11 }}>
+        <div style={{ position: 'relative', height: 24, marginTop: 10 }}>
           {/* rail */}
           <div
             style={{
@@ -453,7 +444,8 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               background: 'var(--hcp-bar-neutral)',
             }}
           />
-          {/* progress fill behind the chaser */}
+          {/* progress fill behind the chaser — flat, reduced-strength amber so it
+              never competes with the 2px gold defending border. */}
           <div
             style={{
               position: 'absolute',
@@ -463,25 +455,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               width: `${pos * 100}%`,
               transform: 'translateY(-50%)',
               borderRadius: 999,
-              background: 'linear-gradient(90deg, #FBBC2E, #F7931E)',
+              background: 'rgba(247,147,30,0.55)',
               transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
             }}
           />
-          {/* quarter notches */}
-          {[0.25, 0.5, 0.75].map((p) => (
-            <div
-              key={p}
-              style={{
-                position: 'absolute',
-                left: `${p * 100}%`,
-                top: '50%',
-                width: 1,
-                height: 8,
-                transform: 'translate(-50%,-50%)',
-                background: 'var(--hcp-line)',
-              }}
-            />
-          ))}
           {/* chaser mini-avatar */}
           <TrackFace
             entry={trackChaser}
@@ -589,6 +566,17 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Pro benchmark — section footer. Sits last so the path from the section
+          title to the champion is uninterrupted. */}
+      {proBenchmark && (
+        <ProBenchmarkBand
+          pro={proBenchmark.pro}
+          base={proBenchmark.base}
+          value={proBenchmark.value}
+          sub={proBenchmark.sub}
+        />
+      )}
 
     </div>
   );
