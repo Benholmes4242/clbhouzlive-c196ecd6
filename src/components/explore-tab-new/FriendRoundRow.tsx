@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { PinIcon } from './PinIcon';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
@@ -154,24 +155,35 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
 
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
             fontSize: SUBLINE_SIZE,
             fontWeight: 500,
             color: SLATE_500,
             lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            minWidth: 0,
           }}
         >
-          {course_name ?? '—'}
+          <PinIcon />
+          <span
+            style={{
+              fontWeight: 600,
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {course_name ?? ''}
+          </span>
           {net != null ? (
-            <>
-              {' · '}
-              <span className="tabular-nums" style={{ color: INK, fontWeight: 600 }}>
+            <span style={{ flexShrink: 0, fontSize: 11, color: 'rgba(15,23,42,0.30)' }}>
+              <span className="tabular-nums" style={{ fontWeight: 600 }}>
                 {net}
               </span>{' '}
               net
-            </>
+            </span>
           ) : null}
         </div>
 

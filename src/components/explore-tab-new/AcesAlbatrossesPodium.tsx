@@ -8,6 +8,7 @@ import {
 import { FONT } from './gamingLightTokens';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { StatRow } from './StatRow';
+import { LedgerSubline } from './PinIcon';
 import { formatHcp } from '@/lib/formatHcp';
 
 const MAX_ROWS = 10;
@@ -105,10 +106,10 @@ export function AcesAlbatrossesPodium({
                 ? `+${other} ${other === 1 ? 'albatross' : 'albatrosses'}`
                 : `+${other} ${other === 1 ? 'ace' : 'aces'}`
               : null;
-          const parts: string[] = [];
-          if (otherLabel) parts.push(otherLabel);
-          if (r.holder_club) parts.push(r.holder_club);
-          const combined = parts.join(' \u00B7 ');
+          const combined =
+            r.holder_club || otherLabel ? (
+              <LedgerSubline courseName={r.holder_club} when={otherLabel} />
+            ) : null;
           const name = formatHolderName(r.holder_name) || 'A member';
           return (
             <StatRow
@@ -117,7 +118,7 @@ export function AcesAlbatrossesPodium({
               avatarUrl={r.holder_avatar}
               avatarUserId={r.user_id ?? null}
               name={name}
-              subline={combined || undefined}
+              subline={combined ?? undefined}
               statValue={count}
               statLabel={count === 1 ? singular : plural}
               showWatermark={i === 0}
@@ -144,7 +145,7 @@ export function AcesAlbatrossesPodium({
             avatarUrl={row.holder_avatar}
             avatarUserId={row.user_id}
             name={name}
-            subline={row.course_name ?? undefined}
+            subline={row.course_name ? <LedgerSubline courseName={row.course_name} /> : undefined}
             chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
             timestamp={when ? relativeTime(when) : undefined}
             isLast={i === merged.length - 1}
