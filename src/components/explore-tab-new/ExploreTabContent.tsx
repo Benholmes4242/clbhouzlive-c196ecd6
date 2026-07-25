@@ -29,7 +29,6 @@ import { EaglesLedger } from './EaglesLedger';
 import { BirdieHaulsLedger } from './BirdieHaulsLedger';
 import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
-import { NemesisHolesStrip } from './NemesisHolesStrip';
 import { SectionHead } from './SectionHead';
 import { DiscoverCard } from './DiscoverCard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
