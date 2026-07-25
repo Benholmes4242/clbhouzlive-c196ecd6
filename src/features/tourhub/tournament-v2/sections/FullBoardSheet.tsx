@@ -102,13 +102,20 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
             background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
           }}
         >
-          <div style={{ width: 52, flexShrink: 0 }}>{t('board.columns.pos')}</div>
-          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>{t('board.columns.player')}</div>
-          <BoardHeaderCells
-            columns={computeBoardColumns(entries, meta?.current_round ?? null)}
-            thruLabel={t('board.columns.thru')}
-            totLabel={t('board.columns.tot')}
-          />
+          {(() => {
+            const cols = computeBoardColumns(entries, meta?.current_round ?? null);
+            return (
+              <>
+                <div style={{ width: cols.posBlockW, flexShrink: 0 }}>{t('board.columns.pos')}</div>
+                <div style={{ flex: 1, minWidth: 0, paddingLeft: 4 }}>{t('board.columns.player')}</div>
+                <BoardHeaderCells
+                  columns={cols}
+                  thruLabel={t('board.columns.thru')}
+                  totLabel={t('board.columns.tot')}
+                />
+              </>
+            );
+          })()}
 
 
         </div>

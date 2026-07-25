@@ -453,13 +453,20 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        <div style={{ width: 52, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
-        <div style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
-        <BoardHeaderCells
-          columns={computeBoardColumns(filteredEntries, currentRound)}
-          thruLabel={t('board.columns.thru')}
-          totLabel={t('board.columns.tot')}
-        />
+        {(() => {
+          const cols = computeBoardColumns(filteredEntries, currentRound);
+          return (
+            <>
+              <div style={{ width: cols.posBlockW, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
+              <div style={{ flex: 1, minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+              <BoardHeaderCells
+                columns={cols}
+                thruLabel={t('board.columns.thru')}
+                totLabel={t('board.columns.tot')}
+              />
+            </>
+          );
+        })()}
       </div>
 
       {/* BOARD */}

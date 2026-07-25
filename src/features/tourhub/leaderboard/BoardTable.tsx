@@ -40,6 +40,8 @@ const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
 const NUM_W = 44;
 const EMPTY_CELL = 'rgba(15,23,42,0.22)';
+/** ONE dash character for every numeric cell that means "no value". */
+const EMPTY_DASH = '\u2014';
 
 const F = 'Geist, system-ui, sans-serif';
 
@@ -87,13 +89,13 @@ function houseColor(score: number | null | undefined): string {
 
 
 function fmtScore(score: number | null | undefined): string {
-  if (score == null) return '-';
+  if (score == null) return EMPTY_DASH;
   if (score === 0) return 'E';
   return score > 0 ? `+${score}` : String(score);
 }
 
 function fmtThru(thru: number | null | undefined): string {
-  if (thru == null) return '-';
+  if (thru == null) return EMPTY_DASH;
   if (thru >= 18) return 'F';
   return String(thru);
 }
@@ -139,6 +141,10 @@ export interface BoardColumns {
   cellW: number;
   gap: number;
   liveRound: number | null;
+  /** Movement column width: 20 when ANY row has movement, else 0. */
+  moveW: number;
+  /** POS + MOVE block width, for parent-rendered headers. */
+  posBlockW: number;
 }
 
 /**
@@ -163,7 +169,41 @@ export function computeBoardColumns(
   const started =
     currentRound != null &&
     entries.some((e) => todayFromEntry(e, currentRound) != null);
-  return { rounds, cellW, gap, liveRound: started ? currentRound! : null };
+  // Movement column is reserved at the TABLE level only: either every row
+  // gets the slot or none do, so player names never go ragged.
+  const moves = boardMovementMap(entries, currentRound ?? null);
+  let hasMovement = false;
+  for (const e of entries) {
+    if (isDemoted(e.status)) continue;
+    const d = e.player?.id ? moves.get(e.player.id) : undefined;
+    if (d != null && d !== 0) { hasMovement = true; break; }
+  }
+  const moveW = hasMovement ? POS_MOVE_W : 0;
+  return {
+    rounds,
+    cellW,
+    gap,
+    liveRound: started ? currentRound! : null,
+    moveW,
+    posBlockW: POS_NUM_W + moveW,
+  };
+}
+
+/** Shared movement source for both the column spec and the row renderer. */
+export function boardMovementMap(entries: BoardEntry[], currentRound: number | null) {
+  return movementFromRounds(
+    entries.map((e) => ({
+      id: e.id,
+      playerId: e.player?.id ?? null,
+      position: e.position,
+      status: e.status ?? null,
+      round_1: e.round_1 ?? null,
+      round_2: e.round_2 ?? null,
+      round_3: e.round_3 ?? null,
+      round_4: e.round_4 ?? null,
+    })),
+    currentRound,
+  );
 }
 
 export const BOARD_NUM_W = NUM_W;
@@ -231,20 +271,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
-    () =>
-      movementFromRounds(
-        entries.map((e) => ({
-          id: e.id,
-          playerId: e.player?.id ?? null,
-          position: e.position,
-          status: e.status ?? null,
-          round_1: e.round_1 ?? null,
-          round_2: e.round_2 ?? null,
-          round_3: e.round_3 ?? null,
-          round_4: e.round_4 ?? null,
-        })),
-        currentRound ?? null,
-      ),
+    () => boardMovementMap(entries, currentRound ?? null),
     [entries, currentRound],
   );
 
@@ -308,14 +335,16 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const posText = demotedRow
       ? statusWord(e.status)
       : e.position == null
-      ? '-'
+      ? EMPTY_DASH
       : `${e.position_tied ? 'T' : ''}${e.position}`;
-    const totColor = demotedRow ? SECONDARY : houseColor(e.score);
+    const totEmpty = !demotedRow && e.score == null;
+    const totColor = demotedRow ? SECONDARY : totEmpty ? EMPTY_CELL : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started
     // for this player, the stale top-level thru (yesterday's "F") is hidden.
-    const thruDisplay = todayVal == null ? '-' : fmtThru(e.thru);
+    const thruEmpty = demotedRow || todayVal == null;
+    const thruDisplay = thruEmpty ? EMPTY_DASH : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const cc = e.player?.country_code || e.player?.country || '';
 
@@ -360,9 +389,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         >
           {posText}
         </div>
+        {columns.moveW > 0 && (
         <div
           style={{
-            width: POS_MOVE_W,
+            width: columns.moveW,
             flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
@@ -399,10 +429,11 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             );
           })()}
         </div>
+        )}
 
 
         {/* PLAYER — single line */}
-        <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingLeft: 4 }}>
           <div
             style={{
               display: 'flex',
@@ -474,7 +505,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                   padding: '1px 0',
                 }}
               >
-                {empty ? '\u2014' : fmtScore(val)}
+                {empty ? EMPTY_DASH : fmtScore(val)}
               </div>
             );
           })}
@@ -487,11 +518,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             flexShrink: 0,
             textAlign: 'center',
             fontSize: 11.5,
-            color: SECONDARY,
+            color: thruEmpty ? EMPTY_CELL : SECONDARY,
+            fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {demotedRow ? '-' : thruDisplay}
+          {thruDisplay}
         </div>
 
 
