@@ -37,6 +37,8 @@ type TierResult = {
   error?: string;
 };
 
+let corsHeaders: Record<string, string> = corsFor(null);
+
 Deno.serve(async (req) => {
   corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
