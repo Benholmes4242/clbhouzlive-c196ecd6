@@ -221,6 +221,7 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(`[LiveSync] version=2026-07-25-round-rollover-v1`);
     console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
