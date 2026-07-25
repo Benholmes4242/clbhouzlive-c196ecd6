@@ -3,7 +3,7 @@ import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom
 import { useQueryClient } from '@tanstack/react-query';
 import {
   ShieldAlert, Gavel, LifeBuoy, BadgeCheck, ShieldCheck, Link2, Map, ChevronRight,
-  CheckCircle2, AlertTriangle,
+  CheckCircle2, AlertTriangle, Unlink,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { adminTheme as t } from '../theme';
@@ -28,6 +28,12 @@ import type { AdminRequestRow } from '../hooks/useAdminActionRequests';
 import type { SupportTicketRow } from '../hooks/useSupportTickets';
 import type { MatchRequestRow } from '../hooks/useMatchRequests';
 import type { CourseRequestRow } from '../hooks/useCourseRequests';
+import {
+  UNMATCHED_COURSES_KEY,
+  ignoreUnmatchedCourse,
+  linkUnmatchedCourse,
+  type UnmatchedCourseRow,
+} from '../hooks/useUnmatchedCourses';
 
 // ---------- type meta ----------
 
@@ -39,6 +45,7 @@ const TYPE_LABEL: Record<InboxType, string> = {
   approval: 'Approvals',
   match: 'Matches',
   courseRequest: 'Course requests',
+  unmatchedCourse: 'Unmatched courses',
 };
 
 const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: string }> = {
@@ -49,6 +56,7 @@ const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: stri
   approval:      { icon: <ShieldCheck size={16} />, bg: '#DCFCE7', fg: '#15803D' },
   match:         { icon: <Link2 size={16} />,       bg: '#F1F5F9', fg: '#0F172A' },
   courseRequest: { icon: <Map size={16} />,         bg: '#F1F5F9', fg: '#0F172A' },
+  unmatchedCourse: { icon: <Unlink size={16} />,   bg: '#FEF3C7', fg: '#B45309' },
 };
 
 function relTime(iso: string): string {
@@ -123,6 +131,7 @@ function InboxListPage() {
   const [verifRow, setVerifRow] = useState<VerificationRow | null>(null);
   const [matchRow, setMatchRow] = useState<MatchRequestRow | null>(null);
   const [courseReqRow, setCourseReqRow] = useState<CourseRequestRow | null>(null);
+  const [unmatchedRow, setUnmatchedRow] = useState<UnmatchedCourseRow | null>(null);
 
   // Deep-link ?ticket= opens support drawer
   useEffect(() => {
@@ -147,7 +156,7 @@ function InboxListPage() {
   const visibleTypes = useMemo<InboxType[]>(() => {
     const out: InboxType[] = [];
     if (canMod) out.push('report', 'appeal', 'support');
-    if (canUsers) out.push('verification', 'match', 'courseRequest');
+    if (canUsers) out.push('verification', 'match', 'courseRequest', 'unmatchedCourse');
     if (canApprove) out.push('approval');
     return out;
   }, [canMod, canUsers, canApprove]);
@@ -176,6 +185,7 @@ function InboxListPage() {
       case 'verification': setVerifRow(item.payload as VerificationRow); break;
       case 'match': setMatchRow(item.payload as MatchRequestRow); break;
       case 'courseRequest': setCourseReqRow(item.payload as CourseRequestRow); break;
+      case 'unmatchedCourse': setUnmatchedRow(item.payload as UnmatchedCourseRow); break;
     }
   };
 
@@ -361,6 +371,7 @@ function InboxListPage() {
       <SupportTicketDrawer ticket={supportRow} onClose={closeSupport} />
       <VerificationInboxSheet row={verifRow} onClose={() => setVerifRow(null)} />
       <MatchInboxSheet row={matchRow} onClose={() => setMatchRow(null)} />
+      <UnmatchedCourseSheet row={unmatchedRow} onClose={() => setUnmatchedRow(null)} />
       <CourseRequestInboxSheet row={courseReqRow} onClose={() => setCourseReqRow(null)} />
     </div>
   );
@@ -606,6 +617,163 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
             fontSize: 13, outline: 'none',
           }}
         />
+        {err && (
+          <div style={{
+            padding: '8px 10px', borderRadius: t.radius.md,
+            background: t.dangerSoft, color: t.dangerText, fontSize: 12,
+          }}>{err}</div>
+        )}
+      </div>
+    </AdminSheet>
+  );
+}
+
+// ---------- unmatched course sheet ----------
+
+interface CourseHit { id: string; name: string; region: string | null; country: string | null }
+
+function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null; onClose: () => void }) {
+  const [query, setQuery] = useState('');
+  const [hits, setHits] = useState<CourseHit[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [chosen, setChosen] = useState<CourseHit | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const qc = useQueryClient();
+
+  const whsId = row?.whs_course_id;
+
+  useEffect(() => {
+    if (!row) return;
+    setChosen(null);
+    setErr(null);
+    setHits([]);
+    setQuery(row.echo_suggestion ?? (row.whs_course_name ?? '').split('-')[0].trim());
+  }, [whsId]);
+
+  useEffect(() => {
+    if (!row) return;
+    const q = query.trim();
+    if (q.length < 2) { setHits([]); return; }
+    setSearching(true);
+    const handle = setTimeout(async () => {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, region, country')
+        .ilike('name', `%${q}%`)
+        .order('name')
+        .limit(25);
+      setSearching(false);
+      if (error) { setErr(error.message); setHits([]); return; }
+      setHits((data ?? []) as CourseHit[]);
+    }, 220);
+    return () => clearTimeout(handle);
+  }, [query, whsId]);
+
+  if (!row) return null;
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
+    qc.invalidateQueries({ queryKey: UNMATCHED_COURSES_KEY });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'triage-counts'] });
+  };
+
+  const doLink = async () => {
+    if (!chosen) return;
+    setBusy(true); setErr(null);
+    try {
+      await linkUnmatchedCourse(row.whs_course_id, chosen.id);
+      refresh();
+      onClose();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Link failed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doIgnore = async () => {
+    setBusy(true); setErr(null);
+    try {
+      await ignoreUnmatchedCourse(row.whs_course_id);
+      refresh();
+      onClose();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Update failed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <AdminSheet
+      open={row !== null}
+      onClose={onClose}
+      title={row.whs_course_name ?? 'Unnamed WHS course'}
+      subtitle={`${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`}
+      footer={
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <button onClick={doIgnore} disabled={busy} style={btnGhost()}>Ignore</button>
+          <button onClick={doLink} disabled={busy || !chosen} style={btnPrimary(busy || !chosen)}>
+            {busy ? 'Working...' : 'Link to course'}
+          </button>
+        </div>
+      }
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ fontSize: 12, color: t.inkMuted }}>
+          Waiting {relTime(row.first_seen_at)}
+          {row.last_tier_tried ? ` - last tier: ${row.last_tier_tried}` : ''}
+        </div>
+        {row.echo_suggestion && (
+          <div style={{ fontSize: 12, color: t.inkMuted }}>
+            Echo suggests: <span style={{ color: t.ink, fontWeight: 600 }}>{row.echo_suggestion}</span>
+          </div>
+        )}
+        <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
+          Search courses
+        </label>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Club name..."
+          style={{
+            padding: '10px 12px', borderRadius: t.radius.md,
+            border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+            fontSize: 13, outline: 'none',
+          }}
+        />
+        {searching ? (
+          <div style={{ color: t.inkMuted, fontSize: 12 }}>Searching...</div>
+        ) : hits.length === 0 ? (
+          <div style={{ color: t.inkMuted, fontSize: 12 }}>
+            {query.trim().length < 2 ? 'Type at least 2 characters.' : 'No matches.'}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {hits.map((h) => {
+              const active = chosen?.id === h.id;
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => setChosen(h)}
+                  style={{
+                    textAlign: 'left', padding: '10px 12px', borderRadius: t.radius.md,
+                    border: `1px solid ${active ? t.brand : t.line}`,
+                    background: active ? t.brandSoft ?? t.canvas : t.surface,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
+                  <div style={{ fontSize: 11, color: t.inkMuted }}>
+                    {[h.region, h.country].filter(Boolean).join(', ') || '-'}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
         {err && (
           <div style={{
             padding: '8px 10px', borderRadius: t.radius.md,
