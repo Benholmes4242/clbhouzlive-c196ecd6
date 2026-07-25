@@ -271,20 +271,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
-    () =>
-      movementFromRounds(
-        entries.map((e) => ({
-          id: e.id,
-          playerId: e.player?.id ?? null,
-          position: e.position,
-          status: e.status ?? null,
-          round_1: e.round_1 ?? null,
-          round_2: e.round_2 ?? null,
-          round_3: e.round_3 ?? null,
-          round_4: e.round_4 ?? null,
-        })),
-        currentRound ?? null,
-      ),
+    () => boardMovementMap(entries, currentRound ?? null),
     [entries, currentRound],
   );
 
