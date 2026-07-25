@@ -38,7 +38,7 @@ type TierResult = {
 };
 
 Deno.serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
