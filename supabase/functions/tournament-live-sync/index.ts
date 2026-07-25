@@ -339,7 +339,10 @@ async function syncTournament(
   // have data; venue-local date-math only as a pre-play fallback.
   const active = await getActiveRound(supabase, tournament.id, tournament);
   const roundToWrite: number | undefined = active.round;
-  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'})`);
+  // Pre-play state so the client can distinguish "R3 scheduled" from "R3 live"
+  // without re-implementing round detection.
+  const roundStatusToWrite: string = active.source === 'scheduled' ? 'scheduled' : (active.inProgress ? 'live' : 'live');
+  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'}, sched R${active.scheduledRound}, playing R${active.playingRound}, inProgress=${active.inProgress})`);
 
 
 
