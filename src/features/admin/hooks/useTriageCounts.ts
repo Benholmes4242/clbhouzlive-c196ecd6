@@ -8,7 +8,8 @@ export type InboxTypeSlug =
   | 'verification'
   | 'approval'
   | 'match'
-  | 'courseRequest';
+  | 'courseRequest'
+  | 'unmatchedCourse';
 
 export interface TriageQueueBucket {
   key: string;
@@ -29,6 +30,7 @@ export interface TriageCounts {
   courseClaims: number;
   courseRequests: number;
   matchRequests: number;
+  unmatchedCourses: number;
   supportAwaitingReply: number;
   approvals: number;
   total: number;
@@ -93,6 +95,11 @@ const QUEUES: QueueSpec[] = [
     oldestBuilder: () => sb.from('whs_course_match_requests').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
+    key: 'unmatchedCourses', label: 'Unmatched courses', type: 'unmatchedCourse',
+    countBuilder: () => sb.from('whs_unmatched_courses').select('whs_course_id', { count: 'exact', head: true }).eq('status', 'open'),
+    oldestBuilder: () => sb.from('whs_unmatched_courses').select('first_seen_at').eq('status', 'open').order('first_seen_at', { ascending: true }).limit(1),
+  },
+  {
     key: 'supportAwaitingReply', label: 'Support tickets', type: 'support',
     countBuilder: () => sb.from('support_tickets').select('id', { count: 'exact', head: true }).eq('last_sender', 'user').not('status', 'in', '(resolved,closed)'),
     oldestBuilder: () => sb.from('support_tickets').select('created_at').eq('last_sender', 'user').not('status', 'in', '(resolved,closed)').order('created_at', { ascending: true }).limit(1),
@@ -128,7 +135,7 @@ async function fetchTriageCounts(): Promise<TriageCounts> {
     }
     if (oldestRes.status === 'fulfilled' && !(oldestRes.value as any)?.error) {
       const row = ((oldestRes.value as any).data ?? [])[0];
-      oldestCreatedAt = row?.created_at ?? null;
+      oldestCreatedAt = row?.created_at ?? row?.first_seen_at ?? null;
     } else {
       hadErrors = true;
     }
@@ -163,6 +170,7 @@ async function fetchTriageCounts(): Promise<TriageCounts> {
     courseClaims: get('courseClaims'),
     courseRequests: get('courseRequests'),
     matchRequests: get('matchRequests'),
+    unmatchedCourses: get('unmatchedCourses'),
     supportAwaitingReply: get('supportAwaitingReply'),
     approvals: get('approvals'),
     total,

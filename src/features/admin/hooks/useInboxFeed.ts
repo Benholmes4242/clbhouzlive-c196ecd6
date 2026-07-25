@@ -9,6 +9,7 @@ import { fetchSupportTickets, type SupportTicketRow } from './useSupportTickets'
 import { fetchVerifications, type VerificationRow } from './useVerifications';
 import { fetchCourseRequests, type CourseRequestRow } from './useCourseRequests';
 import { fetchMatchRequests, type MatchRequestRow } from './useMatchRequests';
+import { fetchUnmatchedCourses, type UnmatchedCourseRow } from './useUnmatchedCourses';
 import type { InboxTypeSlug } from './useTriageCounts';
 
 export type InboxType = InboxTypeSlug;
@@ -133,6 +134,12 @@ export function useInboxFeed(): InboxFeedResult {
     enabled: canUsers,
     staleTime: 30_000,
   });
+  const unmatchedOpen = useQuery({
+    queryKey: ['admin-v2', 'inbox', 'unmatched-courses-open'],
+    queryFn: () => fetchUnmatchedCourses('open'),
+    enabled: canUsers,
+    staleTime: 30_000,
+  });
   const courseReqAll = useQuery({
     queryKey: ['admin-v2', 'inbox', 'course-requests'],
     queryFn: fetchCourseRequests,
@@ -154,7 +161,7 @@ export function useInboxFeed(): InboxFeedResult {
 
   const allQueries = [
     mod, modDone, appealsOpen, appealsDone, supportOpen, supportDone,
-    verifOpen, matchOpen, matchDoneMatched, matchDoneRejected,
+    verifOpen, matchOpen, matchDoneMatched, matchDoneRejected, unmatchedOpen,
     courseReqAll, approvalsOpen, approvalsDone,
   ];
 
@@ -334,6 +341,26 @@ export function useInboxFeed(): InboxFeedResult {
       }
     }
 
+    // Unmatched courses (auto-match ladder gave up)
+    if (canUsers && unmatchedOpen.data) {
+      for (const row of unmatchedOpen.data) {
+        const bits = [
+          `${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`,
+        ];
+        if (row.last_tier_tried) bits.push(`last tier ${row.last_tier_tried}`);
+        if (row.echo_suggestion) bits.push(`Echo suggests ${row.echo_suggestion}`);
+        open.push({
+          id: `unmatched-${row.whs_course_id}`,
+          type: 'unmatchedCourse',
+          title: row.whs_course_name ?? 'Unnamed WHS course',
+          meta: `Unmatched courses - ${bits.join(' - ')}`,
+          createdAt: row.first_seen_at,
+          isHighPriority: false,
+          payload: row,
+        });
+      }
+    }
+
     // Course requests
     if (canUsers && courseReqAll.data) {
       for (const row of courseReqAll.data) {
@@ -394,7 +421,7 @@ export function useInboxFeed(): InboxFeedResult {
 
     // counts
     const c: Record<InboxType, number> = {
-      report: 0, appeal: 0, support: 0, verification: 0, approval: 0, match: 0, courseRequest: 0,
+      report: 0, appeal: 0, support: 0, verification: 0, approval: 0, match: 0, courseRequest: 0, unmatchedCourse: 0,
     };
     for (const it of open) c[it.type]++;
 
@@ -405,7 +432,7 @@ export function useInboxFeed(): InboxFeedResult {
     canMod, canUsers, canApprove,
     mod.data, modDone.data, appealsOpen.data, appealsDone.data,
     supportOpen.data, supportDone.data, verifOpen.data,
-    matchOpen.data, matchDoneMatched.data, matchDoneRejected.data,
+    matchOpen.data, matchDoneMatched.data, matchDoneRejected.data, unmatchedOpen.data,
     courseReqAll.data, approvalsOpen.data, approvalsDone.data,
   ]);
 
