@@ -443,7 +443,8 @@
     "hero": {
       "chip": {
         "majorStarts": "[~~ṀÁĴŐŘ · ŠŢÁŘŢŠ {{date}}~~]",
-        "starts": "[~~ŠŢÁŘŢŠ {{date}}~~]"
+        "starts": "[~~ŠŢÁŘŢŠ {{date}}~~]",
+        "roundN": "Round {{round}}"
       },
       "leaderLabel": "[~~Ļéáđéř~~]",
       "daysLabel": "[~~Đáýš~~]",

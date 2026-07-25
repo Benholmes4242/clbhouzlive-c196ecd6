@@ -63,9 +63,17 @@ export interface PhotoBandProps {
 
 function statePillText(
   state: HeroState,
-  t: (k: string) => string,
+  t: (k: string, opts?: any) => string,
 ): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
+    // Round has rolled over but play has not started: show the round only,
+    // with the non-live pill treatment (no LIVE word, no live tint).
+    if (state.roundStatus === 'scheduled') {
+      return {
+        text: `${t('tournament.hero.chip.roundN', { round: state.round, defaultValue: `ROUND ${state.round}` })}`.toUpperCase(),
+        tone: 'upcoming',
+      };
+    }
     // Match tournament details hero chip: "LIVE · R{n}".
     return {
       text: `${t('status.live')} \u00B7 R${state.round}`.toUpperCase(),

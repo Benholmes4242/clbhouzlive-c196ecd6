@@ -10661,6 +10661,7 @@ export type Database = {
           created_at: string
           currency: string | null
           current_round: number | null
+          current_round_status: string | null
           cut_round: number | null
           cutline: number | null
           defending_champion: string | null
@@ -10705,6 +10706,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           current_round?: number | null
+          current_round_status?: string | null
           cut_round?: number | null
           cutline?: number | null
           defending_champion?: string | null
@@ -10749,6 +10751,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           current_round?: number | null
+          current_round_status?: string | null
           cut_round?: number | null
           cutline?: number | null
           defending_champion?: string | null

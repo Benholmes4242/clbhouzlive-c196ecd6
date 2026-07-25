@@ -166,6 +166,16 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
   const chip = (() => {
     if (state === 'live') {
       const round = meta.current_round ?? 1;
+      // Calendar rolled over, today's round has not teed off: show the round
+      // without the LIVE treatment (reuse the neutral/upcoming pill style).
+      if (meta.current_round_status === 'scheduled') {
+        return {
+          label: t('tournament.hero.chip.roundN', { round, defaultValue: `ROUND ${round}` }).toUpperCase(),
+          color: '#fff',
+          border: 'rgba(255,255,255,0.42)',
+          bg: 'rgba(255,255,255,0.10)',
+        };
+      }
       return {
         label: `${t('status.live')} · R${round}`,
         color: GREEN_LIVE,
