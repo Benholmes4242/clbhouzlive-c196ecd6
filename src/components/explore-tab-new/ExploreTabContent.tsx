@@ -161,13 +161,6 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
         <HardestHolesRail region={activeRegion} />
 
-        {/* Your nemesis holes — signed-in + WHS gated; filters by course_country */}
-        <DiscoverCard>
-          <NemesisHolesStrip userId={userId} region={activeRegion} inCard />
-        </DiscoverCard>
-
-
-
         {/* Feed block */}
         <div
           style={{
