@@ -25,7 +25,10 @@ interface Props {
   userId: string | undefined;
   courseId: string;
   theme?: 'light' | 'dark';
+  /** Render as a footer row inside the combined "you" card. */
+  bare?: boolean;
 }
+
 
 function initials(name: string | null | undefined): string {
   return (
