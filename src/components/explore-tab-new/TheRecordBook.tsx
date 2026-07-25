@@ -108,12 +108,16 @@ interface Props {
   mode: RecordsMode;
   opener?: ScorecardOpener;
   userId: string | undefined;
+  /** Rendered inside the canonical Discover containment card. */
+  inCard?: boolean;
 }
 
 const LEDGER_ROWS = 5;
 const CONQUEST_CAP = 6;
 
-export function TheRecordBook({ region, mode, opener, userId }: Props) {
+export function TheRecordBook({ region, mode, opener, userId, inCard = false }: Props) {
+  const sectionMarginTop = inCard ? 0 : SPACE.sectionSection;
+  const headerPaddingTop = inCard ? 12 : 0;
   const [sheetOpen, setSheetOpen] = useState(false);
   const { data } = useRegionFeats(region, 'records', mode);
 
@@ -127,7 +131,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   if (ledgerRows.length === 0) {
     if (region == null) return null;
     return (
-      <section style={{ marginTop: SPACE.sectionSection, fontFamily: FONT, color: INK }}>
+      <section style={{ marginTop: sectionMarginTop, fontFamily: FONT, color: INK }}>
         <div style={{ padding: `0 ${PAGE_PAD}px` }}>
           <div
             style={{
@@ -160,7 +164,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
   return (
     <section
       style={{
-        marginTop: SPACE.sectionSection,
+        marginTop: sectionMarginTop,
         fontFamily: FONT,
         color: INK,
       }}
@@ -172,7 +176,7 @@ export function TheRecordBook({ region, mode, opener, userId }: Props) {
           alignItems: 'baseline',
           justifyContent: 'space-between',
           gap: 12,
-          padding: `0 ${PAGE_PAD}px`,
+          padding: `${headerPaddingTop}px ${PAGE_PAD}px 0`,
         }}
       >
         <div style={{ minWidth: 0, flex: 1 }}>
