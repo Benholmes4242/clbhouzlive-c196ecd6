@@ -128,12 +128,14 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         <FriendsRoundsSection userId={userId} opener={opener} />
 
+        {/* Attack / Defend band — absorbs "Your next conquests" */}
+        <AttackDefendBand userId={userId} region={activeRegion} />
+
         <DiscoverCard>
           <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
         </DiscoverCard>
 
-        {/* Attack / Defend band — absorbs "Your next conquests" */}
-        <AttackDefendBand userId={userId} region={activeRegion} />
+
 
 
         {/* This week in golf — honours rail */}
