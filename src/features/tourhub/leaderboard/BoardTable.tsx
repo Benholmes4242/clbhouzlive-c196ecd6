@@ -89,13 +89,13 @@ function houseColor(score: number | null | undefined): string {
 
 
 function fmtScore(score: number | null | undefined): string {
-  if (score == null) return '-';
+  if (score == null) return EMPTY_DASH;
   if (score === 0) return 'E';
   return score > 0 ? `+${score}` : String(score);
 }
 
 function fmtThru(thru: number | null | undefined): string {
-  if (thru == null) return '-';
+  if (thru == null) return EMPTY_DASH;
   if (thru >= 18) return 'F';
   return String(thru);
 }
