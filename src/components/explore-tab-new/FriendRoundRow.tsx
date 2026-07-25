@@ -165,7 +165,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
             minWidth: 0,
           }}
         >
-          <PinIcon />
+          
           <span
             style={{
               fontWeight: 600,
