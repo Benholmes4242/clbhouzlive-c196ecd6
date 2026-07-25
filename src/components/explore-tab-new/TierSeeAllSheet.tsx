@@ -27,6 +27,7 @@ import {
 } from './hooks/useRegionFeats';
 import { FeatListRow } from './FeatListRow';
 import { StatRow } from './StatRow';
+import { LedgerSubline } from './PinIcon';
 import { useScorecardOpener } from './useScorecardOpener';
 
 
