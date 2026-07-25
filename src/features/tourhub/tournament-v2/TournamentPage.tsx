@@ -230,7 +230,7 @@ export function TournamentPage() {
               {hasBoard && (
                 <>
                   <SectionEyebrow kicker={t('tournament.shell.board.eyebrow')} actionLabel={t('tournament.shell.board.action')} onAction={openFullBoard} />
-                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
+                  <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} />
                 </>
               )}
               {/* Shared OnTheCourse — featured groups + FULL FIELD expander,
@@ -252,7 +252,7 @@ export function TournamentPage() {
           {pulse.state === 'completed' && hasBoard && (
             <>
               <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
-              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} />
+              <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} />
             </>
           )}
         </section>

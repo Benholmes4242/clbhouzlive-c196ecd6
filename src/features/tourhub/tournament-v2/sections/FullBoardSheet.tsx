@@ -61,7 +61,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       position: e.position ?? null,
       positionTied: e.position_tied ?? null,
       total: e.score ?? null,
-      today: todayFromEntry(e),
+      today: todayFromEntry(e, meta?.current_round ?? null),
       thru: e.thru ?? null,
       status: e.status ?? null,
     });
