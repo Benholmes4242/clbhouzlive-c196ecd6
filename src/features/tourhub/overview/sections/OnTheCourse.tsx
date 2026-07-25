@@ -26,6 +26,7 @@ import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { todayFromEntry } from '../../leaderboard/BoardTable';
 
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -153,14 +154,15 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
       const pid = row?.player_id as string | null | undefined;
       if (!pid) continue;
       m.set(pid, {
-        today: row?.today ?? null,
+        // Round-scoped: null means this player has not started the active round.
+        today: todayFromEntry(row, round),
         score: row?.score ?? null,
         status: (row?.status ?? null) as string | null,
         thru: row?.thru ?? null,
       });
     }
     return m;
-  }, [leaderboardQuery.data]);
+  }, [leaderboardQuery.data, round]);
 
   const groups = parseGroups(data);
 
@@ -253,7 +255,15 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   const name = p.full_name || p.name || '';
                   const status = (p.status || '').toUpperCase();
                   const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
-                  const display = formatScore(p.today) ?? formatScore(p.score) ?? '—';
+                  // Not started the active round -> show TOTAL to par; once out
+                  // on the course -> show TODAY.
+                  const lbRow = p.player_id ? leaderboardByPlayerId.get(p.player_id) : undefined;
+                  const roundToday = lbRow ? lbRow.today : null;
+                  const started = lbRow ? roundToday != null : p.today != null;
+                  const displayValue = started
+                    ? (lbRow ? roundToday : (p.today as number | string | null))
+                    : (lbRow ? lbRow.score : (p.score as number | string | null));
+                  const display = formatScore(displayValue) ?? formatScore(p.score) ?? '—';
                   return (
                     <button
                       key={pi}
@@ -415,7 +425,10 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       const lb = p.id ? leaderboardByPlayerId.get(p.id) : undefined;
                       const status = (lb?.status || '').toUpperCase();
                       const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
-                      const display = formatScore(lb?.today) ?? formatScore(lb?.score) ?? '—';
+                      // Not started the active round -> TOTAL to par; started -> TODAY.
+                      const display = (lb && lb.today != null
+                        ? formatScore(lb.today)
+                        : formatScore(lb?.score)) ?? '—';
                       return (
                         <button
                           key={pi}

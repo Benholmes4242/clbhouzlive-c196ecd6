@@ -33,6 +33,8 @@ interface Props {
   tournamentId: string;
   entries: Row[];
   limit?: number;
+  /** Active round from sr_tournaments.current_round - scopes TODAY and THRU. */
+  currentRound?: number | null;
 }
 
 function fmt(n: number | null | undefined): string {
@@ -46,15 +48,18 @@ function color(n: number | null | undefined): string {
   if (n > 0) return TOPAR_OVER_LIGHT;
   return INK;
 }
-function thruLabel(row: Row): string {
+function thruLabel(row: Row, today: number | null): string {
   const s = row.status?.toUpperCase();
   if (s === 'MC' || s === 'CUT') return 'MC';
   if (s === 'WD') return 'WD';
+  // THRU must agree with TODAY: no round score for the active round means the
+  // player has not started, so the stale top-level thru must not render.
+  if (today == null) return '—';
   if (row.thru == null) return '—';
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -86,7 +91,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
-          const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0]);
+          const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0], currentRound);
           return (
             <button
               key={r.id}
@@ -126,7 +131,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5 }: Props) {
                 </span>
               </div>
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
-                {thruLabel(r)}
+                {thruLabel(r, today)}
               </div>
               <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(today), fontVariantNumeric: 'tabular-nums' }}>
                 {fmt(today)}
