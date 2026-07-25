@@ -49,13 +49,30 @@ interface Props {
   mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
   onLeaderTap?: (userId: string) => void;
+  /** Rendered inside a merged section that owns the header. */
+  hideHeader?: boolean;
+  /** Controlled "View all" sheet (used by the merged Moments section). */
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
 }
 
-export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
+export function EaglesLedger({
+  region,
+  mode,
+  onRowTap,
+  onLeaderTap,
+  hideHeader = false,
+  sheetOpen: sheetOpenProp,
+  onSheetOpenChange,
+}: Props) {
   const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
   const { data: leadersData } = useRegionEagleLeaders(region);
   const feats = useMemo(() => featsData ?? [], [featsData]);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [localSheetOpen, setLocalSheetOpen] = useState(false);
+  const controlled = onSheetOpenChange !== undefined;
+  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
+  const setSheetOpen = controlled ? onSheetOpenChange! : setLocalSheetOpen;
+  const sectionMarginTop = hideHeader ? 0 : 32;
 
   const leaders = useMemo(
     () =>
@@ -72,8 +89,8 @@ export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
   if (!isLoading && !hasData) {
     if (region == null) return null;
     return (
-      <section style={{ marginTop: 32, fontFamily: FONT }}>
-        <SectionHead overline={overlineLabel} paddingX={14} />
+      <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
+        {hideHeader ? null : <SectionHead overline={overlineLabel} paddingX={14} />}
         <EmptyScopeCard
           title={`No eagles ${regionScopePhrase(region)} yet.`}
           subline="This region is unconquered — be the first."
@@ -83,13 +100,16 @@ export function EaglesLedger({ region, mode, onRowTap, onLeaderTap }: Props) {
   }
 
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHead
-        overline={overlineLabel}
-        meta="View all"
-        onMeta={() => setSheetOpen(true)}
-        paddingX={14}
-      />
+    <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
+      {hideHeader ? null : (
+        <SectionHead
+          overline={overlineLabel}
+          meta="View all"
+          onMeta={() => setSheetOpen(true)}
+          paddingX={14}
+        />
+      )}
+
 
       <div>
         {mode === 'alltime'
