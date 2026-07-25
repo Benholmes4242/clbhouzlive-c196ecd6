@@ -43,12 +43,28 @@ interface Props {
   regionUpper: string;
   mode: RecordsMode;
   onRowTap?: (row: FeatRow) => void;
+  /** Rendered inside a merged section that owns the header. */
+  hideHeader?: boolean;
+  /** Controlled "View all" sheet (used by the merged Moments section). */
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
 }
 
-export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
+export function BirdieHaulsLedger({
+  region,
+  mode,
+  onRowTap,
+  hideHeader = false,
+  sheetOpen: sheetOpenProp,
+  onSheetOpenChange,
+}: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
   const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [localSheetOpen, setLocalSheetOpen] = useState(false);
+  const controlled = onSheetOpenChange !== undefined;
+  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
+  const setSheetOpen = controlled ? onSheetOpenChange! : setLocalSheetOpen;
+  const sectionMarginTop = hideHeader ? 0 : 32;
 
   const display = rows.slice(0, ROWS);
   const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
@@ -56,8 +72,8 @@ export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   if (!isLoading && display.length === 0) {
     if (region == null) return null;
     return (
-      <section style={{ marginTop: 32, fontFamily: FONT }}>
-        <SectionHead overline={overlineLabel} paddingX={14} />
+      <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
+        {hideHeader ? null : <SectionHead overline={overlineLabel} paddingX={14} />}
         <EmptyScopeCard
           title={`No birdie hauls ${regionScopePhrase(region)} yet.`}
           subline="This region is unconquered — be the first."
@@ -67,13 +83,16 @@ export function BirdieHaulsLedger({ region, mode, onRowTap }: Props) {
   }
 
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHead
-        overline={overlineLabel}
-        meta="View all"
-        onMeta={() => setSheetOpen(true)}
-        paddingX={14}
-      />
+    <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
+      {hideHeader ? null : (
+        <SectionHead
+          overline={overlineLabel}
+          meta="View all"
+          onMeta={() => setSheetOpen(true)}
+          paddingX={14}
+        />
+      )}
+
 
       <div>
         {display.map((row, i) => {
