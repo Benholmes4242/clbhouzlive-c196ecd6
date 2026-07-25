@@ -7,7 +7,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Crown } from 'lucide-react';
 import type { HeroState, TopTie } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds, todayFromEntry } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots, extractRounds } from '../HybridHero.utils';
+import { todayFromEntry as todayForRound } from '../../../leaderboard/BoardTable';
 import { SoloLeaderRow, TiedLeadersRow, TiedChasersRow } from './LeaderRow';
 import { ChaserRow } from './ChaserRow';
 import { LastYearRow } from './LastYearRow';
@@ -80,7 +81,10 @@ function entryCountry(entry: any): string | null {
   return p?.country_code || p?.country || null;
 }
 
-function entryThru(entry: any): string {
+function entryThru(entry: any, today: number | null): string {
+  // THRU must agree with TODAY: before the active round starts the stale
+  // top-level thru would otherwise read "F" next to a dash.
+  if (today == null) return '—';
   if (entry?.thru === 18 || entry?.thru === 'F') return 'F';
   if (entry?.thru == null) return '—';
   return String(entry.thru);
@@ -117,6 +121,10 @@ export function LeaderboardBand({
   const showFooterStrip =
     state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
   const entryAvatars = (entry: any) => entryAvatarCandidates(entry, tourSlug);
+  // Same round the state pill uses - the pill and the band can never disagree.
+  const currentRound = state.kind === 'live' ? state.round : null;
+  const todayFromEntry = (entry: any): number | null =>
+    todayForRound(entry as any, currentRound);
   const sparklinePar = par ?? 0;
 
 
@@ -142,7 +150,7 @@ export function LeaderboardBand({
               name={entryName(e)}
               country={entryCountry(e)}
               score={fmtScore(e.score)}
-              thru={entryThru(e)}
+              thru={entryThru(e, todayFromEntry(e))}
               today={todayFromEntry(e)}
               avatarCandidates={entryAvatars(e)}
               playerId={entryPlayerId(e)}
@@ -163,7 +171,7 @@ export function LeaderboardBand({
               name={entryName(leader)}
               country={entryCountry(leader)}
               score={fmtScore(leader.score)}
-              thru={entryThru(leader)}
+              thru={entryThru(leader, todayFromEntry(leader))}
               today={todayFromEntry(leader)}
               avatarCandidates={entryAvatars(leader)}
               playerId={entryPlayerId(leader)}
@@ -193,7 +201,7 @@ export function LeaderboardBand({
                 name={entryName(slot.entry)}
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
-                thru={entryThru(slot.entry)}
+                thru={entryThru(slot.entry, todayFromEntry(slot.entry))}
                 today={todayFromEntry(slot.entry)}
                 avatarCandidates={entryAvatars(slot.entry)}
                 playerId={entryPlayerId(slot.entry)}
