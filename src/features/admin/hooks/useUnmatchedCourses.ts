@@ -65,17 +65,29 @@ export async function linkUnmatchedCourse(
   const { data: userRes } = await supabase.auth.getUser();
   const uid = userRes.user?.id ?? null;
 
-  const { error } = await sb
+  const payload = {
+    golf_course_id: golfCourseId,
+    match_method: 'manual_admin',
+    match_confidence: 1.0,
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: uid,
+  };
+
+  // Most unmatched courses already have a null-mapping row: UPDATE it in place
+  // (the requeue trigger fires on UPDATE OF golf_course_id). If no row exists
+  // yet, fall back to a plain INSERT.
+  const { data: updated, error: updateError } = await sb
     .from('whs_to_golf_course_map')
-    .update({
-      golf_course_id: golfCourseId,
-      match_method: 'manual_admin',
-      match_confidence: 1.0,
-      reviewed_at: new Date().toISOString(),
-      reviewed_by: uid,
-    })
-    .eq('whs_course_id', whsCourseId);
-  if (error) throw error;
+    .update(payload)
+    .eq('whs_course_id', whsCourseId)
+    .select('whs_course_id');
+  if (updateError) throw updateError;
+  if (updated && updated.length > 0) return;
+
+  const { error: insertError } = await sb
+    .from('whs_to_golf_course_map')
+    .insert({ whs_course_id: whsCourseId, ...payload });
+  if (insertError) throw insertError;
 }
 
 export async function ignoreUnmatchedCourse(whsCourseId: string): Promise<void> {
