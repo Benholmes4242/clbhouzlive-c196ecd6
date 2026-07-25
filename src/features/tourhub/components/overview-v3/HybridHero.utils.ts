@@ -20,7 +20,7 @@ export type ResultsVariant =
 export type UpcomingVariant = 'far' | 'imminent';
 
 export type HeroState =
-  | { kind: 'live'; round: number; totalRounds: number; thruLabel: string }
+  | { kind: 'live'; round: number; totalRounds: number; thruLabel: string; roundStatus?: 'scheduled' | 'live' }
   | { kind: 'results'; variant: ResultsVariant; finishDate: string; meta: string }
   | { kind: 'upcoming'; variant: UpcomingVariant; countdown: string; meta: string };
 
@@ -158,6 +158,9 @@ export function deriveHeroState(
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
+      // 'scheduled' = the calendar has rolled over but today's round has not
+      // teed off yet -> pill drops the LIVE treatment (see PhotoBand).
+      roundStatus: (tournament as any).currentRoundStatus === 'scheduled' ? 'scheduled' : 'live',
       // INTERIM: no real num_rounds on HeroTournament yet. LPGA events are 54-hole
       // (3 rounds); everything else defaults to 4. Replace with tournament.num_rounds
       // when the cache exposes it.
