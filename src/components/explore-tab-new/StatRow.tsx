@@ -219,19 +219,37 @@ export function StatRow({
       </div>
 
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <div
-          style={{
-            fontSize: nameSize,
-            fontWeight: 600,
-            color: INK,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: nameSize,
+              fontWeight: 600,
+              color: INK,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+              flex: '0 1 auto',
+            }}
+          >
+            {name}
+          </div>
+          {nameMeta ? (
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: SLATE_400,
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              {nameMeta}
+            </div>
+          ) : null}
         </div>
         {subline ? (
           <div
