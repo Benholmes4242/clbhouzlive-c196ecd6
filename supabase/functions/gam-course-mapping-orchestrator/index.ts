@@ -265,11 +265,18 @@ Deno.serve(async (req) => {
         // ---- Ladder gave up: surface for a human --------------------------
         if (echoMethod !== "echo_consensus") {
           if (!(await isAlreadyMapped(supabase, whsCourseId))) {
-            const suggestion =
-              (echoBody?.echo_suggested_name as string | undefined) ??
-              (echoBody?.suggested_course_name as string | undefined) ??
-              (echoBody?.suggestion as string | undefined) ??
-              null;
+            const suggestedId = (echoBody?.consensus?.golf_course_id ?? null) as
+              | string
+              | null;
+            let suggestion: string | null = null;
+            if (suggestedId) {
+              const { data: sc } = await supabase
+                .from("golf_courses")
+                .select("name")
+                .eq("id", suggestedId)
+                .maybeSingle();
+              suggestion = (sc?.name as string | undefined) ?? null;
+            }
             await recordUnmatched(supabase, whsCourseId, echoMethod, suggestion);
           }
         }
