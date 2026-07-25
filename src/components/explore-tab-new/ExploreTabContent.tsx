@@ -141,7 +141,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
 
         {/* Season race */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: SPACE.sectionSection }}>
           <SeasonRaceCard userId={userId} />
         </div>
 
