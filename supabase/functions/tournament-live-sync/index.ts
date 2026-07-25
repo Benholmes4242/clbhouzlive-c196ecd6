@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[LiveSync] version=2026-07-25-round-rollover-v2-liveRound`);
+    console.log(`[LiveSync] version=2026-07-25-round-rollover-v3-liveRound-completeGuard`);
     console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
@@ -622,22 +622,27 @@ async function checkAndTriggerRoundComplete(
 ): Promise<boolean> {
   const { data: entries } = await supabase
     .from('sr_leaderboards')
-    .select('thru, status')
+    .select('round_1, round_2, round_3, round_4, status')
     .eq('tournament_id', tournamentId)
     .not('status', 'in', '("cut","wd","dq","dns")');
 
   if (!entries || entries.length === 0) return false;
 
-  const finished = entries.filter((e: any) => {
-    const thru = String(e.thru || '').toLowerCase();
-    return thru === '18' || thru === 'f' || thru === 'f*';
-  });
+  let completedRound: number | null = null;
+  let completedCount = 0;
+  for (const round of [1, 2, 3, 4]) {
+    const scored = entries.filter((e: any) => e[`round_${round}`] != null).length;
+    const ratio = scored / entries.length;
+    if (ratio >= 0.8) {
+      completedRound = round;
+      completedCount = scored;
+    } else {
+      break;
+    }
+  }
 
-  const ratio = finished.length / entries.length;
-  if (ratio < 0.8) return false;
-
-  // Active round — single source of truth (no per-call ladder, no LIMIT 5 sample).
-  const { round: currentRound } = await getActiveRound(supabase, tournamentId);
+  if (completedRound == null) return false;
+  const currentRound = completedRound;
 
   const { data: existing } = await supabase
     .from('sr_sync_log')
@@ -649,7 +654,7 @@ async function checkAndTriggerRoundComplete(
 
   if (existing?.length) return false;
 
-  console.log(`[LiveSync] Round ${currentRound} complete for ${tournamentName} (${finished.length}/${entries.length} finished) — triggering round-complete`);
+  console.log(`[LiveSync] Round ${currentRound} complete for ${tournamentName} (${completedCount}/${entries.length} round scores) — triggering round-complete`);
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
