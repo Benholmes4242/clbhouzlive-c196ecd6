@@ -133,17 +133,77 @@ export function todayFromEntry(
   return active ?? null;
 }
 
-function roundsLine(e: BoardEntry): string | null {
-  const rs = [e.round_1, e.round_2, e.round_3, e.round_4];
-  const parts: string[] = [];
-  for (let i = 0; i < 4; i++) {
-    const r = rs[i];
-    if (r == null) continue;
-    const disp = r === 0 ? 'E' : r > 0 ? `+${r}` : String(r);
-    parts.push(`R${i + 1} ${disp}`);
-  }
-  return parts.length ? parts.join(' \u00B7 ') : null;
+export interface BoardColumns {
+  rounds: number[];
+  cellW: number;
+  gap: number;
+  liveRound: number | null;
 }
+
+/**
+ * Adaptive per-round column spec. ONE source of truth shared by the row
+ * renderer and by every parent-rendered column header, so the two can
+ * never drift.
+ */
+export function computeBoardColumns(
+  entries: BoardEntry[],
+  currentRound?: number | null,
+): BoardColumns {
+  let highest = 0;
+  for (const e of entries) {
+    const rs = [e.round_1, e.round_2, e.round_3, e.round_4];
+    for (let i = 0; i < 4; i++) if (rs[i] != null) highest = Math.max(highest, i + 1);
+  }
+  const n = Math.max(1, Math.min(4, Math.max(highest, currentRound ?? 0)));
+  const rounds = Array.from({ length: n }, (_, i) => i + 1);
+  const cellW = n >= 4 ? 24 : n === 3 ? 27 : 30;
+  const gap = n >= 4 ? 4 : 6;
+  // "Live" only once play has actually started in the current round.
+  const started =
+    currentRound != null &&
+    entries.some((e) => todayFromEntry(e, currentRound) != null);
+  return { rounds, cellW, gap, liveRound: started ? currentRound! : null };
+}
+
+export const BOARD_NUM_W = NUM_W;
+
+/**
+ * Header cells for the numeric block (R1..Rn | THRU | TOT). Rendered by the
+ * parents inside their own header bar so typography stays theirs, while the
+ * widths/centring come from computeBoardColumns.
+ */
+export function BoardHeaderCells({
+  columns,
+  thruLabel,
+  totLabel,
+}: {
+  columns: BoardColumns;
+  thruLabel: string;
+  totLabel: string;
+}) {
+  return (
+    <>
+      <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+        {columns.rounds.map((r) => (
+          <div
+            key={r}
+            style={{
+              width: columns.cellW,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              color: columns.liveRound === r ? AMBER : undefined,
+            }}
+          >
+            {`R${r}`}
+          </div>
+        ))}
+      </div>
+      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{thruLabel}</div>
+      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{totLabel}</div>
+    </>
+  );
+}
+
 
 function isDemoted(s?: string | null): boolean {
   if (!s) return false;
