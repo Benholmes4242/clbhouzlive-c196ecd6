@@ -1,0 +1,1 @@
+ALTER TABLE public.sr_tournaments ADD COLUMN IF NOT EXISTS current_round_status text;
