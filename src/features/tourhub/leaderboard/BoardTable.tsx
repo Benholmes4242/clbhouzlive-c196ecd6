@@ -312,13 +312,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
     const totalDisplay = fmtScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
-    // THRU must agree with TODAY: if the active round has not started for this
-    // player, the stale top-level thru (yesterday's "F") must not be shown.
+    // THRU must agree with the live round: if the active round has not started
+    // for this player, the stale top-level thru (yesterday's "F") is hidden.
     const thruDisplay = todayVal == null ? '-' : fmtThru(e.thru);
-    const todayDisplay = fmtScore(todayVal);
-    const todayColor = demotedRow ? SECONDARY : houseColor(todayVal);
-    const rounds = roundsLine(e);
+    const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
     const cc = e.player?.country_code || e.player?.country || '';
+
 
     return (
       <div
