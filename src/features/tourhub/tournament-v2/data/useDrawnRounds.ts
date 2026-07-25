@@ -17,14 +17,14 @@ export function useDrawnRounds(tournamentId: string | null | undefined) {
     queryFn: async (): Promise<number[]> => {
       const { data, error } = await supabase
         .from('sr_tee_times')
-        .select('round')
+        .select('round_number')
         .eq('tournament_id', tournamentId as string)
         .limit(1000);
 
       if (error) throw error;
       const set = new Set<number>();
-      for (const row of (data ?? []) as Array<{ round: number | null }>) {
-        const n = Number(row.round);
+      for (const row of (data ?? []) as Array<{ round_number: number | null }>) {
+        const n = Number(row.round_number);
         if (Number.isFinite(n) && n >= 1 && n <= 4) set.add(n);
       }
       return [...set].sort((a, b) => a - b);
