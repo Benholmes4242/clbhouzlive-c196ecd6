@@ -398,28 +398,49 @@ async function recordUnmatched(
   }));
 }
 
+// PostgREST caps a single response at 1000 rows; page through explicitly.
+async function pageAll(
+  supabase: any,
+  table: string,
+  select: string,
+  refine?: (q: any) => any,
+): Promise<any[]> {
+  const PAGE = 1000;
+  const out: any[] = [];
+  for (let from = 0; ; from += PAGE) {
+    let q = supabase.from(table).select(select).range(from, from + PAGE - 1);
+    if (refine) q = refine(q);
+    const { data, error } = await q;
+    if (error) throw error;
+    const rows = (data ?? []) as any[];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
 // One-time (idempotent) seed: every WHS course with rounds but no resolved
 // mapping gets an open queue row.
 async function backfillUnmatched(supabase: any): Promise<number> {
-  const { data: mapRows, error: mapErr } = await supabase
-    .from("whs_to_golf_course_map")
-    .select("whs_course_id, golf_course_id")
-    .limit(50000);
-  if (mapErr) throw mapErr;
+  const mapRows = await pageAll(
+    supabase,
+    "whs_to_golf_course_map",
+    "whs_course_id, golf_course_id",
+  );
   const mapped = new Set<string>();
-  for (const r of mapRows ?? []) {
+  for (const r of mapRows) {
     if (r.golf_course_id) mapped.add(r.whs_course_id as string);
   }
 
-  const { data: scoreRows, error: scoreErr } = await supabase
-    .from("whs_scores")
-    .select("course_id, whs_connections!inner(user_id)")
-    .not("course_id", "is", null)
-    .limit(50000);
-  if (scoreErr) throw scoreErr;
+  const scoreRows = await pageAll(
+    supabase,
+    "whs_scores",
+    "course_id, whs_connections!inner(user_id)",
+    (q: any) => q.not("course_id", "is", null),
+  );
 
   const usage = new Map<string, { rounds: number; users: Set<string> }>();
-  for (const r of (scoreRows ?? []) as any[]) {
+  for (const r of scoreRows as any[]) {
     const cid = r.course_id as string;
     if (!cid || mapped.has(cid)) continue;
     let entry = usage.get(cid);
