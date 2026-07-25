@@ -139,9 +139,8 @@ export function EaglesLedger({
           : feats.slice(0, ROWS).map((row, i, arr) => {
               const name = displayIdentityRow(row);
               const when = row.play_date ?? row.attained_at ?? null;
-              const sub = (
-                <LedgerSubline courseName={row.course_name} when={when ? relativeTime(when) : null} />
-              );
+              const sub = <LedgerSubline courseName={row.course_name} />;
+              const age = when ? relativeTime(when) : null;
 
               return (
                 <StatRow
@@ -149,6 +148,7 @@ export function EaglesLedger({
                   avatarUrl={row.holder_avatar}
                   avatarUserId={row.user_id}
                   name={name}
+                  nameMeta={age ?? undefined}
                   subline={sub}
                   statValue={extractHoleNo(row)}
                   statLabel="HOLE"

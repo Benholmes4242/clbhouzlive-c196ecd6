@@ -99,9 +99,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
   const isRanked = isBirdieHauls && mode === 'alltime';
   const showWatermark = isRanked && rank === 1;
 
-  // Subline: pin + course name (+ date for non-ranked latest views).
+  // Subline: course name; age moves to the name line.
   const showDate = !!when && !isRanked;
-  const subline = <LedgerSubline courseName={row.course_name} when={showDate ? when : null} />;
+  const subline = <LedgerSubline courseName={row.course_name} />;
 
 
   return (
@@ -110,12 +110,12 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       avatarUrl={row.holder_avatar}
       avatarUserId={row.user_id ?? null}
       name={holder}
+      nameMeta={when || undefined}
       subline={subline}
       statValue={legendaryChip ? undefined : value}
       statLabel={legendaryChip ? undefined : label}
       statColor={statColor}
       chip={legendaryChip}
-      timestamp={legendaryChip || isEagles ? when || undefined : undefined}
       showWatermark={showWatermark}
       isLast={isLast}
       onPress={onTap}
