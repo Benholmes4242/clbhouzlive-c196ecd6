@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { PinIcon } from './PinIcon';
+
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
