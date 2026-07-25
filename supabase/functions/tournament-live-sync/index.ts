@@ -472,6 +472,7 @@ async function syncTournament(
     const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
     if (winnerId) updatePayload.winner_id = winnerId;
     if (roundToWrite !== undefined) updatePayload.current_round = roundToWrite;
+    updatePayload.current_round_status = 'complete';
 
     const { error: closeError } = await supabase
       .from('sr_tournaments')
@@ -582,6 +583,7 @@ async function syncTournament(
     const updatePayload: any = { last_live_sync: new Date().toISOString() };
     if (roundToWrite !== undefined) {
       updatePayload.current_round = roundToWrite;
+      updatePayload.current_round_status = roundStatusToWrite;
     }
     await supabase
       .from('sr_tournaments')
