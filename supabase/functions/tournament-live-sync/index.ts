@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[LiveSync] version=2026-07-25-round-rollover-v1`);
+    console.log(`[LiveSync] version=2026-07-25-round-rollover-v2-liveRound`);
     console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
@@ -290,11 +290,20 @@ async function syncTournament(
   const dateCheck = isTournamentDay(tournament.start_date, tournament.end_date, tournamentTz);
 
   // ── FIX 1: Stamp gated tournaments so round-robin advances ───────
+  // Still compute/write current round from our DB here: the playing-hours gate
+  // only protects Sportradar API calls, not local rollover state.
   if (!timeCheck.allowed) {
     console.log(`[LiveSync] Gated: ${tournament.name} — ${timeCheck.reason}`);
+    const active = await getActiveRound(supabase, tournament.id, tournament);
+    const roundStatusToWrite: string = active.source === 'leaderboard' ? 'live' : 'scheduled';
+    console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'}, sched R${active.scheduledRound}, playing R${active.playingRound}, live R${active.liveRound ?? 'none'}, inProgress=${active.inProgress}) [gated write]`);
     await supabase
       .from('sr_tournaments')
-      .update({ last_live_sync: new Date().toISOString() })
+      .update({
+        last_live_sync: new Date().toISOString(),
+        current_round: active.round,
+        current_round_status: roundStatusToWrite,
+      })
       .eq('id', tournament.id);
     return {
       name: tournament.name,
@@ -343,7 +352,7 @@ async function syncTournament(
   // Pre-play state so the client can distinguish "R3 scheduled" from "R3 live"
   // without re-implementing round detection.
   const roundStatusToWrite: string = active.source === 'leaderboard' ? 'live' : 'scheduled';
-  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'}, sched R${active.scheduledRound}, playing R${active.playingRound}, inProgress=${active.inProgress})`);
+  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'}, sched R${active.scheduledRound}, playing R${active.playingRound}, live R${active.liveRound ?? 'none'}, inProgress=${active.inProgress})`);
 
 
 
