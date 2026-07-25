@@ -28,7 +28,9 @@ export interface ActiveRoundResult {
   scheduledRound: number;
   /** Leaderboard-derived: which round has actually been played into. */
   playingRound: number;
-  /** Is any competitor mid-round right now. */
+  /** Leaderboard-derived: which round has an agreed mid-round group right now. */
+  liveRound: number | null;
+  /** Is an agreed group mid-round right now. */
   inProgress: boolean;
   source: ActiveRoundSource;
   confident: boolean;
@@ -36,8 +38,8 @@ export interface ActiveRoundResult {
 
 interface TournamentMeta {
   start_date?: string | null;
+  end_date?: string | null;
   timezone?: string | null;
-  total_rounds?: number | null;
 }
 
 // Active round = highest round number with meaningful field participation.
@@ -47,6 +49,8 @@ interface TournamentMeta {
 // single early poster.
 const MIN_FRACTION = 0.10;
 const MIN_PLAYERS = 5;
+const MIN_LIVE_ROUND_PLAYERS = 3;
+const MAX_ROUNDS = 4;
 
 async function loadMeta(
   supabase: any,
@@ -56,18 +60,32 @@ async function loadMeta(
   if (tournament) return tournament;
   const { data } = await supabase
     .from('sr_tournaments')
-    .select('start_date, timezone, total_rounds')
+    .select('start_date, end_date, timezone')
     .eq('id', tournamentId)
     .maybeSingle();
   return data ?? null;
 }
 
-/** Venue-local date math: which round is scheduled for today. Capped at total_rounds. */
+/** Tournament length from dates, inclusive; capped by the four persisted score columns. */
+function computeRoundCap(meta: TournamentMeta | null): number {
+  if (!meta?.start_date || !meta?.end_date) return MAX_ROUNDS;
+  try {
+    const start = new Date(meta.start_date + 'T00:00:00Z');
+    const end = new Date(meta.end_date + 'T00:00:00Z');
+    const span = Math.floor((end.getTime() - start.getTime()) / 86_400_000) + 1;
+    if (!Number.isFinite(span) || span < 1) return MAX_ROUNDS;
+    return Math.min(MAX_ROUNDS, Math.max(1, span));
+  } catch {
+    return MAX_ROUNDS;
+  }
+}
+
+/** Venue-local date math: which round is scheduled for today. Capped at the event date span. */
 function computeScheduledRound(meta: TournamentMeta | null): number {
   let round = 1;
   if (meta?.start_date && meta?.timezone) {
     try {
-      const cap = meta.total_rounds ?? 4;
+      const cap = computeRoundCap(meta);
       const todayAtVenue = new Date().toLocaleDateString('en-CA', { timeZone: meta.timezone });
       const start = new Date(meta.start_date + 'T00:00:00Z');
       const today = new Date(todayAtVenue + 'T00:00:00Z');
@@ -83,16 +101,59 @@ function computeScheduledRound(meta: TournamentMeta | null): number {
 }
 
 /**
+ * Which round has a real group on the course right now.
+ *
+ * Unlike the old global inProgress boolean, this is round-specific: a player
+ * mid-round on N has prior rounds filled, round N still null, and thru 1–17.
+ * Require three players to agree so one stale thru row cannot advance the UI.
+ */
+function computeLiveRound(rows: any[], roundCap: number): number | null {
+  const counts = new Map<number, number>();
+
+  for (const row of rows) {
+    const thru = Number(row.thru ?? 0);
+    if (!Number.isFinite(thru) || thru < 1 || thru > 17) continue;
+
+    const completedCount = Array.from({ length: roundCap }, (_, i) => i + 1)
+      .filter((round) => row[`round_${round}`] != null)
+      .length;
+    const candidate = completedCount + 1;
+    if (candidate < 1 || candidate > roundCap) continue;
+    if (row[`round_${candidate}`] != null) continue;
+
+    let priorRoundsFilled = true;
+    for (let round = 1; round < candidate; round++) {
+      if (row[`round_${round}`] == null) {
+        priorRoundsFilled = false;
+        break;
+      }
+    }
+    if (!priorRoundsFilled) continue;
+
+    counts.set(candidate, (counts.get(candidate) ?? 0) + 1);
+  }
+
+  let liveRound: number | null = null;
+  counts.forEach((count, round) => {
+    if (count >= MIN_LIVE_ROUND_PLAYERS && (liveRound == null || round > liveRound)) {
+      liveRound = round;
+    }
+  });
+  return liveRound;
+}
+
+/**
  * Resolve the active round for a tournament.
  *
  * Two signals answer two different questions:
  *   - leaderboard participation -> which round is underway (playingRound)
  *   - venue-local date math     -> which round is scheduled today (scheduledRound)
  *
- * Resolution: when the calendar has rolled over AND nobody is mid-round, we
- * are between rounds and show the scheduled round. Otherwise the leaderboard
- * wins — which preserves the Italian Open case (a delayed round finishing on
- * the next calendar day must not be advanced by date math).
+ * Resolution: liveRound answers which round is actually being played right now.
+ * If today's scheduled round is underway, show it live. If an earlier delayed
+ * round is still being played, keep that delayed round live. Otherwise, when
+ * the calendar has rolled ahead of the scored leaderboard, show the scheduled
+ * round as pre-play.
  *
  * @param tournament Optional pre-fetched tournament row (saves a roundtrip).
  */
@@ -109,6 +170,7 @@ export async function getActiveRound(
 
   const meta = await loadMeta(supabase, tournamentId, tournament);
   const scheduledRound = computeScheduledRound(meta);
+  const roundCap = computeRoundCap(meta);
 
   if (!rows || rows.length === 0) {
     // No play at all yet: date math is all we have.
@@ -116,6 +178,7 @@ export async function getActiveRound(
       round: scheduledRound,
       scheduledRound,
       playingRound: 1,
+      liveRound: null,
       inProgress: false,
       source: 'fallback',
       confident: false,
@@ -128,20 +191,44 @@ export async function getActiveRound(
     rows.filter((e: any) => e[`round_${r}`] != null).length;
 
   let playingRound = 1;
-  for (let r = 1; r <= 4; r++) {
+  for (let r = 1; r <= roundCap; r++) {
     if (recorded(r) >= threshold) playingRound = r;
     else break;
   }
 
-  const inProgress = rows.some(
-    (r: any) => r.thru != null && r.thru > 0 && r.thru < 18,
-  );
+  const liveRound = computeLiveRound(rows, roundCap);
+  const inProgress = liveRound != null;
 
-  if (scheduledRound > playingRound && !inProgress) {
+  if (liveRound != null && liveRound >= scheduledRound) {
+    return {
+      round: liveRound,
+      scheduledRound,
+      playingRound,
+      liveRound,
+      inProgress,
+      source: 'leaderboard',
+      confident: true,
+    };
+  }
+
+  if (liveRound != null && liveRound > playingRound) {
+    return {
+      round: liveRound,
+      scheduledRound,
+      playingRound,
+      liveRound,
+      inProgress,
+      source: 'leaderboard',
+      confident: true,
+    };
+  }
+
+  if (scheduledRound > playingRound) {
     return {
       round: scheduledRound,
       scheduledRound,
       playingRound,
+      liveRound,
       inProgress,
       source: 'scheduled',
       confident: true,
@@ -152,6 +239,7 @@ export async function getActiveRound(
     round: playingRound,
     scheduledRound,
     playingRound,
+    liveRound,
     inProgress,
     source: 'leaderboard',
     confident: true,
