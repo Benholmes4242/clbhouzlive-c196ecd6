@@ -124,7 +124,7 @@ export function EaglesLedger({
                   avatarUrl={r.holder_avatar}
                   avatarUserId={r.user_id ?? undefined}
                   name={name}
-                  subline={r.holder_club ?? undefined}
+                  subline={r.holder_club ? <LedgerSubline courseName={r.holder_club} /> : undefined}
                   statValue={r.eagles ?? 0}
                   statLabel="EAGLES"
                   showWatermark={i === 0}
