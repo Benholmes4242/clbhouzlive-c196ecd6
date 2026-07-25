@@ -63,7 +63,7 @@ export interface PhotoBandProps {
 
 function statePillText(
   state: HeroState,
-  t: (k: string) => string,
+  t: (k: string, opts?: any) => string,
 ): { text: string; tone: 'live' | 'final' | 'upcoming' } {
   if (state.kind === 'live') {
     // Round has rolled over but play has not started: show the round only,

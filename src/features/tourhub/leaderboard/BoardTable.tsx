@@ -111,6 +111,13 @@ export function todayFromEntry(
     }
     return null;
   }
+  // When we know the active round, read ONLY that round. Never fall back to
+  // the previous round: a scheduled-but-not-started round must show a dash,
+  // not yesterday's score under a TODAY heading.
+  if (currentRound != null) {
+    const byRound = [e.round_1, e.round_2, e.round_3, e.round_4][currentRound - 1];
+    return byRound ?? null;
+  }
   const roundNum = [e.round_1, e.round_2, e.round_3, e.round_4].filter(
     (r) => r != null,
   ).length;

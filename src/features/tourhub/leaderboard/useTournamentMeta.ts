@@ -22,6 +22,7 @@ export interface TournamentMeta {
   start_date: string | null;
   end_date: string | null;
   current_round: number | null;
+  current_round_status: string | null;
   status: string | null;
   cutline: number | null;
   projected_cutline: number | null;
@@ -42,7 +43,7 @@ export function useTournamentMeta(tournamentId: string | null | undefined) {
       const { data, error } = await supabase
         .from('sr_tournaments')
         .select(
-          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_par, venue_yardage, start_date, end_date, current_round, status, cutline, projected_cutline, cut_round, purse, defending_champion, timezone, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
+          'id, name, venue_name, venue_course_name, venue_city, venue_country, venue_par, venue_yardage, start_date, end_date, current_round, current_round_status, status, cutline, projected_cutline, cut_round, purse, defending_champion, timezone, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, tour_full_name)',
         )
         .eq('id', tournamentId as string)
         .maybeSingle();
