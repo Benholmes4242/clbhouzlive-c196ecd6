@@ -99,9 +99,9 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
   const isRanked = isBirdieHauls && mode === 'alltime';
   const showWatermark = isRanked && rank === 1;
 
-  // Subline: pin + course name (+ date for non-ranked latest views).
+  // Subline: course name; age moves to the name line.
   const showDate = !!when && !isRanked;
-  const subline = <LedgerSubline courseName={row.course_name} when={showDate ? when : null} />;
+  const subline = <LedgerSubline courseName={row.course_name} />
 
 
   return (
