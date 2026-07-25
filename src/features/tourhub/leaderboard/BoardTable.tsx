@@ -141,6 +141,10 @@ export interface BoardColumns {
   cellW: number;
   gap: number;
   liveRound: number | null;
+  /** Movement column width: 20 when ANY row has movement, else 0. */
+  moveW: number;
+  /** POS + MOVE block width, for parent-rendered headers. */
+  posBlockW: number;
 }
 
 /**
@@ -165,7 +169,41 @@ export function computeBoardColumns(
   const started =
     currentRound != null &&
     entries.some((e) => todayFromEntry(e, currentRound) != null);
-  return { rounds, cellW, gap, liveRound: started ? currentRound! : null };
+  // Movement column is reserved at the TABLE level only: either every row
+  // gets the slot or none do, so player names never go ragged.
+  const moves = boardMovementMap(entries, currentRound ?? null);
+  let hasMovement = false;
+  for (const e of entries) {
+    if (isDemoted(e.status)) continue;
+    const d = e.player?.id ? moves.get(e.player.id) : undefined;
+    if (d != null && d !== 0) { hasMovement = true; break; }
+  }
+  const moveW = hasMovement ? POS_MOVE_W : 0;
+  return {
+    rounds,
+    cellW,
+    gap,
+    liveRound: started ? currentRound! : null,
+    moveW,
+    posBlockW: POS_NUM_W + moveW,
+  };
+}
+
+/** Shared movement source for both the column spec and the row renderer. */
+export function boardMovementMap(entries: BoardEntry[], currentRound: number | null) {
+  return movementFromRounds(
+    entries.map((e) => ({
+      id: e.id,
+      playerId: e.player?.id ?? null,
+      position: e.position,
+      status: e.status ?? null,
+      round_1: e.round_1 ?? null,
+      round_2: e.round_2 ?? null,
+      round_3: e.round_3 ?? null,
+      round_4: e.round_4 ?? null,
+    })),
+    currentRound,
+  );
 }
 
 export const BOARD_NUM_W = NUM_W;
