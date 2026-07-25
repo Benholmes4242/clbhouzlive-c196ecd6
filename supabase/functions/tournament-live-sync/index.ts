@@ -341,7 +341,7 @@ async function syncTournament(
   const roundToWrite: number | undefined = active.round;
   // Pre-play state so the client can distinguish "R3 scheduled" from "R3 live"
   // without re-implementing round detection.
-  const roundStatusToWrite: string = active.source === 'scheduled' ? 'scheduled' : (active.inProgress ? 'live' : 'live');
+  const roundStatusToWrite: string = active.source === 'leaderboard' ? 'live' : 'scheduled';
   console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'}, sched R${active.scheduledRound}, playing R${active.playingRound}, inProgress=${active.inProgress})`);
 
 
