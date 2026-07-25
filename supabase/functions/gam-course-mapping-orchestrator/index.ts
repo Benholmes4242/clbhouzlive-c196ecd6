@@ -20,6 +20,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 import { corsFor } from '../_shared/cors.ts';
+const FUNCTION_VERSION = "2026-07-25-unmatched-queue-v1";
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
 const TIER_1_3_METHODS = new Set([
