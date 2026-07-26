@@ -2,6 +2,19 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+const VIEW_PARAMS = ['tab', 'view', 'type'] as const;
+
+function trackedPath(pathname: string, search: string): string {
+  const sp = new URLSearchParams(search);
+  const kept: string[] = [];
+  for (const k of VIEW_PARAMS) {
+    const v = sp.get(k);
+    if (v && /^[A-Za-z0-9_-]{1,40}$/.test(v)) kept.push(`${k}=${v}`);
+  }
+  kept.sort();
+  return kept.length ? `${pathname}?${kept.join('&')}` : pathname;
+}
+
 export function usePageTracking() {
   const location = useLocation();
   const enterTime = useRef(Date.now());
@@ -12,7 +25,7 @@ export function usePageTracking() {
   const exitedOnHide = useRef(false);
 
   useEffect(() => {
-    const path = location.pathname;
+    const path = trackedPath(location.pathname, location.search);
 
     // Track time spent on previous page
     if (lastPath.current && lastPath.current !== path) {
@@ -29,7 +42,7 @@ export function usePageTracking() {
     lastPath.current = path;
     // A fresh route counts as a fresh foreground session for this screen.
     exitedOnHide.current = false;
-  }, [location.pathname]);
+  }, [trackedPath(location.pathname, location.search)]);
 
   // Page hide coverage: without this, page_exit never fires when the member
   // closes the tab, backgrounds the app, or leaves the site, which biases
