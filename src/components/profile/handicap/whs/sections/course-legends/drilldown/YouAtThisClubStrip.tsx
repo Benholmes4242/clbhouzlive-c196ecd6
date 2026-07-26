@@ -268,7 +268,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             lineHeight: 1.2,
             maxWidth: '100%',
             textAlign: 'center',
-            textAlign: 'center',
+
           }}
         >
           {label}
