@@ -768,27 +768,23 @@ class VideoEngineImpl {
     }
 
     // hls.js path.
+    const isRail = laneId.startsWith('rail-');
     if (!lane.hls) {
-      // Rail lanes get the small-tile cold-start profile (lowest startLevel +
-      // capLevelToPlayerSize). Feed-active/fullscreen skip the cap so they
-      // render at manifest-appropriate quality for the viewport.
-      const isRail = laneId.startsWith('rail-');
-      const coldFullscreen = laneId === 'fullscreen';
+      // Rail lanes keep capLevelToPlayerSize (small tiles), feed-active and
+      // fullscreen render at viewport size so they must NOT be capped.
       // [PREDICT] Part 1 — seed ABR from persisted bandwidth memory for
       // FEED-ACTIVE / FULLSCREEN lanes only. Rails intentionally excluded:
-      // their startLevel:0 + capLevelToPlayerSize profile is correct for
-      // small tiles and seeding would only cost data on the first tile.
+      // capLevelToPlayerSize already keeps them small.
       const seededBw = isRail ? null : readSeededBandwidth();
       (lane as any)._seededBw = seededBw;
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
-        ...(coldFullscreen ? { startLevel: 0 } : {}),
         startPosition,
-        // hls.js expects bps. When we have a fresh seed, use it; otherwise
-        // fall back to the conservative default the engine has always used.
-        abrEwmaDefaultEstimate: seededBw ?? 500_000,
-        maxStarvationDelay: 4,
+        // hls.js expects bps. Prefer a real remembered measurement, else the
+        // Network Information API / a sane default — a 500kbps seed opened
+        // every video on the 240p rung and took seconds to climb.
+        abrEwmaDefaultEstimate: isRail ? 800_000 : bandwidthSeed(seededBw),
         // Cap ABR to policy ceiling
         capLevelOnFPSDrop: true,
       };
@@ -797,6 +793,7 @@ class VideoEngineImpl {
       DBG(laneId, 'created hls instance', { seededBw });
 
     } else {
+
       // Re-point: stop current load, then load new source. Instance & element stay.
       lane.hls.stopLoad();
     }
