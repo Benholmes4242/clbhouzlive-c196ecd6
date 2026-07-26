@@ -59,6 +59,15 @@ function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
+/**
+ * Which slice of the sheet to render.
+ * - 'all'   : legacy single-block render (header, skyline, tiles, hole table)
+ * - 'shape' : course-level story only (header, skyline, community tiles)
+ * - 'holes' : the hole-by-hole table only
+ * - 'you'   : personal-only slice (scoring breakdown + personal tiles)
+ */
+export type HoleDataSection = 'all' | 'shape' | 'holes' | 'you';
+
 interface Props {
   courseName: string;
   courseId?: string;
@@ -66,6 +75,13 @@ interface Props {
   totalRounds: number;
   myByHole: Map<number, MyHolePerformanceRow>;
   viewerHasPlayed: boolean;
+  section?: HoleDataSection;
+  /** 'holes' section only: render a Show/Hide affordance in the header. */
+  collapsible?: boolean;
+  /** 'holes' section only: start collapsed. */
+  defaultCollapsed?: boolean;
+  /** Fired the first time the collapsed hole table is opened. */
+  onExpand?: () => void;
 }
 
 export const HoleDataSheet: React.FC<Props> = ({
@@ -75,10 +91,15 @@ export const HoleDataSheet: React.FC<Props> = ({
   totalRounds,
   myByHole,
   viewerHasPlayed,
+  section = 'all',
+  collapsible = false,
+  defaultCollapsed = false,
+  onExpand,
 }) => {
   const { t } = useTranslation(['courses']);
   const [sort, setSort] = useState<'hole' | 'tough'>('hole');
   const [openHole, setOpenHole] = useState<number | null>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(collapsible && defaultCollapsed);
 
   const sortedByHole = useMemo(
     () => [...holes].sort((a, b) => a.hole_no - b.hole_no),
@@ -144,11 +165,18 @@ export const HoleDataSheet: React.FC<Props> = ({
   const rows = sort === 'hole' ? sortedByHole : sortedByTough;
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
+  const showShape = section === 'all' || section === 'shape';
+  const showYou = section === 'all' || section === 'you';
+  const showHoles = section === 'all' || section === 'holes';
+  const tileScope: 'all' | 'community' | 'personal' =
+    section === 'shape' ? 'community' : section === 'you' ? 'personal' : 'all';
+
   return (
     <div style={{ fontFamily: FONT, padding: '16px 12px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <HoleGlyphDefs />
 
       {/* 1. Header */}
+      {showShape && (
       <section style={{ scrollMarginTop: STICKY_SAFE, padding: '0 4px' }}>
         <h2
           style={{
@@ -168,9 +196,10 @@ export const HoleDataSheet: React.FC<Props> = ({
             : t('courses:holes.clubGuide.bodySignedOut', { count: formatNumber(totalRounds) })}
         </p>
       </section>
+      )}
 
       {/* 2. Skyline */}
-      {hardest && (
+      {showShape && hardest && (
         <SkylineCard
           holes={sortedByHole}
           hardest={hardest}
@@ -181,23 +210,28 @@ export const HoleDataSheet: React.FC<Props> = ({
       )}
 
       {/* 3. Story tiles */}
-      <StoryTiles
-        hardest={hardest}
-        easiest={easiest}
-        nemesis={nemesis}
-        holes={holes}
-        myByHole={myByHole}
-        viewerHasPlayed={viewerHasPlayed}
-        birdiedCount={birdiedCount}
-        totalHoles={totalHoles}
-        missingBirdieHole={missingBirdieHole}
-      />
+      {(showShape || showYou) && (
+        <StoryTiles
+          hardest={hardest}
+          easiest={easiest}
+          nemesis={nemesis}
+          holes={holes}
+          myByHole={myByHole}
+          viewerHasPlayed={viewerHasPlayed}
+          birdiedCount={birdiedCount}
+          totalHoles={totalHoles}
+          missingBirdieHole={missingBirdieHole}
+          scope={tileScope}
+        />
+      )}
 
       {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
-      <ScoringBreakdownSection golfCourseId={courseId} />
+      {showYou && <ScoringBreakdownSection golfCourseId={courseId} />}
 
       {/* 4. Hole by hole */}
+      {showHoles && (
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
+
         <div
           style={{
             display: 'flex',
@@ -210,6 +244,33 @@ export const HoleDataSheet: React.FC<Props> = ({
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
             {t('courses:holes.holeByHole')}
           </h3>
+          {collapsible ? (
+            <button
+              type="button"
+              aria-expanded={!collapsed}
+              onClick={() => {
+                setCollapsed((c) => {
+                  if (c) onExpand?.();
+                  return !c;
+                });
+              }}
+              style={{
+                border: 0,
+                background: '#FFFFFF',
+                boxShadow: CARD_SHADOW,
+                color: INK,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                padding: '7px 14px',
+                borderRadius: 999,
+                cursor: 'pointer',
+              }}
+            >
+              {collapsed ? 'SHOW' : 'HIDE'}
+            </button>
+          ) : null}
+          {!collapsed && (
           <div
             role="tablist"
             style={{
@@ -246,14 +307,16 @@ export const HoleDataSheet: React.FC<Props> = ({
               </button>
             ))}
           </div>
+          )}
         </div>
 
-        {viewerHasPlayed && (
+        {!collapsed && viewerHasPlayed && (
           <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
             {t('courses:holes.birdieRingNote')}
           </p>
         )}
 
+        {!collapsed && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map((h) => (
             <HoleCard
@@ -268,8 +331,11 @@ export const HoleDataSheet: React.FC<Props> = ({
             />
           ))}
         </div>
+        )}
       </section>
+      )}
     </div>
+
   );
 };
 
@@ -468,9 +534,11 @@ const StoryTiles: React.FC<{
   birdiedCount: number;
   totalHoles: number;
   missingBirdieHole: number | null;
+  /** 'community' drops the personal tiles, 'personal' drops the field tiles. */
+  scope?: 'all' | 'community' | 'personal';
 }> = ({
   hardest, easiest, nemesis, holes, myByHole, viewerHasPlayed,
-  birdiedCount, totalHoles, missingBirdieHole,
+  birdiedCount, totalHoles, missingBirdieHole, scope = 'all',
 }) => {
   const communityTiles: React.ReactNode[] = [];
   if (hardest) {
@@ -501,7 +569,8 @@ const StoryTiles: React.FC<{
     );
   }
 
-  if (!viewerHasPlayed || communityTiles.length < 2) {
+  if (scope === 'community') {
+    if (communityTiles.length === 0) return null;
     return (
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, scrollMarginTop: STICKY_SAFE }}>
         {communityTiles}
@@ -509,7 +578,17 @@ const StoryTiles: React.FC<{
     );
   }
 
-  const tiles: React.ReactNode[] = [...communityTiles];
+  if (!viewerHasPlayed || (scope === 'all' && communityTiles.length < 2)) {
+    if (scope === 'personal') return null;
+    return (
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, scrollMarginTop: STICKY_SAFE }}>
+        {communityTiles}
+      </section>
+    );
+  }
+
+  const tiles: React.ReactNode[] = scope === 'personal' ? [] : [...communityTiles];
+
 
   // Your battle
   if (nemesis) {

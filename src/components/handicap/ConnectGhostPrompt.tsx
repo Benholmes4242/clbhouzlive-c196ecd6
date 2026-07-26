@@ -34,6 +34,15 @@ interface Props {
   onConnect: () => void;
   /** Extra blur amount if the surface's real components have heavy detail. */
   blurPx?: number;
+  /** Optional copy overrides. When omitted the surface i18n copy is used. */
+  eyebrowOverride?: string;
+  headlineOverride?: string;
+  bodyOverride?: string;
+  ctaOverride?: string;
+  /** Pass null to suppress the footnote entirely. */
+  footnoteOverride?: string | null;
+  /** When false the dismiss affordance and slim re-entry row are skipped. */
+  dismissible?: boolean;
 }
 
 const readDismissed = (key: string) => {
@@ -43,20 +52,31 @@ const writeDismissed = (key: string) => {
   try { localStorage.setItem(key, '1'); } catch { /* silent */ }
 };
 
-export const ConnectGhostPrompt: React.FC<Props> = ({ surface, ghost, onConnect, blurPx = 5 }) => {
+export const ConnectGhostPrompt: React.FC<Props> = ({
+  surface,
+  ghost,
+  onConnect,
+  blurPx = 5,
+  eyebrowOverride,
+  headlineOverride,
+  bodyOverride,
+  ctaOverride,
+  footnoteOverride,
+  dismissible = true,
+}) => {
   const { t } = useTranslation('common');
   const key = `connect_ghost_dismissed_${surface}_v1`;
   const [dismissed, setDismissed] = useState(() => readDismissed(key));
 
-  const eyebrow = t('connectGhost.eyebrow');
-  const headline = t(`connectGhost.${surface}.headline`);
-  const sub = t(`connectGhost.${surface}.sub`);
-  const cta = t('connectGhost.cta');
-  const footnote = t('connectGhost.footnote');
+  const eyebrow = eyebrowOverride ?? t('connectGhost.eyebrow');
+  const headline = headlineOverride ?? t(`connectGhost.${surface}.headline`);
+  const sub = bodyOverride ?? t(`connectGhost.${surface}.sub`);
+  const cta = ctaOverride ?? t('connectGhost.cta');
+  const footnote = footnoteOverride === undefined ? t('connectGhost.footnote') : footnoteOverride;
   const dismissLabel = t('connectGhost.dismissA11y');
   const slimBenefit = t(`connectGhost.${surface}.slim`);
 
-  if (dismissed) {
+  if (dismissible && dismissed) {
     return (
       <div style={{ padding: '12px 16px 0', fontFamily: FONT }}>
         <button
@@ -100,6 +120,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({ surface, ghost, onConnect,
           overflow: 'hidden',
         }}
       >
+        {dismissible && (
         <button
           type="button"
           aria-label={dismissLabel}
@@ -123,6 +144,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({ surface, ghost, onConnect,
         >
           <X size={15} strokeWidth={2.4} />
         </button>
+        )}
 
         {/* Ghost preview — decorative, blurred, unreadable. */}
         <div
@@ -175,9 +197,11 @@ export const ConnectGhostPrompt: React.FC<Props> = ({ surface, ghost, onConnect,
           >
             {cta}
           </button>
-          <div style={{ marginTop: 10, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', color: INK_45, textAlign: 'center' }}>
-            {footnote}
-          </div>
+          {footnote ? (
+            <div style={{ marginTop: 10, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', color: INK_45, textAlign: 'center' }}>
+              {footnote}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

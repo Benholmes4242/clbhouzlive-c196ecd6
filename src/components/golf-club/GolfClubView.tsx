@@ -18,8 +18,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
-import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import CourseYouTab from '@/components/courses/course-detail/CourseYouTab';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 
 
@@ -29,8 +28,20 @@ interface GolfClubViewProps {
   onClose?: () => void;
 }
 
-const VALID_TABS: readonly CourseTabId[] = ['about', 'reviews', 'media', 'holes', 'legends'] as const;
-const asTabId = (v: unknown): CourseTabId => (VALID_TABS.includes(v as CourseTabId) ? (v as CourseTabId) : 'about');
+const VALID_TABS: readonly CourseTabId[] = ['course', 'you', 'reviews', 'media'] as const;
+
+/** Legacy ids kept alive for existing deep links, notifications and shares. */
+const LEGACY_TAB_ALIASES: Record<string, CourseTabId> = {
+  about: 'course',
+  holes: 'course',
+  legends: 'course',
+};
+
+const asTabId = (v: unknown): CourseTabId => {
+  if (VALID_TABS.includes(v as CourseTabId)) return v as CourseTabId;
+  const alias = typeof v === 'string' ? LEGACY_TAB_ALIASES[v] : undefined;
+  return alias ?? 'course';
+};
 
 interface CourseDetailRow {
   id: string;
@@ -57,7 +68,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const routerState = (location.state ?? null) as { activeTab?: string } | null;
   const tabFromState = routerState?.activeTab;
   const tabFromQuery = searchParams.get('tab');
-  const initialTab: CourseTabId = asTabId(tabFromState ?? tabFromQuery ?? 'about');
+  const initialTab: CourseTabId = asTabId(tabFromState ?? tabFromQuery ?? 'course');
   const [activeTab, setActiveTab] = useState<CourseTabId>(initialTab);
 
   const highlightReviewId = searchParams.get('review');
@@ -67,7 +78,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
   useEffect(() => {
     const nextState = (location.state ?? null) as { activeTab?: string } | null;
-    const next = asTabId(nextState?.activeTab ?? searchParams.get('tab') ?? 'about');
+    const next = asTabId(nextState?.activeTab ?? searchParams.get('tab') ?? 'course');
     setActiveTab(next);
     setVisitedTabs(prev => (prev.has(next) ? prev : new Set(prev).add(next)));
   }, [searchParams, location.state]);
@@ -110,7 +121,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
     if (!isInModal) {
       const next = new URLSearchParams(searchParams);
-      if (newTab === 'about') next.delete('tab'); else next.set('tab', newTab);
+      if (newTab === 'course') next.delete('tab'); else next.set('tab', newTab);
       setSearchParams(next, { replace: true });
     }
 
@@ -227,14 +238,23 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div className="course-hero-wrapper bg-background">
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsContent
-          value="about"
-          className={`mt-0 transition-opacity duration-200 ${activeTab === 'about' ? 'opacity-100' : 'hidden'}`}
+          value="course"
+          className={`mt-0 transition-opacity duration-200 ${activeTab === 'course' ? 'opacity-100' : 'hidden'}`}
         >
           <CourseAboutTab
             course={course}
             onTabChange={handleTabChange}
           />
         </TabsContent>
+
+        {visitedTabs.has('you') && (
+          <TabsContent
+            value="you"
+            className={`mt-0 transition-opacity duration-200 ${activeTab === 'you' ? 'opacity-100' : 'hidden'}`}
+          >
+            <CourseYouTab courseId={course.id} courseName={course.name} />
+          </TabsContent>
+        )}
 
         {visitedTabs.has('reviews') && (
           <TabsContent
@@ -255,36 +275,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
           >
             <CourseMediaTabNew courseId={course.id} courseName={course.name} />
-          </TabsContent>
-        )}
-        {visitedTabs.has('holes') && (
-          <TabsContent
-            value="holes"
-            className={`mt-0 transition-opacity duration-200 ${activeTab === 'holes' ? 'opacity-100' : 'hidden'}`}
-          >
-            <CourseHolesTab courseId={course.id} />
-          </TabsContent>
-        )}
-
-
-        {visitedTabs.has('legends') && (
-          <TabsContent
-            value="legends"
-            className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
-          >
-            <div className="hcp-light">
-              <CourseLegendsDrilldown
-                selection={{
-                  courseId: course.id,
-                  courseName: course.name,
-                  courseRegion: course.region ?? null,
-                  courseCountry: course.country ?? null,
-                  courseType: course.course_type ?? null,
-                }}
-                hideHeader
-                theme="light"
-              />
-            </div>
           </TabsContent>
         )}
       </Tabs>

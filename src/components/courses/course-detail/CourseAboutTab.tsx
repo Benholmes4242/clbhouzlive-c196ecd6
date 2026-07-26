@@ -15,7 +15,7 @@ import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { toast } from '@/lib/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
@@ -24,11 +24,9 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
-import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
-import { AboutGhost } from '@/components/handicap/ConnectGhostPreviews';
-import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
-import { PersonalSection } from '@/components/courses/phase5';
+import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseCTA from './ClaimCourseCTA';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
@@ -82,7 +80,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const { user } = useSupabaseSession();
-  const { data: aboutConnection } = useWhsConnection(user?.id);
+  const [searchParams] = useSearchParams();
+  const legendCategoryParam = searchParams.get('cat');
   
   
   const navigate = useNavigate();
@@ -192,30 +191,46 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </button>
           </div>
         )}
-        {user && !aboutConnection && (
-          <ConnectGhostPrompt
-            surface="about"
-            ghost={<AboutGhost />}
-            onConnect={() => navigate('/handicap')}
-          />
-        )}
       </div>
 
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 3. Your Journey — PersonalSection renders its own canonical SectionLabel internally */}
-      {user && (
-        <>
-          <section>
-            <PersonalSection courseId={course.id} courseName={course.name} />
-          </section>
-          <div style={{ margin: '16px 0' }}><Divider /></div>
-        </>
-      )}
-
-      {/* 4. Friends Who've Played */}
+      {/* 3. Friends Who've Played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
+
+      {/* 3b. Play data — tee card + course shape, then the collapsed hole table */}
+      <section>
+        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
+      </section>
+
+      <section>
+        <CourseHolesTab
+          courseId={course.id}
+          section="holes"
+          showTeeCard={false}
+          showGhost={false}
+          showEmptyState={false}
+          collapsible
+          defaultCollapsed
+        />
+      </section>
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 3c. The record book — Champions promoted onto the default view */}
+      <CourseRecordBook
+        courseId={course.id}
+        courseName={course.name}
+        courseRegion={course.region ?? null}
+        courseCountry={course.country ?? null}
+        courseType={(course as { course_type?: string | null }).course_type ?? null}
+        initialCategory={legendCategoryParam}
+      />
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+
 
       {/* 5. About - quiet notes card */}
       {course.description && (
