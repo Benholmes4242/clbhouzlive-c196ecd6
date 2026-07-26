@@ -87,7 +87,21 @@
     "legendEveryone": "Everyone",
     "legendYou": "You",
     "theBeastSuffix": " · the beast",
-    "youAvg": "You {{avg}}"
+    "youAvg": "You {{avg}}",
+    "preview": {
+      "eyebrow": "Hole by hole",
+      "title": "How the field scores every hole",
+      "description": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{count}} rounds{{personal}}.",
+      "personalClause": " and your own average alongside",
+      "descriptionNoRounds": "Par, stroke index and yardage for all {{holes}}, with the spread of scores across the field.",
+      "legendBirdie": "Birdie+",
+      "legendPar": "Par",
+      "legendBogey": "Bogey",
+      "legendDouble": "Double+",
+      "seeAll_one": "See all {{count}} hole",
+      "seeAll_other": "See all {{count}} holes",
+      "showLess": "Show less"
+    }
   },
   "scorecard": {
     "syncingTitle": "Scorecard on the way",
