@@ -530,6 +530,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             )}
           </div>
 
+          {/* Caption — 3-line clamp + See more/See less. Nothing renders for
+              empty/whitespace-only captions (no element, no gap). */}
+          {activePost.caption?.trim() ? (
+            <CaptionBlock caption={activePost.caption} resetKey={activeIndex} />
+          ) : null}
+
+
+
           {activePost.isReview && activePost.review && (
             <button
               type="button"
