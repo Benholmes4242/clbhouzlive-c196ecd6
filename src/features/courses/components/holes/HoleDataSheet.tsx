@@ -31,6 +31,19 @@ const GOLD_GRAD_V = `linear-gradient(180deg, ${GOLD} 0%, ${GOLD_2} 100%)`;
 const CARD_SHADOW = '0 1px 2px rgba(15,23,42,0.04)';
 const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
+/**
+ * Single source of truth for the score-distribution colours.
+ * Used by the mix strip on every hole row and by the collapsed-state legend.
+ */
+const DIST_SEG_COLORS = {
+  eaglePlus: GOLD,
+  birdie: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)`,
+  par: INK_20,
+  bogey: INK_55,
+  double: INK_85,
+} as const;
+
+
 const CARD: React.CSSProperties = {
   background: '#FFFFFF',
   borderRadius: 20,
