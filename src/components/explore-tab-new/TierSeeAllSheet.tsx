@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import {
@@ -29,6 +29,7 @@ import { FeatListRow } from './FeatListRow';
 import { StatRow } from './StatRow';
 import { LedgerSubline } from './PinIcon';
 import { useScorecardOpener } from './useScorecardOpener';
+import { GolferSearchField, normalizeName } from './GolferSearchField';
 
 
 
@@ -71,8 +72,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const [visible, setVisible] = useState(PAGE);
   const [mode, setMode] = useState<RecordsMode>(initialMode);
   const [metric, setMetric] = useState<'aces' | 'albatrosses'>(initialMetric);
+  const [query, setQuery] = useState('');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleQueryChange = useCallback((q: string) => setQuery(q), []);
+  const needle = normalizeName(query);
+  const searching = needle.length > 0;
 
   const hasToggle = true;
   const isEagles = tier === 'eagles';
@@ -97,28 +103,33 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         : mode === initialMode
           ? rows
           : [];
-    if (tier === 'records' && mode === 'alltime') {
-      return sortRecordsAllTime(base);
-    }
-    if (tier === 'birdie_hauls') {
-      return sortBirdieHauls(base, mode);
-    }
-    return base;
-  }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
+    const sorted =
+      tier === 'records' && mode === 'alltime'
+        ? sortRecordsAllTime(base)
+        : tier === 'birdie_hauls'
+          ? sortBirdieHauls(base, mode)
+          : base;
+    if (!needle) return sorted;
+    return sorted.filter((r) =>
+      normalizeName(`${r.holder_name ?? ''} ${r.holder_username ?? ''}`).includes(needle),
+    );
+  }, [fetched, mode, rows, initialMode, tier, isLeaderView, needle]);
 
   const legendaryLeaderRows: LegendaryLeaderRow[] = useMemo(() => {
     if (!isLegendaryLeaders) return [];
     return (leadersData ?? [])
       .filter((r) => (r[metric] ?? 0) > 0)
+      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
       .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
-  }, [isLegendaryLeaders, leadersData, metric]);
+  }, [isLegendaryLeaders, leadersData, metric, needle]);
 
   const eagleLeaderRows: EagleLeaderRow[] = useMemo(() => {
     if (!isEagleLeaders) return [];
     return (eagleLeadersData ?? [])
       .filter((r) => (r.eagles ?? 0) > 0)
+      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
       .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0));
-  }, [isEagleLeaders, eagleLeadersData]);
+  }, [isEagleLeaders, eagleLeadersData, needle]);
 
   const legendaryMax = legendaryLeaderRows[0]?.[metric] ?? 1;
   const eagleMax = eagleLeaderRows[0]?.eagles ?? 1;
@@ -149,7 +160,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     setVisible(PAGE);
     setMode(initialMode);
     setMetric(initialMetric);
+    setQuery('');
   }, [open, initialMode, initialMetric]);
+
+  // Reset the page window when the filter changes.
+  useEffect(() => {
+    setVisible(PAGE);
+  }, [needle]);
 
   useEffect(() => {
     setVisible(PAGE);
@@ -219,33 +236,40 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           background: SLATE_50,
         }}
       >
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: AMBER,
-              marginBottom: 4,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {regionLabel(region)} {'\u00B7'} WHS
-            {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: AMBER,
+                marginBottom: 4,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {regionLabel(region)} {'\u00B7'} WHS
+              {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+            </div>
+            <div
+              id="tier-see-all-title"
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: INK,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {TIER_TITLE[tier]}
+            </div>
           </div>
-          <div
-            id="tier-see-all-title"
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-            }}
-          >
-            {TIER_TITLE[tier]}
-          </div>
+
+          <GolferSearchField onQueryChange={handleQueryChange} />
         </div>
 
         {hasToggle && (
@@ -342,7 +366,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 fontWeight: 600,
               }}
             >
-              No {metric === 'aces' ? 'aces' : 'albatrosses'} yet.
+              {searching
+                ? 'No golfers match that name.'
+                : `No ${metric === 'aces' ? 'aces' : 'albatrosses'} yet.`}
             </div>
           ) : (
             <div>
@@ -391,7 +417,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 fontWeight: 600,
               }}
             >
-              No eagles yet.
+              {searching ? 'No golfers match that name.' : 'No eagles yet.'}
             </div>
           ) : (
             <div>
@@ -428,7 +454,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               fontWeight: 600,
             }}
           >
-            None yet.
+            {searching ? 'No golfers match that name.' : 'None yet.'}
           </div>
         ) : (
           <div>
