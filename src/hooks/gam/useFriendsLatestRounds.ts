@@ -112,7 +112,7 @@ export function useFriendsLatestRounds(
       const { data: rounds } = await supabase
         .from('gam_round_stats' as never)
         .select(
-          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, stableford_points, holes_played',
+          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, stableford_points, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card',
         )
         .in('user_id', friendIds)
         .gte('play_date', windowStartIso)
@@ -129,7 +129,14 @@ export function useFriendsLatestRounds(
         course_id: string | null;
         hcp_at_time: number | null;
         stableford_points: number | null;
+        birdies: number | null;
+        eagles: number | null;
+        albatrosses: number | null;
+        holes_in_one: number | null;
+        beat_par: boolean | null;
+        clean_card: boolean | null;
       };
+
       const allRounds = ((rounds ?? []) as unknown) as Round[];
       if (allRounds.length === 0) return [];
 
