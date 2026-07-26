@@ -21,6 +21,12 @@ interface Props {
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
   variant?: Variant;
+  /**
+   * Override for the tap action. The default event-bus open only works on
+   * /handicap (where GamMount subscribes); surfaces like the profile page
+   * pass a navigate-to-handicap-with-deep-link handler instead.
+   */
+  onOpen?: () => void;
 }
 
 const MED_W = 32;
@@ -172,7 +178,9 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
   variant = 'dark',
+  onOpen,
 }) => {
+  const open = onOpen ?? (() => openGamAchievements());
   const { data: achievements } = useUserAchievements(userId);
 
   const { weeklyCount, lifetimeCount, recentRarities } = React.useMemo(() => {
@@ -285,7 +293,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
         <div style={outerWrapStyle}>
           <button
             type="button"
-            onClick={() => openGamAchievements()}
+            onClick={open}
             aria-label="Open trophies -- browse what you can earn"
             style={{ ...rowStyle, cursor: 'pointer' }}
           >
@@ -325,7 +333,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
       <div style={outerWrapStyle}>
         <button
           type="button"
-          onClick={() => openGamAchievements()}
+          onClick={open}
           aria-label={
             weeklyCount > 0
               ? `Open trophies -- ${weeklyCount} new ${weeklyCount === 1 ? 'unlock' : 'unlocks'} this week`
