@@ -73,7 +73,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const [mode, setMode] = useState<RecordsMode>(initialMode);
   const [metric, setMetric] = useState<'aces' | 'albatrosses'>(initialMetric);
   const [query, setQuery] = useState('');
-  const [searchExpanded, setSearchExpanded] = useState(false);
+  
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
