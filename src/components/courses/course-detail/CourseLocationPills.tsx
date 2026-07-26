@@ -61,7 +61,7 @@ const CourseLocationPills: React.FC<CourseLocationPillsProps> = ({ course }) => 
   if (!primaryRegionLabel) return null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, padding: '14px 16px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, padding: '14px 16px 16px' }}>
       <button
         type="button"
         onClick={() => {
