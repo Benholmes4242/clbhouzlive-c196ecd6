@@ -21772,6 +21772,13 @@ export type Database = {
         Args: { p_business_id: string }
         Returns: boolean
       }
+      user_top100_distinct_counts: {
+        Args: { p_user_id: string }
+        Returns: {
+          course_count: number
+          slug: string
+        }[]
+      }
       user_whs_played_golf_course_ids: {
         Args: { p_user_id: string }
         Returns: {
