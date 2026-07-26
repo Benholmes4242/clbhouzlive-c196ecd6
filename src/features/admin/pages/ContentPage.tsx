@@ -828,14 +828,15 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 
 /* ───────── Add course sheet ───────── */
 
-function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
+function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting }: {
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
   uploadPhoto: (id: string, file: File) => Promise<any>;
+  onOpenExisting: (id: string) => void;
 }) {
   const EMPTY = {
-    name: '', country: '', continent: '',
+    name: '', country: '', continent: '', region_key: '',
     sub_country: '', region: '',
     latitude: '', longitude: '',
     website_url: '', course_type: '',
@@ -847,6 +848,7 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const duplicateHits = useDuplicateCourseCheck(form.name);
   const draftKey = draftKeys.courseNew();
   const set = (k: keyof typeof form, v: any) => setForm(f => {
     const next = { ...f, [k]: v };
@@ -888,18 +890,18 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
   const valid = !!(
     form.name.trim() &&
     form.continent &&
-    form.country.trim() &&
-    isCountryInContinent(form.country.trim(), form.continent)
+    form.region_key &&
+    isCanonicalCountry(form.country) &&
+    form.sub_country.trim()
   );
 
   const submit = async () => {
     if (!form.name.trim()) { toast.error('Name is required'); return; }
-    if (!form.continent) { toast.error('Continent is required'); return; }
-    if (!form.country.trim()) { toast.error('Country is required'); return; }
-    if (!isCountryInContinent(form.country.trim(), form.continent)) {
-      toast.error(`"${form.country}" is not a valid country for ${form.continent}`);
+    if (!form.region_key || !isCanonicalCountry(form.country) || !form.continent) {
+      toast.error('Pick a region (and continent for Rest of World)');
       return;
     }
+    if (!form.sub_country.trim()) { toast.error('Country / home nation is required'); return; }
     setBusy(true);
     try {
       const created = await createCourse(form);
@@ -997,27 +999,35 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto }: {
           </div>
         </Section>
 
+        <DuplicateCourseWarning
+          hits={duplicateHits}
+          onUseInstead={(id) => { onOpenExisting(id); }}
+        />
+
         <Section title="Identity">
           <Field label="Course name" required>
             <TextInput value={form.name} onChange={v => set('name', v)} placeholder="e.g. Augusta National" />
           </Field>
-          <ContinentCountrySelectors
-            continent={form.continent}
-            country={form.country}
-            onContinentChange={v => set('continent', v)}
-            onCountryChange={v => set('country', v)}
-            required
-          />
         </Section>
 
         <Section title="Location">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <CourseGeographySelectors
+              value={{
+                country: form.country,
+                region_key: form.region_key,
+                continent: form.continent,
+                sub_country: form.sub_country,
+                region: form.region,
+              }}
+              onChange={patch => setForm(f => {
+                const next = { ...f, ...patch };
+                saveDraft(draftKey, next);
+                return next;
+              })}
+            />
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <Field label="State / Sub-country">
-              <TextInput value={form.sub_country} onChange={v => set('sub_country', v)} placeholder="e.g. Georgia" />
-            </Field>
-            <Field label="Region">
-              <TextInput value={form.region} onChange={v => set('region', v)} placeholder="e.g. South East" />
-            </Field>
             <Field label="Latitude">
               <TextInput value={form.latitude} onChange={v => set('latitude', v)} inputMode="decimal" placeholder="33.5021" />
             </Field>
