@@ -9,6 +9,7 @@ import { FONT } from './gamingLightTokens';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { StatRow } from './StatRow';
 import { LedgerSubline } from './PinIcon';
+import { HoleContextLine, holeContextParts } from './HoleContextLine';
 import { formatHcp } from '@/lib/formatHcp';
 
 const MAX_ROWS = 10;
@@ -145,6 +146,11 @@ export function AcesAlbatrossesPodium({
             name={name}
             nameMeta={when ? relativeTime(when) : undefined}
             subline={row.course_name ? <LedgerSubline courseName={row.course_name} /> : undefined}
+            metaLine={
+              holeContextParts(row).length > 0 ? (
+                <HoleContextLine parts={holeContextParts(row)} />
+              ) : undefined
+            }
             chip={{ label: isAce ? 'HOLE IN ONE' : 'ALBATROSS', tone: isAce ? 'ace' : 'albatross' }}
             
             isLast={i === merged.length - 1}
