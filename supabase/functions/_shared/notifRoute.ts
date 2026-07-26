@@ -110,12 +110,16 @@ export function routeForNotif(input: NotifRouteInput): string {
   if (
     type === 'top_100_record_beaten' ||
     type === 'course_record_beaten' ||
+    type === 'crown_taken' ||
+    type === 'crown_lost' ||
     type.startsWith('legend_') ||
     type.startsWith('record_')
   ) {
     const cid = data.course_id ?? (entity_type === 'course' ? entity_id : null);
-    if (cid) return `/courses/${cid}?tab=legends`;
+    const cat = data.category as string | undefined;
+    if (cid) return `/courses/${cid}?tab=legends${cat ? `&cat=${encodeURIComponent(cat)}` : ''}`;
   }
+
 
   // entity fallbacks
   if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
