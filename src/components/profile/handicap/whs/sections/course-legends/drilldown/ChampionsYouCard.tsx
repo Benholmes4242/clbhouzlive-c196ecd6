@@ -73,7 +73,7 @@ export const ChampionsYouCard: React.FC<Props> = ({
           ) : null}
 
           {hasCabinet ? (
-            <div style={{ flex: '1 1 180px', minWidth: 0 }}>
+            <div style={{ flex: '1 1 280px', minWidth: 0 }}>
               <div
                 style={{
                   display: 'flex',
