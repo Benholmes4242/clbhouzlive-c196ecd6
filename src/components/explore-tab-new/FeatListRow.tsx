@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { StatRow, type StatRowChip } from './StatRow';
 import { LedgerSubline } from './PinIcon';
+import { HoleContextLine, holeContextParts } from './HoleContextLine';
+
 import { RoundFeatChips } from './RoundFeatChips';
 import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 
