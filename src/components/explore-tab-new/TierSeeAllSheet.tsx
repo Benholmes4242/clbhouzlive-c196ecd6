@@ -277,6 +277,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           </div>
 
           <GolferSearchField
+            key={open ? 'open' : 'closed'}
             onQueryChange={handleQueryChange}
             onExpandedChange={setSearchExpanded}
           />
