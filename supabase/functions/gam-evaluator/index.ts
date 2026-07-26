@@ -1062,7 +1062,12 @@ async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: st
     seen_by_user: false,
   });
   if (error) { console.warn("[badge insert]", error.message); return false; }
-  await enqueueNotification(userId, "badge_earned", { badge_id: badgeId, whs_score_id: whsScoreId });
+  await enqueueNotification(userId, "badge_earned", {
+    badge_id: badgeId,
+    badge_title: await fetchBadgeTitle(badgeId),
+    whs_score_id: whsScoreId,
+  });
+
   return true;
 }
 
