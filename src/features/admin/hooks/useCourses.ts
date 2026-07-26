@@ -117,7 +117,7 @@ export type CourseUpdate = Partial<Pick<AdminCourseRow,
   'country' | 'sub_country' | 'region' | 'continent' |
   'latitude' | 'longitude' | 'country_code' |
   'course_type' | 'has_hosted_major'
->>;
+>> & { region_key?: string | null };
 
 export function useCourses() {
   const qc = useQueryClient();
