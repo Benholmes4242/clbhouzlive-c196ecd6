@@ -21,6 +21,12 @@ interface Props {
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
   variant?: Variant;
+  /**
+   * Override for the tap action. The default event-bus open only works on
+   * /handicap (where GamMount subscribes); surfaces like the profile page
+   * pass a navigate-to-handicap-with-deep-link handler instead.
+   */
+  onOpen?: () => void;
 }
 
 const MED_W = 32;
