@@ -195,6 +195,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         courseCountry={course.country ?? null}
         courseType={(course as { course_type?: string | null }).course_type ?? null}
         initialCategory={legendCategoryParam}
+        onSeeAll={() => onTabChange?.('legends')}
       />
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
