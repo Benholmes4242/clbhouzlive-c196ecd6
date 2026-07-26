@@ -13,6 +13,7 @@ import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 import { LedgerSubline } from './PinIcon';
+import { HoleContextLine, holeContextParts } from './HoleContextLine';
 
 
 const ROWS = 5;
@@ -141,6 +142,7 @@ export function EaglesLedger({
               const when = row.play_date ?? row.attained_at ?? null;
               const sub = <LedgerSubline courseName={row.course_name} />;
               const age = when ? relativeTime(when) : null;
+              const parts = holeContextParts(row);
 
               return (
                 <StatRow
@@ -150,6 +152,7 @@ export function EaglesLedger({
                   name={name}
                   nameMeta={age ?? undefined}
                   subline={sub}
+                  metaLine={parts.length > 0 ? <HoleContextLine parts={parts} /> : undefined}
                   statValue={extractHoleNo(row)}
                   statLabel="HOLE"
                   isLast={i === arr.length - 1}

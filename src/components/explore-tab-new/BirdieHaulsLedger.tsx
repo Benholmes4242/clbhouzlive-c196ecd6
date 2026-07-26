@@ -14,6 +14,7 @@ import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
 import { LedgerSubline } from './PinIcon';
+import { HoleContextLine, holeContextParts } from './HoleContextLine';
 
 import { slugToCacheRegion } from './regionScope';
 
@@ -113,6 +114,11 @@ export function BirdieHaulsLedger({
               name={name}
               nameMeta={age ?? undefined}
               subline={sub}
+              metaLine={
+                holeContextParts(row).length > 0 ? (
+                  <HoleContextLine parts={holeContextParts(row)} />
+                ) : undefined
+              }
               statValue={count}
               statLabel="BIRDIES"
               showWatermark={mode === 'alltime' && i === 0}
