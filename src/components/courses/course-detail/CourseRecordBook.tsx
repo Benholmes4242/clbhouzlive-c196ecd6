@@ -1,12 +1,12 @@
 /**
- * CourseRecordBook — the Champions content promoted onto the Course tab.
+ * CourseRecordBook - the Champions content promoted onto the Course tab.
  *
  * Renders the rank-1 holder for the headline all-time boards as edge-to-edge
  * alternating bands (no cards, per the Champions legibility pass), plus a
  * "See all boards" affordance that opens the full drilldown in a 75dvh sheet.
  *
  * Data comes from the existing useCourseLegends RPC via useCourseRecordSummary
- * — no new query is introduced.
+ * - no new query is introduced.
  */
 import React, { useState } from 'react';
 import { Crown, ChevronRight } from 'lucide-react';
@@ -18,6 +18,7 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { AMBER, INK, INK_MUTE, HAIRLINE_INK_7 } from '@/features/courses/_shared/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   courseId: string;
@@ -40,7 +41,20 @@ export const CourseRecordBook: React.FC<Props> = ({
   const { user } = useSupabaseSession();
   const { isLoading, previewRows, unclaimedCount, hasAnyHolder } =
     useCourseRecordSummary(courseId, user?.id ?? null);
-  const [open, setOpen] = useState(Boolean(initialCategory));
+  const [open, setOpenState] = useState(Boolean(initialCategory));
+
+  const setOpen = React.useCallback((next: boolean) => {
+    setOpenState(next);
+    if (next) analyticsEvents.track('course_record_book_opened', { course_id: courseId });
+  }, [courseId]);
+
+  // Deep-linked opens (?cat=) also count.
+  const deepLinkFired = React.useRef(false);
+  React.useEffect(() => {
+    if (!initialCategory || deepLinkFired.current) return;
+    deepLinkFired.current = true;
+    analyticsEvents.track('course_record_book_opened', { course_id: courseId });
+  }, [initialCategory, courseId]);
 
   if (isLoading) {
     return (
@@ -163,7 +177,7 @@ export const CourseRecordBook: React.FC<Props> = ({
           }}
         >
           {unclaimedCount > 0
-            ? `See all boards · ${unclaimedCount} unclaimed`
+            ? `See all boards - ${unclaimedCount} unclaimed`
             : 'See all boards'}
         </button>
       </div>

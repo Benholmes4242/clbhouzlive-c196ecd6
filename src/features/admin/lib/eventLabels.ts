@@ -36,6 +36,11 @@ export const EVENT_LABELS: Record<string, string> = {
 
   // ─── Courses / ratings ────────────────────────────────────────
   course_view: 'Course viewed',
+  course_tab_viewed: 'Course tab viewed',
+  course_holes_expanded: 'Course hole table expanded',
+  course_record_book_opened: 'Course record book opened',
+  course_you_empty_shown: 'Course You tab empty state shown',
+  course_connect_cta_tapped: 'Course connect handicap tapped',
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',
   rating_submitted: 'Rating submitted',
