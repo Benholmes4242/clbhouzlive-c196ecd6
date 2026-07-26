@@ -8,7 +8,7 @@ import React from 'react';
 import {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell,
   Star, Reply, AtSign, BadgeCheck, XCircle, Trophy, Clock,
-  MailQuestion, Ban, Flag,
+  MailQuestion, Ban, Flag, Crown, TrendingUp, Flame, Swords, ShieldAlert,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -55,6 +55,31 @@ export const T = {
   GOLD: '#B36B00',
   GOLD_SOFT: 'rgba(179,107,0,0.12)',
 } as const;
+
+/**
+ * Game family ("Crowns" chip). MUST match v_game_types in
+ * public.get_activity_feed and the activityCopy() map in
+ * supabase/functions/gam-evaluator/index.ts. These rows are excluded from the
+ * All / New / Mentions / Friends filters server-side.
+ */
+export const GAME_NOTIF_TYPES = [
+  'level_up',
+  'level_near',
+  'legend_earned',
+  'legend_lost',
+  'crown_taken',
+  'crown_lost',
+  'streak_at_risk',
+  'streak_broken',
+  'streak_freeze_applied',
+  'status_at_risk',
+  'status_reclaimed',
+  'rival_played',
+] as const;
+
+export function isGameNotifType(t: string): boolean {
+  return (GAME_NOTIF_TYPES as readonly string[]).includes(t);
+}
 
 export function resolveKind(row: {
   notif_type: string;
@@ -114,6 +139,67 @@ export function resolveKind(row: {
   }
   if (t === 'review_response_posted') {
     return { left: 'actor', right: row.target_course_image ? 'thumb' : 'none', bold: 'course_name' };
+  }
+
+  // GAME / CROWNS ---------------------------------------------------
+  if (t === 'crown_taken' || t === 'legend_earned') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Crown, fg: T.GOLD, bg: T.GOLD_SOFT },
+      isSystem: true,
+      bold: 'course_name',
+    };
+  }
+  if (t === 'crown_lost' || t === 'legend_lost') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Crown, fg: T.RED, bg: T.RED_SOFT },
+      isSystem: true,
+      bold: 'course_name',
+    };
+  }
+  if (t === 'level_up' || t === 'level_near') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: TrendingUp, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      isSystem: true,
+    };
+  }
+  if (t === 'streak_broken' || t === 'streak_at_risk' || t === 'streak_freeze_applied') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: {
+        icon: Flame,
+        fg: t === 'streak_broken' ? T.RED : T.AMBER_DEEP,
+        bg: t === 'streak_broken' ? T.RED_SOFT : T.AMBER_SOFT,
+      },
+      isSystem: true,
+    };
+  }
+  if (t === 'status_at_risk' || t === 'status_reclaimed') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: {
+        icon: ShieldAlert,
+        fg: t === 'status_reclaimed' ? T.GREEN : T.AMBER_DEEP,
+        bg: t === 'status_reclaimed' ? T.GREEN_SOFT : T.AMBER_SOFT,
+      },
+      isSystem: true,
+    };
+  }
+  if (t === 'rival_played') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Swords, fg: T.INK_60, bg: T.NEUTRAL },
+      isSystem: true,
+      bold: 'course_name',
+    };
   }
 
   // ACHIEVEMENTS ----------------------------------------------------
@@ -325,4 +411,5 @@ export function composeCommentBody(row: {
 export const KindIcons = {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell, Star, Reply, AtSign,
   BadgeCheck, XCircle, Trophy, Clock, MailQuestion, Ban, Flag,
+  Crown, TrendingUp, Flame, Swords, ShieldAlert,
 };

@@ -33,12 +33,15 @@ const AMBER_DEEP = '#C97A10';
 const HAIR2 = 'rgba(15,23,42,0.10)';
 const PAGE = '#F8FAFC';
 
-type ChipKey = 'all' | 'new' | 'mentions' | 'friends';
+type ChipKey = 'all' | 'new' | 'mentions' | 'friends' | 'crowns';
 const CHIPS: { key: ChipKey; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'new', label: 'New' },
   { key: 'mentions', label: 'Mentions' },
   { key: 'friends', label: 'Friends' },
+  // Game family (level ups, crowns, streaks). Server-side these types are
+  // excluded from every other chip, so this is their only home in Activity.
+  { key: 'crowns', label: 'Crowns' },
 ];
 const chipToFilter = (c: ChipKey): ActivityFilterV2 =>
   c === 'all' ? null : (c as ActivityFilterV2);
@@ -49,6 +52,7 @@ const EMPTY_COPY: Record<ChipKey, { title: string; sub: string }> = {
   new: { title: 'All caught up', sub: 'Nothing new since your last visit.' },
   mentions: { title: 'No mentions yet', sub: 'When someone @-mentions you, it shows up here.' },
   friends: { title: 'No friend activity yet', sub: 'Follow people and their moves will appear here.' },
+  crowns: { title: 'No crowns yet', sub: 'Tiers, course crowns and streaks land here as you play.' },
 };
 
 interface ChipProps {

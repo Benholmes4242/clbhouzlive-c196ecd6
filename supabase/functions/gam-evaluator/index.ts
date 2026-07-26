@@ -1810,7 +1810,7 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
   // ignoreDuplicates so an eventual unique index resolves cleanly instead of
   // erroring, and any current trigger-skip is a no-op on our side.
   try {
-    const { error } = await supabase
+    const { data: inserted, error } = await supabase
       .from("gam_notification_outbox")
       .upsert(
         {
@@ -1825,10 +1825,152 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
           status: "pending",
         },
         { onConflict: "deduplication_key", ignoreDuplicates: true },
-      );
-    if (error) console.warn("[enqueueNotification]", type, error.message);
+      )
+      .select("id");
+    if (error) {
+      console.warn("[enqueueNotification]", type, error.message);
+      return;
+    }
+    // A row comes back ONLY when the outbox insert actually landed. Both the
+    // dedup trigger (silent skip) and ignoreDuplicates return zero rows, so
+    // this is the exact "the push was really enqueued" signal — the Activity
+    // row is written on the same condition, never on a suppressed push.
+    if (Array.isArray(inserted) && inserted.length > 0) {
+      await writeActivityRow(userId, type, payload);
+    }
   } catch (e) {
     console.warn("[enqueueNotification]", type, (e as Error).message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Activity ledger mirror.
+//
+// gam_notification_outbox stays a pure DELIVERY QUEUE (status/scheduled_for/
+// sent_at). The Activity page reads public.notifications via
+// get_activity_feed, so a game notification also needs a row there or it is
+// push-only and gone. These types are shown under the "Crowns" chip and are
+// EXCLUDED from All/New/Mentions/Friends by get_activity_feed.
+//
+// MUST match v_game_types in public.get_activity_feed and GAME_NOTIF_TYPES in
+// src/features/activity-v2/components/ledgerKinds.tsx.
+// ─────────────────────────────────────────────────────────────────────────────
+function activityCopy(
+  type: string,
+  p: any,
+): { title: string; message: string; entity_type: string | null; entity_id: string | null } | null {
+  const course = (p?.course_name as string | null) || "this course";
+  const courseId = (p?.course_id as string | null) ?? null;
+  switch (type) {
+    case "level_up":
+      return {
+        title: "New tier reached",
+        message: `You reached ${p?.label ?? "a new tier"}.`,
+        entity_type: null,
+        entity_id: null,
+      };
+    case "level_near":
+      return {
+        title: "Almost there",
+        message: `You are ${p?.gap ?? "a few"} medals from ${p?.label ?? "the next tier"}.`,
+        entity_type: null,
+        entity_id: null,
+      };
+    case "legend_earned":
+      return {
+        title: "Course legend",
+        message: `You are now the legend at ${course}.`,
+        entity_type: "course",
+        entity_id: courseId,
+      };
+    case "legend_lost":
+      return {
+        title: "Crown lost",
+        message: `${p?.taker_name ?? "Someone"} took your legend title at ${course}.`,
+        entity_type: "course",
+        entity_id: courseId,
+      };
+    case "crown_taken":
+      return {
+        title: "Crown taken",
+        message: `You took the crown at ${course}.`,
+        entity_type: "course",
+        entity_id: courseId,
+      };
+    case "crown_lost":
+      return {
+        title: "Crown lost",
+        message: `${p?.new_holder_name ?? "Someone"} took your crown at ${course}.`,
+        entity_type: "course",
+        entity_id: courseId,
+      };
+    case "streak_at_risk":
+      return {
+        title: "Streak at risk",
+        message: `Your ${p?.streak_type ?? "playing"} streak is about to break.`,
+        entity_type: null,
+        entity_id: null,
+      };
+    case "streak_broken":
+      return {
+        title: "Streak broken",
+        message: `Your ${p?.streak_type ?? "playing"} streak ended at ${p?.count ?? 0}.`,
+        entity_type: null,
+        entity_id: null,
+      };
+    case "streak_freeze_applied":
+      return {
+        title: "Streak saved",
+        message: `A freeze kept your ${p?.streak_type ?? "playing"} streak alive.`,
+        entity_type: null,
+        entity_id: null,
+      };
+    case "status_at_risk":
+      return {
+        title: "Status at risk",
+        message: "Your handicap status is slipping below the hold line.",
+        entity_type: null,
+        entity_id: null,
+      };
+    case "status_reclaimed":
+      return {
+        title: "Status reclaimed",
+        message: "You are back inside your handicap status band.",
+        entity_type: null,
+        entity_id: null,
+      };
+    case "rival_played":
+      return {
+        title: "Rival on the course",
+        message: `${p?.rival_name ?? "Your rival"} posted a round at ${course}.`,
+        entity_type: "course",
+        entity_id: courseId,
+      };
+    default:
+      // badge_earned and anything else keeps its existing surfaces untouched.
+      return null;
+  }
+}
+
+async function writeActivityRow(userId: string, type: string, payload: any) {
+  const copy = activityCopy(type, payload);
+  if (!copy) return;
+  try {
+    const { error } = await supabase.from("notifications").insert({
+      user_id: userId,
+      recipient_actor_type: "personal",
+      recipient_actor_id: userId,
+      type,
+      title: copy.title,
+      message: copy.message,
+      data: payload ?? {},
+      entity_type: copy.entity_type,
+      entity_id: copy.entity_id,
+      actor_id: null,
+    });
+    if (error) console.warn("[writeActivityRow]", type, error.message);
+  } catch (e) {
+    console.warn("[writeActivityRow]", type, (e as Error).message);
   }
 }
 
