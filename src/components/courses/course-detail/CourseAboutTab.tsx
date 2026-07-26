@@ -20,6 +20,7 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -140,6 +141,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
+  // Fire once per mount when the collapsed hole table is opened.
+  const holesExpandFired = React.useRef(false);
+  const handleHolesExpand = React.useCallback(() => {
+    if (holesExpandFired.current) return;
+    holesExpandFired.current = true;
+    analyticsEvents.track('course_holes_expanded', { course_id: course.id });
+  }, [course.id]);
+
   const handleRateClick = () => {
     if (!user) {
       toast("Sign in required", { description: "Please sign in to rate courses" });
@@ -157,8 +166,41 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
-      {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
-      <div style={{ padding: '16px 16px 0' }}>
+      {/* 2 + 3. The course card, course shape, beast / best chance */}
+      <section>
+        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
+      </section>
+
+      {/* 4. Hole by hole, collapsed */}
+      <section>
+        <CourseHolesTab
+          courseId={course.id}
+          section="holes"
+          showTeeCard={false}
+          showGhost={false}
+          showEmptyState={false}
+          collapsible
+          defaultCollapsed
+          onExpand={handleHolesExpand}
+        />
+      </section>
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 5. The record book - Champions promoted onto the default view */}
+      <CourseRecordBook
+        courseId={course.id}
+        courseName={course.name}
+        courseRegion={course.region ?? null}
+        courseCountry={course.country ?? null}
+        courseType={(course as { course_type?: string | null }).course_type ?? null}
+        initialCategory={legendCategoryParam}
+      />
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 6. The verdict - community rating */}
+      <div style={{ padding: '0 16px' }}>
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -193,46 +235,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </div>
 
-
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 3. Friends Who've Played */}
+      {/* 7. Friends who've played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-      {/* 3b. Play data — tee card + course shape, then the collapsed hole table */}
-      <section>
-        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
-      </section>
-
-      <section>
-        <CourseHolesTab
-          courseId={course.id}
-          section="holes"
-          showTeeCard={false}
-          showGhost={false}
-          showEmptyState={false}
-          collapsible
-          defaultCollapsed
-        />
-      </section>
-
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 3c. The record book — Champions promoted onto the default view */}
-      <CourseRecordBook
-        courseId={course.id}
-        courseName={course.name}
-        courseRegion={course.region ?? null}
-        courseCountry={course.country ?? null}
-        courseType={(course as { course_type?: string | null }).course_type ?? null}
-        initialCategory={legendCategoryParam}
-      />
-
-      <div style={{ margin: '16px 0' }}><Divider /></div>
-
-
-
-      {/* 5. About - quiet notes card */}
+      {/* 8. About - the notes card */}
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
@@ -257,7 +267,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               >
                 <Quote size={14} fill="currentColor" strokeWidth={0} />
               </div>
-              {/* Prose - same type, fade now matches the WHITE card bg */}
+              {/* Prose - fade matches the white card bg */}
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
@@ -287,7 +297,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 6. Top 100 Spotlight — CourseTop100Spotlight renders its own header internally, no SectionLabel */}
+      {/* 9. Top 100 Spotlight - renders its own header internally */}
       {course.id && (
         <>
           <div style={{ margin: '0 16px' }}>
@@ -299,7 +309,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
 
-      {/* 8. Location */}
+      {/* 10. Location */}
       <section>
         <SectionHeader role="section" kicker="LOCATION" paddingX={16} />
         <div style={{ padding: '0 16px' }}>
@@ -322,11 +332,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 8b. Nearby hospitality */}
+      {/* 11. Nearby hospitality */}
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
 
 
-      {/* 9. Claim Course — tri-state: unclaimed / pending / claimed */}
+      {/* 12. Claim course - tri-state: unclaimed / pending / claimed */}
       {course.club_id && claimStatus && (
         <>
           {claimStatus.state === 'unclaimed' && (
@@ -344,17 +354,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 10. Media — AboutMediaStrip renders its own "Media" heading internally, no SectionLabel */}
+      {/* 13. Media strip - renders its own heading internally */}
       <section>
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 11. Explore More — CourseExploreLinks renders its own heading internally, no SectionLabel */}
+      {/* 14. Explore more - renders its own heading internally */}
       <CourseExploreLinks course={course} />
 
-      {/* 12. Official Website — amber ghost button, part of the explore section */}
+      {/* 15. Official website - amber ghost button */}
       {course.website_url && (
         <div style={{ padding: '12px 16px 0' }}>
           <button
