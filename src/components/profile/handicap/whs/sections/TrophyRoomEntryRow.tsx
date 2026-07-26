@@ -178,7 +178,9 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
   variant = 'dark',
+  onOpen,
 }) => {
+  const open = onOpen ?? (() => openGamAchievements());
   const { data: achievements } = useUserAchievements(userId);
 
   const { weeklyCount, lifetimeCount, recentRarities } = React.useMemo(() => {
@@ -291,7 +293,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
         <div style={outerWrapStyle}>
           <button
             type="button"
-            onClick={() => openGamAchievements()}
+            onClick={open}
             aria-label="Open trophies -- browse what you can earn"
             style={{ ...rowStyle, cursor: 'pointer' }}
           >
@@ -331,7 +333,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
       <div style={outerWrapStyle}>
         <button
           type="button"
-          onClick={() => openGamAchievements()}
+          onClick={open}
           aria-label={
             weeklyCount > 0
               ? `Open trophies -- ${weeklyCount} new ${weeklyCount === 1 ? 'unlock' : 'unlocks'} this week`
