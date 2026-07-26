@@ -61,7 +61,7 @@ export const ChampionsYouCard: React.FC<Props> = ({
           }}
         >
           {userId ? (
-            <div style={{ flex: '1 1 150px', minWidth: 0 }}>
+            <div style={{ flex: '1 1 280px', minWidth: 0 }}>
               <YouAtThisClubStrip
                 userId={userId}
                 courseId={courseId}
