@@ -122,6 +122,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { t } = useTranslation('courses');
   const ctx = selection;
 
+  // Deep link from a game notification: ?cat=<legend_category>. Selects the
+  // matching window and autoscrolls to that crown section once data lands.
+  const [searchParams] = useSearchParams();
+  const deepCat = searchParams.get('cat') as LegendCategory | null;
 
   const { activeActor } = useActiveActor();
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
@@ -130,12 +134,15 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { profile } = useProfileData();
   const viewerGender = (profile as any)?.gender as 'male' | 'female' | 'prefer_not_to_say' | null | undefined;
   const pros = useMemo(() => filterProsForViewer(prosRaw ?? [], viewerGender), [prosRaw, viewerGender]);
-  const [window, setWindow] = useState<LegendWindow>('all_time');
+  const [window, setWindow] = useState<LegendWindow>(
+    deepCat && String(deepCat).endsWith('_90d') ? '90d' : 'all_time',
+  );
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
     useState<LegendCategory | null>(null);
   const autoSwitchedRef = useRef(false);
   const [autoSwitchedToAllTime, setAutoSwitchedToAllTime] = useState(false);
+
 
   const has90d = useMemo(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
