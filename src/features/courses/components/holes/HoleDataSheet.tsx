@@ -569,7 +569,8 @@ const StoryTiles: React.FC<{
     );
   }
 
-  if (!viewerHasPlayed || communityTiles.length < 2) {
+  if (scope === 'community') {
+    if (communityTiles.length === 0) return null;
     return (
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, scrollMarginTop: STICKY_SAFE }}>
         {communityTiles}
@@ -577,7 +578,17 @@ const StoryTiles: React.FC<{
     );
   }
 
-  const tiles: React.ReactNode[] = [...communityTiles];
+  if (!viewerHasPlayed || (scope === 'all' && communityTiles.length < 2)) {
+    if (scope === 'personal') return null;
+    return (
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, scrollMarginTop: STICKY_SAFE }}>
+        {communityTiles}
+      </section>
+    );
+  }
+
+  const tiles: React.ReactNode[] = scope === 'personal' ? [] : [...communityTiles];
+
 
   // Your battle
   if (nemesis) {
