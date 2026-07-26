@@ -20,6 +20,7 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -140,6 +141,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
+  // Fire once per mount when the collapsed hole table is opened.
+  const holesExpandFired = React.useRef(false);
+  const handleHolesExpand = React.useCallback(() => {
+    if (holesExpandFired.current) return;
+    holesExpandFired.current = true;
+    analyticsEvents.track('course_holes_expanded', { course_id: course.id });
+  }, [course.id]);
+
   const handleRateClick = () => {
     if (!user) {
       toast("Sign in required", { description: "Please sign in to rate courses" });
@@ -157,8 +166,41 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
 
-      {/* 2. Community Rating — CommunityScoreCard renders its own header internally, no SectionLabel */}
-      <div style={{ padding: '16px 16px 0' }}>
+      {/* 2 + 3. The course card, course shape, beast / best chance */}
+      <section>
+        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
+      </section>
+
+      {/* 4. Hole by hole, collapsed */}
+      <section>
+        <CourseHolesTab
+          courseId={course.id}
+          section="holes"
+          showTeeCard={false}
+          showGhost={false}
+          showEmptyState={false}
+          collapsible
+          defaultCollapsed
+          onExpand={handleHolesExpand}
+        />
+      </section>
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 5. The record book - Champions promoted onto the default view */}
+      <CourseRecordBook
+        courseId={course.id}
+        courseName={course.name}
+        courseRegion={course.region ?? null}
+        courseCountry={course.country ?? null}
+        courseType={(course as { course_type?: string | null }).course_type ?? null}
+        initialCategory={legendCategoryParam}
+      />
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 6. The verdict - community rating */}
+      <div style={{ padding: '0 16px' }}>
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -193,44 +235,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </div>
 
-
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 3. Friends Who've Played */}
+      {/* 7. Friends who've played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-      {/* 3b. Play data — tee card + course shape, then the collapsed hole table */}
-      <section>
-        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
-      </section>
-
-      <section>
-        <CourseHolesTab
-          courseId={course.id}
-          section="holes"
-          showTeeCard={false}
-          showGhost={false}
-          showEmptyState={false}
-          collapsible
-          defaultCollapsed
-        />
-      </section>
-
       <div style={{ margin: '16px 0' }}><Divider /></div>
-
-      {/* 3c. The record book — Champions promoted onto the default view */}
-      <CourseRecordBook
-        courseId={course.id}
-        courseName={course.name}
-        courseRegion={course.region ?? null}
-        courseCountry={course.country ?? null}
-        courseType={(course as { course_type?: string | null }).course_type ?? null}
-        initialCategory={legendCategoryParam}
-      />
-
-      <div style={{ margin: '16px 0' }}><Divider /></div>
-
-
 
       {/* 5. About - quiet notes card */}
       {course.description && (
