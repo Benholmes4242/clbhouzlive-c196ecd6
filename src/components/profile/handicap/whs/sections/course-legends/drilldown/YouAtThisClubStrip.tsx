@@ -267,7 +267,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             color: emphasize ? AMBER : MUTE,
             lineHeight: 1.2,
             maxWidth: '100%',
-            wordBreak: 'break-word',
+            textAlign: 'center',
             textAlign: 'center',
           }}
         >
