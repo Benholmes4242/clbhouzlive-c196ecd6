@@ -15,7 +15,7 @@ import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { toast } from '@/lib/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import CourseExploreLinks from './CourseExploreLinks';
@@ -28,7 +28,8 @@ import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { AboutGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
-import { PersonalSection } from '@/components/courses/phase5';
+import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseCTA from './ClaimCourseCTA';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
@@ -82,6 +83,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const { user } = useSupabaseSession();
+  const [searchParams] = useSearchParams();
+  const legendCategoryParam = searchParams.get('cat');
   const { data: aboutConnection } = useWhsConnection(user?.id);
   
   
