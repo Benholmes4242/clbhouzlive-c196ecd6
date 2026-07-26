@@ -54,6 +54,20 @@ export const ROW_CONTINENT_COUNTRY: Record<RowContinent, string> = {
   'North America': 'Caribbean',
 };
 
+/**
+ * Caribbean island nations already present in the catalogue (122 ROW /
+ * North America rows). Spellings match the stored data exactly - note
+ * 'Curacao' (no cedilla) and the unqualified 'Virgin Islands'.
+ */
+export const CARIBBEAN_NATIONS = new Set<string>([
+  'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados',
+  'Cayman Islands', 'Cuba', 'Curacao', 'Dominica', 'Dominican Republic',
+  'Grenada', 'Guadeloupe', 'Haiti', 'Jamaica', 'Martinique', 'Montserrat',
+  'Puerto Rico', 'St Kitts and Nevis', 'St Lucia', 'St Martin',
+  'St Vincent and the Grenadines', 'Trinidad and Tobago',
+  'Turks and Caicos', 'Virgin Islands',
+]);
+
 export interface GroupingOption {
   key: RegionKey;
   label: string;
@@ -133,11 +147,19 @@ export interface DerivedGeography {
 export function deriveGeography(
   regionKey: RegionKey,
   rowContinent?: string,
+  subCountry?: string,
 ): DerivedGeography | null {
   const g = GROUPINGS.find((x) => x.key === regionKey);
   if (!g) return null;
   if (regionKey === 'ROW') {
     if (!rowContinent) return null;
+    // North America under ROW covers both the Caribbean islands and
+    // Canada / Mexico - derive from the chosen sub_country.
+    if (rowContinent === 'North America') {
+      const sub = (subCountry ?? '').trim();
+      const country = sub && CARIBBEAN_NATIONS.has(sub) ? 'Caribbean' : 'Rest of World';
+      return { country, region_key: 'ROW', continent: rowContinent };
+    }
     const country = ROW_CONTINENT_COUNTRY[rowContinent as RowContinent];
     if (!country) return null;
     return { country, region_key: 'ROW', continent: rowContinent };
