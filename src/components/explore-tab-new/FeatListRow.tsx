@@ -131,6 +131,8 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       nameMeta={when || undefined}
       subline={subline}
       featChips={feats.length > 0 ? <RoundFeatChips feats={feats} /> : undefined}
+      metaLine={holeParts.length > 0 ? <HoleContextLine parts={holeParts} /> : undefined}
+
       statValue={legendaryChip ? undefined : value}
       statLabel={legendaryChip ? undefined : label}
       statColor={statColor}
