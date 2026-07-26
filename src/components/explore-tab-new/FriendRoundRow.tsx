@@ -1,17 +1,20 @@
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
-import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import type { FriendRoundRow, RoundFeat } from '@/hooks/gam/useFriendsLatestRounds';
 
 /**
  * FriendRoundRow — Discover "Friends' latest rounds".
  * Custom row so we can carry an inline chip strip (hcp delta + up to two
- * achievements) under the name. Density constants match StatRow "compact"
- * so this section sits flush with the Record Book above and below.
+ * feats derived from round stats) under the name. Density constants match
+ * StatRow "compact" so this section sits flush with the Record Book above
+ * and below.
  */
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
