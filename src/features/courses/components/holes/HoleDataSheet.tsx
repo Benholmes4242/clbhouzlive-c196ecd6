@@ -244,6 +244,33 @@ export const HoleDataSheet: React.FC<Props> = ({
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
             {t('courses:holes.holeByHole')}
           </h3>
+          {collapsible ? (
+            <button
+              type="button"
+              aria-expanded={!collapsed}
+              onClick={() => {
+                setCollapsed((c) => {
+                  if (c) onExpand?.();
+                  return !c;
+                });
+              }}
+              style={{
+                border: 0,
+                background: '#FFFFFF',
+                boxShadow: CARD_SHADOW,
+                color: INK,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                padding: '7px 14px',
+                borderRadius: 999,
+                cursor: 'pointer',
+              }}
+            >
+              {collapsed ? 'SHOW' : 'HIDE'}
+            </button>
+          ) : null}
+          {!collapsed && (
           <div
             role="tablist"
             style={{
@@ -280,14 +307,16 @@ export const HoleDataSheet: React.FC<Props> = ({
               </button>
             ))}
           </div>
+          )}
         </div>
 
-        {viewerHasPlayed && (
+        {!collapsed && viewerHasPlayed && (
           <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
             {t('courses:holes.birdieRingNote')}
           </p>
         )}
 
+        {!collapsed && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map((h) => (
             <HoleCard
@@ -302,8 +331,11 @@ export const HoleDataSheet: React.FC<Props> = ({
             />
           ))}
         </div>
+        )}
       </section>
+      )}
     </div>
+
   );
 };
 
