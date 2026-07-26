@@ -1091,7 +1091,13 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
     { onConflict: "user_id,badge_id" }
   );
   if (isNewTier) {
-    await enqueueNotification(userId, "badge_earned", { badge_id: badgeId, tier, whs_score_id: whsScoreId });
+    await enqueueNotification(userId, "badge_earned", {
+      badge_id: badgeId,
+      badge_title: await fetchBadgeTitle(badgeId),
+      tier,
+      whs_score_id: whsScoreId,
+    });
+
   }
 }
 
