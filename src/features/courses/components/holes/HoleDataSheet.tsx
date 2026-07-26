@@ -165,11 +165,18 @@ export const HoleDataSheet: React.FC<Props> = ({
   const rows = sort === 'hole' ? sortedByHole : sortedByTough;
   const toggle = (n: number) => setOpenHole((cur) => (cur === n ? null : n));
 
+  const showShape = section === 'all' || section === 'shape';
+  const showYou = section === 'all' || section === 'you';
+  const showHoles = section === 'all' || section === 'holes';
+  const tileScope: 'all' | 'community' | 'personal' =
+    section === 'shape' ? 'community' : section === 'you' ? 'personal' : 'all';
+
   return (
     <div style={{ fontFamily: FONT, padding: '16px 12px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <HoleGlyphDefs />
 
       {/* 1. Header */}
+      {showShape && (
       <section style={{ scrollMarginTop: STICKY_SAFE, padding: '0 4px' }}>
         <h2
           style={{
@@ -189,9 +196,10 @@ export const HoleDataSheet: React.FC<Props> = ({
             : t('courses:holes.clubGuide.bodySignedOut', { count: formatNumber(totalRounds) })}
         </p>
       </section>
+      )}
 
       {/* 2. Skyline */}
-      {hardest && (
+      {showShape && hardest && (
         <SkylineCard
           holes={sortedByHole}
           hardest={hardest}
@@ -202,23 +210,28 @@ export const HoleDataSheet: React.FC<Props> = ({
       )}
 
       {/* 3. Story tiles */}
-      <StoryTiles
-        hardest={hardest}
-        easiest={easiest}
-        nemesis={nemesis}
-        holes={holes}
-        myByHole={myByHole}
-        viewerHasPlayed={viewerHasPlayed}
-        birdiedCount={birdiedCount}
-        totalHoles={totalHoles}
-        missingBirdieHole={missingBirdieHole}
-      />
+      {(showShape || showYou) && (
+        <StoryTiles
+          hardest={hardest}
+          easiest={easiest}
+          nemesis={nemesis}
+          holes={holes}
+          myByHole={myByHole}
+          viewerHasPlayed={viewerHasPlayed}
+          birdiedCount={birdiedCount}
+          totalHoles={totalHoles}
+          missingBirdieHole={missingBirdieHole}
+          scope={tileScope}
+        />
+      )}
 
       {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
-      <ScoringBreakdownSection golfCourseId={courseId} />
+      {showYou && <ScoringBreakdownSection golfCourseId={courseId} />}
 
       {/* 4. Hole by hole */}
+      {showHoles && (
       <section style={{ scrollMarginTop: STICKY_SAFE, display: 'flex', flexDirection: 'column', gap: 8 }}>
+
         <div
           style={{
             display: 'flex',
