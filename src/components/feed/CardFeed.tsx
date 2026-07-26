@@ -22,7 +22,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayo
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -88,6 +88,9 @@ export interface CardFeedProps {
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
   hasNextPage?: boolean;
+  /** Direct fetch trigger for the fullscreen viewer's pagination. Distinct
+   *  from `onNearEnd`, which is the inline list's scroll-position signal. */
+  fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
   topPadding?: number | string;
   bottomPadding?: number;
@@ -125,6 +128,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   getCommentCount,
   onNearEnd,
   hasNextPage,
+  fetchNextPage,
   topPadding = 96,
   bottomPadding = 96,
   isFetchingNextPage = false,
@@ -603,12 +607,23 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           mediaId: mediaId ?? null,
           mediaIndex,
           railOwnerKey: ownerKey ?? null,
+          options: {
+            hasNextPage: hasNextPage ?? false,
+            fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+            isFetchingNextPage: isFetchingNextPage ?? false,
+          },
         });
       } else {
-        openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });
+        openFullscreen(posts, idx, {
+          mediaId: mediaId ?? null,
+          openedFrom: 'clubhouse',
+          hasNextPage: hasNextPage ?? false,
+          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+          isFetchingNextPage: isFetchingNextPage ?? false,
+        });
       }
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx, hasNextPage, fetchNextPage, isFetchingNextPage],
   );
 
   // Stable per-post carousel-change callback so FeedCard memo holds.
@@ -735,6 +750,25 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     [topPadding, bottomPadding, isFetchingNextPage],
   );
 
+
+  // Mirror pagination state + newly-loaded posts into the fullscreen store
+  // while the viewer is owned by this surface, so swipes past the snapshot
+  // taken at open() keep loading. Gated on ownership - the store is global.
+  const isViewerOwnedHere = useIsViewerOwnedBy('clubhouse');
+  const setPaginationState = useFullscreenFeedStore((s) => s.setPaginationState);
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  useEffect(() => {
+    if (!isViewerOwnedHere) return;
+    // Store dedupes by post id.
+    useFullscreenFeedStore.getState().appendPosts(posts);
+  }, [isViewerOwnedHere, posts]);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && onNearEnd) onNearEnd();
