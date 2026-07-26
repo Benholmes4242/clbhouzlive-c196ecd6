@@ -70,6 +70,18 @@ export const HLS_CONFIG = {
   // Don't let hls thrash when tabs backgrounded.
   enableWorker: true,
   lowLatencyMode: false,
+  // CRISP FIRST FRAME: hls.js's built-in "bandwidth test" loads the first
+  // fragment at the LOWEST rung to measure throughput. With 4s segments that
+  // means several seconds of visibly blurry video on every open. We seed ABR
+  // from bandwidth memory and pick the opening rung ourselves instead.
+  testBandwidth: false,
+  // Fetch the first fragment while the level playlist is still being parsed.
+  startFragPrefetch: true,
+  // Don't sit on a stalled fragment for 4s before switching down.
+  maxStarvationDelay: 2,
+  maxLoadingDelay: 2,
+  fragLoadingMaxRetry: 4,
+  manifestLoadingMaxRetry: 3,
 } as const;
 
 /** Rail-only overrides applied on top of HLS_CONFIG for lanes with id
@@ -79,5 +91,5 @@ export const HLS_CONFIG = {
  *  rail lanes re-parented into fullscreen scale up naturally. */
 export const RAIL_HLS_OVERRIDES = {
   capLevelToPlayerSize: true,
-  startLevel: 0,
 } as const;
+

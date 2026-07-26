@@ -28,6 +28,9 @@ import { videoDebug } from '@/config/videoDebug';
 import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/hlsDebugRegistry';
 import { HLS_CONFIG } from '@/video/lanePolicy';
 import { emitVideoTelemetry } from '@/video/telemetry';
+import { readSeededBandwidth } from '@/video/bandwidthMemory';
+import { applyStartLevel, bandwidthSeed, viewportPixelHeight } from '@/video/startLevel';
+
 
 const POOL_SIZE = 3; // prev / current / next
 
@@ -44,7 +47,9 @@ const INLINE_HLS_CONFIG: Partial<HlsConfig> = {
   maxMaxBufferLength: 24,
   backBufferLength: 15,
   maxBufferSize: 20 * 1024 * 1024,
-  abrEwmaDefaultEstimate: 500_000,
+  // Seeded per-instance from bandwidth memory in `attachSource`; this is only
+  // the floor used when we have never measured this device's connection.
+  abrEwmaDefaultEstimate: 2_500_000,
 };
 
 const FULLSCREEN_HLS_CONFIG: Partial<HlsConfig> = {
@@ -53,11 +58,15 @@ const FULLSCREEN_HLS_CONFIG: Partial<HlsConfig> = {
   maxMaxBufferLength: 60,
   backBufferLength: 30,
   maxBufferSize: 40 * 1024 * 1024,
-  abrEwmaDefaultEstimate: 1_200_000,
+  abrEwmaDefaultEstimate: 3_500_000,
 };
 
-const configFor = (surface: PoolSurface): Partial<HlsConfig> =>
-  surface === 'fullscreen' ? FULLSCREEN_HLS_CONFIG : INLINE_HLS_CONFIG;
+const configFor = (surface: PoolSurface): Partial<HlsConfig> => ({
+  ...(surface === 'fullscreen' ? FULLSCREEN_HLS_CONFIG : INLINE_HLS_CONFIG),
+  // Real measurement wins over the static floor above.
+  abrEwmaDefaultEstimate: bandwidthSeed(readSeededBandwidth()),
+});
+
 
 interface PoolEntry {
   id: string;                    // stable "pool-0", "pool-1", ...
@@ -279,7 +288,21 @@ class VideoPoolImpl {
     hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
       emitVideoTelemetry('video.abr_switch', { id: entry.id, level: data?.level });
     });
+    // CRISP FIRST FRAME: pick the opening rung from surface size + known
+    // bandwidth. Without this hls.js opens on the ladder's 240p rung and
+    // needs several 4s segments to climb — the "blurry for 3-4s" bug.
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      const minHeight = (entry.currentSurface ?? surface) === 'fullscreen' ? 720 : 540;
+      const level = applyStartLevel(
+        hls as any,
+        viewportPixelHeight(),
+        readSeededBandwidth(),
+        minHeight,
+      );
+      videoDebug('pool', 'startLevel applied', { id: entry.id, level });
+    });
     hls.loadSource(hlsUrl);
+
     hls.attachMedia(entry.video);
     entry.hls = hls;
     entry.currentUrl = hlsUrl;

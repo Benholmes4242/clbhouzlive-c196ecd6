@@ -39,6 +39,8 @@ import {
   vperfNextId,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
+import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight } from './startLevel';
+
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { feedLaneRoles } from './feedLaneRoles';
@@ -195,8 +197,14 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.muted = true;
 
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
-  el.preload = 'metadata';
+  // 'auto' is load-bearing on the NATIVE HLS path (iOS/WKWebView, where
+  // Hls.isSupported() is false): with 'metadata' the element fetches only the
+  // manifest + init segment and refuses to buffer media until play() is
+  // called, so every activation paid a full cold fetch (multi-second stall
+  // on device) and the feed's neighbour "warm preload" bought nothing.
+  el.preload = 'auto';
   el.setAttribute('webkit-playsinline', 'true');
+
   el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
   return el;
 }
@@ -762,27 +770,23 @@ class VideoEngineImpl {
     }
 
     // hls.js path.
+    const isRail = laneId.startsWith('rail-');
     if (!lane.hls) {
-      // Rail lanes get the small-tile cold-start profile (lowest startLevel +
-      // capLevelToPlayerSize). Feed-active/fullscreen skip the cap so they
-      // render at manifest-appropriate quality for the viewport.
-      const isRail = laneId.startsWith('rail-');
-      const coldFullscreen = laneId === 'fullscreen';
+      // Rail lanes keep capLevelToPlayerSize (small tiles), feed-active and
+      // fullscreen render at viewport size so they must NOT be capped.
       // [PREDICT] Part 1 — seed ABR from persisted bandwidth memory for
       // FEED-ACTIVE / FULLSCREEN lanes only. Rails intentionally excluded:
-      // their startLevel:0 + capLevelToPlayerSize profile is correct for
-      // small tiles and seeding would only cost data on the first tile.
+      // capLevelToPlayerSize already keeps them small.
       const seededBw = isRail ? null : readSeededBandwidth();
       (lane as any)._seededBw = seededBw;
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
-        ...(coldFullscreen ? { startLevel: 0 } : {}),
         startPosition,
-        // hls.js expects bps. When we have a fresh seed, use it; otherwise
-        // fall back to the conservative default the engine has always used.
-        abrEwmaDefaultEstimate: seededBw ?? 500_000,
-        maxStarvationDelay: 4,
+        // hls.js expects bps. Prefer a real remembered measurement, else the
+        // Network Information API / a sane default — a 500kbps seed opened
+        // every video on the 240p rung and took seconds to climb.
+        abrEwmaDefaultEstimate: isRail ? 800_000 : bandwidthSeed(seededBw),
         // Cap ABR to policy ceiling
         capLevelOnFPSDrop: true,
       };
@@ -791,6 +795,7 @@ class VideoEngineImpl {
       DBG(laneId, 'created hls instance', { seededBw });
 
     } else {
+
       // Re-point: stop current load, then load new source. Instance & element stay.
       lane.hls.stopLoad();
     }
@@ -831,12 +836,29 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
+      // CRISP-FROM-FRAME-ONE: choose the opening rung from the surface size
+      // + known bandwidth instead of letting hls.js open on the 240p rung.
+      // Rails stay on capLevelToPlayerSize (tile-sized) and are left alone.
+      if (!isRail) {
+        const minHeight = lane.id === 'fullscreen' ? 720 : 540;
+        const applied = applyStartLevel(
+          hls as any,
+          viewportPixelHeight(),
+          (lane as any)._seededBw ?? null,
+          minHeight,
+        );
+        DBG(lane.id, 'startLevel.applied', {
+          level: applied,
+          height: hls.levels?.[applied]?.height ?? null,
+        });
+      }
       // SOFT-RESET HYGIENE: do NOT promote to 'ready' here. MANIFEST_PARSED
       // fires before any segment is decoded, so element.readyState is still 0
       // — promoting state='ready' now creates a state/readyState decoupling
       // that lets the borrow stateGate lie for the window until loadeddata.
       // Real promotion happens in markReadyToShow (loadeddata/canplay) below.
     };
+
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
         lane.state = 'error';
@@ -1033,6 +1055,13 @@ class VideoEngineImpl {
 
     const onPlay = () => {
       vperfLaneEvent(lane.id, 'playing');
+      // Reveal as soon as the element reports it is actually playing. 'playing'
+      // fires after any pending seek has committed and before the first
+      // throttled 'timeupdate' (~250ms later), so this shaves a visible chunk
+      // off "video is on screen but still showing the poster". markReadyToShow
+      // still enforces the seek-target/position guard internally.
+      if (!lane.firstFrame) markReadyToShow('playing');
+
       // Session begins on first sustained playing state.
       const hls = lane.hls;
       const startLevel = hls ? (hls.currentLevel ?? null) : null;
@@ -1648,11 +1677,20 @@ class VideoEngineImpl {
     if (!lane || !lane.hls) return;
     try {
       lane.hls.autoLevelCapping = -1;
-      // Trigger a level check on next tick — hls.js re-evaluates
-      // capLevelToPlayerSize inside its level controller.
-      lane.hls.nextLevel = lane.hls.nextLevel;
+      // capLevelToPlayerSize + ABR only re-evaluate on their own schedule,
+      // which left a borrowed rail lane (loaded at TILE resolution) blurry in
+      // fullscreen for several seconds. Jump to a viewport-appropriate rung
+      // immediately, then hand control straight back to ABR.
+      const applied = upshiftForSurface(
+        lane.hls as any,
+        viewportPixelHeight(),
+        (lane as any)._seededBw ?? null,
+        720,
+      );
+      DBG(laneId, 'nudgeLevelCap.upshift', { level: applied });
     } catch {}
   }
+
 
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {

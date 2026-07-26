@@ -34,6 +34,16 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
 }) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const [firstFrame, setFirstFrame] = useState(false);
+  // Keep the callback in a ref so an inline arrow from the parent can't
+  // re-run the acquire effect. Before this, every parent re-render released
+  // and re-acquired the pooled element, which tore the warm HLS buffer down
+  // and restarted the fetch — a major source of the multi-second stall.
+  const onFirstFrameRef = useRef(onFirstFrame);
+  onFirstFrameRef.current = onFirstFrame;
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
+  const mutedRef = useRef(muted);
+  mutedRef.current = muted;
 
   // Reparent a pooled <video> into this slot on mount / url change.
   useEffect(() => {
@@ -41,16 +51,24 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
     if (!host) return;
 
     const video = VideoPool.acquire(slotKey, hlsUrl, surface);
-    video.style.objectFit = objectFit;
     if (host.firstChild !== video) host.appendChild(video);
 
     const onLoaded = () => {
       setFirstFrame(true);
-      onFirstFrame?.();
+      onFirstFrameRef.current?.();
     };
     // If already decoded (warm hit), fire immediately.
     if (video.readyState >= 2) onLoaded();
     else video.addEventListener('loadeddata', onLoaded, { once: true });
+
+    // Kick playback on the SAME tick as acquisition when this slot is already
+    // the active one. Waiting for the props effect below cost a frame, and on
+    // a warm element it is the difference between instant and "still".
+    video.muted = mutedRef.current;
+    if (isActiveRef.current) {
+      const p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(() => { /* autoplay guard */ });
+    }
 
     return () => {
       video.removeEventListener('loadeddata', onLoaded);
@@ -58,7 +76,13 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
       // Do NOT remove the element from `host` — React will unmount `host`
       // itself and the pooled <video> continues living in the pool.
     };
-  }, [slotKey, hlsUrl, objectFit, surface, onFirstFrame]);
+  }, [slotKey, hlsUrl, surface]);
+
+  // object-fit is presentation-only — never re-acquire the element for it.
+  useEffect(() => {
+    const video = hostRef.current?.querySelector('video') as HTMLVideoElement | null;
+    if (video) video.style.objectFit = objectFit;
+  }, [objectFit]);
 
   // Drive play/pause + mute from props on whichever element currently owns this slot.
   useEffect(() => {
@@ -74,6 +98,7 @@ export const VideoSlot: React.FC<VideoSlotProps> = ({
       try { video.pause(); } catch { /* ignore */ }
     }
   }, [isActive, muted]);
+
 
   return (
     <>
