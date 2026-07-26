@@ -316,7 +316,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         gap: 11,
         padding: '9px 18px',
         background: isUnread ? 'rgba(247,147,30,0.045)' : 'transparent',
-        opacity: isUnread ? 1 : 0.75,
+        opacity: 1,
         cursor: 'pointer',
         fontFamily: GEIST,
         borderBottom: `0.5px solid ${T.HAIR}`,
