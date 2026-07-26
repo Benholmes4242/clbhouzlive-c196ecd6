@@ -225,50 +225,22 @@ export function useFriendsLatestRounds(
         }
       }
 
-      // 7. Badges — one query for every surfaced friend, grouped by
-      //    trigger_whs_score_id. Badges attach to a round by
-      //    trigger_whs_score_id equality. Cumulative and cross-round badges
-      //    (streaks, founder, rival sweeps, course legend) have a null
-      //    trigger_whs_score_id because no single round earned them — they
-      //    are intentionally NOT shown on round rows. If those should
-      //    surface in Discover, they need their own treatment rather than
-      //    being attributed to an arbitrary round.
-      const badgesByScoreId = new Map<string, Array<{ id: string; title: string; icon: string | null; earned_at: string }>>();
-      if (surfacedFriendIds.length > 0) {
-        const earliestDate = rowsWindow.reduce(
-          (min, r) => (r.play_date < min ? r.play_date : min),
-          rowsWindow[0]!.play_date,
-        );
-        const { data: badges } = await supabase
-          .from('gam_user_badges' as never)
-          .select('id, user_id, badge_id, earned_at, trigger_whs_score_id, gam_badge_catalogue:badge_id(title, icon_name)')
-          .in('user_id', surfacedFriendIds)
-          .gte('earned_at', earliestDate)
-          .not('trigger_whs_score_id', 'is', null)
-          .eq('is_visible', true)
-          .order('earned_at', { ascending: false });
-        for (const b of ((badges ?? []) as unknown) as Array<{
-          id: string;
-          user_id: string;
-          badge_id: string;
-          earned_at: string;
-          trigger_whs_score_id: string | null;
-          gam_badge_catalogue: { title: string | null; icon_name: string | null } | null;
-        }>) {
-          if (!b.trigger_whs_score_id) continue;
-          const arr = badgesByScoreId.get(b.trigger_whs_score_id) ?? [];
-          if (arr.length < 2) {
-            arr.push({
-              id: b.id,
-              title: b.gam_badge_catalogue?.title ?? 'Achievement',
-              icon: b.gam_badge_catalogue?.icon_name ?? null,
-              earned_at: b.earned_at,
-            });
-            badgesByScoreId.set(b.trigger_whs_score_id, arr);
-          }
-        }
-      }
-
+      // 7. Feats — derived from the round stats already selected above.
+      //    Priority order is rarest first; capped at two per row.
+      const featsForRound = (r: Round): RoundFeat[] => {
+        const out: RoundFeat[] = [];
+        const aces = Number(r.holes_in_one ?? 0);
+        const albs = Number(r.albatrosses ?? 0);
+        const eagles = Number(r.eagles ?? 0);
+        const birdies = Number(r.birdies ?? 0);
+        if (aces >= 1) out.push({ key: 'holes_in_one', count: aces });
+        if (albs >= 1) out.push({ key: 'albatrosses', count: albs });
+        if (eagles >= 1) out.push({ key: 'eagles', count: eagles });
+        if (birdies >= BIRDIE_HAUL_THRESHOLD) out.push({ key: 'birdies', count: birdies });
+        if (r.beat_par === true) out.push({ key: 'beat_par', count: 1 });
+        if (r.clean_card === true) out.push({ key: 'clean_card', count: 1 });
+        return out.slice(0, 2);
+      };
 
       // 8. Assemble rows.
       const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
@@ -283,7 +255,6 @@ export function useFriendsLatestRounds(
           current != null && r.hcp_at_time != null
             ? Math.round((current - Number(r.hcp_at_time)) * 10) / 10
             : null;
-        const badges = r.whs_score_id ? (badgesByScoreId.get(r.whs_score_id) ?? []) : [];
         return {
           round_id: r.whs_score_id ?? `${r.user_id}-${r.play_date}`,
           score_id: r.whs_score_id,
@@ -297,7 +268,7 @@ export function useFriendsLatestRounds(
           net,
           stableford: r.stableford_points,
           hcp_delta: hcpDelta,
-          achievements: badges,
+          feats: featsForRound(r),
         };
       });
 
@@ -305,5 +276,6 @@ export function useFriendsLatestRounds(
     },
     enabled: !!userId,
     staleTime: 60_000,
+
   });
 }
