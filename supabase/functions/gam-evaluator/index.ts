@@ -1031,7 +1031,24 @@ async function processTop100Only(userId: string): Promise<{ earned: string[] }> 
   return { earned };
 }
 
+// Resolve the badge title at emit time so the Activity row is self-contained
+// (mirrors how taker_name / course_name are resolved for legend_lost).
+// Degrades to null; the renderer and backfill both fall back to generic copy.
+async function fetchBadgeTitle(badgeId: string): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from("gam_badge_catalogue")
+      .select("title")
+      .eq("id", badgeId)
+      .maybeSingle();
+    return (data?.title as string | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: string | null): Promise<boolean> {
+
   const { data: existing } = await supabase
     .from("gam_user_badges")
     .select("badge_id")
