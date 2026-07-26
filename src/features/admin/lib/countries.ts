@@ -4,11 +4,13 @@
  * Continent keys match the exact values stored in golf_courses.continent
  * (verified via SELECT DISTINCT continent FROM golf_courses).
  *
- * Convention note: existing golf_courses.country data uses broad regional
- * labels ("Britain & Ireland", "Continental Europe", "Asia", "Oceania",
- * "Africa", "Caribbean", "Central and South America"). New entries should
- * use real country names. The legacy labels are kept in-list so existing
- * records are never orphaned as "(unrecognised)".
+ * IMPORTANT: golf_courses.country is a REGION GROUPING, not a country
+ * ("Britain & Ireland", "Continental Europe", "USA", plus legacy labels
+ * "Asia", "Oceania", "Africa", "Caribbean", "Central and South America").
+ * Admin forms must never write a real country name into country - see
+ * lib/geography.ts, which owns the grouping cascade. This file is now only a
+ * source of raw country name lists (consumed by geography.ts to build the
+ * sub_country options) plus legacy display support.
  */
 
 export const CONTINENT_COUNTRIES: Record<string, string[]> = {

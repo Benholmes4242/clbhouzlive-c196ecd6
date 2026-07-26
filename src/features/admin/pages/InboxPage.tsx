@@ -6,6 +6,7 @@ import {
   CheckCircle2, AlertTriangle, Unlink,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { courseMatchLabel } from '../lib/geography';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
 import { useInboxOpsStats, formatDurationShort } from '../hooks/useInboxOpsStats';
@@ -630,7 +631,7 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
 
 // ---------- unmatched course sheet ----------
 
-interface CourseHit { id: string; name: string; region: string | null; country: string | null }
+interface CourseHit { id: string; name: string; region: string | null; sub_country: string | null; country: string | null }
 
 function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null; onClose: () => void }) {
   const [query, setQuery] = useState('');
@@ -659,7 +660,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     const handle = setTimeout(async () => {
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, region, country')
+        .select('id, name, region, sub_country, country')
         .ilike('name', `%${q}%`)
         .order('name')
         .limit(25);
@@ -767,7 +768,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
                 >
                   <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
                   <div style={{ fontSize: 11, color: t.inkMuted }}>
-                    {[h.region, h.country].filter(Boolean).join(', ') || '-'}
+                    {courseMatchLabel(h) || '-'}
                   </div>
                 </button>
               );

@@ -3,6 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Link2, ChevronDown, ChevronUp, Image as ImageIcon, MapPin, CheckCircle2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { courseMatchLabel } from '../lib/geography';
 import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import StatusPill from '../components/StatusPill';
@@ -36,6 +37,7 @@ interface CourseHit {
   id: string;
   name: string;
   region: string | null;
+  sub_country: string | null;
   country: string | null;
   thumbnail_image: string | null;
 }
@@ -375,7 +377,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
       if (!row.echo_suggested_golf_course_id) return;
       const { data } = await supabase
         .from('golf_courses')
-        .select('id, name, region, country, thumbnail_image')
+        .select('id, name, region, sub_country, country, thumbnail_image')
         .eq('id', row.echo_suggested_golf_course_id)
         .maybeSingle();
       if (!cancel && data) setSuggestion(data as CourseHit);
@@ -393,7 +395,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
     const handle = setTimeout(async () => {
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, region, country, thumbnail_image')
+        .select('id, name, region, sub_country, country, thumbnail_image')
         .ilike('name', `%${q}%`)
         .order('name')
         .limit(25);
@@ -478,7 +480,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: t.inkMuted, fontSize: 11 }}>
             <MapPin size={10} />
-            {[hit.region, hit.country].filter(Boolean).join(', ') || '—'}
+            {courseMatchLabel(hit) || '—'}
           </span>
         </span>
       </button>
