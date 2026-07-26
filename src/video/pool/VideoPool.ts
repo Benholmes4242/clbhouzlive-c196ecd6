@@ -288,7 +288,21 @@ class VideoPoolImpl {
     hls.on(Hls.Events.LEVEL_SWITCHED, (_evt, data) => {
       emitVideoTelemetry('video.abr_switch', { id: entry.id, level: data?.level });
     });
+    // CRISP FIRST FRAME: pick the opening rung from surface size + known
+    // bandwidth. Without this hls.js opens on the ladder's 240p rung and
+    // needs several 4s segments to climb — the "blurry for 3-4s" bug.
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      const minHeight = (entry.currentSurface ?? surface) === 'fullscreen' ? 720 : 540;
+      const level = applyStartLevel(
+        hls as any,
+        viewportPixelHeight(),
+        readSeededBandwidth(),
+        minHeight,
+      );
+      videoDebug('pool', 'startLevel applied', { id: entry.id, level });
+    });
     hls.loadSource(hlsUrl);
+
     hls.attachMedia(entry.video);
     entry.hls = hls;
     entry.currentUrl = hlsUrl;
