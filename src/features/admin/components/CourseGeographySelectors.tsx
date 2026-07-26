@@ -113,9 +113,22 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
       onChange({ continent: '', country: '', sub_country: '' });
       return;
     }
-    const derived = deriveGeography('ROW', continent);
+    const derived = deriveGeography('ROW', continent, '');
     if (!derived) return;
     onChange({ ...derived, sub_country: '' });
+  };
+
+  // ROW + North America derives country from the sub_country, so recompute
+  // it whenever the selection changes.
+  const pickSubCountry = (sub: string) => {
+    if (value.region_key === 'ROW' && value.continent === 'North America') {
+      const derived = deriveGeography('ROW', 'North America', sub);
+      if (derived) {
+        onChange({ ...derived, sub_country: sub });
+        return;
+      }
+    }
+    onChange({ sub_country: sub });
   };
 
   if (legacy && !overrideLegacy) {
@@ -207,7 +220,7 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
         <select
           value={value.sub_country ?? ''}
           disabled={subDisabled}
-          onChange={(e) => onChange({ sub_country: e.target.value })}
+          onChange={(e) => pickSubCountry(e.target.value)}
           style={subDisabled ? disabledStyle : inputStyle}
         >
           {subDisabled ? (
