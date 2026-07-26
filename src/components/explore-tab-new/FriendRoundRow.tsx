@@ -227,7 +227,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           ) : null}
         </div>
 
-        {(hcpChip || achievements.length > 0) && (
+        {(hcpChip || feats.length > 0) && (
           <div
             style={{
               display: 'flex',
@@ -238,35 +238,39 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
             }}
           >
             {hcpChip}
-            {achievements.slice(0, 2).map((a) => (
-              <span
-                key={a.id}
-                style={{
-                  ...chipBase,
-                  background: 'rgba(247,147,30,0.10)',
-                  color: AMBER,
-                  textTransform: 'none',
-                  letterSpacing: '0.02em',
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                }}
-                title={a.title}
-              >
-                <span aria-hidden style={{ fontSize: 11 }}>🏅</span>
+            {feats.slice(0, 2).map((f) => {
+              const label = featLabel(f);
+              return (
                 <span
+                  key={f.key}
                   style={{
-                    maxWidth: 120,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    ...chipBase,
+                    background: 'rgba(247,147,30,0.10)',
+                    color: AMBER,
+                    textTransform: 'none',
+                    letterSpacing: '0.02em',
+                    fontSize: 10.5,
+                    fontWeight: 600,
                   }}
+                  title={label}
                 >
-                  {a.title}
+                  <span aria-hidden style={{ fontSize: 11 }}>{'\uD83C\uDFC5'}</span>
+                  <span
+                    style={{
+                      maxWidth: 120,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {label}
+                  </span>
                 </span>
-              </span>
-            ))}
+              );
+            })}
           </div>
         )}
+
       </div>
 
       {gross != null ? (
