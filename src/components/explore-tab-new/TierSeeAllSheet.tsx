@@ -160,7 +160,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     setVisible(PAGE);
     setMode(initialMode);
     setMetric(initialMetric);
+    setQuery('');
   }, [open, initialMode, initialMetric]);
+
+  // Reset the page window when the filter changes.
+  useEffect(() => {
+    setVisible(PAGE);
+  }, [needle]);
 
   useEffect(() => {
     setVisible(PAGE);
