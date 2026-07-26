@@ -311,6 +311,13 @@ const ProfileHandicapCard: React.FC<Props> = ({
           viewMode={isOwnProfile ? 'owner' : 'friend'}
           ownerFirstName={resolvedName}
           variant="light"
+          onOpen={() =>
+            navigate(
+              isOwnProfile
+                ? '/handicap?gam=trophies'
+                : `/handicap/${userId}?gam=trophies`,
+            )
+          }
         />
       </div>
     </div>
