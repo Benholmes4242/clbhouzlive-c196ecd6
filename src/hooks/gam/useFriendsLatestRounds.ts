@@ -16,10 +16,32 @@ import { supabase } from '@/integrations/supabase/client';
  *   NOT approximate net from hcp_at_time (that is the handicap INDEX, not the
  *   course-specific playing handicap).
  *
- * ACHIEVEMENT MATCHING (brief 1.4)
- *   gam_user_badges HAS trigger_whs_score_id in the DB — the brief still
- *   directs date-only matching for v1. See the matcher comment below.
+ * FEAT CHIPS
+ *   Derived from gam_round_stats columns (deterministic, always present) —
+ *   NOT from gam_user_badges. Badges are a milestone mechanism and are sparse
+ *   by design, so a notable round (e.g. four birdies) often has no badge.
+ *   The badge path (trigger_whs_score_id) remains the right foundation for a
+ *   future "recent unlocks" surface (streaks, Founder, Course Legend), which
+ *   deliberately do NOT belong on round rows. Follow-up, not built here.
  */
+
+/** Feat keys, rarest first. Mirrors the chip priority order. */
+export type RoundFeatKey =
+  | 'holes_in_one'
+  | 'albatrosses'
+  | 'eagles'
+  | 'birdies'
+  | 'beat_par'
+  | 'clean_card';
+
+export interface RoundFeat {
+  key: RoundFeatKey;
+  /** Occurrence count; 1 for boolean feats. */
+  count: number;
+}
+
+/** Birdie-haul threshold — MUST match refresh_discover_feats (birdie_count >= 4). */
+export const BIRDIE_HAUL_THRESHOLD = 4;
 
 export interface FriendRoundRow {
   round_id: string;
@@ -35,8 +57,10 @@ export interface FriendRoundRow {
   stableford: number | null;
   /** current handicap index minus hcp_at_time. Negative = handicap dropped (good). */
   hcp_delta: number | null;
-  achievements: Array<{ id: string; title: string; icon: string | null; earned_at: string }>;
+  /** Up to two feats, rarest first. */
+  feats: RoundFeat[];
 }
+
 
 interface Options {
   /** Max number of friends surfaced. */
