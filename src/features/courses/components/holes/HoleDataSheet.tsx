@@ -789,12 +789,13 @@ const StoryTile: React.FC<{
 
 const MixStrip: React.FC<{ row: CourseHole }> = ({ row }) => {
   const segs = [
-    { pct: pctSum(row, ['ace', 'albatross', 'eagle']), bg: GOLD },
-    { pct: row.dist.birdie ?? 0, bg: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)` },
-    { pct: row.dist.par ?? 0, bg: INK_20 },
-    { pct: row.dist.bogey ?? 0, bg: INK_55 },
-    { pct: row.dist.double ?? 0, bg: INK_85 },
+    { pct: pctSum(row, ['ace', 'albatross', 'eagle']), bg: DIST_SEG_COLORS.eaglePlus },
+    { pct: row.dist.birdie ?? 0, bg: DIST_SEG_COLORS.birdie },
+    { pct: row.dist.par ?? 0, bg: DIST_SEG_COLORS.par },
+    { pct: row.dist.bogey ?? 0, bg: DIST_SEG_COLORS.bogey },
+    { pct: row.dist.double ?? 0, bg: DIST_SEG_COLORS.double },
   ];
+
   const total = Math.max(0.01, segs.reduce((s, x) => s + x.pct, 0));
   return (
     <div style={{ height: 5, background: INK_06, borderRadius: 999, overflow: 'hidden', display: 'flex' }}>
