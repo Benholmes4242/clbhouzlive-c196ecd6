@@ -343,9 +343,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                   );
                 })}
               </div>
-            )}
-          </div>
-        )}
+          )}
+
+          <GolferSearchField
+            key={open ? 'open' : 'closed'}
+            onQueryChange={handleQueryChange}
+          />
+        </div>
       </div>
 
       {/* Body */}
