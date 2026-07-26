@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { StatRow, type StatRowChip } from './StatRow';
 import { LedgerSubline } from './PinIcon';
+import { RoundFeatChips } from './RoundFeatChips';
+import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 
 import { rowToPar, toParText, type FeatRow, type FeatTier, type RecordsMode } from './hooks/useRegionFeats';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
@@ -103,6 +105,13 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
   const showDate = !!when && !isRanked;
   const subline = <LedgerSubline courseName={row.course_name} />;
 
+  // Record book only: feat chips from the stats joined into the cached payload.
+  // Rows without stats simply render no chip row.
+  const feats = useMemo(
+    () => (isRecordsRow ? deriveRoundFeats(row) : []),
+    [isRecordsRow, row],
+  );
+
 
   return (
     <StatRow
@@ -112,6 +121,7 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
       name={holder}
       nameMeta={when || undefined}
       subline={subline}
+      featChips={feats.length > 0 ? <RoundFeatChips feats={feats} /> : undefined}
       statValue={legendaryChip ? undefined : value}
       statLabel={legendaryChip ? undefined : label}
       statColor={statColor}
