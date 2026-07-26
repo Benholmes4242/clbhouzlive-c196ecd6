@@ -7063,6 +7063,51 @@ export type Database = {
           },
         ]
       }
+      page_path_map: {
+        Row: {
+          first_seen_at: string
+          mapped_at: string
+          raw_path: string
+          route_pattern: string
+        }
+        Insert: {
+          first_seen_at?: string
+          mapped_at?: string
+          raw_path: string
+          route_pattern: string
+        }
+        Update: {
+          first_seen_at?: string
+          mapped_at?: string
+          raw_path?: string
+          route_pattern?: string
+        }
+        Relationships: []
+      }
+      page_route_manifest: {
+        Row: {
+          area: string
+          is_active: boolean
+          label: string
+          route_pattern: string
+          sort_order: number
+        }
+        Insert: {
+          area: string
+          is_active?: boolean
+          label: string
+          route_pattern: string
+          sort_order?: number
+        }
+        Update: {
+          area?: string
+          is_active?: boolean
+          label?: string
+          route_pattern?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       pickem_picks: {
         Row: {
           created_at: string
@@ -18888,6 +18933,21 @@ export type Database = {
           user_wins: number
         }[]
       }
+      get_screen_analytics: {
+        Args: { p_days?: number }
+        Returns: {
+          area: string
+          events_fired: number
+          label: string
+          median_dwell_sec: number
+          prev_views: number
+          route_pattern: string
+          trend_pct: number
+          unique_sessions: number
+          unique_users: number
+          views: number
+        }[]
+      }
       get_season_calendar: {
         Args: never
         Returns: {
@@ -20528,6 +20588,7 @@ export type Database = {
           username: string
         }[]
       }
+      normalise_page_path: { Args: { p_path: string }; Returns: string }
       normalise_tee_marker: {
         Args: { p_raw: string }
         Returns: {
@@ -20658,6 +20719,7 @@ export type Database = {
         Returns: undefined
       }
       refresh_legendary_leaders: { Args: never; Returns: undefined }
+      refresh_page_path_map: { Args: never; Returns: Json }
       refresh_toughest_courses_cache: {
         Args: { p_limit?: number; p_min_rounds?: number }
         Returns: undefined
@@ -20689,6 +20751,7 @@ export type Database = {
         Args: { lock_name: string }
         Returns: boolean
       }
+      remap_page_path_map: { Args: never; Returns: Json }
       remove_business_member: {
         Args: { p_business_id: string; p_member_user_id: string }
         Returns: Json
