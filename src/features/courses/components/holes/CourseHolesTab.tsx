@@ -11,14 +11,34 @@ import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
-import { HoleDataSheet } from './HoleDataSheet';
+import { HoleDataSheet, type HoleDataSection } from './HoleDataSheet';
 import { CourseTeeCard } from './CourseTeeCard';
 
 interface Props {
   courseId: string | undefined;
+  /** Which slice of HoleDataSheet to render. Default 'all' (legacy tab). */
+  section?: HoleDataSection;
+  /** Render the tee card above the sheet. Default true (legacy tab). */
+  showTeeCard?: boolean;
+  /** Render the connect-handicap ghost prompt. Default true (legacy tab). */
+  showGhost?: boolean;
+  /** Render the "no hole data" empty state. Default true (legacy tab). */
+  showEmptyState?: boolean;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
+  onExpand?: () => void;
 }
 
-export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
+export const CourseHolesTab: React.FC<Props> = ({
+  courseId,
+  section = 'all',
+  showTeeCard = true,
+  showGhost = true,
+  showEmptyState = true,
+  collapsible = false,
+  defaultCollapsed = false,
+  onExpand,
+}) => {
   const { t } = useTranslation(['courses']);
   const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
@@ -28,6 +48,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
+
 
   const holes = data?.holes ?? [];
 
