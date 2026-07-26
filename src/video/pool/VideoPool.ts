@@ -28,6 +28,9 @@ import { videoDebug } from '@/config/videoDebug';
 import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/hlsDebugRegistry';
 import { HLS_CONFIG } from '@/video/lanePolicy';
 import { emitVideoTelemetry } from '@/video/telemetry';
+import { readSeededBandwidth } from '@/video/bandwidthMemory';
+import { applyStartLevel, bandwidthSeed, viewportPixelHeight } from '@/video/startLevel';
+
 
 const POOL_SIZE = 3; // prev / current / next
 
