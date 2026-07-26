@@ -1,17 +1,20 @@
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
-import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import type { FriendRoundRow, RoundFeat } from '@/hooks/gam/useFriendsLatestRounds';
 
 /**
  * FriendRoundRow — Discover "Friends' latest rounds".
  * Custom row so we can carry an inline chip strip (hcp delta + up to two
- * achievements) under the name. Density constants match StatRow "compact"
- * so this section sits flush with the Record Book above and below.
+ * feats derived from round stats) under the name. Density constants match
+ * StatRow "compact" so this section sits flush with the Record Book above
+ * and below.
  */
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = '#0F172A';
@@ -52,6 +55,7 @@ interface Props {
 }
 
 export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
+  const { t } = useTranslation('courses');
   const {
     display_name,
     profile_photo_url,
@@ -61,10 +65,46 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
     gross,
     net,
     hcp_delta,
-    achievements,
+    feats,
   } = row;
 
   const relative = formatRelativeMonths(play_date);
+
+  const featLabel = (f: RoundFeat): string => {
+    switch (f.key) {
+      case 'holes_in_one':
+        return t('discover.friendsRounds.feats.holesInOne', {
+          count: f.count,
+          defaultValue_one: 'HOLE IN ONE',
+          defaultValue_other: '{{count}} HOLES IN ONE',
+        });
+      case 'albatrosses':
+        return t('discover.friendsRounds.feats.albatrosses', {
+          count: f.count,
+          defaultValue_one: 'ALBATROSS',
+          defaultValue_other: '{{count}} ALBATROSSES',
+        });
+      case 'eagles':
+        return t('discover.friendsRounds.feats.eagles', {
+          count: f.count,
+          defaultValue_one: 'EAGLE',
+          defaultValue_other: '{{count}} EAGLES',
+        });
+      case 'birdies':
+        return t('discover.friendsRounds.feats.birdies', {
+          count: f.count,
+          defaultValue_one: '{{count}} BIRDIE',
+          defaultValue_other: '{{count}} BIRDIES',
+        });
+      case 'beat_par':
+        return t('discover.friendsRounds.feats.beatPar', 'UNDER PAR');
+      case 'clean_card':
+        return t('discover.friendsRounds.feats.cleanCard', 'CLEAN CARD');
+      default:
+        return '';
+    }
+  };
+
 
   // hcp movement — direction inverted: negative delta (lower index) is good.
   const hcpChip = (() => {
@@ -187,7 +227,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           ) : null}
         </div>
 
-        {(hcpChip || achievements.length > 0) && (
+        {(hcpChip || feats.length > 0) && (
           <div
             style={{
               display: 'flex',
@@ -198,35 +238,39 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
             }}
           >
             {hcpChip}
-            {achievements.slice(0, 2).map((a) => (
-              <span
-                key={a.id}
-                style={{
-                  ...chipBase,
-                  background: 'rgba(247,147,30,0.10)',
-                  color: AMBER,
-                  textTransform: 'none',
-                  letterSpacing: '0.02em',
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                }}
-                title={a.title}
-              >
-                <span aria-hidden style={{ fontSize: 11 }}>🏅</span>
+            {feats.slice(0, 2).map((f) => {
+              const label = featLabel(f);
+              return (
                 <span
+                  key={f.key}
                   style={{
-                    maxWidth: 120,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    ...chipBase,
+                    background: 'rgba(247,147,30,0.10)',
+                    color: AMBER,
+                    textTransform: 'none',
+                    letterSpacing: '0.02em',
+                    fontSize: 10.5,
+                    fontWeight: 600,
                   }}
+                  title={label}
                 >
-                  {a.title}
+                  <span aria-hidden style={{ fontSize: 11 }}>{'\uD83C\uDFC5'}</span>
+                  <span
+                    style={{
+                      maxWidth: 120,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {label}
+                  </span>
                 </span>
-              </span>
-            ))}
+              );
+            })}
           </div>
         )}
+
       </div>
 
       {gross != null ? (

@@ -18,7 +18,7 @@ interface Props {
  */
 export function FriendsRoundsSection({ userId, opener }: Props) {
   const { t } = useTranslation('courses');
-  const { data: rounds, isLoading } = useFriendsLatestRounds(userId, { limit: 4 });
+  const { data: rounds, isLoading } = useFriendsLatestRounds(userId, { limit: 5 });
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleRowPress = useCallback(
