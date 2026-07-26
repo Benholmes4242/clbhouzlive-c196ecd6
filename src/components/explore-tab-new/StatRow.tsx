@@ -36,6 +36,9 @@ export interface StatRowProps {
   subline?: ReactNode;
   /** Optional chip strip rendered beneath the subline (feat chips). */
   featChips?: ReactNode;
+  /** Optional third text line beneath the subline (e.g. hole context). */
+  metaLine?: ReactNode;
+
   statValue?: ReactNode;
   statLabel?: string;
   statSubLabel?: string;
@@ -149,6 +152,8 @@ export function StatRow({
   nameMeta,
   subline,
   featChips,
+  metaLine,
+
   statValue,
   statLabel,
   statSubLabel,
@@ -285,7 +290,9 @@ export function StatRow({
             {featChips}
           </div>
         ) : null}
+        {metaLine ?? null}
       </div>
+
 
       <div
         style={{

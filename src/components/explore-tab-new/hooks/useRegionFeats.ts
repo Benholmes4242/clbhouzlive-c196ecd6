@@ -15,7 +15,12 @@ export interface FeatRow {
   feat_type?: string;
   feat_value?: string;
   play_date?: string;
+  // legendary rows only: hole context joined at cache-build time
+  hole_no?: number | null;
+  hole_par?: number | null;
+  hole_yards?: number | null;
   score_id?: string;
+
   user_id?: string;
   course_id?: string;
   // per-item region key used by cached rails ('gbi' | 'usa' | 'europe' | 'row')
