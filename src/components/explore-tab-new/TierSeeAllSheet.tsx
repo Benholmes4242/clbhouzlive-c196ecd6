@@ -162,7 +162,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     setMode(initialMode);
     setMetric(initialMetric);
     setQuery('');
-    setSearchExpanded(false);
+    
   }, [open, initialMode, initialMetric]);
 
   // Reset the page window when the filter changes.
