@@ -107,8 +107,8 @@ export const CourseHolesTab: React.FC<Props> = ({
     );
   }
 
-  const showGhost = Boolean(user) && !connection;
-  const ghost = showGhost ? (
+  const wantsGhost = showGhost && Boolean(user) && !connection;
+  const ghost = wantsGhost ? (
     <ConnectGhostPrompt
       surface="holes"
       ghost={<HolesGhost />}
@@ -116,12 +116,14 @@ export const CourseHolesTab: React.FC<Props> = ({
     />
   ) : null;
 
+  const teeCard = showTeeCard ? <CourseTeeCard courseId={courseId} /> : null;
+
   if (!data?.available || holes.length === 0) {
     return (
       <>
         {ghost}
-        <CourseTeeCard courseId={courseId} />
-        <HolesEmptyState courseName={meta?.course_name ?? null} />
+        {teeCard}
+        {showEmptyState && <HolesEmptyState courseName={meta?.course_name ?? null} />}
       </>
     );
   }
@@ -129,7 +131,7 @@ export const CourseHolesTab: React.FC<Props> = ({
   return (
     <>
       {ghost}
-      <CourseTeeCard courseId={courseId} />
+      {teeCard}
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}
@@ -137,9 +139,14 @@ export const CourseHolesTab: React.FC<Props> = ({
         totalRounds={data.total_rounds}
         myByHole={myByHole}
         viewerHasPlayed={viewerHasPlayed}
+        section={section}
+        collapsible={collapsible}
+        defaultCollapsed={defaultCollapsed}
+        onExpand={onExpand}
       />
     </>
   );
 };
+
 
 export default CourseHolesTab;
