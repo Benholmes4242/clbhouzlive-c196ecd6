@@ -31,6 +31,19 @@ const GOLD_GRAD_V = `linear-gradient(180deg, ${GOLD} 0%, ${GOLD_2} 100%)`;
 const CARD_SHADOW = '0 1px 2px rgba(15,23,42,0.04)';
 const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
+/**
+ * Single source of truth for the score-distribution colours.
+ * Used by the mix strip on every hole row and by the collapsed-state legend.
+ */
+const DIST_SEG_COLORS = {
+  eaglePlus: GOLD,
+  birdie: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)`,
+  par: INK_20,
+  bogey: INK_55,
+  double: INK_85,
+} as const;
+
+
 const CARD: React.CSSProperties = {
   background: '#FFFFFF',
   borderRadius: 20,
@@ -235,41 +248,50 @@ export const HoleDataSheet: React.FC<Props> = ({
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'space-between',
             padding: '0 4px',
             gap: 8,
           }}
         >
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
-            {t('courses:holes.holeByHole')}
-          </h3>
-          {collapsible ? (
-            <button
-              type="button"
-              aria-expanded={!collapsed}
-              onClick={() => {
-                setCollapsed((c) => {
-                  if (c) onExpand?.();
-                  return !c;
-                });
-              }}
+          <div style={{ minWidth: 0 }}>
+            <div
               style={{
-                border: 0,
-                background: '#FFFFFF',
-                boxShadow: CARD_SHADOW,
-                color: INK,
                 fontSize: 11,
                 fontWeight: 800,
-                letterSpacing: '0.04em',
-                padding: '7px 14px',
-                borderRadius: 999,
-                cursor: 'pointer',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: GOLD_INK,
               }}
             >
-              {collapsed ? 'SHOW' : 'HIDE'}
-            </button>
-          ) : null}
+              {t('courses:holes.preview.eyebrow')}
+            </div>
+            <h3
+              style={{
+                margin: '4px 0 0',
+                fontSize: 17,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.01em',
+                lineHeight: 1.2,
+              }}
+            >
+              {t('courses:holes.preview.title')}
+            </h3>
+            <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
+              {totalRounds > 0
+                ? t('courses:holes.preview.description', {
+                    holes: formatNumber(totalHoles),
+                    count: formatNumber(totalRounds),
+                    personal: viewerHasPlayed
+                      ? t('courses:holes.preview.personalClause')
+                      : '',
+                  })
+                : t('courses:holes.preview.descriptionNoRounds', {
+                    holes: formatNumber(totalHoles),
+                  })}
+            </p>
+          </div>
           {!collapsed && (
           <div
             role="tablist"
@@ -279,6 +301,7 @@ export const HoleDataSheet: React.FC<Props> = ({
               borderRadius: 999,
               padding: 3,
               boxShadow: CARD_SHADOW,
+              flexShrink: 0,
             }}
           >
             {([
@@ -310,28 +333,86 @@ export const HoleDataSheet: React.FC<Props> = ({
           )}
         </div>
 
+        {/* Legend - colours read from DIST_SEG_COLORS, the same source the mix strip uses */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 4px', flexWrap: 'wrap' }}>
+          {([
+            [DIST_SEG_COLORS.birdie, t('courses:holes.preview.legendBirdie')],
+            [DIST_SEG_COLORS.par, t('courses:holes.preview.legendPar')],
+            [DIST_SEG_COLORS.bogey, t('courses:holes.preview.legendBogey')],
+            [DIST_SEG_COLORS.double, t('courses:holes.preview.legendDouble')],
+          ] as const).map(([bg, label]) => (
+            <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 10, height: 8, borderRadius: 3, background: bg, display: 'inline-block' }} />
+              <span style={{ fontSize: 10, fontWeight: 600, color: INK_55 }}>{label}</span>
+            </span>
+          ))}
+        </div>
+
         {!collapsed && viewerHasPlayed && (
           <p style={{ margin: 0, padding: '0 4px', fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
             {t('courses:holes.birdieRingNote')}
           </p>
         )}
 
-        {!collapsed && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {rows.map((h) => (
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {(collapsed ? sortedByHole.slice(0, 3) : rows).map((h) => (
             <HoleCard
               key={h.hole_no}
               row={h}
               mine={myByHole.get(h.hole_no) ?? null}
               isHardest={hardest?.hole_no === h.hole_no}
               isBirdied={birdiedHoles.has(h.hole_no)}
-              open={openHole === h.hole_no}
+              open={!collapsed && openHole === h.hole_no}
               onToggle={() => toggle(h.hole_no)}
               viewerHasPlayed={viewerHasPlayed}
             />
           ))}
+          {collapsed && sortedByHole.length >= 3 && (
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 80,
+                pointerEvents: 'none',
+                background: 'linear-gradient(180deg, rgba(248,250,252,0) 0%, rgba(248,250,252,0.92) 70%, #F8FAFC 100%)',
+              }}
+            />
+          )}
         </div>
+
+        {collapsible && (
+          <button
+            type="button"
+            aria-expanded={!collapsed}
+            onClick={() => {
+              setCollapsed((c) => {
+                if (c) onExpand?.();
+                return !c;
+              });
+            }}
+            style={{
+              width: '100%',
+              minHeight: 44,
+              border: 0,
+              borderRadius: 14,
+              background: collapsed ? INK : '#F8FAFC',
+              color: collapsed ? '#FFFFFF' : INK,
+              fontSize: 13.5,
+              fontWeight: 800,
+              letterSpacing: '-0.005em',
+              cursor: 'pointer',
+              marginTop: 4,
+            }}
+          >
+            {collapsed
+              ? t('courses:holes.preview.seeAll', { count: totalHoles })
+              : t('courses:holes.preview.showLess')}
+          </button>
         )}
+
       </section>
       )}
     </div>
@@ -708,12 +789,13 @@ const StoryTile: React.FC<{
 
 const MixStrip: React.FC<{ row: CourseHole }> = ({ row }) => {
   const segs = [
-    { pct: pctSum(row, ['ace', 'albatross', 'eagle']), bg: GOLD },
-    { pct: row.dist.birdie ?? 0, bg: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)` },
-    { pct: row.dist.par ?? 0, bg: INK_20 },
-    { pct: row.dist.bogey ?? 0, bg: INK_55 },
-    { pct: row.dist.double ?? 0, bg: INK_85 },
+    { pct: pctSum(row, ['ace', 'albatross', 'eagle']), bg: DIST_SEG_COLORS.eaglePlus },
+    { pct: row.dist.birdie ?? 0, bg: DIST_SEG_COLORS.birdie },
+    { pct: row.dist.par ?? 0, bg: DIST_SEG_COLORS.par },
+    { pct: row.dist.bogey ?? 0, bg: DIST_SEG_COLORS.bogey },
+    { pct: row.dist.double ?? 0, bg: DIST_SEG_COLORS.double },
   ];
+
   const total = Math.max(0.01, segs.reduce((s, x) => s + x.pct, 0));
   return (
     <div style={{ height: 5, background: INK_06, borderRadius: 999, overflow: 'hidden', display: 'flex' }}>
