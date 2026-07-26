@@ -559,75 +559,46 @@ async function getMilestone(userId: string, metric: string): Promise<number> {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // recomputeTop100Milestones
-// Distinct rated-course counts per Top 100 list, written to gam_user_milestones.
-// Set-based (idempotent across replay). Called per evaluation so a user who
-// rates a course between rounds gets credit on the next score post too.
+// Distinct Top 100 course counts per active list (rated OR WHS-played), written
+// to gam_user_milestones. The union is computed in SQL by
+// user_top100_distinct_counts because PostgREST cannot express the required
+// joins (course_top100_memberships has no FK to course_ratings, and whs_scores
+// only bridges to golf_courses through the WHS map).
+// Set-based (idempotent across replay). Fails loudly: if the counts query
+// errors we leave the previous milestones untouched rather than writing a
+// half-computed number.
 // ─────────────────────────────────────────────────────────────────────────────
 async function recomputeTop100Milestones(userId: string) {
-  const distinctByList = new Map<string, Set<string>>();
-
-  // (a) RATED Top 100 courses
-  const { data: ratedRows, error: ratedErr } = await supabase
-    .from("course_top100_memberships")
-    .select(`
-      course_id,
-      top100_lists!inner ( slug, is_active ),
-      course_ratings!inner ( user_id, rating )
-    `)
-    .eq("top100_lists.is_active", true)
-    .eq("course_ratings.user_id", userId)
-    .not("course_ratings.rating", "is", null);
-
-  if (ratedErr) {
-    console.error("[recomputeTop100Milestones] rated query error", ratedErr);
-  }
-  for (const row of ratedRows ?? []) {
-    const slug = (row as any).top100_lists?.slug;
-    if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
-    if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
-    distinctByList.get(slug)!.add((row as any).course_id);
-  }
-
-  // (b) WHS-PLAYED Top 100 courses — bridged via whs_courses + whs_course_aliases by name.
-  // whs_scores.course_id is a whs_courses id, NOT a golf_courses id; the two only bridge
-  // through whs_course_aliases (matched by lower(trim(name))). PostgREST can't express
-  // that join, so we use a small SQL helper RPC.
-  const { data: playedGolfCourseRows, error: playedErr } = await supabase.rpc(
-    "user_whs_played_golf_course_ids",
+  const { data: countRows, error: countErr } = await supabase.rpc(
+    "user_top100_distinct_counts",
     { p_user_id: userId },
   );
-  if (playedErr) {
-    console.error("[recomputeTop100Milestones] whs-played query error", playedErr);
+
+  if (countErr) {
+    console.error(
+      "[recomputeTop100Milestones] counts query error - milestones left untouched",
+      countErr,
+    );
+    return;
   }
-  const playedGolfCourseIds = (playedGolfCourseRows ?? [])
-    .map((r: any) => r.course_id)
-    .filter(Boolean);
+  if (!countRows) {
+    console.error(
+      "[recomputeTop100Milestones] counts query returned no data - milestones left untouched",
+    );
+    return;
+  }
 
-  if (playedGolfCourseIds.length > 0) {
-    const { data: memRows, error: memErr } = await supabase
-      .from("course_top100_memberships")
-      .select(`
-        course_id,
-        top100_lists!inner ( slug, is_active )
-      `)
-      .eq("top100_lists.is_active", true)
-      .in("course_id", playedGolfCourseIds);
-
-    if (memErr) {
-      console.error("[recomputeTop100Milestones] membership query error", memErr);
-    }
-    for (const row of memRows ?? []) {
-      const slug = (row as any).top100_lists?.slug;
-      if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
-      if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
-      distinctByList.get(slug)!.add((row as any).course_id);
-    }
+  const countBySlug = new Map<string, number>();
+  for (const row of countRows as any[]) {
+    if (!row?.slug) continue;
+    countBySlug.set(String(row.slug), Number(row.course_count ?? 0));
   }
 
   const nowIso = new Date().toISOString();
   for (const slug of Object.values(TOP_100_SLUG_BY_METRIC)) {
     const metric = TOP_100_METRIC_BY_SLUG[slug];
-    const count = distinctByList.get(slug)?.size ?? 0;
+    const count = countBySlug.get(slug) ?? 0;
+
 
     const { data: existing } = await supabase
       .from("gam_user_milestones")
