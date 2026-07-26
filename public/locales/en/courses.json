@@ -681,7 +681,19 @@
       "viewAll": "View all",
       "entrySingular": "ROUND",
       "entryPlural": "ROUNDS",
-      "empty": "No recent friend rounds yet."
+      "empty": "No recent friend rounds yet.",
+      "feats": {
+        "holesInOne_one": "HOLE IN ONE",
+        "holesInOne_other": "{{count}} HOLES IN ONE",
+        "albatrosses_one": "ALBATROSS",
+        "albatrosses_other": "{{count}} ALBATROSSES",
+        "eagles_one": "EAGLE",
+        "eagles_other": "{{count}} EAGLES",
+        "birdies_one": "{{count}} BIRDIE",
+        "birdies_other": "{{count}} BIRDIES",
+        "beatPar": "UNDER PAR",
+        "cleanCard": "CLEAN CARD"
+      }
     },
     "moments": {
       "title": "Moments of the game",
