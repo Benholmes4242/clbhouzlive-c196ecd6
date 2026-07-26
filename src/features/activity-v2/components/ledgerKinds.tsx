@@ -8,7 +8,7 @@ import React from 'react';
 import {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell,
   Star, Reply, AtSign, BadgeCheck, XCircle, Trophy, Clock,
-  MailQuestion, Ban, Flag, Crown, TrendingUp, Flame, Swords, ShieldAlert,
+  MailQuestion, Ban, Flag, Crown, TrendingUp, Flame, Swords, ShieldAlert, Award,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -32,7 +32,7 @@ export interface KindSpec {
     fg: string;
     bg: string;
   };
-  bold?: 'course_name' | 'club_name' | 'business_name' | 'achievement_name';
+  bold?: 'course_name' | 'club_name' | 'business_name' | 'achievement_name' | 'badge_title';
   isSystem?: boolean;
 }
 
@@ -75,6 +75,7 @@ export const GAME_NOTIF_TYPES = [
   'status_at_risk',
   'status_reclaimed',
   'rival_played',
+  'badge_earned',
 ] as const;
 
 export function isGameNotifType(t: string): boolean {
@@ -190,6 +191,15 @@ export function resolveKind(row: {
         bg: t === 'status_reclaimed' ? T.GREEN_SOFT : T.AMBER_SOFT,
       },
       isSystem: true,
+    };
+  }
+  if (t === 'badge_earned') {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Award, fg: T.GOLD, bg: T.GOLD_SOFT },
+      isSystem: true,
+      bold: 'badge_title',
     };
   }
   if (t === 'rival_played') {
@@ -411,5 +421,5 @@ export function composeCommentBody(row: {
 export const KindIcons = {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell, Star, Reply, AtSign,
   BadgeCheck, XCircle, Trophy, Clock, MailQuestion, Ban, Flag,
-  Crown, TrendingUp, Flame, Swords, ShieldAlert,
+  Crown, TrendingUp, Flame, Swords, ShieldAlert, Award,
 };

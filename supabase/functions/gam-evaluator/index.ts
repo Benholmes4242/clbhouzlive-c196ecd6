@@ -1031,7 +1031,24 @@ async function processTop100Only(userId: string): Promise<{ earned: string[] }> 
   return { earned };
 }
 
+// Resolve the badge title at emit time so the Activity row is self-contained
+// (mirrors how taker_name / course_name are resolved for legend_lost).
+// Degrades to null; the renderer and backfill both fall back to generic copy.
+async function fetchBadgeTitle(badgeId: string): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from("gam_badge_catalogue")
+      .select("title")
+      .eq("id", badgeId)
+      .maybeSingle();
+    return (data?.title as string | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: string | null): Promise<boolean> {
+
   const { data: existing } = await supabase
     .from("gam_user_badges")
     .select("badge_id")
@@ -1045,7 +1062,12 @@ async function upsertBadgeEarned(userId: string, badgeId: string, whsScoreId: st
     seen_by_user: false,
   });
   if (error) { console.warn("[badge insert]", error.message); return false; }
-  await enqueueNotification(userId, "badge_earned", { badge_id: badgeId, whs_score_id: whsScoreId });
+  await enqueueNotification(userId, "badge_earned", {
+    badge_id: badgeId,
+    badge_title: await fetchBadgeTitle(badgeId),
+    whs_score_id: whsScoreId,
+  });
+
   return true;
 }
 
@@ -1069,7 +1091,13 @@ async function upsertBadgeTiered(userId: string, badgeId: string, counterValue: 
     { onConflict: "user_id,badge_id" }
   );
   if (isNewTier) {
-    await enqueueNotification(userId, "badge_earned", { badge_id: badgeId, tier, whs_score_id: whsScoreId });
+    await enqueueNotification(userId, "badge_earned", {
+      badge_id: badgeId,
+      badge_title: await fetchBadgeTitle(badgeId),
+      tier,
+      whs_score_id: whsScoreId,
+    });
+
   }
 }
 
@@ -1950,9 +1978,23 @@ function activityCopy(
         entity_type: "course",
         entity_id: courseId,
       };
+    case "badge_earned": {
+      // badge_title is enriched at emit time; the bold accent is rendered from
+      // data.badge_title by LedgerRow, so the message stops before the title.
+      const tier = p?.tier;
+      return {
+        title: "Badge earned",
+        message: p?.badge_title
+          ? (tier ? `You reached tier ${tier} of` : "You earned")
+          : "You earned a new badge.",
+        entity_type: null,
+        entity_id: null,
+      };
+    }
     default:
-      // badge_earned and anything else keeps its existing surfaces untouched.
+      // Anything else keeps its existing surfaces untouched.
       return null;
+
   }
 }
 

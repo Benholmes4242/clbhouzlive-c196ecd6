@@ -286,7 +286,14 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   // ------- Body text rendering with bold accents -------
   const quoted = composeCommentBody(row);
   let bodyNode: React.ReactNode = quoted ?? renderBody(body, row.actor_display_name);
-  if (spec.bold === 'achievement_name' && data.achievement_name) {
+  if (spec.bold === 'badge_title' && data.badge_title) {
+    bodyNode = (
+      <>
+        {bodyNode}{' '}
+        <span style={{ fontWeight: 700, color: T.GOLD }}>{data.badge_title}</span>.
+      </>
+    );
+  } else if (spec.bold === 'achievement_name' && data.achievement_name) {
     bodyNode = (
       <>
         {bodyNode}{' '}

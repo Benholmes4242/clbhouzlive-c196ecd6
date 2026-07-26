@@ -19,7 +19,7 @@
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
  *  achievement / achievement_unlocked      -> /achievements
  *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
- *  level_* / streak_* / status_*           -> /achievements
+ *  level_* / streak_* / status_* / badge_earned -> /achievements
  *  business_verification_*                 -> /business/:id/verification
  *  course_claim_*                          -> /courses/:course_id (claim surface)
  *  business_member_added                   -> /business/:id
@@ -72,7 +72,8 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (
     type === 'level_up' || type === 'level_near' ||
     type === 'streak_broken' || type === 'streak_at_risk' || type === 'streak_freeze_applied' ||
-    type === 'status_at_risk' || type === 'status_reclaimed'
+    type === 'status_at_risk' || type === 'status_reclaimed' ||
+    type === 'badge_earned'
   ) {
     return '/achievements';
   }
