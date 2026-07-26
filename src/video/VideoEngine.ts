@@ -836,12 +836,29 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
+      // CRISP-FROM-FRAME-ONE: choose the opening rung from the surface size
+      // + known bandwidth instead of letting hls.js open on the 240p rung.
+      // Rails stay on capLevelToPlayerSize (tile-sized) and are left alone.
+      if (!isRail) {
+        const minHeight = lane.id === 'fullscreen' ? 720 : 540;
+        const applied = applyStartLevel(
+          hls as any,
+          viewportPixelHeight(),
+          (lane as any)._seededBw ?? null,
+          minHeight,
+        );
+        DBG(lane.id, 'startLevel.applied', {
+          level: applied,
+          height: hls.levels?.[applied]?.height ?? null,
+        });
+      }
       // SOFT-RESET HYGIENE: do NOT promote to 'ready' here. MANIFEST_PARSED
       // fires before any segment is decoded, so element.readyState is still 0
       // — promoting state='ready' now creates a state/readyState decoupling
       // that lets the borrow stateGate lie for the window until loadeddata.
       // Real promotion happens in markReadyToShow (loadeddata/canplay) below.
     };
+
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
         lane.state = 'error';
