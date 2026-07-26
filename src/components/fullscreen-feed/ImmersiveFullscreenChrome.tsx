@@ -17,7 +17,7 @@
  * NO fade-on-idle. NO carousel dots at top. NO score eyebrow. Course chip in
  * the top-right is the ONLY score surface.
  */
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   ChevronLeft,
   Heart,
@@ -55,6 +55,106 @@ function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
   return formatCountKilo(n);
 }
+
+/**
+ * FullscreenCaption — the post caption beneath the author sub-row.
+ *
+ * Clamped to 3 lines; "See more" renders ONLY when the text really overflows
+ * (measured scrollHeight vs clientHeight, same approach as the tour hero
+ * insight line). Collapses again whenever the pager moves to another post.
+ */
+const CaptionBlock: React.FC<{ caption: string; resetKey: number }> = ({ caption, resetKey }) => {
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  // Reset on pager move — keyed on activeIndex, NOT the caption string, since
+  // two neighbouring posts can carry identical text.
+  useEffect(() => {
+    setExpanded(false);
+  }, [resetKey]);
+
+  // Real overflow measurement (never estimated from string length).
+  useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    const measure = () => {
+      const node = textRef.current;
+      if (!node) return;
+      if (expanded) return; // clamp is off — nothing meaningful to measure
+      setOverflows(node.scrollHeight > node.clientHeight + 1);
+    };
+    measure();
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(measure);
+      ro.observe(el);
+    } else {
+      window.addEventListener('resize', measure);
+    }
+    return () => {
+      if (ro) ro.disconnect();
+      else window.removeEventListener('resize', measure);
+    };
+  }, [caption, expanded]);
+
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+
+  return (
+    <div
+      style={{ marginTop: 6, minWidth: 0, pointerEvents: 'auto' }}
+      onClick={stop}
+      onPointerDown={stop}
+      onTouchStart={stop}
+      onTouchMove={stop}
+    >
+      <div
+        ref={textRef}
+        style={{
+          fontSize: 13.5,
+          lineHeight: 1.35,
+          color: '#fff',
+          opacity: 0.92,
+          textShadow: TEXT_SHADOW,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          ...(expanded
+            ? {
+                WebkitLineClamp: 'unset' as unknown as number,
+                overflow: 'auto',
+                maxHeight: '40vh',
+                overscrollBehavior: 'contain',
+              }
+            : {
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical' as const,
+                overflow: 'hidden',
+              }),
+        }}
+      >
+        {caption}
+      </div>
+      {(overflows || expanded) && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+          style={{
+            marginTop: 4, alignSelf: 'flex-start', background: 'transparent',
+            border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
+            fontFamily: 'inherit', fontSize: 12.5, fontWeight: 600, color: '#fff',
+            opacity: 0.7, textShadow: TEXT_SHADOW, lineHeight: 1.2,
+          }}
+        >
+          {expanded ? 'See less' : 'See more'}
+        </button>
+      )}
+    </div>
+  );
+};
+
+
 
 
 interface Props {
@@ -429,6 +529,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               </div>
             )}
           </div>
+
+          {/* Caption — 3-line clamp + See more/See less. Nothing renders for
+              empty/whitespace-only captions (no element, no gap). */}
+          {activePost.caption?.trim() ? (
+            <CaptionBlock caption={activePost.caption} resetKey={activeIndex} />
+          ) : null}
+
+
 
           {activePost.isReview && activePost.review && (
             <button
