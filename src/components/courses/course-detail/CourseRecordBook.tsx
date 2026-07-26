@@ -8,13 +8,11 @@
  * Data comes from the existing useCourseLegends RPC via useCourseRecordSummary
  * - no new query is introduced.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { Crown, ChevronRight } from 'lucide-react';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { legendCategoryLabel, formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import { AMBER, INK, INK_MUTE, HAIRLINE_INK_7 } from '@/features/courses/_shared/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -28,6 +26,8 @@ interface Props {
   courseType?: string | null;
   /** Category to scroll to / highlight, forwarded from the ?cat= deep link. */
   initialCategory?: string | null;
+  /** Opens the Champions tab - the record book no longer lives in a sheet. */
+  onSeeAll?: () => void;
 }
 
 export const CourseRecordBook: React.FC<Props> = ({
@@ -37,16 +37,15 @@ export const CourseRecordBook: React.FC<Props> = ({
   courseCountry = null,
   courseType = null,
   initialCategory = null,
+  onSeeAll,
 }) => {
   const { user } = useSupabaseSession();
   const { isLoading, previewRows, unclaimedCount, hasAnyHolder } =
     useCourseRecordSummary(courseId, user?.id ?? null);
-  const [open, setOpenState] = useState(Boolean(initialCategory));
-
-  const setOpen = React.useCallback((next: boolean) => {
-    setOpenState(next);
-    if (next) analyticsEvents.track('course_record_book_opened', { course_id: courseId });
-  }, [courseId]);
+  const openBoards = React.useCallback(() => {
+    analyticsEvents.track('course_record_book_opened', { course_id: courseId });
+    onSeeAll?.();
+  }, [courseId, onSeeAll]);
 
   // Deep-linked opens (?cat=) also count.
   const deepLinkFired = React.useRef(false);
@@ -86,7 +85,7 @@ export const CourseRecordBook: React.FC<Props> = ({
             <button
               key={category}
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={openBoards}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -159,7 +158,7 @@ export const CourseRecordBook: React.FC<Props> = ({
       <div style={{ padding: '12px 16px 0' }}>
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={openBoards}
           style={{
             width: '100%',
             display: 'flex',
@@ -182,27 +181,6 @@ export const CourseRecordBook: React.FC<Props> = ({
         </button>
       </div>
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="bottom"
-          className="p-0 rounded-t-2xl overflow-hidden"
-          style={{ height: '75dvh', maxHeight: '75dvh' }}
-        >
-          <div className="hcp-light h-full overflow-y-auto overscroll-contain">
-            <CourseLegendsDrilldown
-              selection={{
-                courseId,
-                courseName,
-                courseRegion,
-                courseCountry,
-                courseType,
-              }}
-              hideHeader
-              theme="light"
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
     </section>
   );
 };
