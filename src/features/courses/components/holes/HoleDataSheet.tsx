@@ -59,6 +59,15 @@ function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
+/**
+ * Which slice of the sheet to render.
+ * - 'all'   : legacy single-block render (header, skyline, tiles, hole table)
+ * - 'shape' : course-level story only (header, skyline, community tiles)
+ * - 'holes' : the hole-by-hole table only
+ * - 'you'   : personal-only slice (scoring breakdown + personal tiles)
+ */
+export type HoleDataSection = 'all' | 'shape' | 'holes' | 'you';
+
 interface Props {
   courseName: string;
   courseId?: string;
@@ -66,6 +75,13 @@ interface Props {
   totalRounds: number;
   myByHole: Map<number, MyHolePerformanceRow>;
   viewerHasPlayed: boolean;
+  section?: HoleDataSection;
+  /** 'holes' section only: render a Show/Hide affordance in the header. */
+  collapsible?: boolean;
+  /** 'holes' section only: start collapsed. */
+  defaultCollapsed?: boolean;
+  /** Fired the first time the collapsed hole table is opened. */
+  onExpand?: () => void;
 }
 
 export const HoleDataSheet: React.FC<Props> = ({
@@ -75,10 +91,15 @@ export const HoleDataSheet: React.FC<Props> = ({
   totalRounds,
   myByHole,
   viewerHasPlayed,
+  section = 'all',
+  collapsible = false,
+  defaultCollapsed = false,
+  onExpand,
 }) => {
   const { t } = useTranslation(['courses']);
   const [sort, setSort] = useState<'hole' | 'tough'>('hole');
   const [openHole, setOpenHole] = useState<number | null>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(collapsible && defaultCollapsed);
 
   const sortedByHole = useMemo(
     () => [...holes].sort((a, b) => a.hole_no - b.hole_no),
