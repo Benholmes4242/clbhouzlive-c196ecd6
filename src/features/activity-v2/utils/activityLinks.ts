@@ -18,6 +18,8 @@
  *  follow / friend_*                       -> /profile/:actor (or /business/:id when follower is business)
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
  *  achievement / achievement_unlocked      -> /achievements
+ *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
+ *  level_* / streak_* / status_*           -> /achievements
  *  business_verification_*                 -> /business/:id/verification
  *  course_claim_*                          -> /courses/:course_id (claim surface)
  *  business_member_added                   -> /business/:id
@@ -52,6 +54,24 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     actor_user_id,
   } = row;
   const data = (rawData && typeof rawData === 'object' ? rawData : {}) as Record<string, string | undefined>;
+
+  // --- game family (Crowns chip) ---------------------------------------
+  if (
+    type === 'crown_taken' || type === 'crown_lost' ||
+    type === 'legend_earned' || type === 'legend_lost' ||
+    type === 'rival_played'
+  ) {
+    const courseId = data.course_id ?? (entity_type === 'course' ? entity_id : null);
+    // No course id -> inert row (return '' so handleClick's !url guard fires).
+    return courseId ? `/courses/${courseId}` : '';
+  }
+  if (
+    type === 'level_up' || type === 'level_near' ||
+    type === 'streak_broken' || type === 'streak_at_risk' || type === 'streak_freeze_applied' ||
+    type === 'status_at_risk' || type === 'status_reclaimed'
+  ) {
+    return '/achievements';
+  }
 
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {

@@ -36,7 +36,7 @@ const rpcActivityFeed = supabase.rpc.bind(supabase) as unknown as (
   args: Record<string, unknown>,
 ) => Promise<RpcResult<ActivityFeedRowV2[]>>;
 
-export type ActivityFilterV2 = null | 'new' | 'mentions' | 'friends';
+export type ActivityFilterV2 = null | 'new' | 'mentions' | 'friends' | 'crowns';
 
 const PAGE_SIZE = 30;
 
