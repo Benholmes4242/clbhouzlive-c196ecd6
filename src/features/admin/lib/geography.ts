@@ -170,9 +170,19 @@ export function trimOrNull(v: unknown): string | null {
   return s === '' ? null : s;
 }
 
-/** "name - sub_country, country" label used by every course picker. */
+/** "sub_country, country" label used by every course picker. */
 export function courseLocationLabel(
-  c: { sub_country?: string | null; region?: string | null; country?: string | null },
+  c: { sub_country?: string | null; country?: string | null },
+): string {
+  const parts = [c.sub_country, c.country]
+    .map((p) => (typeof p === 'string' ? p.trim() : ''))
+    .filter(Boolean);
+  return parts.join(', ');
+}
+
+/** "region, sub_country, country" - used where same-name courses must be told apart. */
+export function courseMatchLabel(
+  c: { region?: string | null; sub_country?: string | null; country?: string | null },
 ): string {
   const parts = [c.region, c.sub_country, c.country]
     .map((p) => (typeof p === 'string' ? p.trim() : ''))
