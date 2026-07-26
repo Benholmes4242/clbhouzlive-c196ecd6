@@ -16,9 +16,11 @@ function prefersReducedMotion(): boolean {
 interface Props {
   /** Debounced query pushed to the parent. */
   onQueryChange: (q: string) => void;
+  /** Fires when the field expands / collapses so the header can adapt. */
+  onExpandedChange?: (open: boolean) => void;
 }
 
-export function GolferSearchField({ onQueryChange }: Props) {
+export function GolferSearchField({ onQueryChange, onExpandedChange }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -33,6 +35,10 @@ export function GolferSearchField({ onQueryChange }: Props) {
   useEffect(() => {
     if (expanded) inputRef.current?.focus();
   }, [expanded]);
+
+  useEffect(() => {
+    onExpandedChange?.(expanded);
+  }, [expanded, onExpandedChange]);
 
   const collapse = () => {
     setText('');
