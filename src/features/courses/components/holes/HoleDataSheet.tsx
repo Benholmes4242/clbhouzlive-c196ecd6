@@ -534,9 +534,11 @@ const StoryTiles: React.FC<{
   birdiedCount: number;
   totalHoles: number;
   missingBirdieHole: number | null;
+  /** 'community' drops the personal tiles, 'personal' drops the field tiles. */
+  scope?: 'all' | 'community' | 'personal';
 }> = ({
   hardest, easiest, nemesis, holes, myByHole, viewerHasPlayed,
-  birdiedCount, totalHoles, missingBirdieHole,
+  birdiedCount, totalHoles, missingBirdieHole, scope = 'all',
 }) => {
   const communityTiles: React.ReactNode[] = [];
   if (hardest) {
