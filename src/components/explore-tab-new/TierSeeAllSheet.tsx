@@ -103,28 +103,33 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         : mode === initialMode
           ? rows
           : [];
-    if (tier === 'records' && mode === 'alltime') {
-      return sortRecordsAllTime(base);
-    }
-    if (tier === 'birdie_hauls') {
-      return sortBirdieHauls(base, mode);
-    }
-    return base;
-  }, [fetched, mode, rows, initialMode, tier, isLeaderView]);
+    const sorted =
+      tier === 'records' && mode === 'alltime'
+        ? sortRecordsAllTime(base)
+        : tier === 'birdie_hauls'
+          ? sortBirdieHauls(base, mode)
+          : base;
+    if (!needle) return sorted;
+    return sorted.filter((r) =>
+      normalizeName(`${r.holder_name ?? ''} ${r.holder_username ?? ''}`).includes(needle),
+    );
+  }, [fetched, mode, rows, initialMode, tier, isLeaderView, needle]);
 
   const legendaryLeaderRows: LegendaryLeaderRow[] = useMemo(() => {
     if (!isLegendaryLeaders) return [];
     return (leadersData ?? [])
       .filter((r) => (r[metric] ?? 0) > 0)
+      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
       .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
-  }, [isLegendaryLeaders, leadersData, metric]);
+  }, [isLegendaryLeaders, leadersData, metric, needle]);
 
   const eagleLeaderRows: EagleLeaderRow[] = useMemo(() => {
     if (!isEagleLeaders) return [];
     return (eagleLeadersData ?? [])
       .filter((r) => (r.eagles ?? 0) > 0)
+      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
       .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0));
-  }, [isEagleLeaders, eagleLeadersData]);
+  }, [isEagleLeaders, eagleLeadersData, needle]);
 
   const legendaryMax = legendaryLeaderRows[0]?.[metric] ?? 1;
   const eagleMax = eagleLeaderRows[0]?.eagles ?? 1;
