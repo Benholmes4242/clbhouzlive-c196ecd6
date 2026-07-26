@@ -1055,6 +1055,13 @@ class VideoEngineImpl {
 
     const onPlay = () => {
       vperfLaneEvent(lane.id, 'playing');
+      // Reveal as soon as the element reports it is actually playing. 'playing'
+      // fires after any pending seek has committed and before the first
+      // throttled 'timeupdate' (~250ms later), so this shaves a visible chunk
+      // off "video is on screen but still showing the poster". markReadyToShow
+      // still enforces the seek-target/position guard internally.
+      if (!lane.firstFrame) markReadyToShow('playing');
+
       // Session begins on first sustained playing state.
       const hls = lane.hls;
       const startLevel = hls ? (hls.currentLevel ?? null) : null;
