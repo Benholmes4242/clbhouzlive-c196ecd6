@@ -44,7 +44,9 @@ const INLINE_HLS_CONFIG: Partial<HlsConfig> = {
   maxMaxBufferLength: 24,
   backBufferLength: 15,
   maxBufferSize: 20 * 1024 * 1024,
-  abrEwmaDefaultEstimate: 500_000,
+  // Seeded per-instance from bandwidth memory in `attachSource`; this is only
+  // the floor used when we have never measured this device's connection.
+  abrEwmaDefaultEstimate: 2_500_000,
 };
 
 const FULLSCREEN_HLS_CONFIG: Partial<HlsConfig> = {
@@ -53,11 +55,15 @@ const FULLSCREEN_HLS_CONFIG: Partial<HlsConfig> = {
   maxMaxBufferLength: 60,
   backBufferLength: 30,
   maxBufferSize: 40 * 1024 * 1024,
-  abrEwmaDefaultEstimate: 1_200_000,
+  abrEwmaDefaultEstimate: 3_500_000,
 };
 
-const configFor = (surface: PoolSurface): Partial<HlsConfig> =>
-  surface === 'fullscreen' ? FULLSCREEN_HLS_CONFIG : INLINE_HLS_CONFIG;
+const configFor = (surface: PoolSurface): Partial<HlsConfig> => ({
+  ...(surface === 'fullscreen' ? FULLSCREEN_HLS_CONFIG : INLINE_HLS_CONFIG),
+  // Real measurement wins over the static floor above.
+  abrEwmaDefaultEstimate: bandwidthSeed(readSeededBandwidth()),
+});
+
 
 interface PoolEntry {
   id: string;                    // stable "pool-0", "pool-1", ...
