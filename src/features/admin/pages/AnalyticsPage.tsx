@@ -36,14 +36,16 @@ import RetentionCurve from '../components/RetentionCurve';
 import PostInsightSheet from '../components/PostInsightSheet';
 import CourseInsightSheet from '../components/CourseInsightSheet';
 import { useTopContent } from '../hooks/useTopContent';
+import ScreensTab from '../components/ScreensTab';
 
 
-type TabId = 'live' | 'growth' | 'engagement' | 'retention' | 'funnels' | 'events' | 'auth';
+type TabId = 'live' | 'growth' | 'engagement' | 'screens' | 'retention' | 'funnels' | 'events' | 'auth';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'live',       label: 'Live' },
   { id: 'growth',     label: 'Growth' },
   { id: 'engagement', label: 'Engagement' },
+  { id: 'screens',    label: 'Screens' },
   { id: 'retention',  label: 'Retention' },
   { id: 'funnels',    label: 'Funnels' },
   { id: 'events',     label: 'Events' },
@@ -185,6 +187,7 @@ export default function AnalyticsPage() {
       {tab === 'live'       && <LiveTab />}
       {tab === 'growth'     && <GrowthTab     period={period} />}
       {tab === 'engagement' && <EngagementTab period={period} />}
+      {tab === 'screens'    && <ScreensTab     days={periodToDays(period)} />}
       {tab === 'retention'  && <RetentionTab />}
       {tab === 'funnels'    && <FunnelsTab    period={period} />}
       {tab === 'events'     && <EventsTab     period={period} />}

@@ -116,6 +116,8 @@ export const EVENT_LABELS: Record<string, string> = {
 
   // ─── Admin operations ─────────────────────────────────────────
   admin_username_changed: 'Username changed by admin',
+  admin_screens_viewed: 'Admin screens tab viewed',
+  admin_screen_detail_opened: 'Admin screen detail opened',
 
   // Course card (course Holes tab, Phase L3)
   tee_card_viewed: 'Course card viewed',
