@@ -1777,7 +1777,11 @@ const URGENCY: Record<string, string> = {
 function dedupKey(type: string, userId: string, payload: any): string {
   switch (type) {
     case "badge_earned": return `badge_earned:${userId}:${payload.badge_id}`;
-    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${payload.category}`;
+    // Unified with public.gam_emit_legend_pulse_event() — the SQL trigger that
+    // also emits legend_lost. Both sides use the venue-agnostic UTC date so the
+    // two strings match exactly and either emitter suppresses the other.
+    // Key: legend_lost:{userId}:{course_id}:{category}:{YYYY-MM-DD (UTC)}
+    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${payload.category}:${new Date().toISOString().slice(0, 10)}`;
     case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${payload.category}`;
     case "streak_at_risk": return `streak_risk:${userId}:${payload.streak_type}`;
     case "streak_broken": return `streak_broken:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
