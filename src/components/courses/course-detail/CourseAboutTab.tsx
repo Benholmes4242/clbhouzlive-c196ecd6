@@ -24,9 +24,6 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
-import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
-import { AboutGhost } from '@/components/handicap/ConnectGhostPreviews';
-import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
 import CourseRecordBook from './CourseRecordBook';
@@ -85,7 +82,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const { user } = useSupabaseSession();
   const [searchParams] = useSearchParams();
   const legendCategoryParam = searchParams.get('cat');
-  const { data: aboutConnection } = useWhsConnection(user?.id);
   
   
   const navigate = useNavigate();
