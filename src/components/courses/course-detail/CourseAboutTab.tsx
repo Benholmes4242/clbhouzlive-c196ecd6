@@ -242,7 +242,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 5. About - quiet notes card */}
+      {/* 8. About - the notes card */}
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
@@ -267,7 +267,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               >
                 <Quote size={14} fill="currentColor" strokeWidth={0} />
               </div>
-              {/* Prose - same type, fade now matches the WHITE card bg */}
+              {/* Prose - fade matches the white card bg */}
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
                 {!showFullDescription && shouldShowReadMore && (
@@ -297,7 +297,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 6. Top 100 Spotlight — CourseTop100Spotlight renders its own header internally, no SectionLabel */}
+      {/* 9. Top 100 Spotlight - renders its own header internally */}
       {course.id && (
         <>
           <div style={{ margin: '0 16px' }}>
@@ -309,7 +309,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
 
-      {/* 8. Location */}
+      {/* 10. Location */}
       <section>
         <SectionHeader role="section" kicker="LOCATION" paddingX={16} />
         <div style={{ padding: '0 16px' }}>
@@ -332,11 +332,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 8b. Nearby hospitality */}
+      {/* 11. Nearby hospitality */}
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
 
 
-      {/* 9. Claim Course — tri-state: unclaimed / pending / claimed */}
+      {/* 12. Claim course - tri-state: unclaimed / pending / claimed */}
       {course.club_id && claimStatus && (
         <>
           {claimStatus.state === 'unclaimed' && (
@@ -354,17 +354,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </>
       )}
 
-      {/* 10. Media — AboutMediaStrip renders its own "Media" heading internally, no SectionLabel */}
+      {/* 13. Media strip - renders its own heading internally */}
       <section>
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 11. Explore More — CourseExploreLinks renders its own heading internally, no SectionLabel */}
+      {/* 14. Explore more - renders its own heading internally */}
       <CourseExploreLinks course={course} />
 
-      {/* 12. Official Website — amber ghost button, part of the explore section */}
+      {/* 15. Official website - amber ghost button */}
       {course.website_url && (
         <div style={{ padding: '12px 16px 0' }}>
           <button
