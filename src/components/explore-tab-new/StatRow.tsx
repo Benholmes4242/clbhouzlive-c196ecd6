@@ -152,6 +152,8 @@ export function StatRow({
   nameMeta,
   subline,
   featChips,
+  metaLine,
+
   statValue,
   statLabel,
   statSubLabel,
