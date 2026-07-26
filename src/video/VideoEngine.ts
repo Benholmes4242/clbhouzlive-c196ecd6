@@ -195,8 +195,14 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.muted = true;
 
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
-  el.preload = 'metadata';
+  // 'auto' is load-bearing on the NATIVE HLS path (iOS/WKWebView, where
+  // Hls.isSupported() is false): with 'metadata' the element fetches only the
+  // manifest + init segment and refuses to buffer media until play() is
+  // called, so every activation paid a full cold fetch (multi-second stall
+  // on device) and the feed's neighbour "warm preload" bought nothing.
+  el.preload = 'auto';
   el.setAttribute('webkit-playsinline', 'true');
+
   el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
   return el;
 }
