@@ -281,6 +281,36 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Deep-link autoscroll: once the crown sections are painted, bring the
+  // notified category into view with a brief highlight. Runs once per link.
+  const deepScrolledRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!deepCat) return;
+    if (deepScrolledRef.current === deepCat) return;
+    if (isLoading || isError) return;
+    if (!visibleCategories.includes(deepCat)) return;
+    const id = globalThis.setTimeout(() => {
+      const el = containerRef.current?.querySelector<HTMLElement>(
+        `[data-category="${deepCat}"]`,
+      );
+      if (!el) return;
+      deepScrolledRef.current = deepCat;
+      const top = el.getBoundingClientRect().top + (globalThis.scrollY ?? 0) - 96;
+      try {
+        globalThis.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      } catch {
+        el.scrollIntoView({ block: 'start' });
+      }
+      el.style.transition = 'box-shadow 320ms ease';
+      el.style.boxShadow = 'inset 0 0 0 1.5px rgba(247,147,30,0.55)';
+      globalThis.setTimeout(() => {
+        el.style.boxShadow = 'none';
+      }, 1600);
+    }, 260);
+    return () => globalThis.clearTimeout(id);
+  }, [deepCat, isLoading, isError, visibleCategories]);
+
+
   const sheetCategoryDescriptors = useMemo(
     () =>
       visibleCategories.map((cat) => ({
