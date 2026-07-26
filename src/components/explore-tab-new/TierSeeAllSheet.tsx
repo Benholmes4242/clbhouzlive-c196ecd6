@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import {
@@ -29,6 +29,7 @@ import { FeatListRow } from './FeatListRow';
 import { StatRow } from './StatRow';
 import { LedgerSubline } from './PinIcon';
 import { useScorecardOpener } from './useScorecardOpener';
+import { GolferSearchField, normalizeName } from './GolferSearchField';
 
 
 
