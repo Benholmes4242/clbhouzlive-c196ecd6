@@ -1978,9 +1978,23 @@ function activityCopy(
         entity_type: "course",
         entity_id: courseId,
       };
+    case "badge_earned": {
+      // badge_title is enriched at emit time; the bold accent is rendered from
+      // data.badge_title by LedgerRow, so the message stops before the title.
+      const tier = p?.tier;
+      return {
+        title: "Badge earned",
+        message: p?.badge_title
+          ? (tier ? `You reached tier ${tier} of` : "You earned")
+          : "You earned a new badge.",
+        entity_type: null,
+        entity_id: null,
+      };
+    }
     default:
-      // badge_earned and anything else keeps its existing surfaces untouched.
+      // Anything else keeps its existing surfaces untouched.
       return null;
+
   }
 }
 
