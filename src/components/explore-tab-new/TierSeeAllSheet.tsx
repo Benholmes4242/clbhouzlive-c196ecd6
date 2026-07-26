@@ -366,7 +366,9 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 fontWeight: 600,
               }}
             >
-              No {metric === 'aces' ? 'aces' : 'albatrosses'} yet.
+              {searching
+                ? 'No golfers match that name.'
+                : `No ${metric === 'aces' ? 'aces' : 'albatrosses'} yet.`}
             </div>
           ) : (
             <div>
@@ -415,7 +417,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 fontWeight: 600,
               }}
             >
-              No eagles yet.
+              {searching ? 'No golfers match that name.' : 'No eagles yet.'}
             </div>
           ) : (
             <div>
@@ -452,7 +454,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               fontWeight: 600,
             }}
           >
-            None yet.
+            {searching ? 'No golfers match that name.' : 'None yet.'}
           </div>
         ) : (
           <div>
