@@ -73,7 +73,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const [mode, setMode] = useState<RecordsMode>(initialMode);
   const [metric, setMetric] = useState<'aces' | 'albatrosses'>(initialMetric);
   const [query, setQuery] = useState('');
-  const [searchExpanded, setSearchExpanded] = useState(false);
+  
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
@@ -162,7 +162,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     setMode(initialMode);
     setMetric(initialMetric);
     setQuery('');
-    setSearchExpanded(false);
+    
   }, [open, initialMode, initialMetric]);
 
   // Reset the page window when the filter changes.
@@ -241,7 +241,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
-              aria-hidden={searchExpanded}
               style={{
                 fontSize: 10.5,
                 fontWeight: 600,
@@ -253,8 +252,6 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                // Reserve the height so the title / segment never shift.
-                visibility: searchExpanded ? 'hidden' : 'visible',
               }}
             >
               {regionLabel(region)} {'\u00B7'} WHS {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
@@ -275,25 +272,21 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
               {TIER_TITLE[tier]}
             </div>
           </div>
-
-          <GolferSearchField
-            key={open ? 'open' : 'closed'}
-            onQueryChange={handleQueryChange}
-            onExpandedChange={setSearchExpanded}
-          />
         </div>
 
-        {hasToggle && (
-          <div
-            style={{
-              marginTop: 12,
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 8,
-            }}
-          >
+        {/* Controls row: scope segment (+ metric tablist) left, search right.
+            Always rendered so the search has a home on toggle-less tiers. */}
+        <div
+          style={{
+            marginTop: 12,
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          {hasToggle && (
             <ScopeSegment
               value={mode}
               onChange={(v) => setMode(v)}
@@ -303,6 +296,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 { value: 'alltime', label: 'All time' },
               ]}
             />
+          )}
 
             {isLegendaryLeaders && (
               <div
@@ -349,9 +343,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                   );
                 })}
               </div>
-            )}
-          </div>
-        )}
+          )}
+
+          <GolferSearchField
+            key={open ? 'open' : 'closed'}
+            onQueryChange={handleQueryChange}
+          />
+        </div>
       </div>
 
       {/* Body */}
