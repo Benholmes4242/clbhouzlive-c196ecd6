@@ -55,6 +55,7 @@ interface Props {
 }
 
 export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
+  const { t } = useTranslation('courses');
   const {
     display_name,
     profile_photo_url,
@@ -64,10 +65,46 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
     gross,
     net,
     hcp_delta,
-    achievements,
+    feats,
   } = row;
 
   const relative = formatRelativeMonths(play_date);
+
+  const featLabel = (f: RoundFeat): string => {
+    switch (f.key) {
+      case 'holes_in_one':
+        return t('discover.friendsRounds.feats.holesInOne', {
+          count: f.count,
+          defaultValue_one: 'HOLE IN ONE',
+          defaultValue_other: '{{count}} HOLES IN ONE',
+        });
+      case 'albatrosses':
+        return t('discover.friendsRounds.feats.albatrosses', {
+          count: f.count,
+          defaultValue_one: 'ALBATROSS',
+          defaultValue_other: '{{count}} ALBATROSSES',
+        });
+      case 'eagles':
+        return t('discover.friendsRounds.feats.eagles', {
+          count: f.count,
+          defaultValue_one: 'EAGLE',
+          defaultValue_other: '{{count}} EAGLES',
+        });
+      case 'birdies':
+        return t('discover.friendsRounds.feats.birdies', {
+          count: f.count,
+          defaultValue_one: '{{count}} BIRDIE',
+          defaultValue_other: '{{count}} BIRDIES',
+        });
+      case 'beat_par':
+        return t('discover.friendsRounds.feats.beatPar', 'UNDER PAR');
+      case 'clean_card':
+        return t('discover.friendsRounds.feats.cleanCard', 'CLEAN CARD');
+      default:
+        return '';
+    }
+  };
+
 
   // hcp movement — direction inverted: negative delta (lower index) is good.
   const hcpChip = (() => {
