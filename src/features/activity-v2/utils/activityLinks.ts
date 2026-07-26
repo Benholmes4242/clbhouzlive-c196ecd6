@@ -59,12 +59,16 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (
     type === 'crown_taken' || type === 'crown_lost' ||
     type === 'legend_earned' || type === 'legend_lost' ||
-    type === 'rival_played'
+    type === 'course_record_beaten' || type === 'rival_played'
   ) {
     const courseId = data.course_id ?? (entity_type === 'course' ? entity_id : null);
     // No course id -> inert row (return '' so handleClick's !url guard fires).
-    return courseId ? `/courses/${courseId}` : '';
+    if (!courseId) return '';
+    // Champions tab, deep-linked to the exact crown section when known.
+    const cat = data.category;
+    return `/courses/${courseId}?tab=legends${cat ? `&cat=${encodeURIComponent(cat)}` : ''}`;
   }
+
   if (
     type === 'level_up' || type === 'level_near' ||
     type === 'streak_broken' || type === 'streak_at_risk' || type === 'streak_freeze_applied' ||
