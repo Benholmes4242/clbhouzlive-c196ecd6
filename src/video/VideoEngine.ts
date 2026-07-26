@@ -1670,11 +1670,20 @@ class VideoEngineImpl {
     if (!lane || !lane.hls) return;
     try {
       lane.hls.autoLevelCapping = -1;
-      // Trigger a level check on next tick — hls.js re-evaluates
-      // capLevelToPlayerSize inside its level controller.
-      lane.hls.nextLevel = lane.hls.nextLevel;
+      // capLevelToPlayerSize + ABR only re-evaluate on their own schedule,
+      // which left a borrowed rail lane (loaded at TILE resolution) blurry in
+      // fullscreen for several seconds. Jump to a viewport-appropriate rung
+      // immediately, then hand control straight back to ABR.
+      const applied = upshiftForSurface(
+        lane.hls as any,
+        viewportPixelHeight(),
+        (lane as any)._seededBw ?? null,
+        720,
+      );
+      DBG(laneId, 'nudgeLevelCap.upshift', { level: applied });
     } catch {}
   }
+
 
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
