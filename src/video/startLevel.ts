@@ -92,19 +92,25 @@ export function pickStartLevel(
   return chosen;
 }
 
+interface HlsLike {
+  levels?: LevelLike[];
+  currentLevel?: number;
+  nextLevel?: number;
+  startLevel?: number;
+  loadLevel?: number;
+  bandwidthEstimate?: number;
+  autoLevelCapping?: number;
+  on?: (evt: string, cb: (...args: any[]) => void) => void;
+  off?: (evt: string, cb: (...args: any[]) => void) => void;
+}
+
 /**
  * Apply the picked rung to a live hls.js instance at MANIFEST_PARSED time.
- * Safe to call repeatedly. Returns the level index applied (or -1).
+ * Only `startLevel` is written here — it governs the FIRST fragment and
+ * leaves ABR fully automatic afterwards. Returns the level index (or -1).
  */
 export function applyStartLevel(
-  hls: {
-    levels?: LevelLike[];
-    currentLevel?: number;
-    nextLevel?: number;
-    startLevel?: number;
-    bandwidthEstimate?: number;
-    config?: Record<string, unknown>;
-  },
+  hls: HlsLike,
   renderedPixelHeight: number,
   rememberedBw?: number | null,
   minHeight?: number,
@@ -115,13 +121,54 @@ export function applyStartLevel(
   const level = pickStartLevel(levels, renderedPixelHeight, bw, { minHeight });
   if (level < 0) return -1;
   try {
-    // startLevel governs the first fragment; nextLevel forces the rung when
-    // the first fragment request has already been queued. After the first
-    // switch ABR takes over normally (we never pin currentLevel).
     hls.startLevel = level;
-    if ((hls.currentLevel ?? -1) < 0 || (hls.currentLevel ?? -1) < level) {
-      hls.nextLevel = level;
-    }
   } catch { /* hls torn down mid-flight */ }
   return level;
 }
+
+/**
+ * Force ONE fragment at `level`, then hand control straight back to ABR.
+ *
+ * Used when a small tile's stream is promoted to a big surface (rail lane
+ * borrowed into fullscreen): waiting for ABR's own re-evaluation left the
+ * viewer on a tile-sized rung — visibly blurry — for several seconds.
+ * Writing `nextLevel` pins hls.js to manual mode, so we restore `-1` as
+ * soon as the switch lands (or after a short safety timeout).
+ */
+export function forceLevelOnce(hls: HlsLike, level: number): void {
+  if (level < 0) return;
+  const restore = () => {
+    try { hls.nextLevel = -1; } catch { /* torn down */ }
+    if (hls.off) { try { hls.off('hlsLevelSwitched', onSwitched); } catch { /* noop */ } }
+  };
+  const onSwitched = () => restore();
+  try {
+    if (hls.on) hls.on('hlsLevelSwitched', onSwitched);
+    hls.nextLevel = level;
+  } catch { /* torn down */ }
+  // Safety: never leave ABR pinned if the switch event never arrives.
+  setTimeout(restore, 4000);
+}
+
+/**
+ * Re-evaluate quality for a lane whose element just grew (tile → fullscreen).
+ * Lifts any player-size cap and jumps to a viewport-appropriate rung now.
+ */
+export function upshiftForSurface(
+  hls: HlsLike,
+  renderedPixelHeight: number,
+  rememberedBw?: number | null,
+  minHeight = 720,
+): number {
+  const levels = hls.levels ?? [];
+  if (levels.length === 0) return -1;
+  const bw = Math.max(bandwidthSeed(rememberedBw), hls.bandwidthEstimate || 0);
+  const level = pickStartLevel(levels, renderedPixelHeight, bw, { minHeight });
+  const current = hls.currentLevel ?? -1;
+  if (level < 0) return -1;
+  try { hls.autoLevelCapping = -1; } catch { /* noop */ }
+  if (current >= 0 && current >= level) return level; // already sharp enough
+  forceLevelOnce(hls, level);
+  return level;
+}
+
