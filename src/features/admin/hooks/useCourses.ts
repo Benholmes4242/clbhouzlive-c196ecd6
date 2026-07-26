@@ -5,6 +5,7 @@ import { toast } from '@/lib/toast';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGolfCoursesStats } from '@/hooks/admin/useGolfCoursesStats';
 import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
+import { trimOrNull } from '@/features/admin/lib/geography';
 
 export interface AdminCourseRow {
   id: string;
@@ -113,7 +114,7 @@ async function fetchCountries(): Promise<string[]> {
 export type CourseUpdate = Partial<Pick<AdminCourseRow,
   'name' | 'global_rank' | 'regional_rank' | 'usa_rank' | 'country_rank' |
   'website_url' | 'description' | 'top100_url' |
-  'country' | 'sub_country' | 'region' |
+  'country' | 'sub_country' | 'region' | 'continent' |
   'latitude' | 'longitude' | 'country_code' |
   'course_type' | 'has_hosted_major'
 >>;
@@ -226,6 +227,7 @@ export async function createCourse(input: {
   name: string;
   country: string;
   continent: string;
+  region_key?: string;
   sub_country?: string;
   region?: string;
   website_url?: string;
@@ -240,16 +242,17 @@ export async function createCourse(input: {
     .insert({
       name: input.name.trim(),
       country: input.country.trim(),
-      continent: input.continent as any,
-      sub_country: input.sub_country || null,
-      region: input.region || null,
-      website_url: input.website_url || null,
-      description: input.description || null,
+      continent: input.continent.trim() as any,
+      region_key: trimOrNull(input.region_key) as any,
+      sub_country: trimOrNull(input.sub_country),
+      region: trimOrNull(input.region),
+      website_url: trimOrNull(input.website_url),
+      description: trimOrNull(input.description),
       latitude: input.latitude ? parseFloat(input.latitude) : null,
       longitude: input.longitude ? parseFloat(input.longitude) : null,
-      course_type: (input.course_type || null) as any,
+      course_type: (trimOrNull(input.course_type) || null) as any,
       has_hosted_major: input.has_hosted_major,
-    })
+    } as any)
     .select('id')
     .single();
   if (error) throw error;
