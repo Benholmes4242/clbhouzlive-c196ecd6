@@ -167,7 +167,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         <Cell
           icon="📈"
           value={String(changes)}
-          label="changes this month"
+          label="changes 30d"
           emphasize={changes > 0}
           wide
         />
