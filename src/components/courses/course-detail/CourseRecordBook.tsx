@@ -17,7 +17,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import { AMBER, INK, INK_MUTE, HAIRLINE_INK_7 } from '@/features/courses/_shared/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
-import { UserAvatar } from '@/components/ui/UserAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   courseId: string;
@@ -86,10 +86,12 @@ export const CourseRecordBook: React.FC<Props> = ({
                 borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
               }}
             >
-              <UserAvatar
+              <SquircleAvatar
                 src={row.user_photo_url}
-                name={row.user_display_name ?? ''}
+                alt={row.user_display_name ?? 'Golfer'}
+                userId={row.user_id}
                 size={34}
+                thinRing
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
