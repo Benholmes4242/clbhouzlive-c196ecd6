@@ -239,6 +239,7 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
+              aria-hidden={searchExpanded}
               style={{
                 fontSize: 10.5,
                 fontWeight: 600,
@@ -247,10 +248,14 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
                 color: AMBER,
                 marginBottom: 4,
                 fontVariantNumeric: 'tabular-nums',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                // Reserve the height so the title / segment never shift.
+                visibility: searchExpanded ? 'hidden' : 'visible',
               }}
             >
-              {regionLabel(region)} {'\u00B7'} WHS
-              {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+              {regionLabel(region)} {'\u00B7'} WHS {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
             </div>
             <div
               id="tier-see-all-title"
@@ -269,7 +274,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
             </div>
           </div>
 
-          <GolferSearchField onQueryChange={handleQueryChange} />
+          <GolferSearchField
+            onQueryChange={handleQueryChange}
+            onExpandedChange={setSearchExpanded}
+          />
         </div>
 
         {hasToggle && (
