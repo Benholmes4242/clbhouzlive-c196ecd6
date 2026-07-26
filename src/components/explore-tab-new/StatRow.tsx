@@ -34,6 +34,8 @@ export interface StatRowProps {
   /** Small muted meta shown on the name line (e.g. relative age). */
   nameMeta?: ReactNode;
   subline?: ReactNode;
+  /** Optional chip strip rendered beneath the subline (feat chips). */
+  featChips?: ReactNode;
   statValue?: ReactNode;
   statLabel?: string;
   statSubLabel?: string;
@@ -146,6 +148,7 @@ export function StatRow({
   name,
   nameMeta,
   subline,
+  featChips,
   statValue,
   statLabel,
   statSubLabel,
@@ -267,6 +270,19 @@ export function StatRow({
             }}
           >
             {subline}
+          </div>
+        ) : null}
+        {featChips ? (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 2,
+            }}
+          >
+            {featChips}
           </div>
         ) : null}
       </div>

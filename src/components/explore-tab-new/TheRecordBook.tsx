@@ -18,6 +18,8 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
+import { RoundFeatChips } from './RoundFeatChips';
+import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 import { LedgerSubline } from './PinIcon';
 
 import { regionScopePhrase } from './regionScope';
@@ -294,6 +296,8 @@ function RecordStatRow({
   const statColor = showToPar && par! < 0 ? TOPAR_UNDER_LIGHT : INK;
   const sub = <LedgerSubline courseName={row.course_name} />;
   const age = when ? relativeTime(when) : null;
+  // Feat chips from stats joined into the cached payload; absent stats = no chips.
+  const feats = deriveRoundFeats(row);
   return (
     <StatRow
       avatarUrl={row.holder_avatar}
@@ -301,6 +305,7 @@ function RecordStatRow({
       name={holder}
       nameMeta={age ?? undefined}
       subline={sub}
+      featChips={feats.length > 0 ? <RoundFeatChips feats={feats} /> : undefined}
       statValue={toParDisplay}
       statColor={statColor}
       statSubLabel={grossText ? `${grossText} GROSS` : undefined}

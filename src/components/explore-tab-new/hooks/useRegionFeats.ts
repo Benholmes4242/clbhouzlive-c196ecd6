@@ -26,6 +26,13 @@ export interface FeatRow {
   attained_at?: string;
   thumbnail_image?: string | null;
   course_par?: number | null;
+  // records-only feat stats, joined at cache-build time (may be absent)
+  birdies?: number | null;
+  eagles?: number | null;
+  albatrosses?: number | null;
+  holes_in_one?: number | null;
+  beat_par?: boolean | null;
+  clean_card?: boolean | null;
 }
 
 // Rails are bucketed server-side into per-region cache rows. The client
