@@ -69,7 +69,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const routerState = (location.state ?? null) as { activeTab?: string } | null;
   const tabFromState = routerState?.activeTab;
   const tabFromQuery = searchParams.get('tab');
-  const initialTab: CourseTabId = asTabId(tabFromState ?? tabFromQuery ?? 'course');
+  // A ?cat= deep link (game notifications) targets a Champions board.
+  const defaultTab = searchParams.get('cat') ? 'legends' : 'course';
+  const initialTab: CourseTabId = asTabId(tabFromState ?? tabFromQuery ?? defaultTab);
   const [activeTab, setActiveTab] = useState<CourseTabId>(initialTab);
 
   const highlightReviewId = searchParams.get('review');
@@ -79,10 +81,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
   useEffect(() => {
     const nextState = (location.state ?? null) as { activeTab?: string } | null;
-    const next = asTabId(nextState?.activeTab ?? searchParams.get('tab') ?? 'course');
+    const fallback = searchParams.get('cat') ? 'legends' : 'course';
+    const next = asTabId(nextState?.activeTab ?? searchParams.get('tab') ?? fallback);
     setActiveTab(next);
     setVisitedTabs(prev => (prev.has(next) ? prev : new Set(prev).add(next)));
   }, [searchParams, location.state]);
+
 
   const { data: course, isLoading: courseLoading, isError: courseError, refetch: refetchCourse } = useQuery({
     queryKey: ['course-detail', courseId],
