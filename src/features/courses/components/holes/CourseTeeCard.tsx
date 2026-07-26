@@ -192,7 +192,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   return (
     <section
       style={{
-        padding: '20px 16px 8px',
+        padding: '14px 16px 8px',
         fontFamily: FONT,
         background: '#FFFFFF',
         // minWidth:0 is the load-bearing rule here: without it a flex/grid
