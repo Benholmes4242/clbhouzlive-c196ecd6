@@ -236,33 +236,40 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           background: SLATE_50,
         }}
       >
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: AMBER,
-              marginBottom: 4,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {regionLabel(region)} {'\u00B7'} WHS
-            {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: AMBER,
+                marginBottom: 4,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {regionLabel(region)} {'\u00B7'} WHS
+              {'\u00B7'} {total} {total === 1 ? 'ENTRY' : 'ENTRIES'}
+            </div>
+            <div
+              id="tier-see-all-title"
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: INK,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {TIER_TITLE[tier]}
+            </div>
           </div>
-          <div
-            id="tier-see-all-title"
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-            }}
-          >
-            {TIER_TITLE[tier]}
-          </div>
+
+          <GolferSearchField onQueryChange={handleQueryChange} />
         </div>
 
         {hasToggle && (
