@@ -105,12 +105,19 @@ export function FeatListRow({ row, tier, onTap, index = 0, mode, isLast = false,
   const showDate = !!when && !isRanked;
   const subline = <LedgerSubline courseName={row.course_name} />;
 
+  // Legendary rows only: hole context ("17th . par 3 . 168 yds").
+  const holeParts = useMemo(
+    () => (legendaryChip ? holeContextParts(row) : []),
+    [legendaryChip, row],
+  );
+
   // Record book only: feat chips from the stats joined into the cached payload.
   // Rows without stats simply render no chip row.
   const feats = useMemo(
     () => (isRecordsRow ? deriveRoundFeats(row) : []),
     [isRecordsRow, row],
   );
+
 
 
   return (
