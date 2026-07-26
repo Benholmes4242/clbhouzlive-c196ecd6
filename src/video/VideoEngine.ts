@@ -39,7 +39,7 @@ import {
   vperfNextId,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
-import { applyStartLevel, bandwidthSeed, viewportPixelHeight } from './startLevel';
+import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight } from './startLevel';
 
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
