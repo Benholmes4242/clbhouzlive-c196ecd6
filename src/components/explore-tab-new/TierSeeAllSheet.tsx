@@ -72,8 +72,13 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
   const [visible, setVisible] = useState(PAGE);
   const [mode, setMode] = useState<RecordsMode>(initialMode);
   const [metric, setMetric] = useState<'aces' | 'albatrosses'>(initialMetric);
+  const [query, setQuery] = useState('');
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleQueryChange = useCallback((q: string) => setQuery(q), []);
+  const needle = normalizeName(query);
+  const searching = needle.length > 0;
 
   const hasToggle = true;
   const isEagles = tier === 'eagles';
