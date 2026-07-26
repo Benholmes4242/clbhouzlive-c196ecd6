@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type CourseTabId = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
+export type CourseTabId = 'course' | 'you' | 'reviews' | 'media';
 
 interface CourseTabsProps {
   activeTab: CourseTabId;
@@ -11,11 +11,10 @@ interface CourseTabsProps {
 }
 
 const TABS: { id: CourseTabId; labelKey: string }[] = [
-  { id: 'about',   labelKey: 'courseDetail.tabs.about' },
+  { id: 'course',  labelKey: 'courseDetail.tabs.course' },
+  { id: 'you',     labelKey: 'courseDetail.tabs.you' },
   { id: 'reviews', labelKey: 'courseDetail.tabs.reviews' },
   { id: 'media',   labelKey: 'courseDetail.tabs.media' },
-  { id: 'holes',   labelKey: 'courseDetail.tabs.holes' },
-  { id: 'legends', labelKey: 'courseDetail.tabs.legends' },
 ];
 
 /**

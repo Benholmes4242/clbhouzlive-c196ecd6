@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
 
-type CourseDetailTab = 'about' | 'reviews' | 'media' | 'holes' | 'legends';
+type CourseDetailTab = 'course' | 'you' | 'reviews' | 'media';
 
 interface TabDef {
   id: CourseDetailTab;
@@ -11,11 +11,10 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { id: 'about',   labelKey: 'courseDetail.tabs.about' },
+  { id: 'course',  labelKey: 'courseDetail.tabs.course' },
+  { id: 'you',     labelKey: 'courseDetail.tabs.you' },
   { id: 'reviews', labelKey: 'courseDetail.tabs.reviews' },
   { id: 'media',   labelKey: 'courseDetail.tabs.media' },
-  { id: 'holes',   labelKey: 'courseDetail.tabs.holes' },
-  { id: 'legends', labelKey: 'courseDetail.tabs.legends' },
 ];
 
 interface CourseDetailShellTabsProps {
