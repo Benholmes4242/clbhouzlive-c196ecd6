@@ -20,6 +20,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseYouTab from '@/components/courses/course-detail/CourseYouTab';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
 interface GolfClubViewProps {
@@ -115,8 +116,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { data: courseMeta } = useCourseMeta(courseId);
   void ratingStatsLoading;
 
+  // Fire once on first mount with the initial tab.
+  const initialTabFired = useRef(false);
+  useEffect(() => {
+    if (initialTabFired.current || !courseId) return;
+    initialTabFired.current = true;
+    analyticsEvents.track('course_tab_viewed', { course_id: courseId, tab: initialTab });
+  }, [courseId, initialTab]);
+
   const handleTabChange = useCallback((newTab: CourseTabId) => {
     setActiveTab(newTab);
+    analyticsEvents.track('course_tab_viewed', { course_id: courseId, tab: newTab });
     setVisitedTabs(prev => new Set(prev).add(newTab));
 
     if (!isInModal) {
