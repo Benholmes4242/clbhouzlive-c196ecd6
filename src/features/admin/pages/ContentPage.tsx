@@ -27,8 +27,9 @@ import AdminSheet from '../components/AdminSheet';
 import CourseInsight from '../components/CourseInsight';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { COURSE_TYPES } from '../constants';
-import { ContinentCountrySelectors } from '../components/ContinentCountrySelectors';
-import { isCountryInContinent } from '../lib/countries';
+import { CourseGeographySelectors } from '../components/CourseGeographySelectors';
+import { DuplicateCourseWarning, useDuplicateCourseCheck } from '../components/DuplicateCourseWarning';
+import { isCanonicalCountry, trimOrNull } from '../lib/geography';
 import { useCourses, createCourse, type AdminCourseRow, type CourseFilter } from '../hooks/useCourses';
 import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
@@ -291,6 +292,7 @@ function CoursesTab() {
         onClose={closeSheet}
         onCreated={() => { c.refetch(); }}
         uploadPhoto={c.uploadPhoto}
+        onOpenExisting={(id) => { closeSheet(); openCourse(id); }}
       />
 
 
@@ -464,6 +466,7 @@ function CourseDetail({
       name: course.name ?? '',
       continent: course.continent ?? '',
       country: course.country ?? '',
+      region_key: (course as any).region_key ?? '',
       sub_country: course.sub_country ?? '',
       region: course.region ?? '',
       country_code: course.country_code ?? '',
@@ -513,34 +516,40 @@ function CourseDetail({
     if (!courseId) return;
     const continent = (form.continent ?? '').trim();
     const country = (form.country ?? '').trim();
+    const regionKey = (form.region_key ?? '').trim();
+    const name = (form.name ?? '').trim();
+    if (!name) { toast.error('Name is required'); return; }
     if (!continent) { toast.error('Continent is required'); return; }
-    if (!country) { toast.error('Country is required'); return; }
-    // Legacy stored value that isn't in the list is allowed only when
+    if (!country) { toast.error('Region is required'); return; }
+    // Legacy stored value that isn't a grouping label is allowed only when
     // untouched (i.e. still equals the original record value).
     const original = (course?.country ?? '').trim();
-    const legacyUntouched = country === original && !isCountryInContinent(country, continent);
-    if (!legacyUntouched && !isCountryInContinent(country, continent)) {
-      toast.error(`"${country}" is not a valid country for ${continent}`);
+    const legacyUntouched = country === original && !isCanonicalCountry(country);
+    if (!legacyUntouched && !isCanonicalCountry(country)) {
+      toast.error(`"${country}" is not a valid region grouping`);
       return;
     }
+    if (!legacyUntouched && !regionKey) { toast.error('Region key is missing - re-pick the region'); return; }
+    if (!trimOrNull(form.sub_country)) { toast.error('Country / home nation is required'); return; }
     const updates: any = {
-      name: form.name?.trim(),
+      name,
       continent: continent as any,
       country,
-      sub_country: form.sub_country || null,
-      region: form.region || null,
-      country_code: form.country_code || null,
+      region_key: trimOrNull(regionKey),
+      sub_country: trimOrNull(form.sub_country),
+      region: trimOrNull(form.region),
+      country_code: trimOrNull(form.country_code),
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
       global_rank: form.global_rank === '' ? null : Number(form.global_rank),
       regional_rank: form.regional_rank === '' ? null : Number(form.regional_rank),
       usa_rank: form.usa_rank === '' ? null : Number(form.usa_rank),
       country_rank: form.country_rank === '' ? null : Number(form.country_rank),
-      website_url: form.website_url || null,
-      top100_url: form.top100_url || null,
-      course_type: form.course_type || null,
+      website_url: trimOrNull(form.website_url),
+      top100_url: trimOrNull(form.top100_url),
+      course_type: trimOrNull(form.course_type),
       has_hosted_major: !!form.has_hosted_major,
-      description: form.description || null,
+      description: trimOrNull(form.description),
     };
     await update(courseId, updates);
     if (draftKey) clearDraft(draftKey);
@@ -645,19 +654,25 @@ function CourseDetail({
 
           <Section title="Identity">
             <Field label="Name"><TextInput value={form.name} onChange={v => set('name', v)} /></Field>
-            <ContinentCountrySelectors
-              continent={form.continent ?? ''}
-              country={form.country ?? ''}
-              onContinentChange={v => set('continent', v)}
-              onCountryChange={v => set('country', v)}
-              required
-            />
             <Field label="Country code"><TextInput value={form.country_code} onChange={v => set('country_code', v)} placeholder="e.g. US" /></Field>
           </Section>
 
           <Section title="Location">
-            <Field label="State / Sub-country"><TextInput value={form.sub_country} onChange={v => set('sub_country', v)} /></Field>
-            <Field label="Region"><TextInput value={form.region} onChange={v => set('region', v)} /></Field>
+            <CourseGeographySelectors
+              value={{
+                country: form.country ?? '',
+                region_key: form.region_key ?? '',
+                continent: form.continent ?? '',
+                sub_country: form.sub_country ?? '',
+                region: form.region ?? '',
+              }}
+              onChange={patch => setForm(f => {
+                const next = { ...f, ...patch };
+                if (draftKey) saveDraft(draftKey, next);
+                return next;
+              })}
+              originalCountry={course?.country ?? null}
+            />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <Field label="Latitude"><TextInput value={form.latitude} onChange={v => set('latitude', v)} inputMode="decimal" /></Field>
               <Field label="Longitude"><TextInput value={form.longitude} onChange={v => set('longitude', v)} inputMode="decimal" /></Field>
