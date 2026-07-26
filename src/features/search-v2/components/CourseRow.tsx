@@ -29,9 +29,9 @@ export function CourseRow({ course, query, onSelect }: Props) {
           style={{ border: `1px solid ${LIGHT_HAIRLINE}` }}
         />
       </div>
-      <div className="flex-1 min-w-0">
-        {/* Allow the badges to wrap under long names rather than crushing the title. */}
-        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+      <div className="flex-1 min-w-0 flex flex-col gap-1">
+        {/* Row 1: name + rating. The Your Stats pill lives on its own row below. */}
+        <div className="flex items-center gap-2 min-w-0">
           <p className="text-[14px] font-medium truncate min-w-0" style={{ color: '#0F172A' }}>
             <Highlight text={course.name} query={query} />
           </p>
@@ -53,10 +53,14 @@ export function CourseRow({ course, query, onSelect }: Props) {
               {course.avg_rating.toFixed(1)}
             </span>
           )}
-          {yourStatsRounds != null && (
-            <YourStatsChip count={yourStatsRounds} tone="light" />
-          )}
         </div>
+
+        {yourStatsRounds != null && (
+          <div className="flex items-center">
+            <YourStatsChip count={yourStatsRounds} tone="light" />
+          </div>
+        )}
+
         {sub && (
           <p className="text-[12px] truncate" style={{ color: '#475569' }}>
             {sub}
