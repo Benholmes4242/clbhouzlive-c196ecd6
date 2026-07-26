@@ -290,7 +290,9 @@ export function StatRow({
             {featChips}
           </div>
         ) : null}
+        {metaLine ?? null}
       </div>
+
 
       <div
         style={{
