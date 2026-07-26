@@ -204,18 +204,41 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '16px 0' }}><Divider /></div>
 
-      {/* 3. Your Journey — PersonalSection renders its own canonical SectionLabel internally */}
-      {user && (
-        <>
-          <section>
-            <PersonalSection courseId={course.id} courseName={course.name} />
-          </section>
-          <div style={{ margin: '16px 0' }}><Divider /></div>
-        </>
-      )}
-
-      {/* 4. Friends Who've Played */}
+      {/* 3. Friends Who've Played */}
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
+
+      {/* 3b. Play data — tee card + course shape, then the collapsed hole table */}
+      <section>
+        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
+      </section>
+
+      <section>
+        <CourseHolesTab
+          courseId={course.id}
+          section="holes"
+          showTeeCard={false}
+          showGhost={false}
+          showEmptyState={false}
+          collapsible
+          defaultCollapsed
+        />
+      </section>
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+      {/* 3c. The record book — Champions promoted onto the default view */}
+      <CourseRecordBook
+        courseId={course.id}
+        courseName={course.name}
+        courseRegion={course.region ?? null}
+        courseCountry={course.country ?? null}
+        courseType={(course as { course_type?: string | null }).course_type ?? null}
+        initialCategory={legendCategoryParam}
+      />
+
+      <div style={{ margin: '16px 0' }}><Divider /></div>
+
+
 
       {/* 5. About - quiet notes card */}
       {course.description && (
