@@ -21,7 +21,6 @@ const INK = '#0F172A';
 const SLATE_400 = '#94A3B8';
 const SLATE_500 = '#64748B';
 const HAIRLINE = '#E2E8F0';
-const AMBER = '#F7931E';
 const LAUREL_INK = '#0e8a57'; // hcp drop = green
 const RED = '#D2222D';         // hcp rise = red
 
