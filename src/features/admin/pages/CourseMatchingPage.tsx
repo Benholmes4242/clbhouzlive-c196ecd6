@@ -37,6 +37,7 @@ interface CourseHit {
   id: string;
   name: string;
   region: string | null;
+  sub_country: string | null;
   country: string | null;
   thumbnail_image: string | null;
 }
