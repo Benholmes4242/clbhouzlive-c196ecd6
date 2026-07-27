@@ -112,15 +112,27 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
           : base;
     if (!needle) return sorted;
     return sorted.filter((r) =>
-      normalizeName(`${r.holder_name ?? ''} ${r.holder_username ?? ''}`).includes(needle),
+      normalizeName(
+        `${r.holder_name ?? ''} ${r.holder_username ?? ''} ${r.course_name ?? ''}`,
+      ).includes(needle),
     );
   }, [fetched, mode, rows, initialMode, tier, isLeaderView, needle]);
+
+  const matchesLeader = (r: {
+    holder_name?: string | null;
+    holder_club?: string | null;
+    holder_username?: string | null;
+  }) =>
+    !needle ||
+    normalizeName(
+      `${r.holder_name ?? ''} ${r.holder_username ?? ''} ${r.holder_club ?? ''}`,
+    ).includes(needle);
 
   const legendaryLeaderRows: LegendaryLeaderRow[] = useMemo(() => {
     if (!isLegendaryLeaders) return [];
     return (leadersData ?? [])
       .filter((r) => (r[metric] ?? 0) > 0)
-      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
+      .filter(matchesLeader)
       .sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0));
   }, [isLegendaryLeaders, leadersData, metric, needle]);
 
@@ -128,9 +140,10 @@ export function TierSeeAllSheet({ open, onClose, tier, region, rows, onRowTap, i
     if (!isEagleLeaders) return [];
     return (eagleLeadersData ?? [])
       .filter((r) => (r.eagles ?? 0) > 0)
-      .filter((r) => !needle || normalizeName(r.holder_name ?? '').includes(needle))
+      .filter(matchesLeader)
       .sort((a, b) => (b.eagles ?? 0) - (a.eagles ?? 0));
   }, [isEagleLeaders, eagleLeadersData, needle]);
+
 
   const legendaryMax = legendaryLeaderRows[0]?.[metric] ?? 1;
   const eagleMax = eagleLeaderRows[0]?.eagles ?? 1;

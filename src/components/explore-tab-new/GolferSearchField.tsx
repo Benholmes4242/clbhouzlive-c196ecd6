@@ -49,7 +49,7 @@ export function GolferSearchField({ onQueryChange, onExpandedChange }: Props) {
     return (
       <button
         type="button"
-        aria-label="Search golfers"
+        aria-label="Search golfers or courses"
         aria-expanded={false}
         onClick={() => setExpanded(true)}
         style={{
@@ -96,8 +96,8 @@ export function GolferSearchField({ onQueryChange, onExpandedChange }: Props) {
       <input
         ref={inputRef}
         type="search"
-        aria-label="Search golfers by name"
-        placeholder="Search golfers"
+        aria-label="Search golfers or courses"
+        placeholder="Search golfers or courses"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
