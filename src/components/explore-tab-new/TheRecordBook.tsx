@@ -18,7 +18,9 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
-import { RoundFeatChips } from './RoundFeatChips';
+import { RoundFeatChips, useRoundFeatLabel } from './RoundFeatChips';
+import { SectionHead } from './SectionHead';
+import { CinematicLeadCard } from './CinematicLeadCard';
 import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 import { LedgerSubline } from './PinIcon';
 
