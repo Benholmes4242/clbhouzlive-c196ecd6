@@ -242,7 +242,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL - allow explore, top100, and discover for main page
+  // Check for tab parameter in URL - allow explore and top100 for main page.
+  // ?tab=discover is a legacy deep link: the content moved to /explore, so the
+  // link follows it rather than falling back to a courses tab.
   useEffect(() => {
     const tabParam = searchParams.get('tab');
 
@@ -251,12 +253,16 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       setActiveTab(tabParam === 'explore' ? 'explore' : 'my-courses');
       return;
     }
-    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
+    if (tabParam === 'discover') {
+      navigate('/explore', { replace: true });
+      return;
+    }
+    if (tabParam === 'explore' || tabParam === 'top100') {
       setActiveTab(tabParam);
     } else {
-      setActiveTab('discover');
+      setActiveTab('explore');
     }
-  }, [searchParams, username]);
+  }, [searchParams, username, navigate]);
 
   // Scroll to top on mount — prevents page opening halfway down from previous visit
   useEffect(() => {
@@ -267,8 +273,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setActiveTab(value);
     // Persist tab to URL so it survives remount on back navigation
     const params = new URLSearchParams(searchParams);
-    if (value === 'discover') {
-      params.delete('tab'); // 'discover' is the default, keep URL clean
+    if (value === 'explore') {
+      params.delete('tab'); // 'explore' is the default, keep URL clean
     } else {
       params.set('tab', value);
     }
@@ -283,12 +289,13 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       const params = new URLSearchParams(searchParams);
       params.delete('tab');
       setSearchParams(params, { replace: true });
-      setActiveTab('discover');
+      setActiveTab('explore');
       scrollPageToTop('smooth');
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [searchParams, setSearchParams]);
+
 
   // Dynamic subtitle logic
   const getSubtitle = () => {
