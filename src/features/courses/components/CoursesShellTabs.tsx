@@ -1,10 +1,9 @@
 import React from 'react';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 
-type CoursesTab = 'explore' | 'top100' | 'discover';
+type CoursesTab = 'explore' | 'top100';
 
 const TABS = [
-  { id: 'discover' as const, label: 'Discover' },
   { id: 'explore' as const, label: 'Courses' },
   { id: 'top100' as const, label: 'Top 100' },
 ];
@@ -17,6 +16,9 @@ interface CoursesShellTabsProps {
 /**
  * CoursesShellTabs — thin wrapper around the canonical UnderlineTabs primitive
  * using an INK underline (per design: no amber on Courses shell tabs).
+ *
+ * Discover used to be the first tab here; it now lives in the bottom nav at
+ * /explore, so this surface is purely courses.
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
