@@ -6,7 +6,7 @@
  * rendered in the order received.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -59,11 +59,16 @@ const LENS_EMOJI: Record<StatLens, string> = {
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
 
+/** Condensed sticky bar control. */
+const COMPACT_TRIGGER_CLS =
+  'h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none';
+
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const listTopRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [condensed, setCondensed] = useState(false);
   const viewedRef = useRef(false);
 
   const { data: facets } = useStatBrowseFacets();
@@ -115,6 +120,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     },
     [searchParams, setSearchParams],
   );
+
+  /* Condense on scroll: sentinel above the bar leaves the viewport top. */
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => setCondensed(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '0px 0px -100% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   /* ── Analytics ─────────────────────────────────────────────────── */
   useEffect(() => {
