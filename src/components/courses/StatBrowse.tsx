@@ -306,7 +306,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
       {/* ── List ────────────────────────────────────────────────── */}
       {isLoading ? (
-        <div className="mt-4 -mx-4 space-y-4">
+        <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -371,7 +371,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </div>
         )
       ) : (
-        <div className="mt-4 -mx-4 space-y-4">
+        <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
           {rows.map((row, i) => (
             <UnifiedCourseCard
               key={row.course_id}

@@ -6016,6 +6016,27 @@ export type Database = {
           },
         ]
       }
+      geo_regions: {
+        Row: {
+          is_active: boolean
+          region: string
+          sort_order: number
+          sub_country: string
+        }
+        Insert: {
+          is_active?: boolean
+          region: string
+          sort_order?: number
+          sub_country: string
+        }
+        Update: {
+          is_active?: boolean
+          region?: string
+          sort_order?: number
+          sub_country?: string
+        }
+        Relationships: []
+      }
       golf_club_aliases: {
         Row: {
           alias_key: string
