@@ -988,6 +988,16 @@ class VideoEngineImpl {
       // With a seek target, wait until element playhead is at/past target - 0.3s.
       // Without a target (startPosition<=0), any painted frame counts.
       if (target > 0 && now < target - 0.3) return;
+      // REAL-FRAME GATE — the 'play' event fires the instant play() is honoured,
+      // long before the decoder has a composited frame. Revealing then swaps the
+      // poster for an empty (black) <video>. Require decodable data AND real
+      // intrinsic dimensions; otherwise arm a frame callback and bail. The
+      // existing timeupdate/seeked arms remain the fallback.
+      const v = lane.el as HTMLVideoElement;
+      if (v.readyState < 2 || !(v.videoWidth > 0)) {
+        armFrameReveal(lane, markReadyToShow);
+        return;
+      }
       lane.firstFrame = true;
       // Once we have real painted frames, strip the poster attribute so the
       // browser cannot re-composite the poster image on subsequent
