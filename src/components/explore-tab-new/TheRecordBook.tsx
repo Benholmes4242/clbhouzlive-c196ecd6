@@ -165,6 +165,13 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
     else if (row.user_id) opener?.openProfile(row.user_id);
   };
 
+  // Lead entry goes cinematic only when the course actually has imagery;
+  // otherwise it degrades to a normal row (never an empty gradient block).
+  const lead = ledgerRows[0];
+  const leadImage = lead?.thumbnail_image ?? lead?.course_image ?? null;
+  const cinematic = !!leadImage;
+  const restRows = cinematic ? ledgerRows.slice(1) : ledgerRows;
+
   return (
     <section
       style={{
@@ -173,73 +180,32 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
         color: INK,
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: `${headerPaddingTop}px ${PAGE_PAD}px 0`,
-        }}
-      >
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: MUTED,
-              lineHeight: 1,
-            }}
-          >
-            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-          </div>
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: 17,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: INK,
-              lineHeight: 1.15,
-            }}
-          >
-            The record book
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
-          style={{
-            flexShrink: 0,
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            color: AMBER,
-            fontSize: 12,
-            fontWeight: 600,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          View all ›
-        </button>
-      </div>
+      <SectionHead
+        overline={mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+        title="The record book"
+        meta="View all"
+        onMeta={() => setSheetOpen(true)}
+        paddingX={PAGE_PAD}
+        paddingTop={headerPaddingTop}
+        paddingBottom={10}
+      />
+
+      {cinematic ? (
+        <RecordLeadCard row={lead} imageUrl={leadImage!} onTap={() => handleRowTap(lead)} />
+      ) : null}
 
       {/* Ledger — unified flat StatRow list */}
-      <div style={{ marginTop: 8 }}>
-        {ledgerRows.map((row, i) => (
+      <div style={{ marginTop: cinematic ? 0 : 8 }}>
+        {restRows.map((row, i) => (
           <RecordStatRow
             key={`${row.course_id ?? i}-${i}`}
             row={row}
-            isLast={i === ledgerRows.length - 1}
+            isLast={i === restRows.length - 1}
             onTap={() => handleRowTap(row)}
           />
         ))}
       </div>
+
 
       {/* G2 wiring — YouStrip under The Record Book only.
           Flag DISCOVER_YOU_STRIP OFF → renders nothing. */}
