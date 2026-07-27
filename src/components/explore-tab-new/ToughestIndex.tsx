@@ -11,6 +11,9 @@ import { FONT } from './gamingLightTokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { AMBER, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { REGION_TABS } from './AlmanacSections';
+import { DiscoverBand } from './DiscoverBand';
+import { CinematicLeadCard } from './CinematicLeadCard';
+import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
 
 const RED = '#D2222D';
 const GREEN = '#0F8F4A';
@@ -34,109 +37,117 @@ function regionLabel(slug: string | null | undefined): string {
   return REGION_TABS.find((t) => t.slug === slug)?.label ?? 'Worldwide';
 }
 
-function CourseCard({
+// Vertical list row: 44px thumbnail, name, difficulty bar, figure.
+function CourseIndexRow({
   rank,
-  courseId,
-  courseName,
-  avgOverPar,
-  totalRounds,
+  course,
   mode,
+  accent,
+  widthPct,
+  isLast,
+  onTap,
 }: {
   rank: number;
-  courseId: string;
-  courseName: string;
-  avgOverPar: number;
-  totalRounds: number;
+  course: DifficultCourse;
   mode: CourseIndexMode;
+  accent: string;
+  widthPct: number;
+  isLast: boolean;
+  onTap: () => void;
 }) {
-  const navigate = useNavigate();
-  const isTop = rank === 1;
-  const accent = mode === 'friendliest' ? GREEN : RED;
-  const topLabel = mode === 'friendliest' ? '#1 FRIENDLIEST' : '#1 TOUGHEST';
-  const label = isTop ? topLabel : `#${rank}`;
   const value = mode === 'friendliest'
-    ? `${avgOverPar >= 0 ? '+' : ''}${numFmt(avgOverPar, 1)}`
-    : `+${numFmt(avgOverPar, 1)}`;
+    ? `${course.avg_over_par >= 0 ? '+' : ''}${numFmt(course.avg_over_par, 1)}`
+    : `+${numFmt(course.avg_over_par, 1)}`;
   return (
     <button
       type="button"
-      onClick={() => navigate(`/courses/${courseId}`, { state: { activeTab: 'holes' } })}
-      className="text-left active:scale-[0.99] transition-transform"
+      onClick={onTap}
+      className="w-full text-left active:opacity-90 transition-opacity"
       style={{
-        flexShrink: 0,
-        width: 148,
-        minHeight: 130,
-        borderRadius: 12,
-        background: CARD_BG,
-        border: `0.5px solid ${HAIRLINE}`,
-        boxShadow: CARD_SHADOW,
-        padding: '11px 12px 10px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
+        padding: '10px 16px',
         cursor: 'pointer',
         fontFamily: FONT,
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
       <div
-        style={{
-          fontSize: 9,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: isTop ? accent : MUTE,
-          lineHeight: 1,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          marginTop: 6,
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: INK_COLOR,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.2,
-          minHeight: 30,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {courseName}
-      </div>
-      <div
         className="tabular-nums"
-        style={{
-          marginTop: 'auto',
-          fontSize: 20,
-          fontWeight: 700,
-          color: accent,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-        }}
+        style={{ width: 18, flexShrink: 0, fontSize: 12, fontWeight: 700, color: MUTE }}
       >
-        {value}
+        {rank}
       </div>
       <div
         style={{
-          marginTop: 5,
-          fontSize: 9,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: MUTE,
-          lineHeight: 1.2,
+          width: 44,
+          height: 44,
+          flexShrink: 0,
+          borderRadius: 10,
+          overflow: 'hidden',
+          background: SLATE_50,
         }}
       >
-        AVG · {totalRounds} ROUNDS
+        {course.thumbnail_image ? (
+          <img
+            src={getOptimizedImageUrl(course.thumbnail_image, { width: 120 })}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : null}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 600,
+            color: INK_COLOR,
+            letterSpacing: '-0.01em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {course.course_name}
+        </div>
+        <div style={{ marginTop: 6, height: 3, background: 'rgba(15,23,42,0.08)', borderRadius: 2 }}>
+          <div style={{ width: `${widthPct}%`, height: '100%', background: accent, borderRadius: 2 }} />
+        </div>
+      </div>
+      <div style={{ flexShrink: 0, textAlign: 'right' }}>
+        <div
+          className="tabular-nums"
+          style={{ fontSize: 16, fontWeight: 700, color: accent, letterSpacing: '-0.02em', lineHeight: 1 }}
+        >
+          {value}
+        </div>
+        <div
+          className="tabular-nums"
+          style={{
+            marginTop: 4,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: MUTE,
+            lineHeight: 1,
+          }}
+        >
+          {course.total_rounds} rounds
+        </div>
       </div>
     </button>
   );
 }
 
 export function ToughestIndex({ region }: { region?: string | null } = {}) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<CourseIndexMode>('toughest');
   const { data } = useNotableDifficultCourses(mode);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -151,9 +162,16 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
 
   if (rows.length === 0) return null;
 
+  const lead = rows[0];
+  const leadImage = lead?.thumbnail_image ?? null;
+  const cinematic = !!leadImage;
+  const restRows = cinematic ? rows.slice(1) : rows;
+  const accent = mode === 'friendliest' ? GREEN : RED;
+  const maxAvg = Math.max(...rows.map((c) => Math.abs(c.avg_over_par)), 1);
+
   return (
-    <section style={{ marginTop: 32 }}>
-      <div style={{ padding: '0 30px 8px' }}>
+    <DiscoverBand marginTop={32}>
+      <div style={{ padding: '12px 16px 0' }}>
         <SectionHead
           overline="Official WHS"
           title={title}
@@ -173,6 +191,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
             border: '1px solid rgba(15,23,42,0.08)',
             borderRadius: 999,
             marginTop: 2,
+            marginBottom: 12,
           }}
         >
           {([
@@ -208,19 +227,33 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         </div>
       </div>
 
-      <div
-        className="flex overflow-x-auto scrollbar-hide"
-        style={{ padding: '0 16px', gap: 10 }}
-      >
-        {rows.map((c, i) => (
-          <CourseCard
+      {cinematic ? (
+        <CinematicLeadCard
+          imageUrl={leadImage!}
+          alt={lead.course_name}
+          chips={[{
+            label: mode === 'friendliest' ? 'No.1 scoreable' : 'No.1 toughest',
+            tone: mode === 'friendliest' ? 'good' : 'danger',
+          }]}
+          title={lead.course_name}
+          subtitle={`${lead.total_rounds} rounds`}
+          figure={`${mode === 'friendliest' && lead.avg_over_par < 0 ? '' : '+'}${numFmt(lead.avg_over_par, 1)}`}
+          figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
+          onTap={() => navigate(`/courses/${lead.course_id}`, { state: { activeTab: 'holes' } })}
+        />
+      ) : null}
+
+      <div>
+        {restRows.map((c, i) => (
+          <CourseIndexRow
             key={c.course_id}
-            rank={i + 1}
-            courseId={c.course_id}
-            courseName={c.course_name}
-            avgOverPar={c.avg_over_par}
-            totalRounds={c.total_rounds}
+            rank={cinematic ? i + 2 : i + 1}
+            course={c}
             mode={mode}
+            accent={accent}
+            widthPct={Math.max(6, Math.round((Math.abs(c.avg_over_par) / maxAvg) * 100))}
+            isLast={i === restRows.length - 1}
+            onTap={() => navigate(`/courses/${c.course_id}`, { state: { activeTab: 'holes' } })}
           />
         ))}
       </div>
@@ -233,7 +266,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         region={region ?? null}
         title={title}
       />
-    </section>
+    </DiscoverBand>
   );
 }
 

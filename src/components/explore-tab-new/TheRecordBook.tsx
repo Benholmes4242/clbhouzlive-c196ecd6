@@ -18,7 +18,9 @@ import { SPACE } from '@/lib/spacing';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { StatRow } from './StatRow';
-import { RoundFeatChips } from './RoundFeatChips';
+import { RoundFeatChips, useRoundFeatLabel } from './RoundFeatChips';
+import { SectionHead } from './SectionHead';
+import { CinematicLeadCard } from './CinematicLeadCard';
 import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 import { LedgerSubline } from './PinIcon';
 
@@ -136,23 +138,13 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
     if (region == null) return null;
     return (
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT, color: INK }}>
-        <div style={{ padding: `0 ${PAGE_PAD}px` }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: MUTED,
-              lineHeight: 1,
-            }}
-          >
-            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-          </div>
-          <div style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: INK, lineHeight: 1.15 }}>
-            The record book
-          </div>
-        </div>
+        <SectionHead
+          overline={mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+          title="The record book"
+          paddingX={PAGE_PAD}
+          paddingTop={headerPaddingTop}
+          paddingBottom={10}
+        />
         <EmptyScopeCard
           title={`No records set ${regionScopePhrase(region)} yet — the book is open.`}
         />
@@ -165,6 +157,13 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
     else if (row.user_id) opener?.openProfile(row.user_id);
   };
 
+  // Lead entry goes cinematic only when the course actually has imagery;
+  // otherwise it degrades to a normal row (never an empty gradient block).
+  const lead = ledgerRows[0];
+  const leadImage = lead?.thumbnail_image ?? lead?.course_image ?? null;
+  const cinematic = !!leadImage;
+  const restRows = cinematic ? ledgerRows.slice(1) : ledgerRows;
+
   return (
     <section
       style={{
@@ -173,73 +172,32 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
         color: INK,
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: `${headerPaddingTop}px ${PAGE_PAD}px 0`,
-        }}
-      >
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: MUTED,
-              lineHeight: 1,
-            }}
-          >
-            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-          </div>
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: 17,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: INK,
-              lineHeight: 1.15,
-            }}
-          >
-            The record book
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
-          style={{
-            flexShrink: 0,
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            color: AMBER,
-            fontSize: 12,
-            fontWeight: 600,
-            fontFamily: FONT,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          View all ›
-        </button>
-      </div>
+      <SectionHead
+        overline={mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+        title="The record book"
+        meta="View all"
+        onMeta={() => setSheetOpen(true)}
+        paddingX={PAGE_PAD}
+        paddingTop={headerPaddingTop}
+        paddingBottom={10}
+      />
+
+      {cinematic ? (
+        <RecordLeadCard row={lead} imageUrl={leadImage!} onTap={() => handleRowTap(lead)} />
+      ) : null}
 
       {/* Ledger — unified flat StatRow list */}
-      <div style={{ marginTop: 8 }}>
-        {ledgerRows.map((row, i) => (
+      <div style={{ marginTop: cinematic ? 0 : 8 }}>
+        {restRows.map((row, i) => (
           <RecordStatRow
             key={`${row.course_id ?? i}-${i}`}
             row={row}
-            isLast={i === ledgerRows.length - 1}
+            isLast={i === restRows.length - 1}
             onTap={() => handleRowTap(row)}
           />
         ))}
       </div>
+
 
       {/* G2 wiring — YouStrip under The Record Book only.
           Flag DISCOVER_YOU_STRIP OFF → renders nothing. */}
@@ -265,6 +223,45 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
         initialMode={mode}
       />
     </section>
+  );
+}
+
+// ---- Cinematic lead (most recent record) ----------------------------------
+// Only rendered when the course has imagery; the caller falls back to a row.
+function RecordLeadCard({
+  row,
+  imageUrl,
+  onTap,
+}: {
+  row: FeatRow;
+  imageUrl: string;
+  onTap: () => void;
+}) {
+  const featLabel = useRoundFeatLabel();
+  const holder = formatHolderName(row.holder_name) || row.holder_username || 'A member';
+  const par = rowToPar(row);
+  const isStableford = row.category === 'best_stableford_all_time';
+  const showToPar = par != null && !isStableford;
+  const numericValue =
+    typeof row.value === 'number'
+      ? row.value
+      : typeof row.value === 'string' && row.value.trim() !== '' && !isNaN(Number(row.value))
+        ? Number(row.value)
+        : null;
+  const grossText = numericValue != null ? String(numericValue) : row.feat_value ?? '';
+  const chips = deriveRoundFeats(row).map((f) => ({ label: featLabel(f), tone: 'glass' as const }));
+
+  return (
+    <CinematicLeadCard
+      imageUrl={imageUrl}
+      alt={row.course_name}
+      chips={chips}
+      title={row.course_name}
+      subtitle={holder}
+      figure={showToPar ? toParText(par!) : grossText || '—'}
+      figureLabel={grossText ? `${grossText} gross` : undefined}
+      onTap={onTap}
+    />
   );
 }
 

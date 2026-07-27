@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
+import { CinematicLeadCard } from './CinematicLeadCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 
@@ -574,25 +575,59 @@ function GhostGlyph({ glyph }: { glyph: string }) {
 // ---- Attack rail (mirrors old ConquestsStrip) -----------------------------
 function AttackRail({ picks }: { picks: TitleInReach[] }) {
   const navigate = useNavigate();
+  // The closest record leads cinematic when it has imagery; otherwise every
+  // entry stays in the horizontal card rail (never an empty gradient block).
+  const lead = picks.reduce<TitleInReach | null>(
+    (best, r) => (best == null || Math.abs(r.gap) < Math.abs(best.gap) ? r : best),
+    null,
+  );
+  const leadImage = lead?.hero_image_url ?? null;
+  const cinematic = !!(lead && leadImage);
+  const rest = cinematic ? picks.filter((p) => p !== lead) : picks;
+
   return (
-    <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{
-        gap: 10,
-        marginTop: 10,
-        paddingLeft: PAGE_PAD,
-        paddingRight: PAGE_PAD,
-        paddingBottom: 4,
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      {picks.map((row) => (
-        <AttackCard
-          key={`${row.course_id}-${row.category}`}
-          row={row}
-          onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
-        />
-      ))}
+    <div>
+      {cinematic ? (
+        <div style={{ marginTop: 10 }}>
+          <CinematicLeadCard
+            imageUrl={leadImage!}
+            alt={lead!.course_name}
+            chips={[
+              { label: categoryLabel(lead!.category), tone: 'good' },
+              ...(Math.abs(lead!.gap) === 0
+                ? [{ label: 'Level with you', tone: 'glass' as const }]
+                : []),
+            ]}
+            title={lead!.course_name}
+            subtitle={`Record ${formatGapNumber(lead!.leader_value)}`}
+            figure={gapCopyAttack(lead!.category, lead!.gap)}
+            figureLabel="To take it"
+            progressPct={progressPct(lead!.category, lead!.gap)}
+            progressColor={GREEN}
+            onTap={() => navigate(`/courses/${lead!.course_id}?tab=legends`)}
+          />
+        </div>
+      ) : null}
+
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        style={{
+          gap: 10,
+          marginTop: 10,
+          paddingLeft: PAGE_PAD,
+          paddingRight: PAGE_PAD,
+          paddingBottom: 4,
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {rest.map((row) => (
+          <AttackCard
+            key={`${row.course_id}-${row.category}`}
+            row={row}
+            onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

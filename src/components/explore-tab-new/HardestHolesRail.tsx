@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHardestHoles, type HoleIndexMode, type HardestHoleRow } from '@/hooks/gam/useHardestHoles';
 import { SectionHead } from './SectionHead';
+import { DiscoverBand } from './DiscoverBand';
 import { regionScopePhrase, matchesRegionScope } from './regionScope';
 import { FONT } from './gamingLightTokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -30,7 +31,8 @@ function regionLabel(slug: string | null | undefined): string {
   return REGION_TABS.find((t) => t.slug === slug)?.label ?? 'Worldwide';
 }
 
-function HardestCard({
+// Vertical list row (band). Cards are for horizontal rails only.
+function HardestHoleRow({
   courseId,
   courseName,
   holeNo,
@@ -38,6 +40,7 @@ function HardestCard({
   playsTo,
   rounds,
   accent,
+  isLast,
 }: {
   courseId: string;
   courseName: string;
@@ -46,69 +49,80 @@ function HardestCard({
   playsTo: number;
   rounds: number;
   accent: string;
+  isLast: boolean;
 }) {
   const navigate = useNavigate();
   return (
     <button
       type="button"
       onClick={() => navigate(`/courses/${courseId}`, { state: { activeTab: 'holes' } })}
-      className="text-left active:scale-[0.99] transition-transform"
+      className="w-full text-left active:opacity-90 transition-opacity"
       style={{
-        flexShrink: 0,
-        width: 156,
-        minHeight: 138,
-        borderRadius: 12,
-        background: CARD_BG,
-        border: `0.5px solid ${HAIRLINE}`,
-        boxShadow: CARD_SHADOW,
-        padding: '11px 12px 10px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
+        padding: '11px 16px',
         cursor: 'pointer',
         fontFamily: FONT,
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
       <div
         className="tabular-nums"
-        style={{ fontSize: 30, fontWeight: 800, color: INK_COLOR, letterSpacing: '-0.03em', lineHeight: 1 }}
+        style={{
+          width: 46,
+          flexShrink: 0,
+          fontSize: 20,
+          fontWeight: 800,
+          color: INK_COLOR,
+          letterSpacing: '-0.03em',
+          lineHeight: 1,
+        }}
       >
         {ordinal(holeNo)}
       </div>
-      <div
-        style={{
-          marginTop: 6,
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: INK_COLOR,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.2,
-          minHeight: 30,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {courseName}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 600,
+            color: INK_COLOR,
+            letterSpacing: '-0.01em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {courseName}
+        </div>
+        <div
+          className="tabular-nums"
+          style={{
+            marginTop: 3,
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: MUTE,
+          }}
+        >
+          Par {par} · {rounds} rounds
+        </div>
       </div>
       <div
         className="tabular-nums"
-        style={{ marginTop: 'auto', fontSize: 11, fontWeight: 600, color: accent, letterSpacing: '0.02em', lineHeight: 1.2 }}
-      >
-        Par {par} · plays to {numFmt(playsTo, 1)}
-      </div>
-      <div
         style={{
-          marginTop: 4,
-          fontSize: 9,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: MUTE,
-          lineHeight: 1.2,
+          flexShrink: 0,
+          fontSize: 16,
+          fontWeight: 700,
+          color: accent,
+          letterSpacing: '-0.02em',
         }}
       >
-        {rounds} rounds
+        {numFmt(playsTo, 1)}
       </div>
     </button>
   );
@@ -131,8 +145,8 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
   if (rows.length === 0) return null;
 
   return (
-    <section style={{ marginTop: 32 }}>
-      <div style={{ padding: '0 30px 8px' }}>
+    <DiscoverBand marginTop={32}>
+      <div style={{ padding: '12px 16px 0' }}>
         <SectionHead
           overline="Hole index"
           title={title}
@@ -152,6 +166,7 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
             border: '1px solid rgba(15,23,42,0.08)',
             borderRadius: 999,
             marginTop: 2,
+            marginBottom: 12,
           }}
         >
           {([
@@ -187,9 +202,9 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
         </div>
       </div>
 
-      <div className="flex overflow-x-auto scrollbar-hide" style={{ padding: '0 16px', gap: 10 }}>
-        {rows.map((h) => (
-          <HardestCard
+      <div>
+        {rows.map((h, i) => (
+          <HardestHoleRow
             key={`${h.course_id}-${h.hole_no}`}
             courseId={h.course_id}
             courseName={h.course_name}
@@ -198,6 +213,7 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
             playsTo={h.plays_to}
             rounds={h.rounds}
             accent={accent}
+            isLast={i === rows.length - 1}
           />
         ))}
       </div>
@@ -210,7 +226,7 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
         region={region ?? null}
         title={title}
       />
-    </section>
+    </DiscoverBand>
   );
 }
 
