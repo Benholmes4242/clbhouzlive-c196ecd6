@@ -722,5 +722,86 @@
         "birdies": "Birdies"
       }
     }
+  },
+  "statBrowse": {
+    "eyebrow": "Where this community plays",
+    "countTracked_one": "course tracked",
+    "countTracked_other": "courses tracked",
+    "allAreas": "All areas",
+    "allRegions": "All regions",
+    "allOf": "All of {{country}}",
+    "countryOption": "{{country}} ({{count}})",
+    "regionOption": "{{region}} ({{count}})",
+    "selectCountryA11y": "Select country",
+    "selectRegionA11y": "Select region",
+    "selectLensA11y": "Sort courses",
+    "inCountry": " In {{country}}.",
+    "inRegion": " In {{region}}, {{country}}.",
+    "earlyData": "Early data",
+    "showMore": "Show {{count}} more",
+    "showMoreOf": " of {{total}}",
+    "lens": {
+      "toughest": {
+        "label": "Toughest",
+        "title": "Toughest we've tracked",
+        "description": "Ranked by average shots over par. Sample size on every course."
+      },
+      "scoreable": {
+        "label": "Most scoreable",
+        "title": "Most scoreable",
+        "description": "Where the field goes lowest, relative to par."
+      },
+      "played": {
+        "label": "Most played",
+        "title": "Most played",
+        "description": "Where this community spends its golf."
+      },
+      "longest": {
+        "label": "Longest",
+        "title": "Longest",
+        "description": "By the tee our members actually play."
+      },
+      "rated": {
+        "label": "Best rated",
+        "title": "Best rated",
+        "description": "By members who have played and reviewed them."
+      },
+      "chase": {
+        "label": "Records to chase",
+        "title": "Records to chase",
+        "description": "Courses with crowns nobody has claimed yet."
+      }
+    },
+    "unit": {
+      "avgOverPar": "avg over par",
+      "rounds": "rounds",
+      "yards": "yards",
+      "outOfTen": "out of 10",
+      "crownsOpen": "crowns open"
+    },
+    "sample": {
+      "rounds_one": "{{count}} round",
+      "rounds_other": "{{count}} rounds",
+      "members_one": "{{count}} member",
+      "members_other": "{{count}} members",
+      "tees": "{{tee}} tees",
+      "reviews_one": "{{count}} review",
+      "reviews_other": "{{count}} reviews",
+      "record": "record {{score}}"
+    },
+    "empty": {
+      "title": "No rounds logged in {{country}} yet",
+      "body": "{{count}} {{country}} courses are waiting for their first. Connect your handicap and every round you have played there appears automatically.",
+      "connect": "Connect your handicap",
+      "browse": "Browse {{country}} in the directory",
+      "nothingTitle": "Nothing tracked yet",
+      "nothingBody": "No courses match this view yet."
+    },
+    "directory": {
+      "title": "Looking for somewhere else?",
+      "body": "These are the courses our members have played and logged. The full directory has {{count}} more, waiting for their first round.",
+      "cta": "Browse the full directory",
+      "back": "Back to rankings"
+    }
   }
 }

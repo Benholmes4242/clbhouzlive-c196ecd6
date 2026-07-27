@@ -1026,6 +1026,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_claimed_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       business_daily_metrics: {
@@ -3027,6 +3034,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_change_log_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       course_claim_requests: {
@@ -3089,6 +3103,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_claim_requests_source_course_id_fkey"
+            columns: ["source_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -3248,6 +3269,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_edit_suggestions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       course_media: {
@@ -3288,6 +3316,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "course_media_rating_id_fkey"
@@ -3362,6 +3397,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "course_mood_blurbs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "course_mood_blurbs_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
@@ -3407,6 +3449,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "course_prestige_tags_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "course_prestige_tags_season_id_fkey"
             columns: ["season_id"]
             isOneToOne: false
@@ -3450,6 +3499,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_rank_history_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -3530,6 +3586,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "course_ratings_user_id_fkey"
@@ -3736,6 +3799,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_shortlists_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       course_tee_sets: {
@@ -3868,6 +3938,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_top100_memberships_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "course_top100_memberships_list_id_fkey"
@@ -4270,8 +4347,29 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "editorial_feed_cards_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "editorial_feed_cards_debate_option_a_course_id_fkey"
             columns: ["debate_option_a_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_feed_cards_debate_option_a_course_id_fkey"
+            columns: ["debate_option_a_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "editorial_feed_cards_debate_option_b_course_id_fkey"
+            columns: ["debate_option_b_course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
@@ -4280,8 +4378,8 @@ export type Database = {
             foreignKeyName: "editorial_feed_cards_debate_option_b_course_id_fkey"
             columns: ["debate_option_b_course_id"]
             isOneToOne: false
-            referencedRelation: "golf_courses"
-            referencedColumns: ["id"]
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "editorial_feed_cards_source_rating_id_fkey"
@@ -4639,6 +4737,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "explore_course_themes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "explore_course_themes_theme_id_fkey"
             columns: ["theme_id"]
             isOneToOne: false
@@ -4698,6 +4803,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "explore_featured_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -5095,6 +5207,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
             columns: ["trigger_whs_score_id"]
             isOneToOne: false
@@ -5258,6 +5377,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_legend_pulse_events_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -7294,6 +7420,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       player_course_history: {
@@ -7481,6 +7614,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "post_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "post_courses_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
@@ -7645,6 +7785,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_drafts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -8061,6 +8208,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "posts_source_review_id_fkey"
@@ -9611,6 +9765,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -11408,6 +11569,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "top_ten_reactions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
             columns: ["reactor_id"]
             isOneToOne: false
@@ -12417,6 +12585,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_course_personal_rank_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       user_course_tracker: {
@@ -12454,6 +12629,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "user_course_tracker_user_id_fkey"
@@ -12529,6 +12711,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -13520,6 +13709,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_user_profiles_home_club"
+            columns: ["home_club_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "user_profiles_college_id_fkey"
             columns: ["college_id"]
             isOneToOne: false
@@ -14193,6 +14389,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_top_ten_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       user_top_ten_lists: {
@@ -14248,6 +14451,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top10_exclusions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "user_top10_exclusions_user_id_fkey"
@@ -14314,6 +14524,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top100_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -14854,6 +15071,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_course_aliases_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -15521,11 +15745,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "whs_to_golf_course_map_echo_suggested_golf_course_id_fkey"
+            columns: ["echo_suggested_golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "whs_to_golf_course_map_golf_course_id_fkey"
             columns: ["golf_course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whs_to_golf_course_map_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "whs_to_golf_course_map_reviewed_by_fkey"
@@ -15688,6 +15926,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       course_rating_stats: {
@@ -15704,6 +15949,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -15754,6 +16006,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "gam_course_legends_trigger_whs_score_id_fkey"
@@ -15857,6 +16116,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_course_legends_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
           {
             foreignKeyName: "gam_course_legends_user_id_fkey"
@@ -16141,6 +16407,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_user_profiles_home_club"
+            columns: ["home_club_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "user_profiles_college_id_fkey"
             columns: ["college_id"]
             isOneToOne: false
@@ -16171,6 +16444,28 @@ export type Database = {
           season_slug: string | null
           total_xp: number | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      stat_browse_base: {
+        Row: {
+          avg_to_par: number | null
+          community_rating: number | null
+          country: string | null
+          course_id: string | null
+          course_record: number | null
+          global_rank: number | null
+          image_url: string | null
+          members: number | null
+          name: string | null
+          open_crowns: number | null
+          region: string | null
+          regional_rank: number | null
+          review_count: number | null
+          rounds: number | null
+          sub_country: string | null
+          tee_label: string | null
+          total_yards: number | null
         }
         Relationships: []
       }
@@ -16245,6 +16540,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
             foreignKeyName: "course_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -16315,6 +16617,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_top_ten_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -16402,6 +16711,13 @@ export type Database = {
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_top100_memberships_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
         ]
       }
       vw_course_activity_30d: {
@@ -16418,6 +16734,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "golf_courses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
           },
         ]
       }
@@ -19063,6 +19386,36 @@ export type Database = {
           viewer_follows: boolean
         }[]
       }
+      get_stat_browse_courses: {
+        Args: {
+          p_country?: string
+          p_lens?: string
+          p_limit?: number
+          p_offset?: number
+          p_region?: string
+        }
+        Returns: {
+          avg_to_par: number
+          community_rating: number
+          country: string
+          course_id: string
+          course_record: number
+          global_rank: number
+          image_url: string
+          members: number
+          name: string
+          open_crowns: number
+          region: string
+          regional_rank: number
+          review_count: number
+          rounds: number
+          sub_country: string
+          tee_label: string
+          total_count: number
+          total_yards: number
+        }[]
+      }
+      get_stat_browse_facets: { Args: never; Returns: Json }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
@@ -21544,6 +21897,7 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      stat_browse_total_categories: { Args: never; Returns: number }
       submit_business_verification_review:
         | {
             Args: { _decision: string; _note?: string; _request_id: string }
