@@ -127,7 +127,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     if (!el || typeof IntersectionObserver === 'undefined') return;
     const io = new IntersectionObserver(
       ([entry]) => setCondensed(!entry.isIntersecting),
-      { threshold: 0, rootMargin: '0px 0px -100% 0px' },
+      { threshold: 0, rootMargin: '0px 0px 0px 0px' },
     );
     io.observe(el);
     return () => io.disconnect();
