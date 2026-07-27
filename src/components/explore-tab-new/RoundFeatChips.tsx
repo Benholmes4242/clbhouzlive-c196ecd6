@@ -121,19 +121,14 @@ export function RoundFeatChips({ feats }: Props) {
             key={f.key}
             style={{
               ...featChipBase,
-              background: 'rgba(247,147,30,0.10)',
-              color: AMBER,
-              textTransform: 'none',
-              letterSpacing: '0.02em',
-              fontSize: 10.5,
-              fontWeight: 600,
+              ...TIER_STYLE[tierFor(f.key)],
+              fontVariantNumeric: 'tabular-nums',
             }}
             title={label}
           >
-            <span aria-hidden style={{ fontSize: 11 }}>{'\uD83C\uDFC5'}</span>
             <span
               style={{
-                maxWidth: 120,
+                maxWidth: 130,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
