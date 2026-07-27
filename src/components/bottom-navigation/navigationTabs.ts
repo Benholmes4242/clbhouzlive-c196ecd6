@@ -14,18 +14,19 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
-  { id: 'watch',     label: 'Discover',  icon: YoutubeIcon,  path: '/explore' },
+  { id: 'watch',     label: 'Discover',  icon: PulseIcon,  path: '/explore' },
   { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
 
 // Per-tab optical size map (expanded). Keyed by the REAL tab ids above.
-// Rationale: PlusSquare + YoutubeLogo carry corner ink and read large (-1/-2);
-// the MapPin teardrop reads small (+1); House/Trophy hold the 31px baseline.
+// Rationale: PlusSquare carries corner ink and reads large (-1);
+// Pulse line is thinner and reads small at 30, so hold 31; the MapPin teardrop
+// reads small (+1); House/Trophy hold the 31px baseline.
 export const ICON_SIZE: Record<string, number> = {
   clubhouse: 31,
-  watch: 30,
+  watch: 31,
   post: 29,
   courses: 32,
   tourhub: 31,
