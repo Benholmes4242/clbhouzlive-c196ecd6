@@ -10,6 +10,14 @@ export const CLUBHOUSE_VERTICAL_ONLY = false; // TEMPORARILY DISABLED FOR DEBUGG
 export const USE_SAFE_AUTOPLAY_V2 = true;
 export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 
+/**
+ * Standalone Watch surface (/watch, /watch/videos, /watch/clips, /videos, /clips).
+ * OFF = routes stay registered but redirect to /explore. Member video elsewhere
+ * (feed posts, course media, moments) is unaffected. Flip to true to restore.
+ */
+export const WATCH_SURFACE = false;
+
+
 
 /**
  * Top 100 Mock Players Flag
