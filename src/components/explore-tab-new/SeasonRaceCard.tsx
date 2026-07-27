@@ -193,7 +193,7 @@ export function SeasonRaceCard({ userId }: Props) {
           {/* Footer count label */}
           <div
             style={{
-              padding: '10px 14px 12px',
+              padding: '10px 16px 12px',
               borderTop: `1px solid ${HAIRLINE}`,
               fontSize: 11,
               fontWeight: 700,
@@ -205,7 +205,7 @@ export function SeasonRaceCard({ userId }: Props) {
             Crowns this season
           </div>
         </div>
-      </section>
+      </DiscoverBand>
 
       <SeasonStandingsSheet
         open={sheetOpen}
