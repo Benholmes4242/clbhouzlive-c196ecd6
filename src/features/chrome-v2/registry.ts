@@ -304,7 +304,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       test: (p, s) =>
         p.startsWith('/discover') && s.get('main') === 'videos' && !!s.get('section'),
     },
-    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/watch' }, tone: 'light', bleed: false },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
 
   // Discover landing / other discover routes.

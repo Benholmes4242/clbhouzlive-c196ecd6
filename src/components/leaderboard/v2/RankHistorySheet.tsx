@@ -82,7 +82,7 @@ function EmptyState() {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => navigate('/courses?tab=discover')}
+        onClick={() => navigate('/explore')}
         className="gap-2"
       >
         <Plus className="w-4 h-4" />
