@@ -34,6 +34,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/mentions/MentionText';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import MapPinIcon from '@/components/icons/MapPinIcon';
