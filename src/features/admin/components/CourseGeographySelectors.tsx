@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
 import { adminTheme as t } from '../theme';
 import {
   GROUPINGS, ROW_CONTINENTS, subCountryOptions, deriveGeography,
@@ -54,29 +56,29 @@ function Label({ text, required }: { text: string; required?: boolean }) {
   );
 }
 
-/** DISTINCT region values already used for a given sub_country. */
-function useRegionSuggestions(subCountry: string) {
+/** Canonical region vocabulary for a sub_country, from public.geo_regions. */
+function useCanonicalRegions(subCountry: string) {
   const sc = subCountry.trim();
   return useQuery({
     queryKey: ['admin-v2', 'courses', 'regions', sc],
     enabled: sc.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('golf_courses')
-        .select('region')
+      const { data, error } = await supabase
+        .from('geo_regions')
+        .select('region, sort_order')
         .eq('sub_country', sc)
-        .not('region', 'is', null)
-        .limit(1000);
-      const set = new Set<string>();
-      (data ?? []).forEach((r: any) => {
-        const v = (r.region ?? '').trim();
-        if (v) set.add(v);
-      });
-      return Array.from(set).sort((a, b) => a.localeCompare(b));
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .order('region', { ascending: true });
+      if (error) throw error;
+      return (data ?? [])
+        .map((r: any) => (r.region ?? '') as string)
+        .filter((r) => r.length > 0);
     },
   });
 }
+
 
 export function CourseGeographySelectors({ value, onChange, originalCountry }: Props) {
   const storedKey = regionKeyForCountry(value.country);
@@ -91,8 +93,9 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
     () => subCountryOptions(regionKey, value.continent),
     [regionKey, value.continent],
   );
-  const { data: regionSuggestions = [] } = useRegionSuggestions(value.sub_country);
+  const canonicalRegions = useCanonicalRegions(value.sub_country);
   const listId = `region-suggest-${(value.sub_country || 'none').replace(/[^a-z0-9]/gi, '')}`;
+
 
   const pickGrouping = (key: string) => {
     if (!key) {
@@ -167,12 +170,13 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
             {value.sub_country && <option value={value.sub_country}>{value.sub_country}</option>}
           </select>
         </label>
-        <RegionCombobox
+        <RegionField
           value={value.region}
           onChange={(v) => onChange({ region: v })}
-          suggestions={regionSuggestions}
+          query={canonicalRegions}
           listId={listId}
         />
+
       </>
     );
   }
@@ -237,41 +241,78 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
         </select>
       </label>
 
-      <RegionCombobox
+      <RegionField
         value={value.region}
         onChange={(v) => onChange({ region: v })}
-        suggestions={regionSuggestions}
+        query={canonicalRegions}
         listId={listId}
       />
+
     </>
   );
 }
 
-function RegionCombobox({ value, onChange, suggestions, listId }: {
+/**
+ * County / state / province field.
+ *
+ * Seeded country (geo_regions returned rows): strict select, no free text.
+ * Unseeded country (zero rows): free-text input, as before.
+ * While the query is in flight the previously resolved mode is held so the
+ * control does not flicker between the two.
+ */
+function RegionField({ value, onChange, query, listId }: {
   value: string;
   onChange: (v: string) => void;
-  suggestions: string[];
+  query: ReturnType<typeof useCanonicalRegions>;
   listId: string;
 }) {
+  const { t: tr } = useTranslation('common');
+  const regions = query.data ?? [];
+  const settled = query.isSuccess || query.isError;
+  const lastSeeded = useRef(false);
+  if (settled) lastSeeded.current = regions.length > 0;
+  const seeded = settled ? regions.length > 0 : lastSeeded.current;
+  const current = value ?? '';
+  const legacyValue = seeded && current && !regions.includes(current) ? current : '';
+
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <Label text="County / state / province" />
-      <input
-        type="text"
-        value={value ?? ''}
-        list={listId}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="e.g. Kent"
-        style={inputStyle}
-      />
-      <datalist id={listId}>
-        {suggestions.map((s) => <option key={s} value={s} />)}
-      </datalist>
+      <Label text={tr('admin.geography.region.label')} />
+      {seeded ? (
+        <select
+          value={current}
+          onChange={(e) => onChange(e.target.value)}
+          style={inputStyle}
+        >
+          {legacyValue && (
+            <option value={legacyValue}>
+              {tr('admin.geography.region.notInList', { value: legacyValue })}
+            </option>
+          )}
+          <option value="">{tr('admin.geography.region.placeholderOption')}</option>
+          {regions.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+      ) : (
+        <>
+          <input
+            type="text"
+            value={current}
+            list={listId}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={tr('admin.geography.region.freeTextPlaceholder')}
+            style={inputStyle}
+          />
+          <datalist id={listId} />
+        </>
+      )}
       <span style={{ fontSize: 11, color: t.inkFaint }}>
-        Optional. Pick an existing value where possible - trimmed on save.
+        {seeded
+          ? tr('admin.geography.region.helpSeeded')
+          : tr('admin.geography.region.helpFreeText')}
       </span>
     </label>
   );
 }
+
 
 export default CourseGeographySelectors;

@@ -6016,6 +6016,27 @@ export type Database = {
           },
         ]
       }
+      geo_region_aliases: {
+        Row: {
+          canonical: string | null
+          note: string | null
+          raw_region: string
+          sub_country: string
+        }
+        Insert: {
+          canonical?: string | null
+          note?: string | null
+          raw_region: string
+          sub_country: string
+        }
+        Update: {
+          canonical?: string | null
+          note?: string | null
+          raw_region?: string
+          sub_country?: string
+        }
+        Relationships: []
+      }
       geo_regions: {
         Row: {
           is_active: boolean
@@ -17463,6 +17484,7 @@ export type Database = {
       }
       generate_weekly_pickem: { Args: never; Returns: number }
       generate_whs_invite_code: { Args: never; Returns: string }
+      geo_resolve: { Args: { p_raw: string; p_sub: string }; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
