@@ -315,7 +315,11 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: 20,
-          background: SURFACE,
+          // Light-page glass: canonical --glass-bg is a dark token, so the
+          // bar uses the light translucent equivalent to keep ink controls legible.
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(var(--glass-blur))',
+          WebkitBackdropFilter: 'blur(var(--glass-blur))',
           borderBottom: `1px solid ${HAIRLINE_INK_8}`,
         }}
       >
