@@ -98,7 +98,7 @@ export function SeasonRaceCard({ userId }: Props) {
 
   return (
     <>
-      <section style={{ padding: '0 16px', fontFamily: FONT }}>
+      <DiscoverBand style={{ fontFamily: FONT }}>
         <div
           role="button"
           tabIndex={0}
@@ -111,10 +111,8 @@ export function SeasonRaceCard({ userId }: Props) {
           }}
           style={{
             width: '100%',
-            background: CARD_BG,
-            border: `1px solid ${HAIRLINE}`,
-            borderRadius: 16,
-            boxShadow: CARD_SHADOW,
+            background: 'transparent',
+            border: 'none',
             overflow: 'hidden',
             textAlign: 'left',
             cursor: 'pointer',
@@ -125,7 +123,7 @@ export function SeasonRaceCard({ userId }: Props) {
           {/* Header */}
           <div
             style={{
-              padding: '14px 14px 10px',
+              padding: '14px 16px 10px',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
@@ -135,9 +133,9 @@ export function SeasonRaceCard({ userId }: Props) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 10.5,
+                  fontSize: 10,
                   fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   color: AMBER_DEEP,
                   lineHeight: 1,
