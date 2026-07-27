@@ -204,6 +204,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   feedEnded = false,
 }: Props) {
   const navigate = useNavigate();
+
+  // Mentions inside the caption must dismiss the fullscreen overlay BEFORE
+  // routing, otherwise the profile mounts underneath the still-open viewer.
+  // The navigate is deferred one frame so the overlay unmounts cleanly.
+  const handleMentionTap = useCallback(
+    (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => {
+      onClose();
+      const to = m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`;
+      requestAnimationFrame(() => navigate(to));
+    },
+    [onClose, navigate],
+  );
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
