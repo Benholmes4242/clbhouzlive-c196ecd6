@@ -22,7 +22,7 @@ export const LearnEmptyState: React.FC<LearnEmptyStateProps> = ({ className }) =
       <Button
         variant="outline"
         size="sm"
-        onClick={() => navigate('/watch')}
+        onClick={() => navigate('/explore')}
         className="text-slate-600 border-slate-300 hover:bg-slate-50"
       >
         Explore Watch

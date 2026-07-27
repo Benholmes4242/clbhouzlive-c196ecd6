@@ -333,8 +333,8 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   // no-op-safe call rather than a "not found" fall-through. Rails warm
   // themselves on reveal via useWatchAutoplay — do not compete here.
   {
-    // /watch primary grid: warm HLS for any short-form video cache hit.
-    path: '/watch',
+    // /explore (Discover) grid: warm HLS for any short-form video cache hit.
+    path: '/explore',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 6),

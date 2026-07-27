@@ -292,7 +292,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // are back-arrow island (page renders under CompactHeader today).
   {
     match: { prefix: '/discover/explore/theme/' },
-    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/courses?tab=discover' }, tone: 'light', bleed: false },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
   {
     match: {
