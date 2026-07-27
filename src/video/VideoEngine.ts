@@ -1263,6 +1263,38 @@ class VideoEngineImpl {
   }
 
   /**
+   * Re-assert play intent on a lane at increasing delays. Every tick bails
+   * the moment the lane is genuinely playing, loses its host, or drops its
+   * intent, so a healthy start costs one cancelled timer.
+   */
+  private playWatchdogs = new Map<LaneId, number[]>();
+  private armPlayWatchdog(laneId: LaneId): void {
+    this.clearPlayWatchdog(laneId);
+    const delays = [400, 1000, 2000, 3500];
+    const timers = delays.map((d) =>
+      window.setTimeout(() => {
+        const cur = this.lanes.get(laneId);
+        if (!cur || !cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
+        DBG(laneId, 'play.watchdog.retry', { delay: d, readyState: cur.el.readyState });
+        try {
+          const p = cur.el.play();
+          Promise.resolve(p).catch(() => { /* retry rejected — safe */ });
+        } catch { /* noop */ }
+      }, d),
+    );
+    this.playWatchdogs.set(laneId, timers);
+  }
+
+  private clearPlayWatchdog(laneId: LaneId): void {
+    const t = this.playWatchdogs.get(laneId);
+    if (!t) return;
+    t.forEach((id) => clearTimeout(id));
+    this.playWatchdogs.delete(laneId);
+  }
+
+
+  /**
    * Capture the element's LIVE currentTime → lastPos for the lane's current
    * owner, synchronously. Safe to call any time; never gated. Used to:
    *  - freeze lastPos at the true scroll-out position on pause/unbind
