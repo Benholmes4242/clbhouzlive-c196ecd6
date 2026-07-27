@@ -306,7 +306,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
       {/* ── List ────────────────────────────────────────────────── */}
       {isLoading ? (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 -mx-4 space-y-4">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -371,7 +371,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </div>
         )
       ) : (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 -mx-4 space-y-4">
           {rows.map((row, i) => (
             <UnifiedCourseCard
               key={row.course_id}
@@ -394,20 +394,22 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           ))}
 
           {rows.length < totalCount && (
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={isPaging}
-              className="w-full h-11 rounded-xl text-[13.5px] font-semibold"
-              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-            >
-              {t('statBrowse.showMore', {
-                count: Math.min(STAT_BROWSE_PAGE_SIZE, remaining),
-              })}
-              <span style={{ color: INK_MUTE, fontWeight: 500 }}>
-                {t('statBrowse.showMoreOf', { total: formatNumber(totalCount) })}
-              </span>
-            </button>
+            <div className="px-4">
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={isPaging}
+                className="w-full h-11 rounded-xl text-[13.5px] font-semibold"
+                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+              >
+                {t('statBrowse.showMore', {
+                  count: Math.min(STAT_BROWSE_PAGE_SIZE, remaining),
+                })}
+                <span style={{ color: INK_MUTE, fontWeight: 500 }}>
+                  {t('statBrowse.showMoreOf', { total: formatNumber(totalCount) })}
+                </span>
+              </button>
+            </div>
           )}
         </div>
       )}

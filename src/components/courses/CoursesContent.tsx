@@ -417,12 +417,6 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 <>
                   {shellTabsNode}
                   <div className="px-4 pt-3">
-                    {user && (
-                      <RateNudge
-                        userId={user.id}
-                        onEmptyFallback={() => setRateSheetOpen(true)}
-                      />
-                    )}
                     {showDirectory ? (
                       <>
                         <button
