@@ -224,18 +224,19 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   
   
-  // Default to 'discover' for the main courses page
+  // Default to 'explore' (StatBrowse). Discover moved to the /explore nav tab.
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = new URLSearchParams(window.location.search).get('tab');
     if (username) {
       // User-profile variant only defines 'explore' and 'my-courses'.
       return tabParam === 'explore' ? 'explore' : 'my-courses';
     }
-    if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
+    if (tabParam && ['explore', 'top100'].includes(tabParam)) {
       return tabParam;
     }
-    return 'discover';
+    return 'explore';
   });
+
 
   // Check if we're on a user courses page
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
