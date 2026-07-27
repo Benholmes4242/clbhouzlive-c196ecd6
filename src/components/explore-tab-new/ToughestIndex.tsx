@@ -151,9 +151,16 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
 
   if (rows.length === 0) return null;
 
+  const lead = rows[0];
+  const leadImage = lead?.thumbnail_image ?? null;
+  const cinematic = !!leadImage;
+  const restRows = cinematic ? rows.slice(1) : rows;
+  const accent = mode === 'friendliest' ? GREEN : RED;
+  const maxAvg = Math.max(...rows.map((c) => Math.abs(c.avg_over_par)), 1);
+
   return (
-    <section style={{ marginTop: 32 }}>
-      <div style={{ padding: '0 30px 8px' }}>
+    <DiscoverBand marginTop={32}>
+      <div style={{ padding: '12px 16px 0' }}>
         <SectionHead
           overline="Official WHS"
           title={title}
@@ -173,6 +180,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
             border: '1px solid rgba(15,23,42,0.08)',
             borderRadius: 999,
             marginTop: 2,
+            marginBottom: 12,
           }}
         >
           {([
@@ -208,22 +216,37 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         </div>
       </div>
 
-      <div
-        className="flex overflow-x-auto scrollbar-hide"
-        style={{ padding: '0 16px', gap: 10 }}
-      >
-        {rows.map((c, i) => (
-          <CourseCard
+      {cinematic ? (
+        <CinematicLeadCard
+          imageUrl={leadImage!}
+          alt={lead.course_name}
+          chips={[{
+            label: mode === 'friendliest' ? 'No.1 scoreable' : 'No.1 toughest',
+            tone: mode === 'friendliest' ? 'good' : 'danger',
+          }]}
+          title={lead.course_name}
+          subtitle={`${lead.total_rounds} rounds`}
+          figure={`${mode === 'friendliest' && lead.avg_over_par < 0 ? '' : '+'}${numFmt(lead.avg_over_par, 1)}`}
+          figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
+          onTap={() => navigate(`/courses/${lead.course_id}`, { state: { activeTab: 'holes' } })}
+        />
+      ) : null}
+
+      <div>
+        {restRows.map((c, i) => (
+          <CourseIndexRow
             key={c.course_id}
-            rank={i + 1}
-            courseId={c.course_id}
-            courseName={c.course_name}
-            avgOverPar={c.avg_over_par}
-            totalRounds={c.total_rounds}
+            rank={cinematic ? i + 2 : i + 1}
+            course={c}
             mode={mode}
+            accent={accent}
+            widthPct={Math.max(6, Math.round((Math.abs(c.avg_over_par) / maxAvg) * 100))}
+            isLast={i === restRows.length - 1}
+            onTap={() => navigate(`/courses/${c.course_id}`, { state: { activeTab: 'holes' } })}
           />
         ))}
       </div>
+
 
       <CourseIndexSheet
         open={sheetOpen}
