@@ -388,7 +388,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               }}
             >
               <CoursesShellTabs
-                activeTab={activeTab as 'explore' | 'top100' | 'discover'}
+                activeTab={activeTab as 'explore' | 'top100'}
                 onTabChange={handleTabChange}
               />
             </div>
@@ -396,20 +396,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
-              {activeTab === 'discover' ? (
-                <>
-                  <AmateurCircuitHero fallback={<CoursesPageHero />} />
-                  <WireTicker />
-                </>
-              ) : (
-                <CoursesPageHero />
-              )}
+              <CoursesPageHero />
 
               <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
 
-              {activeTab === 'discover' ? (
-                <ExploreTabContent embedded shellTabs={shellTabsNode} />
-              ) : activeTab === 'top100' ? (
+              {activeTab === 'top100' ? (
+
                 <Top100CoursesHubPanel
                   shellTabs={shellTabsNode}
                   rateNudge={
