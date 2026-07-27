@@ -1,36 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { corsFor } from "../_shared/cors.ts";
 
-
-const ALLOWED_ORIGINS = new Set([
-  'https://clbhouz.com',
-  'https://www.clbhouz.com',
-  'https://www.clbhouz.co.uk',
-  'https://app.clbhouz.co.uk',
-  'https://admin.clbhouz.co.uk',
-  'http://localhost:3000',
-  'http://localhost:5173',
-]);
-
-const isAllowedOrigin = (origin: string | null): boolean => {
-  if (!origin) return false;
-  if (ALLOWED_ORIGINS.has(origin)) return true;
-  if (origin.endsWith('.lovableproject.com')) return true;
-  if (origin.endsWith('.lovable.app')) return true;
-  return false;
-};
-
-const corsHeaders = (origin: string | null): HeadersInit => {
-  const allowOrigin = isAllowedOrigin(origin) ? origin! : '';
-  return {
-    'Access-Control-Allow-Origin': allowOrigin,
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST,OPTIONS',
-    'Access-Control-Max-Age': '86400',
-    'Vary': 'Origin',
-  };
-};
 
 type AdminAction =
   | 'delete_user'
