@@ -91,8 +91,9 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
     () => subCountryOptions(regionKey, value.continent),
     [regionKey, value.continent],
   );
-  const { data: regionSuggestions = [] } = useRegionSuggestions(value.sub_country);
+  const canonicalRegions = useCanonicalRegions(value.sub_country);
   const listId = `region-suggest-${(value.sub_country || 'none').replace(/[^a-z0-9]/gi, '')}`;
+
 
   const pickGrouping = (key: string) => {
     if (!key) {
