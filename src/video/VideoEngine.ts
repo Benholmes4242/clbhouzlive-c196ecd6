@@ -1349,6 +1349,7 @@ class VideoEngineImpl {
       return;
     }
     lane.wantPlay = false;
+    this.clearPlayWatchdog(laneId);
     if (!lane.el.paused) lane.el.pause();
   }
 
