@@ -420,7 +420,9 @@ function AppRoutes() {
     const page =
       p === '/' || p === '/clubhouse' ? 'clubhouse'
       : p.startsWith('/watch') ? 'watch'
+      : p === '/explore' ? 'discover'
       : p.startsWith('/discover') ? 'discover'
+
       : p.startsWith('/courses') ? 'courses'
       : p.startsWith('/profile') ? 'profile'
       : p.startsWith('/tour') ? 'tourhub'
