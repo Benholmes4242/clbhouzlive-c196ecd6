@@ -27,7 +27,9 @@ export const useNavigationHandlers = () => {
       setActiveTab('tourhub');
     } else if (location.pathname.startsWith('/courses')) {
   setActiveTab('courses');
-    } else if (location.pathname === '/watch') {
+    } else if (location.pathname === '/explore' || location.pathname === '/watch') {
+      // id 'watch' now owns the Discover surface at /explore. '/watch' is kept
+      // here only so a dormant-route visit still highlights the right tab.
       setActiveTab('watch');
     }
   }, [location.pathname]);
@@ -35,11 +37,15 @@ export const useNavigationHandlers = () => {
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     // Track nav tab tap
     analyticsEvents.track('nav_tab_tap', { tab: tab.id });
+    if (tab.id === 'watch') {
+      analyticsEvents.track('nav_discover_opened', { from: location.pathname });
+    }
 
     if (tab.isAction) {
       // Action tabs are handled by the parent component (BottomNavigation)
       return;
     }
+
 
     if (tab.path) {
       setActiveTab(tab.id);
