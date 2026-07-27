@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -30,7 +30,8 @@ import { BirdieHaulsLedger } from './BirdieHaulsLedger';
 import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
 import { SectionHead } from './SectionHead';
-import { DiscoverCard } from './DiscoverCard';
+import { DiscoverBand } from './DiscoverBand';
+import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { AlmanacEmptyCard } from './AlmanacEmptyCard';
@@ -60,6 +61,22 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
   const userId = user?.id;
   const gridRef = useRef<HTMLDivElement | null>(null);
   const [scope, setScope] = useState<RecordsMode>('latest');
+  // Sticky lens bar: mirrors CoursesContent so the notch veil paints the
+  // strip above the bar the moment it pins (no gap, no colour seam).
+  const lensSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [tabsStuck, setTabsStuck] = useState(false);
+
+  useEffect(() => {
+    setTabsStuck(window.scrollY > 200);
+    const el = lensSentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setTabsStuck(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const { region: activeRegion, setRegion } = useExploreRegion();
 
@@ -116,6 +133,8 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
       </div>
 
       <div>
+        <GlassHeaderPlate visible={tabsStuck} />
+        <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
         <AlmanacLens
           region={activeRegion}
           onRegionChange={handleRegionChange}
@@ -130,9 +149,9 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
 
-        <DiscoverCard>
+        <DiscoverBand>
           <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
-        </DiscoverCard>
+        </DiscoverBand>
 
 
 
@@ -142,9 +161,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
 
         {/* Season race */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: SPACE.sectionSection }}>
-          <SeasonRaceCard userId={userId} />
-        </div>
+        <SeasonRaceCard userId={userId} />
 
         {/* Merged Moments: Honours / Eagles / Birdies */}
         <MomentsSection
@@ -374,7 +391,7 @@ function MomentsSection({
   };
 
   return (
-    <DiscoverCard>
+    <DiscoverBand>
       <SectionHead
         overline={
           mode === 'alltime'
@@ -469,6 +486,6 @@ function MomentsSection({
           />
         ) : null}
       </div>
-    </DiscoverCard>
+    </DiscoverBand>
   );
 }
