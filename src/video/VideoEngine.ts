@@ -205,9 +205,45 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.preload = 'auto';
   el.setAttribute('webkit-playsinline', 'true');
 
-  el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
+  // No black paint of our own: the poster sits behind this element and must
+  // stay visible until a real frame is composited.
+  el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:transparent;';
   return el;
 }
+
+/**
+ * Arm a one-shot "a real frame has been presented" callback for a lane.
+ * Uses requestVideoFrameCallback where available (Chrome/Safari 15.4+), and
+ * falls back to a short rAF poll on readyState/videoWidth. Idempotent per
+ * element — repeated calls while an arm is pending are ignored.
+ */
+const frameArmed = new WeakSet<HTMLVideoElement>();
+function armFrameReveal(lane: { el: HTMLVideoElement }, reveal: (source: string) => void): void {
+  const v = lane.el;
+  if (frameArmed.has(v)) return;
+  frameArmed.add(v);
+  const done = (source: string) => {
+    frameArmed.delete(v);
+    reveal(source);
+  };
+  const anyV = v as any;
+  if (typeof anyV.requestVideoFrameCallback === 'function') {
+    try {
+      anyV.requestVideoFrameCallback(() => done('rvfc'));
+      return;
+    } catch { /* fall through to rAF poll */ }
+  }
+  let tries = 0;
+  const poll = () => {
+    if (!frameArmed.has(v)) return;
+    if (v.readyState >= 2 && v.videoWidth > 0) { done('frame-poll'); return; }
+    if (++tries > 240) { frameArmed.delete(v); return; } // ~4s ceiling
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+}
+
+
 
 
 function isNativeHlsSupported(el: HTMLVideoElement): boolean {
