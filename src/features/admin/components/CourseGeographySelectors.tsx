@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
 import { adminTheme as t } from '../theme';
 import {
   GROUPINGS, ROW_CONTINENTS, subCountryOptions, deriveGeography,
