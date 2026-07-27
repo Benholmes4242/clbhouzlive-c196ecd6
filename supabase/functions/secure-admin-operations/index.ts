@@ -39,7 +39,7 @@ const ALLOWED_NONFULL_DURATIONS = new Set<number>([1, 7, 30]);
 
 serve(async (req) => {
   
-  const headers = corsHeaders(req.headers.get('Origin'));
+  const headers = corsFor(req.headers.get('Origin'), 'POST,OPTIONS');
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers });
