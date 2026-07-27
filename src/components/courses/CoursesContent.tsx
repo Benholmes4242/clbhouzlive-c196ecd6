@@ -3,15 +3,12 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
-import { AmateurCircuitHero } from '@/components/explore-tab-new/AmateurCircuitHero';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
-import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
-import { WireTicker } from '@/components/explore-tab-new/WireTicker';
 import RateNudge from './RateNudge';
 import StatBrowse from './StatBrowse';
 
