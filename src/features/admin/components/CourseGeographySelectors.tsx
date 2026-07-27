@@ -248,31 +248,67 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
   );
 }
 
-function RegionCombobox({ value, onChange, suggestions, listId }: {
+/**
+ * County / state / province field.
+ *
+ * Seeded country (geo_regions returned rows): strict select, no free text.
+ * Unseeded country (zero rows): free-text input, as before.
+ * While the query is in flight the previously resolved mode is held so the
+ * control does not flicker between the two.
+ */
+function RegionField({ value, onChange, query, listId }: {
   value: string;
   onChange: (v: string) => void;
-  suggestions: string[];
+  query: ReturnType<typeof useCanonicalRegions>;
   listId: string;
 }) {
+  const { t: tr } = useTranslation('common');
+  const regions = query.data ?? [];
+  const settled = query.isSuccess || query.isError;
+  const lastSeeded = useRef(false);
+  if (settled) lastSeeded.current = regions.length > 0;
+  const seeded = settled ? regions.length > 0 : lastSeeded.current;
+  const current = value ?? '';
+  const legacyValue = seeded && current && !regions.includes(current) ? current : '';
+
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <Label text="County / state / province" />
-      <input
-        type="text"
-        value={value ?? ''}
-        list={listId}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="e.g. Kent"
-        style={inputStyle}
-      />
-      <datalist id={listId}>
-        {suggestions.map((s) => <option key={s} value={s} />)}
-      </datalist>
+      <Label text={tr('admin.geography.region.label')} />
+      {seeded ? (
+        <select
+          value={current}
+          onChange={(e) => onChange(e.target.value)}
+          style={inputStyle}
+        >
+          {legacyValue && (
+            <option value={legacyValue}>
+              {tr('admin.geography.region.notInList', { value: legacyValue })}
+            </option>
+          )}
+          <option value="">{tr('admin.geography.region.placeholderOption')}</option>
+          {regions.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+      ) : (
+        <>
+          <input
+            type="text"
+            value={current}
+            list={listId}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={tr('admin.geography.region.freeTextPlaceholder')}
+            style={inputStyle}
+          />
+          <datalist id={listId} />
+        </>
+      )}
       <span style={{ fontSize: 11, color: t.inkFaint }}>
-        Optional. Pick an existing value where possible - trimmed on save.
+        {seeded
+          ? tr('admin.geography.region.helpSeeded')
+          : tr('admin.geography.region.helpFreeText')}
       </span>
     </label>
   );
 }
+
 
 export default CourseGeographySelectors;
