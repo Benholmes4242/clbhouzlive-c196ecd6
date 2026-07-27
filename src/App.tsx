@@ -215,6 +215,8 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
+const ExplorePage = lazy(() => import("./pages/ExplorePage"));
+
 
 
 
