@@ -2,15 +2,16 @@ import { FONT } from './gamingLightTokens';
 
 // Canonical section header for the Discover Almanac page.
 // One implementation. Light + dark surfaces. Optional right-aligned meta.
-// Overline: 10.5px 600 letterSpacing 0.06em uppercase.
+// Kicker:   10px 700 letterSpacing 0.16em uppercase, deep amber.
 // Title:    17px 700 letterSpacing -0.02em.
-// Meta:     "View all ›" 12px 600 amber, baseline-aligned with the title.
+// Meta:     "View all ›" 12.5px 700 deep amber, baseline-aligned with the title.
 
-const AMBER = '#F7931E';
-const OVERLINE_LIGHT = 'rgba(15,23,42,0.45)';
-const OVERLINE_DARK = 'rgba(255,255,255,0.55)';
+const AMBER_DEEP = '#B45309';
+const OVERLINE_LIGHT = AMBER_DEEP;
+const OVERLINE_DARK = '#F7931E';
 const TITLE_LIGHT = '#0F172A';
 const TITLE_DARK = '#FFFFFF';
+
 
 interface Props {
   overline: string;
