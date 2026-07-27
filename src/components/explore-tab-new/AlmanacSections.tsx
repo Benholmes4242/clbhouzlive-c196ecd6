@@ -29,10 +29,12 @@ function AlmanacLensInner({ region, onRegionChange, scope, onScopeChange }: Lens
         position: 'sticky',
         top: 'var(--sat, 0px)',
         zIndex: 10,
-        background: 'rgba(244,246,249,0.94)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(15,23,42,0.06)',
+        // Canonical stuck-header glass. Must match the Courses shell tab row
+        // and GlassHeaderPlate exactly, or the two pages show a colour seam.
+        background: 'rgba(248,250,252,0.72)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
         padding: '10px 14px',
         display: 'flex',
         alignItems: 'center',
