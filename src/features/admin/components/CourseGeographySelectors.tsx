@@ -54,29 +54,29 @@ function Label({ text, required }: { text: string; required?: boolean }) {
   );
 }
 
-/** DISTINCT region values already used for a given sub_country. */
-function useRegionSuggestions(subCountry: string) {
+/** Canonical region vocabulary for a sub_country, from public.geo_regions. */
+function useCanonicalRegions(subCountry: string) {
   const sc = subCountry.trim();
   return useQuery({
     queryKey: ['admin-v2', 'courses', 'regions', sc],
     enabled: sc.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('golf_courses')
-        .select('region')
+      const { data, error } = await supabase
+        .from('geo_regions')
+        .select('region, sort_order')
         .eq('sub_country', sc)
-        .not('region', 'is', null)
-        .limit(1000);
-      const set = new Set<string>();
-      (data ?? []).forEach((r: any) => {
-        const v = (r.region ?? '').trim();
-        if (v) set.add(v);
-      });
-      return Array.from(set).sort((a, b) => a.localeCompare(b));
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .order('region', { ascending: true });
+      if (error) throw error;
+      return (data ?? [])
+        .map((r: any) => (r.region ?? '') as string)
+        .filter((r) => r.length > 0);
     },
   });
 }
+
 
 export function CourseGeographySelectors({ value, onChange, originalCountry }: Props) {
   const storedKey = regionKeyForCountry(value.country);
