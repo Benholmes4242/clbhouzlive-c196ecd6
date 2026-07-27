@@ -138,23 +138,13 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
     if (region == null) return null;
     return (
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT, color: INK }}>
-        <div style={{ padding: `0 ${PAGE_PAD}px` }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: MUTED,
-              lineHeight: 1,
-            }}
-          >
-            {mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
-          </div>
-          <div style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: INK, lineHeight: 1.15 }}>
-            The record book
-          </div>
-        </div>
+        <SectionHead
+          overline={mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
+          title="The record book"
+          paddingX={PAGE_PAD}
+          paddingTop={headerPaddingTop}
+          paddingBottom={10}
+        />
         <EmptyScopeCard
           title={`No records set ${regionScopePhrase(region)} yet — the book is open.`}
         />
