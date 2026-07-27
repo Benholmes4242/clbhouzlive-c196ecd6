@@ -109,9 +109,21 @@
   "verifiedAccounts": {
     "title": "Verified accounts",
     "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
-    "cta": "Contact support \u2192",
+    "cta": "Contact support →",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",
     "settingsRowSubtitle": "How verification works"
+  },
+  "admin": {
+    "geography": {
+      "region": {
+        "label": "County / state / province",
+        "placeholderOption": "Select county / state / province...",
+        "notInList": "{{value}} (not in list)",
+        "helpSeeded": "Pick the county, state or province.",
+        "helpFreeText": "Optional. Pick an existing value where possible - trimmed on save.",
+        "freeTextPlaceholder": "e.g. Kent"
+      }
+    }
   }
 }
