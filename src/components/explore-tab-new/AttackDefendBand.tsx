@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
+import { CinematicLeadCard } from './CinematicLeadCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 
