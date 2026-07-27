@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/imageOptimization';
+import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { FONT } from './gamingLightTokens';
 
 /**
