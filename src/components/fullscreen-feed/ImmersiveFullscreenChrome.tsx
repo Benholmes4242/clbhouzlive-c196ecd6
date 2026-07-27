@@ -63,7 +63,11 @@ function formatCount(n: number | null | undefined): string | null {
  * (measured scrollHeight vs clientHeight, same approach as the tour hero
  * insight line). Collapses again whenever the pager moves to another post.
  */
-const CaptionBlock: React.FC<{ caption: string; resetKey: number }> = ({ caption, resetKey }) => {
+const CaptionBlock: React.FC<{
+  caption: string;
+  resetKey: number;
+  onMentionTap: (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => void;
+}> = ({ caption, resetKey, onMentionTap }) => {
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
