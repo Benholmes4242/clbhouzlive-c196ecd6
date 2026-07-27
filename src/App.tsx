@@ -20,6 +20,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate, type Location as RouterLocation } from "react-router-dom";
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
+import { WATCH_SURFACE } from '@/config/featureFlags';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
 import { ThemeProvider } from '@/components/theme-provider';
