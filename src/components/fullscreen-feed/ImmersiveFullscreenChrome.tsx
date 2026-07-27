@@ -34,6 +34,7 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/mentions/MentionText';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import MapPinIcon from '@/components/icons/MapPinIcon';
@@ -63,7 +64,11 @@ function formatCount(n: number | null | undefined): string | null {
  * (measured scrollHeight vs clientHeight, same approach as the tour hero
  * insight line). Collapses again whenever the pager moves to another post.
  */
-const CaptionBlock: React.FC<{ caption: string; resetKey: number }> = ({ caption, resetKey }) => {
+const CaptionBlock: React.FC<{
+  caption: string;
+  resetKey: number;
+  onMentionTap: (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => void;
+}> = ({ caption, resetKey, onMentionTap }) => {
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
@@ -133,7 +138,7 @@ const CaptionBlock: React.FC<{ caption: string; resetKey: number }> = ({ caption
               }),
         }}
       >
-        {caption}
+        <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
       </div>
       {(overflows || expanded) && (
         <button
@@ -200,6 +205,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   feedEnded = false,
 }: Props) {
   const navigate = useNavigate();
+
+  // Mentions inside the caption must dismiss the fullscreen overlay BEFORE
+  // routing, otherwise the profile mounts underneath the still-open viewer.
+  // The navigate is deferred one frame so the overlay unmounts cleanly.
+  const handleMentionTap = useCallback(
+    (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => {
+      onClose();
+      const to = m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`;
+      requestAnimationFrame(() => navigate(to));
+    },
+    [onClose, navigate],
+  );
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
@@ -533,7 +550,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {/* Caption — 3-line clamp + See more/See less. Nothing renders for
               empty/whitespace-only captions (no element, no gap). */}
           {activePost.caption?.trim() ? (
-            <CaptionBlock caption={activePost.caption} resetKey={activeIndex} />
+            <CaptionBlock caption={activePost.caption} resetKey={activeIndex} onMentionTap={handleMentionTap} />
           ) : null}
 
 
