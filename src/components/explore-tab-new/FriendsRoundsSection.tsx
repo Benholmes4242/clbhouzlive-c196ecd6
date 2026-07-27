@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SectionHead } from './SectionHead';
+import { DiscoverBand } from './DiscoverBand';
 import { FriendRoundRow } from './FriendRoundRow';
 import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
 import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
