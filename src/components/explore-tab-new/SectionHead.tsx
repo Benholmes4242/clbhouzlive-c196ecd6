@@ -89,9 +89,9 @@ export function SectionHead({
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              color: AMBER,
-              fontSize: 12,
-              fontWeight: 600,
+              color: surface === 'dark' ? '#F7931E' : AMBER_DEEP,
+              fontSize: 12.5,
+              fontWeight: 700,
               fontFamily: FONT,
               whiteSpace: 'nowrap',
             }}
