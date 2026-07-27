@@ -247,7 +247,6 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         ))}
       </div>
 
-
       <CourseIndexSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -256,7 +255,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         region={region ?? null}
         title={title}
       />
-    </section>
+    </DiscoverBand>
   );
 }
 
