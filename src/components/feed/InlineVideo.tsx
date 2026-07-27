@@ -293,7 +293,9 @@ export const InlineVideo: React.FC<Props> = ({
           src={posterUrl}
           alt=""
           aria-hidden
-          loading="lazy"
+          loading="eager"
+          decoding="async"
+          fetchPriority={isActive || isNear ? 'high' : 'auto'}
           onLoad={() => {
             if (firedRef.current) return;
             firedRef.current = true;
