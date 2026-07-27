@@ -54,9 +54,9 @@ export function SectionHead({
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
             style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
               color: overlineColor,
               lineHeight: 1,
