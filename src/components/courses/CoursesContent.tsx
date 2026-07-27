@@ -374,16 +374,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         (() => {
           const shellTabsNode = (
             <div
-              className="sticky"
               style={{
-                top: 'var(--sat, 0px)',
-                zIndex: 10,
                 background: 'rgba(248,250,252,0.72)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 borderBottom: '1px solid rgba(0,0,0,0.07)',
               }}
             >
+
               <CoursesShellTabs
                 activeTab={activeTab as 'explore' | 'top100'}
                 onTabChange={handleTabChange}
