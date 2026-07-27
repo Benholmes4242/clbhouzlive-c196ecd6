@@ -371,7 +371,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </div>
         )
       ) : (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 -mx-4 space-y-4">
           {rows.map((row, i) => (
             <UnifiedCourseCard
               key={row.course_id}
