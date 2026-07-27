@@ -10,6 +10,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FONT } from './gamingLightTokens';
 import { seasonName as computeSeasonName } from '@/lib/gam/seasonClock';
 import { useViewerHemisphere } from '@/hooks/gam/useViewerHemisphere';
+import { DiscoverBand } from './DiscoverBand';
 
 interface SeasonRow {
   season_name: string | null;
