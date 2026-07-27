@@ -236,6 +236,45 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
   );
 }
 
+// ---- Cinematic lead (most recent record) ----------------------------------
+// Only rendered when the course has imagery; the caller falls back to a row.
+function RecordLeadCard({
+  row,
+  imageUrl,
+  onTap,
+}: {
+  row: FeatRow;
+  imageUrl: string;
+  onTap: () => void;
+}) {
+  const featLabel = useRoundFeatLabel();
+  const holder = formatHolderName(row.holder_name) || row.holder_username || 'A member';
+  const par = rowToPar(row);
+  const isStableford = row.category === 'best_stableford_all_time';
+  const showToPar = par != null && !isStableford;
+  const numericValue =
+    typeof row.value === 'number'
+      ? row.value
+      : typeof row.value === 'string' && row.value.trim() !== '' && !isNaN(Number(row.value))
+        ? Number(row.value)
+        : null;
+  const grossText = numericValue != null ? String(numericValue) : row.feat_value ?? '';
+  const chips = deriveRoundFeats(row).map((f) => ({ label: featLabel(f), tone: 'glass' as const }));
+
+  return (
+    <CinematicLeadCard
+      imageUrl={imageUrl}
+      alt={row.course_name}
+      chips={chips}
+      title={row.course_name}
+      subtitle={holder}
+      figure={showToPar ? toParText(par!) : grossText || '—'}
+      figureLabel={grossText ? `${grossText} gross` : undefined}
+      onTap={onTap}
+    />
+  );
+}
+
 // ---- Record Book row (flat StatRow) ---------------------------------------
 // Recency list — no rank number (the "· 3w" timestamp is the ordering cue).
 function RecordStatRow({
