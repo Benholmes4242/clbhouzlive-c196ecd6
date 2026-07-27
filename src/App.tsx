@@ -20,6 +20,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate, type Location as RouterLocation } from "react-router-dom";
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
+import { WATCH_SURFACE } from '@/config/featureFlags';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -212,6 +215,8 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
+const ExplorePage = lazy(() => import("./pages/ExplorePage"));
+
 
 
 
@@ -303,8 +308,22 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 // PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
 const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
-  return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
+  return <Navigate to={videoId ? `/post/${videoId}` : '/explore'} replace />;
 };
+
+// Watch surface hibernation gate. When WATCH_SURFACE is false the dormant
+// routes stay registered but bounce to /explore, and we record the attempt so
+// we can tell whether anyone is still trying to reach them.
+const WatchGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const dormant = !WATCH_SURFACE;
+  useEffect(() => {
+    if (dormant) analyticsEvents.track('watch_redirect_hit', { path: location.pathname });
+  }, [dormant, location.pathname]);
+  if (dormant) return <Navigate to="/explore" replace />;
+  return <>{children}</>;
+};
+
 const EchoV2Redirect: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
@@ -401,7 +420,9 @@ function AppRoutes() {
     const page =
       p === '/' || p === '/clubhouse' ? 'clubhouse'
       : p.startsWith('/watch') ? 'watch'
+      : p === '/explore' ? 'discover'
       : p.startsWith('/discover') ? 'discover'
+
       : p.startsWith('/courses') ? 'courses'
       : p.startsWith('/profile') ? 'profile'
       : p.startsWith('/tour') ? 'tourhub'
@@ -496,11 +517,15 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<UserReviewsRedirect />} />
         
         
-        <Route path="/watch" element={<Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense>} />
-        <Route path="/videos" element={<Navigate to="/watch" replace />} />
-        <Route path="/watch/clips" element={<Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense>} />
-        <Route path="/watch/videos" element={<Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense>} />
-        <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
+        {/* Watch surface is dormant (WATCH_SURFACE=false): routes stay registered
+            and redirect to /explore so shared links never hard-404. */}
+        <Route path="/watch" element={<WatchGate><Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense></WatchGate>} />
+        <Route path="/videos" element={<WatchGate><Navigate to="/watch" replace /></WatchGate>} />
+        <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
+        <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
+        <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
+        <Route path="/explore" element={<Suspense fallback={<CoursesHubSkeleton />}><ExplorePage /></Suspense>} />
+
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />

@@ -20,6 +20,7 @@ export const IMMERSIVE_EXACT_ROUTES = [
   '/',
   '/clubhouse',
   '/courses',
+  '/explore',
   '/watch',
   '/watch/clips',
   '/watch/videos',

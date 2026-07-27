@@ -3,15 +3,12 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
-import { AmateurCircuitHero } from '@/components/explore-tab-new/AmateurCircuitHero';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
-import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
-import { WireTicker } from '@/components/explore-tab-new/WireTicker';
 import RateNudge from './RateNudge';
 import StatBrowse from './StatBrowse';
 
@@ -224,24 +221,27 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   
   
-  // Default to 'discover' for the main courses page
+  // Default to 'explore' (StatBrowse). Discover moved to the /explore nav tab.
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = new URLSearchParams(window.location.search).get('tab');
     if (username) {
       // User-profile variant only defines 'explore' and 'my-courses'.
       return tabParam === 'explore' ? 'explore' : 'my-courses';
     }
-    if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
+    if (tabParam && ['explore', 'top100'].includes(tabParam)) {
       return tabParam;
     }
-    return 'discover';
+    return 'explore';
   });
+
 
   // Check if we're on a user courses page
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL - allow explore, top100, and discover for main page
+  // Check for tab parameter in URL - allow explore and top100 for main page.
+  // ?tab=discover is a legacy deep link: the content moved to /explore, so the
+  // link follows it rather than falling back to a courses tab.
   useEffect(() => {
     const tabParam = searchParams.get('tab');
 
@@ -250,12 +250,16 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       setActiveTab(tabParam === 'explore' ? 'explore' : 'my-courses');
       return;
     }
-    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
+    if (tabParam === 'discover') {
+      navigate('/explore', { replace: true });
+      return;
+    }
+    if (tabParam === 'explore' || tabParam === 'top100') {
       setActiveTab(tabParam);
     } else {
-      setActiveTab('discover');
+      setActiveTab('explore');
     }
-  }, [searchParams, username]);
+  }, [searchParams, username, navigate]);
 
   // Scroll to top on mount — prevents page opening halfway down from previous visit
   useEffect(() => {
@@ -266,8 +270,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setActiveTab(value);
     // Persist tab to URL so it survives remount on back navigation
     const params = new URLSearchParams(searchParams);
-    if (value === 'discover') {
-      params.delete('tab'); // 'discover' is the default, keep URL clean
+    if (value === 'explore') {
+      params.delete('tab'); // 'explore' is the default, keep URL clean
     } else {
       params.set('tab', value);
     }
@@ -282,12 +286,13 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       const params = new URLSearchParams(searchParams);
       params.delete('tab');
       setSearchParams(params, { replace: true });
-      setActiveTab('discover');
+      setActiveTab('explore');
       scrollPageToTop('smooth');
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [searchParams, setSearchParams]);
+
 
   // Dynamic subtitle logic
   const getSubtitle = () => {
@@ -380,7 +385,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               }}
             >
               <CoursesShellTabs
-                activeTab={activeTab as 'explore' | 'top100' | 'discover'}
+                activeTab={activeTab as 'explore' | 'top100'}
                 onTabChange={handleTabChange}
               />
             </div>
@@ -388,20 +393,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           return (
             <div>
               <GlassHeaderPlate visible={tabsStuck} />
-              {activeTab === 'discover' ? (
-                <>
-                  <AmateurCircuitHero fallback={<CoursesPageHero />} />
-                  <WireTicker />
-                </>
-              ) : (
-                <CoursesPageHero />
-              )}
+              <CoursesPageHero />
 
               <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
 
-              {activeTab === 'discover' ? (
-                <ExploreTabContent embedded shellTabs={shellTabsNode} />
-              ) : activeTab === 'top100' ? (
+              {activeTab === 'top100' ? (
+
                 <Top100CoursesHubPanel
                   shellTabs={shellTabsNode}
                   rateNudge={

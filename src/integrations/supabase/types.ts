@@ -17484,6 +17484,10 @@ export type Database = {
       }
       generate_weekly_pickem: { Args: never; Returns: number }
       generate_whs_invite_code: { Args: never; Returns: string }
+      geo_region_from_coords: {
+        Args: { p_lat: number; p_lon: number; p_sub: string }
+        Returns: string
+      }
       geo_resolve: { Args: { p_raw: string; p_sub: string }; Returns: string }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {

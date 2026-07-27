@@ -278,8 +278,13 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
   { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true, scrollAway: true } },
 
+  // Discover landing (bottom-nav tab). Same editorial geometry as /courses:
+  // cinematic hero under a scroll-away glass island.
+  { match: { exact: '/explore' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
   { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+
 
   // Friends activity — back arrow, history.
   { match: { exact: '/friends-activity' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
@@ -292,14 +297,14 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // are back-arrow island (page renders under CompactHeader today).
   {
     match: { prefix: '/discover/explore/theme/' },
-    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/courses?tab=discover' }, tone: 'light', bleed: false },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
   {
     match: {
       test: (p, s) =>
         p.startsWith('/discover') && s.get('main') === 'videos' && !!s.get('section'),
     },
-    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/watch' }, tone: 'light', bleed: false },
+    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
 
   // Discover landing / other discover routes.
