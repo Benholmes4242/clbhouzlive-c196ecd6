@@ -10,6 +10,8 @@ export const EVENT_LABELS: Record<string, string> = {
   page_exit: 'Page exited',
   nav_tab_tap: 'Nav tab tapped',
   feed_tab_switch: 'Feed tab switched',
+  nav_discover_opened: 'Discover opened from nav',
+  watch_redirect_hit: 'Dormant Watch route redirected',
 
   // ─── Auth ─────────────────────────────────────────────────────
   auth_method_selected: 'Auth method selected',
