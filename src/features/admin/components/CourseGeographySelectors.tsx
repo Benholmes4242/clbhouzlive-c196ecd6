@@ -168,12 +168,13 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
             {value.sub_country && <option value={value.sub_country}>{value.sub_country}</option>}
           </select>
         </label>
-        <RegionCombobox
+        <RegionField
           value={value.region}
           onChange={(v) => onChange({ region: v })}
-          suggestions={regionSuggestions}
+          query={canonicalRegions}
           listId={listId}
         />
+
       </>
     );
   }
