@@ -137,7 +137,7 @@ const CaptionBlock: React.FC<{
               }),
         }}
       >
-        {caption}
+        <MentionText text={caption} onMentionTap={onMentionTap} style={{ pointerEvents: 'auto' }} />
       </div>
       {(overflows || expanded) && (
         <button
