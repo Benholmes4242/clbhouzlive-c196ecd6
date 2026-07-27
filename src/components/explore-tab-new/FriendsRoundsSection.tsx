@@ -34,22 +34,14 @@ export function FriendsRoundsSection({ userId, opener }: Props) {
   if (!rounds || rounds.length === 0) return null;
 
   return (
-    <section style={{ padding: '0 16px', marginTop: 8 }}>
-      <div
-        style={{
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.08)',
-          borderRadius: 16,
-          boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.05)',
-          overflow: 'hidden',
-        }}
-      >
+    <>
+      <DiscoverBand marginTop={8}>
         <SectionHead
           overline={t('discover.friendsRounds.overline', 'YOUR CIRCLE')}
           title={t('discover.friendsRounds.title', "Friends' latest rounds")}
           meta={t('discover.friendsRounds.viewAll', 'View all')}
           onMeta={() => setSheetOpen(true)}
-          paddingX={14}
+          paddingX={16}
           paddingTop={12}
           paddingBottom={10}
         />
@@ -63,14 +55,14 @@ export function FriendsRoundsSection({ userId, opener }: Props) {
             />
           ))}
         </div>
-      </div>
+      </DiscoverBand>
       <FriendsRoundsSeeAllSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         userId={userId}
         onRowPress={handleRowPress}
       />
-    </section>
+    </>
   );
 }
 
