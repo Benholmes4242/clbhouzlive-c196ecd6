@@ -1228,6 +1228,12 @@ class VideoEngineImpl {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
     }
+    // STUCK-PAUSED WATCHDOG — a play() issued while the source is still
+    // attaching (HLS attachMedia / manifest parse) can resolve to nothing:
+    // the element never leaves paused and there is no rejection to react to,
+    // so the card sits on its poster until the viewer opens fullscreen.
+    // Re-assert intent a few times while it is still wanted.
+    this.armPlayWatchdog(laneId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
