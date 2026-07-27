@@ -496,11 +496,15 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<UserReviewsRedirect />} />
         
         
-        <Route path="/watch" element={<Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense>} />
-        <Route path="/videos" element={<Navigate to="/watch" replace />} />
-        <Route path="/watch/clips" element={<Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense>} />
-        <Route path="/watch/videos" element={<Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense>} />
-        <Route path="/explore" element={<Navigate to="/courses?tab=discover" replace />} />
+        {/* Watch surface is dormant (WATCH_SURFACE=false): routes stay registered
+            and redirect to /explore so shared links never hard-404. */}
+        <Route path="/watch" element={<WatchGate><Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense></WatchGate>} />
+        <Route path="/videos" element={<WatchGate><Navigate to="/watch" replace /></WatchGate>} />
+        <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
+        <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
+        <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
+        <Route path="/explore" element={<Suspense fallback={<CoursesHubSkeleton />}><ExplorePage /></Suspense>} />
+
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
