@@ -205,9 +205,45 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.preload = 'auto';
   el.setAttribute('webkit-playsinline', 'true');
 
-  el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
+  // No black paint of our own: the poster sits behind this element and must
+  // stay visible until a real frame is composited.
+  el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:transparent;';
   return el;
 }
+
+/**
+ * Arm a one-shot "a real frame has been presented" callback for a lane.
+ * Uses requestVideoFrameCallback where available (Chrome/Safari 15.4+), and
+ * falls back to a short rAF poll on readyState/videoWidth. Idempotent per
+ * element — repeated calls while an arm is pending are ignored.
+ */
+const frameArmed = new WeakSet<HTMLVideoElement>();
+function armFrameReveal(lane: { el: HTMLVideoElement }, reveal: (source: string) => void): void {
+  const v = lane.el;
+  if (frameArmed.has(v)) return;
+  frameArmed.add(v);
+  const done = (source: string) => {
+    frameArmed.delete(v);
+    reveal(source);
+  };
+  const anyV = v as any;
+  if (typeof anyV.requestVideoFrameCallback === 'function') {
+    try {
+      anyV.requestVideoFrameCallback(() => done('rvfc'));
+      return;
+    } catch { /* fall through to rAF poll */ }
+  }
+  let tries = 0;
+  const poll = () => {
+    if (!frameArmed.has(v)) return;
+    if (v.readyState >= 2 && v.videoWidth > 0) { done('frame-poll'); return; }
+    if (++tries > 240) { frameArmed.delete(v); return; } // ~4s ceiling
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+}
+
+
 
 
 function isNativeHlsSupported(el: HTMLVideoElement): boolean {
@@ -988,6 +1024,16 @@ class VideoEngineImpl {
       // With a seek target, wait until element playhead is at/past target - 0.3s.
       // Without a target (startPosition<=0), any painted frame counts.
       if (target > 0 && now < target - 0.3) return;
+      // REAL-FRAME GATE — the 'play' event fires the instant play() is honoured,
+      // long before the decoder has a composited frame. Revealing then swaps the
+      // poster for an empty (black) <video>. Require decodable data AND real
+      // intrinsic dimensions; otherwise arm a frame callback and bail. The
+      // existing timeupdate/seeked arms remain the fallback.
+      const v = lane.el as HTMLVideoElement;
+      if (v.readyState < 2 || !(v.videoWidth > 0)) {
+        armFrameReveal(lane, markReadyToShow);
+        return;
+      }
       lane.firstFrame = true;
       // Once we have real painted frames, strip the poster attribute so the
       // browser cannot re-composite the poster image on subsequent
@@ -1182,6 +1228,12 @@ class VideoEngineImpl {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
     }
+    // STUCK-PAUSED WATCHDOG — a play() issued while the source is still
+    // attaching (HLS attachMedia / manifest parse) can resolve to nothing:
+    // the element never leaves paused and there is no rejection to react to,
+    // so the card sits on its poster until the viewer opens fullscreen.
+    // Re-assert intent a few times while it is still wanted.
+    this.armPlayWatchdog(laneId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
@@ -1209,6 +1261,38 @@ class VideoEngineImpl {
       }, 250);
     });
   }
+
+  /**
+   * Re-assert play intent on a lane at increasing delays. Every tick bails
+   * the moment the lane is genuinely playing, loses its host, or drops its
+   * intent, so a healthy start costs one cancelled timer.
+   */
+  private playWatchdogs = new Map<LaneId, number[]>();
+  private armPlayWatchdog(laneId: LaneId): void {
+    this.clearPlayWatchdog(laneId);
+    const delays = [400, 1000, 2000, 3500];
+    const timers = delays.map((d) =>
+      window.setTimeout(() => {
+        const cur = this.lanes.get(laneId);
+        if (!cur || !cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
+        DBG(laneId, 'play.watchdog.retry', { delay: d, readyState: cur.el.readyState });
+        try {
+          const p = cur.el.play();
+          Promise.resolve(p).catch(() => { /* retry rejected — safe */ });
+        } catch { /* noop */ }
+      }, d),
+    );
+    this.playWatchdogs.set(laneId, timers);
+  }
+
+  private clearPlayWatchdog(laneId: LaneId): void {
+    const t = this.playWatchdogs.get(laneId);
+    if (!t) return;
+    t.forEach((id) => clearTimeout(id));
+    this.playWatchdogs.delete(laneId);
+  }
+
 
   /**
    * Capture the element's LIVE currentTime → lastPos for the lane's current
@@ -1265,6 +1349,7 @@ class VideoEngineImpl {
       return;
     }
     lane.wantPlay = false;
+    this.clearPlayWatchdog(laneId);
     if (!lane.el.paused) lane.el.pause();
   }
 

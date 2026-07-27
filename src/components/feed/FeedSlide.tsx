@@ -237,7 +237,8 @@ export const FeedSlide = memo(function FeedSlide({
               aria-hidden
               className="w-full h-full"
               style={{ position: 'absolute', inset: 0, objectFit: 'cover', zIndex: 1 }}
-              loading="lazy"
+              loading="eager"
+              decoding="async"
               draggable={false}
               onLoad={() => onFirstFrameReady?.()}
             />
@@ -1706,7 +1707,8 @@ const FullscreenPagerPage: React.FC<{
               width: videoRect.width, height: videoRect.height,
               objectFit: videoRect.fit, zIndex: 1,
             }}
-            loading="lazy"
+            loading="eager"
+            decoding="async"
             draggable={false}
           />
         )}
