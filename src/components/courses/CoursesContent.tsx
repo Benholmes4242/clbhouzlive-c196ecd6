@@ -13,6 +13,7 @@ import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
 import { WireTicker } from '@/components/explore-tab-new/WireTicker';
 import RateNudge from './RateNudge';
+import StatBrowse from './StatBrowse';
 
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -23,7 +24,7 @@ import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
-import { Search, X, Star, ChevronRight } from 'lucide-react';
+import { Search, X, Star, ChevronRight, ChevronLeft } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -199,6 +200,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
+  // Explore tab local view toggle: stat browse (default) vs full directory.
+  const [showDirectory, setShowDirectory] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -420,10 +423,26 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                         onEmptyFallback={() => setRateSheetOpen(true)}
                       />
                     )}
-                    <CourseExplorer />
+                    {showDirectory ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setShowDirectory(false)}
+                          className="flex items-center gap-1.5 mb-3 text-[13px] font-semibold"
+                          style={{ color: '#0F172A' }}
+                        >
+                          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                          {t('statBrowse.directory.back')}
+                        </button>
+                        <CourseExplorer />
+                      </>
+                    ) : (
+                      <StatBrowse onOpenDirectory={() => setShowDirectory(true)} />
+                    )}
                   </div>
                 </>
               )}
+
             </div>
           );
         })()

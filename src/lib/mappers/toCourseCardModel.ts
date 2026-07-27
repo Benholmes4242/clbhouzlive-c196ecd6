@@ -207,3 +207,38 @@ export function toCourseCardModel(course: Record<string, any>, context?: Partial
     displayRank: course.displayRank ?? course.display_rank,
   };
 }
+
+// ── Stat browse (get_stat_browse_courses) ──────────────────────────
+// Sibling mapper rather than a change to fromGolfCourse: the RPC uses
+// course_id/image_url/community_rating column names and carries no
+// thumbnail_image/average_rating, so the shapes do not align.
+export interface StatBrowseRowRaw {
+  course_id: string;
+  name: string;
+  region?: string | null;
+  sub_country?: string | null;
+  country: string;
+  image_url?: string | null;
+  community_rating?: number | string | null;
+  review_count?: number | string | null;
+  global_rank?: number | string | null;
+  regional_rank?: number | string | null;
+}
+
+export function fromStatBrowseRow(row: StatBrowseRowRaw): CourseCardModel {
+  const num = (v: number | string | null | undefined): number | null =>
+    v === null || v === undefined ? null : Number(v);
+  return {
+    id: row.course_id,
+    name: row.name,
+    locationText: buildLocationText(row.country, row.sub_country ?? row.region ?? null),
+    imageUrl: row.image_url ?? null,
+    communityRating: num(row.community_rating),
+    ratingCount: num(row.review_count) ?? 0,
+    ranks: {
+      global: num(row.global_rank),
+      regional: num(row.regional_rank),
+    },
+    country: row.country,
+  };
+}

@@ -42,9 +42,14 @@ interface UnifiedCourseCardProps {
   loggedDate?: string | Date | null;
   contextTag?: string;
   activeListSlug?: string | null;
+  /** Glass stat capsule rendered top-right of the image (stat browse). */
+  statChip?: { value: string; unit: string } | null;
+  /** Small sample line under the location line, with optional early-data flag. */
+  statLine?: { text: string; earlyData?: boolean } | null;
   onClick?: () => void;
   className?: string;
 }
+
 
 /**
  * Determine the regional badge slug based on available data
@@ -85,6 +90,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   loggedDate,
   contextTag,
   activeListSlug = null,
+  statChip = null,
+  statLine = null,
+
   onClick,
   className = '',
 }) => {
@@ -268,12 +276,46 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           </div>
         )}
 
+        {/* Stat browse chip — top-right glass capsule (value over unit) */}
+        {statChip && (
+          <div
+            className="absolute top-3 right-3 text-right"
+            style={{
+              background: 'rgba(12,18,14,0.58)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              borderRadius: 9999,
+              padding: '5px 11px',
+              lineHeight: 1.05,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 17, fontWeight: 800, color: '#fff',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.015em',
+              }}
+            >
+              {statChip.value}
+            </div>
+            <div
+              style={{
+                fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.75)',
+              }}
+            >
+              {statChip.unit}
+            </div>
+          </div>
+        )}
+
         {/* Played / Rate chip — top-right */}
         {showRateChip ? (
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/rate`); }}
             style={{
-              position: 'absolute', top: 10, right: 10,
+              position: 'absolute', top: statChip ? 54 : 10, right: 10,
               display: 'flex', alignItems: 'center', gap: 4,
               background: '#F7931E',
               borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
@@ -284,11 +326,15 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>{t('card.rate')}</span>
           </button>
         ) : showPlayedStatus && isPlayed ? (
-          <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white">
+          <div
+            className="absolute right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white"
+            style={{ top: statChip ? 54 : 12 }}
+          >
             <Check className="w-2.5 h-2.5" />
             <span>{t('card.played')}</span>
           </div>
         ) : null}
+
 
         {/* Context tag — top-right when no played status */}
         {contextTag && !showPlayedStatus && (
@@ -335,6 +381,32 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 {course.locationText}
               </p>
             )}
+            {/* Sample line — how much data sits behind the ranking */}
+            {statLine && (
+              <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                <span
+                  className="text-[11.5px] truncate"
+                  style={{ color: 'rgba(255,255,255,0.82)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
+                >
+                  {statLine.text}
+                </span>
+                {statLine.earlyData && (
+                  <span
+                    className="flex-shrink-0"
+                    style={{
+                      fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
+                      letterSpacing: '0.05em', borderRadius: 9999,
+                      padding: '2px 6px',
+                      background: 'rgba(255,255,255,0.2)',
+                      color: 'rgba(255,255,255,0.9)',
+                    }}
+                  >
+                    {t('statBrowse.earlyData')}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Logged date if present */}
             {loggedDate && (
               <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">

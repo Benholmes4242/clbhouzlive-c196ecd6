@@ -128,6 +128,16 @@ export const EVENT_LABELS: Record<string, string> = {
   tee_card_viewed: 'Course card viewed',
   tee_card_tee_changed: 'Course card tee changed',
 
+  // Stat browse (courses explore tab)
+  stat_browse_viewed: 'Stat browse viewed',
+  stat_browse_lens_changed: 'Stat browse lens changed',
+  stat_browse_country_changed: 'Stat browse country changed',
+  stat_browse_region_changed: 'Stat browse region changed',
+  stat_browse_course_opened: 'Stat browse course opened',
+  stat_browse_empty_shown: 'Stat browse empty state shown',
+  stat_browse_connect_tapped: 'Stat browse connect handicap tapped',
+  stat_browse_directory_opened: 'Stat browse directory opened',
+
   // Review tee context (Phase L6)
   review_tee_selected: 'Review tee selected',
   review_tee_filter_toggled: 'Review tee filter toggled',
