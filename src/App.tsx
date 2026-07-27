@@ -303,8 +303,22 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 // PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
 const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
-  return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
+  return <Navigate to={videoId ? `/post/${videoId}` : '/explore'} replace />;
 };
+
+// Watch surface hibernation gate. When WATCH_SURFACE is false the dormant
+// routes stay registered but bounce to /explore, and we record the attempt so
+// we can tell whether anyone is still trying to reach them.
+const WatchGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const dormant = !WATCH_SURFACE;
+  useEffect(() => {
+    if (dormant) analyticsEvents.track('watch_redirect_hit', { path: location.pathname });
+  }, [dormant, location.pathname]);
+  if (dormant) return <Navigate to="/explore" replace />;
+  return <>{children}</>;
+};
+
 const EchoV2Redirect: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
