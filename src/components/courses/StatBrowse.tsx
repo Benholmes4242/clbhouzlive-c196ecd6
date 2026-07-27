@@ -6,7 +6,7 @@
  * rendered in the order received.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard from './UnifiedCourseCard';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
@@ -47,14 +46,29 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
+/** Scanning aid inside the dropdowns only - never in the headline copy. */
+const LENS_EMOJI: Record<StatLens, string> = {
+  toughest: '\u{1F624}',
+  scoreable: '\u{1F3AF}',
+  played: '\u26F3',
+  longest: '\u{1F4CF}',
+  rated: '\u2B50',
+  chase: '\u{1F451}',
+};
+
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
+
+/** Condensed sticky bar control. */
+const COMPACT_TRIGGER_CLS =
+  'h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none';
 
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const listTopRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [condensed, setCondensed] = useState(false);
   const viewedRef = useRef(false);
 
   const { data: facets } = useStatBrowseFacets();
@@ -107,8 +121,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     [searchParams, setSearchParams],
   );
 
-  const scrollListTop = useCallback(() => {
-    listTopRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  /* Condense on scroll: sentinel above the bar leaves the viewport top. */
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => setCondensed(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '0px 0px -100% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   /* ── Analytics ─────────────────────────────────────────────────── */
@@ -130,21 +152,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const onLensChange = (next: StatLens) => {
     analyticsEvents.track('stat_browse_lens_changed', { from: lens, to: next });
     writeUrl({ lens: next });
-    scrollListTop();
   };
 
   const onCountryChange = (value: string) => {
     const next = value === 'all' ? null : value;
     analyticsEvents.track('stat_browse_country_changed', { country: next });
     writeUrl({ country: next });
-    scrollListTop();
   };
 
   const onRegionChange = (value: string) => {
     const next = value === 'all' ? null : value;
     analyticsEvents.track('stat_browse_region_changed', { country, region: next });
     writeUrl({ region: next });
-    scrollListTop();
   };
 
   const openDirectory = (withCountry: string | null) => {
@@ -189,105 +208,146 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const remaining = Math.max(0, totalCount - rows.length);
   const showEmpty = !isLoading && rows.length === 0;
 
+  const countryTriggerLabel = country ?? t('statBrowse.allAreas');
+
+  const countrySelect = (compact: boolean) => (
+    <Select value={country ?? 'all'} onValueChange={onCountryChange}>
+      <SelectTrigger
+        className={compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS}
+        style={{ borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
+        aria-label={t('statBrowse.selectCountryA11y')}
+      >
+        {compact ? (
+          <span className="truncate">
+            {'\u{1F30D}  '}
+            {countryTriggerLabel}
+          </span>
+        ) : (
+          <SelectValue />
+        )}
+      </SelectTrigger>
+      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+        <SelectItem value="all">
+          <span>{'\u{1F30D}  '}{t('statBrowse.allAreas')}</span>
+        </SelectItem>
+        {(facets?.countries ?? []).map((c) => (
+          <SelectItem key={c.sub_country} value={c.sub_country}>
+            <span className="flex items-center gap-2">
+              <CountryFlag country={c.sub_country} size="sm" />
+              {t('statBrowse.countryOption', {
+                country: c.sub_country,
+                count: c.courses,
+              })}
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const regionSelect = (compact: boolean) => (
+    <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
+      <SelectTrigger
+        className={`${compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS} disabled:opacity-60`}
+        style={{ borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
+        aria-label={t('statBrowse.selectRegionA11y')}
+      >
+        {regionDisabled && !compact ? (
+          <span className="truncate">{t('statBrowse.allRegions')}</span>
+        ) : compact ? (
+          <span className="truncate">{region}</span>
+        ) : (
+          <SelectValue />
+        )}
+      </SelectTrigger>
+      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+        <SelectItem value="all">
+          {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
+        </SelectItem>
+        {regionsForCountry.map((r) => (
+          <SelectItem key={r.region} value={r.region}>
+            {t('statBrowse.regionOption', { region: r.region, count: r.courses })}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const lensSelect = (compact: boolean) => (
+    <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
+      <SelectTrigger
+        className={
+          compact
+            ? COMPACT_TRIGGER_CLS
+            : 'h-8 rounded-xl border bg-white px-3 text-[12px] font-semibold w-auto'
+        }
+        style={{ borderColor: HAIRLINE_INK_10, color: INK }}
+        aria-label={t('statBrowse.selectLensA11y')}
+      >
+        {compact ? (
+          <span className="truncate">
+            {`${LENS_EMOJI[lens]}  `}
+            {t(`statBrowse.lens.${lens}.label`)}
+          </span>
+        ) : (
+          <SelectValue />
+        )}
+      </SelectTrigger>
+      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+        {STAT_LENSES.map((l) => (
+          <SelectItem key={l} value={l}>
+            {`${LENS_EMOJI[l]}  `}
+            {t(`statBrowse.lens.${l}.label`)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
   return (
     <div className="w-full">
-      {/* ── Pickers ─────────────────────────────────────────────── */}
+      {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
+      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
+
+      {/* ── Pickers (sticky) ────────────────────────────────────── */}
       <div
-        className="-mx-4 px-4 pt-3 pb-3"
-        style={{ background: SURFACE, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}
+        className="-mx-4 px-4 pt-3 pb-3 sticky"
+        style={{
+          top: 'calc(var(--sat, 0px))',
+          zIndex: 20,
+          background: SURFACE,
+          borderBottom: `1px solid ${HAIRLINE_INK_8}`,
+        }}
       >
-        <div className="flex items-center gap-2">
-          {/* Country */}
-          <div className="flex-1 min-w-0">
-            <Select value={country ?? 'all'} onValueChange={onCountryChange}>
-              <SelectTrigger
-                className={TRIGGER_CLS}
-                style={{ borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
-                aria-label={t('statBrowse.selectCountryA11y')}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-                <SelectItem value="all">
-                  <span className="flex items-center gap-2">
-                    <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t('statBrowse.allAreas')}
-                  </span>
-                </SelectItem>
-                {(facets?.countries ?? []).map((c) => (
-                  <SelectItem key={c.sub_country} value={c.sub_country}>
-                    <span className="flex items-center gap-2">
-                      <CountryFlag country={c.sub_country} size="sm" />
-                      {t('statBrowse.countryOption', {
-                        country: c.sub_country,
-                        count: c.courses,
-                      })}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {condensed ? (
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              {region ? regionSelect(true) : countrySelect(true)}
+            </div>
+            <div className="min-w-0 flex-1">{lensSelect(true)}</div>
           </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">{countrySelect(false)}</div>
+              <div className="flex-1 min-w-0">{regionSelect(false)}</div>
+            </div>
 
-          {/* Region */}
-          <div className="flex-1 min-w-0">
-            <Select
-              value={region ?? 'all'}
-              onValueChange={onRegionChange}
-              disabled={regionDisabled}
-            >
-              <SelectTrigger
-                className={`${TRIGGER_CLS} disabled:opacity-60`}
-                style={{ borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
-                aria-label={t('statBrowse.selectRegionA11y')}
-              >
-                {regionDisabled ? (
-                  <span className="truncate">{t('statBrowse.allRegions')}</span>
-                ) : (
-                  <SelectValue />
-                )}
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-                <SelectItem value="all">
-                  {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
-                </SelectItem>
-                {regionsForCountry.map((r) => (
-                  <SelectItem key={r.region} value={r.region}>
-                    {t('statBrowse.regionOption', { region: r.region, count: r.courses })}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Count + lens */}
-        <div className="flex items-center justify-between gap-3 mt-2.5">
-          <span style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.3 }}>
-            <strong style={{ color: INK, fontWeight: 800 }}>{formatNumber(totalCount)}</strong>{' '}
-            {t('statBrowse.countTracked', { count: totalCount })}
-          </span>
-          <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
-            <SelectTrigger
-              className="h-8 rounded-xl border bg-white px-3 text-[12px] font-semibold w-auto"
-              style={{ borderColor: HAIRLINE_INK_10, color: INK }}
-              aria-label={t('statBrowse.selectLensA11y')}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-              {STAT_LENSES.map((l) => (
-                <SelectItem key={l} value={l}>
-                  {t(`statBrowse.lens.${l}.label`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            {/* Count + lens */}
+            <div className="flex items-center justify-between gap-3 mt-2.5">
+              <span style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.3 }}>
+                <strong style={{ color: INK, fontWeight: 800 }}>{formatNumber(totalCount)}</strong>{' '}
+                {t('statBrowse.countTracked', { count: totalCount })}
+              </span>
+              {lensSelect(false)}
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Headline ────────────────────────────────────────────── */}
-      <div ref={listTopRef} className="pt-4">
+      <div className="pt-4">
+
         <div
           style={{
             fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
