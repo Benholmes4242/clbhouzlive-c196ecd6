@@ -238,12 +238,13 @@ export function CourseGeographySelectors({ value, onChange, originalCountry }: P
         </select>
       </label>
 
-      <RegionCombobox
+      <RegionField
         value={value.region}
         onChange={(v) => onChange({ region: v })}
-        suggestions={regionSuggestions}
+        query={canonicalRegions}
         listId={listId}
       />
+
     </>
   );
 }
