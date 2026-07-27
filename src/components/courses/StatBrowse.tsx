@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard from './UnifiedCourseCard';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
@@ -46,6 +45,16 @@ interface StatBrowseProps {
   /** Reveal CourseExplorer (the full directory) — owned by the parent. */
   onOpenDirectory: (country: string | null) => void;
 }
+
+/** Scanning aid inside the dropdowns only - never in the headline copy. */
+const LENS_EMOJI: Record<StatLens, string> = {
+  toughest: '\u{1F624}',
+  scoreable: '\u{1F3AF}',
+  played: '\u26F3',
+  longest: '\u{1F4CF}',
+  rated: '\u2B50',
+  chase: '\u{1F451}',
+};
 
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
@@ -107,10 +116,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     [searchParams, setSearchParams],
   );
 
-  const scrollListTop = useCallback(() => {
-    listTopRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, []);
-
   /* ── Analytics ─────────────────────────────────────────────────── */
   useEffect(() => {
     if (viewedRef.current) return;
@@ -130,21 +135,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const onLensChange = (next: StatLens) => {
     analyticsEvents.track('stat_browse_lens_changed', { from: lens, to: next });
     writeUrl({ lens: next });
-    scrollListTop();
   };
 
   const onCountryChange = (value: string) => {
     const next = value === 'all' ? null : value;
     analyticsEvents.track('stat_browse_country_changed', { country: next });
     writeUrl({ country: next });
-    scrollListTop();
   };
 
   const onRegionChange = (value: string) => {
     const next = value === 'all' ? null : value;
     analyticsEvents.track('stat_browse_region_changed', { country, region: next });
     writeUrl({ region: next });
-    scrollListTop();
   };
 
   const openDirectory = (withCountry: string | null) => {
@@ -209,10 +211,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
                 <SelectItem value="all">
-                  <span className="flex items-center gap-2">
-                    <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t('statBrowse.allAreas')}
-                  </span>
+                  <span>{'\u{1F30D}  '}{t('statBrowse.allAreas')}</span>
                 </SelectItem>
                 {(facets?.countries ?? []).map((c) => (
                   <SelectItem key={c.sub_country} value={c.sub_country}>
@@ -278,6 +277,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
               {STAT_LENSES.map((l) => (
                 <SelectItem key={l} value={l}>
+                  {`${LENS_EMOJI[l]}  `}
                   {t(`statBrowse.lens.${l}.label`)}
                 </SelectItem>
               ))}
