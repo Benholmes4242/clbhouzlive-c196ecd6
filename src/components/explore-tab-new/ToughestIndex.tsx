@@ -9,7 +9,7 @@ import { SectionHead } from './SectionHead';
 import { regionScopePhrase, matchesRegionScope } from './regionScope';
 import { FONT } from './gamingLightTokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { AMBER, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
+import { INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { REGION_TABS } from './AlmanacSections';
 import { DiscoverBand } from './DiscoverBand';
 import { CinematicLeadCard } from './CinematicLeadCard';
@@ -424,7 +424,7 @@ function CourseIndexSheet({
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: mode === 'friendliest' ? GREEN : RED,
             marginBottom: 4,
             fontVariantNumeric: 'tabular-nums',
           }}

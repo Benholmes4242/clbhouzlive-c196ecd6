@@ -102,8 +102,10 @@ export function CinematicLeadCard({
           aspectRatio: carousel ? '16 / 12' : '16 / 10',
           borderRadius: carousel ? 14 : 0,
           overflow: 'hidden',
+          background: 'linear-gradient(155deg, #20262F 0%, #0E1218 100%)',
         }}
       >
+        {imageUrl ? (
         <img
           src={getOptimizedImageUrl(imageUrl, { width: 800 })}
           srcSet={generateImageSrcSet(imageUrl, [{ width: 480 }, { width: 800 }, { width: 1200 }])}
@@ -113,6 +115,7 @@ export function CinematicLeadCard({
           decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
+        ) : null}
 
         {/* Bottom scrim */}
         <div
