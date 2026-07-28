@@ -129,9 +129,15 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
     [opener],
   );
 
+  // Scope-driven rails report their own emptiness; the page shows ONE
+  // consolidated note when two or more have gone missing.
+  const { reporter, hiddenCount } = useHiddenRailTracker();
+  const showConsolidatedEmpty = isHideableScope(activeRegion) && hiddenCount >= 2;
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       <div>
+
 
         {shellTabs}
         {/* Your standing — merged identity + standing band (crowns / rank+progress / hcp) */}
