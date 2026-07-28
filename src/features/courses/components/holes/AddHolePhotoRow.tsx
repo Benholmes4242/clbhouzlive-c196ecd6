@@ -1,167 +1,253 @@
 /**
- * H2 — contribution affordance for a single hole.
+ * H2 - contribution affordance for a single hole.
  *
- * Shown inside the expanded hole card when the viewer has a logged round at
- * the course. States: submit / uploading / in review / rejected / live.
+ * Surfaces: the hole detail sheet ('hole_sheet') and the hardest/easiest holes
+ * carousel card on Discover ('discover_card').
+ *
+ * Render rules:
+ *  - approved photo exists -> show it, credited
+ *  - viewer's row is pending -> their image + "In review" chip (only they see it)
+ *  - viewer's row is rejected -> reason + "Try another photo" (delete, resubmit)
+ *  - otherwise, if they have a logged round here -> the add affordance
  */
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  useApprovedHoleMedia,
-  useMyHoleMedia,
+  useCanContributeHole,
+  useHolePhoto,
   useSubmitHolePhoto,
-} from '@/hooks/courses/useHoleMedia';
+  type SubmitFailureReason,
+} from '@/hooks/media/useHoleMedia';
 
 const INK = '#0F172A';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_55 = 'rgba(15,23,42,0.55)';
-const GOLD_INK = '#C97211';
+const AMBER_INK = '#C97211';
+
+export type HolePhotoSurface = 'hole_sheet' | 'discover_card';
 
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
-  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 }
+
+const ERROR_KEY: Record<SubmitFailureReason, string> = {
+  duplicate: 'courses:holePhoto.errors.duplicate',
+  rls: 'courses:holePhoto.errors.notEligible',
+  upload: 'courses:holePhoto.errors.upload',
+  not_signed_in: 'courses:holePhoto.errors.signedOut',
+  unknown: 'courses:holePhoto.errors.generic',
+};
 
 interface Props {
   courseId?: string;
   holeNo: number;
-  /** Viewer has a logged round at this course. */
-  eligible: boolean;
+  surface: HolePhotoSurface;
+  /** Dark card background (Discover carousel). */
+  dark?: boolean;
 }
 
-export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, eligible }) => {
+export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, dark = false }) => {
   const { t } = useTranslation(['courses']);
   const { user } = useSupabaseSession();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [justSubmitted, setJustSubmitted] = useState(false);
+  const shownRef = useRef(false);
 
-  const { data: approved } = useApprovedHoleMedia(courseId);
-  const { data: mine } = useMyHoleMedia(courseId, user?.id);
-  const { submit, submitting, progress } = useSubmitHolePhoto();
+  const { data: photo } = useHolePhoto(courseId, holeNo, user?.id);
+  const { data: eligibility } = useCanContributeHole(courseId, user?.id);
+  const { submit, deleteMine, submitting, progress } = useSubmitHolePhoto();
+  const [busy, setBusy] = useState(false);
 
-  if (!courseId || !user) return null;
+  const approved = photo?.approved ?? null;
+  const mine = photo?.mine ?? null;
+  const canAdd = Boolean(courseId && user && eligibility?.canContribute && !approved && !mine);
 
-  const approvedPhoto = approved?.get(holeNo) ?? null;
-  const myRow = mine?.get(holeNo) ?? null;
+  useEffect(() => {
+    if (!canAdd || shownRef.current || !courseId) return;
+    shownRef.current = true;
+    // callsite: hole_photo_cta_shown
+    analyticsEvents.track('hole_photo_cta_shown', {
+      course_id: courseId,
+      hole_no: holeNo,
+      surface,
+    });
+  }, [canAdd, courseId, holeNo, surface]);
 
-  const onPick = async (file: File | undefined) => {
+  if (!courseId) return null;
+
+  const muted = dark ? 'rgba(255,255,255,0.62)' : INK_55;
+  const strong = dark ? '#FFFFFF' : INK;
+  const hairline = dark ? 'rgba(255,255,255,0.14)' : INK_06;
+
+  const handleFile = async (file: File | undefined) => {
     if (!file) return;
-    const res = await submit({ courseId, holeNo, file });
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('courses:holePhoto.errors.notImage'));
+      return;
+    }
+    setBusy(true);
+    const res = await submit({
+      courseId,
+      holeNo,
+      file,
+      proofScoreId: eligibility?.proofScoreId ?? null,
+    });
+    setBusy(false);
     if (res.ok) {
-      setJustSubmitted(true);
+      // callsite: hole_photo_submitted
+      analyticsEvents.track('hole_photo_submitted', { course_id: courseId, hole_no: holeNo });
       toast.success(t('courses:holePhoto.thanks'));
     } else {
-      toast.error(res.error ?? t('courses:holePhoto.failed'));
+      const reason = res.reason ?? 'unknown';
+      // callsite: hole_photo_submit_failed
+      analyticsEvents.track('hole_photo_submit_failed', {
+        course_id: courseId,
+        hole_no: holeNo,
+        reason,
+      });
+      toast.error(t(ERROR_KEY[reason]));
     }
   };
 
-  const chip = (label: string, color: string) => (
-    <span
-      style={{
-        fontSize: 10,
-        fontWeight: 700,
-        letterSpacing: 0.4,
-        textTransform: 'uppercase',
-        color,
-        background: INK_06,
-        borderRadius: 999,
-        padding: '3px 8px',
+  const picker = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/*"
+      hidden
+      onChange={(e) => {
+        const f = e.target.files?.[0];
+        e.target.value = '';
+        void handleFile(f);
       }}
-    >
-      {label}
-    </span>
+    />
   );
 
-  let body: React.ReactNode = null;
-
-  if (myRow || justSubmitted) {
-    const status = myRow?.status ?? 'pending';
-    if (status === 'pending') {
-      body = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {chip(t('courses:holePhoto.inReview'), GOLD_INK)}
-          <span style={{ fontSize: 11.5, color: INK_55 }}>{t('courses:holePhoto.inReviewNote')}</span>
-        </div>
-      );
-    } else if (status === 'rejected') {
-      body = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {chip(t('courses:holePhoto.notUsed'), INK_55)}
-          <span style={{ fontSize: 11.5, color: INK_55 }}>
-            {myRow?.reject_reason || t('courses:holePhoto.notUsedNote')}
-          </span>
-        </div>
-      );
-    } else {
-      body = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {chip(t('courses:holePhoto.live'), GOLD_INK)}
-          <span style={{ fontSize: 11.5, color: INK_55 }}>{t('courses:holePhoto.liveNote')}</span>
-        </div>
-      );
-    }
-  } else if (submitting) {
-    body = (
-      <span style={{ fontSize: 11.5, color: INK_55 }}>
-        {t('courses:holePhoto.uploading', { percent: progress.percent })}
-      </span>
-    );
-  } else if (eligible) {
-    body = (
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        style={{
-          border: `1px solid ${INK_06}`,
-          background: '#FFFFFF',
-          borderRadius: 999,
-          padding: '8px 14px',
-          fontSize: 12,
-          fontWeight: 700,
-          color: INK,
-          cursor: 'pointer',
-          minHeight: 36,
-        }}
-      >
-        {t('courses:holePhoto.add', { hole: ordinal(holeNo) })}
-      </button>
-    );
-  } else if (approvedPhoto?.contributorName) {
-    body = (
-      <span style={{ fontSize: 11.5, color: INK_55 }}>
-        {t('courses:holePhoto.credit', { name: approvedPhoto.contributorName })}
-      </span>
+  // Approved photo: shown to everyone, credited.
+  if (approved) {
+    return (
+      <figure style={{ margin: 0 }}>
+        <img
+          src={approved.media_url}
+          alt={t('courses:holePhoto.alt', { ordinal: ordinal(holeNo) })}
+          loading="lazy"
+          style={{ width: '100%', borderRadius: 12, display: 'block', objectFit: 'cover' }}
+        />
+        {approved.contributorName ? (
+          <figcaption style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: muted }}>
+            {t('courses:holePhoto.credit', { name: approved.contributorName })}
+          </figcaption>
+        ) : null}
+      </figure>
     );
   }
 
-  if (!body) return null;
+  // The viewer's own pending submission.
+  if (mine?.status === 'pending') {
+    return (
+      <div>
+        <img
+          src={mine.media_url}
+          alt={t('courses:holePhoto.alt', { ordinal: ordinal(holeNo) })}
+          loading="lazy"
+          style={{ width: '100%', borderRadius: 12, display: 'block', objectFit: 'cover', opacity: 0.85 }}
+        />
+        <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: AMBER_INK,
+              border: `1px solid ${hairline}`,
+              borderRadius: 999,
+              padding: '2px 8px',
+            }}
+          >
+            {t('courses:holePhoto.inReview')}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: muted }}>
+            {t('courses:holePhoto.inReviewNote')}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // The viewer's own rejected submission: reason plus a retry.
+  if (mine?.status === 'rejected') {
+    return (
+      <div>
+        {picker}
+        <div style={{ fontSize: 11, fontWeight: 600, color: muted, marginBottom: 6 }}>
+          {mine.reject_reason || t('courses:holePhoto.notUsedNote')}
+        </div>
+        <button
+          type="button"
+          disabled={busy || submitting}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await deleteMine(mine.id, courseId, holeNo);
+              inputRef.current?.click();
+            } catch {
+              toast.error(t('courses:holePhoto.errors.generic'));
+            } finally {
+              setBusy(false);
+            }
+          }}
+          style={{
+            border: `1px solid ${hairline}`,
+            background: 'transparent',
+            borderRadius: 999,
+            padding: '8px 14px',
+            fontSize: 12,
+            fontWeight: 700,
+            color: strong,
+            minHeight: 40,
+            cursor: 'pointer',
+          }}
+        >
+          {t('courses:holePhoto.tryAnother')}
+        </button>
+      </div>
+    );
+  }
+
+  if (!canAdd) return null;
+
+  const uploading = busy || submitting;
 
   return (
-    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {approvedPhoto && (
-        <div style={{ borderRadius: 12, overflow: 'hidden', position: 'relative' }}>
-          <img
-            src={approvedPhoto.media_url}
-            alt={t('courses:holePhoto.alt', { hole: holeNo })}
-            loading="lazy"
-            style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', objectFit: 'cover' }}
-          />
-        </div>
-      )}
-      {body}
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={(e) => {
-          void onPick(e.target.files?.[0]);
-          e.currentTarget.value = '';
+    <div>
+      {picker}
+      <button
+        type="button"
+        disabled={uploading}
+        onClick={() => inputRef.current?.click()}
+        style={{
+          width: '100%',
+          border: `1px dashed ${dark ? 'rgba(255,255,255,0.28)' : 'rgba(15,23,42,0.18)'}`,
+          background: 'transparent',
+          borderRadius: 12,
+          padding: '10px 12px',
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: uploading ? muted : strong,
+          minHeight: 44,
+          cursor: uploading ? 'default' : 'pointer',
+          textAlign: 'center',
         }}
-      />
+      >
+        {uploading
+          ? t('courses:holePhoto.uploading', { percent: Math.round(progress?.percent ?? 0) })
+          : t('courses:holePhoto.add', { ordinal: ordinal(holeNo) })}
+      </button>
     </div>
   );
 };
