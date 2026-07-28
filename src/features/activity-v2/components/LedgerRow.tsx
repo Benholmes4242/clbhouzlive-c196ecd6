@@ -269,6 +269,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   const navigate = useNavigate();
   const location = useLocation();
   const spec = resolveKind(row);
+  // C4 — only the daily-cap winner returns a candidate; RPC does all gating.
+  const sharePrompt = useSharePromptFor(row.notif_id);
+
   const isUnread = !row.is_read;
   const body = row.message ?? row.title ?? '';
   const data = (row.data && typeof row.data === 'object' ? row.data : {}) as Record<string, string | undefined>;
