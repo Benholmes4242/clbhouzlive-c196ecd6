@@ -282,7 +282,8 @@ export const HoleDataSheet: React.FC<Props> = ({
               {totalRounds > 0
                 ? t('courses:holes.preview.description', {
                     holes: formatNumber(totalHoles),
-                    count: formatNumber(totalRounds),
+                    count: totalRounds,
+                    rounds: formatNumber(totalRounds),
                     personal: viewerHasPlayed
                       ? t('courses:holes.preview.personalClause')
                       : '',
