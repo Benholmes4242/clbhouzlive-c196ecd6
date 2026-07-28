@@ -125,5 +125,13 @@
         "freeTextPlaceholder": "e.g. Kent"
       }
     }
+  },
+  "feed": {
+    "courseLine": {
+      "avgOverPar": "Avg over par",
+      "roundsTracked": "Rounds tracked",
+      "yourBest": "Your best",
+      "notPlayed": "You haven't played here"
+    }
   }
 }
