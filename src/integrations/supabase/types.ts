@@ -19816,6 +19816,19 @@ export type Database = {
         }
         Returns: Json
       }
+      get_share_prompt_candidates: {
+        Args: { p_day_start: string }
+        Returns: {
+          category: string
+          course_country: string
+          course_id: string
+          course_name: string
+          created_at: string
+          notif_id: string
+          notif_type: string
+          whs_score_id: string
+        }[]
+      }
       get_similar_handicap_leaderboard: {
         Args: {
           p_current_user_id?: string

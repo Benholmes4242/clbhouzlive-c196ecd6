@@ -4,18 +4,23 @@
  * body column -> optional right element -> unread dot.
  */
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ratingTextColor } from '@/lib/ratingTier';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
 import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds';
+
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -195,12 +200,78 @@ const ResolvePill: React.FC = () => (
   </span>
 );
 
+// -- C4 share prompt action ------------------------------------------
+// Reuses the RoundDetailSheet path: openPostStudioForRound. Never posts.
+const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ candidate }) => {
+  const { t } = useTranslation('common');
+  const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
+  const shown = useRef(false);
+
+  useEffect(() => {
+    if (shown.current) return;
+    shown.current = true;
+    analyticsEvents.track('share_prompt_shown', {
+      notif_id: candidate.notif_id,
+      notif_type: candidate.notif_type,
+      category: candidate.category,
+      course_id: candidate.course_id,
+      whs_score_id: candidate.whs_score_id,
+    });
+  }, [candidate]);
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        analyticsEvents.track('share_prompt_tapped', {
+          notif_id: candidate.notif_id,
+          notif_type: candidate.notif_type,
+          category: candidate.category,
+          course_id: candidate.course_id,
+          whs_score_id: candidate.whs_score_id,
+        });
+        analyticsEvents.track('round_share_opened', {
+          whs_score_id: candidate.whs_score_id,
+          course_id: candidate.course_id,
+          source: 'share_prompt',
+        });
+        openPostStudioForRound({
+          course: {
+            id: candidate.course_id,
+            name: candidate.course_name ?? '',
+            country: candidate.course_country,
+          },
+          whsScoreId: candidate.whs_score_id,
+        });
+      }}
+      style={{
+        marginTop: 7,
+        padding: '6px 11px',
+        borderRadius: 20,
+        border: `1px solid ${T.AMBER}`,
+        background: 'transparent',
+        color: T.AMBER_DEEP,
+        fontSize: 11.5,
+        fontWeight: 700,
+        fontFamily: GEIST,
+        cursor: 'pointer',
+      }}
+    >
+      {t('sharePrompt.action')}
+    </button>
+  );
+};
+
 // ---------------------------------------------------------------------
 
 export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const spec = resolveKind(row);
+  // C4 — only the daily-cap winner returns a candidate; RPC does all gating.
+  const sharePrompt = useSharePromptFor(row.notif_id);
+
   const isUnread = !row.is_read;
   const body = row.message ?? row.title ?? '';
   const data = (row.data && typeof row.data === 'object' ? row.data : {}) as Record<string, string | undefined>;
@@ -346,6 +417,8 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         <div style={{ fontSize: 11, fontWeight: 500, color: T.INK_45, marginTop: 2 }}>
           {relativeTime(row.created_at)}
         </div>
+        {sharePrompt && <SharePromptAction candidate={sharePrompt} />}
+
       </div>
       {rightEl && <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{rightEl}</div>}
       {isUnread && (
