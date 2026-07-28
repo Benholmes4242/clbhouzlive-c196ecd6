@@ -713,6 +713,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {courseContext && (
               <PostCourseDataLine
                 ctx={courseContext}
+                theirGross={postRound?.grossScore ?? null}
                 onTap={post.courseId ? () => onCourse?.(post) : undefined}
               />
             )}
