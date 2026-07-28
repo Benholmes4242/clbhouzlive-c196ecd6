@@ -30,6 +30,11 @@ export interface Top100Mover {
 
 /** A move of less than this is noise, not an opinion shift. */
 const MIN_DELTA = 0.1;
+/**
+ * A move larger than this is not opinion shifting — it is a course picking up
+ * its first ratings from a zero baseline. Reporting it as a swing would lie.
+ */
+const MAX_DELTA = 3;
 
 export function useTop100Movers(range: MoverRange, scope = 'worldwide') {
   return useQuery({
@@ -57,7 +62,9 @@ export function useTop100Movers(range: MoverRange, scope = 'worldwide') {
           avg_rating: null as number | null,
           rating_count: 0,
         }))
-        .filter((r) => Math.abs(r.rating_delta) >= MIN_DELTA);
+        .filter(
+          (r) => Math.abs(r.rating_delta) >= MIN_DELTA && Math.abs(r.rating_delta) <= MAX_DELTA,
+        );
 
       if (rows.length === 0) return [];
 
