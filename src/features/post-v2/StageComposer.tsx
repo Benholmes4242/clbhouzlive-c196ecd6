@@ -202,6 +202,34 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const roundsAtCourse = useMemo(() => myRounds ?? [], [myRounds]);
   const preselectAppliedFor = useRef<string | null>(null);
 
+  // A round belongs to exactly one course. When the PRIMARY course changes -
+  // to another club or to nothing - the attachment must go with it, otherwise
+  // a post can carry course_id from club A and whs_score_id from club B.
+  // `undefined` = first render, so an edit-mode restore is never wiped.
+  const prevPrimaryCourseId = useRef<string | null | undefined>(undefined);
+  const attachedRoundRef = useRef(state.attachedRound);
+  attachedRoundRef.current = state.attachedRound;
+
+  useEffect(() => {
+    const prev = prevPrimaryCourseId.current;
+    prevPrimaryCourseId.current = primaryCourseId;
+    if (prev === undefined) return; // first mount (incl. edit-mode hydration)
+    if (prev === primaryCourseId) return;
+
+    // Let the new course run its own pre-selection.
+    preselectAppliedFor.current = null;
+
+    if (!attachedRoundRef.current) return;
+    setAttachedRound(null);
+    // Analytics callsite: post_round_detached - reported against the OLD
+    // course so "course changed" is distinguishable from "member removed it".
+    analyticsEvents.track('post_round_detached', {
+      course_id: prev,
+      reason: 'course_changed',
+    });
+  }, [primaryCourseId, setAttachedRound]);
+
+
   // Pre-selection: only a round played today or yesterday, and only once per
   // course. Visible and removable - never silent.
   useEffect(() => {
