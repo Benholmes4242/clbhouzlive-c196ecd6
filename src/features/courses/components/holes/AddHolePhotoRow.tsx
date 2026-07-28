@@ -17,10 +17,11 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   useCanContributeHole,
-  useHolePhoto,
+  useHolePhotos,
   useSubmitHolePhoto,
   type SubmitFailureReason,
 } from '@/hooks/media/useHoleMedia';
+
 
 const INK = '#0F172A';
 const INK_06 = 'rgba(15,23,42,0.06)';
@@ -57,14 +58,16 @@ export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, da
   const inputRef = useRef<HTMLInputElement>(null);
   const shownRef = useRef(false);
 
-  const { data: photo } = useHolePhoto(courseId, holeNo, user?.id);
+  const { data: photo } = useHolePhotos(courseId, holeNo, user?.id);
   const { data: eligibility } = useCanContributeHole(courseId, user?.id);
   const { submit, deleteMine, submitting, progress } = useSubmitHolePhoto();
   const [busy, setBusy] = useState(false);
 
-  const approved = photo?.approved ?? null;
   const mine = photo?.mine ?? null;
-  const canAdd = Boolean(courseId && user && eligibility?.canContribute && !approved && !mine);
+  // Multiple approved photos per hole are permitted, so an existing approved
+  // photo no longer blocks a contribution.
+  const canAdd = Boolean(courseId && user && eligibility?.canContribute && !mine);
+
 
   useEffect(() => {
     if (!canAdd || shownRef.current || !courseId) return;
@@ -127,24 +130,9 @@ export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, da
     />
   );
 
-  // Approved photo: shown to everyone, credited.
-  if (approved) {
-    return (
-      <figure style={{ margin: 0 }}>
-        <img
-          src={approved.media_url}
-          alt={t('courses:holePhoto.alt', { ordinal: ordinal(holeNo) })}
-          loading="lazy"
-          style={{ width: '100%', borderRadius: 12, display: 'block', objectFit: 'cover' }}
-        />
-        {approved.contributorName ? (
-          <figcaption style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: muted }}>
-            {t('courses:holePhoto.credit', { name: approved.contributorName })}
-          </figcaption>
-        ) : null}
-      </figure>
-    );
-  }
+  // Approved photos are rendered by the surrounding surface (hole gallery /
+  // carousel card), so this row only ever owns the contribution states.
+
 
   // The viewer's own pending submission.
   if (mine?.status === 'pending') {
