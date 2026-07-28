@@ -46,23 +46,6 @@ interface PostStudioStoreState {
   }) => void;
 
   /** Close the studio and reset trigger state */
-  openPostStudioForRound: (opts) =>
-    set({
-      isOpen: true,
-      initialMedia: [],
-      initialActorType: 'personal',
-      initialActorId: null,
-      returnPath: opts.returnPath ?? window.location.pathname,
-      editPostId: null,
-      draftId: null,
-      prefillCourse: {
-        id: opts.course.id,
-        name: opts.course.name,
-        country: opts.course.country ?? null,
-      },
-      prefillWhsScoreId: opts.whsScoreId,
-    }),
-
   closePostStudio: () => void;
 }
 
