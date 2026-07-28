@@ -31,6 +31,12 @@ import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
 import { SectionHead } from './SectionHead';
 import { DiscoverBand } from './DiscoverBand';
+import {
+  isHideableScope,
+  useHiddenRailTracker,
+  useReportRailEmpty,
+  type OnRailEmpty,
+} from './railEmptiness';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
