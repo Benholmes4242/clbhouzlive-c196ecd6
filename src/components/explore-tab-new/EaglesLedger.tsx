@@ -12,6 +12,7 @@ import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 import { LedgerSubline } from './PinIcon';
 import { HoleContextLine, holeContextParts } from './HoleContextLine';
 
