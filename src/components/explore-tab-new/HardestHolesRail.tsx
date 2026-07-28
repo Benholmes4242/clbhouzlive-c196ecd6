@@ -15,6 +15,8 @@ import { AMBER, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/token
 import { REGION_TABS } from './AlmanacSections';
 import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
 import { isEarlyData } from '@/lib/earlyData';
+import { AddHolePhotoRow } from '@/features/courses/components/holes/AddHolePhotoRow';
+
 
 const RED = '#D2222D';
 const GREEN = '#0F8F4A';
