@@ -22,6 +22,7 @@ import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { isEarlyData } from '@/lib/earlyData';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import {
   chipForLens,
   isStatLens,
@@ -57,6 +58,9 @@ const LENS_EMOJI: Record<StatLens, string> = {
   chase: '\u{1F451}',
 };
 
+/** Remembers the member's last lens choice across visits. */
+const LENS_STORAGE_KEY = 'clbhouz.statBrowse.lens';
+
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
 
@@ -75,8 +79,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { data: facets } = useStatBrowseFacets();
 
   /* ── URL state: read + validate against the facets ─────────────── */
+  /**
+   * Lens precedence, highest first:
+   *   1. ?lens= URL param (if a known lens id)
+   *   2. localStorage, the member's last choice (if a known lens id)
+   *   3. 'rated'
+   * Country and region are never persisted — only the lens.
+   */
   const urlLens = searchParams.get('lens');
-  const lens: StatLens = isStatLens(urlLens) ? urlLens : 'toughest';
+  const storedLens = useMemo(() => safeLocalStorage.get(LENS_STORAGE_KEY), []);
+  const lens: StatLens = isStatLens(urlLens)
+    ? urlLens
+    : isStatLens(storedLens)
+      ? storedLens
+      : 'rated';
 
   const urlCountry = searchParams.get('country');
   const country = useMemo(() => {
@@ -152,6 +168,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const onLensChange = (next: StatLens) => {
     analyticsEvents.track('stat_browse_lens_changed', { from: lens, to: next });
+    safeLocalStorage.set(LENS_STORAGE_KEY, next);
     writeUrl({ lens: next });
   };
 
@@ -445,7 +462,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               showRankBadges
               showRating
               showPlayedStatus
-              statChip={chipForLens(lens, row, unitLabel)}
+              /* The lens chip renders unless it would duplicate a figure
+                 already on the card — 'rated' repeats the community rating. */
+              statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
               statLine={sampleLine(row)}
               onClick={() => {
                 analyticsEvents.track('stat_browse_course_opened', {
