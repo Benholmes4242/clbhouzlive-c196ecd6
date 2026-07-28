@@ -593,7 +593,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
 
       {/* Course eyebrow + location (above caption) */}
-      {post.courseName && (() => {
+      {(post.courseName || courseContext) && (() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
