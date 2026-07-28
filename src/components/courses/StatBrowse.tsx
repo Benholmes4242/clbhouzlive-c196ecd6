@@ -462,7 +462,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               showRankBadges
               showRating
               showPlayedStatus
-              statChip={chipForLens(lens, row, unitLabel)}
+              /* The lens chip renders unless it would duplicate a figure
+                 already on the card — 'rated' repeats the community rating. */
+              statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
               statLine={sampleLine(row)}
               onClick={() => {
                 analyticsEvents.track('stat_browse_course_opened', {
