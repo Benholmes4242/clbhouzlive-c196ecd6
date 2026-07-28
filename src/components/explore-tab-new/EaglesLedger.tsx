@@ -12,6 +12,7 @@ import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 import { LedgerSubline } from './PinIcon';
 import { HoleContextLine, holeContextParts } from './HoleContextLine';
 
@@ -57,6 +58,8 @@ interface Props {
   /** Controlled "View all" sheet (used by the merged Moments section). */
   sheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 export function EaglesLedger({
@@ -67,15 +70,17 @@ export function EaglesLedger({
   hideHeader = false,
   sheetOpen: sheetOpenProp,
   onSheetOpenChange,
+  onEmpty,
 }: Props) {
-  const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
-  const { data: leadersData } = useRegionEagleLeaders(region);
+  const { data: featsData, isLoading: featsLoading } = useRegionFeats(region, 'eagles', 'latest');
+  const { data: leadersData, isLoading: leadersLoading } = useRegionEagleLeaders(region);
   const feats = useMemo(() => featsData ?? [], [featsData]);
   const [localSheetOpen, setLocalSheetOpen] = useState(false);
   const controlled = onSheetOpenChange !== undefined;
   const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
   const setSheetOpen = controlled ? onSheetOpenChange! : setLocalSheetOpen;
   const sectionMarginTop = hideHeader ? 0 : 32;
+  const isLoading = mode === 'alltime' ? leadersLoading : featsLoading;
 
   const leaders = useMemo(
     () =>
@@ -89,8 +94,11 @@ export function EaglesLedger({
   const hasData = mode === 'alltime' ? leaders.length > 0 : feats.length > 0;
   const overlineLabel = mode === 'alltime' ? 'All-time eagles' : 'Latest eagles';
 
+  const resolvedEmpty = !isLoading && !hasData;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
+
   if (!isLoading && !hasData) {
-    if (region == null) return null;
+    if (region == null || isHideableScope(region)) return null;
     return (
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
         {hideHeader ? null : <SectionHead overline={overlineLabel} paddingX={14} />}

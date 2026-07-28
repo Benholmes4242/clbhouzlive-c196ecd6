@@ -31,6 +31,12 @@ import { ToughestIndex } from './ToughestIndex';
 import { HardestHolesRail } from './HardestHolesRail';
 import { SectionHead } from './SectionHead';
 import { DiscoverBand } from './DiscoverBand';
+import {
+  isHideableScope,
+  useHiddenRailTracker,
+  useReportRailEmpty,
+  type OnRailEmpty,
+} from './railEmptiness';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -123,9 +129,15 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
     [opener],
   );
 
+  // Scope-driven rails report their own emptiness; the page shows ONE
+  // consolidated note when two or more have gone missing.
+  const { reporter, hiddenCount } = useHiddenRailTracker();
+  const showConsolidatedEmpty = isHideableScope(activeRegion) && hiddenCount >= 2;
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
       <div>
+
 
         {shellTabs}
         {/* Your standing — merged identity + standing band (crowns / rank+progress / hcp) */}
@@ -149,15 +161,22 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
 
-        <DiscoverBand>
-          <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
-        </DiscoverBand>
+        {/* The record book owns its own containment card so a hidden rail
+            takes the band with it. */}
+        <TheRecordBook
+          region={activeRegion}
+          opener={opener}
+          mode={scope}
+          userId={userId}
+          inCard
+          onEmpty={reporter('records')}
+        />
 
 
 
 
         {/* This week in golf — honours rail */}
-        <WeekInGolfRail region={activeRegion} />
+        <WeekInGolfRail region={activeRegion} onEmpty={reporter('week')} />
 
 
         {/* Season race */}
@@ -170,6 +189,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           mode={scope}
           onRowTap={handleFeatRowTap}
           onLeaderTap={handleLeaderTap}
+          onEmpty={reporter('moments')}
         />
 
         {/* Toughest courses index */}
@@ -177,6 +197,32 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
 
         {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
         <HardestHolesRail region={activeRegion} />
+
+        {/* ONE consolidated note for everything the scope has yet to fill. */}
+        {showConsolidatedEmpty ? (
+          <DiscoverBand>
+            <div style={{ padding: '16px 14px' }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  textTransform: 'uppercase',
+                  color: 'rgba(15,23,42,0.45)',
+                  marginBottom: 4,
+                }}
+              >
+                Early days
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 650, color: '#0F172A', lineHeight: 1.3 }}>
+                {feedRegionLabel} is still filling up — records, honours and hauls
+                will appear here as rounds land.
+              </div>
+            </div>
+          </DiscoverBand>
+        ) : null}
+
+
 
         {/* Feed block */}
         <div
@@ -230,6 +276,7 @@ function LegendarySection({
   hideHeader = false,
   sheetOpen: sheetOpenProp,
   onSheetOpenChange,
+  onEmpty,
 }: {
   region: string | null;
   regionUpper: string;
@@ -239,6 +286,7 @@ function LegendarySection({
   hideHeader?: boolean;
   sheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
+  onEmpty?: OnRailEmpty;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
   const rows = useMemo(() => data ?? [], [data]);
@@ -339,6 +387,7 @@ function LegendarySection({
         metric={sheetMetric}
         onRowTap={onLeaderTap}
         onLatestRowTap={onRowTap}
+        onEmpty={onEmpty}
       />
       <TierSeeAllSheet
         open={sheetOpen}
@@ -367,16 +416,25 @@ function MomentsSection({
   mode,
   onRowTap,
   onLeaderTap,
+  onEmpty,
 }: {
   region: string | null;
   regionUpper: string;
   mode: RecordsMode;
   onRowTap: (row: FeatRow) => void;
   onLeaderTap: (uid: string) => void;
+  onEmpty?: OnRailEmpty;
 }) {
   const { t } = useTranslation('courses');
   const [tab, setTab] = useState<MomentsTab>('honours');
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // All three bodies stay mounted (inactive ones visually hidden) so each can
+  // report its own emptiness — the merged band only disappears when the whole
+  // set is empty for the scope.
+  const { reporter, hiddenCount } = useHiddenRailTracker();
+  const allEmpty = hiddenCount >= 3;
+  useReportRailEmpty(onEmpty, allEmpty);
 
   const tabs: { id: MomentsTab; label: string }[] = [
     { id: 'honours', label: t('discover.moments.tabs.honours', 'Honours') },
@@ -391,7 +449,8 @@ function MomentsSection({
   };
 
   return (
-    <DiscoverBand>
+    <DiscoverBand hidden={allEmpty}>
+
       <SectionHead
         overline={
           mode === 'alltime'
@@ -450,7 +509,7 @@ function MomentsSection({
       </div>
 
       <div style={{ paddingBottom: 4 }}>
-        {tab === 'honours' ? (
+        <div style={tab === 'honours' ? undefined : { display: 'none' }}>
           <LegendarySection
             region={region}
             regionUpper={regionUpper}
@@ -458,11 +517,12 @@ function MomentsSection({
             onRowTap={onRowTap}
             onLeaderTap={onLeaderTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'honours' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('honours')}
           />
-        ) : null}
-        {tab === 'eagles' ? (
+        </div>
+        <div style={tab === 'eagles' ? undefined : { display: 'none' }}>
           <EaglesLedger
             region={region}
             regionUpper={regionUpper}
@@ -470,21 +530,23 @@ function MomentsSection({
             onRowTap={onRowTap}
             onLeaderTap={onLeaderTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'eagles' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('eagles')}
           />
-        ) : null}
-        {tab === 'birdies' ? (
+        </div>
+        <div style={tab === 'birdies' ? undefined : { display: 'none' }}>
           <BirdieHaulsLedger
             region={region}
             regionUpper={regionUpper}
             mode={mode}
             onRowTap={onRowTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'birdies' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('birdies')}
           />
-        ) : null}
+        </div>
       </div>
     </DiscoverBand>
   );

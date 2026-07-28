@@ -11,6 +11,7 @@ import { FONT } from './gamingLightTokens';
 import { formatRelativeAgo } from '@/i18n/format';
 import { matchesRegionScope, regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 
 
 type EventType =
@@ -118,15 +119,28 @@ function isGold(type: EventType) {
 interface WeekInGolfRailProps {
   region?: string | null;
   onSectionShown?: () => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
-export function WeekInGolfRail({ region = null }: WeekInGolfRailProps = {}) {
+export function WeekInGolfRail({ region = null, onEmpty }: WeekInGolfRailProps = {}) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id;
   // Pull a wider pool so client-side region filter still yields a full rail.
   const { data, isLoading, isError, error } = useWeekInGolf(48, userId);
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const allRows = data ?? [];
+  // rank_unlocked events are region-agnostic by design — show only worldwide.
+  const scoped = allRows.filter((r) => {
+    if (r.event_type === 'rank_unlocked') return region == null;
+    return matchesRegionScope(region, r.course_country ?? null, r.course_region ?? null);
+  });
+
+  // Resolved and empty only — never while loading.
+  const resolvedEmpty = !isLoading && !isError && scoped.length < 3;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
 
   if (isError) {
     // silent — garnish section
@@ -136,17 +150,12 @@ export function WeekInGolfRail({ region = null }: WeekInGolfRailProps = {}) {
   }
   if (isLoading) return null;
 
-  const allRows = data ?? [];
-  // rank_unlocked events are region-agnostic by design — show only worldwide.
-  const scoped = allRows.filter((r) => {
-    if (r.event_type === 'rank_unlocked') return region == null;
-    return matchesRegionScope(region, r.course_country ?? null, r.course_region ?? null);
-  });
-
   const eyebrow = 'THIS WEEK IN GOLF';
 
   if (scoped.length < 3) {
-    if (region == null) return null;
+    // Scoped-empty rails render nothing at all; the page owns the single
+    // consolidated empty state.
+    if (region == null || isHideableScope(region)) return null;
     return (
       <section style={{ marginTop: 32, fontFamily: FONT }}>
         <SectionHead overline={eyebrow} title="Moments from the community" paddingX={16} />
@@ -157,6 +166,7 @@ export function WeekInGolfRail({ region = null }: WeekInGolfRailProps = {}) {
       </section>
     );
   }
+
 
   const ordered = interleave(scoped.slice(0, 12));
   const hasOlder = ordered.some((r) => (r.window_days ?? 0) > 7);

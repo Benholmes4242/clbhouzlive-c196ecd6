@@ -26,6 +26,8 @@ import { LedgerSubline } from './PinIcon';
 
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { DiscoverBand } from './DiscoverBand';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
 import { slugToCacheRegion } from './regionScope';
 
@@ -116,16 +118,18 @@ interface Props {
   userId: string | undefined;
   /** Rendered inside the canonical Discover containment card. */
   inCard?: boolean;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 const LEDGER_ROWS = 5;
 const CONQUEST_CAP = 6;
 
-export function TheRecordBook({ region, mode, opener, userId, inCard = false }: Props) {
+export function TheRecordBook({ region, mode, opener, userId, inCard = false, onEmpty }: Props) {
   const sectionMarginTop = inCard ? 0 : SPACE.sectionSection;
   const headerPaddingTop = inCard ? 12 : 0;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { data } = useRegionFeats(region, 'records', mode);
+  const { data, isLoading } = useRegionFeats(region, 'records', mode);
 
   const allRows = useMemo(() => {
     const raw = data ?? [];
@@ -134,9 +138,17 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
 
   const ledgerRows = useMemo(() => allRows.slice(0, LEDGER_ROWS), [allRows]);
 
+  const resolvedEmpty = !isLoading && ledgerRows.length === 0;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
+
+  // The containment card lives inside the component so a hidden rail takes
+  // its card with it — no empty band left behind.
+  const wrap = (node: React.ReactNode) =>
+    inCard ? <DiscoverBand>{node}</DiscoverBand> : <>{node}</>;
+
   if (ledgerRows.length === 0) {
-    if (region == null) return null;
-    return (
+    if (region == null || isHideableScope(region)) return null;
+    return wrap(
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT, color: INK }}>
         <SectionHead
           overline={mode === 'alltime' ? 'All-time course records' : 'Latest course records'}
@@ -148,9 +160,10 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
         <EmptyScopeCard
           title={`No records set ${regionScopePhrase(region)} yet — the book is open.`}
         />
-      </section>
+      </section>,
     );
   }
+
 
   const handleRowTap = (row: FeatRow) => {
     if (row.score_id) opener?.openByScore(row.score_id, null, row.user_id);
@@ -164,7 +177,7 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
   const cinematic = !!leadImage;
   const restRows = cinematic ? ledgerRows.slice(1) : ledgerRows;
 
-  return (
+  return wrap(
     <section
       style={{
         marginTop: sectionMarginTop,
@@ -222,7 +235,7 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false }: 
         onRowTap={handleRowTap}
         initialMode={mode}
       />
-    </section>
+    </section>,
   );
 }
 

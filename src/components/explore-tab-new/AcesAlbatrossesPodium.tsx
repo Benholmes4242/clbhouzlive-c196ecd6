@@ -11,6 +11,7 @@ import { StatRow } from './StatRow';
 import { LedgerSubline } from './PinIcon';
 import { HoleContextLine, holeContextParts } from './HoleContextLine';
 import { formatHcp } from '@/lib/formatHcp';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 
 const MAX_ROWS = 10;
 const INK_MUTE = 'rgba(15,23,42,0.55)';
@@ -39,6 +40,8 @@ interface Props {
   metric?: 'aces' | 'albatrosses';
   onRowTap?: (userId: string) => void;
   onLatestRowTap?: (row: FeatRow) => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 // Moments of the game.
@@ -50,10 +53,12 @@ export function AcesAlbatrossesPodium({
   metric = 'aces',
   onRowTap,
   onLatestRowTap,
+  onEmpty,
 }: Props) {
   const isAllTime = mode === 'alltime';
-  const { data: latestData } = useRegionFeats(region, 'legendary', 'latest');
-  const { data: leadersData } = useRegionLegendaryLeaders(region);
+  const { data: latestData, isLoading: latestLoading } = useRegionFeats(region, 'legendary', 'latest');
+  const { data: leadersData, isLoading: leadersLoading } = useRegionLegendaryLeaders(region);
+  const isLoading = isAllTime ? leadersLoading : latestLoading;
 
   const merged = useMemo(() => {
     if (isAllTime) return [];
@@ -77,7 +82,15 @@ export function AcesAlbatrossesPodium({
   }, [isAllTime, leadersData, metric]);
 
   const empty = isAllTime ? leaders.length === 0 : merged.length === 0;
+  // Guard added: the podium had none — it rendered a blank block while the
+  // payload was still resolving, and a bare "None yet." once it had.
+  const resolvedEmpty = !isLoading && empty;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
+
+  if (isLoading) return null;
+
   if (empty) {
+    if (isHideableScope(region)) return null;
     return (
       <div
         style={{
@@ -92,6 +105,7 @@ export function AcesAlbatrossesPodium({
       </div>
     );
   }
+
 
   if (isAllTime) {
     const singular = metric === 'aces' ? 'HOLE IN ONE' : 'ALBATROSS';

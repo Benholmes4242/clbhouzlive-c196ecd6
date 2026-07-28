@@ -12,6 +12,7 @@ import { FONT } from './gamingLightTokens';
 import { StatRow } from './StatRow';
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
 import { LedgerSubline } from './PinIcon';
 import { HoleContextLine, holeContextParts } from './HoleContextLine';
@@ -51,6 +52,8 @@ interface Props {
   /** Controlled "View all" sheet (used by the merged Moments section). */
   sheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 export function BirdieHaulsLedger({
@@ -60,6 +63,7 @@ export function BirdieHaulsLedger({
   hideHeader = false,
   sheetOpen: sheetOpenProp,
   onSheetOpenChange,
+  onEmpty,
 }: Props) {
   const { data, isLoading } = useRegionFeats(region, 'birdie_hauls', mode);
   const rows = useMemo(() => sortBirdieHauls(data ?? [], mode), [data, mode]);
@@ -72,8 +76,11 @@ export function BirdieHaulsLedger({
   const display = rows.slice(0, ROWS);
   const overlineLabel = mode === 'alltime' ? 'All-time birdie hauls' : 'Latest birdie hauls';
 
+  const resolvedEmpty = !isLoading && display.length === 0;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
+
   if (!isLoading && display.length === 0) {
-    if (region == null) return null;
+    if (region == null || isHideableScope(region)) return null;
     return (
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
         {hideHeader ? null : <SectionHead overline={overlineLabel} paddingX={14} />}
