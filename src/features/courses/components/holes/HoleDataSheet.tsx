@@ -14,6 +14,7 @@ import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
+import { AddHolePhotoRow } from './AddHolePhotoRow';
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -366,6 +367,7 @@ export const HoleDataSheet: React.FC<Props> = ({
               open={!collapsed && openHole === h.hole_no}
               onToggle={() => toggle(h.hole_no)}
               viewerHasPlayed={viewerHasPlayed}
+              courseId={courseId}
             />
           ))}
           {collapsed && sortedByHole.length >= 3 && (
@@ -819,7 +821,8 @@ const HoleCard: React.FC<{
   open: boolean;
   onToggle: () => void;
   viewerHasPlayed: boolean;
-}> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed }) => {
+  courseId?: string;
+}> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed, courseId }) => {
   const { t } = useTranslation(['courses']);
   const fieldOver = row.avg_to_par;
   const showYou = viewerHasPlayed && mine != null;
@@ -934,7 +937,7 @@ const HoleCard: React.FC<{
         </div>
       </div>
 
-      {open && <ExpandedCard row={row} mine={mine} viewerHasPlayed={viewerHasPlayed} />}
+      {open && <ExpandedCard row={row} mine={mine} viewerHasPlayed={viewerHasPlayed} courseId={courseId} />}
     </div>
   );
 };
@@ -947,7 +950,8 @@ const ExpandedCard: React.FC<{
   row: CourseHole;
   mine: MyHolePerformanceRow | null;
   viewerHasPlayed: boolean;
-}> = ({ row, mine, viewerHasPlayed }) => {
+  courseId?: string;
+}> = ({ row, mine, viewerHasPlayed, courseId }) => {
   const parOrBetterPct = Math.round(pctSum(row, ['ace', 'albatross', 'eagle', 'birdie', 'par']));
   const overPct = pctSum(row, ['bogey', 'double']);
   const bogeyDescriptor = overPct >= 70
@@ -980,6 +984,12 @@ const ExpandedCard: React.FC<{
   return (
     <div style={{ padding: '0 14px 14px' }}>
       <div style={{ height: 1, background: INK_06, marginTop: 0, marginBottom: 12 }} />
+
+      <div style={{ marginBottom: 12 }}>
+        <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} eligible={viewerHasPlayed} />
+      </div>
+
+
 
       <div style={{ fontSize: 11.5, color: INK_55, lineHeight: 1.5, marginBottom: LABEL_GAP }}>
         {sentence}

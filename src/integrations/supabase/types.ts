@@ -3306,6 +3306,97 @@ export type Database = {
           },
         ]
       }
+      course_hole_media: {
+        Row: {
+          auto_confidence: number | null
+          auto_notes: string | null
+          auto_verdict: string | null
+          course_id: string
+          created_at: string
+          exif_captured_at: string | null
+          exif_lat: number | null
+          exif_lng: number | null
+          file_name: string | null
+          height: number | null
+          hole_no: number
+          id: string
+          media_url: string
+          proof_score_id: string | null
+          reject_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          auto_confidence?: number | null
+          auto_notes?: string | null
+          auto_verdict?: string | null
+          course_id: string
+          created_at?: string
+          exif_captured_at?: string | null
+          exif_lat?: number | null
+          exif_lng?: number | null
+          file_name?: string | null
+          height?: number | null
+          hole_no: number
+          id?: string
+          media_url: string
+          proof_score_id?: string | null
+          reject_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          auto_confidence?: number | null
+          auto_notes?: string | null
+          auto_verdict?: string | null
+          course_id?: string
+          created_at?: string
+          exif_captured_at?: string | null
+          exif_lat?: number | null
+          exif_lng?: number | null
+          file_name?: string | null
+          height?: number | null
+          hole_no?: number
+          id?: string
+          media_url?: string
+          proof_score_id?: string | null
+          reject_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_hole_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "course_hole_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_hole_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
       course_media: {
         Row: {
           course_id: string

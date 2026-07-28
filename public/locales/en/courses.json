@@ -57,6 +57,20 @@
       "body": "Tee cards are built from members' synced rounds. Sync your WHS handicap and the tees you play will appear."
     }
   },
+  "holePhoto": {
+    "add": "Add a photo of the {{hole}}",
+    "uploading": "Uploading… {{percent}}%",
+    "thanks": "Thanks — we'll check it and add it to the hole shortly.",
+    "failed": "Couldn't upload that photo",
+    "inReview": "In review",
+    "inReviewNote": "Only you can see this until it's approved.",
+    "notUsed": "Not used",
+    "notUsedNote": "This photo wasn't added to the hole.",
+    "live": "Live",
+    "liveNote": "Your photo is on this hole.",
+    "credit": "Photo by {{name}}",
+    "alt": "Photo of hole {{hole}}"
+  },
   "holes": {
     "detailsA11y": "Hole {{holeNo}} details",
     "parLabel": "Par {{par}}",
