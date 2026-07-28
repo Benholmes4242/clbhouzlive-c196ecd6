@@ -205,8 +205,8 @@ export const HoleDataSheet: React.FC<Props> = ({
         </h2>
         <p style={{ margin: '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
           {viewerHasPlayed
-            ? t('courses:holes.clubGuide.bodySignedIn', { count: formatNumber(totalRounds) })
-            : t('courses:holes.clubGuide.bodySignedOut', { count: formatNumber(totalRounds) })}
+            ? t('courses:holes.clubGuide.bodySignedIn', { count: totalRounds, rounds: formatNumber(totalRounds) })
+            : t('courses:holes.clubGuide.bodySignedOut', { count: totalRounds, rounds: formatNumber(totalRounds) })}
         </p>
       </section>
       )}
