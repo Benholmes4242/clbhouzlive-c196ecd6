@@ -1,6 +1,7 @@
 // DetailRows - three tap-through rows: course, actor, schedule.
 
-import { ChevronRight, MapPin, User2, Clock } from 'lucide-react';
+import { ChevronRight, MapPin, User2, Clock, Flag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { StageCourse } from '../hooks/useStageComposer';
 import type { ActiveActor } from '@/types/actor';
 import { formatSchedule } from '../lib/formatSchedule';
@@ -17,9 +18,14 @@ interface Props {
   /** Edit mode: actor is display-only; schedule row can be hidden. */
   actorLocked?: boolean;
   showSchedule?: boolean;
+  /** C2: shown only when the primary course has logged rounds for the viewer. */
+  showAttachRound?: boolean;
+  attachRoundLabel?: string | null;
+  onOpenAttachRound?: () => void;
 }
 
-export default function DetailRows({ course, courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
+export default function DetailRows({ course, courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true, showAttachRound, attachRoundLabel, onOpenAttachRound }: Props) {
+  const { t } = useTranslation('composer');
   const list = courses ?? (course ? [course] : []);
   const courseLabel = list.length === 0
     ? null
@@ -29,6 +35,9 @@ export default function DetailRows({ course, courses, onOpenCourse, actor, onOpe
   return (
     <div style={{ background: '#F8FAFC' }}>
       <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={courseLabel} onClick={onOpenCourse} />
+      {showAttachRound && onOpenAttachRound && (
+        <Row icon={<Flag size={16} color="#F7931E" />} label={t('attachRound.row')} value={attachRoundLabel ?? null} onClick={onOpenAttachRound} />
+      )}
       <Row icon={<User2 size={16} color="#F7931E" />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
       {showSchedule && (
         <Row icon={<Clock size={16} color="#F7931E" />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
