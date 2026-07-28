@@ -111,8 +111,10 @@
     "aceA11y": "Hole in one",
     "clubGuide": {
       "title": "How the course plays",
-      "bodySignedIn": "Built from {{count}} official rounds — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedOut": "Built from {{count}} official rounds — the community's scoring on every hole."
+      "bodySignedIn_one": "Built from {{rounds}} official round — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{rounds}} official rounds — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{rounds}} official round — the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{rounds}} official rounds — the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
     "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
@@ -193,7 +195,8 @@
     "preview": {
       "eyebrow": "Hole by hole",
       "title": "How the field scores every hole",
-      "description": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{count}} rounds{{personal}}.",
+      "description_one": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{rounds}} round{{personal}}.",
+      "description_other": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{rounds}} rounds{{personal}}.",
       "personalClause": " and your own average alongside",
       "descriptionNoRounds": "Par, stroke index and yardage for all {{holes}}, with the spread of scores across the field.",
       "legendBirdie": "Birdie+",
