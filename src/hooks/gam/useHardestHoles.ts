@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+/** Scoring spread for a hole, as percentages (0-100, one decimal). */
+export interface HoleScoreDistribution {
+  birdie_plus: number;
+  par: number;
+  bogey: number;
+  double_plus: number;
+}
+
 export interface HardestHoleRow {
   course_id: string;
   course_name: string;
@@ -12,6 +20,8 @@ export interface HardestHoleRow {
   plays_to: number;
   avg_over: number;
   rounds: number;
+  /** Present on every row in the live cache; render defensively if absent. */
+  dist: HoleScoreDistribution;
 }
 
 export type HoleIndexMode = 'hardest' | 'easiest';
