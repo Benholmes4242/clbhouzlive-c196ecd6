@@ -236,6 +236,7 @@ function LegendarySection({
   hideHeader = false,
   sheetOpen: sheetOpenProp,
   onSheetOpenChange,
+  onEmpty,
 }: {
   region: string | null;
   regionUpper: string;
@@ -245,6 +246,7 @@ function LegendarySection({
   hideHeader?: boolean;
   sheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
+  onEmpty?: OnRailEmpty;
 }) {
   const { data } = useRegionFeats(region, 'legendary');
   const rows = useMemo(() => data ?? [], [data]);
