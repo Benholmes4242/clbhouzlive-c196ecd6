@@ -161,15 +161,22 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Attack / Defend band — absorbs "Your next conquests" */}
         <AttackDefendBand userId={userId} region={activeRegion} />
 
-        <DiscoverBand>
-          <TheRecordBook region={activeRegion} opener={opener} mode={scope} userId={userId} inCard />
-        </DiscoverBand>
+        {/* The record book owns its own containment card so a hidden rail
+            takes the band with it. */}
+        <TheRecordBook
+          region={activeRegion}
+          opener={opener}
+          mode={scope}
+          userId={userId}
+          inCard
+          onEmpty={reporter('records')}
+        />
 
 
 
 
         {/* This week in golf — honours rail */}
-        <WeekInGolfRail region={activeRegion} />
+        <WeekInGolfRail region={activeRegion} onEmpty={reporter('week')} />
 
 
         {/* Season race */}
@@ -182,6 +189,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
           mode={scope}
           onRowTap={handleFeatRowTap}
           onLeaderTap={handleLeaderTap}
+          onEmpty={reporter('moments')}
         />
 
         {/* Toughest courses index */}
