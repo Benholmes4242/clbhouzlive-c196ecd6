@@ -514,6 +514,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
+      {/* Attached round — scorecard block sits ABOVE media */}
+      {postRound && (
+        <PostRoundCard
+          round={postRound}
+          onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
+        />
+      )}
+
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
