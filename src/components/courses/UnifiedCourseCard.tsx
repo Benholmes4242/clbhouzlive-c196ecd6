@@ -96,7 +96,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   contextTag,
   activeListSlug = null,
   statChip = null,
+  statLine = null,
   viewerStatus = null,
+
 
   onClick,
   className = '',
