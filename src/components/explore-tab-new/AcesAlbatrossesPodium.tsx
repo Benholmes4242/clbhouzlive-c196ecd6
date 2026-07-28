@@ -39,6 +39,8 @@ interface Props {
   metric?: 'aces' | 'albatrosses';
   onRowTap?: (userId: string) => void;
   onLatestRowTap?: (row: FeatRow) => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 // Moments of the game.
