@@ -126,7 +126,11 @@
       }
     }
   },
+  "sharePrompt": {
+    "action": "Share this round"
+  },
   "feed": {
+
     "courseLine": {
       "avgOverPar": "Avg over par",
       "roundsTracked": "Rounds tracked",
