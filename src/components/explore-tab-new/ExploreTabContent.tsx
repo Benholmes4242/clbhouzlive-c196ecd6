@@ -215,7 +215,7 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
                 Early days
               </div>
               <div style={{ fontSize: 14, fontWeight: 650, color: '#0F172A', lineHeight: 1.3 }}>
-                {regionLabelFor(activeRegion)} is still filling up — records, honours and hauls
+                {feedRegionLabel} is still filling up — records, honours and hauls
                 will appear here as rounds land.
               </div>
             </div>
