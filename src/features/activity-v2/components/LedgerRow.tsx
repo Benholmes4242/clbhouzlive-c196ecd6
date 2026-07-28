@@ -4,18 +4,23 @@
  * body column -> optional right element -> unread dot.
  */
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ratingTextColor } from '@/lib/ratingTier';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
 import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds';
+
 
 const GEIST =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
