@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, MapPin, RefreshCw, Table } from 'lucide-react';
+import { User, MapPin, RefreshCw, Table, Share2 } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -68,6 +68,8 @@ export interface CardScorecardSheetProps {
   // FOOTER
   onViewProfile?: () => void;
   onViewCourse?: () => void;
+  /** C3 — shown only for the viewer's own round; opens the composer pre-filled. */
+  onShareRound?: () => void;
 }
 
 function fmtRel(n: number | null): string {
@@ -361,7 +363,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   holes, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId,
-  onViewProfile, onViewCourse,
+  onViewProfile, onViewCourse, onShareRound,
 }) => {
   const { t } = useTranslation(['courses']);
   void emptyMessage;
@@ -389,7 +391,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
-  const showFooter = !!onViewProfile || !!onViewCourse;
+  const showFooter = !!onViewProfile || !!onViewCourse || !!onShareRound;
 
   return (
     <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={CANVAS} style={{ background: CANVAS, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
@@ -547,7 +549,25 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           )}
         </div>
 
-        {/* FOOTER — two buttons */}
+        {/* FOOTER — share row, then the two navigation buttons */}
+        {onShareRound && (
+          <div style={{ padding: '4px 16px 0', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={onShareRound}
+              style={{
+                width: '100%', background: '#FFFFFF', border: `1px solid ${INK}`,
+                borderRadius: 13, padding: '12px 14px',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                fontFamily: GEIST, fontSize: 13.5, fontWeight: 800, color: INK,
+                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <Share2 size={16} strokeWidth={2} />
+              {t('courses:scorecard.shareRound')}
+            </button>
+          </div>
+        )}
         {showFooter && (
           <div style={{
             display: 'flex', gap: 8,
