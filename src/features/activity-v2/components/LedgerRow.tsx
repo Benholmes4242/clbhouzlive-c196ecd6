@@ -200,9 +200,72 @@ const ResolvePill: React.FC = () => (
   </span>
 );
 
+// -- C4 share prompt action ------------------------------------------
+// Reuses the RoundDetailSheet path: openPostStudioForRound. Never posts.
+const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ candidate }) => {
+  const { t } = useTranslation('common');
+  const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
+  const shown = useRef(false);
+
+  useEffect(() => {
+    if (shown.current) return;
+    shown.current = true;
+    analyticsEvents.track('share_prompt_shown', {
+      notif_id: candidate.notif_id,
+      notif_type: candidate.notif_type,
+      category: candidate.category,
+      course_id: candidate.course_id,
+      whs_score_id: candidate.whs_score_id,
+    });
+  }, [candidate]);
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        analyticsEvents.track('share_prompt_tapped', {
+          notif_id: candidate.notif_id,
+          notif_type: candidate.notif_type,
+          category: candidate.category,
+          course_id: candidate.course_id,
+          whs_score_id: candidate.whs_score_id,
+        });
+        analyticsEvents.track('round_share_opened', {
+          whs_score_id: candidate.whs_score_id,
+          course_id: candidate.course_id,
+          source: 'share_prompt',
+        });
+        openPostStudioForRound({
+          course: {
+            id: candidate.course_id,
+            name: candidate.course_name ?? '',
+            country: candidate.course_country,
+          },
+          whsScoreId: candidate.whs_score_id,
+        });
+      }}
+      style={{
+        marginTop: 7,
+        padding: '6px 11px',
+        borderRadius: 20,
+        border: `1px solid ${T.AMBER}`,
+        background: 'transparent',
+        color: T.AMBER_DEEP,
+        fontSize: 11.5,
+        fontWeight: 700,
+        fontFamily: GEIST,
+        cursor: 'pointer',
+      }}
+    >
+      {t('sharePrompt.action')}
+    </button>
+  );
+};
+
 // ---------------------------------------------------------------------
 
 export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const spec = resolveKind(row);
