@@ -168,6 +168,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const onLensChange = (next: StatLens) => {
     analyticsEvents.track('stat_browse_lens_changed', { from: lens, to: next });
+    safeLocalStorage.set(LENS_STORAGE_KEY, next);
     writeUrl({ lens: next });
   };
 
