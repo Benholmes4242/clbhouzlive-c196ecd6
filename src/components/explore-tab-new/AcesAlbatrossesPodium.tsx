@@ -11,6 +11,7 @@ import { StatRow } from './StatRow';
 import { LedgerSubline } from './PinIcon';
 import { HoleContextLine, holeContextParts } from './HoleContextLine';
 import { formatHcp } from '@/lib/formatHcp';
+import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 
 const MAX_ROWS = 10;
 const INK_MUTE = 'rgba(15,23,42,0.55)';
