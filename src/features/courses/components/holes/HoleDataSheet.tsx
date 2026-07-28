@@ -819,7 +819,8 @@ const HoleCard: React.FC<{
   open: boolean;
   onToggle: () => void;
   viewerHasPlayed: boolean;
-}> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed }) => {
+  courseId?: string;
+}> = ({ row, mine, isHardest, isBirdied, open, onToggle, viewerHasPlayed, courseId }) => {
   const { t } = useTranslation(['courses']);
   const fieldOver = row.avg_to_par;
   const showYou = viewerHasPlayed && mine != null;
@@ -947,7 +948,8 @@ const ExpandedCard: React.FC<{
   row: CourseHole;
   mine: MyHolePerformanceRow | null;
   viewerHasPlayed: boolean;
-}> = ({ row, mine, viewerHasPlayed }) => {
+  courseId?: string;
+}> = ({ row, mine, viewerHasPlayed, courseId }) => {
   const parOrBetterPct = Math.round(pctSum(row, ['ace', 'albatross', 'eagle', 'birdie', 'par']));
   const overPct = pctSum(row, ['bogey', 'double']);
   const bogeyDescriptor = overPct >= 70
