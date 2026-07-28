@@ -19958,6 +19958,7 @@ export type Database = {
           course_name: string
           course_region: string
           gap: number
+          hero_image_url: string
           my_value: number
           threat_score: number
         }[]
