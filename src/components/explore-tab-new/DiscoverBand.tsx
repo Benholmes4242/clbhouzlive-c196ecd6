@@ -18,20 +18,32 @@ export function DiscoverBand({
   children,
   style,
   marginTop = SPACE.sectionSection,
+  hidden = false,
 }: {
   children: ReactNode;
   style?: CSSProperties;
   marginTop?: number;
+  /**
+   * Visually removes the band (including its rules and spacing) while keeping
+   * children mounted — used by scope-driven sections whose children must stay
+   * alive to keep reporting their emptiness.
+   */
+  hidden?: boolean;
 }) {
   return (
     <section
-      style={{
-        marginTop,
-        background: '#FFFFFF',
-        borderTop: `1px solid ${BAND_RULE}`,
-        borderBottom: `1px solid ${BAND_RULE}`,
-        ...style,
-      }}
+      style={
+        hidden
+          ? { display: 'none' }
+          : {
+              marginTop,
+              background: '#FFFFFF',
+              borderTop: `1px solid ${BAND_RULE}`,
+              borderBottom: `1px solid ${BAND_RULE}`,
+              ...style,
+            }
+      }
+      aria-hidden={hidden || undefined}
     >
       {children}
     </section>
