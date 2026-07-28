@@ -177,7 +177,7 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false, on
   const cinematic = !!leadImage;
   const restRows = cinematic ? ledgerRows.slice(1) : ledgerRows;
 
-  return (
+  return wrap(
     <section
       style={{
         marginTop: sectionMarginTop,
