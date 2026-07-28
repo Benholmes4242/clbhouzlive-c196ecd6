@@ -275,7 +275,12 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
             tone: mode === 'friendliest' ? 'good' : 'danger',
           }]}
           title={lead.course_name}
-          subtitle={`${lead.total_rounds} rounds`}
+          subtitle={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span className="tabular-nums">{lead.total_rounds} rounds</span>
+              {isEarlyData(lead.total_rounds) ? <EarlyDataBadge tone="glass" /> : null}
+            </span>
+          }
           figure={`${mode === 'friendliest' && lead.avg_over_par < 0 ? '' : '+'}${numFmt(lead.avg_over_par, 1)}`}
           figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
           onTap={() => navigate(`/courses/${lead.course_id}`, { state: { activeTab: 'holes' } })}
@@ -478,17 +483,27 @@ function CourseIndexSheet({
                     {avg}
                   </div>
                   <div
-                    className="tabular-nums"
                     style={{
                       marginTop: 3,
-                      fontSize: 10,
-                      fontWeight: 600,
-                      color: MUTE,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      gap: 4,
                     }}
                   >
-                    {c.total_rounds} rds
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: MUTE,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {c.total_rounds} rds
+                    </span>
+                    {isEarlyData(c.total_rounds) ? <EarlyDataBadge /> : null}
                   </div>
                 </div>
               </button>
