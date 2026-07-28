@@ -52,6 +52,16 @@ interface Props {
   progressPct?: number | null;
   progressColor?: string;
   onTap?: () => void;
+  /**
+   * 'default' keeps the full-bleed lead entry used by TheRecordBook and
+   * AttackDefendBand. 'carousel' is the tighter 16/12 rounded card used in
+   * the Toughest index rail.
+   */
+  variant?: 'default' | 'carousel';
+  /** Optional glass badge pinned to the top right (carousel variant). */
+  topRight?: ReactNode;
+  /** Optional small line under the subtitle (carousel variant). */
+  metaLine?: ReactNode;
 }
 
 export function CinematicLeadCard({
@@ -65,7 +75,11 @@ export function CinematicLeadCard({
   progressPct = null,
   progressColor = '#F7931E',
   onTap,
+  variant = 'default',
+  topRight,
+  metaLine,
 }: Props) {
+  const carousel = variant === 'carousel';
   return (
     <button
       type="button"
@@ -81,7 +95,17 @@ export function CinematicLeadCard({
         fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 10', overflow: 'hidden' }}>
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: carousel ? '16 / 12' : '16 / 10',
+          borderRadius: carousel ? 14 : 0,
+          overflow: 'hidden',
+          background: 'linear-gradient(155deg, #20262F 0%, #0E1218 100%)',
+        }}
+      >
+        {imageUrl ? (
         <img
           src={getOptimizedImageUrl(imageUrl, { width: 800 })}
           srcSet={generateImageSrcSet(imageUrl, [{ width: 480 }, { width: 800 }, { width: 1200 }])}
@@ -91,6 +115,7 @@ export function CinematicLeadCard({
           decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
+        ) : null}
 
         {/* Bottom scrim */}
         <div
@@ -147,6 +172,10 @@ export function CinematicLeadCard({
           </div>
         ) : null}
 
+        {topRight ? (
+          <div style={{ position: 'absolute', top: 12, right: 12 }}>{topRight}</div>
+        ) : null}
+
         {/* Bottom row - title/subtitle left, figure right */}
         <div
           style={{
@@ -163,11 +192,11 @@ export function CinematicLeadCard({
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
-                fontSize: 17,
+                fontSize: carousel ? 15.5 : 17,
                 fontWeight: 800,
                 color: '#FFFFFF',
                 letterSpacing: '-0.02em',
-                lineHeight: 1.15,
+                lineHeight: carousel ? 1.22 : 1.15,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 display: '-webkit-box',
@@ -182,9 +211,9 @@ export function CinematicLeadCard({
               <div
                 style={{
                   marginTop: 4,
-                  fontSize: 12,
+                  fontSize: carousel ? 11 : 12,
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.80)',
+                  color: carousel ? 'rgba(255,255,255,0.66)' : 'rgba(255,255,255,0.80)',
                   lineHeight: 1.2,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -195,12 +224,29 @@ export function CinematicLeadCard({
                 {subtitle}
               </div>
             ) : null}
+            {metaLine ? (
+              <div
+                style={{
+                  marginTop: 3,
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.8)',
+                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {metaLine}
+              </div>
+            ) : null}
           </div>
 
           <div style={{ flexShrink: 0, textAlign: 'right' }}>
             <div
               style={{
-                fontSize: 34,
+                fontSize: carousel ? 32 : 34,
                 fontWeight: 800,
                 color: '#FFFFFF',
                 letterSpacing: '-0.03em',
@@ -215,11 +261,11 @@ export function CinematicLeadCard({
               <div
                 style={{
                   marginTop: 4,
-                  fontSize: 9.5,
+                  fontSize: carousel ? 9 : 9.5,
                   fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  letterSpacing: carousel ? '0.12em' : '0.08em',
                   textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.78)',
+                  color: carousel ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.78)',
                   lineHeight: 1,
                   fontVariantNumeric: 'tabular-nums',
                 }}

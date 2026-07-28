@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   useNotableDifficultCourses,
@@ -9,7 +9,7 @@ import { SectionHead } from './SectionHead';
 import { regionScopePhrase, matchesRegionScope } from './regionScope';
 import { FONT } from './gamingLightTokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { AMBER, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
+import { INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { REGION_TABS } from './AlmanacSections';
 import { DiscoverBand } from './DiscoverBand';
 import { CinematicLeadCard } from './CinematicLeadCard';
@@ -67,7 +67,8 @@ function regionLabel(slug: string | null | undefined): string {
 }
 
 // Vertical list row: 44px thumbnail, name, difficulty bar, figure.
-function CourseIndexRow({
+// Retained (exported) for other rails - the index itself is a carousel now.
+export function CourseIndexRow({
   rank,
   course,
   mode,
@@ -190,6 +191,9 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
   const [mode, setMode] = useState<CourseIndexMode>('toughest');
   const { data } = useNotableDifficultCourses(mode);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const filtered = useMemo(
     () => (data ?? []).filter((c) => matchesRegionScope(region, c.course_country, c.course_region)),
@@ -198,15 +202,35 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
   const rows = filtered.slice(0, MAX);
   const scope = regionScopePhrase(region);
   const title = mode === 'friendliest' ? `Friendliest courses ${scope}` : `Toughest courses ${scope}`;
+  const accent = mode === 'friendliest' ? GREEN : RED;
+
+  // Active dot derived from scroll position, coalesced into one rAF tick.
+  const onRailScroll = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const el = railRef.current;
+      if (!el) return;
+      const count = el.children.length;
+      if (count === 0) return;
+      const step = el.scrollWidth / count;
+      const next = Math.max(0, Math.min(count - 1, Math.round(el.scrollLeft / step)));
+      setActiveIndex((prev) => (prev === next ? prev : next));
+    });
+  }, []);
+
+  useEffect(() => () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  // Mode switch returns the rail to the first card.
+  useEffect(() => {
+    const el = railRef.current;
+    if (el) el.scrollTo({ left: 0, behavior: 'auto' });
+    setActiveIndex(0);
+  }, [mode]);
 
   if (rows.length === 0) return null;
-
-  const lead = rows[0];
-  const leadImage = lead?.thumbnail_image ?? null;
-  const cinematic = !!leadImage;
-  const restRows = cinematic ? rows.slice(1) : rows;
-  const accent = mode === 'friendliest' ? GREEN : RED;
-  const maxAvg = Math.max(...rows.map((c) => Math.abs(c.avg_over_par)), 1);
 
   return (
     <DiscoverBand marginTop={32}>
@@ -216,6 +240,7 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
           title={title}
           meta="View all"
           onMeta={() => setSheetOpen(true)}
+          overlineColor={accent}
           paddingX={0}
           paddingBottom={10}
         />
@@ -266,38 +291,73 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
         </div>
       </div>
 
-      {cinematic ? (
-        <CinematicLeadCard
-          imageUrl={leadImage!}
-          alt={lead.course_name}
-          chips={[{
-            label: mode === 'friendliest' ? 'No.1 scoreable' : 'No.1 toughest',
-            tone: mode === 'friendliest' ? 'good' : 'danger',
-          }]}
-          title={lead.course_name}
-          subtitle={
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span className="tabular-nums">{lead.total_rounds} rounds</span>
-              {isEarlyData(lead.total_rounds) ? <EarlyDataBadge tone="glass" /> : null}
-            </span>
-          }
-          figure={`${mode === 'friendliest' && lead.avg_over_par < 0 ? '' : '+'}${numFmt(lead.avg_over_par, 1)}`}
-          figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
-          onTap={() => navigate(`/courses/${lead.course_id}`, { state: { activeTab: 'holes' } })}
-        />
-      ) : null}
+      <div
+        ref={railRef}
+        onScroll={onRailScroll}
+        className="toughest-rail"
+        style={{
+          display: 'flex',
+          gap: 10,
+          padding: '0 14px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        <style>{'.toughest-rail::-webkit-scrollbar{display:none}'}</style>
+        {rows.map((c, i) => {
+          const location = [c.course_region, c.course_country].filter(Boolean).join(', ');
+          const rankLabel = i === 0
+            ? (mode === 'friendliest' ? 'No.1 scoreable' : 'No.1 toughest')
+            : `No.${i + 1}`;
+          return (
+            <div
+              key={c.course_id}
+              style={{
+                flex: '0 0 auto',
+                width: 'min(92vw, 386px)',
+                scrollSnapAlign: 'center',
+              }}
+            >
+              <CinematicLeadCard
+                variant="carousel"
+                imageUrl={c.thumbnail_image ?? ''}
+                alt={c.course_name}
+                chips={[{ label: rankLabel, tone: mode === 'friendliest' ? 'good' : 'danger' }]}
+                topRight={isEarlyData(c.total_rounds) ? <EarlyDataBadge tone="glass" /> : undefined}
+                title={c.course_name}
+                subtitle={location || undefined}
+                metaLine={<span className="tabular-nums">{c.total_rounds} rounds</span>}
+                figure={`${mode === 'friendliest' && c.avg_over_par < 0 ? '' : '+'}${numFmt(c.avg_over_par, 1)}`}
+                figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
+                onTap={() => navigate(`/courses/${c.course_id}`, { state: { activeTab: 'holes' } })}
+              />
+            </div>
+          );
+        })}
+      </div>
 
-      <div>
-        {restRows.map((c, i) => (
-          <CourseIndexRow
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 4,
+          padding: '10px 0 12px',
+        }}
+      >
+        {rows.map((c, i) => (
+          <span
             key={c.course_id}
-            rank={cinematic ? i + 2 : i + 1}
-            course={c}
-            mode={mode}
-            accent={accent}
-            widthPct={Math.max(6, Math.round((Math.abs(c.avg_over_par) / maxAvg) * 100))}
-            isLast={i === restRows.length - 1}
-            onTap={() => navigate(`/courses/${c.course_id}`, { state: { activeTab: 'holes' } })}
+            style={{
+              width: i === activeIndex ? 18 : 5,
+              height: 3,
+              borderRadius: 2,
+              background: i === activeIndex ? accent : 'rgba(15,23,42,0.16)',
+              transition: 'width 0.18s ease, background 0.18s ease',
+            }}
           />
         ))}
       </div>
@@ -364,7 +424,7 @@ function CourseIndexSheet({
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: mode === 'friendliest' ? GREEN : RED,
             marginBottom: 4,
             fontVariantNumeric: 'tabular-nums',
           }}
