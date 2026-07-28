@@ -104,6 +104,8 @@ export interface FeedCardProps {
   isFirstCard?: boolean;
   /** Fires once when this card's primary content is paint-ready (decoded image / first video frame / rAF for text). */
   onContentReady?: () => void;
+  /** Batched course data for this post's course (resolved in Clubhouse.tsx). */
+  courseContext?: PostCourseContext | null;
 }
 
 interface CaptionBlockProps {
