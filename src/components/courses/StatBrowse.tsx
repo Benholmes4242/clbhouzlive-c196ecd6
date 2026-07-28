@@ -75,8 +75,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { data: facets } = useStatBrowseFacets();
 
   /* ── URL state: read + validate against the facets ─────────────── */
+  /**
+   * Lens precedence, highest first:
+   *   1. ?lens= URL param (if a known lens id)
+   *   2. localStorage, the member's last choice (if a known lens id)
+   *   3. 'rated'
+   * Country and region are never persisted — only the lens.
+   */
   const urlLens = searchParams.get('lens');
-  const lens: StatLens = isStatLens(urlLens) ? urlLens : 'toughest';
+  const storedLens = useMemo(() => safeLocalStorage.get(LENS_STORAGE_KEY), []);
+  const lens: StatLens = isStatLens(urlLens)
+    ? urlLens
+    : isStatLens(storedLens)
+      ? storedLens
+      : 'rated';
 
   const urlCountry = searchParams.get('country');
   const country = useMemo(() => {
