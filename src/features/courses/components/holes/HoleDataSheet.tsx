@@ -986,7 +986,7 @@ const ExpandedCard: React.FC<{
       <div style={{ height: 1, background: INK_06, marginTop: 0, marginBottom: 12 }} />
 
       <div style={{ marginBottom: 12 }}>
-        <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} eligible={viewerHasPlayed} />
+        <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} surface="hole_sheet" />
       </div>
 
 
