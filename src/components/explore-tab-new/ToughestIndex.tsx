@@ -14,6 +14,35 @@ import { REGION_TABS } from './AlmanacSections';
 import { DiscoverBand } from './DiscoverBand';
 import { CinematicLeadCard } from './CinematicLeadCard';
 import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
+import { isEarlyData } from '@/lib/earlyData';
+
+/**
+ * EARLY DATA badge - same threshold and visual treatment as the Courses
+ * page stat browse (UnifiedCourseCard). 'glass' sits on imagery, 'light'
+ * on white surfaces.
+ */
+function EarlyDataBadge({ tone = 'light' }: { tone?: 'light' | 'glass' }) {
+  const glass = tone === 'glass';
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        flexShrink: 0,
+        fontSize: 9,
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        borderRadius: 9999,
+        padding: '2px 6px',
+        background: glass ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.06)',
+        color: glass ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.55)',
+      }}
+    >
+      Early data
+    </span>
+  );
+}
 
 const RED = '#D2222D';
 const GREEN = '#0F8F4A';
@@ -128,18 +157,28 @@ function CourseIndexRow({
           {value}
         </div>
         <div
-          className="tabular-nums"
           style={{
             marginTop: 4,
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: MUTE,
-            lineHeight: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 4,
           }}
         >
-          {course.total_rounds} rounds
+          <span
+            className="tabular-nums"
+            style={{
+              fontSize: 9,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTE,
+              lineHeight: 1,
+            }}
+          >
+            {course.total_rounds} rounds
+          </span>
+          {isEarlyData(course.total_rounds) ? <EarlyDataBadge /> : null}
         </div>
       </div>
     </button>
@@ -236,7 +275,12 @@ export function ToughestIndex({ region }: { region?: string | null } = {}) {
             tone: mode === 'friendliest' ? 'good' : 'danger',
           }]}
           title={lead.course_name}
-          subtitle={`${lead.total_rounds} rounds`}
+          subtitle={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span className="tabular-nums">{lead.total_rounds} rounds</span>
+              {isEarlyData(lead.total_rounds) ? <EarlyDataBadge tone="glass" /> : null}
+            </span>
+          }
           figure={`${mode === 'friendliest' && lead.avg_over_par < 0 ? '' : '+'}${numFmt(lead.avg_over_par, 1)}`}
           figureLabel={mode === 'friendliest' ? 'Avg to par' : 'Avg over par'}
           onTap={() => navigate(`/courses/${lead.course_id}`, { state: { activeTab: 'holes' } })}
@@ -439,17 +483,27 @@ function CourseIndexSheet({
                     {avg}
                   </div>
                   <div
-                    className="tabular-nums"
                     style={{
                       marginTop: 3,
-                      fontSize: 10,
-                      fontWeight: 600,
-                      color: MUTE,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      gap: 4,
                     }}
                   >
-                    {c.total_rounds} rds
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: MUTE,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {c.total_rounds} rds
+                    </span>
+                    {isEarlyData(c.total_rounds) ? <EarlyDataBadge /> : null}
                   </div>
                 </div>
               </button>

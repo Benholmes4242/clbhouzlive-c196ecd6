@@ -21,6 +21,7 @@ import UnifiedCourseCard from './UnifiedCourseCard';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
+import { isEarlyData } from '@/lib/earlyData';
 import {
   chipForLens,
   isStatLens,
@@ -191,7 +192,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           : null;
       }
       if (!text) return null;
-      return { text, earlyData: row.rounds < 10 };
+      return { text, earlyData: isEarlyData(row.rounds) };
     },
     [lens, t],
   );
