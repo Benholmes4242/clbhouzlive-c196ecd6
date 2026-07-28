@@ -414,6 +414,8 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         <div style={{ fontSize: 11, fontWeight: 500, color: T.INK_45, marginTop: 2 }}>
           {relativeTime(row.created_at)}
         </div>
+        {sharePrompt && <SharePromptAction candidate={sharePrompt} />}
+
       </div>
       {rightEl && <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{rightEl}</div>}
       {isUnread && (
