@@ -61,6 +61,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   footer,
   activeListSlug = null,
   showGhostRank = false,
+  renderEnrichment,
+  viewerStatusFor,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sampleCardRef = useRef<HTMLDivElement>(null);
@@ -252,8 +254,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
+                viewerStatus={viewerStatusFor?.(course.id) ?? null}
                 onClick={() => handleCardClick(course.id)}
               />
+              {renderEnrichment?.(course.id)}
             </div>
           ))}
         </div>
@@ -283,8 +287,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
+                viewerStatus={viewerStatusFor?.(course.id) ?? null}
                 onClick={() => handleCardClick(course.id)}
               />
+              {renderEnrichment?.(course.id)}
             </div>
           ))}
         </div>
