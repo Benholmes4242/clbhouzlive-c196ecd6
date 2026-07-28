@@ -146,19 +146,38 @@ export async function fetchLiveHolePhoto(
 export interface ProofRound {
   found: boolean;
   playDate: string | null;
+  par: number | null;
 }
 
-/** The logged round backing the submission. Absent proof is not disqualifying. */
-export async function fetchProofRound(proofScoreId: string | null): Promise<ProofRound> {
-  if (!proofScoreId) return { found: false, playDate: null };
+/**
+ * The logged round backing the submission, plus the par the member played on
+ * that hole. Absent proof is shown as absent - never invented.
+ */
+export async function fetchProofRound(
+  proofScoreId: string | null,
+  holeNo?: number,
+): Promise<ProofRound> {
+  if (!proofScoreId) return { found: false, playDate: null, par: null };
   const { data, error } = await sb
     .from('whs_scores')
     .select('id, play_date')
     .eq('id', proofScoreId)
     .maybeSingle();
-  if (error || !data) return { found: false, playDate: null };
-  return { found: true, playDate: (data as any).play_date ?? null };
+  if (error || !data) return { found: false, playDate: null, par: null };
+
+  let par: number | null = null;
+  if (typeof holeNo === 'number') {
+    const { data: hole } = await sb
+      .from('whs_score_holes')
+      .select('par')
+      .eq('score_id', proofScoreId)
+      .eq('hole_no', holeNo)
+      .maybeSingle();
+    par = (hole as any)?.par ?? null;
+  }
+  return { found: true, playDate: (data as any).play_date ?? null, par };
 }
+
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
