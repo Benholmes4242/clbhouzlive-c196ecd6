@@ -157,18 +157,28 @@ function CourseIndexRow({
           {value}
         </div>
         <div
-          className="tabular-nums"
           style={{
             marginTop: 4,
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: MUTE,
-            lineHeight: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 4,
           }}
         >
-          {course.total_rounds} rounds
+          <span
+            className="tabular-nums"
+            style={{
+              fontSize: 9,
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: MUTE,
+              lineHeight: 1,
+            }}
+          >
+            {course.total_rounds} rounds
+          </span>
+          {isEarlyData(course.total_rounds) ? <EarlyDataBadge /> : null}
         </div>
       </div>
     </button>
