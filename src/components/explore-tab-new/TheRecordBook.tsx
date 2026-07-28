@@ -235,7 +235,7 @@ export function TheRecordBook({ region, mode, opener, userId, inCard = false, on
         onRowTap={handleRowTap}
         initialMode={mode}
       />
-    </section>
+    </section>,
   );
 }
 
