@@ -14,6 +14,35 @@ import { REGION_TABS } from './AlmanacSections';
 import { DiscoverBand } from './DiscoverBand';
 import { CinematicLeadCard } from './CinematicLeadCard';
 import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
+import { isEarlyData } from '@/lib/earlyData';
+
+/**
+ * EARLY DATA badge - same threshold and visual treatment as the Courses
+ * page stat browse (UnifiedCourseCard). 'glass' sits on imagery, 'light'
+ * on white surfaces.
+ */
+function EarlyDataBadge({ tone = 'light' }: { tone?: 'light' | 'glass' }) {
+  const glass = tone === 'glass';
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        flexShrink: 0,
+        fontSize: 9,
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        borderRadius: 9999,
+        padding: '2px 6px',
+        background: glass ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.06)',
+        color: glass ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.55)',
+      }}
+    >
+      Early data
+    </span>
+  );
+}
 
 const RED = '#D2222D';
 const GREEN = '#0F8F4A';
