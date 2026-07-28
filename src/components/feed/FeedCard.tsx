@@ -242,6 +242,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
   isFirstCard = false,
   onContentReady,
+  courseContext,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
