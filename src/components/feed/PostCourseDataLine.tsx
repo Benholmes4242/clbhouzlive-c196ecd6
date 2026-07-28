@@ -54,10 +54,12 @@ const Stat: React.FC<{ figure: string; label: string; color?: string }> = ({
 
 interface Props {
   ctx: PostCourseContext;
+  /** Gross of the round attached to this post (C3). Enables the you-vs-them row. */
+  theirGross?: number | null;
   onTap?: () => void;
 }
 
-export const PostCourseDataLine: React.FC<Props> = ({ ctx, onTap }) => {
+export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap }) => {
   const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
