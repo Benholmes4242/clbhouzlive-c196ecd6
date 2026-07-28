@@ -46,6 +46,11 @@ interface UnifiedCourseCardProps {
   statChip?: { value: string; unit: string } | null;
   /** Small sample line under the location line, with optional early-data flag. */
   statLine?: { text: string; earlyData?: boolean } | null;
+  /**
+   * Viewer's relationship to this course, rendered as a small pill inside the
+   * rank capsule. 'rated' outranks 'played' — a rating implies a visit.
+   */
+  viewerStatus?: 'rated' | 'played' | null;
   onClick?: () => void;
   className?: string;
 }
