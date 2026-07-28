@@ -17,7 +17,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 function strokesOf(h: WhsScoreHole): number | null {
@@ -50,7 +50,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId,
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useSupabaseSession();
   const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
