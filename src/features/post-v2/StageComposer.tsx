@@ -588,7 +588,11 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           onOpenSchedule={() => setSheet('schedule')}
           actorLocked={isEditMode}
           showSchedule={showScheduleRow}
+          showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
+          attachRoundLabel={attachRoundLabel}
+          onOpenAttachRound={openRoundSheet}
         />
+
       </div>
 
       {/* Sheets */}
