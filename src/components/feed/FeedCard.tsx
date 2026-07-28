@@ -253,6 +253,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   isFirstCard = false,
   onContentReady,
   courseContext,
+  postRound,
+  onRoundTap,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
