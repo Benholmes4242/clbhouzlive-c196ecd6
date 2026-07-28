@@ -37,6 +37,8 @@ interface DefendRow {
   course_name: string;
   course_country?: string | null;
   course_region?: string | null;
+  hero_image_url?: string | null;
+
   category: string;
   category_label: string | null;
   my_value: number;
