@@ -22,6 +22,8 @@ interface Props {
   paddingX?: number;
   paddingBottom?: number;
   paddingTop?: number;
+  /** Overrides the default amber kicker colour (e.g. mode accent). */
+  overlineColor?: string;
 }
 
 export function SectionHead({
@@ -33,8 +35,11 @@ export function SectionHead({
   paddingX = 16,
   paddingBottom = 10,
   paddingTop = 0,
+  overlineColor: overlineColorProp,
 }: Props) {
-  const overlineColor = surface === 'dark' ? OVERLINE_DARK : OVERLINE_LIGHT;
+  const overlineColor =
+    overlineColorProp ?? (surface === 'dark' ? OVERLINE_DARK : OVERLINE_LIGHT);
+
   const titleColor = surface === 'dark' ? TITLE_DARK : TITLE_LIGHT;
   return (
     <div
