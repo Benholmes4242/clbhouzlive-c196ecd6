@@ -44,6 +44,8 @@ import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
+import { PostCourseDataLine } from './PostCourseDataLine';
+import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
@@ -104,6 +106,8 @@ export interface FeedCardProps {
   isFirstCard?: boolean;
   /** Fires once when this card's primary content is paint-ready (decoded image / first video frame / rAF for text). */
   onContentReady?: () => void;
+  /** Batched course data for this post's course (resolved in Clubhouse.tsx). */
+  courseContext?: PostCourseContext | null;
 }
 
 interface CaptionBlockProps {
@@ -242,6 +246,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
   isFirstCard = false,
   onContentReady,
+  courseContext,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
@@ -593,7 +598,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
 
       {/* Course eyebrow + location (above caption) */}
-      {post.courseName && (() => {
+      {(post.courseName || courseContext) && (() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
@@ -688,6 +693,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 <MapPin size={10} color={T40} style={{ marginRight: 3, flexShrink: 0 }} />
                 {courseLocation}
               </div>
+            )}
+            {courseContext && (
+              <PostCourseDataLine
+                ctx={courseContext}
+                onTap={post.courseId ? () => onCourse?.(post) : undefined}
+              />
             )}
           </div>
         );

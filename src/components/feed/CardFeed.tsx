@@ -34,6 +34,7 @@ import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted 
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { FeedCard } from './FeedCard';
+import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 
@@ -106,6 +107,10 @@ export interface CardFeedProps {
   initialState?: StateSnapshot;
   /** Called on unmount with the current Virtuoso state snapshot. */
   onSnapshot?: (state: StateSnapshot) => void;
+  /** Batched course data keyed by course_id (one RPC per page, see Clubhouse.tsx). */
+  courseContextMap?: Map<string, PostCourseContext>;
+  /** Resolves the course id for a post (course_id, else first tagged course). */
+  resolveCourseId?: (post: FeedPost) => string | null;
 }
 
 export interface CardFeedHandle {
@@ -140,6 +145,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   tab,
   initialState,
   onSnapshot,
+  courseContextMap,
+  resolveCourseId,
 }, ref) {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -702,6 +709,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 feedIndex={index}
                 isFirstCard={index === 0}
                 onContentReady={onFirstContentReady}
+                courseContext={(() => {
+                  const cid = resolveCourseId?.(post) ?? post.courseId ?? null;
+                  return cid ? courseContextMap?.get(cid) ?? null : null;
+                })()}
               />
             )}
           </FeedItemGate>
@@ -728,6 +739,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       onFollow,
       currentUserId,
       onFirstContentReady,
+      courseContextMap,
+      resolveCourseId,
     ],
   );
 

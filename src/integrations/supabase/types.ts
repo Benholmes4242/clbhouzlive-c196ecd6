@@ -19544,6 +19544,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_post_course_context: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          avg_over_par: number
+          course_id: string
+          rounds_tracked: number
+          your_best: number
+          your_rounds: number
+        }[]
+      }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
       get_profile_posts: {
         Args: {

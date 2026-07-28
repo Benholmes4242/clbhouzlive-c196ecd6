@@ -55,6 +55,7 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
+import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -190,6 +191,14 @@ const ClubhouseContent = () => {
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
 
   const posts = activeFeed.posts;
+
+  // C1 — batched course data for the whole visible page. ONE rpc call for all
+  // posts; never one per card. Passed down into CardFeed -> FeedCard.
+  const feedCourseIds = useMemo(
+    () => posts.map((p) => resolvePostCourseId(p)).filter((id): id is string => !!id),
+    [posts],
+  );
+  const courseContextMap = usePostCourseContext(feedCourseIds);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -477,6 +486,8 @@ const ClubhouseContent = () => {
               initialState={safeInitialState(virtuosoSnapshots.current[activeTab], posts.length)}
               onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
               posts={posts}
+              courseContextMap={courseContextMap}
+              resolveCourseId={resolvePostCourseId}
               topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
