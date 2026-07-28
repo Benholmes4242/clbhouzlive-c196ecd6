@@ -43,6 +43,10 @@ export const EVENT_LABELS: Record<string, string> = {
   course_record_book_opened: 'Course record book opened',
   course_you_empty_shown: 'Course You tab empty state shown',
   course_connect_cta_tapped: 'Course connect handicap tapped',
+  hole_photo_cta_shown: 'Hole photo prompt shown',
+  hole_photo_submitted: 'Hole photo submitted',
+  hole_photo_submit_failed: 'Hole photo submission failed',
+
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',
   rating_submitted: 'Rating submitted',

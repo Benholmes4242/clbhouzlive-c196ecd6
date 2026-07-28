@@ -15,6 +15,8 @@ import { AMBER, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/token
 import { REGION_TABS } from './AlmanacSections';
 import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
 import { isEarlyData } from '@/lib/earlyData';
+import { AddHolePhotoRow } from '@/features/courses/components/holes/AddHolePhotoRow';
+
 
 const RED = '#D2222D';
 const GREEN = '#0F8F4A';
@@ -476,7 +478,12 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
                 mode={mode}
                 onTap={() => navigate(`/courses/${h.course_id}`, { state: { activeTab: 'holes' } })}
               />
+              {/* H2 contribution affordance - sits under the card, layout untouched */}
+              <div style={{ marginTop: 8 }}>
+                <AddHolePhotoRow courseId={h.course_id} holeNo={h.hole_no} surface="discover_card" />
+              </div>
             </div>
+
           );
         })}
       </div>

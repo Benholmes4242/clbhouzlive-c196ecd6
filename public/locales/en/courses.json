@@ -58,19 +58,25 @@
     }
   },
   "holePhoto": {
-    "add": "Add a photo of the {{hole}}",
-    "uploading": "Uploading… {{percent}}%",
-    "thanks": "Thanks — we'll check it and add it to the hole shortly.",
-    "failed": "Couldn't upload that photo",
+    "add": "Add a photo of the {{ordinal}} hole",
+    "uploading": "Uploading {{percent}}%",
+    "thanks": "Thanks - we will check it and add it to the hole shortly.",
     "inReview": "In review",
-    "inReviewNote": "Only you can see this until it's approved.",
-    "notUsed": "Not used",
-    "notUsedNote": "This photo wasn't added to the hole.",
-    "live": "Live",
-    "liveNote": "Your photo is on this hole.",
+    "inReviewNote": "Only you can see this until it is approved.",
+    "notUsedNote": "This photo was not added to the hole.",
+    "tryAnother": "Try another photo",
     "credit": "Photo by {{name}}",
-    "alt": "Photo of hole {{hole}}"
+    "alt": "Photo of the {{ordinal}} hole",
+    "errors": {
+      "duplicate": "You have already added a photo for this hole.",
+      "notEligible": "You need a logged round at this course first",
+      "upload": "That upload did not finish. Try again.",
+      "notImage": "Photos only - videos are not accepted here.",
+      "signedOut": "Sign in to add a photo.",
+      "generic": "Something went wrong. Try again."
+    }
   },
+
   "holes": {
     "detailsA11y": "Hole {{holeNo}} details",
     "parLabel": "Par {{par}}",
