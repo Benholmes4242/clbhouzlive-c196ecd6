@@ -132,10 +132,11 @@
   "feed": {
 
     "courseLine": {
-      "avgOverPar": "Avg over par",
-      "roundsTracked": "Rounds tracked",
+      "panelHeading": "Course stats",
+      "playsOnAvg": "Plays on avg",
+      "roundsTracked_one": "Round tracked",
+      "roundsTracked_other": "Rounds tracked",
       "yourBest": "Your best",
-      "notPlayed": "You haven't played here",
       "them": "Them",
       "you": "You",
       "level": "Level",

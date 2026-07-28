@@ -622,7 +622,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           e.stopPropagation();
           onCourse?.(post);
         };
-        const pill = post.courseRating != null ? (() => {
+        // Secondary-chip rule (same as the Courses stat browse): the community
+        // rating chip renders unless it would duplicate a figure already on the
+        // card. On a review post the reviewer's own rating is already shown as
+        // the ghost numeral, so the chip is suppressed.
+        const suppressRatingChip = Boolean(post.isReview) && reviewRating != null;
+        const pill = post.courseRating != null && !suppressRatingChip ? (() => {
           return (
             <button
               type="button"
