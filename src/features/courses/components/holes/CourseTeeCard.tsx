@@ -54,10 +54,22 @@ function fmtRating(n: number): string {
 // Default tee resolution order (per brief):
 //   1) localStorage 'tee-card:{courseId}' if it matches a returned tee_label
 //   2) profile gender 'female': first tee with gender_scope='ladies';
-//      if none, the SHORTEST colour tee (last colour entry)
-//   3) otherwise: first colour tee (longest)
-//   4) no colour tees at all: first entry
+//      if none, the SHORTEST ladies-scoped colour tee, else shortest colour tee
+//   3) otherwise: the MOST-SAMPLED colour tee
+//   4) no colour tees at all: the MOST-SAMPLED entry
 // -----------------------------------------------------------------------------
+// Comparator: rounds_sampled desc -> total_yards desc -> tee_label asc.
+function mostSampled(list: TeeSet[]): TeeSet | undefined {
+  if (list.length === 0) return undefined;
+  return [...list].sort((a, b) => {
+    const r = (b.rounds_sampled ?? 0) - (a.rounds_sampled ?? 0);
+    if (r !== 0) return r;
+    const y = (b.total_yards ?? 0) - (a.total_yards ?? 0);
+    if (y !== 0) return y;
+    return a.tee_label.localeCompare(b.tee_label);
+  })[0];
+}
+
 function resolveDefaultTee(
   tees: TeeSet[],
   courseId: string,
@@ -77,12 +89,18 @@ function resolveDefaultTee(
   if (gender === 'female') {
     const ladies = tees.find((t) => t.gender_scope === 'ladies');
     if (ladies) return ladies.tee_label;
-    if (colours.length > 0) return colours[colours.length - 1].tee_label;
+    if (colours.length > 0) {
+      // Keep "shortest colour tee" intent, scoped to ladies tees where any exist.
+      const ladiesColours = colours.filter((t) => t.gender_scope === 'ladies');
+      const pool = ladiesColours.length > 0 ? ladiesColours : colours;
+      return pool[pool.length - 1].tee_label;
+    }
   }
 
-  if (colours.length > 0) return colours[0].tee_label;
-  return tees[0].tee_label;
+  if (colours.length > 0) return (mostSampled(colours) ?? colours[0]).tee_label;
+  return (mostSampled(tees) ?? tees[0]).tee_label;
 }
+
 
 export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
