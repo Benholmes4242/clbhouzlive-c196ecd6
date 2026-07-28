@@ -108,6 +108,10 @@ export interface FeedCardProps {
   onContentReady?: () => void;
   /** Batched course data for this post's course (resolved in Clubhouse.tsx). */
   courseContext?: PostCourseContext | null;
+  /** Batched round attached to this post (resolved in Clubhouse.tsx). */
+  postRound?: PostRound | null;
+  /** Opens the attached round's scorecard. */
+  onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
 interface CaptionBlockProps {
