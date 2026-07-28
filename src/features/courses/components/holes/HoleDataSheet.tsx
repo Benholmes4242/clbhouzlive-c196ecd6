@@ -14,6 +14,7 @@ import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
+import { AddHolePhotoRow } from './AddHolePhotoRow';
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -366,6 +367,7 @@ export const HoleDataSheet: React.FC<Props> = ({
               open={!collapsed && openHole === h.hole_no}
               onToggle={() => toggle(h.hole_no)}
               viewerHasPlayed={viewerHasPlayed}
+              courseId={courseId}
             />
           ))}
           {collapsed && sortedByHole.length >= 3 && (
@@ -935,7 +937,7 @@ const HoleCard: React.FC<{
         </div>
       </div>
 
-      {open && <ExpandedCard row={row} mine={mine} viewerHasPlayed={viewerHasPlayed} />}
+      {open && <ExpandedCard row={row} mine={mine} viewerHasPlayed={viewerHasPlayed} courseId={courseId} />}
     </div>
   );
 };
