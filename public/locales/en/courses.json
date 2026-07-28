@@ -76,7 +76,6 @@
       "generic": "Something went wrong. Try again."
     }
   },
-
   "holes": {
     "detailsA11y": "Hole {{holeNo}} details",
     "parLabel": "Par {{par}}",
@@ -238,7 +237,8 @@
     "gross": "GROSS",
     "toPar": "TO PAR",
     "viewProfile": "View profile",
-    "viewCourse": "View course"
+    "viewCourse": "View course",
+    "shareRound": "Share this round"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
