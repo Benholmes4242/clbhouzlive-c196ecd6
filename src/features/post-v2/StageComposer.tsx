@@ -603,7 +603,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         selected={state.courses}
         userId={profile?.id ?? null}
       />
+      <AttachRoundSheet
+        open={sheet === 'round'}
+        onClose={() => setSheet(null)}
+        rounds={roundsAtCourse}
+        selectedId={state.attachedRound?.whsScoreId ?? null}
+        onSelect={handleSelectRound}
+      />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
+
       <ScheduleSheetV2
         open={sheet === 'schedule'}
         onClose={() => setSheet(null)}
