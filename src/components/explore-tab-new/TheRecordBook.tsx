@@ -26,6 +26,7 @@ import { LedgerSubline } from './PinIcon';
 
 import { regionScopePhrase } from './regionScope';
 import { EmptyScopeCard } from './EmptyScopeCard';
+import { DiscoverBand } from './DiscoverBand';
 import { isHideableScope, useReportRailEmpty, type OnRailEmpty } from './railEmptiness';
 import { DiscoverYouStripMount } from './DiscoverYouStripMount';
 import { slugToCacheRegion } from './regionScope';
