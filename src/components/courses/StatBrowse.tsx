@@ -22,6 +22,7 @@ import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { isEarlyData } from '@/lib/earlyData';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import {
   chipForLens,
   isStatLens,
