@@ -367,16 +367,25 @@ function MomentsSection({
   mode,
   onRowTap,
   onLeaderTap,
+  onEmpty,
 }: {
   region: string | null;
   regionUpper: string;
   mode: RecordsMode;
   onRowTap: (row: FeatRow) => void;
   onLeaderTap: (uid: string) => void;
+  onEmpty?: OnRailEmpty;
 }) {
   const { t } = useTranslation('courses');
   const [tab, setTab] = useState<MomentsTab>('honours');
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // All three bodies stay mounted (inactive ones visually hidden) so each can
+  // report its own emptiness — the merged band only disappears when the whole
+  // set is empty for the scope.
+  const { reporter, hiddenCount } = useHiddenRailTracker();
+  const allEmpty = hiddenCount >= 3;
+  useReportRailEmpty(onEmpty, allEmpty);
 
   const tabs: { id: MomentsTab; label: string }[] = [
     { id: 'honours', label: t('discover.moments.tabs.honours', 'Honours') },
@@ -391,7 +400,8 @@ function MomentsSection({
   };
 
   return (
-    <DiscoverBand>
+    <DiscoverBand hidden={allEmpty}>
+
       <SectionHead
         overline={
           mode === 'alltime'
