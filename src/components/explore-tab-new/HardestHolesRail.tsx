@@ -476,7 +476,12 @@ export function HardestHolesRail({ region }: { region?: string | null } = {}) {
                 mode={mode}
                 onTap={() => navigate(`/courses/${h.course_id}`, { state: { activeTab: 'holes' } })}
               />
+              {/* H2 contribution affordance - sits under the card, layout untouched */}
+              <div style={{ marginTop: 8 }}>
+                <AddHolePhotoRow courseId={h.course_id} holeNo={h.hole_no} surface="discover_card" />
+              </div>
             </div>
+
           );
         })}
       </div>
