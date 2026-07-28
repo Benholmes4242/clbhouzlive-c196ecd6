@@ -70,15 +70,17 @@ export function EaglesLedger({
   hideHeader = false,
   sheetOpen: sheetOpenProp,
   onSheetOpenChange,
+  onEmpty,
 }: Props) {
-  const { data: featsData, isLoading } = useRegionFeats(region, 'eagles', 'latest');
-  const { data: leadersData } = useRegionEagleLeaders(region);
+  const { data: featsData, isLoading: featsLoading } = useRegionFeats(region, 'eagles', 'latest');
+  const { data: leadersData, isLoading: leadersLoading } = useRegionEagleLeaders(region);
   const feats = useMemo(() => featsData ?? [], [featsData]);
   const [localSheetOpen, setLocalSheetOpen] = useState(false);
   const controlled = onSheetOpenChange !== undefined;
   const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
   const setSheetOpen = controlled ? onSheetOpenChange! : setLocalSheetOpen;
   const sectionMarginTop = hideHeader ? 0 : 32;
+  const isLoading = mode === 'alltime' ? leadersLoading : featsLoading;
 
   const leaders = useMemo(
     () =>
@@ -92,8 +94,11 @@ export function EaglesLedger({
   const hasData = mode === 'alltime' ? leaders.length > 0 : feats.length > 0;
   const overlineLabel = mode === 'alltime' ? 'All-time eagles' : 'Latest eagles';
 
+  const resolvedEmpty = !isLoading && !hasData;
+  useReportRailEmpty(onEmpty, resolvedEmpty && isHideableScope(region));
+
   if (!isLoading && !hasData) {
-    if (region == null) return null;
+    if (region == null || isHideableScope(region)) return null;
     return (
       <section style={{ marginTop: sectionMarginTop, fontFamily: FONT }}>
         {hideHeader ? null : <SectionHead overline={overlineLabel} paddingX={14} />}
