@@ -255,7 +255,8 @@
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
     "experiencePoints": "Experience Points Earned",
-    "yourStats": "Your stats"
+    "yourStats": "Your stats",
+    "rated": "Rated"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
@@ -357,7 +358,62 @@
     "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
     "clearSearch": "Clear search",
     "resetFilters": "Reset filters",
-    "sectionTitle": "The world's best"
+    "sectionTitle": "The world's best",
+    "pill": {
+      "played": "Played",
+      "rated": "Rated"
+    },
+    "stats": {
+      "heading": "Course stats",
+      "memberRating": "Member rating",
+      "ratings": "Ratings",
+      "playsOnAvg": "Plays on avg",
+      "beTheFirst": "Be the first to rate it",
+      "emptyBody": "No member has rated this course yet."
+    },
+    "verdict": {
+      "higher": "Members rate it higher",
+      "lower": "Members rate it lower",
+      "figures": "#{{rank}} · {{rating}} from {{count}}"
+    },
+    "verdictSheet": {
+      "title": "How this compares",
+      "memberRating_one": "Member rating · {{count}} rating",
+      "memberRating_other": "Member rating · {{count}} ratings",
+      "explanation": "This course is published at #{{rank}}. Members who have played it rate it {{rating}} from {{count}} ratings. Where those two disagree, we show it — we do not adjust the list.",
+      "distribution": "How members scored it",
+      "rateCta": "Rate this course"
+    },
+    "movers": {
+      "kicker": "The list is fixed. Opinion is not.",
+      "title": "Opinion is moving",
+      "subtitle": "Courses whose member rating has shifted most.",
+      "viewAll": "View all",
+      "now": "Now {{rating}}",
+      "fromRatings_one": "from {{count}} rating",
+      "fromRatings_other": "from {{count}} ratings",
+      "empty": "No course has moved enough to report yet.",
+      "rangeA11y": "Movers time range",
+      "rangeMonth": "This month",
+      "rangeYear": "This year"
+    },
+    "progressPanel": {
+      "heading": "Your progress",
+      "aggregate": "{{played}} of {{total}} played · {{rated}} rated",
+      "row": "{{played}}/{{total}}"
+    },
+    "listSheet": {
+      "summary": "{{played}} of {{total}} played · {{rated}} rated",
+      "segmentA11y": "Filter list",
+      "segAll": "All",
+      "segPlayed": "Played",
+      "segNotPlayed": "Not played",
+      "segRated": "Rated",
+      "emptyAll": "This list is empty.",
+      "emptyPlayed": "You haven't played any of these yet.",
+      "emptyNotPlayed": "You've played every course on this list.",
+      "emptyRated": "You haven't rated any of these yet."
+    }
   },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",
