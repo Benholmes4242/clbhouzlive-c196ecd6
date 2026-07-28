@@ -346,29 +346,77 @@ function TabButton({
 // ---- Defend rail ----------------------------------------------------------
 function DefendRail({ rows }: { rows: DefendRow[] }) {
   const navigate = useNavigate();
-  return (
-    <div
-      className="flex overflow-x-auto scrollbar-hide"
-      style={{
-        gap: 10,
-        marginTop: 10,
-        paddingLeft: PAGE_PAD,
-        paddingRight: PAGE_PAD,
-        paddingBottom: 4,
-        WebkitOverflowScrolling: 'touch',
-      }}
+  // Mirrors AttackRail: the most urgent crown leads cinematic when it has
+  // imagery; otherwise every entry stays in the horizontal card rail.
+  const lead = rows.reduce<DefendRow | null>(
+    (best, r) =>
+      best == null || (r.threat_score ?? 0) > (best.threat_score ?? 0) ? r : best,
+    null,
+  );
+  const leadImage = lead?.hero_image_url ?? null;
+  const cinematic = !!(lead && leadImage);
+  const rest = cinematic ? rows.filter((r) => r !== lead) : rows;
 
-    >
-      {rows.map((row) => (
-        <DefendCard
-          key={`${row.course_id}-${row.category}`}
-          row={row}
-          onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
-        />
-      ))}
+  const leadGap = lead?.gap ?? 0;
+  const leadTied = !!lead?.challenger_user_id && leadGap <= 0;
+
+  return (
+    <div>
+      {cinematic ? (
+        <div style={{ marginTop: 10 }}>
+          <CinematicLeadCard
+            imageUrl={leadImage!}
+            alt={lead!.course_name}
+            chips={[
+              {
+                label: lead!.category_label ?? categoryLabel(lead!.category),
+                tone: 'danger',
+              },
+              ...(leadTied
+                ? [{ label: 'Level with you', tone: 'glass' as const }]
+                : []),
+              ...(lead!.challenger_active_7d
+                ? [{ label: 'Played this week', tone: 'glass' as const }]
+                : []),
+            ]}
+            title={lead!.course_name}
+            subtitle={
+              lead!.challenger_user_id
+                ? `${lead!.challenger_name ?? 'Challenger'} chasing`
+                : 'No challengers'
+            }
+            figure={leadTied ? 'Level' : formatGapNumber(Math.max(0, leadGap))}
+            figureLabel={leadTied ? 'With you' : 'Your lead'}
+            progressPct={progressPct(lead!.category, Math.max(0, leadGap))}
+            progressColor={RED}
+            onTap={() => navigate(`/courses/${lead!.course_id}?tab=legends`)}
+          />
+        </div>
+      ) : null}
+
+      <div
+        className="flex overflow-x-auto scrollbar-hide"
+        style={{
+          gap: 10,
+          marginTop: 10,
+          paddingLeft: PAGE_PAD,
+          paddingRight: PAGE_PAD,
+          paddingBottom: 4,
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {rest.map((row) => (
+          <DefendCard
+            key={`${row.course_id}-${row.category}`}
+            row={row}
+            onTap={() => navigate(`/courses/${row.course_id}?tab=legends`)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
+
 
 function DefendCard({ row, onTap }: { row: DefendRow; onTap: () => void }) {
   const hasChallenger = !!row.challenger_user_id;
