@@ -985,6 +985,12 @@ const ExpandedCard: React.FC<{
     <div style={{ padding: '0 14px 14px' }}>
       <div style={{ height: 1, background: INK_06, marginTop: 0, marginBottom: 12 }} />
 
+      <div style={{ marginBottom: 12 }}>
+        <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} eligible={viewerHasPlayed} />
+      </div>
+
+
+
       <div style={{ fontSize: 11.5, color: INK_55, lineHeight: 1.5, marginBottom: LABEL_GAP }}>
         {sentence}
       </div>
