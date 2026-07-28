@@ -347,6 +347,7 @@ function LegendarySection({
         metric={sheetMetric}
         onRowTap={onLeaderTap}
         onLatestRowTap={onRowTap}
+        onEmpty={onEmpty}
       />
       <TierSeeAllSheet
         open={sheetOpen}
