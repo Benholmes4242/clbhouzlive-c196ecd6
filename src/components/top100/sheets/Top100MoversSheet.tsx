@@ -52,7 +52,7 @@ export const Top100MoversSheet: React.FC<Props> = ({
             {t('top100.movers.subtitle')}
           </div>
           <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
-            <ScopeSegment<MoverRange>
+            <ScopeSegment
               value={range}
               ariaLabel={t('top100.movers.rangeA11y')}
               onChange={(next) => {
