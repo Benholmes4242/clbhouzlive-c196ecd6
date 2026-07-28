@@ -16,6 +16,8 @@ import { REGION_TABS } from './AlmanacSections';
 import { getOptimizedImageUrl } from '@/utils/enhancedImageOptimization';
 import { isEarlyData } from '@/lib/earlyData';
 import { AddHolePhotoRow } from '@/features/courses/components/holes/AddHolePhotoRow';
+import { useHolePhotos, selectDailyPhoto } from '@/hooks/media/useHoleMedia';
+
 
 
 const RED = '#D2222D';
@@ -150,7 +152,13 @@ function HoleCard({
   onTap: () => void;
 }) {
   const dist = safeDist(row.dist);
-  const img = row.course_image ? getOptimizedImageUrl(row.course_image, { width: 772 }) : '';
+  const { data: holeMedia } = useHolePhotos(row.course_id, row.hole_no);
+  const holePhoto = selectDailyPhoto(holeMedia?.approved, row.course_id, row.hole_no);
+  const courseImg = row.course_image ? getOptimizedImageUrl(row.course_image, { width: 772 }) : '';
+  // A hole photo IS the subject, so it keeps a bottom-weighted scrim instead of
+  // the flat dim used behind course atmosphere photography.
+  const img = holePhoto ? holePhoto.media_url : courseImg;
+  const credit = holePhoto?.contributorName ?? null;
   const meta = [
     row.region,
     `par ${row.par}`,
@@ -187,7 +195,7 @@ function HoleCard({
       {img ? (
         <img
           src={img}
-          alt={row.course_name}
+          alt={holePhoto ? `Hole ${row.hole_no}, ${row.course_name}` : row.course_name}
           loading="lazy"
           style={{
             position: 'absolute',
@@ -198,7 +206,31 @@ function HoleCard({
           }}
         />
       ) : null}
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,10,12,0.78)' }} />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: holePhoto
+            ? 'linear-gradient(180deg, rgba(8,10,12,0.42) 0%, rgba(8,10,12,0.12) 32%, rgba(8,10,12,0.72) 74%, rgba(8,10,12,0.92) 100%)'
+            : 'rgba(8,10,12,0.78)',
+        }}
+      />
+      {credit ? (
+        <div
+          style={{
+            position: 'absolute',
+            left: 14,
+            bottom: 6,
+            zIndex: 1,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            color: 'rgba(255,255,255,0.62)',
+          }}
+        >
+          {`Photo by ${credit}`}
+        </div>
+      ) : null}
 
       <div
         style={{
@@ -208,8 +240,10 @@ function HoleCard({
           flexDirection: 'column',
           justifyContent: 'flex-end',
           padding: 14,
+          paddingBottom: credit ? 24 : 14,
         }}
       >
+
         <div
           style={{
             position: 'absolute',
