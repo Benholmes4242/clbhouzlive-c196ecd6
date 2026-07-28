@@ -45,7 +45,9 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseDataLine } from './PostCourseDataLine';
+import { PostRoundCard } from './PostRoundCard';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import type { PostRound } from '@/hooks/feed/usePostRounds';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
