@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 import { useStageComposer, type StageMediaItem, type AttachedRound } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
