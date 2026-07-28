@@ -58,6 +58,8 @@ interface Props {
   /** Controlled "View all" sheet (used by the merged Moments section). */
   sheetOpen?: boolean;
   onSheetOpenChange?: (open: boolean) => void;
+  /** Reports resolved-emptiness upward (see railEmptiness.ts). */
+  onEmpty?: OnRailEmpty;
 }
 
 export function EaglesLedger({
