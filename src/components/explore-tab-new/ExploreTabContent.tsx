@@ -198,6 +198,32 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
         <HardestHolesRail region={activeRegion} />
 
+        {/* ONE consolidated note for everything the scope has yet to fill. */}
+        {showConsolidatedEmpty ? (
+          <DiscoverBand>
+            <div style={{ padding: '16px 14px' }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  textTransform: 'uppercase',
+                  color: 'rgba(15,23,42,0.45)',
+                  marginBottom: 4,
+                }}
+              >
+                Early days
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 650, color: '#0F172A', lineHeight: 1.3 }}>
+                {regionLabelFor(activeRegion)} is still filling up — records, honours and hauls
+                will appear here as rounds land.
+              </div>
+            </div>
+          </DiscoverBand>
+        ) : null}
+
+
+
         {/* Feed block */}
         <div
           style={{
