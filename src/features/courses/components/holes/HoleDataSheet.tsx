@@ -15,6 +15,8 @@ import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
+import { HolePhotoGallery } from './HolePhotoGallery';
+
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -986,8 +988,12 @@ const ExpandedCard: React.FC<{
       <div style={{ height: 1, background: INK_06, marginTop: 0, marginBottom: 12 }} />
 
       <div style={{ marginBottom: 12 }}>
-        <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} surface="hole_sheet" />
+        <HolePhotoGallery courseId={courseId} holeNo={row.hole_no} />
+        <div style={{ marginTop: 10 }}>
+          <AddHolePhotoRow courseId={courseId} holeNo={row.hole_no} surface="hole_sheet" />
+        </div>
       </div>
+
 
 
 
