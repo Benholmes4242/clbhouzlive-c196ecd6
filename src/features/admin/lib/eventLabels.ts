@@ -46,6 +46,9 @@ export const EVENT_LABELS: Record<string, string> = {
   hole_photo_cta_shown: 'Hole photo prompt shown',
   hole_photo_submitted: 'Hole photo submitted',
   hole_photo_submit_failed: 'Hole photo submission failed',
+  hole_photo_approved: 'Hole photo approved',
+  hole_photo_rejected: 'Hole photo rejected',
+  hole_photo_replaced: 'Hole photo replaced',
 
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',
