@@ -279,6 +279,22 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                   <span>#{regionalRank}</span>
                 </span>
               )}
+              {viewerStatus && (
+                <>
+                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  <span
+                    style={{
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      color: viewerStatus === 'rated' ? '#F7931E' : 'rgba(255,255,255,0.82)',
+                    }}
+                  >
+                    {viewerStatus === 'rated' ? t('card.rated') : t('card.played')}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         )}
