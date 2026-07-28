@@ -2,7 +2,7 @@
  * Hole photography (H2) - member-contributed photographs of a single hole.
  *
  * Three hooks:
- *  - useHolePhoto(courseId, holeNo): the approved photo (credited) plus the
+ *  - useHolePhotos(courseId, holeNo): every approved photo (credited) plus the
  *    viewer's OWN row for that hole whatever its status.
  *  - useCanContributeHole(courseId): mirrors the RLS insert policy exactly and
  *    returns the proof round id.
