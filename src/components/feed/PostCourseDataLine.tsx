@@ -143,7 +143,43 @@ export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap }) 
           {t('feed.courseLine.notPlayed')}
         </span>
       )}
+
+      {/* C3 — you versus them, only when a round is attached to the post. */}
+      {theirGross != null && (
+        <span
+          style={{
+            flexBasis: '100%',
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 8,
+            marginTop: 2,
+          }}
+        >
+          {hasYourBest && ctx.your_best != null ? (
+            <>
+              <Stat figure={String(theirGross)} label={t('feed.courseLine.them')} />
+              <Stat figure={String(ctx.your_best)} label={t('feed.courseLine.you')} />
+              <span
+                style={{
+                  ...figureStyle,
+                  fontSize: 11.5,
+                  color: ctx.your_best < theirGross ? '#34D399' : ctx.your_best > theirGross ? RED : T60,
+                }}
+              >
+                {ctx.your_best === theirGross
+                  ? t('feed.courseLine.level')
+                  : `${ctx.your_best < theirGross ? '−' : '+'}${Math.abs(ctx.your_best - theirGross)}`}
+              </span>
+            </>
+          ) : (
+            <span style={{ ...labelStyle, color: T60, letterSpacing: '0.08em', textTransform: 'none', fontSize: 11 }}>
+              {t('feed.courseLine.noBestToCompare')}
+            </span>
+          )}
+        </span>
+      )}
     </div>
+
   );
 };
 
