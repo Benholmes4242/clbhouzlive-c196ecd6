@@ -10,6 +10,12 @@ import { fetchVerifications, type VerificationRow } from './useVerifications';
 import { fetchCourseRequests, type CourseRequestRow } from './useCourseRequests';
 import { fetchMatchRequests, type MatchRequestRow } from './useMatchRequests';
 import { fetchUnmatchedCourses, type UnmatchedCourseRow } from './useUnmatchedCourses';
+import {
+  fetchHolePhotosOpen,
+  fetchHolePhotosDone,
+  holePhotoReasonLabel,
+  type HolePhotoQueueRow,
+} from './useHolePhotoQueue';
 import type { InboxTypeSlug } from './useTriageCounts';
 
 export type InboxType = InboxTypeSlug;
@@ -146,6 +152,18 @@ export function useInboxFeed(): InboxFeedResult {
     enabled: canUsers,
     staleTime: 30_000,
   });
+  const holePhotosOpen = useQuery({
+    queryKey: ['admin-v2', 'inbox', 'hole-photos-open'],
+    queryFn: fetchHolePhotosOpen,
+    enabled: canUsers,
+    staleTime: 30_000,
+  });
+  const holePhotosDone = useQuery({
+    queryKey: ['admin-v2', 'inbox', 'hole-photos-done'],
+    queryFn: fetchHolePhotosDone,
+    enabled: canUsers,
+    staleTime: 30_000,
+  });
   const approvalsOpen = useQuery({
     queryKey: ['admin-v2', 'inbox', 'approvals-open'],
     queryFn: () => fetchAdminActionRequests('pending'),
@@ -162,7 +180,7 @@ export function useInboxFeed(): InboxFeedResult {
   const allQueries = [
     mod, modDone, appealsOpen, appealsDone, supportOpen, supportDone,
     verifOpen, matchOpen, matchDoneMatched, matchDoneRejected, unmatchedOpen,
-    courseReqAll, approvalsOpen, approvalsDone,
+    courseReqAll, approvalsOpen, approvalsDone, holePhotosOpen, holePhotosDone,
   ];
 
   const isLoading = allQueries.some(q => q.isLoading && (q.fetchStatus !== 'idle'));
@@ -378,6 +396,42 @@ export function useInboxFeed(): InboxFeedResult {
       }
     }
 
+    // Hole photos
+    const holePhotoTitle = (row: HolePhotoQueueRow) =>
+      `Hole ${row.hole_no} photo`;
+    const holePhotoMeta = (row: HolePhotoQueueRow) =>
+      `Hole photos - ${row.courseName ?? 'Unknown course'} - by ${row.contributorName ?? 'a member'}`;
+
+    if (canUsers && holePhotosOpen.data) {
+      for (const row of holePhotosOpen.data) {
+        open.push({
+          id: `hole-photo-${row.id}`,
+          type: 'holePhoto',
+          title: holePhotoTitle(row),
+          meta: holePhotoMeta(row),
+          createdAt: row.created_at,
+          isHighPriority: false,
+          payload: row,
+        });
+      }
+    }
+    if (canUsers && holePhotosDone.data) {
+      for (const row of holePhotosDone.data) {
+        done.push({
+          id: `done-hole-photo-${row.id}`,
+          type: 'holePhoto',
+          title: holePhotoTitle(row),
+          meta: holePhotoMeta(row),
+          createdAt: row.reviewed_at ?? row.created_at,
+          isHighPriority: false,
+          payload: row,
+          closedOutcome: row.status === 'approved'
+            ? 'Approved'
+            : `Rejected - ${holePhotoReasonLabel(row.reject_reason)}`,
+        });
+      }
+    }
+
     // Approvals
     if (canApprove && approvalsOpen.data) {
       for (const row of approvalsOpen.data) {
@@ -421,7 +475,7 @@ export function useInboxFeed(): InboxFeedResult {
 
     // counts
     const c: Record<InboxType, number> = {
-      report: 0, appeal: 0, support: 0, verification: 0, approval: 0, match: 0, courseRequest: 0, unmatchedCourse: 0,
+      report: 0, appeal: 0, support: 0, verification: 0, approval: 0, match: 0, courseRequest: 0, unmatchedCourse: 0, holePhoto: 0,
     };
     for (const it of open) c[it.type]++;
 
@@ -434,6 +488,7 @@ export function useInboxFeed(): InboxFeedResult {
     supportOpen.data, supportDone.data, verifOpen.data,
     matchOpen.data, matchDoneMatched.data, matchDoneRejected.data, unmatchedOpen.data,
     courseReqAll.data, approvalsOpen.data, approvalsDone.data,
+    holePhotosOpen.data, holePhotosDone.data,
   ]);
 
   const refetchAll = () => {

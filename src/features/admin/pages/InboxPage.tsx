@@ -3,7 +3,7 @@ import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom
 import { useQueryClient } from '@tanstack/react-query';
 import {
   ShieldAlert, Gavel, LifeBuoy, BadgeCheck, ShieldCheck, Link2, Map, ChevronRight,
-  CheckCircle2, AlertTriangle, Unlink,
+  CheckCircle2, AlertTriangle, Unlink, Camera,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { courseMatchLabel } from '../lib/geography';
@@ -17,6 +17,8 @@ import AppealDetailDrawer from '../components/AppealDetailDrawer';
 import SupportTicketDrawer from '../components/SupportTicketDrawer';
 import ApprovalDetailDrawer from '../components/ApprovalDetailDrawer';
 import AdminSheet from '../components/AdminSheet';
+import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
+import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -47,6 +49,7 @@ const TYPE_LABEL: Record<InboxType, string> = {
   match: 'Matches',
   courseRequest: 'Course requests',
   unmatchedCourse: 'Unmatched courses',
+  holePhoto: 'Hole photos',
 };
 
 const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: string }> = {
@@ -58,6 +61,7 @@ const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: stri
   match:         { icon: <Link2 size={16} />,       bg: '#F1F5F9', fg: '#0F172A' },
   courseRequest: { icon: <Map size={16} />,         bg: '#F1F5F9', fg: '#0F172A' },
   unmatchedCourse: { icon: <Unlink size={16} />,   bg: '#FEF3C7', fg: '#B45309' },
+  holePhoto:     { icon: <Camera size={16} />,      bg: '#E0F2FE', fg: '#0369A1' },
 };
 
 function relTime(iso: string): string {
@@ -133,6 +137,7 @@ function InboxListPage() {
   const [matchRow, setMatchRow] = useState<MatchRequestRow | null>(null);
   const [courseReqRow, setCourseReqRow] = useState<CourseRequestRow | null>(null);
   const [unmatchedRow, setUnmatchedRow] = useState<UnmatchedCourseRow | null>(null);
+  const [holePhotoRow, setHolePhotoRow] = useState<HolePhotoQueueRow | null>(null);
 
   // Deep-link ?ticket= opens support drawer
   useEffect(() => {
@@ -157,7 +162,7 @@ function InboxListPage() {
   const visibleTypes = useMemo<InboxType[]>(() => {
     const out: InboxType[] = [];
     if (canMod) out.push('report', 'appeal', 'support');
-    if (canUsers) out.push('verification', 'match', 'courseRequest', 'unmatchedCourse');
+    if (canUsers) out.push('verification', 'match', 'courseRequest', 'unmatchedCourse', 'holePhoto');
     if (canApprove) out.push('approval');
     return out;
   }, [canMod, canUsers, canApprove]);
@@ -187,6 +192,7 @@ function InboxListPage() {
       case 'match': setMatchRow(item.payload as MatchRequestRow); break;
       case 'courseRequest': setCourseReqRow(item.payload as CourseRequestRow); break;
       case 'unmatchedCourse': setUnmatchedRow(item.payload as UnmatchedCourseRow); break;
+      case 'holePhoto': setHolePhotoRow(item.payload as HolePhotoQueueRow); break;
     }
   };
 
@@ -374,6 +380,7 @@ function InboxListPage() {
       <MatchInboxSheet row={matchRow} onClose={() => setMatchRow(null)} />
       <UnmatchedCourseSheet row={unmatchedRow} onClose={() => setUnmatchedRow(null)} />
       <CourseRequestInboxSheet row={courseReqRow} onClose={() => setCourseReqRow(null)} />
+      <HolePhotoReviewSheet row={holePhotoRow} onClose={() => setHolePhotoRow(null)} />
     </div>
   );
 }

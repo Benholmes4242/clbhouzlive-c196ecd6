@@ -9,7 +9,8 @@ export type InboxTypeSlug =
   | 'approval'
   | 'match'
   | 'courseRequest'
-  | 'unmatchedCourse';
+  | 'unmatchedCourse'
+  | 'holePhoto';
 
 export interface TriageQueueBucket {
   key: string;
@@ -31,6 +32,7 @@ export interface TriageCounts {
   courseRequests: number;
   matchRequests: number;
   unmatchedCourses: number;
+  holePhotos: number;
   supportAwaitingReply: number;
   approvals: number;
   total: number;
@@ -98,6 +100,11 @@ const QUEUES: QueueSpec[] = [
     key: 'unmatchedCourses', label: 'Unmatched courses', type: 'unmatchedCourse',
     countBuilder: () => sb.from('whs_unmatched_courses').select('whs_course_id', { count: 'exact', head: true }).eq('status', 'open'),
     oldestBuilder: () => sb.from('whs_unmatched_courses').select('first_seen_at').eq('status', 'open').order('first_seen_at', { ascending: true }).limit(1),
+  },
+  {
+    key: 'holePhotos', label: 'Hole photos', type: 'holePhoto',
+    countBuilder: () => sb.from('course_hole_media').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    oldestBuilder: () => sb.from('course_hole_media').select('created_at').eq('status', 'pending').order('created_at', { ascending: true }).limit(1),
   },
   {
     key: 'supportAwaitingReply', label: 'Support tickets', type: 'support',
@@ -171,6 +178,7 @@ async function fetchTriageCounts(): Promise<TriageCounts> {
     courseRequests: get('courseRequests'),
     matchRequests: get('matchRequests'),
     unmatchedCourses: get('unmatchedCourses'),
+    holePhotos: get('holePhotos'),
     supportAwaitingReply: get('supportAwaitingReply'),
     approvals: get('approvals'),
     total,
