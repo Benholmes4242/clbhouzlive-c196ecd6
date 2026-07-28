@@ -46,6 +46,11 @@ interface UnifiedCourseCardProps {
   statChip?: { value: string; unit: string } | null;
   /** Small sample line under the location line, with optional early-data flag. */
   statLine?: { text: string; earlyData?: boolean } | null;
+  /**
+   * Viewer's relationship to this course, rendered as a small pill inside the
+   * rank capsule. 'rated' outranks 'played' — a rating implies a visit.
+   */
+  viewerStatus?: 'rated' | 'played' | null;
   onClick?: () => void;
   className?: string;
 }
@@ -92,6 +97,8 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   activeListSlug = null,
   statChip = null,
   statLine = null,
+  viewerStatus = null,
+
 
   onClick,
   className = '',
@@ -271,6 +278,22 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                   <FlagChip slug={regionalBadgeSlug} size={10} />
                   <span>#{regionalRank}</span>
                 </span>
+              )}
+              {viewerStatus && (
+                <>
+                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  <span
+                    style={{
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      color: viewerStatus === 'rated' ? '#F7931E' : 'rgba(255,255,255,0.82)',
+                    }}
+                  >
+                    {viewerStatus === 'rated' ? t('card.rated') : t('card.played')}
+                  </span>
+                </>
               )}
             </div>
           </div>

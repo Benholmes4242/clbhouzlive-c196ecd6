@@ -38,7 +38,17 @@ interface VirtualizedCourseListProps {
   footer?: React.ReactNode;
   activeListSlug?: string | null;
   showGhostRank?: boolean;
+  /**
+   * Optional fixed-height enrichment footer rendered under each card.
+   * MUST return the same height for every course — row height is measured
+   * from one sample card and multiplied, so a variable footer would drift
+   * the virtualised offsets.
+   */
+  renderEnrichment?: (courseId: string) => React.ReactNode;
+  /** Viewer's relationship to a course, shown as a pill in the rank capsule. */
+  viewerStatusFor?: (courseId: string) => 'rated' | 'played' | null;
 }
+
 
 // Initial row-height estimate. The actual rendered height is measured at runtime
 // from a sample card on mount + when courses/columnCount change.
@@ -51,6 +61,8 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   footer,
   activeListSlug = null,
   showGhostRank = false,
+  renderEnrichment,
+  viewerStatusFor,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sampleCardRef = useRef<HTMLDivElement>(null);
@@ -242,8 +254,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
+                viewerStatus={viewerStatusFor?.(course.id) ?? null}
                 onClick={() => handleCardClick(course.id)}
               />
+              {renderEnrichment?.(course.id)}
             </div>
           ))}
         </div>
@@ -273,8 +287,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 showRating={true}
                 showGhostRank={showGhostRank}
                 activeListSlug={activeListSlug}
+                viewerStatus={viewerStatusFor?.(course.id) ?? null}
                 onClick={() => handleCardClick(course.id)}
               />
+              {renderEnrichment?.(course.id)}
             </div>
           ))}
         </div>
