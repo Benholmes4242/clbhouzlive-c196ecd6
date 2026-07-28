@@ -148,7 +148,7 @@ function HoleCard({
   onTap: () => void;
 }) {
   const dist = safeDist(row.dist);
-  const img = row.course_image ? getOptimizedImageUrl(row.course_image, 'card') : '';
+  const img = row.course_image ? getOptimizedImageUrl(row.course_image, { width: 772 }) : '';
   const meta = [
     row.region,
     `par ${row.par}`,
