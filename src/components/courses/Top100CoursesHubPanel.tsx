@@ -15,6 +15,18 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
+import { useNavigate } from 'react-router-dom';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
+import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers';
+import { useUserTop100Progress, type Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
+import { computeVerdict, type Verdict } from '@/components/top100/verdict';
+import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
+import { Top100ProgressPanel } from '@/components/top100/Top100ProgressPanel';
+import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
+import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
+import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
+import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
 
 /** Known Top 100 list slugs for validation. */
 const KNOWN_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'];
@@ -37,6 +49,7 @@ interface Top100CoursesHubPanelProps {
 const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs, rateNudge }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
 
   // State — initialised from sessionStorage when available
   const [selectedList, setSelectedList] = useState(() => {
@@ -186,6 +199,97 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     if (!opt) return 'Top 100';
     return opt.label.replace(/\s*Top 100\s*$/, '').trim();
   })();
+  // ── Enrichment ────────────────────────────────────────────────────────────
+  // One batched fetch for the whole loaded page set — never per card.
+  const verdictConfig = useTop100Config();
+  const courseIds = React.useMemo(() => allCourses.map((c) => c.id), [allCourses]);
+  const enrichment = useTop100Enrichment(courseIds, user?.id);
+  const { data: progressLists = [] } = useUserTop100Progress(user?.id);
+
+  const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
+  const { data: movers = [] } = useTop100Movers(moverRange);
+
+  const [progressSheet, setProgressSheet] = useState<Top100ListProgress | null>(null);
+  const [moversSheetOpen, setMoversSheetOpen] = useState(false);
+  const [verdictSheet, setVerdictSheet] = useState<
+    { courseId: string; courseName: string; verdict: Verdict; canRate: boolean } | null
+  >(null);
+
+  // Rank within the list currently on screen, keyed for O(1) lookup.
+  const rankMap = React.useMemo(() => {
+    const map = new Map<string, number>();
+    for (const course of allCourses) {
+      const memberships = (course.list_memberships ?? []) as CourseListMembership[];
+      const match = memberships.find((m) => m.list_slug.includes(selectedList));
+      const rank = match?.rank ?? course.displayRank ?? null;
+      if (rank != null) map.set(course.id, rank);
+    }
+    return map;
+  }, [allCourses, selectedList]);
+
+  const ratedCourseIds = React.useMemo(() => {
+    const set = new Set<string>();
+    enrichment.forEach((value, id) => {
+      if (value.ratedByYou) set.add(id);
+    });
+    return set;
+  }, [enrichment]);
+
+  const courseNameById = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const course of allCourses) map.set(course.id, course.name);
+    return map;
+  }, [allCourses]);
+
+  const verdictFor = React.useCallback(
+    (courseId: string): Verdict | null => {
+      const data = enrichment.get(courseId);
+      if (!data) return null;
+      return computeVerdict({
+        rank: rankMap.get(courseId) ?? null,
+        rating: data.rating,
+        ratingCount: data.ratingCount,
+        config: verdictConfig,
+      });
+    },
+    [enrichment, rankMap, verdictConfig],
+  );
+
+  const viewerStatusFor = React.useCallback(
+    (courseId: string): 'rated' | 'played' | null => {
+      const data = enrichment.get(courseId);
+      if (!data) return null;
+      if (data.ratedByYou) return 'rated';
+      return data.yourRounds > 0 ? 'played' : null;
+    },
+    [enrichment],
+  );
+
+  const renderEnrichment = React.useCallback(
+    (courseId: string) => {
+      const data = enrichment.get(courseId);
+      const verdict = verdictFor(courseId);
+      return (
+        <Top100EnrichmentBlock
+          courseId={courseId}
+          data={data}
+          verdict={verdict}
+          onOpenVerdict={() => {
+            if (!verdict) return;
+            setVerdictSheet({
+              courseId,
+              courseName: courseNameById.get(courseId) ?? '',
+              verdict,
+              canRate: !!data && !data.ratedByYou,
+            });
+          }}
+          onRate={() => navigate(`/courses/${courseId}/rate`)}
+        />
+      );
+    },
+    [enrichment, verdictFor, courseNameById, navigate],
+  );
+
   // Total courses in the active list — pulled from the per-list summaries
   const totalCoursesInActiveList =
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
@@ -339,6 +443,16 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             </div>
           )}
 
+          {/* Member context — progress across lists, then where opinion moved */}
+          {!searchTerm && !isLoading && !isError && (
+            <div className="flex flex-col gap-3">
+              {progressLists.length > 0 && (
+                <Top100ProgressPanel lists={progressLists} onOpenList={setProgressSheet} />
+              )}
+              <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
+            </div>
+          )}
+
           {/* Rankings List */}
           <div>
           {isLoading ? (
@@ -418,11 +532,48 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               onCourseClick={handleCourseClick}
               activeListSlug={selectedList}
               showGhostRank={true}
+              viewerStatusFor={viewerStatusFor}
+              renderEnrichment={renderEnrichment}
             />
           )}
           </div>
         </div>
       </div>
+
+      <Top100ListProgressSheet
+        open={!!progressSheet}
+        onClose={() => setProgressSheet(null)}
+        listSlug={progressSheet?.list_slug ?? ''}
+        listName={progressSheet?.list_name ?? ''}
+        played={progressSheet?.played ?? 0}
+        total={progressSheet?.total ?? 0}
+        rated={progressSheet?.rated ?? 0}
+        userId={user?.id}
+        ratedCourseIds={ratedCourseIds}
+      />
+
+      <Top100MoversSheet
+        open={moversSheetOpen}
+        onClose={() => setMoversSheetOpen(false)}
+        movers={movers}
+        range={moverRange}
+        onRangeChange={setMoverRange}
+      />
+
+      {verdictSheet && (
+        <Top100VerdictExplainerSheet
+          open
+          onClose={() => setVerdictSheet(null)}
+          courseId={verdictSheet.courseId}
+          courseName={verdictSheet.courseName}
+          listLabel={activeListShortLabel}
+          rank={verdictSheet.verdict.rank}
+          rating={verdictSheet.verdict.rating}
+          ratingCount={verdictSheet.verdict.ratingCount}
+          canRate={verdictSheet.canRate}
+          onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
+        />
+      )}
     </div>
   );
 };
