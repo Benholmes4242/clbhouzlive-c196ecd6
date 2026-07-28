@@ -26,5 +26,11 @@
       "your card from this morning",
       "the view from the 18th"
     ]
+  },
+  "attachRound": {
+    "row": "Attach a round",
+    "title": "Attach a round",
+    "none": "None",
+    "attached": "Round attached"
   }
 }

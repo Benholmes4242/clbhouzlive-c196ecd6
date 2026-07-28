@@ -51,6 +51,9 @@ export const EVENT_LABELS: Record<string, string> = {
   hole_photo_replaced: 'Hole photo replaced',
   feed_course_line_shown: 'Feed course line shown',
   feed_course_line_tapped: 'Feed course line tapped',
+  post_round_attach_opened: 'Post round attach opened',
+  post_round_attached: 'Post round attached',
+  post_round_detached: 'Post round detached',
 
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',

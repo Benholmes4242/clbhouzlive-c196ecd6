@@ -23,7 +23,10 @@ export interface SubmitInput {
   course: StageCourse | null;
   /** Full ordered tag list - written to posts.tagged_course_ids. */
   courses?: StageCourse[];
+  /** Optional logged round linked to the post (posts.whs_score_id). */
+  whsScoreId?: string | null;
   scheduledAt: Date | null;
+
   actorType: 'personal' | 'business';
   actorId: string;
   authorName: string;
@@ -117,13 +120,18 @@ export function usePostSubmit() {
       const taggedIds = (input.courses && input.courses.length > 0)
         ? input.courses.map((c) => c.id)
         : (input.course ? [input.course.id] : []);
-      if (taggedIds.length > 0) {
+      // C2: the optional attached round rides along with the tag write.
+      const postPatch: Record<string, unknown> = {};
+      if (taggedIds.length > 0) postPatch.tagged_course_ids = taggedIds;
+      if (input.whsScoreId) postPatch.whs_score_id = input.whsScoreId;
+      if (Object.keys(postPatch).length > 0) {
         const { error: tagErr } = await supabase
           .from('posts')
-          .update({ tagged_course_ids: taggedIds } as never)
+          .update(postPatch as never)
           .eq('id', postId);
-        if (tagErr) console.warn('[post-v2] tagged_course_ids write failed:', tagErr);
+        if (tagErr) console.warn('[post-v2] tag/round write failed:', tagErr);
       }
+
 
       // Mention notifications: insert into the canonical public.mentions
       // pipeline (source_type='post'). The trg_create_mention_notification

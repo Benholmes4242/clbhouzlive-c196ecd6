@@ -22,7 +22,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 
-import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
+import { useStageComposer, type StageMediaItem, type AttachedRound } from './hooks/useStageComposer';
+import { useTranslation } from 'react-i18next';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useMyRoundsAtCourse, pickPreselectedRound, daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
+import AttachRoundSheet, { formatRoundLabel } from './components/AttachRoundSheet';
+
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
 import { useEditablePost } from '@/hooks/useEditablePost';
@@ -55,9 +60,11 @@ interface Props {
 
 export default function StageComposer({ onClose, onPosted, editPostId, draftId }: Props) {
   const { profile } = useProfileData();
+  const { t } = useTranslation('composer');
+
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setAttachedRound, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
@@ -66,30 +73,34 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   // Edit-mode load
   const editable = useEditablePost(editPostId ?? null);
-  const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null } | null>(null);
+  const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null; whsScoreId: string | null } | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const stageAddInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
+  // Fetch the post's status + scheduled_at + attached round
+  // (useEditablePost doesn't return them).
   useEffect(() => {
     if (!editPostId) return;
     let cancelled = false;
     supabase
       .from('posts')
-      .select('status, scheduled_at')
+      .select('status, scheduled_at, whs_score_id')
       .eq('id', editPostId)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
+        const row = data as { status?: string | null; scheduled_at?: string | null; whs_score_id?: string | null } | null;
         setEditStatus({
-          status: (data?.status as string | null) ?? null,
-          scheduledAt: (data?.scheduled_at as string | null) ?? null,
+          status: row?.status ?? null,
+          scheduledAt: row?.scheduled_at ?? null,
+          whsScoreId: row?.whs_score_id ?? null,
         });
       });
     return () => { cancelled = true; };
   }, [editPostId]);
+
 
   // Composer is a light #F8FAFC surface -> dark status-bar icons.
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
@@ -130,9 +141,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
         ? new Date(editStatus.scheduledAt)
         : null,
+      // C2 edit path: restore the attached round so an edit never drops it.
+      // Detail (score/tee) is filled in once the round list resolves.
+      attachedRound: editStatus?.whsScoreId
+        ? { whsScoreId: editStatus.whsScoreId, playDate: '', grossScore: null, coursePar: null, teeMarker: null }
+        : null,
       media,
       activeIndex: 0,
     });
+
     setHydrated(true);
   }, [isEditMode, hydrated, editable.data, editStatus, hydrate]);
 
@@ -168,7 +185,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'round' | 'close-guard'>(null);
+
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
@@ -176,6 +194,61 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const [savingDraft, setSavingDraft] = useState(false);
 
   const active = state.media[state.activeIndex] ?? null;
+
+  // ---- C2: attach a logged round -----------------------------------------
+  // Rounds are scoped to the PRIMARY tagged course only.
+  const primaryCourseId = state.course?.id ?? null;
+  const { data: myRounds } = useMyRoundsAtCourse(primaryCourseId);
+  const roundsAtCourse = useMemo(() => myRounds ?? [], [myRounds]);
+  const preselectAppliedFor = useRef<string | null>(null);
+
+  // Pre-selection: only a round played today or yesterday, and only once per
+  // course. Visible and removable - never silent.
+  useEffect(() => {
+    if (isEditMode) return;
+    if (!primaryCourseId || roundsAtCourse.length === 0) return;
+    if (preselectAppliedFor.current === primaryCourseId) return;
+    preselectAppliedFor.current = primaryCourseId;
+    if (state.attachedRound) return;
+    const pick = pickPreselectedRound(roundsAtCourse);
+    if (pick) setAttachedRound(pick);
+  }, [isEditMode, primaryCourseId, roundsAtCourse, state.attachedRound, setAttachedRound]);
+
+  // Edit path: fill in the label detail for a restored attachment.
+  useEffect(() => {
+    const att = state.attachedRound;
+    if (!att || att.playDate) return;
+    const match = roundsAtCourse.find((r) => r.whsScoreId === att.whsScoreId);
+    if (match) setAttachedRound(match);
+  }, [state.attachedRound, roundsAtCourse, setAttachedRound]);
+
+  const attachRoundLabel = state.attachedRound
+    ? (state.attachedRound.playDate ? formatRoundLabel(state.attachedRound) : t('attachRound.attached'))
+    : null;
+
+  const openRoundSheet = useCallback(() => {
+    // Analytics callsite: post_round_attach_opened
+    analyticsEvents.track('post_round_attach_opened', {
+      course_id: primaryCourseId,
+      rounds_available: roundsAtCourse.length,
+    });
+    setSheet('round');
+  }, [primaryCourseId, roundsAtCourse.length]);
+
+  const handleSelectRound = useCallback((r: AttachedRound | null) => {
+    setAttachedRound(r);
+    if (r) {
+      // Analytics callsite: post_round_attached
+      analyticsEvents.track('post_round_attached', {
+        course_id: primaryCourseId,
+        days_since_round: r.playDate ? daysSinceRound(r.playDate) : null,
+      });
+    } else {
+      // Analytics callsite: post_round_detached
+      analyticsEvents.track('post_round_detached', { course_id: primaryCourseId });
+    }
+  }, [primaryCourseId, setAttachedRound]);
+
 
   // Post button vs Save button gating.
   const canSubmit = !submitting && !saving && (state.caption.trim().length > 0 || state.media.length > 0) && !!activeActor;
@@ -208,6 +281,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         media: state.media,
         course: state.course,
         courses: state.courses,
+        whsScoreId: state.attachedRound?.whsScoreId ?? null,
+
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
         actorId: activeActor.id,
@@ -231,6 +306,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
         tagged_course_ids: state.courses.map((c) => c.id),
+        whs_score_id: state.attachedRound?.whsScoreId ?? null,
+
       };
       // Only touch scheduled_at when the post is still scheduled.
       if (editStatus?.status === 'scheduled') {
@@ -511,7 +588,11 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           onOpenSchedule={() => setSheet('schedule')}
           actorLocked={isEditMode}
           showSchedule={showScheduleRow}
+          showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
+          attachRoundLabel={attachRoundLabel}
+          onOpenAttachRound={openRoundSheet}
         />
+
       </div>
 
       {/* Sheets */}
@@ -522,7 +603,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         selected={state.courses}
         userId={profile?.id ?? null}
       />
+      <AttachRoundSheet
+        open={sheet === 'round'}
+        onClose={() => setSheet(null)}
+        rounds={roundsAtCourse}
+        selectedId={state.attachedRound?.whsScoreId ?? null}
+        onSelect={handleSelectRound}
+      />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
+
       <ScheduleSheetV2
         open={sheet === 'schedule'}
         onClose={() => setSheet(null)}

@@ -8396,6 +8396,7 @@ export type Database = {
           updated_at: string
           user_id: string
           visibility: Database["public"]["Enums"]["post_visibility"]
+          whs_score_id: string | null
         }
         Insert: {
           achievement_badge_id?: string | null
@@ -8431,6 +8432,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
+          whs_score_id?: string | null
         }
         Update: {
           achievement_badge_id?: string | null
@@ -8466,6 +8468,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           visibility?: Database["public"]["Enums"]["post_visibility"]
+          whs_score_id?: string | null
         }
         Relationships: [
           {
@@ -8536,6 +8539,20 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "posts_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
             referencedColumns: ["id"]
           },
         ]

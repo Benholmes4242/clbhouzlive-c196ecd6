@@ -52,6 +52,16 @@ export interface StageCourse {
   country?: string | null;
 }
 
+/** A logged round linked to the post (posts.whs_score_id). */
+export interface AttachedRound {
+  whsScoreId: string;
+  playDate: string;
+  grossScore: number | null;
+  coursePar: number | null;
+  teeMarker: string | null;
+}
+
+
 export const MAX_MEDIA = 10;
 
 export interface StageState {
@@ -67,7 +77,13 @@ export interface StageState {
   /** Deprecated derived alias for the primary course; kept for consumers. */
   course: StageCourse | null;
   scheduledAt: Date | null;
+  /**
+   * Optional logged round linked to this post (posts.whs_score_id).
+   * Always scoped to the PRIMARY course - cleared whenever it changes.
+   */
+  attachedRound: AttachedRound | null;
   dirty: boolean;
+
 }
 
 const emptyState: StageState = {
@@ -77,7 +93,9 @@ const emptyState: StageState = {
   courses: [],
   course: null,
   scheduledAt: null,
+  attachedRound: null,
   dirty: false,
+
 };
 
 export function useStageComposer() {
@@ -175,14 +193,30 @@ export function useStageComposer() {
   }, []);
 
   const setCaption = useCallback((v: string) => markDirty({ caption: v }), []);
+  // Course setters ALWAYS clear the attached round: a round from a different
+  // course must never survive a course change.
   const setCourse = useCallback((c: StageCourse | null) => {
     // Single-course setter: replaces the whole list with [c] (or clears).
     const courses = c ? [c] : [];
-    markDirty({ courses, course: courses[0] ?? null });
+    setState(s => ({
+      ...s,
+      courses,
+      course: courses[0] ?? null,
+      attachedRound: courses[0]?.id === s.course?.id ? s.attachedRound : null,
+      dirty: true,
+    }));
   }, []);
   const setCourses = useCallback((cs: StageCourse[]) => {
-    markDirty({ courses: cs, course: cs[0] ?? null });
+    setState(s => ({
+      ...s,
+      courses: cs,
+      course: cs[0] ?? null,
+      attachedRound: cs[0]?.id === s.course?.id ? s.attachedRound : null,
+      dirty: true,
+    }));
   }, []);
+  const setAttachedRound = useCallback((r: AttachedRound | null) => markDirty({ attachedRound: r }), []);
+
   const setScheduledAt = useCallback((d: Date | null) => markDirty({ scheduledAt: d }), []);
 
   const restoreDraft = useCallback((patch: Partial<StageState>) => {
@@ -220,6 +254,8 @@ export function useStageComposer() {
     setCaption,
     setCourse,
     setCourses,
+    setAttachedRound,
+
     setScheduledAt,
     restoreDraft,
     hydrate,
