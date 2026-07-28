@@ -694,6 +694,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 {courseLocation}
               </div>
             )}
+            {courseContext && (
+              <PostCourseDataLine
+                ctx={courseContext}
+                onTap={post.courseId ? () => onCourse?.(post) : undefined}
+              />
+            )}
           </div>
         );
       })()}
