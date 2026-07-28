@@ -36,7 +36,8 @@ export interface ApprovedHolePhoto extends HoleMediaRow {
 }
 
 export interface HolePhotoState {
-  approved: ApprovedHolePhoto | null;
+  /** Every approved photo, ordered created_at ASC then id ASC (stable). */
+  approved: ApprovedHolePhoto[];
   mine: HoleMediaRow | null;
 }
 
@@ -59,12 +60,45 @@ async function currentUserId(): Promise<string | null> {
   return data?.user?.id ?? null;
 }
 
+/** Viewer's LOCAL calendar date as YYYY-MM-DD (never UTC). */
+export function localDateKey(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = `${date.getMonth() + 1}`.padStart(2, '0');
+  const d = `${date.getDate()}`.padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Deterministic 32-bit string hash (djb2-xor), always non-negative. */
+function hashString(input: string): number {
+  let h = 5381;
+  for (let i = 0; i < input.length; i += 1) {
+    h = ((h << 5) + h) ^ input.charCodeAt(i);
+    h |= 0; // keep it in int32
+  }
+  return Math.abs(h);
+}
+
 /**
- * (a) The approved photo for a hole, plus the viewer's own row (any status).
- * RLS already hides other members' pending/rejected rows; the explicit status
- * filter on the approved read keeps the query on its index.
+ * Pure, deterministic pick of the photo of the day for a hole.
+ * Same input -> same output, for every member, all day long.
  */
-export function useHolePhoto(courseId?: string, holeNo?: number, userId?: string) {
+export function selectDailyPhoto<T>(
+  photos: T[] | null | undefined,
+  courseId: string | undefined,
+  holeNo: number | undefined,
+  date: Date = new Date(),
+): T | null {
+  if (!photos || photos.length === 0) return null;
+  const seed = hashString(`${courseId ?? ''}:${holeNo ?? ''}:${localDateKey(date)}`);
+  return photos[seed % photos.length] ?? null;
+}
+
+/**
+ * (a) All approved photos for a hole (multiple are permitted since H5), plus
+ * the viewer's own row in any status. RLS already hides other members'
+ * pending/rejected rows.
+ */
+export function useHolePhotos(courseId?: string, holeNo?: number, userId?: string) {
   return useQuery({
     queryKey: holeMediaKeys.photo(courseId, holeNo, userId),
     enabled: Boolean(courseId && typeof holeNo === 'number'),
@@ -72,47 +106,57 @@ export function useHolePhoto(courseId?: string, holeNo?: number, userId?: string
     queryFn: async (): Promise<HolePhotoState> => {
       const cols = 'id, hole_no, media_url, width, height, user_id, status, reject_reason, created_at';
 
-      const { data: approvedRow, error: approvedErr } = await supabase
+      const { data: approvedRows, error: approvedErr } = await supabase
         .from('course_hole_media')
         .select(cols)
         .eq('course_id', courseId!)
         .eq('hole_no', holeNo!)
         .eq('status', 'approved')
-        .maybeSingle();
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true });
 
       if (approvedErr) throw approvedErr;
 
-      let approved: ApprovedHolePhoto | null = null;
-      if (approvedRow) {
-        const row = approvedRow as unknown as HoleMediaRow;
-        const { data: profile } = await supabase
+      const rows = (approvedRows ?? []) as unknown as HoleMediaRow[];
+      let approved: ApprovedHolePhoto[] = [];
+
+      if (rows.length > 0) {
+        const ids = Array.from(new Set(rows.map((r) => r.user_id)));
+        const { data: profiles } = await supabase
           .from('user_profiles')
           .select('id, display_name, username')
-          .eq('id', row.user_id)
-          .maybeSingle();
-        approved = {
+          .in('id', ids);
+        const nameById = new Map<string, string | null>(
+          (profiles ?? []).map((p: { id: string; display_name: string | null; username: string | null }) => [
+            p.id,
+            p.display_name || p.username || null,
+          ]),
+        );
+        approved = rows.map((row) => ({
           ...row,
-          contributorName: profile?.display_name || profile?.username || null,
-        };
+          contributorName: nameById.get(row.user_id) ?? null,
+        }));
       }
 
       let mine: HoleMediaRow | null = null;
       if (userId) {
-        const { data: myRow, error: myErr } = await supabase
+        const { data: myRows, error: myErr } = await supabase
           .from('course_hole_media')
           .select(cols)
           .eq('course_id', courseId!)
           .eq('hole_no', holeNo!)
           .eq('user_id', userId)
-          .maybeSingle();
+          .order('created_at', { ascending: false })
+          .limit(1);
         if (myErr) throw myErr;
-        mine = (myRow as unknown as HoleMediaRow) ?? null;
+        mine = ((myRows ?? [])[0] as unknown as HoleMediaRow) ?? null;
       }
 
       return { approved, mine };
     },
   });
 }
+
 
 export interface ContributeEligibility {
   canContribute: boolean;
