@@ -217,14 +217,7 @@ async function notifyContributor(
   }
 }
 
-export class HolePhotoCollisionError extends Error {
-  constructor() {
-    super('This hole already has a live photo - remove it first');
-    this.name = 'HolePhotoCollisionError';
-  }
-}
-
-/** Approve. A 23505 means chm_one_live_per_hole already has a winner. */
+/** Approve. Multiple approved photos per hole are permitted. */
 export async function approveHolePhoto(row: HolePhotoQueueRow): Promise<void> {
   const adminId = await currentUserId();
   const { error } = await sb
@@ -237,10 +230,8 @@ export async function approveHolePhoto(row: HolePhotoQueueRow): Promise<void> {
     })
     .eq('id', row.id);
 
-  if (error) {
-    if ((error as any).code === '23505') throw new HolePhotoCollisionError();
-    throw error;
-  }
+  if (error) throw error;
+
 
   await notifyContributor(
     row.user_id,

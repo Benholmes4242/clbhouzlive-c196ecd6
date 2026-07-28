@@ -13,7 +13,7 @@ import AdminSheet from './AdminSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   HOLE_PHOTO_REJECT_REASONS,
-  HolePhotoCollisionError,
+  
   approveHolePhoto,
   fetchLiveHolePhoto,
   fetchProofRound,
@@ -120,11 +120,10 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
       refresh();
       onClose();
     } catch (e) {
-      const msg = e instanceof HolePhotoCollisionError
-        ? 'This hole already has a live photo - remove it first, then approve this one'
-        : (e as Error)?.message ?? 'Could not approve the photo';
+      const msg = (e as Error)?.message ?? 'Could not approve the photo';
       setErr(msg);
       toast.error(msg);
+
     } finally {
       setBusy(false);
     }
