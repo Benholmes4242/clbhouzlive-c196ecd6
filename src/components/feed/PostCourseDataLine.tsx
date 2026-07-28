@@ -54,10 +54,12 @@ const Stat: React.FC<{ figure: string; label: string; color?: string }> = ({
 
 interface Props {
   ctx: PostCourseContext;
+  /** Gross of the round attached to this post (C3). Enables the you-vs-them row. */
+  theirGross?: number | null;
   onTap?: () => void;
 }
 
-export const PostCourseDataLine: React.FC<Props> = ({ ctx, onTap }) => {
+export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap }) => {
   const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
@@ -141,7 +143,43 @@ export const PostCourseDataLine: React.FC<Props> = ({ ctx, onTap }) => {
           {t('feed.courseLine.notPlayed')}
         </span>
       )}
+
+      {/* C3 — you versus them, only when a round is attached to the post. */}
+      {theirGross != null && (
+        <span
+          style={{
+            flexBasis: '100%',
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 8,
+            marginTop: 2,
+          }}
+        >
+          {hasYourBest && ctx.your_best != null ? (
+            <>
+              <Stat figure={String(theirGross)} label={t('feed.courseLine.them')} />
+              <Stat figure={String(ctx.your_best)} label={t('feed.courseLine.you')} />
+              <span
+                style={{
+                  ...figureStyle,
+                  fontSize: 11.5,
+                  color: ctx.your_best < theirGross ? '#34D399' : ctx.your_best > theirGross ? RED : T60,
+                }}
+              >
+                {ctx.your_best === theirGross
+                  ? t('feed.courseLine.level')
+                  : `${ctx.your_best < theirGross ? '−' : '+'}${Math.abs(ctx.your_best - theirGross)}`}
+              </span>
+            </>
+          ) : (
+            <span style={{ ...labelStyle, color: T60, letterSpacing: '0.08em', textTransform: 'none', fontSize: 11 }}>
+              {t('feed.courseLine.noBestToCompare')}
+            </span>
+          )}
+        </span>
+      )}
     </div>
+
   );
 };
 

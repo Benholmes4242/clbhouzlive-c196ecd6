@@ -45,7 +45,9 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseDataLine } from './PostCourseDataLine';
+import { PostRoundCard } from './PostRoundCard';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import type { PostRound } from '@/hooks/feed/usePostRounds';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
@@ -108,6 +110,10 @@ export interface FeedCardProps {
   onContentReady?: () => void;
   /** Batched course data for this post's course (resolved in Clubhouse.tsx). */
   courseContext?: PostCourseContext | null;
+  /** Batched round attached to this post (resolved in Clubhouse.tsx). */
+  postRound?: PostRound | null;
+  /** Opens the attached round's scorecard. */
+  onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
 interface CaptionBlockProps {
@@ -247,6 +253,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   isFirstCard = false,
   onContentReady,
   courseContext,
+  postRound,
+  onRoundTap,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
@@ -506,6 +514,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
+      {/* Attached round — scorecard block sits ABOVE media */}
+      {postRound && (
+        <PostRoundCard
+          round={postRound}
+          onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
+        />
+      )}
+
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
@@ -697,6 +713,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {courseContext && (
               <PostCourseDataLine
                 ctx={courseContext}
+                theirGross={postRound?.grossScore ?? null}
                 onTap={post.courseId ? () => onCourse?.(post) : undefined}
               />
             )}

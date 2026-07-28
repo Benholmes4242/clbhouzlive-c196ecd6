@@ -16,6 +16,9 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -47,6 +50,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId,
 }) => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const isRoundLoading = userQuery.isLoading;
@@ -111,6 +116,25 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ? () => { onClose(); navigate(`/courses/${courseIdQuery.data}`); }
     : undefined;
 
+  // C3 — "Share this round". Offered only on the viewer's OWN round, and only
+  // once the course has resolved (a post needs the course tag to carry the
+  // round). Opens the composer pre-filled with both.
+  const shareCourseId = courseIdQuery.data ?? null;
+  const isOwnRound = !!user?.id && !!profileUserId && user.id === profileUserId;
+  const onShareRound = (isOwnRound && shareCourseId && scoreId && courseName)
+    ? () => {
+        analyticsEvents.track('round_share_opened', {
+          whs_score_id: scoreId,
+          course_id: shareCourseId,
+        });
+        onClose();
+        openPostStudioForRound({
+          course: { id: shareCourseId, name: courseName, country: courseLocation },
+          whsScoreId: scoreId,
+        });
+      }
+    : undefined;
+
   return (
     <CardScorecardSheet
       open={open}
@@ -130,6 +154,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       playerUserId={profileUserId ?? null}
       onViewProfile={onViewProfile}
       onViewCourse={onViewCourse}
+      onShareRound={onShareRound}
       emptyVariant={emptyVariant}
       emptyGross={grossVal}
       emptyToPar={toParVal}

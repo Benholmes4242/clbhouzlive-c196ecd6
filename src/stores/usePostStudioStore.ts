@@ -14,6 +14,9 @@ interface PostStudioStoreState {
   editPostId: string | null;
   /** When set, the composer opens by resuming the given draft. */
   draftId: string | null;
+  /** C3 "Share this round" — course + round the composer opens pre-filled with. */
+  prefillCourse: { id: string; name: string; country: string | null } | null;
+  prefillWhsScoreId: string | null;
 
   /** Open the studio (optionally with pre-selected media or actor) */
   openPostStudio: (opts?: {
@@ -35,6 +38,13 @@ interface PostStudioStoreState {
     returnPath?: string;
   }) => void;
 
+  /** Open the studio pre-filled with a course and one of the member's rounds. */
+  openPostStudioForRound: (opts: {
+    course: { id: string; name: string; country?: string | null };
+    whsScoreId: string;
+    returnPath?: string;
+  }) => void;
+
   /** Close the studio and reset trigger state */
   closePostStudio: () => void;
 }
@@ -47,6 +57,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   returnPath: '/',
   editPostId: null,
   draftId: null,
+  prefillCourse: null,
+  prefillWhsScoreId: null,
 
   openPostStudio: (opts) =>
     set({
@@ -57,6 +69,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       returnPath: opts?.returnPath ?? window.location.pathname,
       editPostId: null,
       draftId: null,
+      prefillCourse: null,
+      prefillWhsScoreId: null,
     }),
 
   openPostStudioForEdit: (opts) =>
@@ -68,6 +82,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       returnPath: opts.returnPath ?? window.location.pathname,
       editPostId: opts.postId,
       draftId: null,
+      prefillCourse: null,
+      prefillWhsScoreId: null,
     }),
 
   openPostStudioForDraft: (opts) =>
@@ -79,6 +95,25 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       returnPath: opts.returnPath ?? window.location.pathname,
       editPostId: null,
       draftId: opts.draftId,
+      prefillCourse: null,
+      prefillWhsScoreId: null,
+    }),
+
+  openPostStudioForRound: (opts) =>
+    set({
+      isOpen: true,
+      initialMedia: [],
+      initialActorType: 'personal',
+      initialActorId: null,
+      returnPath: opts.returnPath ?? window.location.pathname,
+      editPostId: null,
+      draftId: null,
+      prefillCourse: {
+        id: opts.course.id,
+        name: opts.course.name,
+        country: opts.course.country ?? null,
+      },
+      prefillWhsScoreId: opts.whsScoreId,
     }),
 
   closePostStudio: () =>
@@ -90,6 +125,8 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       returnPath: '/',
       editPostId: null,
       draftId: null,
+      prefillCourse: null,
+      prefillWhsScoreId: null,
     }),
 }));
 

@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 import { useStageComposer, type StageMediaItem, type AttachedRound } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
@@ -185,6 +186,33 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return () => { cancelled = true; };
   }, [draftId, isEditMode, profile?.id, restoreDraft]);
 
+  // C3 "Share this round" — open the composer pre-filled with the course and
+  // the round the member tapped share on.
+  const prefillCourse = usePostStudioStore((st) => st.prefillCourse);
+  const prefillWhsScoreId = usePostStudioStore((st) => st.prefillWhsScoreId);
+  const prefillAppliedRef = useRef(false);
+  const skipNextCourseClearRef = useRef(false);
+
+  useEffect(() => {
+    if (isEditMode || draftId) return;
+    if (prefillAppliedRef.current) return;
+    if (!prefillCourse) return;
+    prefillAppliedRef.current = true;
+    // The course-change guard must not strip the round we just attached.
+    skipNextCourseClearRef.current = true;
+    hydrate({
+      caption: '',
+      courses: [prefillCourse],
+      course: prefillCourse,
+      scheduledAt: null,
+      attachedRound: prefillWhsScoreId
+        ? { whsScoreId: prefillWhsScoreId, playDate: '', grossScore: null, coursePar: null, teeMarker: null }
+        : null,
+      media: [],
+      activeIndex: 0,
+    });
+  }, [isEditMode, draftId, prefillCourse, prefillWhsScoreId, hydrate]);
+
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'round' | 'close-guard'>(null);
 
   const [success, setSuccess] = useState<SubmitResult | null>(null);
@@ -215,6 +243,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     prevPrimaryCourseId.current = primaryCourseId;
     if (prev === undefined) return; // first mount (incl. edit-mode hydration)
     if (prev === primaryCourseId) return;
+    if (skipNextCourseClearRef.current) {
+      // Share-a-round prefill set the course and the round together.
+      skipNextCourseClearRef.current = false;
+      preselectAppliedFor.current = primaryCourseId;
+      return;
+    }
 
     // Let the new course run its own pre-selection.
     preselectAppliedFor.current = null;

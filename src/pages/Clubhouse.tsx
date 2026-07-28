@@ -56,6 +56,8 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
+import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -199,6 +201,19 @@ const ClubhouseContent = () => {
     [posts],
   );
   const courseContextMap = usePostCourseContext(feedCourseIds);
+
+  // C3 — batched attached-round data. Two queries per page (score-id
+  // resolution + round stats/shape); never one per card.
+  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const postScoreIdMap = usePostScoreIds(feedPostIds);
+  const feedScoreIds = useMemo(
+    () => Array.from(postScoreIdMap.values()),
+    [postScoreIdMap],
+  );
+  const postRoundMap = usePostRounds(feedScoreIds);
+
+  // Round drill-in from a feed scorecard tap.
+  const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -488,6 +503,11 @@ const ClubhouseContent = () => {
               posts={posts}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
+              postScoreIdMap={postScoreIdMap}
+              postRoundMap={postRoundMap}
+              onRoundTap={(post, round) =>
+                setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
+              }
               topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
@@ -573,6 +593,16 @@ const ClubhouseContent = () => {
           rewardTier={seasonRecap.rewardTier}
           seasonId={seasonRecap.seasonId}
           userId={user.id}
+        />
+      )}
+
+      {/* C3 — attached-round drill-in */}
+      {roundSheet && (
+        <RoundDetailSheet
+          open
+          onClose={() => setRoundSheet(null)}
+          scoreId={roundSheet.scoreId}
+          profileUserId={roundSheet.userId}
         />
       )}
 

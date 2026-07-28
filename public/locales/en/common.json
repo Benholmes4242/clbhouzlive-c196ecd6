@@ -131,7 +131,17 @@
       "avgOverPar": "Avg over par",
       "roundsTracked": "Rounds tracked",
       "yourBest": "Your best",
-      "notPlayed": "You haven't played here"
+      "notPlayed": "You haven't played here",
+      "them": "Them",
+      "you": "You",
+      "level": "Level",
+      "noBestToCompare": "No round of yours to compare"
+    },
+    "roundCard": {
+      "kicker": "Round posted",
+      "index": "Index",
+      "under": "Under",
+      "over": "Over"
     }
   }
 }

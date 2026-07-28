@@ -34,6 +34,7 @@ import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted 
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { FeedCard } from './FeedCard';
+import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
@@ -111,6 +112,12 @@ export interface CardFeedProps {
   courseContextMap?: Map<string, PostCourseContext>;
   /** Resolves the course id for a post (course_id, else first tagged course). */
   resolveCourseId?: (post: FeedPost) => string | null;
+  /** Batched attached-round data keyed by whs_score_id (C3, one query per page). */
+  postRoundMap?: Map<string, PostRound>;
+  /** post_id -> whs_score_id for the current page (C3). */
+  postScoreIdMap?: Map<string, string>;
+  /** Opens the attached round's scorecard. */
+  onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
 export interface CardFeedHandle {
@@ -147,6 +154,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   onSnapshot,
   courseContextMap,
   resolveCourseId,
+  postRoundMap,
+  postScoreIdMap,
+  onRoundTap,
 }, ref) {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -713,6 +723,11 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   const cid = resolveCourseId?.(post) ?? post.courseId ?? null;
                   return cid ? courseContextMap?.get(cid) ?? null : null;
                 })()}
+                postRound={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? postRoundMap?.get(sid) ?? null : null;
+                })()}
+                onRoundTap={onRoundTap}
               />
             )}
           </FeedItemGate>
@@ -741,6 +756,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       onFirstContentReady,
       courseContextMap,
       resolveCourseId,
+      postRoundMap,
+      postScoreIdMap,
+      onRoundTap,
     ],
   );
 
