@@ -460,7 +460,7 @@ function MomentsSection({
       </div>
 
       <div style={{ paddingBottom: 4 }}>
-        {tab === 'honours' ? (
+        <div style={tab === 'honours' ? undefined : { display: 'none' }}>
           <LegendarySection
             region={region}
             regionUpper={regionUpper}
@@ -468,11 +468,12 @@ function MomentsSection({
             onRowTap={onRowTap}
             onLeaderTap={onLeaderTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'honours' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('honours')}
           />
-        ) : null}
-        {tab === 'eagles' ? (
+        </div>
+        <div style={tab === 'eagles' ? undefined : { display: 'none' }}>
           <EaglesLedger
             region={region}
             regionUpper={regionUpper}
@@ -480,21 +481,23 @@ function MomentsSection({
             onRowTap={onRowTap}
             onLeaderTap={onLeaderTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'eagles' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('eagles')}
           />
-        ) : null}
-        {tab === 'birdies' ? (
+        </div>
+        <div style={tab === 'birdies' ? undefined : { display: 'none' }}>
           <BirdieHaulsLedger
             region={region}
             regionUpper={regionUpper}
             mode={mode}
             onRowTap={onRowTap}
             hideHeader
-            sheetOpen={sheetOpen}
+            sheetOpen={tab === 'birdies' && sheetOpen}
             onSheetOpenChange={setSheetOpen}
+            onEmpty={reporter('birdies')}
           />
-        ) : null}
+        </div>
       </div>
     </DiscoverBand>
   );
