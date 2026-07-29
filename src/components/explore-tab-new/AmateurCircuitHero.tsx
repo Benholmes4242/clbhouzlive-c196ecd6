@@ -1,10 +1,20 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useHeroStories, type HeroStoryRow, type HeroStoryKind } from './hooks/useHeroStories';
+import {
+  useHeroStories,
+  type HeroChips,
+  type HeroStoryDetail,
+  type HeroStoryRow,
+  type HeroStoryKind,
+} from './hooks/useHeroStories';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { toParText } from './hooks/useRegionFeats';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
@@ -42,6 +52,121 @@ function initials(name: string): string {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Story + chips (jsonb, parsed defensively - shapes are not guaranteed)
+// ---------------------------------------------------------------------------
+
+export type HeroStoryKindTag = 'beat' | 'rarity' | 'first_at_course' | 'most_at_course' | 'none';
+
+function asRecord(v: unknown): Record<string, unknown> | null {
+  return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
+}
+
+function num(v: unknown): number | null {
+  const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
+interface ChipItem {
+  key: string;
+  label: string;
+}
+
+/** Ordered chip list. Absent/zero/false keys are omitted entirely. */
+function buildChips(raw: HeroChips | null | undefined, t: TFunction): ChipItem[] {
+  const r = asRecord(raw);
+  if (!r) return [];
+  const out: ChipItem[] = [];
+  const birdies = num(r.birdies) ?? 0;
+  if (birdies > 0) {
+    out.push({
+      key: 'birdies',
+      // plural key, count passed as a NUMBER so i18next selects _one/_other
+      label: t('discover.friendsRounds.feats.birdies', { count: birdies }),
+    });
+  }
+  const eagles = num(r.eagles) ?? 0;
+  if (eagles > 0) {
+    out.push({ key: 'eagles', label: t('discover.friendsRounds.feats.eagles', { count: eagles }) });
+  }
+  if (r.beat_par === true) {
+    out.push({ key: 'beat_par', label: t('discover.friendsRounds.feats.beatPar', 'UNDER PAR') });
+  }
+  if (r.clean_card === true) {
+    out.push({ key: 'clean_card', label: t('discover.friendsRounds.feats.cleanCard', 'CLEAN CARD') });
+  }
+  return out;
+}
+
+/**
+ * Story renderer. Returns null for a missing story OR an unrecognised
+ * story kind - the caller renders nothing and reserves no space.
+ */
+function buildStoryLine(
+  raw: HeroStoryDetail | null | undefined,
+  row: HeroStoryRow,
+  t: TFunction,
+): { text: string; storyKind: HeroStoryKindTag } | null {
+  const s = asRecord(raw);
+  if (!s) return null;
+  const kind = typeof s.kind === 'string' ? s.kind : '';
+
+  if (kind === 'beat') {
+    const by = num(s.by);
+    if (by == null) return null;
+    const stood = s.stood == null || s.stood === '' ? null : String(s.stood);
+    // self is load-bearing: the holder cannot "beat" themselves.
+    if (s.self === true) {
+      let text = t('discover.heroStory.beatSelf', { by });
+      if (stood) text += t('discover.heroStory.stoodSelf', { stood });
+      return { text, storyKind: 'beat' };
+    }
+    const name = typeof s.name === 'string' && s.name.trim() ? s.name.trim() : null;
+    if (!name) return null;
+    let text = t('discover.heroStory.beat', { name, by });
+    if (stood) text += t('discover.heroStory.stood', { stood });
+    return { text, storyKind: 'beat' };
+  }
+
+  if (kind === 'rarity') {
+    const noun =
+      row.kind === 'ace'
+        ? t('discover.heroStory.nounAce', 'hole-in-one')
+        : row.kind === 'albatross'
+          ? t('discover.heroStory.nounAlbatross', 'albatross')
+          : null;
+    if (!noun) return null;
+    const total = num(s.total);
+    if (total === 1) {
+      return { text: t('discover.heroStory.rarityOnly', { noun }), storyKind: 'rarity' };
+    }
+    const ordinalN = num(s.ordinal);
+    if (ordinalN == null || ordinalN < 1) return null;
+    const ordinal = t('discover.heroStory.ordinal', { count: ordinalN, ordinal: true });
+    return { text: t('discover.heroStory.rarityNth', { ordinal, noun }), storyKind: 'rarity' };
+  }
+
+  if (kind === 'first_at_course') {
+    if (!row.course_name) return null;
+    return {
+      text: t('discover.heroStory.firstEagle', { course: row.course_name }),
+      storyKind: 'first_at_course',
+    };
+  }
+
+  if (kind === 'most_at_course') {
+    if (!row.course_name) return null;
+    return {
+      text: t('discover.heroStory.mostBirdies', { course: row.course_name }),
+      storyKind: 'most_at_course',
+    };
+  }
+
+  // Unrecognised story kind - render nothing.
+  return null;
+}
+
+
 interface HeroSlideProps {
   story: HeroStoryRow;
   onOpenScore: (scoreId: string, userId: string | null) => void;
@@ -49,8 +174,12 @@ interface HeroSlideProps {
 }
 
 function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
+  const { t } = useTranslation('courses');
   const holder = formatHolderName(story.holder_name);
   const overline = `${KIND_LABEL[story.kind] ?? story.kind.toUpperCase()} · THE AMATEUR CIRCUIT`;
+  const chips = useMemo(() => buildChips(story.chips, t), [story.chips, t]);
+  const storyLine = useMemo(() => buildStoryLine(story.story, story, t), [story, t]);
+
 
   let bigValue = '';
   let bigColor = '#FFFFFF';
@@ -182,6 +311,51 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           >
             {story.course_name}
           </div>
+
+          {/* Chips - nothing rendered (and no space reserved) when absent */}
+          {chips.length > 0 ? (
+            <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {chips.map((c) => (
+                <span
+                  key={c.key}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '3px 6px',
+                    borderRadius: 4,
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.07em',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                    color: '#FFFFFF',
+                    background: 'rgba(255,255,255,0.16)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {c.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Story line - absent story renders nothing at all */}
+          {storyLine ? (
+            <div
+              style={{
+                marginTop: 11,
+                fontSize: 14,
+                lineHeight: 1.45,
+                maxWidth: 330,
+                color: 'rgba(255,255,255,0.9)',
+              }}
+            >
+              {storyLine.text}
+            </div>
+          ) : null}
+
           <div
             style={{
               marginTop: 10,
@@ -324,6 +498,28 @@ function AmateurCircuitHeroInner({ fallback }: AmateurCircuitHeroProps) {
 
   const stories = data ?? [];
   const count = stories.length;
+
+  // Analytics: fire once per slide VIEW, not per render (the carousel
+  // re-renders on every swipe frame). The 'none' story_kind count tells us
+  // what share of slides have nothing to say.
+  const { t: tHero } = useTranslation('courses');
+  const seenSlidesRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    const row = stories[activeIndex];
+    if (!row) return;
+    if (seenSlidesRef.current.has(activeIndex)) return;
+    seenSlidesRef.current.add(activeIndex);
+    const line = buildStoryLine(row.story, row, tHero);
+    analyticsEvents.track('hero_story_shown', {
+      kind: row.kind,
+      story_kind: line?.storyKind ?? 'none',
+    });
+    analyticsEvents.track('hero_chips_shown', {
+      kind: row.kind,
+      chip_count: buildChips(row.chips, tHero).length,
+    });
+  }, [activeIndex, stories, tHero]);
+
 
   // Pick a random entry slide once per mount, jump to it instantly
   // (no scroll animation), and sync the dot state. Runs BEFORE paint so
