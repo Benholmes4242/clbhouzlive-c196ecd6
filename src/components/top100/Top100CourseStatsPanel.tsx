@@ -1,180 +1,267 @@
 /**
- * Top100CourseStatsPanel — the same contained COURSE STATS module the
- * Clubhouse feed and Discover use, in its light-surface form.
+ * Top100CourseStatsPanel — the COURSE STATS block beneath each rated Top 100
+ * card.
  *
- * Cells are omitted when null; a dash is never shown. When no member has
- * rated the course the panel becomes a prompt instead, which is the whole
- * reason this module belongs in the Top 100 tab.
+ * Renders NOTHING when the course carries no member rating: the "Rate" nudge
+ * at the top of the tab already carries that ask, and ninety-odd identical
+ * prompts drown the courses that actually hold data.
  *
- * This component NEVER fetches — everything arrives batched from
- * useTop100Enrichment.
+ * Row one pairs the member rating (left) with the difficulty reading (right).
+ * The four rating sub-scores that already live in course_rating_aggregates
+ * follow as 2x2 bars, gated behind t100_subscore_min_ratings (default 3) so a
+ * single member's afternoon is never presented as analysis.
+ *
+ * This component NEVER fetches course data — everything arrives batched from
+ * useTop100Enrichment. Only the runtime threshold is read (cached config).
+ *
+ * Analytics callsites:
+ *  - top100_subscores_shown  { course_id, rating_count }  (see barsRef IO)
+ *  - top100_subscores_hidden { course_id, rating_count }  (see barsRef IO)
  */
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Flag } from 'lucide-react';
-import { AMBER, HAIRLINE_INK_8, INK, INK_TINT_02 } from '@/features/courses/_shared/tokens';
+import React, { useEffect, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { AMBER, HAIRLINE_INK_8, INK } from '@/features/courses/_shared/tokens';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
 const RED = '#DC2626';
+const GREEN = '#047857';
 const LABEL_INK = 'rgba(15,23,42,0.42)';
+const MUTED_INK = 'rgba(15,23,42,0.55)';
+const TRACK = 'rgba(15,23,42,0.08)';
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
-export const STATS_PANEL_HEIGHT = 66;
-
-const figureStyle: React.CSSProperties = {
-  fontFamily: MONO,
+/** Slashed zeros are switched off wherever tabular figures appear here. */
+const NUMERALS: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
-  fontSize: 17,
-  fontWeight: 800,
-  letterSpacing: '-0.035em',
-  lineHeight: 1.1,
+  fontFeatureSettings: '"zero" 0',
 };
 
-const labelStyle: React.CSSProperties = {
+/** Fires once per course per session, not per mount. */
+const seenSubscores = new Set<string>();
+
+const headingStyle: React.CSSProperties = {
   fontSize: 8.5,
   fontWeight: 800,
-  letterSpacing: '0.12em',
+  letterSpacing: '0.14em',
   textTransform: 'uppercase',
-  color: LABEL_INK,
+  color: AMBER,
   lineHeight: 1,
-  marginTop: 3,
-  whiteSpace: 'nowrap',
 };
 
+const ratingStyle: React.CSSProperties = {
+  ...NUMERALS,
+  fontFamily: MONO,
+  fontSize: 22,
+  fontWeight: 800,
+  letterSpacing: '-0.04em',
+  lineHeight: 1.05,
+  color: INK,
+};
+
+const difficultyLineStyle: React.CSSProperties = {
+  fontSize: 11.5,
+  fontWeight: 500,
+  color: MUTED_INK,
+  lineHeight: 1.35,
+  letterSpacing: '-0.005em',
+};
+
+const barLabelStyle: React.CSSProperties = {
+  width: 54,
+  flexShrink: 0,
+  fontSize: 10,
+  fontWeight: 600,
+  color: LABEL_INK,
+  whiteSpace: 'nowrap',
+  lineHeight: 1,
+};
+
+const barFigureStyle: React.CSSProperties = {
+  ...NUMERALS,
+  fontFamily: MONO,
+  fontSize: 11,
+  fontWeight: 800,
+  lineHeight: 1,
+  letterSpacing: '-0.02em',
+};
+
+function bandColor(score: number): string {
+  if (score >= 9) return GREEN;
+  if (score >= 7.5) return AMBER;
+  return RED;
+}
+
 interface Props {
+  courseId: string;
   data: Top100Enrichment | undefined;
   onRate: () => void;
 }
 
-export const Top100CourseStatsPanel: React.FC<Props> = ({ data, onRate }) => {
+const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label, score }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+    <span style={barLabelStyle}>{label}</span>
+    <div style={{ flex: 1, height: 3, borderRadius: 2, background: TRACK, minWidth: 0 }}>
+      <div
+        style={{
+          width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
+          height: '100%',
+          borderRadius: 2,
+          background: bandColor(score),
+        }}
+      />
+    </div>
+    <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
+  </div>
+);
+
+export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, data, onRate }) => {
   const { t } = useTranslation('courses');
+  const { subscoreMinRatings } = useTop100Config();
+  const barsRef = useRef<HTMLDivElement | null>(null);
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
   const avgOverPar = data?.avgOverPar ?? null;
+  const harderPct = data?.harderThanPct ?? null;
 
-  const shell: React.CSSProperties = {
-    height: STATS_PANEL_HEIGHT,
-    background: INK_TINT_02,
-    border: `1px solid ${HAIRLINE_INK_8}`,
-    borderRadius: 10,
-    padding: '8px 0 9px',
-    display: 'flex',
-    flexDirection: 'column',
+  const hasRating = rating != null && ratingCount > 0;
+
+  const subs = data?.subScores;
+  const showBars =
+    hasRating &&
+    ratingCount >= subscoreMinRatings &&
+    !!subs &&
+    subs.design != null &&
+    subs.condition != null &&
+    subs.facilities != null &&
+    subs.clubhouse != null;
+
+  // One-shot per course per session: did the 3-rating gate suppress the bars?
+  useEffect(() => {
+    const el = barsRef.current;
+    if (!el || !hasRating || seenSubscores.has(courseId)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || seenSubscores.has(courseId)) return;
+        seenSubscores.add(courseId);
+        io.disconnect();
+        analyticsEvents.track(
+          showBars ? 'top100_subscores_shown' : 'top100_subscores_hidden',
+          { course_id: courseId, rating_count: ratingCount },
+        );
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [courseId, hasRating, showBars, ratingCount]);
+
+  // Nothing to say about a course no member has rated.
+  if (!hasRating) return null;
+
+  const figureStyleFor = (color: string): React.CSSProperties => ({
+    ...NUMERALS,
+    fontFamily: MONO,
+    fontSize: 12.5,
+    fontWeight: 800,
+    color,
+    letterSpacing: '-0.02em',
+  });
+
+  /**
+   * The difficulty reading, in three directions.
+   *  above par  -> "Plays X above par on average" / "Harder than N% of courses"
+   *  below par  -> "Plays X below par on average" / "Easier than (100-N)% of courses"
+   *  level par  -> "Plays level par on average"   / "Middle of the pack for difficulty"
+   * The percentile INVERTS below par: a course playing under par is not
+   * "harder than 4%", it is easier than 96%.
+   */
+  const renderDifficulty = (): React.ReactNode => {
+    if (avgOverPar == null) return null;
+
+    if (avgOverPar === 0) {
+      return (
+        <>
+          <div style={difficultyLineStyle}>{t('top100.stats.playsLevel')}</div>
+          <div style={difficultyLineStyle}>{t('top100.stats.middleOfPack')}</div>
+        </>
+      );
+    }
+
+    const above = avgOverPar > 0;
+    const color = above ? RED : GREEN;
+    const abs = Math.abs(avgOverPar).toFixed(1);
+
+    return (
+      <>
+        <div style={difficultyLineStyle}>
+          <Trans
+            i18nKey={above ? 'top100.stats.playsAbove' : 'top100.stats.playsBelow'}
+            ns="courses"
+            values={{ value: abs }}
+            components={{ 1: <span style={figureStyleFor(color)} /> }}
+          />
+        </div>
+        {harderPct != null && (
+          <div style={difficultyLineStyle}>
+            <Trans
+              i18nKey={above ? 'top100.stats.harderThan' : 'top100.stats.easierThan'}
+              ns="courses"
+              values={{ pct: above ? Math.round(harderPct) : 100 - Math.round(harderPct) }}
+              components={{ 1: <span style={figureStyleFor(color)} /> }}
+            />
+          </div>
+        )}
+      </>
+    );
   };
 
-  const heading = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 12px', marginBottom: 6 }}>
-      <Flag size={9} color={AMBER} strokeWidth={2.5} />
-      <span
-        style={{
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: AMBER,
-          lineHeight: 1,
-        }}
-      >
-        {t('top100.stats.heading')}
-      </span>
-    </div>
-  );
-
-  // No member has rated it yet -> turn the gap into a prompt.
-  if (rating == null || ratingCount === 0) {
-    return (
-      <div style={shell}>
-        {heading}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            padding: '0 12px',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 500,
-              color: 'rgba(15,23,42,0.55)',
-              lineHeight: 1.2,
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {t('top100.stats.emptyBody')}
-          </span>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRate();
-            }}
-            style={{
-              flexShrink: 0,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.02em',
-              color: AMBER,
-              padding: '5px 10px',
-              borderRadius: 999,
-              border: `1px solid ${HAIRLINE_INK_8}`,
-              background: '#FFFFFF',
-            }}
-          >
-            {t('top100.stats.beTheFirst')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const cells: { key: string; figure: string; label: string; color: string }[] = [
-    {
-      key: 'rating',
-      figure: rating.toFixed(1),
-      label: t('top100.stats.memberRating'),
-      color: INK,
-    },
-    {
-      key: 'count',
-      figure: String(ratingCount),
-      label: t('top100.stats.ratings', { count: ratingCount }),
-      color: INK,
-    },
-  ];
-
-  if (avgOverPar != null) {
-    cells.push({
-      key: 'avg',
-      figure: `${avgOverPar > 0 ? '+' : ''}${avgOverPar.toFixed(1)}`,
-      label: t('top100.stats.playsOnAvg'),
-      color: RED,
-    });
-  }
-
   return (
-    <div style={shell}>
-      {heading}
-      <div style={{ display: 'flex', alignItems: 'stretch', width: '100%' }}>
-        {cells.map((cell, i) => (
+    <div style={{ paddingTop: 10 }}>
+      <div style={{ ...headingStyle, marginBottom: 8 }}>{t('top100.stats.heading')}</div>
+
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        <div style={{ flexShrink: 0 }}>
+          <div style={ratingStyle}>{rating.toFixed(1)}</div>
           <div
-            key={cell.key}
             style={{
-              flex: 1,
-              minWidth: 0,
-              textAlign: 'center',
-              padding: '0 6px',
-              borderLeft: i === 0 ? 'none' : `1px solid ${HAIRLINE_INK_8}`,
+              fontSize: 11.5,
+              fontWeight: 500,
+              color: MUTED_INK,
+              lineHeight: 1.3,
+              marginTop: 2,
             }}
           >
-            <div style={{ ...figureStyle, color: cell.color }}>{cell.figure}</div>
-            <div style={labelStyle}>{cell.label}</div>
+            {t('top100.stats.fromRatings', { count: ratingCount })}
           </div>
-        ))}
+        </div>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>{renderDifficulty()}</div>
+      </div>
+
+      <div ref={barsRef}>
+        {showBars && subs && (
+          <div
+            style={{
+              marginTop: 9,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              borderTop: `1px solid ${HAIRLINE_INK_8}`,
+              paddingTop: 9,
+            }}
+          >
+            <div style={{ display: 'flex', gap: 16 }}>
+              <SubScoreBar label={t('top100.stats.design')} score={subs.design as number} />
+              <SubScoreBar label={t('top100.stats.condition')} score={subs.condition as number} />
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <SubScoreBar label={t('top100.stats.facilities')} score={subs.facilities as number} />
+              <SubScoreBar label={t('top100.stats.clubhouse')} score={subs.clubhouse as number} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
