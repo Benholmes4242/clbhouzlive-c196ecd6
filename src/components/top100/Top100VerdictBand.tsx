@@ -31,18 +31,50 @@ const RED_INK = '#B91C1C';
 
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();
+const seenRank = new Set<string>();
 
-/** Minimum height only. The band WRAPS to two lines and never truncates. */
+/** Minimum height only. The band WRAPS and never truncates. */
 export const VERDICT_BAND_HEIGHT = 30;
+
+/** 1st / 2nd / 3rd / 4th ... */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
+
+export interface VerdictRatingRank {
+  position: number;
+  poolSize: number;
+}
 
 interface Props {
   courseId: string;
   courseName: string;
   verdict: Verdict;
+  /** Standing within the rated pool of the selected list, when known. */
+  ratingRank?: VerdictRatingRank | null;
+  list?: string;
   onOpen: () => void;
 }
 
-export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdict, onOpen }) => {
+export const Top100VerdictBand: React.FC<Props> = ({
+  courseId,
+  courseName,
+  verdict,
+  ratingRank,
+  list,
+  onOpen,
+}) => {
   const { t } = useTranslation('courses');
   const ref = useRef<HTMLButtonElement | null>(null);
 
@@ -69,6 +101,31 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdi
     return () => io.disconnect();
   }, [courseId, verdict.direction, verdict.gap, verdict.ratingCount]);
 
+  // t100_rating_rank_shown — one shot per course per session, render callsite.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !ratingRank || seenRank.has(courseId)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || seenRank.has(courseId)) return;
+        seenRank.add(courseId);
+        io.disconnect();
+        analyticsEvents.track('t100_rating_rank_shown', {
+          course_id: courseId,
+          list: list ?? null,
+          position: ratingRank.position,
+          pool_size: ratingRank.poolSize,
+          published_rank: verdict.rank,
+        });
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [courseId, list, ratingRank, verdict.rank]);
+
+  const ink = higher ? GREEN_INK : RED_INK;
+
   return (
     <button
       ref={ref}
@@ -83,8 +140,9 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdi
       }}
       style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
         width: '100%',
         minHeight: VERDICT_BAND_HEIGHT,
         padding: '7px 12px',
@@ -92,7 +150,7 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdi
         textAlign: 'left',
         background: higher ? GREEN_BG : RED_BG,
         border: `1px solid ${higher ? GREEN_LINE : RED_LINE}`,
-        color: higher ? GREEN_INK : RED_INK,
+        color: ink,
       }}
     >
       <span
@@ -101,16 +159,29 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdi
           fontWeight: 800,
           letterSpacing: '-0.005em',
           lineHeight: 1.3,
-          display: '-webkit-box',
-          WebkitBoxOrient: 'vertical',
-          WebkitLineClamp: 2,
-          overflow: 'hidden',
         }}
       >
         {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', { course: courseName })}
       </span>
+      {ratingRank && (
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 600,
+            lineHeight: 1.3,
+            marginTop: 2,
+            opacity: 0.78,
+          }}
+        >
+          {t('top100.verdict.ratingRank', {
+            position: ordinal(ratingRank.position),
+            poolSize: ratingRank.poolSize,
+          })}
+        </span>
+      )}
     </button>
   );
 };
+
 
 export default Top100VerdictBand;

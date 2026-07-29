@@ -9,18 +9,20 @@
  * can drift on lists with mixed rated/unrated coverage.
  */
 import React from 'react';
-import { Top100VerdictBand } from './Top100VerdictBand';
+import { Top100VerdictBand, type VerdictRatingRank } from './Top100VerdictBand';
 import { Top100CourseStatsPanel } from './Top100CourseStatsPanel';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import type { Verdict } from './verdict';
 
 interface Props {
   courseId: string;
-  courseName: string;
+  /** Null when the name lookup misses: the band is then suppressed entirely. */
+  courseName: string | null;
   rank: number | null;
   list: string;
   data: Top100Enrichment | undefined;
   verdict: Verdict | null;
+  ratingRank?: VerdictRatingRank | null;
   onOpenVerdict: () => void;
   onRate: () => void;
 }
@@ -32,6 +34,7 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
   list,
   data,
   verdict,
+  ratingRank,
   onOpenVerdict,
   onRate,
 }) => {
@@ -40,16 +43,19 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
 
   return (
     <div className="px-3 sm:px-0" style={{ paddingTop: 8 }}>
-      {verdict && (
+      {verdict && courseName && (
         <div style={{ marginBottom: 6 }}>
           <Top100VerdictBand
             courseId={courseId}
             courseName={courseName}
             verdict={verdict}
+            ratingRank={ratingRank}
+            list={list}
             onOpen={onOpenVerdict}
           />
         </div>
       )}
+
       <Top100CourseStatsPanel
         courseId={courseId}
         rank={rank}

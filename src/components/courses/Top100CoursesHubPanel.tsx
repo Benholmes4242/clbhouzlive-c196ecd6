@@ -251,23 +251,51 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     [enrichment],
   );
 
+  /**
+   * Standing on member ratings WITHIN the selected list, restricted to the
+   * same minRatings pool the verdict band itself uses so the number can never
+   * contradict the sentence above it. Computed from allCourses, never from the
+   * rendered or paginated subset. Tiebreak is ratingCount DESC: on equal
+   * ratings the more widely rated course goes above.
+   */
+  const ratingRankMap = React.useMemo(() => {
+    const pool: { id: string; rating: number; count: number }[] = [];
+    for (const course of allCourses) {
+      const memberships = (course.list_memberships ?? []) as CourseListMembership[];
+      const inList = memberships.some((m) => m.list_slug.includes(selectedList));
+      if (!inList && memberships.length > 0) continue;
+      const data = enrichment.get(course.id);
+      if (!data || data.rating == null) continue;
+      if (data.ratingCount < verdictConfig.minRatings) continue;
+      pool.push({ id: course.id, rating: data.rating, count: data.ratingCount });
+    }
+    pool.sort((a, b) => b.rating - a.rating || b.count - a.count);
+    const map = new Map<string, { position: number; poolSize: number }>();
+    pool.forEach((entry, index) => {
+      map.set(entry.id, { position: index + 1, poolSize: pool.length });
+    });
+    return map;
+  }, [allCourses, selectedList, enrichment, verdictConfig.minRatings]);
+
   const renderEnrichment = React.useCallback(
     (courseId: string) => {
       const data = enrichment.get(courseId);
       const verdict = verdictFor(courseId);
+      const courseName = courseNameById.get(courseId) ?? null;
       return (
         <Top100EnrichmentBlock
           courseId={courseId}
-          courseName={courseNameById.get(courseId) ?? ''}
+          courseName={courseName}
           rank={rankMap.get(courseId) ?? null}
           list={selectedList}
           data={data}
           verdict={verdict}
+          ratingRank={ratingRankMap.get(courseId) ?? null}
           onOpenVerdict={() => {
-            if (!verdict) return;
+            if (!verdict || !courseName) return;
             setVerdictSheet({
               courseId,
-              courseName: courseNameById.get(courseId) ?? '',
+              courseName,
               verdict,
               canRate: !!data && !data.ratedByYou,
             });
@@ -276,8 +304,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         />
       );
     },
-    [enrichment, verdictFor, courseNameById, rankMap, selectedList, navigate],
+    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, navigate],
   );
+
 
   // Total courses in the active list — pulled from the per-list summaries
   const totalCoursesInActiveList =
