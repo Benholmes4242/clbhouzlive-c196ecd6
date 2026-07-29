@@ -130,7 +130,6 @@
     "action": "Share this round"
   },
   "feed": {
-
     "courseLine": {
       "panelHeading": "Course stats",
       "playsOnAvg": "Plays on avg",
@@ -147,6 +146,38 @@
       "index": "Index",
       "under": "Under",
       "over": "Over"
+    },
+    "courseBand": {
+      "avg": "Avg",
+      "rounds_one": "Round",
+      "rounds_other": "Rounds",
+      "yourBest": "Your best"
+    },
+    "courseSheet": {
+      "kicker": "Course stats",
+      "memberRating": "member rating",
+      "playsOnAvgLabel": "Plays on avg",
+      "playsOnAvgHeadline": "Members average {{avg}} shots over par here.",
+      "playsOnAvgBody": "That makes it harder than {{pct}}% of the courses we track.",
+      "thinNote_one": "From {{count}} round so far, so treat this lightly. It will settle as more members play here.",
+      "thinNote_other": "From {{count}} rounds so far, so treat this lightly. It will settle as more members play here.",
+      "roundsLabel_one": "Round tracked",
+      "roundsLabel_other": "Rounds tracked",
+      "roundsHeadline_one": "{{count}} round has been posted here by members.",
+      "roundsHeadline_other": "{{count}} rounds have been posted here by members.",
+      "circlePlayed_one": "{{count}} in your circle has played it.",
+      "circlePlayed_other": "{{count}} in your circle have played it.",
+      "circleEmpty": "Nobody in your circle has played it yet.",
+      "roundsThinNote": "Play here and your round becomes part of this.",
+      "yourBestLabel": "Your best",
+      "yourBestHeadline": "Your best round here is {{score}}.",
+      "yourBestBody_one": "Set on {{date}}, across {{count}} round you have played here.",
+      "yourBestBody_other": "Set on {{date}}, across {{count}} rounds you have played here.",
+      "yourBestEmpty": "You have not posted a round here. When you do, your best will show alongside the field.",
+      "hardestHoleLabel": "Hardest hole",
+      "hardestHoleMeta": "par {{par}}, plays to",
+      "viewCourse": "View course",
+      "footnote": "Computed from official WHS rounds posted by members."
     }
   }
 }

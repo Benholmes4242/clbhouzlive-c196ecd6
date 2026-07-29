@@ -19,7 +19,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
-import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
@@ -45,6 +45,8 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseDataLine } from './PostCourseDataLine';
+import { PostCourseBand } from './PostCourseBand';
+import { CourseStatsSheet } from './CourseStatsSheet';
 import { PostRoundCard } from './PostRoundCard';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
@@ -280,6 +282,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Double-tap-to-like: burst overlay + like-only (never unlike) commit.
   const [burstKey, setBurstKey] = useState(0);
   const [burstVisible, setBurstVisible] = useState(false);
+  // Course stats sheet. Mounting it is what enables the detail RPC.
+  const [statsOpen, setStatsOpen] = useState(false);
   const handleMediaDoubleTap = React.useCallback(() => {
     // Always show the burst (confirms even when already liked)…
     setBurstKey((k) => k + 1);
@@ -614,147 +618,81 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
 
 
-      {/* Course eyebrow + location (above caption) */}
-      {(post.courseName || courseContext) && (() => {
+      {/* Course band: identity + figures + actions in ONE container. */}
+      {(() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
-        const handleCourseTap = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          onCourse?.(post);
-        };
-        // Secondary-chip rule (same as the Courses stat browse): the community
-        // rating chip renders unless it would duplicate a figure already on the
-        // card. On a review post the reviewer's own rating is already shown as
-        // the ghost numeral, so the chip is suppressed.
-        const suppressRatingChip = Boolean(post.isReview) && reviewRating != null;
-        const pill = post.courseRating != null && !suppressRatingChip ? (() => {
-          return (
-            <button
-              type="button"
-              onClick={handleCourseTap}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                padding: '3px 9px 3px 4px', borderRadius: 999,
-                cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-            >
-              <img
-                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                alt=""
-                style={{
-                  width: 16, height: 16, flexShrink: 0, objectFit: 'contain',
-                }}
-                aria-hidden="true"
-              />
-              <span style={{ fontSize: 11, fontWeight: 800, color: T100, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                {formatRatingValue(post.courseRating)}
-              </span>
-            </button>
-          );
-        })() : null;
-        const nameEl = post.courseId ? (
-          <button
-            type="button"
-            onClick={handleCourseTap}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              textAlign: 'left',
-              fontSize: 13,
-              fontWeight: 700,
-              color: T100,
-              cursor: 'pointer',
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {post.courseName}
-          </button>
-        ) : (
+        // Secondary-figure rule (same as the Courses stat browse): the
+        // community rating renders unless it would duplicate a figure already
+        // on the card. On a review post the reviewer's own rating is already
+        // shown as the ghost numeral, so it is suppressed.
+        const suppressRating = Boolean(post.isReview) && reviewRating != null;
+        const hasCourse = Boolean(post.courseName || courseContext);
+
+        const actionsRow = (
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: T100,
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 14px 12px',
             }}
           >
-            {post.courseName}
+            <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+            <FooterButton
+              icon={Heart}
+              label={formatCount(likeCount)}
+              active={liked}
+              onClick={() => onLike(post, effectiveActor)}
+              activeColor={AMBER}
+              haptic={!liked ? 'selection' : 'none'}
+            />
+            <FooterButton
+              icon={MessageCircle}
+              label={formatCount(commentCount)}
+              onClick={() => onComment(post, effectiveActor)}
+            />
+            <FooterButton icon={Share} onClick={() => onShare(post)} />
           </div>
         );
+
+        if (!hasCourse) {
+          return <div style={{ borderTop: `0.5px solid ${LINE}` }}>{actionsRow}</div>;
+        }
+
         return (
-          <div style={{ padding: '10px 14px 10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              {nameEl}
-              {pill}
-            </div>
-            {courseLocation && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: 11,
-                  color: T60,
-                  marginTop: 2,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <MapPin size={10} color={T40} style={{ marginRight: 3, flexShrink: 0 }} />
-                {courseLocation}
-              </div>
-            )}
-            {courseContext && (
-              <PostCourseDataLine
-                ctx={courseContext}
-                theirGross={postRound?.grossScore ?? null}
-                onTap={post.courseId ? () => onCourse?.(post) : undefined}
+          <>
+            <PostCourseBand
+              courseName={post.courseName}
+              courseLocation={courseLocation || null}
+              courseRating={suppressRating ? null : post.courseRating ?? null}
+              ctx={courseContext ?? null}
+              onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
+              actions={actionsRow}
+              extra={
+                courseContext && postRound?.grossScore != null ? (
+                  <PostCourseDataLine
+                    ctx={courseContext}
+                    theirGross={postRound.grossScore}
+                    panel={false}
+                  />
+                ) : null
+              }
+            />
+            {post.courseId && statsOpen && (
+              <CourseStatsSheet
+                open={statsOpen}
+                onClose={() => setStatsOpen(false)}
+                courseId={post.courseId}
+                courseName={post.courseName}
+                courseLocation={courseLocation || null}
+                courseRating={post.courseRating ?? null}
               />
             )}
-          </div>
+          </>
         );
       })()}
-
-
-      {/* Footer action bar — 4 evenly spaced items */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 14px 12px',
-          borderTop: `0.5px solid ${LINE}`,
-        }}
-      >
-        <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-        <FooterButton
-          icon={Heart}
-          label={formatCount(likeCount)}
-          active={liked}
-          onClick={() => onLike(post, effectiveActor)}
-          activeColor={AMBER}
-          haptic={!liked ? 'selection' : 'none'}
-        />
-        <FooterButton
-          icon={MessageCircle}
-          label={formatCount(commentCount)}
-          onClick={() => onComment(post, effectiveActor)}
-        />
-        <FooterButton icon={Share} onClick={() => onShare(post)} />
-
-      </div>
     </article>
   );
 };

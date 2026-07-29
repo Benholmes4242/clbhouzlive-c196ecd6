@@ -87,9 +87,14 @@ interface Props {
   /** Gross of the round attached to this post (C3). Enables the you-vs-them row. */
   theirGross?: number | null;
   onTap?: () => void;
+  /**
+   * When false the COURSE STATS panel is suppressed and only the C3
+   * you-vs-them row renders. The band above now carries the figures.
+   */
+  panel?: boolean;
 }
 
-export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap }) => {
+export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap, panel = true }) => {
   const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
@@ -151,7 +156,7 @@ export const PostCourseDataLine: React.FC<Props> = ({ ctx, theirGross, onTap }) 
 
   // No tracked rounds at the course at all -> no panel. The course name and
   // region row above is untouched.
-  const showPanel = hasRounds && cellCount > 0;
+  const showPanel = panel && hasRounds && cellCount > 0;
   if (!showPanel && theirGross == null) return null;
 
   return (
