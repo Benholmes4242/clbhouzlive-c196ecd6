@@ -329,7 +329,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
       {/* ── Pickers (sticky) ────────────────────────────────────── */}
       <div
-        className="-mx-4 px-4 pt-3 pb-3 sticky"
+        className="-mx-4 px-4 pt-1.5 pb-2 sticky"
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: 20,
