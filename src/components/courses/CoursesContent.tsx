@@ -409,7 +409,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               ) : (
                 <>
                   {shellTabsNode}
-                  <div className="px-4 pt-3">
+                  <div className="px-4 pt-0">
                     {showDirectory ? (
                       <>
                         <button
