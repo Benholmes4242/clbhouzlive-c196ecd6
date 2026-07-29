@@ -221,9 +221,9 @@ export const PostCourseBand: React.FC<Props> = ({
         {courseLocation ? (
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12,
               lineHeight: 1,
-              color: T60,
+              color: T40,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -234,39 +234,27 @@ export const PostCourseBand: React.FC<Props> = ({
         ) : null}
       </div>
 
+      <div style={{ flex: 1, minWidth: 8 }} />
 
-      <div style={{ flex: 1, minWidth: 0 }} />
-
-      {figures.length > 0 && (
+      {figure && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 9,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 6,
             flexShrink: 0,
           }}
         >
-          {figures.map((f) => (
-            <div
-              key={f.key}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-              }}
-            >
-              <span style={{ ...inlineFigureValueStyle, color: f.color }}>
-                {f.figure}
-              </span>
-              <span style={inlineFigureLabelStyle}>{f.label}</span>
-            </div>
-          ))}
+          <span style={{ ...figureValueStyle, color: figure.color }}>
+            {figure.figure}
+          </span>
+          <span style={figureLabelStyle}>{figure.label}</span>
         </div>
       )}
 
       {tappable && (
         <ChevronRight
-          size={14}
+          size={16}
           color={T40}
           style={{ flexShrink: 0, marginLeft: 6 }}
         />
