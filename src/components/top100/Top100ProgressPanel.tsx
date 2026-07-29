@@ -66,7 +66,11 @@ export const Top100ProgressPanel: React.FC<Props> = ({ lists, onOpenList }) => {
             color: INK_MUTE,
           }}
         >
-          {t('top100.progressPanel.aggregate', { played: totalPlayed, total: totalCourses })}
+          {t('top100.progressPanel.aggregate', {
+            played: totalPlayed,
+            total: totalCourses,
+            rated: totalRated,
+          })}
         </span>
       </div>
 
