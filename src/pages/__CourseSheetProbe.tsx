@@ -12,7 +12,7 @@ export default function CourseSheetProbe() {
       <CourseStatsSheet
         open={open}
         onClose={() => setOpen(false)}
-        courseId="35e9d5a0-ac61-47aa-8c56-1cc26aa41675"
+        courseId="84e8a638-87c6-48d8-9a4c-d6ae01992c8f"
         courseName="Sundridge Park (West Course)"
         courseLocation="Bromley, England"
         courseRating={7.4}
