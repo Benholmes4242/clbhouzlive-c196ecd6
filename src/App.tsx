@@ -528,6 +528,7 @@ function AppRoutes() {
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
+
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
         <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
         <Route path="/post-v2" element={<Suspense fallback={<GenericPageSkeleton />}><PostV2Page /></Suspense>} />
