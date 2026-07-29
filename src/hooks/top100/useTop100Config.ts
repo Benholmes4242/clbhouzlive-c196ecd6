@@ -19,6 +19,8 @@ const KEYS = [
   't100_verdict_enabled',
   't100_verdict_min_ratings',
   't100_verdict_threshold',
+  't100_verdict_anchor',
+  't100_verdict_slope',
   't100_subscore_min_ratings',
 ] as const;
 
@@ -26,6 +28,8 @@ const FALLBACK: Top100Config = {
   enabled: false,
   minRatings: 3,
   threshold: 0.5,
+  anchor: 9.36,
+  slope: 0.01,
   subscoreMinRatings: 3,
 };
 
@@ -53,6 +57,8 @@ export function useTop100Config(): Top100Config {
     enabled: (data.t100_verdict_enabled ?? 0) === 1,
     minRatings: data.t100_verdict_min_ratings ?? FALLBACK.minRatings,
     threshold: data.t100_verdict_threshold ?? FALLBACK.threshold,
+    anchor: data.t100_verdict_anchor ?? FALLBACK.anchor,
+    slope: data.t100_verdict_slope ?? FALLBACK.slope,
     subscoreMinRatings: data.t100_subscore_min_ratings ?? FALLBACK.subscoreMinRatings,
   };
 }

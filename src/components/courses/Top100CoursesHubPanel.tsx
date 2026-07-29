@@ -258,6 +258,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
       return (
         <Top100EnrichmentBlock
           courseId={courseId}
+          courseName={courseNameById.get(courseId) ?? ''}
+          rank={rankMap.get(courseId) ?? null}
+          list={selectedList}
           data={data}
           verdict={verdict}
           onOpenVerdict={() => {
@@ -273,7 +276,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         />
       );
     },
-    [enrichment, verdictFor, courseNameById, navigate],
+    [enrichment, verdictFor, courseNameById, rankMap, selectedList, navigate],
   );
 
   // Total courses in the active list — pulled from the per-list summaries

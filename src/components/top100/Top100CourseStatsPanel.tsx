@@ -17,6 +17,7 @@
  * Analytics callsites:
  *  - top100_subscores_shown  { course_id, rating_count }  (see barsRef IO)
  *  - top100_subscores_hidden { course_id, rating_count }  (see barsRef IO)
+ *  - t100_no_rounds_line_shown { course_id, rank, list } (see noRoundsRef IO)
  */
 import React, { useEffect, useRef } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -29,6 +30,8 @@ const RED = '#DC2626';
 const GREEN = '#047857';
 const LABEL_INK = 'rgba(15,23,42,0.42)';
 const MUTED_INK = 'rgba(15,23,42,0.55)';
+/** Deliberately colourless: this is an invitation, not a data value. */
+const NO_ROUNDS_INK = '#68707B';
 const TRACK = 'rgba(15,23,42,0.08)';
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
@@ -40,6 +43,7 @@ const NUMERALS: React.CSSProperties = {
 
 /** Fires once per course per session, not per mount. */
 const seenSubscores = new Set<string>();
+const seenNoRounds = new Set<string>();
 
 const headingStyle: React.CSSProperties = {
   fontSize: 8.5,
@@ -95,6 +99,8 @@ function bandColor(score: number): string {
 
 interface Props {
   courseId: string;
+  rank: number | null;
+  list: string;
   data: Top100Enrichment | undefined;
   onRate: () => void;
 }
@@ -116,10 +122,11 @@ const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label, score 
   </div>
 );
 
-export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, data, onRate }) => {
+export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data, onRate }) => {
   const { t } = useTranslation('courses');
   const { subscoreMinRatings } = useTop100Config();
   const barsRef = useRef<HTMLDivElement | null>(null);
+  const noRoundsRef = useRef<HTMLDivElement | null>(null);
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
@@ -127,6 +134,10 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, data, onRate
   const harderPct = data?.harderThanPct ?? null;
 
   const hasRating = rating != null && ratingCount > 0;
+
+  // Only when the block is already rendering AND nobody has logged a round.
+  // At 1 or 2 rounds the existing "Early data" treatment already speaks.
+  const showNoRounds = hasRating && (data?.roundsTracked ?? 0) === 0;
 
   const subs = data?.subScores;
   const showBars =
@@ -157,6 +168,26 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, data, onRate
     io.observe(el);
     return () => io.disconnect();
   }, [courseId, hasRating, showBars, ratingCount]);
+
+  useEffect(() => {
+    const el = noRoundsRef.current;
+    if (!el || !showNoRounds || seenNoRounds.has(courseId)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || seenNoRounds.has(courseId)) return;
+        seenNoRounds.add(courseId);
+        io.disconnect();
+        analyticsEvents.track('t100_no_rounds_line_shown', {
+          course_id: courseId,
+          rank,
+          list,
+        });
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [courseId, showNoRounds, rank, list]);
 
   // Nothing to say about a course no member has rated.
   if (!hasRating) return null;
@@ -237,7 +268,23 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, data, onRate
             {t('top100.stats.fromRatings', { count: ratingCount })}
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>{renderDifficulty()}</div>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+          {showNoRounds ? (
+            <div
+              ref={noRoundsRef}
+              style={{
+                fontSize: 11.5,
+                fontWeight: 500,
+                color: NO_ROUNDS_INK,
+                lineHeight: 1.3,
+              }}
+            >
+              {t('top100.stats.noRounds')}
+            </div>
+          ) : (
+            renderDifficulty()
+          )}
+        </div>
       </div>
 
       <div ref={barsRef}>
