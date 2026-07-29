@@ -282,6 +282,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Double-tap-to-like: burst overlay + like-only (never unlike) commit.
   const [burstKey, setBurstKey] = useState(0);
   const [burstVisible, setBurstVisible] = useState(false);
+  // Course stats sheet. Mounting it is what enables the detail RPC.
+  const [statsOpen, setStatsOpen] = useState(false);
   const handleMediaDoubleTap = React.useCallback(() => {
     // Always show the burst (confirms even when already liked)…
     setBurstKey((k) => k + 1);
