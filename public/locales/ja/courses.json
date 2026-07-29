@@ -251,11 +251,12 @@
       "design": "Design",
       "condition": "Condition",
       "facilities": "Facilities",
-      "clubhouse": "Clubhouse"
+      "clubhouse": "Clubhouse",
+      "noRounds": "No rounds tracked here yet. Be the first."
     },
     "verdict": {
-      "higher": "Members rate it higher than its rank suggests",
-      "lower": "Members rate it lower than its rank suggests"
+      "higher": "Members rate {{course}} higher than its rank suggests",
+      "lower": "Members rate {{course}} lower than its rank suggests"
     }
   },
   "userCourses": {
