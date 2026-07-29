@@ -221,36 +221,8 @@ export const PostCourseBand: React.FC<Props> = ({
             {courseLocation}
           </span>
         ) : null}
-        {courseRating != null ? (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              flexShrink: 0,
-            }}
-          >
-            <img
-              src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-              alt=""
-              aria-hidden="true"
-              style={{ width: 10, height: 10, objectFit: 'contain' }}
-            />
-            <span
-              style={{
-                fontSize: 11.5,
-                fontFamily: MONO,
-                fontVariantNumeric: 'tabular-nums',
-                fontWeight: 800,
-                color: T60,
-                lineHeight: 1,
-              }}
-            >
-              {formatRatingValue(courseRating)}
-            </span>
-          </span>
-        ) : null}
       </div>
+
 
       <div style={{ flex: 1, minWidth: 0 }} />
 
