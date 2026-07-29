@@ -307,6 +307,51 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           >
             {story.course_name}
           </div>
+
+          {/* Chips - nothing rendered (and no space reserved) when absent */}
+          {chips.length > 0 ? (
+            <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {chips.map((c) => (
+                <span
+                  key={c.key}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '3px 6px',
+                    borderRadius: 4,
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.07em',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                    color: '#FFFFFF',
+                    background: 'rgba(255,255,255,0.16)',
+                    backdropFilter: 'blur(6px)',
+                    WebkitBackdropFilter: 'blur(6px)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {c.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Story line - absent story renders nothing at all */}
+          {storyLine ? (
+            <div
+              style={{
+                marginTop: 11,
+                fontSize: 14,
+                lineHeight: 1.45,
+                maxWidth: 330,
+                color: 'rgba(255,255,255,0.9)',
+              }}
+            >
+              {storyLine.text}
+            </div>
+          ) : null}
+
           <div
             style={{
               marginTop: 10,
