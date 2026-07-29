@@ -1,10 +1,20 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useHeroStories, type HeroStoryRow, type HeroStoryKind } from './hooks/useHeroStories';
+import {
+  useHeroStories,
+  type HeroChips,
+  type HeroStoryDetail,
+  type HeroStoryRow,
+  type HeroStoryKind,
+} from './hooks/useHeroStories';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { toParText } from './hooks/useRegionFeats';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const GOLD = '#FBBC2E';
