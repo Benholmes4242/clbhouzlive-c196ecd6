@@ -18548,6 +18548,24 @@ export type Database = {
           rounds_90d: number
         }[]
       }
+      get_course_stats_detail: {
+        Args: { p_course_id: string }
+        Returns: {
+          avg_over_par: number
+          circle_played: number
+          course_id: string
+          harder_than_pct: number
+          hardest_hole_no: number
+          hardest_hole_par: number
+          hardest_hole_plays: number
+          rounds_tracked: number
+          top100_list: string
+          top100_rank: number
+          your_best: number
+          your_best_at: string
+          your_rounds: number
+        }[]
+      }
       get_course_sub_regions: {
         Args: { p_region: string }
         Returns: {
