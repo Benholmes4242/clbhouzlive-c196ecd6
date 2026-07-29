@@ -342,8 +342,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             background: 'rgba(248,250,252,0.72)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
-            borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '4px 0 10px',
+            padding: '4px 0 6px',
             marginTop: -1,
           }}
         >
