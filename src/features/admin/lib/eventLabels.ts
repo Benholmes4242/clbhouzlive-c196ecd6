@@ -55,6 +55,8 @@ export const EVENT_LABELS: Record<string, string> = {
   hero_blurb_shown: 'Courses hero blurb shown',
   hero_context_shown: 'Courses hero context line shown',
   hero_view_course: 'Courses hero view course',
+  hero_story_shown: 'Discover hero story shown',
+  hero_chips_shown: 'Discover hero chips shown',
 
   course_sheet_opened: 'Course stats sheet opened',
   course_sheet_view_course: 'Course stats sheet view course',
