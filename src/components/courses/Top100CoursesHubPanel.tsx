@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
