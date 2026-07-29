@@ -8,6 +8,31 @@ export type HeroStoryKind =
   | 'eagle'
   | 'birdie_haul';
 
+/**
+ * Feat chips attached to the round behind a hero story.
+ * jsonb, may be {} - parse defensively at the render site.
+ */
+export interface HeroChips {
+  birdies?: number | null;
+  eagles?: number | null;
+  beat_par?: boolean | null;
+  clean_card?: boolean | null;
+}
+
+/**
+ * Narrative payload. jsonb or null; the shape depends on the row kind:
+ *   course_record  { kind:'beat', name, by, self, stood }
+ *   ace|albatross  { kind:'rarity', ordinal, total }
+ *   eagle          { kind:'first_at_course' }
+ *   birdie_haul    { kind:'most_at_course', count }
+ */
+export type HeroStoryDetail =
+  | { kind: 'beat'; name?: string | null; by?: number | null; self?: boolean | null; stood?: string | number | null }
+  | { kind: 'rarity'; ordinal?: number | null; total?: number | null }
+  | { kind: 'first_at_course' }
+  | { kind: 'most_at_course'; count?: number | null }
+  | { kind: string };
+
 export interface HeroStoryRow {
   kind: HeroStoryKind;
   course_id: string | null;
@@ -21,7 +46,12 @@ export interface HeroStoryRow {
   course_par: number | null;
   hole: number | null;
   happened_at: string | null;
+  /** jsonb, may be {} */
+  chips?: HeroChips | null;
+  /** jsonb, may be null */
+  story?: HeroStoryDetail | null;
 }
+
 
 export function useHeroStories() {
   return useQuery<HeroStoryRow[]>({
