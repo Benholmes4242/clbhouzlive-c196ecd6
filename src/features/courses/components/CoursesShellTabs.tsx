@@ -1,5 +1,5 @@
 import React from 'react';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import { FilterChips } from '@/components/ui/FilterChips';
 
 type CoursesTab = 'explore' | 'top100';
 
@@ -14,22 +14,21 @@ interface CoursesShellTabsProps {
 }
 
 /**
- * CoursesShellTabs — canonical pill tab strip shared with Discover.
- * Light variant, centered, no bottom divider (the parent owns the seam).
+ * CoursesShellTabs — canonical dark-fill pill row (FilterChips), matching the
+ * Top 100 region pills. Centered, no bottom divider (the parent owns the seam).
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => (
-  <SegmentedControl
-    tabs={TABS}
-    activeTab={activeTab}
-    onTabChange={(id) => onTabChange(id as CoursesTab)}
-    variant="light"
-    align="center"
-    hideBorder
-    ariaLabel="Courses Sections"
-  />
+  <div className="px-4 py-2 flex justify-center">
+    <FilterChips
+      options={TABS}
+      value={activeTab}
+      onChange={(id) => onTabChange(id as CoursesTab)}
+      ariaLabel="Courses Sections"
+    />
+  </div>
 );
 
 export default CoursesShellTabs;
