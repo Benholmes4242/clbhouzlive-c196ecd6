@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FilterChips } from '@/components/ui/FilterChips';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { useNavigate } from 'react-router-dom';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
@@ -69,20 +69,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   // Fetch data
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: lists = [] } = useTop100Lists();
-
-  // Cross-list progress — only counts lists the user has actually started
-  // (at least 1 played). Mirrors the original framing the previous panel had.
-  const crossListProgress = React.useMemo(() => {
-    const started = listSummaries.filter(s => s.played_count > 0);
-    if (started.length === 0) return null;
-    const totalRated = started.reduce((acc, s) => acc + s.played_count, 0);
-    const totalInStartedLists = started.reduce((acc, s) => acc + s.total_courses, 0);
-    return {
-      totalRated,
-      totalInStartedLists,
-      listsStarted: started.length,
-    };
-  }, [listSummaries]);
 
   // Debounce search
   useEffect(() => {
@@ -294,6 +280,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const totalCoursesInActiveList =
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
+  // Progress is scoped to the active list only. When the member has no row for
+  // that list yet we synthesise a zero row so the panel still renders.
+  const activeProgress: Top100ListProgress = React.useMemo(() => {
+    const match = progressLists.find((l) => l.list_slug === selectedList);
+    if (match) return match;
+    const fallbackName =
+      listOptions.find((o) => o.value === selectedList)?.label ?? 'Top 100';
+    return {
+      list_id: selectedList,
+      list_slug: selectedList,
+      list_name: fallbackName,
+      total: totalCoursesInActiveList,
+      played: 0,
+      rated: 0,
+    };
+  }, [progressLists, selectedList, totalCoursesInActiveList, listOptions]);
+
   return (
     <div>
       {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
@@ -325,36 +328,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             {t('top100.provenance', { defaultValue: "The top 100 courses in the world and in every region, as ranked by golf's leading publications." })}
           </p>
 
-          {crossListProgress && (
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: SLATE_600,
-                margin: '6px 0 0',
-                letterSpacing: '-0.005em',
-                fontFamily: "'Geist', sans-serif",
-              }}
-            >
-              <Trans
-                i18nKey={crossListProgress.listsStarted === 1 ? 'top100.progress_one' : 'top100.progress_other'}
-                ns="courses"
-                values={{
-                  rated: crossListProgress.totalRated,
-                  total: crossListProgress.totalInStartedLists,
-                  count: crossListProgress.listsStarted,
-                }}
-                components={{
-                  1: <span style={{
-                    color: AMBER,
-                    fontWeight: 700,
-                    fontVariantNumeric: 'tabular-nums',
-                    fontFeatureSettings: '"zero" 0',
-                  }} />,
-                }}
-              />
-            </p>
-          )}
         </div>
       </div>
 
@@ -446,9 +419,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {/* Member context — progress across lists, then where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              {progressLists.length > 0 && (
-                <Top100ProgressPanel lists={progressLists} onOpenList={setProgressSheet} />
-              )}
+              <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
             </div>
           )}
