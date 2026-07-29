@@ -499,6 +499,28 @@ function AmateurCircuitHeroInner({ fallback }: AmateurCircuitHeroProps) {
   const stories = data ?? [];
   const count = stories.length;
 
+  // Analytics: fire once per slide VIEW, not per render (the carousel
+  // re-renders on every swipe frame). The 'none' story_kind count tells us
+  // what share of slides have nothing to say.
+  const { t: tHero } = useTranslation('courses');
+  const seenSlidesRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    const row = stories[activeIndex];
+    if (!row) return;
+    if (seenSlidesRef.current.has(activeIndex)) return;
+    seenSlidesRef.current.add(activeIndex);
+    const line = buildStoryLine(row.story, row, tHero);
+    analyticsEvents.track('hero_story_shown', {
+      kind: row.kind,
+      story_kind: line?.storyKind ?? 'none',
+    });
+    analyticsEvents.track('hero_chips_shown', {
+      kind: row.kind,
+      chip_count: buildChips(row.chips, tHero).length,
+    });
+  }, [activeIndex, stories, tHero]);
+
+
   // Pick a random entry slide once per mount, jump to it instantly
   // (no scroll animation), and sync the dot state. Runs BEFORE paint so
   // the user lands on the chosen slide rather than watching it travel.
