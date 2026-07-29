@@ -359,7 +359,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           </div>
         </div>
 
-        <div className="px-4 space-y-4 pt-4">
+        <div className="px-4 space-y-4 pt-2">
           {/* Search bar — non-sticky */}
           <div className="-mx-4 px-4">
             <div className="relative">
