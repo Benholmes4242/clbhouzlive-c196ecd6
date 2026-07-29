@@ -151,7 +151,11 @@
       "avg": "avg",
       "rounds_one": "round",
       "rounds_other": "rounds",
-      "yourBest": "pb"
+      "yourBest": "pb",
+      "yourBestHere": "your best here",
+      "roundTracked_one": "round tracked",
+      "roundTracked_other": "rounds tracked",
+      "harderThan": "harder than {{pct}}% of courses"
     },
     "courseSheet": {
       "kicker": "Course stats",
