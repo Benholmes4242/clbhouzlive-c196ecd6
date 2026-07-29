@@ -37,7 +37,7 @@ const MONO =
 const inlineFigureValueStyle: React.CSSProperties = {
   fontFamily: MONO,
   fontVariantNumeric: 'tabular-nums',
-  fontSize: 12.5,
+  fontSize: 8.5,
   fontWeight: 800,
   letterSpacing: '-0.03em',
   lineHeight: 1,
