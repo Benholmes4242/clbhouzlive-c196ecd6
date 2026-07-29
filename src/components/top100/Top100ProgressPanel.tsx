@@ -24,6 +24,7 @@ export const Top100ProgressPanel: React.FC<Props> = ({ lists, onOpenList }) => {
   if (started.length === 0) return null;
 
   const totalPlayed = started.reduce((acc, l) => acc + l.played, 0);
+  const totalRated = started.reduce((acc, l) => acc + l.rated, 0);
   const totalCourses = started.reduce((acc, l) => acc + l.total, 0);
 
   return (
