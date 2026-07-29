@@ -632,6 +632,22 @@
         "eagles": "Eagles",
         "birdies": "Birdies"
       }
+    },
+    "heroStory": {
+      "beat": "Beat {{name}} by {{by}}.",
+      "beatSelf": "Lowered their own record by {{by}}.",
+      "stood": " The record had stood since {{stood}}.",
+      "stoodSelf": " It had stood since {{stood}}.",
+      "rarityOnly": "The only {{noun}} ever logged on clbhouz.",
+      "rarityNth": "Only the {{ordinal}} {{noun}} ever logged on clbhouz.",
+      "nounAce": "hole-in-one",
+      "nounAlbatross": "albatross",
+      "firstEagle": "The first eagle logged at {{course}}.",
+      "mostBirdies": "The most birdies anyone has posted at {{course}}.",
+      "ordinal_ordinal_one": "{{count}}st",
+      "ordinal_ordinal_two": "{{count}}nd",
+      "ordinal_ordinal_few": "{{count}}rd",
+      "ordinal_ordinal_other": "{{count}}th"
     }
   }
 }
