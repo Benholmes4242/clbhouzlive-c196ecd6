@@ -133,18 +133,58 @@ export const PostCourseBand: React.FC<Props> = ({
   const line1 = (
     <div
       style={{
-        fontSize: 14.5,
-        fontWeight: 800,
-        letterSpacing: '-0.015em',
-        lineHeight: 1.05,
-        color: T100,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
+        display: 'flex',
+        alignItems: 'center',
         width: '100%',
+        lineHeight: 1.05,
       }}
     >
-      {courseName}
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          fontSize: 14.5,
+          fontWeight: 800,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.05,
+          color: T100,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {courseName}
+      </div>
+      {courseRating != null ? (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 3,
+            flexShrink: 0,
+            marginLeft: 8,
+          }}
+        >
+          <img
+            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+            alt=""
+            aria-hidden="true"
+            style={{ width: 10, height: 10, objectFit: 'contain' }}
+          />
+          <span
+            style={{
+              fontSize: 11.5,
+              fontFamily: MONO,
+              fontVariantNumeric: 'tabular-nums',
+              fontWeight: 800,
+              color: T60,
+              lineHeight: 1,
+            }}
+          >
+            {formatRatingValue(courseRating)}
+          </span>
+        </span>
+      ) : null}
     </div>
   );
 
