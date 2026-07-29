@@ -220,8 +220,6 @@
     }
   },
   "top100": {
-    "progress_one": "You've rated <1>{{rated}} of {{total}}</1> across {{count}} list",
-    "progress_other": "You've rated <1>{{rated}} of {{total}}</1> across {{count}} lists",
     "searchPlaceholder": "Search the {{listLabel}} Top 100",
     "searchA11y": "Search within Top 100 list",
     "listsA11y": "Top 100 lists",

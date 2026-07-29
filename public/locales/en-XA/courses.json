@@ -218,8 +218,6 @@
     }
   },
   "top100": {
-    "progress_one": "[~~Ýőú'ṽé řáţéđ <1>{{rated}} őƒ {{total}}</1> across {{count}} ļíšţ~~]",
-    "progress_other": "[~~Ýőú'ṽé řáţéđ <1>{{rated}} őƒ {{total}}</1> across {{count}} ļíšţš~~]",
     "searchPlaceholder": "[~~Šéářĉĥ ţĥé {{listLabel}} Ţőƥ 100~~]",
     "searchA11y": "[~~Šéářĉĥ ŵíţĥíñ Ţőƥ 100 ļíšţ~~]",
     "listsA11y": "[~~Ţőƥ 100 ļíšţš~~]",
