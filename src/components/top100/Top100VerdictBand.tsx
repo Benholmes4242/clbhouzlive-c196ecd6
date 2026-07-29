@@ -183,3 +183,5 @@ export const Top100VerdictBand: React.FC<Props> = ({
   );
 };
 
+
+export default Top100VerdictBand;
