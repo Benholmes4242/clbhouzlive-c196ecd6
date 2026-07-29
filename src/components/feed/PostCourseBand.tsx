@@ -34,23 +34,22 @@ const SURFACE = 'rgba(255,255,255,0.035)';
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
-const figureStyle: React.CSSProperties = {
+const inlineFigureValueStyle: React.CSSProperties = {
   fontFamily: MONO,
   fontVariantNumeric: 'tabular-nums',
-  fontSize: 16,
+  fontSize: 12.5,
   fontWeight: 800,
-  letterSpacing: '-0.035em',
-  lineHeight: 1.05,
+  letterSpacing: '-0.03em',
+  lineHeight: 1,
 };
 
-const labelStyle: React.CSSProperties = {
-  fontSize: 8,
+const inlineFigureLabelStyle: React.CSSProperties = {
+  fontSize: 8.5,
   fontWeight: 800,
-  letterSpacing: '0.11em',
+  letterSpacing: '0.1em',
   textTransform: 'uppercase',
   color: T40,
   lineHeight: 1,
-  marginTop: 3,
   whiteSpace: 'nowrap',
 };
 
@@ -131,105 +130,132 @@ export const PostCourseBand: React.FC<Props> = ({
     onOpenStats?.();
   };
 
-  const rowOne = (
-    <>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 14.5,
-            fontWeight: 800,
-            letterSpacing: '-0.015em',
-            color: T100,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {courseName}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginTop: 2,
-            minWidth: 0,
-          }}
-        >
-          {courseLocation ? (
+  const line1 = (
+    <div
+      style={{
+        fontSize: 14.5,
+        fontWeight: 800,
+        letterSpacing: '-0.015em',
+        lineHeight: 1.05,
+        color: T100,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        width: '100%',
+      }}
+    >
+      {courseName}
+    </div>
+  );
+
+  const line2 = (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 4,
+        lineHeight: 1,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+          flexShrink: 0,
+          minWidth: 0,
+        }}
+      >
+        {courseLocation ? (
+          <span
+            style={{
+              fontSize: 11.5,
+              lineHeight: 1,
+              color: T60,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {courseLocation}
+          </span>
+        ) : null}
+        {courseRating != null ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              flexShrink: 0,
+            }}
+          >
+            <img
+              src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+              alt=""
+              aria-hidden="true"
+              style={{ width: 10, height: 10, objectFit: 'contain' }}
+            />
             <span
               style={{
                 fontSize: 11.5,
+                fontFamily: MONO,
+                fontVariantNumeric: 'tabular-nums',
+                fontWeight: 800,
                 color: T60,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                minWidth: 0,
+                lineHeight: 1,
               }}
             >
-              {courseLocation}
+              {formatRatingValue(courseRating)}
             </span>
-          ) : null}
-          {courseRating != null ? (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                alt=""
-                aria-hidden="true"
-                style={{ width: 12, height: 12, objectFit: 'contain' }}
-              />
-              <span
-                style={{
-                  fontSize: 11.5,
-                  fontFamily: MONO,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: T60,
-                  lineHeight: 1,
-                }}
-              >
-                {formatRatingValue(courseRating)}
-              </span>
-            </span>
-          ) : null}
-        </div>
+          </span>
+        ) : null}
       </div>
+
+      <div style={{ flex: 1, minWidth: 0 }} />
 
       {figures.length > 0 && (
         <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
-            gap: 13,
+            alignItems: 'center',
+            gap: 9,
             flexShrink: 0,
-            textAlign: 'right',
           }}
         >
           {figures.map((f) => (
-            <div key={f.key}>
-              <div style={{ ...figureStyle, color: f.color }}>{f.figure}</div>
-              <div style={labelStyle}>{f.label}</div>
+            <div
+              key={f.key}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+              }}
+            >
+              <span style={{ ...inlineFigureValueStyle, color: f.color }}>
+                {f.figure}
+              </span>
+              <span style={inlineFigureLabelStyle}>{f.label}</span>
             </div>
           ))}
         </div>
       )}
 
       {tappable && (
-        <ChevronRight size={15} color={T40} style={{ flexShrink: 0, alignSelf: 'center' }} />
+        <ChevronRight
+          size={14}
+          color={T40}
+          style={{ flexShrink: 0, marginLeft: 6 }}
+        />
       )}
-    </>
+    </div>
   );
 
   const rowStyle: React.CSSProperties = {
     display: 'flex',
-    alignItems: 'center',
-    gap: 10,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 0,
     width: '100%',
     textAlign: 'left',
     padding: '9px 14px 10px',
@@ -246,10 +272,14 @@ export const PostCourseBand: React.FC<Props> = ({
           className="active:opacity-70"
           style={{ ...rowStyle, cursor: 'pointer' }}
         >
-          {rowOne}
+          {line1}
+          {line2}
         </button>
       ) : (
-        <div style={rowStyle}>{rowOne}</div>
+        <div style={rowStyle}>
+          {line1}
+          {line2}
+        </div>
       )}
 
       {extra ? <div style={{ padding: '0 14px 8px' }}>{extra}</div> : null}

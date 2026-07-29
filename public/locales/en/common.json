@@ -148,10 +148,10 @@
       "over": "Over"
     },
     "courseBand": {
-      "avg": "Avg",
-      "rounds_one": "Round",
-      "rounds_other": "Rounds",
-      "yourBest": "Your best"
+      "avg": "avg",
+      "rounds_one": "round",
+      "rounds_other": "rounds",
+      "yourBest": "best"
     },
     "courseSheet": {
       "kicker": "Course stats",
