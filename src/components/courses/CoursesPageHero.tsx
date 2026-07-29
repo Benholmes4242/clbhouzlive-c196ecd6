@@ -278,10 +278,71 @@ function CoursesPageHeroInner() {
               </div>
             </div>
 
+            {/* Blurb: absent for most moods, so the gap closes with it. */}
+            {blurb && (
+              <div
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(255,255,255,0.9)',
+                  lineHeight: 1.45,
+                  maxWidth: 340,
+                  marginTop: 12,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {blurb}
+              </div>
+            )}
+
+            {contextLine && (
+              <div
+                style={{
+                  marginTop: blurb ? 10 : 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: 999,
+                    background: '#F7931E',
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 12.5,
+                    color: 'rgba(255,255,255,0.72)',
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {contextLine.text}
+                </span>
+              </div>
+            )}
+
             <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
               <button
                 type="button"
-                onClick={() => navigate(`/courses/${hero.course_id}`)}
+                onClick={() => {
+                  analyticsEvents.track('hero_view_course', {
+                    course_id: hero.course_id,
+                    mood,
+                    had_blurb: !!blurb,
+                  });
+                  navigate(`/courses/${hero.course_id}`);
+                }}
+
                 className="active:scale-[0.98] transition-transform"
                 style={{
                   background: '#fff',
