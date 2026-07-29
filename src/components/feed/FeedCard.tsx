@@ -563,6 +563,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 position: 'relative',
                 width: '100%',
                 aspectRatio: String(ratio),
+                maxHeight: 'calc(100vh - 340px)',
                 overflow: 'hidden',
                 background: '#05080F',
               }}
