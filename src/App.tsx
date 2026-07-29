@@ -1,4 +1,3 @@
-import CourseSheetProbe from '@/pages/__CourseSheetProbe';
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
@@ -529,7 +528,6 @@ function AppRoutes() {
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
-        <Route path="/__course-sheet-probe" element={<Suspense fallback={null}><CourseSheetProbe /></Suspense>} />
 
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
         <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
