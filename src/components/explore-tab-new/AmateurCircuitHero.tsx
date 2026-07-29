@@ -174,8 +174,12 @@ interface HeroSlideProps {
 }
 
 function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
+  const { t } = useTranslation('courses');
   const holder = formatHolderName(story.holder_name);
   const overline = `${KIND_LABEL[story.kind] ?? story.kind.toUpperCase()} · THE AMATEUR CIRCUIT`;
+  const chips = useMemo(() => buildChips(story.chips, t), [story.chips, t]);
+  const storyLine = useMemo(() => buildStoryLine(story.story, story, t), [story, t]);
+
 
   let bigValue = '';
   let bigColor = '#FFFFFF';
