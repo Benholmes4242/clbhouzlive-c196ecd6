@@ -23,6 +23,14 @@ export interface Top100Enrichment {
   yourRounds: number;
   yourBest: number | null;
   ratedByYou: boolean;
+  harderThanPct: number | null;
+  /** Rating sub-scores, straight from course_rating_aggregates. */
+  subScores: {
+    design: number | null;
+    condition: number | null;
+    facilities: number | null;
+    clubhouse: number | null;
+  };
 }
 
 const EMPTY = new Map<string, Top100Enrichment>();
@@ -54,7 +62,7 @@ export function useTop100Enrichment(courseIds: string[], userId: string | undefi
       const [aggRes, ctxRes, mineRes] = await Promise.all([
         supabase
           .from('course_rating_aggregates' as any)
-          .select('course_id, avg_overall_score, review_count')
+          .select('course_id, avg_overall_score, review_count, avg_design_score, avg_condition_score, avg_facilities_score, avg_clubhouse_score')
           .in('course_id', ids),
         supabase.rpc('get_post_course_context', { p_course_ids: ids }),
         userId
@@ -81,6 +89,8 @@ export function useTop100Enrichment(courseIds: string[], userId: string | undefi
           yourRounds: 0,
           yourBest: null,
           ratedByYou: false,
+          harderThanPct: null,
+          subScores: { design: null, condition: null, facilities: null, clubhouse: null },
         });
       }
 
@@ -89,6 +99,13 @@ export function useTop100Enrichment(courseIds: string[], userId: string | undefi
         if (!entry) continue;
         entry.rating = row.avg_overall_score != null ? Number(row.avg_overall_score) : null;
         entry.ratingCount = Number(row.review_count ?? 0);
+        const num = (v: unknown) => (v != null ? Number(v) : null);
+        entry.subScores = {
+          design: num(row.avg_design_score),
+          condition: num(row.avg_condition_score),
+          facilities: num(row.avg_facilities_score),
+          clubhouse: num(row.avg_clubhouse_score),
+        };
       }
 
       for (const row of (ctxRes.data ?? []) as any[]) {
@@ -98,6 +115,7 @@ export function useTop100Enrichment(courseIds: string[], userId: string | undefi
         entry.avgOverPar = row.avg_over_par != null ? Number(row.avg_over_par) : null;
         entry.yourRounds = Number(row.your_rounds ?? 0);
         entry.yourBest = row.your_best != null ? Number(row.your_best) : null;
+        entry.harderThanPct = row.harder_than_pct != null ? Number(row.harder_than_pct) : null;
       }
 
       for (const row of (mineRes.data ?? []) as any[]) {

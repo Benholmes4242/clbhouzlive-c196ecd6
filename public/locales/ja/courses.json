@@ -229,7 +229,26 @@
     "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
     "clearSearch": "Clear search",
     "resetFilters": "Reset filters",
-    "sectionTitle": "The world's best"
+    "sectionTitle": "The world's best",
+    "stats": {
+      "heading": "Course stats",
+      "fromRatings_one": "from {{count}} rating",
+      "fromRatings_other": "from {{count}} ratings",
+      "playsAbove": "Plays <1>{{value}}</1> above par on average",
+      "playsBelow": "Plays <1>{{value}}</1> below par on average",
+      "playsLevel": "Plays level par on average",
+      "harderThan": "Harder than <1>{{pct}}%</1> of courses",
+      "easierThan": "Easier than <1>{{pct}}%</1> of courses",
+      "middleOfPack": "Middle of the pack for difficulty",
+      "design": "Design",
+      "condition": "Condition",
+      "facilities": "Facilities",
+      "clubhouse": "Clubhouse"
+    },
+    "verdict": {
+      "higher": "Members rate it higher than its rank suggests",
+      "lower": "Members rate it lower than its rank suggests"
+    }
   },
   "userCourses": {
     "emptyRegion": "No courses found in the selected region.",

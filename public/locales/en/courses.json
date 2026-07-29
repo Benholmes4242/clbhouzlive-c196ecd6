@@ -363,16 +363,22 @@
     },
     "stats": {
       "heading": "Course stats",
-      "memberRating": "Member rating",
-      "ratings": "Ratings",
-      "playsOnAvg": "Plays on avg",
-      "beTheFirst": "Be the first to rate it",
-      "emptyBody": "No member has rated this course yet."
+      "fromRatings_one": "from {{count}} rating",
+      "fromRatings_other": "from {{count}} ratings",
+      "playsAbove": "Plays <1>{{value}}</1> above par on average",
+      "playsBelow": "Plays <1>{{value}}</1> below par on average",
+      "playsLevel": "Plays level par on average",
+      "harderThan": "Harder than <1>{{pct}}%</1> of courses",
+      "easierThan": "Easier than <1>{{pct}}%</1> of courses",
+      "middleOfPack": "Middle of the pack for difficulty",
+      "design": "Design",
+      "condition": "Condition",
+      "facilities": "Facilities",
+      "clubhouse": "Clubhouse"
     },
     "verdict": {
-      "higher": "Members rate it higher",
-      "lower": "Members rate it lower",
-      "figures": "#{{rank}} · {{rating}} from {{count}}"
+      "higher": "Members rate it higher than its rank suggests",
+      "lower": "Members rate it lower than its rank suggests"
     },
     "verdictSheet": {
       "title": "How this compares",

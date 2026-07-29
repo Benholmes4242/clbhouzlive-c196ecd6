@@ -2,6 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { VerdictConfig } from '@/components/top100/verdict';
 
+export interface Top100Config extends VerdictConfig {
+  /** Minimum member ratings before the four sub-score bars are shown. */
+  subscoreMinRatings: number;
+}
+
 /**
  * Reads the Top 100 verdict switches from public.feed_config.
  *
@@ -14,15 +19,17 @@ const KEYS = [
   't100_verdict_enabled',
   't100_verdict_min_ratings',
   't100_verdict_threshold',
+  't100_subscore_min_ratings',
 ] as const;
 
-const FALLBACK: VerdictConfig = {
+const FALLBACK: Top100Config = {
   enabled: false,
   minRatings: 3,
   threshold: 0.5,
+  subscoreMinRatings: 3,
 };
 
-export function useTop100Config(): VerdictConfig {
+export function useTop100Config(): Top100Config {
   const { data } = useQuery({
     queryKey: ['top100-verdict-config'],
     queryFn: async (): Promise<Record<string, number>> => {
@@ -46,5 +53,6 @@ export function useTop100Config(): VerdictConfig {
     enabled: (data.t100_verdict_enabled ?? 0) === 1,
     minRatings: data.t100_verdict_min_ratings ?? FALLBACK.minRatings,
     threshold: data.t100_verdict_threshold ?? FALLBACK.threshold,
+    subscoreMinRatings: data.t100_subscore_min_ratings ?? FALLBACK.subscoreMinRatings,
   };
 }
