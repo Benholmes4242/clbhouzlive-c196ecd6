@@ -56,6 +56,7 @@ export const Top100ProgressPanel: React.FC<Props> = ({ list, onOpenList }) => {
           style={{
             fontFamily: MONO,
             fontVariantNumeric: 'tabular-nums',
+            fontFeatureSettings: '"zero" 0, "tnum" 1',
             fontSize: 11,
             fontWeight: 700,
             color: INK_MUTE,
