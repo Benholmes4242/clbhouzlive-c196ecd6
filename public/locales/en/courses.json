@@ -383,11 +383,12 @@
       "condition": "Condition",
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
-      "noRounds": "No rounds tracked here yet. Be the first."
+      "noRounds": "Rated, but no rounds tracked here yet. Be the first."
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank suggests",
-      "lower": "Members rate {{course}} lower than its rank suggests"
+      "lower": "Members rate {{course}} lower than its rank suggests",
+      "ratingRank": "{{position}} of {{poolSize}} rated courses on this list"
     },
     "verdictSheet": {
       "title": "How this compares",
