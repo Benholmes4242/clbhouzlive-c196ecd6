@@ -1,5 +1,5 @@
 import React from 'react';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 
 type CoursesTab = 'explore' | 'top100';
 
@@ -14,23 +14,20 @@ interface CoursesShellTabsProps {
 }
 
 /**
- * CoursesShellTabs — thin wrapper around the canonical UnderlineTabs primitive
- * using an INK underline (per design: no amber on Courses shell tabs).
- *
- * Discover used to be the first tab here; it now lives in the bottom nav at
- * /explore, so this surface is purely courses.
+ * CoursesShellTabs — canonical pill tab strip shared with Discover.
+ * Light variant, centered, no bottom divider (the parent owns the seam).
  */
 export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => (
-  <UnderlineTabs
-    options={TABS}
-    value={activeTab}
-    onChange={onTabChange}
-    size="md"
+  <SegmentedControl
+    tabs={TABS}
+    activeTab={activeTab}
+    onTabChange={(id) => onTabChange(id as CoursesTab)}
+    variant="light"
     align="center"
-    underlineColor="#15171F"
+    hideBorder
     ariaLabel="Courses Sections"
   />
 );
