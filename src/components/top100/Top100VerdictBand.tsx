@@ -3,8 +3,9 @@
  *
  * Where members diverge from the published rank, a coloured band states the
  * disagreement and nothing more. Permitted copy is exactly "Members rate it
- * higher" / "Members rate it lower" with the two raw figures beside it. No
- * publication is named, no judgement word is used, and no formula is shown.
+ * higher/lower than its rank suggests". No publication is named, no judgement
+ * word is used, no formula is shown, and no figures are repeated here - the
+ * rating and count sit in the panel directly beneath.
  *
  * Suppression lives entirely in computeVerdict() — this component renders
  * whatever it is handed and renders nothing when handed null.
@@ -26,8 +27,6 @@ const GREEN_INK = '#047857';
 const RED_BG = 'rgba(239,68,68,0.09)';
 const RED_LINE = 'rgba(239,68,68,0.26)';
 const RED_INK = '#B91C1C';
-
-const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();
@@ -82,8 +81,7 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, verdict, onOpen }
       style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 10,
+        justifyContent: 'flex-start',
         width: '100%',
         height: VERDICT_BAND_HEIGHT,
         padding: '0 12px',
@@ -106,23 +104,6 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, verdict, onOpen }
         }}
       >
         {higher ? t('top100.verdict.higher') : t('top100.verdict.lower')}
-      </span>
-      <span
-        style={{
-          fontFamily: MONO,
-          fontVariantNumeric: 'tabular-nums',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          opacity: 0.85,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {t('top100.verdict.figures', {
-          rank: verdict.rank,
-          rating: verdict.rating.toFixed(1),
-        })}
       </span>
     </button>
   );
