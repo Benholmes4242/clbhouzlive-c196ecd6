@@ -52,6 +52,121 @@ function initials(name: string): string {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Story + chips (jsonb, parsed defensively - shapes are not guaranteed)
+// ---------------------------------------------------------------------------
+
+export type HeroStoryKindTag = 'beat' | 'rarity' | 'first_at_course' | 'most_at_course' | 'none';
+
+function asRecord(v: unknown): Record<string, unknown> | null {
+  return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
+}
+
+function num(v: unknown): number | null {
+  const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
+interface ChipItem {
+  key: string;
+  label: string;
+}
+
+/** Ordered chip list. Absent/zero/false keys are omitted entirely. */
+function buildChips(raw: HeroChips | null | undefined, t: TFunction): ChipItem[] {
+  const r = asRecord(raw);
+  if (!r) return [];
+  const out: ChipItem[] = [];
+  const birdies = num(r.birdies) ?? 0;
+  if (birdies > 0) {
+    out.push({
+      key: 'birdies',
+      // plural key, count passed as a NUMBER so i18next selects _one/_other
+      label: t('discover.friendsRounds.feats.birdies', { count: birdies }),
+    });
+  }
+  const eagles = num(r.eagles) ?? 0;
+  if (eagles > 0) {
+    out.push({ key: 'eagles', label: t('discover.friendsRounds.feats.eagles', { count: eagles }) });
+  }
+  if (r.beat_par === true) {
+    out.push({ key: 'beat_par', label: t('discover.friendsRounds.feats.beatPar', 'UNDER PAR') });
+  }
+  if (r.clean_card === true) {
+    out.push({ key: 'clean_card', label: t('discover.friendsRounds.feats.cleanCard', 'CLEAN CARD') });
+  }
+  return out;
+}
+
+/**
+ * Story renderer. Returns null for a missing story OR an unrecognised
+ * story kind - the caller renders nothing and reserves no space.
+ */
+function buildStoryLine(
+  raw: HeroStoryDetail | null | undefined,
+  row: HeroStoryRow,
+  t: TFunction,
+): { text: string; storyKind: HeroStoryKindTag } | null {
+  const s = asRecord(raw);
+  if (!s) return null;
+  const kind = typeof s.kind === 'string' ? s.kind : '';
+
+  if (kind === 'beat') {
+    const by = num(s.by);
+    if (by == null) return null;
+    const stood = s.stood == null || s.stood === '' ? null : String(s.stood);
+    // self is load-bearing: the holder cannot "beat" themselves.
+    if (s.self === true) {
+      let text = t('discover.heroStory.beatSelf', { by });
+      if (stood) text += t('discover.heroStory.stoodSelf', { stood });
+      return { text, storyKind: 'beat' };
+    }
+    const name = typeof s.name === 'string' && s.name.trim() ? s.name.trim() : null;
+    if (!name) return null;
+    let text = t('discover.heroStory.beat', { name, by });
+    if (stood) text += t('discover.heroStory.stood', { stood });
+    return { text, storyKind: 'beat' };
+  }
+
+  if (kind === 'rarity') {
+    const noun =
+      row.kind === 'ace'
+        ? t('discover.heroStory.nounAce', 'hole-in-one')
+        : row.kind === 'albatross'
+          ? t('discover.heroStory.nounAlbatross', 'albatross')
+          : null;
+    if (!noun) return null;
+    const total = num(s.total);
+    if (total === 1) {
+      return { text: t('discover.heroStory.rarityOnly', { noun }), storyKind: 'rarity' };
+    }
+    const ordinalN = num(s.ordinal);
+    if (ordinalN == null || ordinalN < 1) return null;
+    const ordinal = t('discover.heroStory.ordinal', { count: ordinalN, ordinal: true });
+    return { text: t('discover.heroStory.rarityNth', { ordinal, noun }), storyKind: 'rarity' };
+  }
+
+  if (kind === 'first_at_course') {
+    if (!row.course_name) return null;
+    return {
+      text: t('discover.heroStory.firstEagle', { course: row.course_name }),
+      storyKind: 'first_at_course',
+    };
+  }
+
+  if (kind === 'most_at_course') {
+    if (!row.course_name) return null;
+    return {
+      text: t('discover.heroStory.mostBirdies', { course: row.course_name }),
+      storyKind: 'most_at_course',
+    };
+  }
+
+  // Unrecognised story kind - render nothing.
+  return null;
+}
+
+
 interface HeroSlideProps {
   story: HeroStoryRow;
   onOpenScore: (scoreId: string, userId: string | null) => void;
