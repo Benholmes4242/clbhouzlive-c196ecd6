@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { FilterChips } from '@/components/ui/FilterChips';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { useNavigate } from 'react-router-dom';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
