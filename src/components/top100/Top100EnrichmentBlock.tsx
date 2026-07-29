@@ -16,6 +16,9 @@ import type { Verdict } from './verdict';
 
 interface Props {
   courseId: string;
+  courseName: string;
+  rank: number | null;
+  list: string;
   data: Top100Enrichment | undefined;
   verdict: Verdict | null;
   onOpenVerdict: () => void;
@@ -24,6 +27,9 @@ interface Props {
 
 export const Top100EnrichmentBlock: React.FC<Props> = ({
   courseId,
+  courseName,
+  rank,
+  list,
   data,
   verdict,
   onOpenVerdict,
@@ -36,10 +42,21 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
     <div className="px-3 sm:px-0" style={{ paddingTop: 8 }}>
       {verdict && (
         <div style={{ marginBottom: 6 }}>
-          <Top100VerdictBand courseId={courseId} verdict={verdict} onOpen={onOpenVerdict} />
+          <Top100VerdictBand
+            courseId={courseId}
+            courseName={courseName}
+            verdict={verdict}
+            onOpen={onOpenVerdict}
+          />
         </div>
       )}
-      <Top100CourseStatsPanel courseId={courseId} data={data} onRate={onRate} />
+      <Top100CourseStatsPanel
+        courseId={courseId}
+        rank={rank}
+        list={list}
+        data={data}
+        onRate={onRate}
+      />
     </div>
   );
 };

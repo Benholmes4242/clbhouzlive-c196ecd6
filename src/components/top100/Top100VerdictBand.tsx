@@ -3,7 +3,8 @@
  *
  * Where members diverge from the published rank, a coloured band states the
  * disagreement and nothing more. Permitted copy is exactly "Members rate it
- * higher/lower than its rank suggests". No publication is named, no judgement
+ * higher/lower than its rank suggests", with the course named so the claim
+ * cannot be misread against the next card. No publication is named, no judgement
  * word is used, no formula is shown, and no figures are repeated here - the
  * rating and count sit in the panel directly beneath.
  *
@@ -31,15 +32,17 @@ const RED_INK = '#B91C1C';
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();
 
+/** Minimum height only. The band WRAPS to two lines and never truncates. */
 export const VERDICT_BAND_HEIGHT = 30;
 
 interface Props {
   courseId: string;
+  courseName: string;
   verdict: Verdict;
   onOpen: () => void;
 }
 
-export const Top100VerdictBand: React.FC<Props> = ({ courseId, verdict, onOpen }) => {
+export const Top100VerdictBand: React.FC<Props> = ({ courseId, courseName, verdict, onOpen }) => {
   const { t } = useTranslation('courses');
   const ref = useRef<HTMLButtonElement | null>(null);
 
@@ -83,8 +86,8 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, verdict, onOpen }
         alignItems: 'center',
         justifyContent: 'flex-start',
         width: '100%',
-        height: VERDICT_BAND_HEIGHT,
-        padding: '0 12px',
+        minHeight: VERDICT_BAND_HEIGHT,
+        padding: '7px 12px',
         borderRadius: 8,
         textAlign: 'left',
         background: higher ? GREEN_BG : RED_BG,
@@ -97,13 +100,14 @@ export const Top100VerdictBand: React.FC<Props> = ({ courseId, verdict, onOpen }
           fontSize: 11.5,
           fontWeight: 800,
           letterSpacing: '-0.005em',
-          lineHeight: 1,
-          whiteSpace: 'nowrap',
+          lineHeight: 1.3,
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
           overflow: 'hidden',
-          textOverflow: 'ellipsis',
         }}
       >
-        {higher ? t('top100.verdict.higher') : t('top100.verdict.lower')}
+        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', { course: courseName })}
       </span>
     </button>
   );
