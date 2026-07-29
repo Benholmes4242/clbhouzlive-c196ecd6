@@ -297,9 +297,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   return (
     <div>
       {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
-      <div style={{ paddingBottom: 16 }}>
+      <div style={{ paddingBottom: 8 }}>
         {shellTabs}
-        <div className="px-4 pt-3">
+        <div className="px-4 pt-2">
           {rateNudge}
           <SectionHeader
             role="section"
@@ -370,7 +370,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             borderBottom: '1px solid rgba(0,0,0,0.07)',
-            padding: '8px 0 10px',
+            padding: '4px 0 10px',
             marginTop: -1,
           }}
         >

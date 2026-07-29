@@ -21,7 +21,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
   activeTab,
   onTabChange,
 }) => (
-  <div className="px-4 py-2 flex justify-center">
+  <div className="px-4 py-1 flex justify-center">
     <FilterChips
       options={TABS}
       value={activeTab}
