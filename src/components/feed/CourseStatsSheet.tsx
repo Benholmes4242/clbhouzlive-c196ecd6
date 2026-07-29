@@ -32,6 +32,8 @@ const T40 = 'rgba(248,250,252,0.42)';
 const RED = '#EF4444';
 const AMBER = '#F7931E';
 const LINE = 'rgba(255,255,255,0.10)';
+// App charcoal surface (same value the dark handicap hero uses via --hcp-bg-0).
+const CHARCOAL = '#15171F';
 
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
@@ -163,8 +165,8 @@ export const CourseStatsSheet: React.FC<Props> = ({
     : null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="dark" maxHeight="88vh">
-      <div style={{ overflowY: 'auto', maxHeight: 'calc(88vh - 40px)' }}>
+    <BottomSheet open={open} onClose={onClose} variant="dark" surfaceColor={CHARCOAL} maxHeight="75dvh">
+      <div style={{ overflowY: 'auto', maxHeight: 'calc(75dvh - 40px)' }}>
         {/* Header */}
         <div style={{ padding: '4px 18px 14px' }}>
           <div style={kickerStyle}>{t('feed.courseSheet.kicker')}</div>

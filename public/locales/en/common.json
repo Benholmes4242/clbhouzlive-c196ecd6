@@ -151,7 +151,7 @@
       "avg": "avg",
       "rounds_one": "round",
       "rounds_other": "rounds",
-      "yourBest": "best"
+      "yourBest": "pb"
     },
     "courseSheet": {
       "kicker": "Course stats",
