@@ -34,19 +34,19 @@ const SURFACE = 'rgba(255,255,255,0.035)';
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
-const inlineFigureValueStyle: React.CSSProperties = {
+const figureValueStyle: React.CSSProperties = {
   fontFamily: MONO,
   fontVariantNumeric: 'tabular-nums',
-  fontSize: 8.5,
+  fontSize: 17,
   fontWeight: 800,
   letterSpacing: '-0.03em',
   lineHeight: 1,
 };
 
-const inlineFigureLabelStyle: React.CSSProperties = {
-  fontSize: 8.5,
-  fontWeight: 800,
-  letterSpacing: '0.1em',
+const figureLabelStyle: React.CSSProperties = {
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.07em',
   textTransform: 'uppercase',
   color: T40,
   lineHeight: 1,
@@ -60,12 +60,53 @@ export interface CourseBandFigure {
   color: string;
 }
 
+/**
+ * ONE contextual figure per card, first match wins:
+ *  1 viewer has played it        -> their best, amber
+ *  2 fewer than 3 rounds tracked -> the round count, muted (no difficulty)
+ *  3 otherwise                   -> +avg over par, red, with the percentile
+ * No tracked rounds at all -> null, and the row is not tappable.
+ */
+export function pickCourseBandFigure(
+  ctx: PostCourseContext | null | undefined,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): CourseBandFigure | null {
+  const rounds = ctx?.rounds_tracked ?? 0;
+  if (!ctx || rounds <= 0) return null;
+
+  if ((ctx.your_rounds ?? 0) > 0 && ctx.your_best != null) {
+    return {
+      key: 'your-best',
+      figure: String(ctx.your_best),
+      label: t('feed.courseBand.yourBestHere'),
+      color: AMBER,
+    };
+  }
+
+  if (rounds < 3 || ctx.avg_over_par == null || ctx.harder_than_pct == null) {
+    return {
+      key: 'rounds',
+      figure: String(rounds),
+      // count is passed as a NUMBER so i18next can pluralise (_one/_other).
+      label: t('feed.courseBand.roundTracked', { count: rounds }),
+      color: T60,
+    };
+  }
+
+  return {
+    key: 'difficulty',
+    figure: `${ctx.avg_over_par > 0 ? '+' : ''}${ctx.avg_over_par.toFixed(1)}`,
+    label: t('feed.courseBand.harderThan', { pct: ctx.harder_than_pct }),
+    color: RED,
+  };
+}
+
 interface Props {
   courseName: string | null | undefined;
   courseLocation?: string | null;
   courseRating?: number | null;
   ctx?: PostCourseContext | null;
-  /** Opens the course stats sheet. Not wired when there are no figures. */
+  /** Opens the course stats sheet. Not wired when there is no figure. */
   onOpenStats?: () => void;
   /** The existing actions row, attached to the same container. */
   actions: React.ReactNode;
@@ -84,40 +125,10 @@ export const PostCourseBand: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('common');
 
-  const roundsTracked = ctx?.rounds_tracked ?? 0;
-  const hasRounds = roundsTracked > 0;
   const hasYourBest = (ctx?.your_rounds ?? 0) > 0 && ctx?.your_best != null;
+  const figure = pickCourseBandFigure(ctx, t);
 
-  // Figure inventory. A null figure omits its cell entirely, never a dash.
-  // No tracked rounds at all -> NO figures, and the row is not tappable.
-  const figures: CourseBandFigure[] = [];
-  if (hasRounds) {
-    if (ctx?.avg_over_par != null) {
-      figures.push({
-        key: 'avg',
-        figure: `${ctx.avg_over_par > 0 ? '+' : ''}${ctx.avg_over_par.toFixed(1)}`,
-        label: t('feed.courseBand.avg'),
-        color: RED,
-      });
-    }
-    figures.push({
-      key: 'rounds',
-      figure: String(roundsTracked),
-      // count is passed as a NUMBER so i18next can pluralise (_one/_other).
-      label: t('feed.courseBand.rounds', { count: roundsTracked }),
-      color: T100,
-    });
-    if (hasYourBest) {
-      figures.push({
-        key: 'best',
-        figure: String(ctx?.your_best),
-        label: t('feed.courseBand.yourBest'),
-        color: AMBER,
-      });
-    }
-  }
-
-  const tappable = figures.length > 0 && !!onOpenStats;
+  const tappable = !!figure && !!onOpenStats;
 
   const handleTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -125,7 +136,7 @@ export const PostCourseBand: React.FC<Props> = ({
     analyticsEvents.track('course_band_tapped', {
       course_id: ctx?.course_id ?? null,
       has_your_best: hasYourBest,
-      figures: figures.length,
+      figures: figure ? 1 : 0,
     });
     onOpenStats?.();
   };
@@ -210,9 +221,9 @@ export const PostCourseBand: React.FC<Props> = ({
         {courseLocation ? (
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12,
               lineHeight: 1,
-              color: T60,
+              color: T40,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -223,39 +234,27 @@ export const PostCourseBand: React.FC<Props> = ({
         ) : null}
       </div>
 
+      <div style={{ flex: 1, minWidth: 8 }} />
 
-      <div style={{ flex: 1, minWidth: 0 }} />
-
-      {figures.length > 0 && (
+      {figure && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 9,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 6,
             flexShrink: 0,
           }}
         >
-          {figures.map((f) => (
-            <div
-              key={f.key}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-              }}
-            >
-              <span style={{ ...inlineFigureValueStyle, color: f.color }}>
-                {f.figure}
-              </span>
-              <span style={inlineFigureLabelStyle}>{f.label}</span>
-            </div>
-          ))}
+          <span style={{ ...figureValueStyle, color: figure.color }}>
+            {figure.figure}
+          </span>
+          <span style={figureLabelStyle}>{figure.label}</span>
         </div>
       )}
 
       {tappable && (
         <ChevronRight
-          size={14}
+          size={16}
           color={T40}
           style={{ flexShrink: 0, marginLeft: 6 }}
         />

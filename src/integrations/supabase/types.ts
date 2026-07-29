@@ -19584,6 +19584,7 @@ export type Database = {
         Returns: {
           avg_over_par: number
           course_id: string
+          harder_than_pct: number
           rounds_tracked: number
           your_best: number
           your_rounds: number

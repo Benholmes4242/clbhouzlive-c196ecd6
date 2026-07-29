@@ -13,6 +13,8 @@ export interface PostCourseContext {
   course_id: string;
   rounds_tracked: number | null;
   avg_over_par: number | null;
+  /** Percentile difficulty, batched from get_post_course_context. */
+  harder_than_pct: number | null;
   your_rounds: number | null;
   your_best: number | null;
 }
