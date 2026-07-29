@@ -19,7 +19,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
-import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
