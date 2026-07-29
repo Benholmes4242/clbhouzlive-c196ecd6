@@ -671,7 +671,8 @@ function AppRoutes() {
         <Route path="/join" element={<Suspense fallback={<GenericPageSkeleton />}><JoinLandingPage /></Suspense>} />
         <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
 
-        
+        <Route path="/__feedcard-probe" element={<Suspense fallback={<GenericPageSkeleton />}><FeedCardProbe /></Suspense>} />
+
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
