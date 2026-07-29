@@ -1,0 +1,1 @@
+INSERT INTO public.feed_config (key, value) VALUES ('t100_subscore_min_ratings', 3) ON CONFLICT (key) DO NOTHING;
