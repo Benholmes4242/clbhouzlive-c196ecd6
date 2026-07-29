@@ -22,8 +22,12 @@ export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) 
   return useQuery({
     queryKey: ['explore-hero', userId, mood],
     enabled: !!userId,
-    staleTime: 0,
-    refetchOnMount: 'always',
+    // The RPC still selects with a random OFFSET, so every refetch swaps the
+    // hero out from under the reader. Holding the result for the session keeps
+    // the blurb readable and the hero showable.
+    staleTime: 6 * 60 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     gcTime: 15 * 60 * 1000,
     queryFn: async (): Promise<ExploreHeroRow | null> => {
       const { data, error } = await supabase.rpc('get_explore_hero', {

@@ -177,7 +177,15 @@
     "explore": "Explore"
   },
   "hero": {
-    "viewCourse": "View course"
+    "viewCourse": "View course",
+    "contextSimilar": "Like {{name}}, your highest rated",
+    "contextFriendsOne": "{{name1}} has played here",
+    "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
+    "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
+    "contextBucket_one": "{{count}} member has this on their list",
+    "contextBucket_other": "{{count}} members have this on their list",
+    "contextHidden_one": "Rated {{avg}} from just {{count}} member",
+    "contextHidden_other": "Rated {{avg}} from just {{count}} members"
   },
   "friends": {
     "signInTitle": "Sign in to see friends' courses",
