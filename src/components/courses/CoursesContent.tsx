@@ -378,10 +378,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 background: 'rgba(248,250,252,0.72)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
-                borderBottom: '1px solid rgba(0,0,0,0.07)',
               }}
             >
-
               <CoursesShellTabs
                 activeTab={activeTab as 'explore' | 'top100'}
                 onTabChange={handleTabChange}

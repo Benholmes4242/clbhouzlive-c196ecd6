@@ -14,6 +14,9 @@ interface SegmentedControlProps {
   className?: string;
   variant?: 'light' | 'dark' | 'slate';
   align?: 'start' | 'center';
+  /** Hide the bottom hairline divider. Useful when the control sits inside a parent that already owns the seam. */
+  hideBorder?: boolean;
+  ariaLabel?: string;
 }
 
 /**
@@ -29,6 +32,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   className,
   variant = 'light',
   align = 'start',
+  hideBorder = false,
+  ariaLabel,
 }) => {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [overflowing, setOverflowing] = useState(false);
@@ -56,15 +61,18 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       className={cn('relative', !isDark && 'bg-background', className)}
       style={{
         background: isDark ? '#0A0E14' : undefined,
-        borderBottom: isDark
-          ? '0.5px solid rgba(255,255,255,0.06)'
-          : '1px solid rgba(15,23,42,0.08)',
+        borderBottom: hideBorder
+          ? 'none'
+          : isDark
+            ? '0.5px solid rgba(255,255,255,0.06)'
+            : '1px solid rgba(15,23,42,0.08)',
       }}
     >
       <div
         ref={scrollerRef}
         className="segmented-scroller"
         role="tablist"
+        aria-label={ariaLabel}
         style={{
           display: 'flex',
           justifyContent: align === 'center' ? 'center' : 'flex-start',
