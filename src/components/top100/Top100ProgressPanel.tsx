@@ -10,7 +10,7 @@ import { ChevronRight } from 'lucide-react';
 import { AMBER, HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import type { Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
 
-const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
+
 
 interface Props {
   list: Top100ListProgress;
