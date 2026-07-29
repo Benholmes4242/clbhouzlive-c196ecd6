@@ -567,11 +567,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 position: 'relative',
                 width: '100%',
                 aspectRatio: String(ratio),
-                // Measured chrome on a 390x844 card: header 54.7 + caption 49.2 +
-                // unified course band incl. actions 100.2 + 1px hairline + 88px nav
-                // = 293px. Reserve 305px (12px margin) and subtract the home
-                // indicator, since 100vh on iOS does not exclude it.
-                maxHeight: 'calc(100vh - 305px - env(safe-area-inset-bottom))',
+                // Measured chrome on a 390x844 review card: header 54.7 +
+                // caption 3 lines + "Read review" 74.5 + unified course band
+                // incl. actions 100.2 + 1px hairline + 88px nav = 318.4px.
+                // Reserve 330px (margin) and subtract the home indicator,
+                // since 100vh on iOS does not exclude it.
+                maxHeight: 'calc(100vh - 330px - env(safe-area-inset-bottom))',
                 overflow: 'hidden',
                 background: '#05080F',
               }}
