@@ -65,5 +65,6 @@ export function useTop100Config(): Top100Config {
     anchor: data.t100_verdict_anchor ?? FALLBACK.anchor,
     slope: data.t100_verdict_slope ?? FALLBACK.slope,
     subscoreMinRatings: data.t100_subscore_min_ratings ?? FALLBACK.subscoreMinRatings,
+    minPlayed: data.t100_progress_min_played ?? FALLBACK.minPlayed,
   };
 }
