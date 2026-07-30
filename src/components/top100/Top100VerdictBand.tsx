@@ -179,7 +179,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
             fontWeight: 600,
             lineHeight: 1.3,
             marginTop: 2,
-            opacity: 0.78,
+            color: line2Ink,
           }}
         >
           {listLabel && listLabel.trim()
