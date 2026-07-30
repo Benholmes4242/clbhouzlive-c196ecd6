@@ -1,37 +1,39 @@
 /**
- * OverallScrubber — 0-10 in 0.1 steps, drag + arrow-key a11y.
- * Big 44px readout with clbhouz-gold-shimmer at >= 9.0.
- * Fresh component — no imports from the legacy TickScrubber.
+ * OverallScrubber - the step 0 dial. Range 1.0 to 10.0 in 0.1 steps.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
-import { getRatingTier, HERO_NUMBER_STYLE, ratingTextColor, rampForRating } from '@/lib/ratingTier';
+import { bandColor } from '../bandColor';
 
 interface Props {
   value: number | null;
   onChange: (v: number) => void;
+  caption: string;
+  ariaLabel: string;
 }
 
-const clamp = (n: number) => Math.max(0, Math.min(10, n));
-const step = (n: number) => Math.round(clamp(n) * 10) / 10;
+const MIN = 1;
+const MAX = 10;
+const clamp = (n: number) => Math.max(MIN, Math.min(MAX, n));
+const snap = (n: number) => Math.round(clamp(n) * 10) / 10;
+const toPct = (v: number) => ((v - MIN) / (MAX - MIN)) * 100;
 
-export function OverallScrubber({ value, onChange }: Props) {
+const MARK_5 = toPct(5);
+const MARK_9 = toPct(9);
+
+export function OverallScrubber({ value, onChange, caption, ariaLabel }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
-
-  const display = value ?? 0;
-  const tier = getRatingTier(value);
-  const isGold = tier === 'EXCEPTIONAL';
-  const color = ratingTextColor(value);
-  const ramp = rampForRating(value);
+  const color = bandColor(value);
+  const fillPct = value == null ? 0 : toPct(value);
 
   const pointerToValue = useCallback((clientX: number) => {
     const rail = trackRef.current;
     if (!rail) return;
     const r = rail.getBoundingClientRect();
     const pct = (clientX - r.left) / r.width;
-    onChange(step(pct * 10));
+    onChange(snap(MIN + pct * (MAX - MIN)));
   }, [onChange]);
 
   useEffect(() => {
@@ -49,58 +51,47 @@ export function OverallScrubber({ value, onChange }: Props) {
   }, [dragging, pointerToValue]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (value == null) return;
+    const current = value ?? MIN;
     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
       e.preventDefault();
-      onChange(step(value + 0.1));
+      onChange(snap(current + 0.1));
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
       e.preventDefault();
-      onChange(step(value - 0.1));
+      onChange(snap(current - 0.1));
     } else if (e.key === 'Home') {
       e.preventDefault();
-      onChange(0);
+      onChange(MIN);
     } else if (e.key === 'End') {
       e.preventDefault();
-      onChange(10);
+      onChange(MAX);
     }
   };
 
-  const fillPct = (display / 10) * 100;
-
   return (
-    <div style={{ padding: '2px 0 4px' }}>
+    <div>
       <div
         style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 2,
-          justifyContent: 'center',
-          marginBottom: 12,
+          fontSize: 64,
+          fontWeight: 800,
+          lineHeight: 1,
+          letterSpacing: '-0.035em',
+          color,
         }}
       >
-        <span
-          className={isGold ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            fontSize: 44,
-            lineHeight: 1,
-            ...HERO_NUMBER_STYLE,
-            ...(isGold ? {} : { color: value == null ? RV2.muted : color }),
-          }}
-        >
-          {value == null ? '—' : value.toFixed(1)}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: RV2.muted, letterSpacing: '-0.02em' }}>
-          /10
-        </span>
+        {value == null ? '--' : value.toFixed(1)}
       </div>
+      <div style={{ fontSize: 12, color: RV2.secondary, margin: '6px 0 18px', minHeight: 17 }}>
+        {caption}
+      </div>
+
       <div
         ref={trackRef}
         role="slider"
         tabIndex={0}
-        aria-valuemin={0}
+        aria-valuemin={1}
         aria-valuemax={10}
-        aria-valuenow={value ?? 0}
-        aria-label="Overall score"
+        aria-valuenow={value ?? 1}
+        aria-label={ariaLabel}
         onPointerDown={(e) => {
           setDragging(true);
           pointerToValue(e.clientX);
@@ -108,34 +99,42 @@ export function OverallScrubber({ value, onChange }: Props) {
         onKeyDown={onKeyDown}
         style={{
           position: 'relative',
-          height: 44,
-          padding: '16px 0',
+          height: 12,
+          borderRadius: 999,
+          background: 'rgba(15,23,42,0.08)',
           cursor: 'pointer',
           touchAction: 'none',
-          outline: 'none',
+          padding: 0,
+          margin: '16px 0',
         }}
       >
         <div
           style={{
-            height: 8,
-            borderRadius: 4,
-            background: RV2.ghost,
-            position: 'relative',
-            overflow: 'hidden',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${fillPct}%`,
+            background: value == null ? 'transparent' : color,
+            borderRadius: 999,
+            transition: dragging ? 'none' : 'width 120ms ease',
           }}
-        >
+        />
+        {[MARK_5, MARK_9].map((m) => (
           <div
+            key={m}
+            aria-hidden
             style={{
               position: 'absolute',
-              inset: 0,
-              width: `${fillPct}%`,
-              background: value == null
-                ? 'transparent'
-                : `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`,
-              transition: dragging ? 'none' : 'width 120ms ease',
+              left: `${m}%`,
+              top: 0,
+              bottom: 0,
+              width: 1,
+              background: 'rgba(15,23,42,0.16)',
+              pointerEvents: 'none',
             }}
           />
-        </div>
+        ))}
         {value != null && (
           <div
             aria-hidden
@@ -144,30 +143,32 @@ export function OverallScrubber({ value, onChange }: Props) {
               top: '50%',
               left: `${fillPct}%`,
               transform: 'translate(-50%, -50%)',
-              width: 22,
-              height: 22,
+              width: 26,
+              height: 26,
               borderRadius: '50%',
               background: '#FFFFFF',
-              border: `2px solid ${isGold ? '#F0A500' : RV2.amber}`,
-              boxShadow: '0 2px 6px rgba(15,23,42,0.16)',
+              border: `2.5px solid ${color}`,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
               pointerEvents: 'none',
             }}
           />
         )}
       </div>
+
       <div
+        aria-hidden
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: 10,
-          color: RV2.muted,
-          marginTop: 2,
-          letterSpacing: '0.08em',
+          marginTop: 9,
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          fontWeight: 700,
         }}
       >
-        <span>0</span><span>5</span><span>10</span>
+        <span style={{ width: `${MARK_5}%`, color: bandColor(1) }}>Under 5.0</span>
+        <span style={{ width: `${MARK_9 - MARK_5}%`, color: bandColor(5) }}>5.0</span>
+        <span style={{ flex: 1, color: bandColor(9) }}>9.0</span>
       </div>
     </div>
   );
