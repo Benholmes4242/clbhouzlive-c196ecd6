@@ -24,6 +24,7 @@ import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
+import { useCourseRatingStanding } from '@/hooks/top100/useCourseRatingStanding';
 import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -79,6 +80,29 @@ const TRIGGER_CLS =
 /** Condensed sticky bar control. */
 const COMPACT_TRIGGER_CLS =
   'h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none';
+
+
+/**
+ * Wraps the enrichment block so the standing line can be fetched per course
+ * WITHOUT calling a hook for every visible row: the query is enabled only when
+ * the course already qualifies for the verdict band (ranked and rated).
+ * p_list_slug is left NULL so the server picks the list by sort_order — a
+ * course in both Global and GB&I resolves to Global and names it.
+ */
+const RankedEnrichment: React.FC<
+  React.ComponentProps<typeof Top100EnrichmentBlock> & { hasVerdict: boolean }
+> = ({ hasVerdict, ...props }) => {
+  const { data: standing } = useCourseRatingStanding(props.courseId, null, hasVerdict);
+  return (
+    <Top100EnrichmentBlock
+      {...props}
+      ratingRank={
+        standing ? { position: standing.standing, poolSize: standing.poolSize } : null
+      }
+      listLabel={standing?.listLabel ?? undefined}
+    />
+  );
+};
 
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
@@ -622,7 +646,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                   }}
                 />
                 {rank != null && (
-                  <Top100EnrichmentBlock
+                  <RankedEnrichment
+                    hasVerdict={!!verdict}
                     courseId={row.course_id}
                     courseName={row.name}
                     rank={rank}
