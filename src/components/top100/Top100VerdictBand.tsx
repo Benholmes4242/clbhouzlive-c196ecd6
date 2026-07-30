@@ -19,6 +19,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { shortenCourseName, type Verdict } from './verdict';
 
@@ -131,6 +132,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
 
   const ink = higher ? GREEN_INK : RED_INK;
   const line2Ink = higher ? '#63A883' : '#C87C72';
+  const Trend = higher ? TrendingUp : TrendingDown;
 
   return (
     <button
@@ -162,6 +164,9 @@ export const Top100VerdictBand: React.FC<Props> = ({
     >
       <span
         style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 7,
           fontSize: 11.5,
           fontWeight: 800,
           letterSpacing: '-0.005em',
@@ -171,10 +176,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
         {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
           course: shortenCourseName(courseName),
         })}
-        {/* Geometric glyph, not emoji: takes the band ink and scales with the
-            font. Plain space, never a margin, so it cannot wrap alone. */}
-        {' '}
-        <span aria-hidden="true">{higher ? '\u25B2' : '\u25BC'}</span>
+        <Trend size={17} strokeWidth={2.5} color={ink} aria-hidden />
       </span>
 
       {ratingRank && (
