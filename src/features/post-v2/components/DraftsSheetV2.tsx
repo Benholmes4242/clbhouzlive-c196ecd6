@@ -17,6 +17,7 @@ interface Props {
 }
 
 export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDelete }: Props) {
+  const { t } = useTranslation('composer');
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
   return (
