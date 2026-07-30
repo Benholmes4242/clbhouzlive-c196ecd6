@@ -492,80 +492,87 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         {formatCourseLocation(course)}
       </p>
 
-      {showBand && (
-        <button
-          type="button"
-          onClick={() => {
-            analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
-            onOpenStats();
-          }}
-          className="inline-flex items-center mb-2 active:scale-[0.98] transition-transform"
-          style={{
-            background: 'rgba(15,23,42,0.5)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            borderRadius: 8,
-            padding: '4px 8px',
-            border: 0,
-            gap: 6,
-            flexWrap: 'wrap',
-          }}
-        >
-          {cells.map((cell, i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>·</span>}
-              {cell}
-            </React.Fragment>
-          ))}
-          {rounds < 10 && (
-            <span
+      {/* One row: stat band on the left (optically aligned to the h1), rank +
+          community rating pushed to the right edge, both vertically centred. */}
+      {(showBand || hasRank || communityRating != null) && (
+        <div className="flex items-center justify-between gap-3 w-full">
+          {showBand ? (
+            <button
+              type="button"
+              onClick={() => {
+                analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
+                onOpenStats();
+              }}
+              className="inline-flex items-center active:scale-[0.98] transition-transform"
               style={{
-                fontSize: 9,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                borderRadius: 9999,
-                padding: '2px 6px',
-                background: 'rgba(255,255,255,0.2)',
-                color: 'rgba(255,255,255,0.9)',
+                background: 'rgba(15,23,42,0.5)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: 8,
+                padding: '4px 8px',
+                marginLeft: -8,
+                border: 0,
+                gap: 6,
+                flexWrap: 'wrap',
               }}
             >
-              {t('statBrowse.earlyData')}
-            </span>
+              {cells.map((cell, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>·</span>}
+                  {cell}
+                </React.Fragment>
+              ))}
+              {rounds < 10 && (
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    borderRadius: 9999,
+                    padding: '2px 6px',
+                    background: 'rgba(255,255,255,0.2)',
+                    color: 'rgba(255,255,255,0.9)',
+                  }}
+                >
+                  {t('statBrowse.earlyData')}
+                </span>
+              )}
+            </button>
+          ) : (
+            <span />
           )}
-        </button>
-      )}
 
-      {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
-          one tee while CourseTeeCard resolves the member's own tee, so the two
-          figures legitimately differ. The tee card, 300px below, owns and
-          labels tee data. Fallback chain is now: rounds -> stat band, no
-          rounds -> name and location only. */}
+          {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
+              one tee while CourseTeeCard resolves the member's own tee, so the two
+              figures legitimately differ. The tee card, 300px below, owns and
+              labels tee data. */}
 
-
-      {(hasRank || communityRating != null) && (
-        <div
-          className="inline-flex items-center"
-          style={{
-            background: 'rgba(15,23,42,0.5)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            borderRadius: 8,
-            padding: '4px 8px',
-            gap: 8,
-          }}
-        >
-          {hasRank && (
-            <CourseRankBadges
-              globalRank={course.global_rank ?? null}
-              regionalRank={course.regional_rank ?? null}
-              usaRank={course.usa_rank ?? null}
-              country={course.country}
-              positioning="inline"
-            />
-          )}
-          {communityRating != null && (
-            <CourseCommunityRating rating={communityRating} size="sm" showLogo onDark />
+          {(hasRank || communityRating != null) && (
+            <div
+              className="inline-flex items-center shrink-0"
+              style={{
+                background: 'rgba(15,23,42,0.5)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: 8,
+                padding: '4px 8px',
+                gap: 8,
+              }}
+            >
+              {hasRank && (
+                <CourseRankBadges
+                  globalRank={course.global_rank ?? null}
+                  regionalRank={course.regional_rank ?? null}
+                  usaRank={course.usa_rank ?? null}
+                  country={course.country}
+                  positioning="inline"
+                />
+              )}
+              {communityRating != null && (
+                <CourseCommunityRating rating={communityRating} size="sm" showLogo onDark />
+              )}
+            </div>
           )}
         </div>
       )}
