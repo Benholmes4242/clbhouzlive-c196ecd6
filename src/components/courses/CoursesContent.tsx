@@ -360,9 +360,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="explore" className="mt-section">
-            <CourseExplorer />
-          </TabsContent>
+
 
 
           <TabsContent value="my-courses" className="mt-section">
