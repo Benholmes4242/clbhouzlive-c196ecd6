@@ -59,6 +59,9 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
   const { rows, isLoading, isPaging, hasMore, loadMore, enabled, debounced } =
     useCourseDirectorySearch(term, country);
 
+  const { data: ratedRows = [] } = useDirectoryRecentRatings(country, open && !enabled, 8);
+
+
   /* Reset the field (and the scope) each time the sheet opens. */
   useEffect(() => {
     if (open) {
