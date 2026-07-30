@@ -37,24 +37,6 @@ function fillBuckets(rows: { created_at: string }[], days: number): DailyBucket[
   }
   return Object.entries(b).map(([date, value]) => ({ date, value }));
 }
-function uniqueDailyUsers(
-  rows: { created_at: string; user_id: string | null }[],
-  days: number,
-): DailyBucket[] {
-  const dayMap: Record<string, Set<string>> = {};
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dayMap[toDateKey(d)] = new Set();
-  }
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = toDateKey(r.created_at);
-    if (k in dayMap) dayMap[k].add(r.user_id);
-  }
-  return Object.entries(dayMap).map(([date, set]) => ({ date, value: set.size }));
-}
-
 // ─── Platform ─────────────────────────────────────────────────────────────────
 
 export interface PlatformAnalyticsData {
