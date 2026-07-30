@@ -343,6 +343,17 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     };
   }, [progressLists, selectedList, totalCoursesInActiveList, listOptions]);
 
+  // Below the configured threshold the progress panel is suppressed entirely.
+  const progressHidden = activeProgress.played < verdictConfig.minPlayed;
+  useEffect(() => {
+    if (!progressHidden) return;
+    analyticsEvents.track('t100_progress_hidden', {
+      list: selectedList,
+      played: activeProgress.played,
+      min_played: verdictConfig.minPlayed,
+    });
+  }, [progressHidden, selectedList, activeProgress.played, verdictConfig.minPlayed]);
+
   return (
     <div>
       {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
