@@ -370,7 +370,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       rounds_available: roundsAtCourse.length,
     });
     setSheet('round');
-  }, [primaryCourseId, roundsAtCourse.length]);
+  }, [primaryCourseId, roundsAtCourse.length, openDetail]);
 
   const handleSelectRound = useCallback((r: AttachedRound | null) => {
     setAttachedRound(r);
