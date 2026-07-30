@@ -22,7 +22,8 @@ import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers
 import { useUserTop100Progress, type Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
-import { Top100ProgressPanel, Top100ProgressEmpty } from '@/components/top100/Top100ProgressPanel';
+import { Top100ProgressPanel } from '@/components/top100/Top100ProgressPanel';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
@@ -343,6 +344,17 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     };
   }, [progressLists, selectedList, totalCoursesInActiveList, listOptions]);
 
+  // Below the configured threshold the progress panel is suppressed entirely.
+  const progressHidden = activeProgress.played < verdictConfig.minPlayed;
+  useEffect(() => {
+    if (!progressHidden) return;
+    analyticsEvents.track('t100_progress_hidden', {
+      list: selectedList,
+      played: activeProgress.played,
+      min_played: verdictConfig.minPlayed,
+    });
+  }, [progressHidden, selectedList, activeProgress.played, verdictConfig.minPlayed]);
+
   return (
     <div>
       {/* SCOPE 1 — non-sticky: shell tabs + editorial header */}
@@ -464,9 +476,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {/* Member context — progress across lists, then where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              {activeProgress.played === 0 ? (
-                <Top100ProgressEmpty list={selectedList} signedIn={!!user?.id} />
-              ) : (
+              {activeProgress.played >= verdictConfig.minPlayed && (
                 <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
               )}
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
