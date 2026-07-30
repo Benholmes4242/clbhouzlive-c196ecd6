@@ -436,7 +436,12 @@ const SkylineCard: React.FC<{
   myByHole: Map<number, MyHolePerformanceRow>;
   viewerHasPlayed: boolean;
   beatFieldCount: number;
-}> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount }) => {
+  /** Rendered inside a shared container (chart + callouts) — drop own card chrome. */
+  embedded?: boolean;
+  /** Callouts anchored directly beneath the chart, inside the same container. */
+  footer?: React.ReactNode;
+}> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount, embedded = false, footer }) => {
+
   const { t } = useTranslation(['courses']);
   const sorted = holes;
   const domainMax = Math.max(
