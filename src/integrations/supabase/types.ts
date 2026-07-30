@@ -19559,6 +19559,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_platform_activity: {
+        Args: { p_days?: number }
+        Returns: {
+          avg_dau: number
+          dau_today: number
+          mau: number
+          peak_dau: number
+          trend: Json
+          wau: number
+        }[]
+      }
       get_played_unrated_courses: {
         Args: { p_user_id: string }
         Returns: {
