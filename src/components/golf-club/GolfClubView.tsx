@@ -476,6 +476,18 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
       );
     }
   }
+  if (communityRating != null) {
+    cells.push(
+      <CourseCommunityRating
+        key="rating"
+        rating={communityRating}
+        size="sm"
+        showLogo
+        onDark
+        forceNeutral
+      />
+    );
+  }
 
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1]">
@@ -492,11 +504,11 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         {formatCourseLocation(course)}
       </p>
 
-      {/* One row: stat band on the left (optically aligned to the h1), rank +
-          community rating pushed to the right edge, both vertically centred. */}
-      {(showBand || hasRank || communityRating != null) && (
+      {/* One row: stat band on the left (optically aligned to the h1), rank
+          badges pushed to the right edge, both vertically centred. */}
+      {(cells.length > 0 || hasRank) && (
         <div className="flex items-center justify-between gap-3 w-full">
-          {showBand ? (
+          {cells.length > 0 ? (
             <button
               type="button"
               onClick={() => {
@@ -522,7 +534,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
                   {cell}
                 </React.Fragment>
               ))}
-              {rounds < 10 && (
+              {showBand && rounds < 10 && (
                 <span
                   style={{
                     fontSize: 9,
@@ -548,7 +560,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
               figures legitimately differ. The tee card, 300px below, owns and
               labels tee data. */}
 
-          {(hasRank || communityRating != null) && (
+          {hasRank && (
             <div
               className="inline-flex items-center shrink-0"
               style={{
@@ -560,18 +572,13 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
                 gap: 8,
               }}
             >
-              {hasRank && (
-                <CourseRankBadges
-                  globalRank={course.global_rank ?? null}
-                  regionalRank={course.regional_rank ?? null}
-                  usaRank={course.usa_rank ?? null}
-                  country={course.country}
-                  positioning="inline"
-                />
-              )}
-              {communityRating != null && (
-                <CourseCommunityRating rating={communityRating} size="sm" showLogo onDark />
-              )}
+              <CourseRankBadges
+                globalRank={course.global_rank ?? null}
+                regionalRank={course.regional_rank ?? null}
+                usaRank={course.usa_rank ?? null}
+                country={course.country}
+                positioning="inline"
+              />
             </div>
           )}
         </div>
