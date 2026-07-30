@@ -175,6 +175,11 @@
     "explore": "[~~Éẋƥļőřé~~]"
   },
   "hero": {
+    "factBestRound": "Best round tracked here: {{gross}}, {{holder}}",
+    "factHardestHole": "The {{hole}} plays hardest, {{over}} over par",
+    "factOverPar": "Plays {{over}} over par on average",
+    "factUnderPar": "Plays {{over}} under par on average",
+    "factLevelPar": "Plays level par on average",
     "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
     "contextSimilar": "Like {{name}}, your highest rated",
     "contextFriendsOne": "{{name1}} has played here",
