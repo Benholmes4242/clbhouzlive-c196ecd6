@@ -203,6 +203,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     (facets?.directory_total ?? 0) - (facets?.played_total ?? 0),
   );
 
+  /**
+   * Tracked total across every country — the denominator of "N of M courses
+   * tracked". played_total is exactly the sum of facets.countries[].courses
+   * (both 121 live), so the direct field is used rather than summing here.
+   */
+  const trackedTotal = facets?.played_total ?? 0;
+
+
 
   /* ── Analytics ─────────────────────────────────────────────────── */
   useEffect(() => {
