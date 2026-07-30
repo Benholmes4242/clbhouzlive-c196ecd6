@@ -18532,7 +18532,7 @@ export type Database = {
         }[]
       }
       get_course_rating_standing: {
-        Args: { p_course_id: string; p_list_slug: string }
+        Args: { p_course_id: string; p_list_slug?: string }
         Returns: {
           list_label: string
           list_slug: string

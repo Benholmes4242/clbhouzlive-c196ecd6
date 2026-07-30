@@ -936,6 +936,8 @@
     "eyebrow": "Where this community plays",
     "countTracked_one": "course tracked",
     "countTracked_other": "courses tracked",
+    "countOfTracked_one": "of {{total}} course tracked",
+    "countOfTracked_other": "of {{total}} courses tracked",
     "allAreas": "All areas",
     "allRegions": "All regions",
     "allOf": "All of {{country}}",

@@ -18,7 +18,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
-import UnifiedCourseCard from './UnifiedCourseCard';
+import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { computeVerdict, type Verdict } from '@/components/top100/verdict';
+import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
+import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
@@ -59,6 +65,14 @@ const LENS_EMOJI: Record<StatLens, string> = {
 };
 
 
+/** Short list labels for the verdict explainer sheet. */
+const LIST_LABEL: Record<string, string> = {
+  global: 'Global',
+  'gb-i': 'GB&I',
+  usa: 'USA',
+  europe: 'Europe',
+};
+
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
 
@@ -69,6 +83,7 @@ const COMPACT_TRIGGER_CLS =
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -110,6 +125,31 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     country,
     region,
   });
+
+  /* ── Top 100 enrichment (ranked rows only) ─────────────────────── */
+  /**
+   * Only rows carrying a published rank get the verdict band + COURSE STATS
+   * panel, so only those ids are fetched. The set grows a page at a time and
+   * the hook is keyed on the whole set, so each page refetches it — acceptable
+   * at the current ceiling (121 tracked courses, fewer ranked). Do not widen.
+   */
+  const rankedRows = useMemo(
+    () => rows.filter((r) => r.global_rank != null || r.regional_rank != null),
+    [rows],
+  );
+  const rankedIds = useMemo(() => rankedRows.map((r) => r.course_id), [rankedRows]);
+  const enrichment = useTop100Enrichment(rankedIds, user?.id);
+  const verdictConfig = useTop100Config();
+  const [verdictSheet, setVerdictSheet] = useState<{
+    courseId: string;
+    courseName: string;
+    verdict: Verdict;
+    canRate: boolean;
+    listLabel: string;
+    listCount: number;
+  } | null>(null);
+
+
 
   /* ── URL state: write ──────────────────────────────────────────── */
   const writeUrl = useCallback(
@@ -202,6 +242,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     0,
     (facets?.directory_total ?? 0) - (facets?.played_total ?? 0),
   );
+
+  /**
+   * Tracked total across every country — the denominator of "N of M courses
+   * tracked". played_total is exactly the sum of facets.countries[].courses
+   * (both 121 live), so the direct field is used rather than summing here.
+   */
+  const trackedTotal = facets?.played_total ?? 0;
+
 
 
   /* ── Analytics ─────────────────────────────────────────────────── */
@@ -433,7 +481,12 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <div className="flex items-center justify-between gap-3 mt-2.5">
               <span style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.3 }}>
                 <strong style={{ color: INK, fontWeight: 800 }}>{formatNumber(totalCount)}</strong>{' '}
-                {t('statBrowse.countTracked', { count: totalCount })}
+                {trackedTotal > 0 && totalCount !== trackedTotal
+                  ? t('statBrowse.countOfTracked', {
+                      count: totalCount,
+                      total: formatNumber(trackedTotal),
+                    })
+                  : t('statBrowse.countTracked', { count: totalCount })}
               </span>
               {lensSelect(false)}
             </div>
@@ -528,28 +581,74 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )
       ) : (
         <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
-          {rows.map((row, i) => (
-            <UnifiedCourseCard
-              key={row.course_id}
-              course={fromStatBrowseRow(row)}
-              variant="vertical"
-              showRankBadges
-              showRating
-              showPlayedStatus
-              /* The lens chip renders unless it would duplicate a figure
-                 already on the card — 'rated' repeats the community rating. */
-              statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
-              statLine={sampleLine(row)}
-              onClick={() => {
-                analyticsEvents.track('stat_browse_course_opened', {
-                  course_id: row.course_id,
-                  lens,
-                  rank: i + 1,
-                });
-                navigate(`/courses/${row.course_id}`);
-              }}
-            />
-          ))}
+          {rows.map((row, i) => {
+            const model = fromStatBrowseRow(row);
+            const rank = row.global_rank ?? row.regional_rank ?? null;
+            const listSlug =
+              row.global_rank != null ? 'global' : getRegionalBadgeSlug(model) ?? 'regional';
+            const data = rank != null ? enrichment.get(row.course_id) : undefined;
+            /* No ratingRank here by decision: a course can sit in two lists at
+               once and this surface has no single list loaded, so "Nth of N on
+               this list" has no correct answer. First line only. */
+            const verdict =
+              rank != null && data
+                ? computeVerdict({
+                    rank,
+                    rating: data.rating,
+                    ratingCount: data.ratingCount,
+                    config: verdictConfig,
+                  })
+                : null;
+
+            return (
+              <div key={row.course_id}>
+                <UnifiedCourseCard
+                  course={model}
+                  variant="vertical"
+                  showRankBadges
+                  showRating
+                  showPlayedStatus
+                  /* The lens chip renders unless it would duplicate a figure
+                     already on the card — 'rated' repeats the community rating. */
+                  statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
+                  statLine={sampleLine(row)}
+                  onClick={() => {
+                    analyticsEvents.track('stat_browse_course_opened', {
+                      course_id: row.course_id,
+                      lens,
+                      rank: i + 1,
+                    });
+                    navigate(`/courses/${row.course_id}`);
+                  }}
+                />
+                {rank != null && (
+                  <Top100EnrichmentBlock
+                    courseId={row.course_id}
+                    courseName={row.name}
+                    rank={rank}
+                    list={listSlug}
+                    data={data}
+                    verdict={verdict}
+                    onOpenVerdict={() => {
+                      if (!verdict) return;
+                      setVerdictSheet({
+                        courseId: row.course_id,
+                        courseName: row.name,
+                        verdict,
+                        canRate: !!data && !data.ratedByYou,
+                        listLabel: LIST_LABEL[listSlug] ?? '',
+                        listCount:
+                          (row.global_rank != null ? 1 : 0) +
+                          (row.regional_rank != null ? 1 : 0),
+                      });
+                    }}
+                    onRate={() => navigate(`/courses/${row.course_id}/rate`)}
+                  />
+                )}
+              </div>
+            );
+          })}
+
 
           {isPaging && (
             <div className="px-4" style={{ fontSize: 12.5, color: INK_MUTE }}>
@@ -588,6 +687,24 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             {t('statBrowse.directory.cta')}
           </button>
         </div>
+      )}
+
+      {verdictSheet && (
+        <Top100VerdictExplainerSheet
+          open
+          onClose={() => setVerdictSheet(null)}
+          courseId={verdictSheet.courseId}
+          courseName={verdictSheet.courseName}
+          listLabel={verdictSheet.listLabel}
+          rank={verdictSheet.verdict.rank}
+          rating={verdictSheet.verdict.rating}
+          ratingCount={verdictSheet.verdict.ratingCount}
+          listCount={verdictSheet.listCount}
+          ratingRank={null}
+          ratingPoolSize={null}
+          canRate={verdictSheet.canRate}
+          onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
+        />
       )}
     </div>
   );

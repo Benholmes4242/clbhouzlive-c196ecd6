@@ -8,16 +8,9 @@ import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
-import { getScoreRingColors } from '@/hooks/useTierStyles';
-import { getRatingTier, rampForRating, ratingTextColor } from '@/lib/ratingTier';
+import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
-
-// Computed once — reduced-motion users get static gold rings/bars.
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
@@ -58,59 +51,6 @@ const ReviewText: React.FC<{ text: string }> = ({ text }) => {
           {expanded ? 'Show less' : 'Read more'}
         </button>
       )}
-    </div>
-  );
-};
-
-// Score ring SVG component
-const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 80 }) => {
-  const { from, to } = getScoreRingColors(score);
-  const radius = (size - 12) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (score / 10) * circumference;
-  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
-  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
-
-  return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(245,158,11,0.08)" strokeWidth="6" />
-        <circle
-          cx={size / 2} cy={size / 2} r={radius}
-          fill="none" stroke={`url(#${gradientId})`}
-          strokeWidth="6" strokeLinecap="round"
-          strokeDasharray={`${progress} ${circumference}`}
-        />
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={from} />
-            <stop offset="100%" stopColor={to} />
-            {isExceptional && !prefersReducedMotion && (
-              <animateTransform
-                attributeName="gradientTransform"
-                type="rotate"
-                from="0 0.5 0.5"
-                to="360 0.5 0.5"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-            )}
-          </linearGradient>
-        </defs>
-      </svg>
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span
-          className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            fontVariantNumeric: 'tabular-nums',
-            ...(isExceptional ? {} : { color: ratingTextColor(score) }),
-          }}
-        >
-          {score.toFixed(1)}
-        </span>
-      </div>
     </div>
   );
 };
@@ -218,39 +158,30 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         </button>
       </div>
 
-      {/* Score ring + category breakdown */}
+      {/* Headline figure + category bars */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: highlightCategories.length > 0 || rating.review ? 14 : 0 }}>
-        <ScoreRing score={rating.rating} size={80} />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
+          <span
+            style={{
+              fontSize: 44,
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              color: bandColor(rating.rating),
+            }}
+          >
+            {rating.rating.toFixed(1)}
+          </span>
+          <span style={{ fontSize: 15, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>
+            /10
+          </span>
+        </div>
         {categories.length > 0 && (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 14, rowGap: 8 }}>
-            {categories.map(cat => {
-              const catRamp = rampForRating(cat.score);
-              const catExceptional = getRatingTier(cat.score) === 'EXCEPTIONAL';
-              return (
-                <div key={cat.key}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                    <span style={{ color: '#94A3B8' }}>{t(cat.labelKey)}</span>
-
-                    <span style={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                      {cat.score.toFixed(1)}
-                    </span>
-                  </div>
-                  <div style={{ height: 4, borderRadius: 999, overflow: 'hidden', background: 'rgba(245,158,11,0.08)' }}>
-                    <div
-                      className={catExceptional ? 'clbhouz-gold-shimmer-bar' : undefined}
-                      style={{
-                        height: '100%',
-                        borderRadius: 999,
-                        width: `${(cat.score / 10) * 100}%`,
-                        background: catExceptional
-                          ? undefined
-                          : `linear-gradient(90deg, ${catRamp.lo}, ${catRamp.hi})`,
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+          <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 14, rowGap: 8 }}>
+            {categories.map((cat) => (
+              <SubScoreBar key={cat.key} label={t(cat.labelKey)} score={cat.score} />
+            ))}
           </div>
         )}
       </div>
