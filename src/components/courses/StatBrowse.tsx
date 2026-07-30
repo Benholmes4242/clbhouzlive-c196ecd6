@@ -166,19 +166,22 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   }, [loadMore, isPaging, rows.length]);
 
   /* Depth reached, once per page load. */
-  const depthRef = useRef({ rows: 0, sent: false });
+  const depthRef = useRef({ rows: 0, total: 0, lens, country, sent: false });
   useEffect(() => {
     depthRef.current.rows = rows.length;
-  }, [rows.length]);
+    depthRef.current.total = totalCount;
+    depthRef.current.lens = lens;
+    depthRef.current.country = country;
+  }, [rows.length, totalCount, lens, country]);
   useEffect(() => {
     const send = () => {
       if (depthRef.current.sent) return;
       depthRef.current.sent = true;
       analyticsEvents.track('stat_browse_scroll_depth', {
-        lens,
-        country,
+        lens: depthRef.current.lens,
+        country: depthRef.current.country,
         rows_loaded: depthRef.current.rows,
-        total_count: totalCount,
+        total_count: depthRef.current.total,
       });
     };
     window.addEventListener('pagehide', send);
