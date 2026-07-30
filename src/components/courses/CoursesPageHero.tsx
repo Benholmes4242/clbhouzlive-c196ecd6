@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
-import { useExploreMood, type ExploreMoodId } from '@/components/explore-tab-new/hooks/useExploreMood';
+import { useExploreMood } from '@/components/explore-tab-new/hooks/useExploreMood';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { formatNumber } from '@/i18n/format';
@@ -29,13 +29,14 @@ import {
  * The global CompactHeader floats over this hero in transparent overlay
  * mode; this component reserves that space via env(safe-area-inset-top).
  *
- * Copy surfaces: `why_ai` (course_mood_blurbs) and `context_stats` were
- * already returned by get_explore_hero and simply thrown away. Both are
- * rendered here; neither is fetched here. No RPC was added or changed.
+ * Copy surfaces: `why_ai` (course_mood_blurbs) from get_explore_hero, and
+ * a single true data line from get_hero_course_fact. The old context line
+ * built from `context_stats` is gone - it claimed similarity clbhouz could
+ * not support.
  *
  * Analytics callsites:
  *  - hero_blurb_shown   { course_id, mood }                (blurb effect)
- *  - hero_context_shown { course_id, mood, kind }          (context effect)
+ *  - hero_fact_shown    { course_id, fact_kind, rounds_tracked, player_count }
  *  - hero_view_course   { course_id, mood, had_blurb }     (CTA onClick)
  */
 
