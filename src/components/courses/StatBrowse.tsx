@@ -1,6 +1,6 @@
 /**
  * StatBrowse — stat-led browse over the courses this community actually
- * plays. Sits in the Courses explore tab ahead of the full directory.
+ * plays. Sits in the Courses explore tab ahead of the directory sheet.
  *
  * Presentation only: rows arrive already ordered from the RPC and are
  * rendered in the order received.
@@ -8,6 +8,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Select,
@@ -44,7 +45,7 @@ import {
 } from '@/features/courses/_shared/tokens';
 
 interface StatBrowseProps {
-  /** Reveal CourseExplorer (the full directory) — owned by the parent. */
+  /** Open the course directory sheet — owned by the parent. */
   onOpenDirectory: (country: string | null) => void;
 }
 
@@ -73,6 +74,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const loadSentinelRef = useRef<HTMLDivElement | null>(null);
   const [condensed, setCondensed] = useState(false);
   const viewedRef = useRef(false);
 
@@ -150,6 +152,48 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     return () => io.disconnect();
   }, []);
 
+  /* Continuous scroll: sentinel below the last card pulls the next page. */
+  useEffect(() => {
+    const el = loadSentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isPaging) loadMore();
+      },
+      { rootMargin: '300px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [loadMore, isPaging, rows.length]);
+
+  /* Depth reached, once per page load. */
+  const depthRef = useRef({ rows: 0, total: 0, lens, country, sent: false });
+  useEffect(() => {
+    depthRef.current.rows = rows.length;
+    depthRef.current.total = totalCount;
+    depthRef.current.lens = lens;
+    depthRef.current.country = country;
+  }, [rows.length, totalCount, lens, country]);
+  useEffect(() => {
+    const send = () => {
+      if (depthRef.current.sent) return;
+      depthRef.current.sent = true;
+      analyticsEvents.track('stat_browse_scroll_depth', {
+        lens: depthRef.current.lens,
+        country: depthRef.current.country,
+        rows_loaded: depthRef.current.rows,
+        total_count: depthRef.current.total,
+      });
+    };
+    window.addEventListener('pagehide', send);
+    return () => {
+      window.removeEventListener('pagehide', send);
+      send();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   /* ── Analytics ─────────────────────────────────────────────────── */
   useEffect(() => {
     if (viewedRef.current) return;
@@ -184,8 +228,11 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     writeUrl({ region: next });
   };
 
-  const openDirectory = (withCountry: string | null) => {
-    analyticsEvents.track('stat_browse_directory_opened', { lens, country });
+  const openDirectory = (
+    withCountry: string | null,
+    entry: 'filter_bar' | 'footer' | 'empty_state',
+  ) => {
+    analyticsEvents.track('stat_browse_directory_opened', { lens, country, entry });
     onOpenDirectory(withCountry);
   };
 
@@ -322,6 +369,21 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     </Select>
   );
 
+  /* Top-of-page door into the full directory — a member whose course is
+     missing should not have to exhaust the list to go looking. */
+  const directorySearchButton = (compact: boolean) => (
+    <button
+      type="button"
+      onClick={() => openDirectory(country, 'filter_bar')}
+      aria-label={t('directorySheet.openA11y')}
+      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 rounded-xl bg-white flex items-center justify-center`}
+      style={{ border: `1px solid ${HAIRLINE_INK_10}` }}
+    >
+      <Search className={compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+    </button>
+  );
+
+
   return (
     <div className="w-full">
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
@@ -347,13 +409,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               {region ? regionSelect(true) : countrySelect(true)}
             </div>
             <div className="min-w-0 flex-1">{lensSelect(true)}</div>
+            {directorySearchButton(true)}
           </div>
         ) : (
           <>
             <div className="flex items-center gap-2">
               <div className="flex-1 min-w-0">{countrySelect(false)}</div>
               <div className="flex-1 min-w-0">{regionSelect(false)}</div>
+              {directorySearchButton(false)}
             </div>
+
 
             {/* Count + lens */}
             <div className="flex items-center justify-between gap-3 mt-2.5">
@@ -435,7 +500,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </button>
             <button
               type="button"
-              onClick={() => openDirectory(country)}
+              onClick={() => openDirectory(country, 'empty_state')}
               className="w-full mt-2 h-11 rounded-xl text-[14px] font-semibold"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
@@ -477,51 +542,44 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
 
-          {rows.length < totalCount && (
-            <div className="px-4">
-              <button
-                type="button"
-                onClick={loadMore}
-                disabled={isPaging}
-                className="w-full h-11 rounded-xl text-[13.5px] font-semibold"
-                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-              >
-                {t('statBrowse.showMore', {
-                  count: Math.min(STAT_BROWSE_PAGE_SIZE, remaining),
-                })}
-                <span style={{ color: INK_MUTE, fontWeight: 500 }}>
-                  {t('statBrowse.showMoreOf', { total: formatNumber(totalCount) })}
-                </span>
-              </button>
+          {isPaging && (
+            <div className="px-4" style={{ fontSize: 12.5, color: INK_MUTE }}>
+              {t('statBrowse.loadingMore')}
             </div>
+          )}
+
+          {rows.length < totalCount && (
+            <div ref={loadSentinelRef} style={{ height: 1 }} aria-hidden="true" />
           )}
         </div>
       )}
 
       {/* ── Directory floor ─────────────────────────────────────── */}
-      <div
-        className="mt-6 p-4"
-        style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`, borderRadius: 14 }}
-      >
-        <h3 style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
-          {t('statBrowse.directory.title')}
-        </h3>
-        <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
-          {t('statBrowse.directory.body', {
-            count: formatNumber(
-              Math.max(0, (facets?.directory_total ?? 0) - (facets?.played_total ?? 0)),
-            ),
-          })}
-        </p>
-        <button
-          type="button"
-          onClick={() => openDirectory(null)}
-          className="w-full mt-3 h-11 rounded-xl text-[13.5px] font-semibold"
-          style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+      {rows.length >= totalCount && (
+        <div
+          className="mt-6 p-4"
+          style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`, borderRadius: 14 }}
         >
-          {t('statBrowse.directory.cta')}
-        </button>
-      </div>
+          <h3 style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
+            {t('statBrowse.directory.title')}
+          </h3>
+          <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
+            {t('statBrowse.directory.body', {
+              count: formatNumber(
+                Math.max(0, (facets?.directory_total ?? 0) - (facets?.played_total ?? 0)),
+              ),
+            })}
+          </p>
+          <button
+            type="button"
+            onClick={() => openDirectory(null, 'footer')}
+            className="w-full mt-3 h-11 rounded-xl text-[13.5px] font-semibold"
+            style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+          >
+            {t('statBrowse.directory.cta')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

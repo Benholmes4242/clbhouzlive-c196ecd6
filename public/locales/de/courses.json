@@ -672,5 +672,13 @@
       "ordinal_ordinal_few": "{{count}}rd",
       "ordinal_ordinal_other": "{{count}}th"
     }
+  },
+  "directorySheet": {
+    "placeholder": "Search all courses",
+    "clear": "Clear search",
+    "openA11y": "Search the full course directory",
+    "prompt": "Type at least {{count}} characters to search the full directory.",
+    "noResults": "No courses matched that. Check the spelling and try again.",
+    "loadingMore": "Loading more courses..."
   }
 }

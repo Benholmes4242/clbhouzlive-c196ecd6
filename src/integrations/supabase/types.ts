@@ -19154,6 +19154,21 @@ export type Database = {
           username: string
         }[]
       }
+      get_hero_course_fact: {
+        Args: { p_course_id: string }
+        Returns: {
+          avg_over_par: number
+          fact_kind: string
+          hole_no: number
+          hole_over: number
+          hole_par: number
+          hole_plays: number
+          player_count: number
+          record_gross: number
+          record_holder: string
+          rounds_tracked: number
+        }[]
+      }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }

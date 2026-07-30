@@ -1,6 +1,6 @@
 /**
  * PlayersFromFilter - Country-based player filter dropdown
- * Matches CourseExplorer region/sub-region dropdown style
+ * Matches the courses region/sub-region dropdown style
  */
 
 import React, { useState } from 'react';
