@@ -25,18 +25,15 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { AMBER, HAIRLINE_INK_8, INK } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
+import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
 
-const RED = '#DC2626';
-const GREEN = '#047857';
 /** Difficulty band inks. Relative difficulty only - see BRIEF_TOP100_DIFFICULTY_BANDS. */
 const BAND_RED = '#C8372B';
 const BAND_GREEN = '#0F8F4A';
 const BAND_INK = '#0E1216';
-const LABEL_INK = 'rgba(15,23,42,0.42)';
 const MUTED_INK = 'rgba(15,23,42,0.55)';
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
-const TRACK = 'rgba(15,23,42,0.08)';
 /** Numerals stay in the Geist stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
@@ -78,31 +75,6 @@ const difficultyLineStyle: React.CSSProperties = {
   letterSpacing: '-0.005em',
 };
 
-const barLabelStyle: React.CSSProperties = {
-  width: 54,
-  flexShrink: 0,
-  fontSize: 10,
-  fontWeight: 600,
-  color: LABEL_INK,
-  whiteSpace: 'nowrap',
-  lineHeight: 1,
-};
-
-const barFigureStyle: React.CSSProperties = {
-  ...NUMERALS,
-  fontFamily: MONO,
-  fontSize: 11,
-  fontWeight: 800,
-  lineHeight: 1,
-  letterSpacing: '-0.02em',
-};
-
-function bandColor(score: number): string {
-  if (score >= 9) return GREEN;
-  if (score >= 5) return AMBER;
-  return RED;
-}
-
 interface Props {
   courseId: string;
   rank: number | null;
@@ -110,23 +82,6 @@ interface Props {
   data: Top100Enrichment | undefined;
   onRate: () => void;
 }
-
-const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label, score }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-    <span style={barLabelStyle}>{label}</span>
-    <div style={{ flex: 1, height: 3, borderRadius: 2, background: TRACK, minWidth: 0 }}>
-      <div
-        style={{
-          width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
-          height: '100%',
-          borderRadius: 2,
-          background: bandColor(score),
-        }}
-      />
-    </div>
-    <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
-  </div>
-);
 
 export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data, onRate }) => {
   const { t } = useTranslation('courses');
