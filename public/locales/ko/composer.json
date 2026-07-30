@@ -26,5 +26,12 @@
       "your card from this morning",
       "the view from the 18th"
     ]
+  },
+  "drafts": {
+    "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."
+  },
+  "closeGuard": {
+    "mediaNotSaved_one": "{{count}} photo will not be saved",
+    "mediaNotSaved_other": "{{count}} photos will not be saved"
   }
 }
