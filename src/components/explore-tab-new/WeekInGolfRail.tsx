@@ -158,7 +158,7 @@ export function WeekInGolfRail({ region = null, onEmpty }: WeekInGolfRailProps =
     if (region == null || isHideableScope(region)) return null;
     return (
       <section style={{ marginTop: 32, fontFamily: FONT }}>
-        <SectionHead overline={eyebrow} title="Moments from the community" paddingX={16} />
+        <SectionHead overline={eyebrow} title="Moments from the community" paddingX={30} />
         <EmptyScopeCard
           title={`A quiet week ${regionScopePhrase(region)}.`}
           subline="Log a round on your official WHS record and make the board."
@@ -184,7 +184,7 @@ export function WeekInGolfRail({ region = null, onEmpty }: WeekInGolfRailProps =
         title="Moments from the community"
         meta="See all"
         onMeta={() => setSheetOpen(true)}
-        paddingX={16}
+        paddingX={30}
       />
 
       <div
