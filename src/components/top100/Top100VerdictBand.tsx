@@ -19,6 +19,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { shortenCourseName, type Verdict } from './verdict';
 
