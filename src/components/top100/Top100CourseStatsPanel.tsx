@@ -31,7 +31,6 @@ import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
 const BAND_RED = '#C8372B';
 const BAND_GREEN = '#0F8F4A';
 const BAND_INK = '#0E1216';
-const LABEL_INK = 'rgba(15,23,42,0.42)';
 const MUTED_INK = 'rgba(15,23,42,0.55)';
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
