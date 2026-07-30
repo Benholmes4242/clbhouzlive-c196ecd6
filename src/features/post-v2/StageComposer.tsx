@@ -259,6 +259,44 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const active = state.media[state.activeIndex] ?? null;
 
+  // Refreshed every render so the unmount cleanup reads teardown values.
+  abandonRef.current = {
+    hasMedia: state.media.length > 0,
+    hasCaption: state.caption.trim().length > 0,
+    mediaCount: state.media.length,
+  };
+
+  // Media added: kind is image / video / mixed across the batch just added.
+  const handleAddFiles = useCallback(async (files: File[]) => {
+    const countBefore = state.media.length;
+    await addFiles(files);
+    if (files.length === 0) return;
+    const hasVideo = files.some((f) => f.type.startsWith('video/'));
+    const hasImage = files.some((f) => !f.type.startsWith('video/'));
+    // Analytics callsite: post_media_added
+    analyticsEvents.track('post_media_added', {
+      mode,
+      count_after: countBefore + files.length,
+      kind: hasVideo && hasImage ? 'mixed' : (hasVideo ? 'video' : 'image'),
+    });
+  }, [addFiles, state.media.length, mode]);
+
+  // Caption: post_caption_started fires ONCE per composer session.
+  const handleSetCaption = useCallback((v: string) => {
+    if (!captionStartedRef.current && v.trim().length > 0) {
+      captionStartedRef.current = true;
+      // Analytics callsite: post_caption_started
+      analyticsEvents.track('post_caption_started', { mode });
+    }
+    setCaption(v);
+  }, [setCaption, mode]);
+
+  const openDetail = useCallback((row: 'course' | 'round' | 'actor' | 'schedule') => {
+    // Analytics callsite: post_detail_opened
+    analyticsEvents.track('post_detail_opened', { mode, row });
+  }, [mode]);
+
+
   // ---- C2: attach a logged round -----------------------------------------
   // Rounds are scoped to the PRIMARY tagged course only.
   const primaryCourseId = state.course?.id ?? null;
