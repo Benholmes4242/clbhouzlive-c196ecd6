@@ -228,7 +228,67 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                 ))}
               </div>
             )}
+
+            {ratedRows.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <span
+                  className="block"
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    color: INK_MUTE,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    marginBottom: 4,
+                  }}
+                >
+                  {t('directorySheet.ratedHeading')}
+                </span>
+                {ratedRows.map((c, i) => (
+                  <button
+                    key={c.course_id}
+                    type="button"
+                    onClick={() => onRatedTap(c, i)}
+                    className="w-full text-left py-3 flex items-center gap-3"
+                    style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}
+                  >
+                    {c.thumbnail_image ? (
+                      <img
+                        src={c.thumbnail_image}
+                        alt=""
+                        loading="lazy"
+                        className="h-11 w-11 object-cover shrink-0"
+                        style={{ borderRadius: '34%' }}
+                      />
+                    ) : (
+                      <div
+                        className="h-11 w-11 shrink-0"
+                        style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
+                      />
+                    )}
+                    <span className="flex-1 min-w-0">
+                      <span
+                        className="block truncate"
+                        style={{ fontSize: 14, fontWeight: 700, color: INK }}
+                      >
+                        {c.course_name}
+                      </span>
+                      <span
+                        className="block truncate"
+                        style={{ fontSize: 12, color: INK_MUTE, marginTop: 2 }}
+                      >
+                        {[c.sub_country, c.country].filter(Boolean).join(', ')}
+                      </span>
+                    </span>
+                    {c.avg_overall_score !== null && (
+                      <CourseCommunityRating rating={c.avg_overall_score} size="sm" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
         ) : isLoading ? (
           <div className="mt-3 space-y-2">
             {[0, 1, 2, 3, 4].map((i) => (
