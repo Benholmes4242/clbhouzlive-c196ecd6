@@ -31,7 +31,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
   };
 
   return (
-    <div style={{ padding: 0, background: CT.canvas, borderTop: `1px solid ${CT.hairline}`, display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
+    <div style={{ padding: 0, background: CT.canvas, display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
       <button
         onClick={handleAdd}
         style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, border: '1px dashed rgba(0,0,0,0.2)', background: '#fff', color: CT.ink, fontSize: 22, cursor: 'pointer' }}
