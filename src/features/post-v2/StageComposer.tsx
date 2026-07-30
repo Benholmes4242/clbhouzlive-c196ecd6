@@ -705,23 +705,25 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   return (
     <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
-        <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
-          <X size={22} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
+        <button onClick={handleClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+          {'\u2039'}
         </button>
-        {isEditMode ? (
-          <div style={{ fontSize: 14, fontWeight: 600, color: CT.ink }}>Edit post</div>
-        ) : drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: `1px solid ${CT.hairlineStrong}`, borderRadius: 999, padding: '4px 10px', fontSize: 12, color: CT.ink, cursor: 'pointer' }}>
-            Drafts - {drafts.drafts.length}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {isEditMode ? 'Edit post' : 'New post'}
+          </div>
+          {activeActor?.name && (
+            <div style={{ fontSize: 11.5, color: CT.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {`Posting as ${activeActor.name}`}
+            </div>
+          )}
+        </div>
+        {!isEditMode && drafts.drafts.length > 0 && (
+          <button onClick={() => setSheet('drafts')} style={{ background: 'none', border: 0, fontSize: 12.5, fontWeight: 700, color: CT.secondary, cursor: 'pointer' }}>
+            Drafts
           </button>
         )}
-        <div style={{ flex: 1 }} />
-        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
-          {(submitting || saving)
-            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block' }} />
-            : primaryLabel}
-        </button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -742,32 +744,56 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
-      <div style={{ flex: 'none', maxHeight: '55dvh', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)', background: CT.canvas }}>
-        <MediaTray
-          media={state.media}
-          activeIndex={state.activeIndex}
-          onSelect={setActiveIndex}
-          onRemove={handleRemoveAt}
-          onReorder={reorder}
-          onAddFiles={handleAddFiles}
-        />
-        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
-        <DetailRows
-          course={state.course}
-          courses={state.courses}
-          onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
-          actor={activeActor}
-          onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
-          scheduledAt={state.scheduledAt}
-          onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
-          actorLocked={isEditMode}
-          showSchedule={showScheduleRow}
-          showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
-          attachRoundLabel={attachRoundLabel}
-          onOpenAttachRound={openRoundSheet}
-        />
+      <div style={{ flex: 'none', maxHeight: '48dvh', overflowY: 'auto', padding: '0 16px', background: CT.canvas }}>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>PHOTOS</div>
+          <MediaTray
+            media={state.media}
+            activeIndex={state.activeIndex}
+            onSelect={setActiveIndex}
+            onRemove={handleRemoveAt}
+            onReorder={reorder}
+            onAddFiles={handleAddFiles}
+          />
+        </div>
 
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>IN YOUR WORDS</div>
+          <div style={{ background: CT.cardBg, borderRadius: CT.panelRadius, border: `1px solid ${CT.hairline}`, padding: 14, minHeight: 96 }}>
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>DETAILS</div>
+          <div style={{ background: CT.cardBg, borderRadius: CT.cardRadius, border: `1px solid ${CT.hairline}`, padding: '2px 16px' }}>
+            <DetailRows
+              course={state.course}
+              courses={state.courses}
+              onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
+              actor={activeActor}
+              onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
+              scheduledAt={state.scheduledAt}
+              onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
+              actorLocked={isEditMode}
+              showSchedule={showScheduleRow}
+              showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
+              attachRoundLabel={attachRoundLabel}
+              onOpenAttachRound={openRoundSheet}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Action bar — sibling of the scrolling stack, so it never scrolls away */}
+      <div style={{ flex: 'none', background: CT.canvas, borderTop: `1px solid ${CT.hairline}`, padding: '12px 16px max(env(safe-area-inset-bottom), 18px)' }}>
+        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
+          {(submitting || saving)
+            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
+            : primaryLabel}
+        </button>
+      </div>
+
 
       {/* Sheets */}
       <CourseTagSheet
