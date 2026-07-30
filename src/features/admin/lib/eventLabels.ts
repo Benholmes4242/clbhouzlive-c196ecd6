@@ -163,6 +163,7 @@ export const EVENT_LABELS: Record<string, string> = {
   stat_browse_scroll_depth: 'Stat browse scroll depth',
   course_directory_searched: 'Course directory searched',
   course_directory_result_tapped: 'Course directory result tapped',
+  course_directory_request_opened: 'Course directory request opened',
 
   // Review tee context (Phase L6)
   review_tee_selected: 'Review tee selected',
