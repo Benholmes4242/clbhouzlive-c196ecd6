@@ -746,17 +746,17 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           onSelect={setActiveIndex}
           onRemove={handleRemoveAt}
           onReorder={reorder}
-          onAddFiles={addFiles}
+          onAddFiles={handleAddFiles}
         />
-        <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
+        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
           course={state.course}
           courses={state.courses}
-          onOpenCourse={() => setSheet('course')}
+          onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
           actor={activeActor}
-          onOpenActor={() => setSheet('actor')}
+          onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
           scheduledAt={state.scheduledAt}
-          onOpenSchedule={() => setSheet('schedule')}
+          onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
           actorLocked={isEditMode}
           showSchedule={showScheduleRow}
           showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
