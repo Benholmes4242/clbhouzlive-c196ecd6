@@ -64,6 +64,8 @@ interface Props {
   /** Standing within the rated pool of the selected list, when known. */
   ratingRank?: VerdictRatingRank | null;
   list?: string;
+  /** Short label of the active list (Global, GB&I, USA, Europe). */
+  listLabel?: string;
   onOpen: () => void;
 }
 
@@ -73,6 +75,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
   verdict,
   ratingRank,
   list,
+  listLabel,
   onOpen,
 }) => {
   const { t } = useTranslation('courses');
