@@ -169,7 +169,18 @@ export const EVENT_LABELS: Record<string, string> = {
   // Review tee context (Phase L6)
   review_tee_selected: 'Review tee selected',
   review_tee_filter_toggled: 'Review tee filter toggled',
+
+  // Review wizard (three-step composer)
+  review_wizard_opened: 'Review wizard opened',
+  review_wizard_abandoned: 'Review wizard abandoned',
+  review_step_viewed: 'Review step viewed',
+  review_step_completed: 'Review step completed',
+  review_submitted: 'Review submitted',
+  review_receipt_viewed: 'Review receipt viewed',
+  review_receipt_action: 'Review receipt action tapped',
+  review_next_course_tapped: 'Review next course tapped',
 };
+
 
 export function titleize(name: string): string {
   return name

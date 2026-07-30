@@ -576,7 +576,71 @@
     "teesPlayed": {
       "eyebrow": "TEES PLAYED (OPTIONAL)"
     },
-    "teeBadge": "{{label}} tees"
+    "teeBadge": "{{label}} tees",
+    "wizard": {
+      "rail": {
+        "score": "Score",
+        "breakdown": "Breakdown",
+        "words": "Words"
+      },
+      "backA11y": "Back",
+      "deleteA11y": "Remove review",
+      "a11yStep": "Step {{n}} of 3, {{label}}",
+      "continue": "Continue",
+      "save": "Save review",
+      "post": "Post review",
+      "saving": "Saving...",
+      "posting": "Posting...",
+      "step0": {
+        "heading": "How good is it, out of ten?",
+        "captionEmpty": "Drag to set your score",
+        "captionSet": "Your overall score",
+        "gate": "Set your score",
+        "a11y": "Overall score, 1 to 10"
+      },
+      "step1": {
+        "heading": "Break it down",
+        "body": "All four are needed. This is what makes the community numbers mean something.",
+        "gate_one": "{{count}} category left",
+        "gate_other": "{{count}} categories left"
+      },
+      "hint": {
+        "design": "Routing, shot variety, memorability",
+        "condition": "Greens, fairways, bunkers on the day",
+        "clubhouse": "Welcome, food, atmosphere",
+        "facilities": "Range, practice areas, changing rooms"
+      },
+      "step2": {
+        "wordsEyebrow": "Your words",
+        "placeholder": "What should another golfer know before they play here?",
+        "optionalNote": "Optional. Everything below is too.",
+        "photosEyebrow": "Photos",
+        "teesEyebrow": "Tees played",
+        "shareTitle": "Share to the Clubhouse",
+        "shareSub": "Your review appears in the feed"
+      },
+      "receipt": {
+        "eyebrow": "Review posted",
+        "didEyebrow": "What this did",
+        "rowA": "<cnt>{{count}}</cnt> members rate {{course}} at <avg>{{avg}}</avg>",
+        "rowADeltaAbove": "You rated it {{delta}} above the average",
+        "rowADeltaBelow": "You rated it {{delta}} below the average",
+        "rowB": "You are the first to rate this course",
+        "rowBSub": "Your score sets the community average",
+        "rowC": "Ranked <b>#{{rank}}</b> on the {{list}} Top 100",
+        "rowCRight_one": "{{count}} rated",
+        "rowCRight_other": "{{count}} rated",
+        "rowD": "Your <b>{{ordinal}}</b> highest rated course",
+        "rowDRight_one": "of {{count}} rated",
+        "rowDRight_other": "of {{count}} rated",
+        "nextEyebrow_one": "{{count}} played course still unrated",
+        "nextEyebrow_other": "{{count}} played courses still unrated",
+        "nextPlayed": "Played {{date}}",
+        "nextRate": "Rate",
+        "actionClubhouse": "See it in the Clubhouse",
+        "actionBack": "Back to {{course}}"
+      }
+    }
   },
   "courseDetail": {
     "claim": {

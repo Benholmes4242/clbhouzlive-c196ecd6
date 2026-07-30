@@ -409,6 +409,70 @@
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses"
+    },
+    "wizard": {
+      "rail": {
+        "score": "점수",
+        "breakdown": "세부 평가",
+        "words": "후기"
+      },
+      "backA11y": "뒤로",
+      "deleteA11y": "리뷰 삭제",
+      "a11yStep": "3단계 중 {{n}}단계, {{label}}",
+      "continue": "계속",
+      "save": "리뷰 저장",
+      "post": "리뷰 게시",
+      "saving": "저장 중...",
+      "posting": "게시 중...",
+      "step0": {
+        "heading": "10점 만점에 몇 점인가요?",
+        "captionEmpty": "드래그해서 점수를 정하세요",
+        "captionSet": "내 종합 점수",
+        "gate": "점수를 정하세요",
+        "a11y": "종합 점수, 1에서 10"
+      },
+      "step1": {
+        "heading": "세부 평가",
+        "body": "네 항목 모두 필요합니다. 그래야 커뮤니티 수치가 의미를 가집니다.",
+        "gate_one": "{{count}}개 항목 남음",
+        "gate_other": "{{count}}개 항목 남음"
+      },
+      "hint": {
+        "design": "루팅, 샷의 다양성, 기억에 남는 정도",
+        "condition": "그날의 그린, 페어웨이, 벙커",
+        "clubhouse": "응대, 음식, 분위기",
+        "facilities": "연습장, 연습 구역, 탈의실"
+      },
+      "step2": {
+        "wordsEyebrow": "내 후기",
+        "placeholder": "다른 골퍼가 플레이 전에 알아야 할 점은?",
+        "optionalNote": "선택 사항입니다. 아래 항목도 모두 선택 사항입니다.",
+        "photosEyebrow": "사진",
+        "teesEyebrow": "플레이한 티",
+        "shareTitle": "클럽하우스에 공유",
+        "shareSub": "리뷰가 피드에 표시됩니다"
+      },
+      "receipt": {
+        "eyebrow": "리뷰가 게시되었습니다",
+        "didEyebrow": "이 리뷰의 영향",
+        "rowA": "회원 <cnt>{{count}}</cnt>명이 {{course}}을(를) <avg>{{avg}}</avg>로 평가",
+        "rowADeltaAbove": "평균보다 {{delta}} 높게 평가했습니다",
+        "rowADeltaBelow": "평균보다 {{delta}} 낮게 평가했습니다",
+        "rowB": "이 코스를 처음으로 평가했습니다",
+        "rowBSub": "내 점수가 커뮤니티 평균이 됩니다",
+        "rowC": "{{list}} Top 100 <b>#{{rank}}</b>위",
+        "rowCRight_one": "{{count}}곳 평가",
+        "rowCRight_other": "{{count}}곳 평가",
+        "rowD": "내가 <b>{{ordinal}}</b> 번째로 높게 평가한 코스",
+        "rowDRight_one": "{{count}}곳 중",
+        "rowDRight_other": "{{count}}곳 중",
+        "nextEyebrow_one": "아직 평가하지 않은 플레이 코스 {{count}}곳",
+        "nextEyebrow_other": "아직 평가하지 않은 플레이 코스 {{count}}곳",
+        "nextPlayed": "{{date}} 플레이",
+        "nextRate": "평가하기",
+        "actionClubhouse": "클럽하우스에서 보기",
+        "actionBack": "{{course}}(으)로 돌아가기"
+      }
     }
   },
   "courseDetail": {

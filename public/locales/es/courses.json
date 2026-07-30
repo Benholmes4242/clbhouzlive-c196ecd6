@@ -416,6 +416,70 @@
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses"
+    },
+    "wizard": {
+      "rail": {
+        "score": "Nota",
+        "breakdown": "Desglose",
+        "words": "Palabras"
+      },
+      "backA11y": "Atrás",
+      "deleteA11y": "Eliminar reseña",
+      "a11yStep": "Paso {{n}} de 3, {{label}}",
+      "continue": "Continuar",
+      "save": "Guardar reseña",
+      "post": "Publicar reseña",
+      "saving": "Guardando...",
+      "posting": "Publicando...",
+      "step0": {
+        "heading": "¿Qué tan bueno es, sobre diez?",
+        "captionEmpty": "Desliza para poner tu nota",
+        "captionSet": "Tu nota general",
+        "gate": "Pon tu nota",
+        "a11y": "Nota general, del 1 al 10"
+      },
+      "step1": {
+        "heading": "Desglósalo",
+        "body": "Hacen falta las cuatro. Es lo que da sentido a los números de la comunidad.",
+        "gate_one": "Queda {{count}} categoría",
+        "gate_other": "Quedan {{count}} categorías"
+      },
+      "hint": {
+        "design": "Recorrido, variedad de golpes, carácter",
+        "condition": "Greens, calles y búnkeres ese día",
+        "clubhouse": "Acogida, comida, ambiente",
+        "facilities": "Campo de prácticas, zonas de juego corto, vestuarios"
+      },
+      "step2": {
+        "wordsEyebrow": "Tus palabras",
+        "placeholder": "¿Qué debería saber otro golfista antes de jugar aquí?",
+        "optionalNote": "Opcional. Todo lo de abajo también.",
+        "photosEyebrow": "Fotos",
+        "teesEyebrow": "Tees jugados",
+        "shareTitle": "Compartir en el Clubhouse",
+        "shareSub": "Tu reseña aparece en el feed"
+      },
+      "receipt": {
+        "eyebrow": "Reseña publicada",
+        "didEyebrow": "Lo que ha cambiado",
+        "rowA": "<cnt>{{count}}</cnt> miembros valoran {{course}} con <avg>{{avg}}</avg>",
+        "rowADeltaAbove": "Lo valoraste {{delta}} por encima de la media",
+        "rowADeltaBelow": "Lo valoraste {{delta}} por debajo de la media",
+        "rowB": "Eres el primero en valorar este campo",
+        "rowBSub": "Tu nota fija la media de la comunidad",
+        "rowC": "Puesto <b>#{{rank}}</b> del Top 100 de {{list}}",
+        "rowCRight_one": "{{count}} valorado",
+        "rowCRight_other": "{{count}} valorados",
+        "rowD": "Tu <b>{{ordinal}}</b> campo mejor valorado",
+        "rowDRight_one": "de {{count}} valorado",
+        "rowDRight_other": "de {{count}} valorados",
+        "nextEyebrow_one": "{{count}} campo jugado sin valorar",
+        "nextEyebrow_other": "{{count}} campos jugados sin valorar",
+        "nextPlayed": "Jugado el {{date}}",
+        "nextRate": "Valorar",
+        "actionClubhouse": "Verlo en el Clubhouse",
+        "actionBack": "Volver a {{course}}"
+      }
     }
   },
   "courseDetail": {
