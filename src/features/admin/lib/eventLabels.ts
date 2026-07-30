@@ -66,6 +66,15 @@ export const EVENT_LABELS: Record<string, string> = {
   post_round_attached: 'Post round attached',
   post_round_detached: 'Post round detached',
 
+  // ─── Post composer funnel ─────────────────────────────────────
+  post_composer_opened: 'Post composer opened',
+  post_media_added: 'Post media added',
+  post_caption_started: 'Post caption started',
+  post_detail_opened: 'Post detail row opened',
+  post_draft_saved: 'Post draft saved',
+  post_composer_abandoned: 'Post composer abandoned',
+  post_submitted: 'Post submitted',
+
   rating_modal_opened: 'Rating opened',
   rating_slider_changed: 'Rating slider changed',
   rating_submitted: 'Rating submitted',

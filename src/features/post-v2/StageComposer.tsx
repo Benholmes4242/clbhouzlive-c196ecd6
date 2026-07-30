@@ -72,6 +72,42 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const isEditMode = !!editPostId;
 
+  // ---- Composer funnel instrumentation -----------------------------------
+  // mode is derived from the props the openers set; entry from how it opened.
+  const mode: 'create' | 'edit' | 'draft' = editPostId ? 'edit' : (draftId ? 'draft' : 'create');
+  const mountedAtRef = useRef<number>(Date.now());
+  const submittedRef = useRef(false);
+  const captionStartedRef = useRef(false);
+  // Read once at mount: a deep-linked open (edit / draft / share-a-round)
+  // vs the create sheet.
+  const entryRef = useRef<'create_sheet' | 'deep_link' | 'unknown'>('unknown');
+  if (entryRef.current === 'unknown') {
+    const st = usePostStudioStore.getState();
+    if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
+    else if (st.isOpen) entryRef.current = 'create_sheet';
+  }
+
+  // Abandon snapshot: refreshed on every render, read in the [] cleanup.
+  // A state value read there would be the mount value, not the teardown one.
+  const abandonRef = useRef({ hasMedia: false, hasCaption: false, mediaCount: 0 });
+
+  useEffect(() => {
+    // Analytics callsite: post_composer_opened
+    analyticsEvents.track('post_composer_opened', { mode, entry: entryRef.current });
+    return () => {
+      if (submittedRef.current) return;
+      // Analytics callsite: post_composer_abandoned
+      analyticsEvents.track('post_composer_abandoned', {
+        mode,
+        has_media: abandonRef.current.hasMedia,
+        has_caption: abandonRef.current.hasCaption,
+        media_count: abandonRef.current.mediaCount,
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   // Edit-mode load
   const editable = useEditablePost(editPostId ?? null);
   const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null; whsScoreId: string | null } | null>(null);
@@ -223,6 +259,44 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const active = state.media[state.activeIndex] ?? null;
 
+  // Refreshed every render so the unmount cleanup reads teardown values.
+  abandonRef.current = {
+    hasMedia: state.media.length > 0,
+    hasCaption: state.caption.trim().length > 0,
+    mediaCount: state.media.length,
+  };
+
+  // Media added: kind is image / video / mixed across the batch just added.
+  const handleAddFiles = useCallback(async (files: File[]) => {
+    const countBefore = state.media.length;
+    await addFiles(files);
+    if (files.length === 0) return;
+    const hasVideo = files.some((f) => f.type.startsWith('video/'));
+    const hasImage = files.some((f) => !f.type.startsWith('video/'));
+    // Analytics callsite: post_media_added
+    analyticsEvents.track('post_media_added', {
+      mode,
+      count_after: countBefore + files.length,
+      kind: hasVideo && hasImage ? 'mixed' : (hasVideo ? 'video' : 'image'),
+    });
+  }, [addFiles, state.media.length, mode]);
+
+  // Caption: post_caption_started fires ONCE per composer session.
+  const handleSetCaption = useCallback((v: string) => {
+    if (!captionStartedRef.current && v.trim().length > 0) {
+      captionStartedRef.current = true;
+      // Analytics callsite: post_caption_started
+      analyticsEvents.track('post_caption_started', { mode });
+    }
+    setCaption(v);
+  }, [setCaption, mode]);
+
+  const openDetail = useCallback((row: 'course' | 'round' | 'actor' | 'schedule') => {
+    // Analytics callsite: post_detail_opened
+    analyticsEvents.track('post_detail_opened', { mode, row });
+  }, [mode]);
+
+
   // ---- C2: attach a logged round -----------------------------------------
   // Rounds are scoped to the PRIMARY tagged course only.
   const primaryCourseId = state.course?.id ?? null;
@@ -289,13 +363,14 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     : null;
 
   const openRoundSheet = useCallback(() => {
+    openDetail('round');
     // Analytics callsite: post_round_attach_opened
     analyticsEvents.track('post_round_attach_opened', {
       course_id: primaryCourseId,
       rounds_available: roundsAtCourse.length,
     });
     setSheet('round');
-  }, [primaryCourseId, roundsAtCourse.length]);
+  }, [primaryCourseId, roundsAtCourse.length, openDetail]);
 
   const handleSelectRound = useCallback((r: AttachedRound | null) => {
     setAttachedRound(r);
@@ -351,6 +426,20 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         authorName,
         authorAvatarUrl: authorAvatar,
         authorUsername,
+      });
+      submittedRef.current = true;
+      // Analytics callsite: post_submitted
+      analyticsEvents.track('post_submitted', {
+        mode,
+        media_count: state.media.length,
+        has_caption: state.caption.trim().length > 0,
+        caption_len: state.caption.trim().length,
+        course_tagged: !!state.course,
+        courses_count: state.courses.length,
+        round_attached: !!state.attachedRound,
+        scheduled: !!state.scheduledAt,
+        actor_type: activeActor.type,
+        total_ms: Math.round(Date.now() - mountedAtRef.current),
       });
       setSuccess(res);
       reset();
@@ -449,13 +538,27 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       queryClient.invalidateQueries({ queryKey: ['post', editPostId] });
       window.dispatchEvent(new CustomEvent('postUpdated', { detail: { postId: editPostId } }));
 
+      submittedRef.current = true;
+      // Analytics callsite: post_submitted
+      analyticsEvents.track('post_submitted', {
+        mode,
+        media_count: state.media.length,
+        has_caption: state.caption.trim().length > 0,
+        caption_len: state.caption.trim().length,
+        course_tagged: !!state.course,
+        courses_count: state.courses.length,
+        round_attached: !!state.attachedRound,
+        scheduled: !!state.scheduledAt,
+        actor_type: activeActor?.type ?? editable.data.actorType,
+        total_ms: Math.round(Date.now() - mountedAtRef.current),
+      });
       setSaveSuccess(true);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save changes");
     } finally {
       setSaving(false);
     }
-  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient]);
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode]);
 
   const onPrimary = () => {
     if (isEditMode) return void doSaveEdit();
@@ -493,6 +596,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         courseCountry: state.course?.country ?? null,
         courses: state.courses,
       });
+      // Analytics callsite: post_draft_saved
+      analyticsEvents.track('post_draft_saved', {
+        mode,
+        media_count: state.media.length,
+        had_caption: state.caption.trim().length > 0,
+      });
       if (restoredDraftId) {
         await drafts.remove(restoredDraftId);
         setRestoredDraftId(null);
@@ -529,7 +638,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const handleStageAdd = () => stageAddInputRef.current?.click();
   const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length) addFiles(files);
+    if (files.length) void handleAddFiles(files);
     e.target.value = '';
   };
 
@@ -637,17 +746,17 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           onSelect={setActiveIndex}
           onRemove={handleRemoveAt}
           onReorder={reorder}
-          onAddFiles={addFiles}
+          onAddFiles={handleAddFiles}
         />
-        <CaptionField value={state.caption} onChange={setCaption} currentUserId={profile?.id ?? null} />
+        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
         <DetailRows
           course={state.course}
           courses={state.courses}
-          onOpenCourse={() => setSheet('course')}
+          onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
           actor={activeActor}
-          onOpenActor={() => setSheet('actor')}
+          onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
           scheduledAt={state.scheduledAt}
-          onOpenSchedule={() => setSheet('schedule')}
+          onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
           actorLocked={isEditMode}
           showSchedule={showScheduleRow}
           showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
@@ -723,8 +832,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           {!isEditMode && (
             <>
               {state.media.length > 0 && (
-                <div style={{ fontSize: 12.5, color: '#5A6270', lineHeight: 1.45 }}>
-                  Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
+                <div style={{ fontSize: 12, fontWeight: 500, color: '#8A9099', marginBottom: 8, textAlign: 'center' }}>
+                  {t('closeGuard.mediaNotSaved', { count: state.media.length })}
                 </div>
               )}
               <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>

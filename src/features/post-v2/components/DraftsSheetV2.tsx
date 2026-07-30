@@ -2,6 +2,7 @@
 // Empty state + filled rows aligned to messaging-v2 polish.
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import BottomSheet from './BottomSheet';
 import { Pencil, Trash2 } from 'lucide-react';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDelete }: Props) {
+  const { t } = useTranslation('composer');
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
   return (
@@ -76,7 +78,7 @@ export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDele
             );
           })}
           <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8', textAlign: 'center' }}>
-            Drafts keep your words, tags and settings - media re-attaches on restore.
+            {t('drafts.footerNote')}
           </div>
         </>
       )}
