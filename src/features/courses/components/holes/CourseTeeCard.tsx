@@ -552,7 +552,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               <div style={{ textAlign: 'right' }}>{t('courses:teeCard.col.yards')}</div>
             </div>
 
-            {front9.map((h, idx) => (
+            {front9.map((h) => (
               <Row key={h.hole_no} h={h} />
             ))}
 
@@ -562,7 +562,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               yards={outYards}
             />
 
-            {back9.map((h, idx) => (
+            {back9.map((h) => (
               <Row key={h.hole_no} h={h} />
             ))}
 
