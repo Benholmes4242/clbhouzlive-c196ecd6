@@ -176,7 +176,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
         {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
           course: shortenCourseName(courseName),
         })}
-        <Trend size={17} strokeWidth={2.5} color={ink} aria-hidden />
+        <Trend size={16} strokeWidth={2.5} color={ink} aria-hidden />
       </span>
 
       {ratingRank && (
