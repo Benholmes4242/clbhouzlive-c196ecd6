@@ -185,7 +185,7 @@ export default function CourseTagSheet({
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           {showPopular ? (
             <>
-              {popularPinned.pinned.length > 0 && (
+              {!isSingle && popularPinned.pinned.length > 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {popularPinned.pinned.map((r) => (
@@ -194,7 +194,7 @@ export default function CourseTagSheet({
                 </>
               )}
               {/* Selected courses NOT in popular list — pin them at the very top */}
-              {draft.filter((d) => !popular.some((p) => p.id === d.id)).length > 0 && popularPinned.pinned.length === 0 && (
+              {!isSingle && draft.filter((d) => !popular.some((p) => p.id === d.id)).length > 0 && popularPinned.pinned.length === 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {draft.filter((d) => !popular.some((p) => p.id === d.id)).map((r) => (
