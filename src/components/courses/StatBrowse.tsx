@@ -477,51 +477,44 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
 
-          {rows.length < totalCount && (
-            <div className="px-4">
-              <button
-                type="button"
-                onClick={loadMore}
-                disabled={isPaging}
-                className="w-full h-11 rounded-xl text-[13.5px] font-semibold"
-                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
-              >
-                {t('statBrowse.showMore', {
-                  count: Math.min(STAT_BROWSE_PAGE_SIZE, remaining),
-                })}
-                <span style={{ color: INK_MUTE, fontWeight: 500 }}>
-                  {t('statBrowse.showMoreOf', { total: formatNumber(totalCount) })}
-                </span>
-              </button>
+          {isPaging && (
+            <div className="px-4" style={{ fontSize: 12.5, color: INK_MUTE }}>
+              {t('statBrowse.loadingMore')}
             </div>
+          )}
+
+          {rows.length < totalCount && (
+            <div ref={loadSentinelRef} style={{ height: 1 }} aria-hidden="true" />
           )}
         </div>
       )}
 
       {/* ── Directory floor ─────────────────────────────────────── */}
-      <div
-        className="mt-6 p-4"
-        style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`, borderRadius: 14 }}
-      >
-        <h3 style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
-          {t('statBrowse.directory.title')}
-        </h3>
-        <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
-          {t('statBrowse.directory.body', {
-            count: formatNumber(
-              Math.max(0, (facets?.directory_total ?? 0) - (facets?.played_total ?? 0)),
-            ),
-          })}
-        </p>
-        <button
-          type="button"
-          onClick={() => openDirectory(null)}
-          className="w-full mt-3 h-11 rounded-xl text-[13.5px] font-semibold"
-          style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+      {rows.length >= totalCount && (
+        <div
+          className="mt-6 p-4"
+          style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_8}`, borderRadius: 14 }}
         >
-          {t('statBrowse.directory.cta')}
-        </button>
-      </div>
+          <h3 style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
+            {t('statBrowse.directory.title')}
+          </h3>
+          <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
+            {t('statBrowse.directory.body', {
+              count: formatNumber(
+                Math.max(0, (facets?.directory_total ?? 0) - (facets?.played_total ?? 0)),
+              ),
+            })}
+          </p>
+          <button
+            type="button"
+            onClick={() => openDirectory(null, 'footer')}
+            className="w-full mt-3 h-11 rounded-xl text-[13.5px] font-semibold"
+            style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+          >
+            {t('statBrowse.directory.cta')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
