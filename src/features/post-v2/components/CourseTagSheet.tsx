@@ -104,6 +104,7 @@ export default function CourseTagSheet({
   const selectedIds = useMemo(() => new Set(draft.map(d => d.id)), [draft]);
 
   const toggle = (c: StageCourse) => {
+    if (isSingle) { onDone([c]); onClose(); return; }
     setDraft((cur) => {
       if (cur.some((r) => r.id === c.id)) return cur.filter((r) => r.id !== c.id);
       return [...cur, c];
