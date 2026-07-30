@@ -24,7 +24,8 @@ import {
   INK_MUTE,
 } from '@/features/courses/_shared/tokens';
 
-const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
+/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+const MONO = 'inherit';
 
 /** 1st / 2nd / 3rd / 4th ... */
 function ordinal(n: number): string {
@@ -138,6 +139,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                 style={{
                   fontFamily: MONO,
                   fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"zero" 0, "tnum" 1',
                   fontSize: 19,
                   fontWeight: 800,
                   color: INK,
@@ -171,6 +173,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                 style={{
                   fontFamily: MONO,
                   fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"zero" 0, "tnum" 1',
                   fontSize: 19,
                   fontWeight: 800,
                   color: INK,
@@ -214,6 +217,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                   color: INK,
                   marginTop: 3,
                   fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"zero" 0, "tnum" 1',
                 }}
               >
                 {t('top100.verdictSheet.ratingRank', {
@@ -279,6 +283,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                     style={{
                       fontFamily: MONO,
                       fontVariantNumeric: 'tabular-nums',
+                      fontFeatureSettings: '"zero" 0, "tnum" 1',
                       fontSize: 10.5,
                       fontWeight: 700,
                       color: INK_MUTE,
@@ -309,6 +314,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                     style={{
                       fontFamily: MONO,
                       fontVariantNumeric: 'tabular-nums',
+                      fontFeatureSettings: '"zero" 0, "tnum" 1',
                       fontSize: 10.5,
                       fontWeight: 700,
                       color: INK_MUTE,
