@@ -538,6 +538,20 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       queryClient.invalidateQueries({ queryKey: ['post', editPostId] });
       window.dispatchEvent(new CustomEvent('postUpdated', { detail: { postId: editPostId } }));
 
+      submittedRef.current = true;
+      // Analytics callsite: post_submitted
+      analyticsEvents.track('post_submitted', {
+        mode,
+        media_count: state.media.length,
+        has_caption: state.caption.trim().length > 0,
+        caption_len: state.caption.trim().length,
+        course_tagged: !!state.course,
+        courses_count: state.courses.length,
+        round_attached: !!state.attachedRound,
+        scheduled: !!state.scheduledAt,
+        actor_type: activeActor?.type ?? editable.data.actorType,
+        total_ms: Math.round(Date.now() - mountedAtRef.current),
+      });
       setSaveSuccess(true);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save changes");
