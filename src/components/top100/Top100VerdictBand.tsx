@@ -164,7 +164,9 @@ export const Top100VerdictBand: React.FC<Props> = ({
           lineHeight: 1.3,
         }}
       >
-        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', { course: courseName })}
+        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
+          course: shortenCourseName(courseName),
+        })}
       </span>
       {ratingRank && (
         <span
@@ -176,10 +178,16 @@ export const Top100VerdictBand: React.FC<Props> = ({
             opacity: 0.78,
           }}
         >
-          {t('top100.verdict.ratingRank', {
-            position: ordinal(ratingRank.position),
-            poolSize: ratingRank.poolSize,
-          })}
+          {listLabel && listLabel.trim()
+            ? t('top100.verdict.ratingRank', {
+                position: ordinal(ratingRank.position),
+                poolSize: ratingRank.poolSize,
+                listLabel: listLabel.trim(),
+              })
+            : t('top100.verdict.ratingRankNoList', {
+                position: ordinal(ratingRank.position),
+                poolSize: ratingRank.poolSize,
+              })}
         </span>
       )}
     </button>
