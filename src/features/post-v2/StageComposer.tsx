@@ -427,6 +427,20 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         authorAvatarUrl: authorAvatar,
         authorUsername,
       });
+      submittedRef.current = true;
+      // Analytics callsite: post_submitted
+      analyticsEvents.track('post_submitted', {
+        mode,
+        media_count: state.media.length,
+        has_caption: state.caption.trim().length > 0,
+        caption_len: state.caption.trim().length,
+        course_tagged: !!state.course,
+        courses_count: state.courses.length,
+        round_attached: !!state.attachedRound,
+        scheduled: !!state.scheduledAt,
+        actor_type: activeActor.type,
+        total_ms: Math.round(Date.now() - mountedAtRef.current),
+      });
       setSuccess(res);
       reset();
     } catch (e) {
