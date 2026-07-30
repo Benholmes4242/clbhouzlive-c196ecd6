@@ -22,12 +22,14 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { shortenCourseName, type Verdict } from './verdict';
 
-const GREEN_BG = 'rgba(16,185,129,0.10)';
-const GREEN_LINE = 'rgba(16,185,129,0.28)';
-const GREEN_INK = '#047857';
-const RED_BG = 'rgba(239,68,68,0.09)';
-const RED_LINE = 'rgba(239,68,68,0.26)';
-const RED_INK = '#B91C1C';
+const GREEN_BG = '#EDF7F0';
+const GREEN_INK = '#0C7B40';
+const GREEN_LINE = 'rgba(15,143,74,0.14)';
+const GREEN_SHADOW = 'rgba(15,143,74,0.07)';
+const RED_BG = '#FDF1EF';
+const RED_INK = '#B22F24';
+const RED_LINE = 'rgba(200,55,43,0.13)';
+const RED_SHADOW = 'rgba(200,55,43,0.07)';
 
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();
