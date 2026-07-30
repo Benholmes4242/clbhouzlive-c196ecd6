@@ -25,7 +25,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { AMBER, HAIRLINE_INK_8, INK } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
+import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
 
 /** Difficulty band inks. Relative difficulty only - see BRIEF_TOP100_DIFFICULTY_BANDS. */
 const BAND_RED = '#C8372B';
@@ -75,25 +75,6 @@ const difficultyLineStyle: React.CSSProperties = {
   color: MUTED_INK,
   lineHeight: 1.35,
   letterSpacing: '-0.005em',
-};
-
-const barLabelStyle: React.CSSProperties = {
-  width: 54,
-  flexShrink: 0,
-  fontSize: 10,
-  fontWeight: 600,
-  color: LABEL_INK,
-  whiteSpace: 'nowrap',
-  lineHeight: 1,
-};
-
-const barFigureStyle: React.CSSProperties = {
-  ...NUMERALS,
-  fontFamily: MONO,
-  fontSize: 11,
-  fontWeight: 800,
-  lineHeight: 1,
-  letterSpacing: '-0.02em',
 };
 
 interface Props {
