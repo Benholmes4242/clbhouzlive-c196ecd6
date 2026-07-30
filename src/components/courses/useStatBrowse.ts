@@ -182,10 +182,12 @@ export function chipForLens(
 ): { value: string; unit: string } | null {
   switch (lens) {
     case 'toughest':
-    case 'scoreable':
-      return row.avg_to_par == null
-        ? null
-        : { value: `+${row.avg_to_par.toFixed(1)}`, unit: unitLabel('avgOverPar') };
+    case 'scoreable': {
+      if (row.avg_to_par == null) return null;
+      const v = Math.round(row.avg_to_par * 10) / 10;
+      const value = v > 0 ? `+${v.toFixed(1)}` : v < 0 ? `-${Math.abs(v).toFixed(1)}` : 'E';
+      return { value, unit: unitLabel('avgToPar') };
+    }
     case 'played':
       return row.rounds == null ? null : { value: fmt(row.rounds), unit: unitLabel('rounds') };
     case 'longest':
