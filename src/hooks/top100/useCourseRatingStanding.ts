@@ -39,7 +39,8 @@ export function useCourseRatingStanding(
         p_list_slug: listSlug ?? null,
       } as never);
       if (error) throw error;
-      const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | undefined;
+      const rows = (data ?? null) as unknown;
+      const row = (Array.isArray(rows) ? rows[0] : rows) as Record<string, unknown> | undefined;
       if (!row || row.standing == null) return null;
       return {
         standing: Number(row.standing),
