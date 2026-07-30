@@ -26,6 +26,12 @@ import {
   SURFACE,
 } from '@/features/courses/_shared/tokens';
 import { useDirectoryRecents } from './directoryRecents';
+import CourseCommunityRating from './CourseCommunityRating';
+import {
+  useDirectoryRecentRatings,
+  type DirectoryRatedCourse,
+} from '@/hooks/courses/useDirectoryRecentRatings';
+
 import { openRequestCourseSheet } from './requestCourseSheetStore';
 
 interface Props {
@@ -52,6 +58,9 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
 
   const { rows, isLoading, isPaging, hasMore, loadMore, enabled, debounced } =
     useCourseDirectorySearch(term, country);
+
+  const { data: ratedRows = [] } = useDirectoryRecentRatings(country, open && !enabled, 8);
+
 
   /* Reset the field (and the scope) each time the sheet opens. */
   useEffect(() => {
@@ -102,10 +111,29 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
     navigate(`/courses/${id}`);
   };
 
+  const onRatedTap = (c: DirectoryRatedCourse, index: number) => {
+    analyticsEvents.track('course_directory_recent_rated_tapped', {
+      course_id: c.course_id,
+      position: index + 1,
+    });
+    analyticsEvents.track('course_directory_result_tapped', {
+      course_id: c.course_id,
+      position: index + 1,
+    });
+    saveRecent({
+      id: c.course_id,
+      name: c.course_name,
+      location: [c.sub_country, c.country].filter(Boolean).join(', '),
+    });
+    onClose();
+    navigate(`/courses/${c.course_id}`);
+  };
+
   const onRequestCourse = () => {
     analyticsEvents.track('course_directory_request_opened', {
       query_length: debounced.length,
     });
+
     const q = debounced;
     onClose();
     setTimeout(() => openRequestCourseSheet(q), 0);
@@ -181,9 +209,12 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       <div ref={scrollerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 pb-8">
         {!enabled ? (
           <div>
-            <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
-              {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
-            </p>
+            {recents.length === 0 && ratedRows.length === 0 && (
+              <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
+                {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
+              </p>
+            )}
+
 
             {recents.length > 0 && (
               <div style={{ marginTop: 18 }}>
@@ -228,7 +259,67 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                 ))}
               </div>
             )}
+
+            {ratedRows.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <span
+                  className="block"
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    color: INK_MUTE,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    marginBottom: 4,
+                  }}
+                >
+                  {t('directorySheet.ratedHeading')}
+                </span>
+                {ratedRows.map((c, i) => (
+                  <button
+                    key={c.course_id}
+                    type="button"
+                    onClick={() => onRatedTap(c, i)}
+                    className="w-full text-left py-3 flex items-center gap-3"
+                    style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}
+                  >
+                    {c.thumbnail_image ? (
+                      <img
+                        src={c.thumbnail_image}
+                        alt=""
+                        loading="lazy"
+                        className="h-11 w-11 object-cover shrink-0"
+                        style={{ borderRadius: '34%' }}
+                      />
+                    ) : (
+                      <div
+                        className="h-11 w-11 shrink-0"
+                        style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
+                      />
+                    )}
+                    <span className="flex-1 min-w-0">
+                      <span
+                        className="block truncate"
+                        style={{ fontSize: 14, fontWeight: 700, color: INK }}
+                      >
+                        {c.course_name}
+                      </span>
+                      <span
+                        className="block truncate"
+                        style={{ fontSize: 12, color: INK_MUTE, marginTop: 2 }}
+                      >
+                        {[c.sub_country, c.country].filter(Boolean).join(', ')}
+                      </span>
+                    </span>
+                    {c.avg_overall_score !== null && (
+                      <CourseCommunityRating rating={c.avg_overall_score} size="sm" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
         ) : isLoading ? (
           <div className="mt-3 space-y-2">
             {[0, 1, 2, 3, 4].map((i) => (

@@ -18579,6 +18579,19 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: string[]
       }
+      get_directory_recent_ratings: {
+        Args: { p_country?: string; p_limit?: number }
+        Returns: {
+          avg_overall_score: number
+          country: string
+          course_id: string
+          course_name: string
+          last_rated_at: string
+          review_count: number
+          sub_country: string
+          thumbnail_image: string
+        }[]
+      }
       get_discover_courses_this_week: {
         Args: { p_limit?: number }
         Returns: {
