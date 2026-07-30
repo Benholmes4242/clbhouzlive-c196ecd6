@@ -72,6 +72,42 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const isEditMode = !!editPostId;
 
+  // ---- Composer funnel instrumentation -----------------------------------
+  // mode is derived from the props the openers set; entry from how it opened.
+  const mode: 'create' | 'edit' | 'draft' = editPostId ? 'edit' : (draftId ? 'draft' : 'create');
+  const mountedAtRef = useRef<number>(Date.now());
+  const submittedRef = useRef(false);
+  const captionStartedRef = useRef(false);
+  // Read once at mount: a deep-linked open (edit / draft / share-a-round)
+  // vs the create sheet.
+  const entryRef = useRef<'create_sheet' | 'deep_link' | 'unknown'>('unknown');
+  if (entryRef.current === 'unknown') {
+    const st = usePostStudioStore.getState();
+    if (editPostId || draftId || st.prefillCourse) entryRef.current = 'deep_link';
+    else if (st.isOpen) entryRef.current = 'create_sheet';
+  }
+
+  // Abandon snapshot: refreshed on every render, read in the [] cleanup.
+  // A state value read there would be the mount value, not the teardown one.
+  const abandonRef = useRef({ hasMedia: false, hasCaption: false, mediaCount: 0 });
+
+  useEffect(() => {
+    // Analytics callsite: post_composer_opened
+    analyticsEvents.track('post_composer_opened', { mode, entry: entryRef.current });
+    return () => {
+      if (submittedRef.current) return;
+      // Analytics callsite: post_composer_abandoned
+      analyticsEvents.track('post_composer_abandoned', {
+        mode,
+        has_media: abandonRef.current.hasMedia,
+        has_caption: abandonRef.current.hasCaption,
+        media_count: abandonRef.current.mediaCount,
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   // Edit-mode load
   const editable = useEditablePost(editPostId ?? null);
   const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null; whsScoreId: string | null } | null>(null);
