@@ -5,15 +5,10 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
-import { getScoreRingColors } from '@/hooks/useTierStyles';
-import { getRatingTier } from '@/lib/ratingTier';
+import { bandColor } from '@/features/courses/_shared/scoreBands';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
-
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 interface Review {
   id: string;
@@ -66,65 +61,6 @@ const formatDate = (dateString: string) => {
   if (diffInDays < 365) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
   const years = Math.floor(diffInDays / 365);
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
-};
-
-/** Circular SVG score ring — graduated grey → amber → gold ramp */
-const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 46 }) => {
-  const { from, to } = getScoreRingColors(score);
-  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
-  const r = (size / 2) - 4;
-  const circ = 2 * Math.PI * r;
-  const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
-  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
-  return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={from} />
-            <stop offset="100%" stopColor={to} />
-            {isExceptional && !prefersReducedMotion && (
-              <animateTransform
-                attributeName="gradientTransform"
-                type="rotate"
-                from="0 0.5 0.5"
-                to="360 0.5 0.5"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-            )}
-          </linearGradient>
-        </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth={3} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={`url(#${gradientId})`}
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeDasharray={`${fill} ${circ}`}
-        />
-      </svg>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 13,
-          fontWeight: 900,
-          color: '#0F172A',
-          letterSpacing: '-0.03em',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {formatRatingValue(score)}
-      </div>
-    </div>
-  );
 };
 
 const SUBSCORE_LABELS: { key: keyof Review; labelKey: string }[] = [
@@ -258,7 +194,18 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <ScoreRing score={score} size={46} />
+          <span
+            style={{
+              fontSize: 22,
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+              color: bandColor(score),
+            }}
+          >
+            {formatRatingValue(score)}
+          </span>
           {!isMine && onReportClick && (
             <button
               onClick={(e) => {
