@@ -18,7 +18,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
-import UnifiedCourseCard from './UnifiedCourseCard';
+import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { computeVerdict, type Verdict } from '@/components/top100/verdict';
+import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
+import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
