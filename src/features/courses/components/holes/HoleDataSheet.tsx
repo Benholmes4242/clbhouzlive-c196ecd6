@@ -192,22 +192,24 @@ export const HoleDataSheet: React.FC<Props> = ({
     <div style={{ fontFamily: FONT, padding: '16px 12px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <HoleGlyphDefs />
 
-      {/* 1. Header */}
+      {/* 1. Header — the block header is owned by the page in the 'shape' slice. */}
       {showShape && (
       <section style={{ scrollMarginTop: STICKY_SAFE, padding: '0 4px' }}>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-            color: INK,
-            lineHeight: 1.15,
-          }}
-        >
-          {t('courses:holes.clubGuide.title')}
-        </h2>
-        <p style={{ margin: '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
+        {section !== 'shape' && (
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 22,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              color: INK,
+              lineHeight: 1.15,
+            }}
+          >
+            {t('courses:holes.clubGuide.title')}
+          </h2>
+        )}
+        <p style={{ margin: section === 'shape' ? 0 : '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
           {viewerHasPlayed
             ? t('courses:holes.clubGuide.bodySignedIn', { count: totalRounds, rounds: formatNumber(totalRounds) })
             : t('courses:holes.clubGuide.bodySignedOut', { count: totalRounds, rounds: formatNumber(totalRounds) })}
@@ -215,8 +217,37 @@ export const HoleDataSheet: React.FC<Props> = ({
       </section>
       )}
 
-      {/* 2. Skyline */}
-      {showShape && hardest && (
+      {/* 2 + 3. Skyline with the Beast / Best Chance callouts anchored beneath it */}
+      {showShape && hardest && section === 'shape' && (
+        <div style={{ ...CARD, padding: 16 }}>
+          <SkylineCard
+            holes={sortedByHole}
+            hardest={hardest}
+            myByHole={myByHole}
+            viewerHasPlayed={viewerHasPlayed}
+            beatFieldCount={beatFieldCount}
+            embedded
+            footer={
+              <div style={{ marginTop: 12 }}>
+                <StoryTiles
+                  hardest={hardest}
+                  easiest={easiest}
+                  nemesis={nemesis}
+                  holes={holes}
+                  myByHole={myByHole}
+                  viewerHasPlayed={viewerHasPlayed}
+                  birdiedCount={birdiedCount}
+                  totalHoles={totalHoles}
+                  missingBirdieHole={missingBirdieHole}
+                  scope="community"
+                />
+              </div>
+            }
+          />
+        </div>
+      )}
+
+      {showShape && hardest && section !== 'shape' && (
         <SkylineCard
           holes={sortedByHole}
           hardest={hardest}
@@ -227,7 +258,7 @@ export const HoleDataSheet: React.FC<Props> = ({
       )}
 
       {/* 3. Story tiles */}
-      {(showShape || showYou) && (
+      {(showYou || (showShape && section !== 'shape')) && (
         <StoryTiles
           hardest={hardest}
           easiest={easiest}
@@ -241,6 +272,7 @@ export const HoleDataSheet: React.FC<Props> = ({
           scope={tileScope}
         />
       )}
+
 
       {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
       {showYou && <ScoringBreakdownSection golfCourseId={courseId} />}
