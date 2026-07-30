@@ -363,6 +363,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     : null;
 
   const openRoundSheet = useCallback(() => {
+    openDetail('round');
     // Analytics callsite: post_round_attach_opened
     analyticsEvents.track('post_round_attach_opened', {
       course_id: primaryCourseId,
