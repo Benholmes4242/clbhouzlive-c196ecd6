@@ -40,93 +40,61 @@ import {
 const HERO_MIN_HEIGHT =
   'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
 
-type ContextKind = 'similar' | 'friends' | 'bucket' | 'hidden';
-
-interface HeroContextLine {
-  kind: ContextKind;
-  text: string;
+/** 1st, 2nd, 3rd, 11th - never "The 11 plays hardest". */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
 }
 
-const asRecord = (value: unknown): Record<string, unknown> | null =>
-  value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
-
-const asName = (value: unknown): string | null => {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-};
-
-const asNames = (value: unknown): string[] =>
-  Array.isArray(value) ? value.map(asName).filter((n): n is string => !!n) : [];
-
-const asCount = (value: unknown): number | null => {
-  const n = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
-};
+const oneDecimal = (n: number) => Math.abs(n).toFixed(1);
 
 /**
- * context_stats is jsonb with a different shape per mood, so every field is
- * probed defensively. Anything missing, malformed or from an unrecognised
- * mood returns null and the line is not rendered at all - a partial sentence
- * is worse than silence. `weekend` never renders: its own payload says
- * geolocation is not provided server-side, so there is nothing true to say.
+ * Branch on fact_kind ONLY. A hardest_hole row still carries hole data
+ * when the record line won, so inferring the fact from field presence
+ * would break the one-fact rule.
  */
-function buildContextLine(
-  mood: ExploreMoodId,
-  raw: unknown,
+function buildFactLine(
+  fact: HeroCourseFactRow,
   t: (key: string, opts?: Record<string, unknown>) => string,
-): HeroContextLine | null {
-  const stats = asRecord(raw);
-  if (!stats) return null;
-
-  if (mood === 'foryou') {
-    const similar = asName(stats.similar_to);
-    if (!similar) return null;
-    return { kind: 'similar', text: t('hero.contextSimilar', { name: similar }) };
+): string | null {
+  if (fact.fact_kind === 'course_record') {
+    if (fact.record_gross == null || !fact.record_holder) return null;
+    return t('hero.factBestRound', {
+      gross: fact.record_gross,
+      holder: fact.record_holder,
+    });
   }
 
-  if (mood === 'friends') {
-    const names = asNames(stats.top_friend_names);
-    const total = asCount(stats.friends_played_count) ?? names.length;
-    if (names.length === 0) return null;
-    if (names.length === 1) {
-      return { kind: 'friends', text: t('hero.contextFriendsOne', { name1: names[0] }) };
-    }
-    const more = total - 2;
-    if (names.length === 2 && more <= 0) {
-      return {
-        kind: 'friends',
-        text: t('hero.contextFriendsTwo', { name1: names[0], name2: names[1] }),
-      };
-    }
-    if (more <= 0) return null;
-    return {
-      kind: 'friends',
-      text: t('hero.contextFriendsMany', { name1: names[0], name2: names[1], count: more }),
-    };
+  if (fact.fact_kind === 'hardest_hole') {
+    if (fact.hole_no == null || fact.hole_over == null) return null;
+    return t('hero.factHardestHole', {
+      hole: ordinal(Number(fact.hole_no)),
+      over: `+${oneDecimal(Number(fact.hole_over))}`,
+    });
   }
 
-  if (mood === 'bucket') {
-    const count = asCount(stats.wishlist_count_in_network);
-    if (count == null) return null;
-    return { kind: 'bucket', text: t('hero.contextBucket', { count }) };
+  if (fact.fact_kind === 'over_par') {
+    const avg = fact.avg_over_par == null ? null : Number(fact.avg_over_par);
+    if (avg == null || !Number.isFinite(avg)) return null;
+    const rounded = Number(oneDecimal(avg));
+    if (rounded === 0) return t('hero.factLevelPar');
+    if (avg < 0) return t('hero.factUnderPar', { over: oneDecimal(avg) });
+    return t('hero.factOverPar', { over: `+${oneDecimal(avg)}` });
   }
 
-  if (mood === 'hidden') {
-    const count = asCount(stats.review_count);
-    const avgRaw = typeof stats.avg_rating === 'number' ? stats.avg_rating : Number(stats.avg_rating);
-    if (count == null || !Number.isFinite(avgRaw)) return null;
-    return {
-      kind: 'hidden',
-      text: t('hero.contextHidden', { count, avg: formatRatingValue(Number(avgRaw)) }),
-    };
-  }
-
-  // weekend and any unrecognised mood: render nothing.
   return null;
 }
+
 
 function CoursesPageHeroInner() {
   const { t } = useTranslation('courses');
