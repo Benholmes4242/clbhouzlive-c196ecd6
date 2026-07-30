@@ -11,6 +11,7 @@ import React, { useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   /** Provide to make the overlay tap-anywhere-to-close. */
