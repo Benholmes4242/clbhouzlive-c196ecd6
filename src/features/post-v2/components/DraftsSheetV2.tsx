@@ -2,6 +2,7 @@
 // Empty state + filled rows aligned to messaging-v2 polish.
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import BottomSheet from './BottomSheet';
 import { Pencil, Trash2 } from 'lucide-react';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
