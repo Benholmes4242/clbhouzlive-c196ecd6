@@ -69,7 +69,9 @@ export const CourseHolesTab: React.FC<Props> = ({
   const viewerHasPlayed = Boolean(user && connection && myPerf && myPerf.length > 0);
 
   if (isLoading) {
+    if (suppressStatus) return null;
     return (
+
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, fontFamily: FONT }}>
         {[0, 1, 2, 3].map((i) => (
           <div
