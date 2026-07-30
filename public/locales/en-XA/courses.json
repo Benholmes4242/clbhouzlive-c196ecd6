@@ -180,8 +180,7 @@
     "factOverPar": "Plays {{over}} over par on average",
     "factUnderPar": "Plays {{over}} under par on average",
     "factLevelPar": "Plays level par on average",
-    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
-    "contextSimilar": "Like {{name}}, your highest rated",
+    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]"
     "contextFriendsOne": "{{name1}} has played here",
     "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
     "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
