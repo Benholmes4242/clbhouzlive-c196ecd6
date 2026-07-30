@@ -638,7 +638,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   const handleStageAdd = () => stageAddInputRef.current?.click();
   const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length) addFiles(files);
+    if (files.length) void handleAddFiles(files);
     e.target.value = '';
   };
 
