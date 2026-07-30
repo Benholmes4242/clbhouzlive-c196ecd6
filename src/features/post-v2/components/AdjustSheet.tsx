@@ -9,7 +9,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import BottomSheet from './BottomSheet';
 import type { StageMediaItem } from '../hooks/useStageComposer';
 import {
-import { CT } from '@/features/_shared/composerTokens';
   DEFAULT_POS,
   MAX_SCALE,
   MIN_SCALE,
@@ -17,6 +16,7 @@ import { CT } from '@/features/_shared/composerTokens';
   clampScale,
   frameRatio,
 } from '../lib/frameCropMath';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
