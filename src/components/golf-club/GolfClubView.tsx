@@ -348,18 +348,38 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <CourseTabs activeTab={activeTab} onChange={handleTabChange} />
         </div>
         {tabContent}
+      <CourseStatsSheet
+        open={statsSheetOpen}
+        onClose={() => setStatsSheetOpen(false)}
+        courseId={course.id}
+        courseName={course.name}
+        courseLocation={formatCourseLocation(course)}
+        courseRating={communityRating}
+      />
       </div>
     );
   }
 
-  return <StandaloneCourseDetail
-    course={course}
-    courseMeta={courseMeta}
-    activeTab={activeTab}
-    handleTabChange={handleTabChange}
-    cinematicHero={cinematicHero}
-    tabContent={tabContent}
-  />;
+  return (
+    <>
+      <StandaloneCourseDetail
+        course={course}
+        courseMeta={courseMeta}
+        activeTab={activeTab}
+        handleTabChange={handleTabChange}
+        cinematicHero={cinematicHero}
+        tabContent={tabContent}
+      />
+      <CourseStatsSheet
+        open={statsSheetOpen}
+        onClose={() => setStatsSheetOpen(false)}
+        courseId={course.id}
+        courseName={course.name}
+        courseLocation={formatCourseLocation(course)}
+        courseRating={communityRating}
+      />
+    </>
+  );
 };
 
 interface CourseOverlayShape {
@@ -377,63 +397,199 @@ interface CourseMetaShape {
 interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
   courseMeta: CourseMetaShape | null | undefined;
+  courseStats: CourseStatsDetail | null;
+  communityRating: number | null;
+  onOpenStats: () => void;
 }
 
-const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseMeta }) => (
-  <div className="absolute inset-x-0 bottom-4 px-4 z-[1]">
-    <h1
-      className="text-[24px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
-      style={{ lineHeight: 1.15 }}
-    >
-      {course.name}
-    </h1>
-    <p
-      className="drop-shadow-lg mb-1"
-      style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
-    >
-      {formatCourseLocation(course)}
-    </p>
-    {(courseMeta?.course_cr != null || courseMeta?.course_slope != null) && (
-      <p
-        className="drop-shadow-lg mb-2"
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          letterSpacing: '0.08em',
-          color: 'rgba(255,255,255,0.7)',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {[
-          courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
-          courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
-        ]
-          .filter(Boolean)
-          .join(' · ')}
-      </p>
-    )}
-    {(course.global_rank || course.regional_rank || course.usa_rank) && (
-      <div
-        className="inline-flex"
-        style={{
-          background: 'rgba(15,23,42,0.5)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderRadius: 8,
-          padding: '4px 8px',
-        }}
-      >
-        <CourseRankBadges
-          globalRank={course.global_rank ?? null}
-          regionalRank={course.regional_rank ?? null}
-          usaRank={course.usa_rank ?? null}
-          country={course.country}
-          positioning="inline"
-        />
-      </div>
-    )}
-  </div>
+const MONO_FIGURE: React.CSSProperties = {
+  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  fontVariantNumeric: 'tabular-nums',
+  fontFeatureSettings: '"zero" 0',
+  letterSpacing: '-0.03em',
+  fontWeight: 800,
+  fontSize: 13,
+  color: 'rgba(255,255,255,0.95)',
+};
+
+const CELL_LABEL: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  color: 'rgba(255,255,255,0.7)',
+};
+
+/** Round FIRST, then decide direction — otherwise -0.04 prints as "-0.0". */
+const signedToPar = (raw: number): string => {
+  const v = Math.round(raw * 10) / 10;
+  if (v > 0) return `+${v.toFixed(1)}`;
+  if (v < 0) return `-${Math.abs(v).toFixed(1)}`;
+  return 'E';
+};
+
+const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+    <span style={CELL_LABEL}>{label}</span>
+    <span style={MONO_FIGURE}>{value}</span>
+  </span>
 );
+
+const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
+  course,
+  courseMeta,
+  courseStats,
+  communityRating,
+  onOpenStats,
+}) => {
+  const { t } = useTranslation('courses');
+  const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
+  const showBand = rounds > 0;
+  const showCrSlope = !showBand && (courseMeta?.course_cr != null || courseMeta?.course_slope != null);
+  const hasRank = Boolean(course.global_rank || course.regional_rank || course.usa_rank);
+
+  const courseId = (course as { id?: string }).id ?? null;
+  const shownRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!showBand || !courseId) return;
+    if (shownRef.current === courseId) return;
+    shownRef.current = courseId;
+    analyticsEvents.track('course_hero_stats_shown', {
+      course_id: courseId,
+      rounds_tracked: rounds,
+      has_your_pb: Boolean((courseStats?.your_rounds ?? 0) > 0 && courseStats?.your_best != null),
+    });
+  }, [showBand, courseId, rounds, courseStats?.your_rounds, courseStats?.your_best]);
+
+  const cells: React.ReactNode[] = [];
+  if (showBand && courseStats) {
+    cells.push(<HeroStatCell key="rounds" label={t('courseHero.rounds')} value={String(rounds)} />);
+    if (courseStats.avg_over_par != null) {
+      cells.push(
+        <HeroStatCell key="atp" label={t('courseHero.avgToPar')} value={signedToPar(courseStats.avg_over_par)} />
+      );
+    }
+    if ((courseStats.your_rounds ?? 0) > 0 && courseStats.your_best != null) {
+      cells.push(
+        <HeroStatCell key="pb" label={t('courseHero.yourPb')} value={String(courseStats.your_best)} />
+      );
+    } else if (courseStats.harder_than_pct != null) {
+      cells.push(
+        <span key="harder" style={CELL_LABEL}>
+          {t('courseHero.harderThan', { pct: Math.round(courseStats.harder_than_pct) })}
+        </span>
+      );
+    }
+  }
+
+  return (
+    <div className="absolute inset-x-0 bottom-4 px-4 z-[1]">
+      <h1
+        className="text-[24px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
+        style={{ lineHeight: 1.15 }}
+      >
+        {course.name}
+      </h1>
+      <p
+        className="drop-shadow-lg mb-1"
+        style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
+      >
+        {formatCourseLocation(course)}
+      </p>
+
+      {showBand && (
+        <button
+          type="button"
+          onClick={() => {
+            analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
+            onOpenStats();
+          }}
+          className="inline-flex items-center mb-2 active:scale-[0.98] transition-transform"
+          style={{
+            background: 'rgba(15,23,42,0.5)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderRadius: 8,
+            padding: '4px 8px',
+            border: 0,
+            gap: 6,
+            flexWrap: 'wrap',
+          }}
+        >
+          {cells.map((cell, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>·</span>}
+              {cell}
+            </React.Fragment>
+          ))}
+          {rounds < 10 && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                borderRadius: 9999,
+                padding: '2px 6px',
+                background: 'rgba(255,255,255,0.2)',
+                color: 'rgba(255,255,255,0.9)',
+              }}
+            >
+              {t('statBrowse.earlyData')}
+            </span>
+          )}
+        </button>
+      )}
+
+      {showCrSlope && (
+        <p
+          className="drop-shadow-lg mb-2"
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: 'rgba(255,255,255,0.7)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {[
+            courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
+            courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
+      )}
+
+      {(hasRank || communityRating != null) && (
+        <div
+          className="inline-flex items-center"
+          style={{
+            background: 'rgba(15,23,42,0.5)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderRadius: 8,
+            padding: '4px 8px',
+            gap: 8,
+          }}
+        >
+          {hasRank && (
+            <CourseRankBadges
+              globalRank={course.global_rank ?? null}
+              regionalRank={course.regional_rank ?? null}
+              usaRank={course.usa_rank ?? null}
+              country={course.country}
+              positioning="inline"
+            />
+          )}
+          {communityRating != null && (
+            <CourseCommunityRating rating={communityRating} size="sm" showLogo onDark />
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface StandaloneCourseDetailProps {
   course: CourseDetailRow;
