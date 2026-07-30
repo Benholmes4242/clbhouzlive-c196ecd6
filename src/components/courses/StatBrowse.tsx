@@ -58,7 +58,6 @@ const LENS_EMOJI: Record<StatLens, string> = {
   chase: '\u{1F451}',
 };
 
-/** Remembers the member's last lens choice across visits. */
 
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
