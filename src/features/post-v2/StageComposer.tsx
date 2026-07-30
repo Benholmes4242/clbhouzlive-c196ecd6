@@ -771,7 +771,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
-      <div style={{ flex: 'none', maxHeight: '48dvh', overflowY: 'auto', padding: '0 16px', background: CT.canvas }}>
+      <div style={{ flex: 'none', maxHeight: '48dvh', overflowY: 'auto', padding: '16px 16px 0', background: CT.canvas }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ ...EYEBROW, marginBottom: 9 }}>PHOTOS</div>
           <MediaTray
