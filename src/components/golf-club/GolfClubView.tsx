@@ -21,6 +21,10 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseYouTab from '@/components/courses/course-detail/CourseYouTab';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
+import CourseCommunityRating from '@/components/courses/CourseCommunityRating';
+import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
@@ -116,9 +120,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     gcTime: 10 * 60 * 1000,
   });
 
-  const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
+  const { data: ratingAggregate } = useCourseRatingAggregates(courseId);
   const { data: courseMeta } = useCourseMeta(courseId);
-  void ratingStatsLoading;
+  // One course, one destination page the member deliberately navigated to —
+  // see the hook header: the "never prefetch" rule is about N courses in a feed.
+  const { data: courseStats } = useCourseStatsDetail(courseId, true);
+  const communityRating = ratingAggregate?.avg_overall_score ?? null;
+  const [statsSheetOpen, setStatsSheetOpen] = useState(false);
 
   // Fire once on first mount with the initial tab.
   const initialTabFired = useRef(false);
@@ -220,7 +228,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
         </button>
       )}
-      <CourseTitleOverlay course={course} courseMeta={courseMeta} />
+      <CourseTitleOverlay
+        course={course}
+        courseMeta={courseMeta}
+        courseStats={courseStats ?? null}
+        communityRating={communityRating}
+        onOpenStats={() => setStatsSheetOpen(true)}
+      />
     </div>
   );
 
@@ -244,7 +258,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      <CourseTitleOverlay course={course} courseMeta={courseMeta} />
+      <CourseTitleOverlay
+        course={course}
+        courseMeta={courseMeta}
+        courseStats={courseStats ?? null}
+        communityRating={communityRating}
+        onOpenStats={() => setStatsSheetOpen(true)}
+      />
     </div>
   );
 
