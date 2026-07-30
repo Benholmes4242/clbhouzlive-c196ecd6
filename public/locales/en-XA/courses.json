@@ -250,7 +250,8 @@
       "condition": "Condition",
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
-      "noRounds": "Rated, but no rounds tracked here yet. Be the first."
+      "noRoundsTitle": "Rated, but no rounds tracked here yet.",
+      "noRoundsCta": "Be the first."
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank suggests",
