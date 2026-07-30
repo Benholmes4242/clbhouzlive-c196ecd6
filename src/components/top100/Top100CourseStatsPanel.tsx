@@ -34,7 +34,6 @@ const BAND_INK = '#0E1216';
 const MUTED_INK = 'rgba(15,23,42,0.55)';
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
-const TRACK = 'rgba(15,23,42,0.08)';
 /** Numerals stay in the Geist stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
