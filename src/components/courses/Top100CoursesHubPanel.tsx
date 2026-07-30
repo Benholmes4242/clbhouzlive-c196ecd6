@@ -22,7 +22,7 @@ import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers
 import { useUserTop100Progress, type Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
-import { Top100ProgressPanel } from '@/components/top100/Top100ProgressPanel';
+import { Top100ProgressPanel, Top100ProgressEmpty } from '@/components/top100/Top100ProgressPanel';
 import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
@@ -464,7 +464,11 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {/* Member context — progress across lists, then where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
+              {activeProgress.played === 0 ? (
+                <Top100ProgressEmpty list={selectedList} signedIn={!!user?.id} />
+              ) : (
+                <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
+              )}
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
             </div>
           )}

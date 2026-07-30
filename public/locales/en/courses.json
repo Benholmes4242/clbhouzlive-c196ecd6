@@ -421,6 +421,12 @@
       "aggregate": "{{played}} of {{total}} played · {{rated}} rated",
       "row": "{{played}}/{{total}}"
     },
+    "progress": {
+      "emptyTitle": "You have not played any of these yet.",
+      "emptyBody": "Play one and it lands here, with your rating alongside the published rank.",
+      "signedOutTitle": "Track your Top 100.",
+      "signedOutBody": "Sign in to track which of these you have played."
+    },
     "listSheet": {
       "summary": "{{played}} of {{total}} played · {{rated}} rated",
       "segmentA11y": "Filter list",
