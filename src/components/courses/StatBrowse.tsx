@@ -23,7 +23,6 @@ import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { isEarlyData } from '@/lib/earlyData';
-import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import {
   chipForLens,
   isStatLens,
@@ -60,7 +59,6 @@ const LENS_EMOJI: Record<StatLens, string> = {
 };
 
 /** Remembers the member's last lens choice across visits. */
-const LENS_STORAGE_KEY = 'clbhouz.statBrowse.lens';
 
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
