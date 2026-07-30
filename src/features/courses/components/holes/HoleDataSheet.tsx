@@ -599,7 +599,9 @@ const SkylineCard: React.FC<{
       <div style={{ marginTop: 10, fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
         {caption}
       </div>
+      {footer}
     </section>
+
   );
 };
 
