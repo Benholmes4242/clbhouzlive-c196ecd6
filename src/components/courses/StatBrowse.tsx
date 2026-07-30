@@ -84,17 +84,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   /**
    * Lens precedence, highest first:
    *   1. ?lens= URL param (if a known lens id)
-   *   2. localStorage, the member's last choice (if a known lens id)
-   *   3. 'rated'
-   * Country and region are never persisted — only the lens.
+   *   2. 'rated' — the landing default, never persisted across visits
    */
   const urlLens = searchParams.get('lens');
-  const storedLens = useMemo(() => safeLocalStorage.get(LENS_STORAGE_KEY), []);
-  const lens: StatLens = isStatLens(urlLens)
-    ? urlLens
-    : isStatLens(storedLens)
-      ? storedLens
-      : 'rated';
+  const lens: StatLens = isStatLens(urlLens) ? urlLens : 'rated';
 
   const urlCountry = searchParams.get('country');
   const country = useMemo(() => {
@@ -232,7 +225,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const onLensChange = (next: StatLens) => {
     analyticsEvents.track('stat_browse_lens_changed', { from: lens, to: next });
-    safeLocalStorage.set(LENS_STORAGE_KEY, next);
     writeUrl({ lens: next });
   };
 
