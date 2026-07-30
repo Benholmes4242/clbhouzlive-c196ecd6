@@ -116,9 +116,11 @@ function CoursesPageHeroInner() {
 
   const blurb = hero?.why_ai?.trim() ? hero.why_ai.trim() : null;
 
-  const contextLine = useMemo(
-    () => (hero ? buildContextLine(mood, hero.context_stats, t) : null),
-    [hero, mood, t],
+  const { data: fact } = useHeroCourseFact(hero?.course_id);
+
+  const factLine = useMemo(
+    () => (fact ? buildFactLine(fact, t) : null),
+    [fact, t],
   );
 
   // Analytics: how often a blurb actually exists decides whether
@@ -129,18 +131,31 @@ function CoursesPageHeroInner() {
   }, [hero?.course_id, blurb, mood]);
 
   useEffect(() => {
-    if (!hero?.course_id || !contextLine) return;
-    analyticsEvents.track('hero_context_shown', {
+    if (!hero?.course_id || !fact || !factLine) return;
+    analyticsEvents.track('hero_fact_shown', {
       course_id: hero.course_id,
-      mood,
-      kind: contextLine.kind,
+      fact_kind: fact.fact_kind,
+      rounds_tracked: fact.rounds_tracked,
+      player_count: fact.player_count,
     });
-  }, [hero?.course_id, contextLine, mood]);
+  }, [hero?.course_id, fact, factLine]);
+
+  /* Eyebrow tail: the rating when there is one, otherwise the round count
+     from the fact row. Both absent leaves the location as the last part. */
+  const eyebrowTail =
+    hero?.rating_avg != null
+      ? formatRatingValue(Number(hero.rating_avg))
+      : fact?.rounds_tracked
+        ? t('holes.rounds', {
+            count: fact.rounds_tracked,
+            formattedCount: formatNumber(fact.rounds_tracked),
+          })
+        : null;
 
   const eyebrowParts = hero
-    ? [hero.list_label, hero.location_primary, hero.rating_avg != null ? formatRatingValue(Number(hero.rating_avg)) : null]
-        .filter(Boolean)
+    ? [hero.list_label, hero.location_primary, eyebrowTail].filter(Boolean)
     : [];
+
 
 
   return (
