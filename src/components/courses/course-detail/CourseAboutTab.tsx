@@ -166,7 +166,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       style={{ paddingBottom: 32, background: SLATE_50 }}
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
-      <SectionHeader role="section" kicker={t('courseDetail.blocks.theCard')} paddingX={16} />
       <CourseLocationPills course={course} />
       <CourseTeeCard courseId={course.id} />
 
