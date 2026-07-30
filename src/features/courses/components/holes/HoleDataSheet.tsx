@@ -65,11 +65,12 @@ function ord(n: number): string {
   return `${n}${ordinalSuffix(n)}`;
 }
 
-function characterClause(hardestHole: number): string {
-  if (hardestHole >= 16) return 'It builds to the finish';
-  if (hardestHole <= 3) return 'It bites early';
-  return 'The middle sets the test';
+function characterClauseKey(hardestHole: number): string {
+  if (hardestHole >= 16) return 'courses:holes.shapeNarrative.clauseFinish';
+  if (hardestHole <= 3) return 'courses:holes.shapeNarrative.clauseEarly';
+  return 'courses:holes.shapeNarrative.clauseMiddle';
 }
+
 
 function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
