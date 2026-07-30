@@ -596,6 +596,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         courseCountry: state.course?.country ?? null,
         courses: state.courses,
       });
+      // Analytics callsite: post_draft_saved
+      analyticsEvents.track('post_draft_saved', {
+        mode,
+        media_count: state.media.length,
+        had_caption: state.caption.trim().length > 0,
+      });
       if (restoredDraftId) {
         await drafts.remove(restoredDraftId);
         setRestoredDraftId(null);
