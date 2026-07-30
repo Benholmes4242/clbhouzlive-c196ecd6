@@ -1,6 +1,6 @@
 /**
  * CourseDirectorySheet — search the full course directory from a 75dvh bottom
- * sheet. Replaces the old inline CourseExplorer view swap.
+ * sheet. Replaces the old inline directory view swap.
  *
  * Every row carries its location: there are four courses called Paraiso across
  * three continents, so a bare name is not a safe picker.
