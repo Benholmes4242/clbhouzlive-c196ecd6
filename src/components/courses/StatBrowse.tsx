@@ -433,7 +433,12 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <div className="flex items-center justify-between gap-3 mt-2.5">
               <span style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.3 }}>
                 <strong style={{ color: INK, fontWeight: 800 }}>{formatNumber(totalCount)}</strong>{' '}
-                {t('statBrowse.countTracked', { count: totalCount })}
+                {trackedTotal > 0 && totalCount !== trackedTotal
+                  ? t('statBrowse.countOfTracked', {
+                      count: totalCount,
+                      total: formatNumber(trackedTotal),
+                    })
+                  : t('statBrowse.countTracked', { count: totalCount })}
               </span>
               {lensSelect(false)}
             </div>
