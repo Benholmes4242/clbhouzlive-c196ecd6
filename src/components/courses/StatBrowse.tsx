@@ -581,10 +581,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </h3>
           <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
             {t('statBrowse.directory.body', {
-              count: formatNumber(
-                Math.max(0, (facets?.directory_total ?? 0) - (facets?.played_total ?? 0)),
-              ),
+              count: directoryRemaining,
+              total: formatNumber(directoryRemaining),
             })}
+
           </p>
           <button
             type="button"
