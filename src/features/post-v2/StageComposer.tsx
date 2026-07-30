@@ -649,7 +649,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return (
       <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
         {/* Header mirror: close X + "Edit post" title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
           <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
             <X size={22} />
           </button>
@@ -703,14 +703,14 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   return (
     <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
         <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
         {isEditMode ? (
           <div style={{ fontSize: 14, fontWeight: 600, color: CT.ink }}>Edit post</div>
         ) : drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: CT.ink, cursor: 'pointer' }}>
+          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: `1px solid ${CT.hairlineStrong}`, borderRadius: 999, padding: '4px 10px', fontSize: 12, color: CT.ink, cursor: 'pointer' }}>
             Drafts - {drafts.drafts.length}
           </button>
         )}
@@ -840,7 +840,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
               <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.danger }}>Discard</button>
+          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: `1px solid ${CT.hairlineStrong}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.danger }}>Discard</button>
         </div>
       </BottomSheet>
     </div>

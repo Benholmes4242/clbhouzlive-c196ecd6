@@ -68,7 +68,7 @@ function RowButton({ label, selected, onClick }: { label: string; selected: bool
         width: '100%',
         background: 'transparent',
         border: 0,
-        borderTop: '1px solid rgba(0,0,0,0.07)',
+        borderTop: `1px solid ${CT.hairline}`,
         padding: '14px 16px',
         textAlign: 'left',
         cursor: 'pointer',

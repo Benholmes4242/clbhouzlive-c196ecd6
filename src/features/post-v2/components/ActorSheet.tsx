@@ -21,7 +21,7 @@ export default function ActorSheet({ open, onClose, onSelect, selectedId }: Prop
       {availableActors.map(a => {
         const active = a.id === selectedId;
         return (
-          <button key={`${a.type}:${a.id}`} onClick={() => { onSelect(a); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', border: 0, borderTop: '1px solid rgba(0,0,0,0.07)', padding: '12px 16px', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+          <button key={`${a.type}:${a.id}`} onClick={() => { onSelect(a); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', border: 0, borderTop: `1px solid ${CT.hairline}`, padding: '12px 16px', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
             <SquircleAvatar src={a.avatarUrl ?? null} alt={a.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, color: CT.ink, fontWeight: 600 }}>{a.name}</div>

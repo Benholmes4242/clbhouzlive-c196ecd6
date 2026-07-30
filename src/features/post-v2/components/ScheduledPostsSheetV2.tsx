@@ -87,7 +87,7 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
         {loading && rows.length === 0 && (
           <>
             {[0, 1, 2].map((i) => (
-              <div key={`sk-${i}`} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+              <div key={`sk-${i}`} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${CT.hairline}` }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div className="clb-shimmer-light" style={{ height: 14, width: '70%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
                   <div className="clb-shimmer-light" style={{ height: 11, width: '40%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
@@ -109,7 +109,7 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
           </div>
         )}
         {rows.map(r => (
-          <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+          <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: `1px solid ${CT.hairline}` }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, color: CT.ink, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{(r.content || '(no caption)').slice(0, 60)}</div>
               <div style={{ fontSize: 12, color: CT.secondary, marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
@@ -126,7 +126,7 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
                 </button>
                 <button
                   onClick={() => setConfirmCancelId(null)}
-                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: CT.ink, borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: `1px solid ${CT.hairlineStrong}`, color: CT.ink, borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}
                 >
                   No
                 </button>
@@ -136,7 +136,7 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
                 <button
                   onClick={() => setReschedTarget(r)}
                   disabled={busyId === r.id}
-                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: CT.ink, borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: `1px solid ${CT.hairlineStrong}`, color: CT.ink, borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
                 >
                   Reschedule
                 </button>
