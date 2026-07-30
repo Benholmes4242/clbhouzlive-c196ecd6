@@ -832,8 +832,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           {!isEditMode && (
             <>
               {state.media.length > 0 && (
-                <div style={{ fontSize: 12.5, color: '#5A6270', lineHeight: 1.45 }}>
-                  Drafts save your caption and course tags. Photos and videos aren't kept yet - you'll need to re-add them.
+                <div style={{ fontSize: 12, fontWeight: 500, color: '#8A9099', marginBottom: 8, textAlign: 'center' }}>
+                  {t('closeGuard.mediaNotSaved', { count: state.media.length })}
                 </div>
               )}
               <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
