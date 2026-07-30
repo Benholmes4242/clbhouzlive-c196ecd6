@@ -280,7 +280,8 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
                 lineHeight: 1.3,
               }}
             >
-              {t('top100.stats.noRounds')}
+              <div>{t('top100.stats.noRoundsTitle')}</div>
+              <div>{t('top100.stats.noRoundsCta')}</div>
             </div>
           ) : (
             renderDifficulty()
