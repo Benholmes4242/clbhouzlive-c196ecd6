@@ -53,7 +53,7 @@ export const EVENT_LABELS: Record<string, string> = {
   feed_course_line_tapped: 'Feed course line tapped',
   course_band_tapped: 'Course band tapped',
   hero_blurb_shown: 'Courses hero blurb shown',
-  hero_context_shown: 'Courses hero context line shown',
+  hero_fact_shown: 'Courses hero course fact shown',
   hero_view_course: 'Courses hero view course',
   hero_story_shown: 'Discover hero story shown',
   hero_chips_shown: 'Discover hero chips shown',
