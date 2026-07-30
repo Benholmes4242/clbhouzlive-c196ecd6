@@ -5,7 +5,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
 import { useExploreMood, type ExploreMoodId } from '@/components/explore-tab-new/hooks/useExploreMood';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { formatNumber, formatRatingValue } from '@/utils/formatters';
+import { formatRatingValue } from '@/utils/formatters';
+import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import {
   buildOverviewHeroBackground,
