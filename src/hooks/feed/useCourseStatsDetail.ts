@@ -5,6 +5,12 @@
  * This RPC is materially more expensive than the batched
  * `get_post_course_context` used by the feed band, so it is deliberately
  * NOT part of the feed query and is NEVER prefetched for visible posts.
+ *
+ * Exception, by design: the course detail hero (GolfClubView) calls this with
+ * `open = true`. That rule exists because a feed renders N courses at once;
+ * the course page is ONE course the member deliberately navigated to, so a
+ * single call on mount is justified. Caching (staleTime 5 min, no refetch on
+ * focus) is unchanged and the sheet opened from that hero reuses this entry.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';

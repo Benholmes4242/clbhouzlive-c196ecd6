@@ -303,6 +303,12 @@
   "tabs": {
     "explore": "Explore"
   },
+  "courseHero": {
+    "rounds": "rounds",
+    "avgToPar": "avg to par",
+    "yourPb": "your pb",
+    "harderThan": "harder than {{pct}}%"
+  },
   "hero": {
     "factBestRound": "Best round tracked here: {{gross}}, {{holder}}",
     "factHardestHole": "The {{hole}} plays hardest, {{over}} over par",

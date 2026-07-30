@@ -10,6 +10,8 @@ interface CourseCommunityRatingProps {
   showLogo?: boolean;
   /** Force the rating text to foreground color regardless of tier */
   forceNeutral?: boolean;
+  /** Dark/photographic surface: the non-amber tier renders near-white instead of foreground. */
+  onDark?: boolean;
 }
 
 /**
@@ -26,6 +28,7 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   size = 'md',
   showLogo = false,
   forceNeutral = false,
+  onDark = false,
 }) => {
   const textClasses = {
     sm: 'text-xs',
@@ -49,11 +52,14 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
           aria-hidden="true"
         />
       )}
-      <span className={cn(
-        textClasses,
-        'font-semibold tabular-nums',
-        forceNeutral ? 'text-foreground' : 'text-amber-500'
-      )}>
+      <span
+        className={cn(
+          textClasses,
+          'font-semibold tabular-nums',
+          forceNeutral ? (onDark ? '' : 'text-foreground') : 'text-amber-500'
+        )}
+        style={forceNeutral && onDark ? { color: 'rgba(255,255,255,0.95)' } : undefined}
+      >
         {formatRatingValue(rating)}
       </span>
     </div>

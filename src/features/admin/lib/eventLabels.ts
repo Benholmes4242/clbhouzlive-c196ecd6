@@ -60,6 +60,8 @@ export const EVENT_LABELS: Record<string, string> = {
 
   course_sheet_opened: 'Course stats sheet opened',
   course_sheet_view_course: 'Course stats sheet view course',
+  course_hero_stats_shown: 'Course hero stat band shown',
+  course_hero_stats_tapped: 'Course hero stat band tapped',
   post_round_attach_opened: 'Post round attach opened',
   post_round_attached: 'Post round attached',
   post_round_detached: 'Post round detached',
