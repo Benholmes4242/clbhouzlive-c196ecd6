@@ -230,7 +230,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 lineHeight: 1,
                 userSelect: 'none',
                 pointerEvents: 'none',
-                zIndex: 1,
               }}
             >
               <span
