@@ -8,10 +8,9 @@ import {
   getRatingTier,
   HERO_NUMBER_STYLE,
   TIER_LABEL_STYLE,
-  ratingTextColor,
   rampForRating,
 } from '@/lib/ratingTier';
-import { getScoreRingColors } from '@/hooks/useTierStyles';
+import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 
@@ -51,78 +50,6 @@ const TIERS: { key: keyof RatingTierDistributionData; labelKey: string }[] = [
   { key: 'poor', labelKey: 'review.filter.optionPoor' },
 ];
 
-
-const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 50 }) => {
-  const { from, to } = getScoreRingColors(score);
-  const r = (size / 2) - 4;
-  const circ = 2 * Math.PI * r;
-  const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
-  // useId is stable across renders; sanitize because useId emits ':' which is
-  // not a valid character in a CSS/SVG url(#id) reference.
-  const gradientId = `scoreGradient-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-
-  const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
-  return (
-    <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        style={{ transform: 'rotate(-90deg)' }}
-      >
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={from} />
-            <stop offset="100%" stopColor={to} />
-            {isExceptional && !prefersReducedMotion && (
-              <animateTransform
-                attributeName="gradientTransform"
-                type="rotate"
-                from="0 0.5 0.5"
-                to="360 0.5 0.5"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-            )}
-          </linearGradient>
-        </defs>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="rgba(15,23,42,0.06)"
-          strokeWidth={3.5}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={`url(#${gradientId})`}
-          strokeWidth={3.5}
-          strokeLinecap="round"
-          strokeDasharray={`${fill} ${circ}`}
-          style={{ transition: 'stroke-dasharray 0.5s ease' }}
-        />
-      </svg>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 13,
-          ...HERO_NUMBER_STYLE,
-          color: ratingTextColor(score),
-        }}
-      >
-        {score.toFixed(1)}
-      </div>
-    </div>
-  );
-};
 
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseName,
@@ -228,11 +155,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
           <span
-            className={tierLabel === 'EXCEPTIONAL' ? 'clbhouz-gold-shimmer-light' : undefined}
             style={{
               fontSize: 58,
               ...HERO_NUMBER_STYLE,
-              ...(tierLabel === 'EXCEPTIONAL' ? {} : { color: ratingTextColor(communityAverage) }),
+              color: bandColor(communityAverage),
               lineHeight: 1,
             }}
           >
@@ -245,11 +171,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
           <div>
             <div
-              className={tierLabel === 'EXCEPTIONAL' ? 'clbhouz-gold-shimmer-light' : undefined}
               style={{
                 fontSize: 12,
                 ...TIER_LABEL_STYLE,
-                ...(tierLabel === 'EXCEPTIONAL' ? {} : { color: ratingTextColor(communityAverage) }),
+                color: bandColor(communityAverage),
               }}
             >
               {tierLabel}
@@ -348,30 +273,19 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           >
             {t('courseDetail.communityScore.categoryScores')}
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${categories.length}, 1fr)`,
-              gap: 8,
-            }}
-          >
-            {categories.map((cat) => (
-              <div key={cat.id} style={{ textAlign: 'center' as const }}>
-                <ScoreRing score={cat.score || 0} size={50} />
-                <div
-                  style={{
-                    fontSize: 8,
-                    fontWeight: 700,
-                    color: INK_FAINT,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase' as const,
-                    marginTop: 6,
-                  }}
-                >
-                  {t(cat.labelKey)}
-                </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 16 }}>
+              {categories.slice(0, 2).map((cat) => (
+                <SubScoreBar key={cat.id} label={t(cat.labelKey)} score={cat.score || 0} />
+              ))}
+            </div>
+            {categories.length > 2 && (
+              <div style={{ display: 'flex', gap: 16 }}>
+                {categories.slice(2, 4).map((cat) => (
+                  <SubScoreBar key={cat.id} label={t(cat.labelKey)} score={cat.score || 0} />
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </>
       )}
