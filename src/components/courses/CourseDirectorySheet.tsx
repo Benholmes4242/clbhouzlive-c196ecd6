@@ -26,6 +26,12 @@ import {
   SURFACE,
 } from '@/features/courses/_shared/tokens';
 import { useDirectoryRecents } from './directoryRecents';
+import CourseCommunityRating from './CourseCommunityRating';
+import {
+  useDirectoryRecentRatings,
+  type DirectoryRatedCourse,
+} from '@/hooks/courses/useDirectoryRecentRatings';
+
 import { openRequestCourseSheet } from './requestCourseSheetStore';
 
 interface Props {
