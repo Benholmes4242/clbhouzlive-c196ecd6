@@ -464,9 +464,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {/* Member context — progress across lists, then where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              {activeProgress.played === 0 ? (
-                <Top100ProgressEmpty list={selectedList} signedIn={!!user?.id} />
-              ) : (
+              {activeProgress.played >= verdictConfig.minPlayed && (
                 <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
               )}
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
