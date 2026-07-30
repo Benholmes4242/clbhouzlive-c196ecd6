@@ -25,6 +25,8 @@ import {
   INK_MUTE,
   SURFACE,
 } from '@/features/courses/_shared/tokens';
+import { useDirectoryRecents } from './directoryRecents';
+import { openRequestCourseSheet } from './requestCourseSheetStore';
 
 interface Props {
   open: boolean;
