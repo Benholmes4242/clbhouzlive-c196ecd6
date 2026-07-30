@@ -230,7 +230,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       )}
       <CourseTitleOverlay
         course={course}
-        courseMeta={courseMeta}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
         onOpenStats={() => setStatsSheetOpen(true)}
@@ -260,7 +259,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     >
       <CourseTitleOverlay
         course={course}
-        courseMeta={courseMeta}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
         onOpenStats={() => setStatsSheetOpen(true)}
@@ -396,7 +394,6 @@ interface CourseMetaShape {
 }
 interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
-  courseMeta: CourseMetaShape | null | undefined;
   courseStats: CourseStatsDetail | null;
   communityRating: number | null;
   onOpenStats: () => void;
@@ -437,7 +434,6 @@ const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
-  courseMeta,
   courseStats,
   communityRating,
   onOpenStats,
@@ -445,7 +441,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   const { t } = useTranslation('courses');
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
   const showBand = rounds > 0;
-  const showCrSlope = !showBand && (courseMeta?.course_cr != null || courseMeta?.course_slope != null);
   const hasRank = Boolean(course.global_rank || course.regional_rank || course.usa_rank);
 
   const courseId = (course as { id?: string }).id ?? null;
@@ -541,25 +536,12 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         </button>
       )}
 
-      {showCrSlope && (
-        <p
-          className="drop-shadow-lg mb-2"
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: 'rgba(255,255,255,0.7)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {[
-            courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
-            courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-      )}
+      {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
+          one tee while CourseTeeCard resolves the member's own tee, so the two
+          figures legitimately differ. The tee card, 300px below, owns and
+          labels tee data. Fallback chain is now: rounds -> stat band, no
+          rounds -> name and location only. */}
+
 
       {(hasRank || communityRating != null) && (
         <div

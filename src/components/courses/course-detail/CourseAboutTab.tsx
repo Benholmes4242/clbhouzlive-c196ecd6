@@ -27,6 +27,8 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import { CourseTeeCard } from '@/features/courses/components/holes/CourseTeeCard';
+
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseCTA from './ClaimCourseCTA';
@@ -163,31 +165,35 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       className="animate-in fade-in duration-200"
       style={{ paddingBottom: 32, background: SLATE_50 }}
     >
-      {/* 1. Location breadcrumb pills */}
+      {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
+      <SectionHeader role="section" kicker={t('courseDetail.blocks.theCard')} paddingX={16} />
       <CourseLocationPills course={course} />
+      <CourseTeeCard courseId={course.id} />
 
-      {/* 2 + 3. The course card, course shape, beast / best chance */}
-      <section>
-        <CourseHolesTab courseId={course.id} section="shape" showGhost={false} />
-      </section>
+      <div style={{ margin: '20px 0' }}><Divider /></div>
 
-      {/* 4. Hole by hole, collapsed */}
-      <section>
-        <CourseHolesTab
-          courseId={course.id}
-          section="holes"
-          showTeeCard={false}
-          showGhost={false}
-          showEmptyState={false}
-          collapsible
-          defaultCollapsed
-          onExpand={handleHolesExpand}
-        />
-      </section>
+      {/* ══ BLOCK 2 — HOW IT PLAYS (one dataset, one header, three depths) ══ */}
+      <SectionHeader role="section" kicker={t('courseDetail.blocks.howItPlays')} paddingX={16} />
+      {/* Chart + Beast / Best Chance callouts, anchored together */}
+      <CourseHolesTab courseId={course.id} section="shape" showTeeCard={false} showGhost={false} />
+      {/* Detail — hole by hole, collapsed. Status branches deferred to the mount above. */}
+      <CourseHolesTab
+        courseId={course.id}
+        section="holes"
+        showTeeCard={false}
+        showGhost={false}
+        showEmptyState={false}
+        suppressStatus
+        collapsible
+        defaultCollapsed
+        onExpand={handleHolesExpand}
+      />
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
+      <div style={{ margin: '20px 0' }}><Divider /></div>
 
-      {/* 5. The record book - Champions promoted onto the default view */}
+      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
+      <SectionHeader role="section" kicker={t('courseDetail.blocks.whoPlaysHere')} paddingX={16} />
+
       <CourseRecordBook
         courseId={course.id}
         courseName={course.name}
@@ -196,12 +202,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         courseType={(course as { course_type?: string | null }).course_type ?? null}
         initialCategory={legendCategoryParam}
         onSeeAll={() => onTabChange?.('legends')}
+        hideHeader
       />
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
-
-      {/* 6. The verdict - community rating */}
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '20px 16px 0' }}>
         <CommunityScoreCard
           courseId={course.id}
           courseName={course.name}
@@ -236,83 +240,74 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </div>
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
-
-      {/* 7. Friends who've played */}
+      <div style={{ height: 20 }} />
       <CourseFriendsStrip courseId={course.id} courseName={course.name} />
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
+      <div style={{ margin: '20px 0' }}><Divider /></div>
 
-      {/* 8. About - the notes card */}
+      {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
+      <SectionHeader role="section" kicker={t('courseDetail.blocks.aboutThisPlace')} paddingX={16} />
+
       {course.description && (
-        <>
-          <div style={{ marginTop: 24 }}>
-            <SectionHeader role="section" kicker="ABOUT" paddingX={16} />
-            <div
-              style={{
-                margin: '0 16px',
-                background: '#FFFFFF',
-                border: `1px solid ${HAIRLINE_INK_7}`,
-                borderRadius: 16,
-                padding: 16,
-              }}
-            >
-              {/* Amber quote-mark motif */}
-              <div
+        <div
+          style={{
+            margin: '0 16px',
+            background: '#FFFFFF',
+            border: `1px solid ${HAIRLINE_INK_7}`,
+            borderRadius: 16,
+            padding: 16,
+          }}
+        >
+          {/* Amber quote-mark motif */}
+          <div
+            style={{
+              width: 28, height: 28, borderRadius: 9,
+              background: 'rgba(247,147,30,0.10)', color: AMBER,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 12,
+            }}
+          >
+            <Quote size={14} fill="currentColor" strokeWidth={0} />
+          </div>
+          {/* Prose - fade matches the white card bg */}
+          <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
+            {formatDescription(displayDescription)}
+            {!showFullDescription && shouldShowReadMore && (
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 44, background: 'linear-gradient(to top, #FFFFFF, transparent)', pointerEvents: 'none' }} />
+            )}
+          </div>
+          {/* Footer rail - amber ghost pill */}
+          {shouldShowReadMore && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${HAIRLINE_INK_7}` }}>
+              <button
+                onClick={() => setShowFullDescription(!showFullDescription)}
                 style={{
-                  width: 28, height: 28, borderRadius: 9,
-                  background: 'rgba(247,147,30,0.10)', color: AMBER,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 12,
+                  background: 'rgba(247,147,30,0.10)',
+                  border: 'none', borderRadius: 999,
+                  padding: '7px 14px',
+                  fontSize: 12, fontWeight: 700, color: AMBER,
+                  cursor: 'pointer',
                 }}
               >
-                <Quote size={14} fill="currentColor" strokeWidth={0} />
-              </div>
-              {/* Prose - fade matches the white card bg */}
-              <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
-                {formatDescription(displayDescription)}
-                {!showFullDescription && shouldShowReadMore && (
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 44, background: 'linear-gradient(to top, #FFFFFF, transparent)', pointerEvents: 'none' }} />
-                )}
-              </div>
-              {/* Footer rail - amber ghost pill */}
-              {shouldShowReadMore && (
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${HAIRLINE_INK_7}` }}>
-                  <button
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                    style={{
-                      background: 'rgba(247,147,30,0.10)',
-                      border: 'none', borderRadius: 999,
-                      padding: '7px 14px',
-                      fontSize: 12, fontWeight: 700, color: AMBER,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {showFullDescription ? 'Show less' : 'Read more'}
-                  </button>
-                </div>
-              )}
+                {showFullDescription ? 'Show less' : 'Read more'}
+              </button>
             </div>
-          </div>
-          <div style={{ margin: '16px 0' }}><Divider /></div>
-        </>
+          )}
+        </div>
       )}
 
-      {/* 9. Top 100 Spotlight - renders its own header internally */}
+      {/* Top 100 spotlight + summary */}
       {course.id && (
-        <>
+        <div style={{ marginTop: 20 }}>
           <div style={{ margin: '0 16px' }}>
             <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
           </div>
           <CourseTop100Summary />
-          <div style={{ margin: '16px 0' }}><Divider /></div>
-        </>
+        </div>
       )}
 
-
-      {/* 10. Location */}
-      <section>
-        <SectionHeader role="section" kicker="LOCATION" paddingX={16} />
+      {/* Location */}
+      <section style={{ marginTop: 20 }}>
         <div style={{ padding: '0 16px' }}>
           {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
           {coords && (
@@ -331,15 +326,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       </section>
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
-
-      {/* 11. Nearby hospitality */}
+      <div style={{ height: 20 }} />
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
 
-
-      {/* 12. Claim course - tri-state: unclaimed / pending / claimed */}
+      {/* Claim course - tri-state: unclaimed / pending / claimed */}
       {course.club_id && claimStatus && (
-        <>
+        <div style={{ marginTop: 20 }}>
           {claimStatus.state === 'unclaimed' && (
             <ClaimCourseCTA
               clubId={course.club_id}
@@ -351,21 +343,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           {claimStatus.state === 'claimed' && claimStatus.business && (
             <ClaimedCourseProfileLink business={claimStatus.business} />
           )}
-          <div style={{ margin: '16px 0' }}><Divider /></div>
-        </>
+        </div>
       )}
 
-      {/* 13. Media strip - renders its own heading internally */}
-      <section>
+      {/* Media strip - renders its own heading internally */}
+      <section style={{ marginTop: 20 }}>
         <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
       </section>
 
-      <div style={{ margin: '16px 0' }}><Divider /></div>
+      {/* Explore more - renders its own heading internally */}
+      <div style={{ marginTop: 20 }}>
+        <CourseExploreLinks course={course} />
+      </div>
 
-      {/* 14. Explore more - renders its own heading internally */}
-      <CourseExploreLinks course={course} />
-
-      {/* 15. Official website - amber ghost button */}
+      {/* Official website - amber ghost button */}
       {course.website_url && (
         <div style={{ padding: '12px 16px 0' }}>
           <button
@@ -377,6 +368,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </button>
         </div>
       )}
+
 
       {course.website_url && (
         <ExternalLinkSheet

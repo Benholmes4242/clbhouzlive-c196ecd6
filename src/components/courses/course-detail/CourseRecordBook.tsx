@@ -28,6 +28,8 @@ interface Props {
   initialCategory?: string | null;
   /** Opens the Champions tab - the record book no longer lives in a sheet. */
   onSeeAll?: () => void;
+  /** The page owns the block header (WHO PLAYS HERE) - suppress the local one. */
+  hideHeader?: boolean;
 }
 
 export const CourseRecordBook: React.FC<Props> = ({
@@ -38,6 +40,7 @@ export const CourseRecordBook: React.FC<Props> = ({
   courseType = null,
   initialCategory = null,
   onSeeAll,
+  hideHeader = false,
 }) => {
   const { user } = useSupabaseSession();
   const { isLoading, previewRows, unclaimedCount, hasAnyHolder } =
@@ -58,7 +61,7 @@ export const CourseRecordBook: React.FC<Props> = ({
   if (isLoading) {
     return (
       <section style={{ padding: '4px 0 0' }}>
-        <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />
+        {!hideHeader && <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {[0, 1, 2].map((i) => (
             <div
@@ -77,7 +80,7 @@ export const CourseRecordBook: React.FC<Props> = ({
 
   return (
     <section style={{ padding: '4px 0 0' }}>
-      <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />
+      {!hideHeader && <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />}
 
       {hasAnyHolder ? (
         <div style={{ display: 'flex', flexDirection: 'column' }}>

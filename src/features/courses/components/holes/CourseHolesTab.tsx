@@ -24,6 +24,12 @@ interface Props {
   showGhost?: boolean;
   /** Render the "no hole data" empty state. Default true (legacy tab). */
   showEmptyState?: boolean;
+  /**
+   * Suppress the loading and error branches. Used by the second mount on the
+   * Course tab so a single shimmer / single Retry panel is shown, owned by the
+   * 'shape' mount above it. React Query dedupes the fetch either way.
+   */
+  suppressStatus?: boolean;
   collapsible?: boolean;
   defaultCollapsed?: boolean;
   onExpand?: () => void;
@@ -35,10 +41,12 @@ export const CourseHolesTab: React.FC<Props> = ({
   showTeeCard = true,
   showGhost = true,
   showEmptyState = true,
+  suppressStatus = false,
   collapsible = false,
   defaultCollapsed = false,
   onExpand,
 }) => {
+
   const { t } = useTranslation(['courses']);
   const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = useCourseHoleAnalysis(courseId);
@@ -61,7 +69,9 @@ export const CourseHolesTab: React.FC<Props> = ({
   const viewerHasPlayed = Boolean(user && connection && myPerf && myPerf.length > 0);
 
   if (isLoading) {
+    if (suppressStatus) return null;
     return (
+
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, fontFamily: FONT }}>
         {[0, 1, 2, 3].map((i) => (
           <div
@@ -81,7 +91,9 @@ export const CourseHolesTab: React.FC<Props> = ({
   }
 
   if (isError) {
+    if (suppressStatus) return null;
     return (
+
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE, marginBottom: 16 }}>
           {t('courses:holes.errorLoading')}

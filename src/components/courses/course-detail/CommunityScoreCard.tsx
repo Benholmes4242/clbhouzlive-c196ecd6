@@ -13,6 +13,8 @@ import {
 } from '@/lib/ratingTier';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+
 
 // Representative score per distribution tier — drives bar colour via rampForRating
 const TIER_REP_SCORE: Record<string, number> = {
@@ -55,7 +57,10 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
   const r = (size / 2) - 4;
   const circ = 2 * Math.PI * r;
   const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
-  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  // useId is stable across renders; sanitize because useId emits ':' which is
+  // not a valid character in a CSS/SVG url(#id) reference.
+  const gradientId = `scoreGradient-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
   const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
   return (
     <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
@@ -128,9 +133,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   onSeeAllReviews,
 }) => {
   const { t } = useTranslation('courses');
+  const { subscoreMinRatings } = useTop100Config();
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
+
 
 
   // Empty state — invitation card with 0–10 numeric language
@@ -181,12 +188,20 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
 
-  const categories = [
-    { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
-    { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
-    { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
-    { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
-  ].filter((cat) => cat.score !== null && cat.score !== undefined);
+  // Sub-scores are gated behind the SAME threshold the Top 100 panel uses
+  // (t100_subscore_min_ratings, default 3). One number, both surfaces move
+  // together. Below it: headline, tier, distribution and count only.
+  const categories =
+    totalRatings >= subscoreMinRatings
+      ? [
+          { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
+          { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
+          { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+          { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
+        ].filter((cat) => cat.score !== null && cat.score !== undefined)
+      : [];
+
+
 
 
   // Distribution counts (fallback to zeros)

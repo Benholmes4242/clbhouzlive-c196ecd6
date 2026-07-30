@@ -65,11 +65,12 @@ function ord(n: number): string {
   return `${n}${ordinalSuffix(n)}`;
 }
 
-function characterClause(hardestHole: number): string {
-  if (hardestHole >= 16) return 'It builds to the finish';
-  if (hardestHole <= 3) return 'It bites early';
-  return 'The middle sets the test';
+function characterClauseKey(hardestHole: number): string {
+  if (hardestHole >= 16) return 'courses:holes.shapeNarrative.clauseFinish';
+  if (hardestHole <= 3) return 'courses:holes.shapeNarrative.clauseEarly';
+  return 'courses:holes.shapeNarrative.clauseMiddle';
 }
+
 
 function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
@@ -191,22 +192,24 @@ export const HoleDataSheet: React.FC<Props> = ({
     <div style={{ fontFamily: FONT, padding: '16px 12px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <HoleGlyphDefs />
 
-      {/* 1. Header */}
+      {/* 1. Header — the block header is owned by the page in the 'shape' slice. */}
       {showShape && (
       <section style={{ scrollMarginTop: STICKY_SAFE, padding: '0 4px' }}>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-            color: INK,
-            lineHeight: 1.15,
-          }}
-        >
-          {t('courses:holes.clubGuide.title')}
-        </h2>
-        <p style={{ margin: '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
+        {section !== 'shape' && (
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 22,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              color: INK,
+              lineHeight: 1.15,
+            }}
+          >
+            {t('courses:holes.clubGuide.title')}
+          </h2>
+        )}
+        <p style={{ margin: section === 'shape' ? 0 : '8px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
           {viewerHasPlayed
             ? t('courses:holes.clubGuide.bodySignedIn', { count: totalRounds, rounds: formatNumber(totalRounds) })
             : t('courses:holes.clubGuide.bodySignedOut', { count: totalRounds, rounds: formatNumber(totalRounds) })}
@@ -214,8 +217,37 @@ export const HoleDataSheet: React.FC<Props> = ({
       </section>
       )}
 
-      {/* 2. Skyline */}
-      {showShape && hardest && (
+      {/* 2 + 3. Skyline with the Beast / Best Chance callouts anchored beneath it */}
+      {showShape && hardest && section === 'shape' && (
+        <div style={{ ...CARD, padding: 16 }}>
+          <SkylineCard
+            holes={sortedByHole}
+            hardest={hardest}
+            myByHole={myByHole}
+            viewerHasPlayed={viewerHasPlayed}
+            beatFieldCount={beatFieldCount}
+            embedded
+            footer={
+              <div style={{ marginTop: 12 }}>
+                <StoryTiles
+                  hardest={hardest}
+                  easiest={easiest}
+                  nemesis={nemesis}
+                  holes={holes}
+                  myByHole={myByHole}
+                  viewerHasPlayed={viewerHasPlayed}
+                  birdiedCount={birdiedCount}
+                  totalHoles={totalHoles}
+                  missingBirdieHole={missingBirdieHole}
+                  scope="community"
+                />
+              </div>
+            }
+          />
+        </div>
+      )}
+
+      {showShape && hardest && section !== 'shape' && (
         <SkylineCard
           holes={sortedByHole}
           hardest={hardest}
@@ -226,7 +258,7 @@ export const HoleDataSheet: React.FC<Props> = ({
       )}
 
       {/* 3. Story tiles */}
-      {(showShape || showYou) && (
+      {(showYou || (showShape && section !== 'shape')) && (
         <StoryTiles
           hardest={hardest}
           easiest={easiest}
@@ -240,6 +272,7 @@ export const HoleDataSheet: React.FC<Props> = ({
           scope={tileScope}
         />
       )}
+
 
       {/* Scoring breakdown — renders nothing when RPC missing / <5 rounds / no WHS */}
       {showYou && <ScoringBreakdownSection golfCourseId={courseId} />}
@@ -258,44 +291,49 @@ export const HoleDataSheet: React.FC<Props> = ({
           }}
         >
           <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: GOLD_INK,
-              }}
-            >
-              {t('courses:holes.preview.eyebrow')}
-            </div>
-            <h3
-              style={{
-                margin: '4px 0 0',
-                fontSize: 17,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-              }}
-            >
-              {t('courses:holes.preview.title')}
-            </h3>
-            <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
-              {totalRounds > 0
-                ? t('courses:holes.preview.description', {
-                    holes: formatNumber(totalHoles),
-                    count: totalRounds,
-                    rounds: formatNumber(totalRounds),
-                    personal: viewerHasPlayed
-                      ? t('courses:holes.preview.personalClause')
-                      : '',
-                  })
-                : t('courses:holes.preview.descriptionNoRounds', {
-                    holes: formatNumber(totalHoles),
-                  })}
-            </p>
+            {section !== 'holes' && (
+              <>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: GOLD_INK,
+                  }}
+                >
+                  {t('courses:holes.preview.eyebrow')}
+                </div>
+                <h3
+                  style={{
+                    margin: '4px 0 0',
+                    fontSize: 17,
+                    fontWeight: 800,
+                    color: INK,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {t('courses:holes.preview.title')}
+                </h3>
+                <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
+                  {totalRounds > 0
+                    ? t('courses:holes.preview.description', {
+                        holes: formatNumber(totalHoles),
+                        count: totalRounds,
+                        rounds: formatNumber(totalRounds),
+                        personal: viewerHasPlayed
+                          ? t('courses:holes.preview.personalClause')
+                          : '',
+                      })
+                    : t('courses:holes.preview.descriptionNoRounds', {
+                        holes: formatNumber(totalHoles),
+                      })}
+                </p>
+              </>
+            )}
           </div>
+
           {!collapsed && (
           <div
             role="tablist"
@@ -435,7 +473,12 @@ const SkylineCard: React.FC<{
   myByHole: Map<number, MyHolePerformanceRow>;
   viewerHasPlayed: boolean;
   beatFieldCount: number;
-}> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount }) => {
+  /** Rendered inside a shared container (chart + callouts) — drop own card chrome. */
+  embedded?: boolean;
+  /** Callouts anchored directly beneath the chart, inside the same container. */
+  footer?: React.ReactNode;
+}> = ({ holes, hardest, myByHole, viewerHasPlayed, beatFieldCount, embedded = false, footer }) => {
+
   const { t } = useTranslation(['courses']);
   const sorted = holes;
   const domainMax = Math.max(
@@ -481,14 +524,23 @@ const SkylineCard: React.FC<{
     if (seg.length > 0) segments.push(seg);
   }
 
-  const clause = characterClause(hardest.hole_no);
-  const beastFrag = `The ${ord(hardest.hole_no)} is the beast: ${fmtToPar(hardest.avg_to_par)} for the field.`;
+  const beastFrag = t('courses:holes.shapeNarrative.beast', {
+    hole: ord(hardest.hole_no),
+    value: fmtToPar(hardest.avg_to_par),
+  });
   const caption = viewerHasPlayed
-    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. ${beastFrag}`
+    ? t('courses:holes.shapeNarrative.withYou', {
+        clause: t(characterClauseKey(hardest.hole_no)),
+        beat: beatFieldCount,
+        total: sorted.length,
+        beast: beastFrag,
+      })
     : beastFrag;
 
+
   return (
-    <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
+    <section style={embedded ? { scrollMarginTop: STICKY_SAFE } : { ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
         <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
@@ -584,7 +636,9 @@ const SkylineCard: React.FC<{
       <div style={{ marginTop: 10, fontSize: 11.5, color: INK_55, lineHeight: 1.5 }}>
         {caption}
       </div>
+      {footer}
     </section>
+
   );
 };
 

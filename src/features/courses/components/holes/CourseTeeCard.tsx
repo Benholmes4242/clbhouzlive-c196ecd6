@@ -290,7 +290,9 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           </svg>
         </div>
 
-        {/* Compact stat strip: PAR / CR / SLOPE only (yards is in title) */}
+        {/* Compact stat strip: PAR / CR / SLOPE only (yards is in title).
+            Hidden when expanded — the four-up row below owns the trio then. */}
+        {!expanded && (
         <div
           style={{
             display: 'grid',
@@ -342,6 +344,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             </div>
           ))}
         </div>
+        )}
+
       </button>
 
       {/* Collapsible panel */}
@@ -548,8 +552,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               <div style={{ textAlign: 'right' }}>{t('courses:teeCard.col.yards')}</div>
             </div>
 
-            {front9.map((h, idx) => (
-              <Row key={h.hole_no} h={h} zebra={idx % 2 === 1} />
+            {front9.map((h) => (
+              <Row key={h.hole_no} h={h} />
             ))}
 
             <SubtotalRow
@@ -558,8 +562,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
               yards={outYards}
             />
 
-            {back9.map((h, idx) => (
-              <Row key={h.hole_no} h={h} zebra={idx % 2 === 1} />
+            {back9.map((h) => (
+              <Row key={h.hole_no} h={h} />
             ))}
 
             <SubtotalRow
@@ -787,14 +791,14 @@ const TeePillsRow: React.FC<{
 
 
 
-const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: number }; zebra: boolean }> = ({ h, zebra }) => (
+const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: number } }> = ({ h }) => (
   <div
     role="row"
     style={{
       display: 'grid',
       gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
-      background: zebra ? 'rgba(15,23,42,0.02)' : '#FFFFFF',
+      background: '#FFFFFF',
       fontSize: 13,
       color: INK,
       ...NUM,
@@ -802,10 +806,12 @@ const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: numb
   >
     <div style={{ fontWeight: 700 }}>{h.hole_no}</div>
     <div style={{ textAlign: 'right' }}>{h.par || '-'}</div>
-    <div style={{ textAlign: 'right' }}>{h.si || '-'}</div>
+    {/* SI is reference data, not a headline — quieter than PAR and YARDS. */}
+    <div style={{ textAlign: 'right', color: INK_MUTE }}>{h.si || '-'}</div>
     <div style={{ textAlign: 'right' }}>{h.yards ? h.yards.toLocaleString('en-US') : '-'}</div>
   </div>
 );
+
 
 const SubtotalRow: React.FC<{ label: string; par: number; yards: number; strong?: boolean }> = ({ label, par, yards, strong }) => (
   <div
