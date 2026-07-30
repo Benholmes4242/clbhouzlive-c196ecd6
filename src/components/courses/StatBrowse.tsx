@@ -571,28 +571,70 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )
       ) : (
         <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
-          {rows.map((row, i) => (
-            <UnifiedCourseCard
-              key={row.course_id}
-              course={fromStatBrowseRow(row)}
-              variant="vertical"
-              showRankBadges
-              showRating
-              showPlayedStatus
-              /* The lens chip renders unless it would duplicate a figure
-                 already on the card — 'rated' repeats the community rating. */
-              statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
-              statLine={sampleLine(row)}
-              onClick={() => {
-                analyticsEvents.track('stat_browse_course_opened', {
-                  course_id: row.course_id,
-                  lens,
-                  rank: i + 1,
-                });
-                navigate(`/courses/${row.course_id}`);
-              }}
-            />
-          ))}
+          {rows.map((row, i) => {
+            const model = fromStatBrowseRow(row);
+            const rank = row.global_rank ?? row.regional_rank ?? null;
+            const listSlug =
+              row.global_rank != null ? 'global' : getRegionalBadgeSlug(model) ?? 'regional';
+            const data = rank != null ? enrichment.get(row.course_id) : undefined;
+            /* No ratingRank here by decision: a course can sit in two lists at
+               once and this surface has no single list loaded, so "Nth of N on
+               this list" has no correct answer. First line only. */
+            const verdict =
+              rank != null && data
+                ? computeVerdict({
+                    rank,
+                    rating: data.rating,
+                    ratingCount: data.ratingCount,
+                    config: verdictConfig,
+                  })
+                : null;
+
+            return (
+              <div key={row.course_id}>
+                <UnifiedCourseCard
+                  course={model}
+                  variant="vertical"
+                  showRankBadges
+                  showRating
+                  showPlayedStatus
+                  /* The lens chip renders unless it would duplicate a figure
+                     already on the card — 'rated' repeats the community rating. */
+                  statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
+                  statLine={sampleLine(row)}
+                  onClick={() => {
+                    analyticsEvents.track('stat_browse_course_opened', {
+                      course_id: row.course_id,
+                      lens,
+                      rank: i + 1,
+                    });
+                    navigate(`/courses/${row.course_id}`);
+                  }}
+                />
+                {rank != null && (
+                  <Top100EnrichmentBlock
+                    courseId={row.course_id}
+                    courseName={row.name}
+                    rank={rank}
+                    list={listSlug}
+                    data={data}
+                    verdict={verdict}
+                    onOpenVerdict={() => {
+                      if (!verdict) return;
+                      setVerdictSheet({
+                        courseId: row.course_id,
+                        courseName: row.name,
+                        verdict,
+                        canRate: !!data && !data.ratedByYou,
+                      });
+                    }}
+                    onRate={() => navigate(`/courses/${row.course_id}/rate`)}
+                  />
+                )}
+              </div>
+            );
+          })}
+
 
           {isPaging && (
             <div className="px-4" style={{ fontSize: 12.5, color: INK_MUTE }}>
