@@ -59,7 +59,7 @@ interface UnifiedCourseCardProps {
 /**
  * Determine the regional badge slug based on available data
  */
-function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe' | null {
+export function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe' | null {
   if (course.ranks?.usa) return 'usa';
   if (course.ranks?.regional) {
     const gbCountries = [
