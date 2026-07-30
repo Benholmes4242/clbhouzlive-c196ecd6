@@ -639,6 +639,7 @@
     "scopeClear": "Search everywhere",
     "recentHeading": "Recent",
     "recentClear": "Clear",
-    "addCourse": "Add \"{{query}}\""
+    "addCourse": "Add \"{{query}}\"",
+    "ratedHeading": "Recently rated"
   }
 }

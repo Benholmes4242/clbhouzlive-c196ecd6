@@ -164,6 +164,7 @@ export const EVENT_LABELS: Record<string, string> = {
   course_directory_searched: 'Course directory searched',
   course_directory_result_tapped: 'Course directory result tapped',
   course_directory_request_opened: 'Course directory request opened',
+  course_directory_recent_rated_tapped: 'Course directory recently-rated tapped',
 
   // Review tee context (Phase L6)
   review_tee_selected: 'Review tee selected',
