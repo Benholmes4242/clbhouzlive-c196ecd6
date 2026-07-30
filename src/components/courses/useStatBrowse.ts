@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const STAT_BROWSE_PAGE_SIZE = 6;
+export const STAT_BROWSE_PAGE_SIZE = 10;
 
 export const STAT_LENSES = [
   'toughest',
