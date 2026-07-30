@@ -291,44 +291,49 @@ export const HoleDataSheet: React.FC<Props> = ({
           }}
         >
           <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: GOLD_INK,
-              }}
-            >
-              {t('courses:holes.preview.eyebrow')}
-            </div>
-            <h3
-              style={{
-                margin: '4px 0 0',
-                fontSize: 17,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-              }}
-            >
-              {t('courses:holes.preview.title')}
-            </h3>
-            <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
-              {totalRounds > 0
-                ? t('courses:holes.preview.description', {
-                    holes: formatNumber(totalHoles),
-                    count: totalRounds,
-                    rounds: formatNumber(totalRounds),
-                    personal: viewerHasPlayed
-                      ? t('courses:holes.preview.personalClause')
-                      : '',
-                  })
-                : t('courses:holes.preview.descriptionNoRounds', {
-                    holes: formatNumber(totalHoles),
-                  })}
-            </p>
+            {section !== 'holes' && (
+              <>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: GOLD_INK,
+                  }}
+                >
+                  {t('courses:holes.preview.eyebrow')}
+                </div>
+                <h3
+                  style={{
+                    margin: '4px 0 0',
+                    fontSize: 17,
+                    fontWeight: 800,
+                    color: INK,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {t('courses:holes.preview.title')}
+                </h3>
+                <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
+                  {totalRounds > 0
+                    ? t('courses:holes.preview.description', {
+                        holes: formatNumber(totalHoles),
+                        count: totalRounds,
+                        rounds: formatNumber(totalRounds),
+                        personal: viewerHasPlayed
+                          ? t('courses:holes.preview.personalClause')
+                          : '',
+                      })
+                    : t('courses:holes.preview.descriptionNoRounds', {
+                        holes: formatNumber(totalHoles),
+                      })}
+                </p>
+              </>
+            )}
           </div>
+
           {!collapsed && (
           <div
             role="tablist"
