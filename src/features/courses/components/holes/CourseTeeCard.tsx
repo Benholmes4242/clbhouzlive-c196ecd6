@@ -290,7 +290,9 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
           </svg>
         </div>
 
-        {/* Compact stat strip: PAR / CR / SLOPE only (yards is in title) */}
+        {/* Compact stat strip: PAR / CR / SLOPE only (yards is in title).
+            Hidden when expanded — the four-up row below owns the trio then. */}
+        {!expanded && (
         <div
           style={{
             display: 'grid',
@@ -342,6 +344,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             </div>
           ))}
         </div>
+        )}
+
       </button>
 
       {/* Collapsible panel */}
