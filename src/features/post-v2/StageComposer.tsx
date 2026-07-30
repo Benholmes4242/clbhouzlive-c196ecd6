@@ -396,16 +396,18 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Post');
   const primaryStyle: React.CSSProperties = {
-    background: (!isEditMode && state.scheduledAt) ? CT.amber : CT.dark,
-    color: (!isEditMode && state.scheduledAt) ? CT.dark : CT.onDark,
-    border: 0,
-    borderRadius: 999,
-    padding: '8px 16px',
-    fontSize: 14,
-    fontWeight: 600,
+    width: '100%',
+    padding: 16,
+    borderRadius: CT.panelRadius,
+    border: 'none',
+    fontSize: 14.5,
+    fontWeight: 700,
+    background: canSubmit ? CT.amber : 'rgba(15,23,42,0.10)',
+    color: canSubmit ? '#fff' : CT.secondary,
+    boxShadow: canSubmit ? '0 6px 16px rgba(247,147,30,0.28)' : undefined,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
-    opacity: (canSubmit || submitting || saving) ? 1 : 0.4,
   };
+
 
   const authorName = useMemo(() => activeActor?.name ?? profile?.display_name ?? 'You', [activeActor, profile]);
   const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
