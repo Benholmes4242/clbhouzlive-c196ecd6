@@ -961,7 +961,7 @@
       }
     },
     "unit": {
-      "avgOverPar": "avg over par",
+      "avgToPar": "avg to par",
       "rounds": "rounds",
       "yards": "yards",
       "outOfTen": "out of 10",
