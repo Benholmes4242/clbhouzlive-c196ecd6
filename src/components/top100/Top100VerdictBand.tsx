@@ -20,7 +20,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import type { Verdict } from './verdict';
+import { shortenCourseName, type Verdict } from './verdict';
 
 const GREEN_BG = 'rgba(16,185,129,0.10)';
 const GREEN_LINE = 'rgba(16,185,129,0.28)';
