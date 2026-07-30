@@ -69,3 +69,36 @@ export function computeVerdict(args: {
     ratingCount,
   };
 }
+
+/**
+ * Shorten a club name for the verdict band ONLY. The card title keeps the
+ * full name. Only the full multi-word phrases below are stripped, and only
+ * when preceded by a space and followed by end-of-string or " (", so
+ * "European Club" and "The Honors Course" are left alone and any
+ * parenthetical (Old), (Championship), (Hotchkin) always survives.
+ */
+const SHORTEN_PHRASES = [
+  'Golf and Country Club',
+  'Golf & Country Club',
+  'Golf Club',
+  'Golf Links',
+  'Golf Resort',
+  'Golf Course',
+];
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function shortenCourseName(name: string): string {
+  let out = name;
+  for (const phrase of SHORTEN_PHRASES) {
+    const re = new RegExp(`\\s${escapeRegExp(phrase)}(?=$|\\s\\()`);
+    const next = out.replace(re, '');
+    if (next !== out) {
+      out = next;
+      break;
+    }
+  }
+  return out.trim();
+}
