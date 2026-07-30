@@ -151,6 +151,45 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     return () => io.disconnect();
   }, []);
 
+  /* Continuous scroll: sentinel below the last card pulls the next page. */
+  useEffect(() => {
+    const el = loadSentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isPaging) loadMore();
+      },
+      { rootMargin: '300px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [loadMore, isPaging, rows.length]);
+
+  /* Depth reached, once per page load. */
+  const depthRef = useRef({ rows: 0, sent: false });
+  useEffect(() => {
+    depthRef.current.rows = rows.length;
+  }, [rows.length]);
+  useEffect(() => {
+    const send = () => {
+      if (depthRef.current.sent) return;
+      depthRef.current.sent = true;
+      analyticsEvents.track('stat_browse_scroll_depth', {
+        lens,
+        country,
+        rows_loaded: depthRef.current.rows,
+        total_count: totalCount,
+      });
+    };
+    window.addEventListener('pagehide', send);
+    return () => {
+      window.removeEventListener('pagehide', send);
+      send();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   /* ── Analytics ─────────────────────────────────────────────────── */
   useEffect(() => {
     if (viewedRef.current) return;
