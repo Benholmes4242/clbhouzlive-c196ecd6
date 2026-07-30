@@ -368,6 +368,21 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     </Select>
   );
 
+  /* Top-of-page door into the full directory — a member whose course is
+     missing should not have to exhaust the list to go looking. */
+  const directorySearchButton = (compact: boolean) => (
+    <button
+      type="button"
+      onClick={() => openDirectory(country, 'filter_bar')}
+      aria-label={t('directorySheet.openA11y')}
+      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 rounded-xl bg-white flex items-center justify-center`}
+      style={{ border: `1px solid ${HAIRLINE_INK_10}` }}
+    >
+      <Search className={compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
+    </button>
+  );
+
+
   return (
     <div className="w-full">
       {/* Sentinel: once this leaves the top, the sticky bar condenses. */}
