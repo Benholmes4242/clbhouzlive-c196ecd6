@@ -78,7 +78,7 @@ export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDele
             );
           })}
           <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8', textAlign: 'center' }}>
-            Drafts keep your words, tags and settings - media re-attaches on restore.
+            {t('drafts.footerNote')}
           </div>
         </>
       )}
