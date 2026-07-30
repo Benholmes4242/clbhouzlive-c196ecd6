@@ -230,7 +230,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       )}
       <CourseTitleOverlay
         course={course}
-        courseMeta={courseMeta}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
         onOpenStats={() => setStatsSheetOpen(true)}
@@ -260,7 +259,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     >
       <CourseTitleOverlay
         course={course}
-        courseMeta={courseMeta}
         courseStats={courseStats ?? null}
         communityRating={communityRating}
         onOpenStats={() => setStatsSheetOpen(true)}
@@ -396,7 +394,6 @@ interface CourseMetaShape {
 }
 interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
-  courseMeta: CourseMetaShape | null | undefined;
   courseStats: CourseStatsDetail | null;
   communityRating: number | null;
   onOpenStats: () => void;
@@ -437,7 +434,6 @@ const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
-  courseMeta,
   courseStats,
   communityRating,
   onOpenStats,
@@ -445,7 +441,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   const { t } = useTranslation('courses');
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
   const showBand = rounds > 0;
-  const showCrSlope = !showBand && (courseMeta?.course_cr != null || courseMeta?.course_slope != null);
   const hasRank = Boolean(course.global_rank || course.regional_rank || course.usa_rank);
 
   const courseId = (course as { id?: string }).id ?? null;
