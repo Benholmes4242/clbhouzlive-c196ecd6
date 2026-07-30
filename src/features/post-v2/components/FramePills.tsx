@@ -1,6 +1,7 @@
 // FramePills - Original / 4:5 / 1:1 / 9:16 chooser overlaid on the stage.
 
 import type { FrameId } from '../hooks/useStageComposer';
+import { CT } from '@/features/_shared/composerTokens';
 
 const ALL: { id: FrameId; label: string }[] = [
   { id: 'original', label: 'Original' },
@@ -24,8 +25,8 @@ export default function FramePills({ value, onChange }: Props) {
             key={p.id}
             onClick={() => onChange(p.id)}
             style={{
-              background: active ? '#F5F6F7' : 'rgba(0,0,0,0.55)',
-              color: active ? '#15171F' : '#F5F6F7',
+              background: active ? CT.onDark : 'rgba(0,0,0,0.55)',
+              color: active ? CT.dark : CT.onDark,
               border: 0,
               fontSize: 12,
               fontWeight: active ? 600 : 400,

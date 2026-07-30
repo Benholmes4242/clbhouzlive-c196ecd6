@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import BottomSheet from './BottomSheet';
 import type { StageMediaItem } from '../hooks/useStageComposer';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -31,9 +32,9 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
           src={item.previewUrl}
           playsInline
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-          style={{ width: '100%', maxHeight: 240, background: '#15171F', borderRadius: 10 }}
+          style={{ width: '100%', maxHeight: 240, background: CT.dark, borderRadius: 10 }}
         />
-        <label style={{ fontSize: 12, color: '#1F2428', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <label style={{ fontSize: 12, color: CT.ink, display: 'flex', flexDirection: 'column', gap: 6 }}>
           Poster time: {ts.toFixed(2)}s
           <input
             type="range"
@@ -46,12 +47,12 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
               setTs(v);
               if (videoRef.current) videoRef.current.currentTime = v;
             }}
-            style={{ width: '100%', accentColor: '#15171F', cursor: 'pointer' }}
+            style={{ width: '100%', accentColor: CT.dark, cursor: 'pointer' }}
           />
         </label>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={onClose} style={{ flex: 1, background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer' }}>Cancel</button>
-          <button onClick={() => { onApply(ts); onClose(); }} style={{ flex: 1, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Apply</button>
+          <button onClick={() => { onApply(ts); onClose(); }} style={{ flex: 1, background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Apply</button>
         </div>
       </div>
     </BottomSheet>

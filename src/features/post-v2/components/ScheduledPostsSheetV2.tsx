@@ -11,6 +11,7 @@ import BottomSheet from './BottomSheet';
 import ScheduleSheetV2 from './ScheduleSheetV2';
 import { CalendarClock, Trash2 } from 'lucide-react';
 import { formatSchedule } from '../lib/formatSchedule';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Row {
   id: string;
@@ -98,11 +99,11 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
         )}
         {!loading && rows.length === 0 && (
           <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 56, height: 56, borderRadius: 18, background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CalendarClock size={22} color="#F8FAFC" />
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: CT.ink, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CalendarClock size={22} color={CT.canvas} />
             </div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>Nothing scheduled yet</div>
-            <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: CT.ink }}>Nothing scheduled yet</div>
+            <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center', maxWidth: 280, lineHeight: 1.45 }}>
               Line up a post for the perfect tee time - we'll publish it on the dot.
             </div>
           </div>
@@ -110,22 +111,22 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
         {rows.map(r => (
           <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, color: '#1F2428', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{(r.content || '(no caption)').slice(0, 60)}</div>
-              <div style={{ fontSize: 12, color: '#8A9099', marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
+              <div style={{ fontSize: 14, color: CT.ink, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{(r.content || '(no caption)').slice(0, 60)}</div>
+              <div style={{ fontSize: 12, color: CT.secondary, marginTop: 2 }}>{r.scheduled_at ? formatSchedule(new Date(r.scheduled_at)) : '-'}</div>
             </div>
             {confirmCancelId === r.id ? (
               <>
-                <span style={{ fontSize: 12, color: '#B00020', fontWeight: 600 }}>Cancel this post?</span>
+                <span style={{ fontSize: 12, color: CT.danger, fontWeight: 600 }}>Cancel this post?</span>
                 <button
                   onClick={() => void performCancel(r.id)}
                   disabled={busyId === r.id}
-                  style={{ background: '#B00020', color: '#fff', border: 0, borderRadius: 999, padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: CT.danger, color: '#fff', border: 0, borderRadius: 999, padding: '4px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
                 >
                   {busyId === r.id ? 'Cancelling' : 'Yes'}
                 </button>
                 <button
                   onClick={() => setConfirmCancelId(null)}
-                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: CT.ink, borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer' }}
                 >
                   No
                 </button>
@@ -135,14 +136,14 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
                 <button
                   onClick={() => setReschedTarget(r)}
                   disabled={busyId === r.id}
-                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: '#1F2428', borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', color: CT.ink, borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
                 >
                   Reschedule
                 </button>
                 <button
                   onClick={() => setConfirmCancelId(r.id)}
                   aria-label="Cancel"
-                  style={{ background: 'transparent', border: 0, color: '#8A9099', cursor: 'pointer', padding: 8 }}
+                  style={{ background: 'transparent', border: 0, color: CT.secondary, cursor: 'pointer', padding: 8 }}
                 >
                   <Trash2 size={16} />
                 </button>

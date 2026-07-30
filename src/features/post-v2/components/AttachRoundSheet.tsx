@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import BottomSheet from './BottomSheet';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 import type { MyRoundAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -73,8 +74,8 @@ function RowButton({ label, selected, onClick }: { label: string; selected: bool
         cursor: 'pointer',
       }}
     >
-      <span style={{ fontSize: 14, fontWeight: selected ? 700 : 500, color: '#0F172A', flex: 1 }}>{label}</span>
-      {selected && <Check size={16} color="#F7931E" />}
+      <span style={{ fontSize: 14, fontWeight: selected ? 700 : 500, color: CT.ink, flex: 1 }}>{label}</span>
+      {selected && <Check size={16} color={CT.amber} />}
     </button>
   );
 }

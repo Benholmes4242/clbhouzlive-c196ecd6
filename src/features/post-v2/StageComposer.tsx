@@ -49,6 +49,7 @@ import CoverFrameSheet from './components/CoverFrameSheet';
 import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   onClose: () => void;
@@ -395,8 +396,8 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Post');
   const primaryStyle: React.CSSProperties = {
-    background: (!isEditMode && state.scheduledAt) ? '#F7931E' : '#15171F',
-    color: (!isEditMode && state.scheduledAt) ? '#15171F' : '#F5F6F7',
+    background: (!isEditMode && state.scheduledAt) ? CT.amber : CT.dark,
+    color: (!isEditMode && state.scheduledAt) ? CT.dark : CT.onDark,
     border: 0,
     borderRadius: 999,
     padding: '8px 16px',
@@ -618,7 +619,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (saveSuccess) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2
           result={{ kind: 'published', postId: editPostId ?? '' }}
           onDone={() => { setSaveSuccess(false); onPosted?.(); onClose(); }}
@@ -629,7 +630,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (success) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
       </div>
     );
@@ -646,13 +647,13 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // post is being fetched for editing.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
     return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
         {/* Header mirror: close X + "Edit post" title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
-          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
             <X size={22} />
           </button>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: CT.ink }}>Edit post</div>
           <div style={{ flex: 1 }} />
         </div>
         {/* Stage block */}
@@ -676,10 +677,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Edit target failed to load or does not exist.
   if (isEditMode && !editable.isLoading && !editable.data) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Couldn't load this post</div>
-        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
-        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Couldn't load this post</div>
+        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
+        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
@@ -687,29 +688,29 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Can't edit this post</div>
-        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Can't edit this post</div>
+        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
           {editable.data.blockedReason === 'review-derived'
             ? 'Review posts are edited from the course page.'
             : "You don't have permission to edit this post."}
         </div>
-        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
-        <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
+        <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
           <X size={22} />
         </button>
         {isEditMode ? (
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: CT.ink }}>Edit post</div>
         ) : drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: '#1F2428', cursor: 'pointer' }}>
+          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: CT.ink, cursor: 'pointer' }}>
             Drafts - {drafts.drafts.length}
           </button>
         )}
@@ -739,7 +740,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
-      <div style={{ flex: 'none', maxHeight: '55dvh', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)', background: '#F8FAFC' }}>
+      <div style={{ flex: 'none', maxHeight: '55dvh', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)', background: CT.canvas }}>
         <MediaTray
           media={state.media}
           activeIndex={state.activeIndex}
@@ -832,14 +833,14 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           {!isEditMode && (
             <>
               {state.media.length > 0 && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: '#8A9099', marginBottom: 8, textAlign: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: CT.secondary, marginBottom: 8, textAlign: 'center' }}>
                   {t('closeGuard.mediaNotSaved', { count: state.media.length })}
                 </div>
               )}
-              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
+              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
+          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.danger }}>Discard</button>
         </div>
       </BottomSheet>
     </div>

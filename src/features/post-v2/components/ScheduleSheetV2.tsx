@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import BottomSheet from './BottomSheet';
 import { formatScheduleDay, formatScheduleTime } from '../lib/formatSchedule';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -117,9 +118,9 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
                   width: 60,
                   padding: '10px 0 10px',
                   borderRadius: 14,
-                  background: selected ? '#0F172A' : '#FFFFFF',
+                  background: selected ? CT.ink : CT.cardBg,
                   border: selected ? 0 : '1px solid rgba(15,23,42,0.08)',
-                  color: selected ? '#F8FAFC' : '#0F172A',
+                  color: selected ? CT.canvas : CT.ink,
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
@@ -128,9 +129,9 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
                   position: 'relative',
                 }}
               >
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 0.6, color: isToday ? '#F7931E' : (selected ? '#F7931E' : '#94A3B8') }}>{isToday ? 'TODAY' : DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 0.6, color: isToday ? CT.amber : (selected ? CT.amber : CT.secondary) }}>{isToday ? 'TODAY' : DAY_LABELS[d.getDay()]}</span>
                 <span style={{ fontSize: 17, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{d.getDate()}</span>
-                <span style={{ fontSize: 10, color: selected ? 'rgba(248,250,252,0.7)' : '#94A3B8' }}>{MONTH_LABELS[d.getMonth()]}</span>
+                <span style={{ fontSize: 10, color: selected ? 'rgba(248,250,252,0.7)' : CT.secondary }}>{MONTH_LABELS[d.getMonth()]}</span>
               </button>
             );
           })}
@@ -139,13 +140,13 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         <SectionLabel>Time</SectionLabel>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
           <Stepper value={hour} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpHour(1)} onDec={() => bumpHour(-1)} />
-          <div style={{ fontSize: 34, fontWeight: 200, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>:</div>
+          <div style={{ fontSize: 34, fontWeight: 200, color: CT.ink, fontVariantNumeric: 'tabular-nums' }}>:</div>
           <Stepper value={minute} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpMinute(15)} onDec={() => bumpMinute(-15)} />
         </div>
 
         {/* Summary */}
-        <div style={{ padding: '12px 14px', borderRadius: 12, background: '#FFFFFF', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 13, color: isPast ? '#B00020' : '#0F172A' }}>
+        <div style={{ padding: '12px 14px', borderRadius: 12, background: CT.cardBg, border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 13, color: isPast ? CT.danger : CT.ink }}>
             {isPast ? 'Pick a future time.' : (
               <>Goes live <span style={{ fontWeight: 700 }}>{formatScheduleDay(finalDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatScheduleTime(finalDate)}</span></>
             )}
@@ -154,15 +155,15 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
 
         <div style={{ display: 'flex', gap: 8 }}>
           {value && (
-            <button onClick={clear} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#0F172A' }}>Clear</button>
+            <button onClick={clear} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Clear</button>
           )}
           <button
             onClick={apply}
             disabled={isPast}
             style={{
               flex: 2,
-              background: isPast ? 'rgba(247,147,30,0.4)' : '#F7931E',
-              color: '#FFFFFF',
+              background: isPast ? 'rgba(247,147,30,0.4)' : CT.amber,
+              color: CT.cardBg,
               border: 0,
               borderRadius: 12,
               padding: '12px',
@@ -179,7 +180,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
       {onOpenScheduled && (
         <button
           onClick={onOpenScheduled}
-          style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: '#0F172A', cursor: 'pointer' }}
+          style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: CT.ink, cursor: 'pointer' }}
         >
           View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount ?? 0}</span>
         </button>
@@ -193,13 +194,13 @@ function Preset({ children, onClick }: { children: React.ReactNode; onClick: () 
     <button
       onClick={onClick}
       style={{
-        background: '#FFFFFF',
+        background: CT.cardBg,
         border: '1px solid rgba(15,23,42,0.1)',
         borderRadius: 999,
         padding: '8px 14px',
         fontSize: 13,
         fontWeight: 600,
-        color: '#0F172A',
+        color: CT.ink,
         cursor: 'pointer',
       }}
     >
@@ -210,16 +211,16 @@ function Preset({ children, onClick }: { children: React.ReactNode; onClick: () 
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>{children}</div>
+    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: CT.secondary }}>{children}</div>
   );
 }
 
 function Stepper({ value, format, onInc, onDec }: { value: number; format: (n: number) => string; onInc: () => void; onDec: () => void }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-      <button onClick={onInc} aria-label="Increase" style={stepBtn}><ChevronUp size={18} color="#94A3B8" /></button>
-      <div style={{ fontSize: 34, fontWeight: 200, color: '#0F172A', fontVariantNumeric: 'tabular-nums', lineHeight: 1.05, minWidth: 56, textAlign: 'center' }}>{format(value)}</div>
-      <button onClick={onDec} aria-label="Decrease" style={stepBtn}><ChevronDown size={18} color="#94A3B8" /></button>
+      <button onClick={onInc} aria-label="Increase" style={stepBtn}><ChevronUp size={18} color={CT.secondary} /></button>
+      <div style={{ fontSize: 34, fontWeight: 200, color: CT.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1.05, minWidth: 56, textAlign: 'center' }}>{format(value)}</div>
+      <button onClick={onDec} aria-label="Decrease" style={stepBtn}><ChevronDown size={18} color={CT.secondary} /></button>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   media: StageMediaItem[];
@@ -30,10 +31,10 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
   };
 
   return (
-    <div style={{ padding: '12px', background: '#F8FAFC', borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
+    <div style={{ padding: '12px', background: CT.canvas, borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
       <button
         onClick={handleAdd}
-        style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, border: '1px dashed rgba(0,0,0,0.2)', background: '#fff', color: '#1F2428', fontSize: 22, cursor: 'pointer' }}
+        style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, border: '1px dashed rgba(0,0,0,0.2)', background: '#fff', color: CT.ink, fontSize: 22, cursor: 'pointer' }}
       >+</button>
       <input ref={inputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleFiles} />
       {media.map((m, i) => {
@@ -49,7 +50,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
               dragFrom.current = null;
             }}
             onClick={() => onSelect(i)}
-            style={{ position: 'relative', flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', boxShadow: active ? '0 0 0 2px #F7931E' : '0 0 0 1px rgba(0,0,0,0.07)', cursor: 'grab', background: '#15171F' }}
+            style={{ position: 'relative', flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', boxShadow: active ? '0 0 0 2px #F7931E' : '0 0 0 1px rgba(0,0,0,0.07)', cursor: 'grab', background: CT.dark }}
           >
             {m.type === 'video' ? (
               <video src={m.previewUrl} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -64,7 +65,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
           </div>
         );
       })}
-      <div style={{ marginLeft: 'auto', color: '#8A9099', fontSize: 12 }}>{media.length}/{MAX_MEDIA}</div>
+      <div style={{ marginLeft: 'auto', color: CT.secondary, fontSize: 12 }}>{media.length}/{MAX_MEDIA}</div>
     </div>
   );
 }

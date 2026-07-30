@@ -10,6 +10,7 @@ import BottomSheet from './BottomSheet';
 import type { StageCourse } from '../hooks/useStageComposer';
 import { usePopularCourses } from '../hooks/usePopularCourses';
 import useKeyboardHeight from '@/hooks/messaging/useKeyboardHeight';
+import { CT } from '@/features/_shared/composerTokens';
 
 
 interface Props {
@@ -156,13 +157,13 @@ export default function CourseTagSheet({
               color: 'rgba(15,23,42,0.55)',
             }}
           >
-            <MapPin size={11} strokeWidth={2.25} color="#F7931E" />
+            <MapPin size={11} strokeWidth={2.25} color={CT.amber} />
             {title ?? 'Tag a course'}
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
+            style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 4 }}
           >
             <X size={18} />
           </button>
@@ -170,13 +171,13 @@ export default function CourseTagSheet({
 
         <div style={{ flex: 'none', padding: '8px 16px 12px' }}>
           <div style={{ position: 'relative' }}>
-            <Search size={16} color="#94A3B8" style={{ position: 'absolute', top: 12, left: 12 }} />
+            <Search size={16} color={CT.secondary} style={{ position: 'absolute', top: 12, left: 12 }} />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search any of 40,000+ courses"
-              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 12, fontSize: 14, background: '#fff', color: '#0F172A' }}
+              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 12, fontSize: 14, background: '#fff', color: CT.ink }}
             />
           </div>
         </div>
@@ -219,12 +220,12 @@ export default function CourseTagSheet({
                       onToggle={toggle}
                     />
                   ))}
-                  <div style={{ padding: '16px', fontSize: 12, color: '#94A3B8' }}>
+                  <div style={{ padding: '16px', fontSize: 12, color: CT.secondary }}>
                     Can't see it? Search any of 40,000+ courses above.
                   </div>
                 </>
               ) : (
-                <div style={{ padding: '32px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                <div style={{ padding: '32px 16px', fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
                   Search any of 40,000+ courses above.
                 </div>
               )}
@@ -247,7 +248,7 @@ export default function CourseTagSheet({
                   <CourseRowSkeleton />
                 </>
               ) : searchPinned.rest.length === 0 && searchPinned.pinned.length === 0 ? (
-                <div style={{ padding: '32px 16px', fontSize: 13, color: '#94A3B8', textAlign: 'center' }}>
+                <div style={{ padding: '32px 16px', fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
                   No courses found for "{q.trim()}"
                 </div>
               ) : (
@@ -274,20 +275,20 @@ export default function CourseTagSheet({
               flexShrink: 0,
               padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
               borderTop: '1px solid rgba(15,23,42,0.08)',
-              background: '#FFFFFF',
+              background: CT.cardBg,
               display: 'flex',
               alignItems: 'center',
               gap: 12,
             }}
           >
-            <div style={{ flex: 1, fontSize: 12, color: '#64748B' }}>
+            <div style={{ flex: 1, fontSize: 12, color: CT.secondary }}>
               {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
             </div>
             <button
               onClick={handleDone}
               style={{
-                background: '#F7931E',
-                color: '#15171F',
+                background: CT.amber,
+                color: CT.dark,
                 border: 0,
                 borderRadius: 999,
                 padding: '8px 18px',
@@ -309,7 +310,7 @@ export default function CourseTagSheet({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#94A3B8' }}>
+    <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 800, letterSpacing: 1, color: CT.secondary }}>
       {children}
     </div>
   );
@@ -350,12 +351,12 @@ function CourseRow({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 12, background: '#F1F5F9', border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MapPin size={16} color="#F7931E" />
+        <div style={{ width: 34, height: 34, borderRadius: 12, background: CT.ghost, border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MapPin size={16} color={CT.amber} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
-          {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? '#F7931E' : '#94A3B8', fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
+          <div style={{ fontSize: 14, color: CT.ink, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.name}</div>
+          {locality && <div style={{ fontSize: 12, color: row.isHomeClub ? CT.amber : CT.secondary, fontWeight: row.isHomeClub ? 700 : 400 }}>{locality}</div>}
         </div>
         {reviewed && !selected && (
           <div
@@ -364,7 +365,7 @@ function CourseRow({
               padding: '3px 8px',
               borderRadius: 999,
               background: 'rgba(247,147,30,0.12)',
-              color: '#B45309',
+              color: CT.amberDeep,
               fontSize: 9.5,
               fontWeight: 800,
               letterSpacing: '0.08em',
@@ -381,13 +382,13 @@ function CourseRow({
             height: 22,
             borderRadius: 999,
             border: selected ? 0 : '1.5px solid rgba(15,23,42,0.18)',
-            background: selected ? '#F7931E' : 'transparent',
+            background: selected ? CT.amber : 'transparent',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {selected && <Check size={14} color="#FFFFFF" strokeWidth={3} />}
+          {selected && <Check size={14} color={CT.cardBg} strokeWidth={3} />}
         </div>
       </div>
     </button>

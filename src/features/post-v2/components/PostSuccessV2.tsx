@@ -13,9 +13,10 @@ import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
+import { CT } from '@/features/_shared/composerTokens';
 
-const AMBER = '#F7931E';
-const GREEN = '#22C55E';
+const AMBER = CT.amber;
+const GREEN = CT.success;
 const NEUTRAL = 'rgba(255,255,255,0.5)';
 
 interface Props {
