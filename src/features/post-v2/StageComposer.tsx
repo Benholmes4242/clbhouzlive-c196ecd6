@@ -558,7 +558,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     } finally {
       setSaving(false);
     }
-  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient]);
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode]);
 
   const onPrimary = () => {
     if (isEditMode) return void doSaveEdit();
