@@ -2,7 +2,7 @@
 // media frame. Warm paper gradient + contour lines + three pinned polaroid
 // frames + rotating subline + amber CTA.
 
-import { Plus, Play } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,14 +14,14 @@ const ROTATE_MS = 2600;
 const FADE_MS = 150;
 
 interface Frame {
-  x: number; y: number; w: number; h: number; r: number; fill: string; play?: boolean;
+  x: number; y: number; w: number; h: number; r: number; fill: string;
 }
 
 // Base geometry authored at 430px container width; scaled proportionally.
 const BASE_W = 430;
 const FRAMES: Frame[] = [
   { x: 44,  y: 92,  w: 116, h: 138, r: -8, fill: '#DCE6D8' },
-  { x: 158, y: 62,  w: 132, h: 156, r: 4,  fill: '#CFE0D2', play: true },
+  { x: 158, y: 62,  w: 132, h: 156, r: 4,  fill: '#CFE0D2' },
   { x: 276, y: 104, w: 112, h: 132, r: 9,  fill: '#E2E8DC' },
 ];
 
@@ -156,22 +156,6 @@ export default function PostEmptyStage({ onRequestAdd }: Props) {
                   justifyContent: 'center',
                 }}
               >
-                {f.play && (
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.9)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingLeft: 3,
-                    }}
-                  >
-                    <Play size={13} color="#1E3A2B" fill="#1E3A2B" />
-                  </div>
-                )}
               </div>
               {/* Pin */}
               <div
