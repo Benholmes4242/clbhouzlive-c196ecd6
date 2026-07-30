@@ -130,6 +130,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
   }, [courseId, list, ratingRank, verdict.rank]);
 
   const ink = higher ? GREEN_INK : RED_INK;
+  const line2Ink = higher ? '#63A883' : '#C87C72';
 
   return (
     <button
@@ -150,11 +151,12 @@ export const Top100VerdictBand: React.FC<Props> = ({
         justifyContent: 'center',
         width: '100%',
         minHeight: VERDICT_BAND_HEIGHT,
-        padding: '7px 12px',
-        borderRadius: 8,
+        padding: '11px 14px',
+        borderRadius: 14,
         textAlign: 'left',
         background: higher ? GREEN_BG : RED_BG,
-        border: `1px solid ${higher ? GREEN_LINE : RED_LINE}`,
+        border: 'none',
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 0.5px ${higher ? GREEN_LINE : RED_LINE}, 0 1px 3px ${higher ? GREEN_SHADOW : RED_SHADOW}`,
         color: ink,
       }}
     >
