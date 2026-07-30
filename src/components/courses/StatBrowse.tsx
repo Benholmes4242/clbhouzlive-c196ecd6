@@ -111,6 +111,29 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     region,
   });
 
+  /* ── Top 100 enrichment (ranked rows only) ─────────────────────── */
+  /**
+   * Only rows carrying a published rank get the verdict band + COURSE STATS
+   * panel, so only those ids are fetched. The set grows a page at a time and
+   * the hook is keyed on the whole set, so each page refetches it — acceptable
+   * at the current ceiling (121 tracked courses, fewer ranked). Do not widen.
+   */
+  const rankedRows = useMemo(
+    () => rows.filter((r) => r.global_rank != null || r.regional_rank != null),
+    [rows],
+  );
+  const rankedIds = useMemo(() => rankedRows.map((r) => r.course_id), [rankedRows]);
+  const enrichment = useTop100Enrichment(rankedIds, user?.id);
+  const verdictConfig = useTop100Config();
+  const [verdictSheet, setVerdictSheet] = useState<{
+    courseId: string;
+    courseName: string;
+    verdict: Verdict;
+    canRate: boolean;
+  } | null>(null);
+
+
+
   /* ── URL state: write ──────────────────────────────────────────── */
   const writeUrl = useCallback(
     (next: { lens?: StatLens; country?: string | null; region?: string | null }) => {
