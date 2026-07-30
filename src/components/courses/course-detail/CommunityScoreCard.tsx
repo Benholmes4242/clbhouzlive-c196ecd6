@@ -55,7 +55,10 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
   const r = (size / 2) - 4;
   const circ = 2 * Math.PI * r;
   const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
-  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
+  // useId is stable across renders; sanitize because useId emits ':' which is
+  // not a valid character in a CSS/SVG url(#id) reference.
+  const gradientId = `scoreGradient-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
   const isExceptional = getRatingTier(score) === 'EXCEPTIONAL';
   return (
     <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
