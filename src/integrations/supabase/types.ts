@@ -8388,6 +8388,7 @@ export type Database = {
           post_categories: string[] | null
           post_type: string | null
           pre_moderation_status: string | null
+          round_notability: number | null
           scheduled_at: string | null
           source_review_id: string | null
           status: string
@@ -8424,6 +8425,7 @@ export type Database = {
           post_categories?: string[] | null
           post_type?: string | null
           pre_moderation_status?: string | null
+          round_notability?: number | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
@@ -8460,6 +8462,7 @@ export type Database = {
           post_categories?: string[] | null
           post_type?: string | null
           pre_moderation_status?: string | null
+          round_notability?: number | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
@@ -13670,6 +13673,7 @@ export type Database = {
         Row: {
           actor_type: string | null
           additional_clubs_visibility: string
+          auto_post_rounds: boolean
           background_image_url: string | null
           bag_visible: boolean | null
           bio: string | null
@@ -13794,6 +13798,7 @@ export type Database = {
         Insert: {
           actor_type?: string | null
           additional_clubs_visibility?: string
+          auto_post_rounds?: boolean
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
@@ -13918,6 +13923,7 @@ export type Database = {
         Update: {
           actor_type?: string | null
           additional_clubs_visibility?: string
+          auto_post_rounds?: boolean
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
@@ -17704,6 +17710,7 @@ export type Database = {
         }
         Returns: Json
       }
+      create_round_posts: { Args: never; Returns: number }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
