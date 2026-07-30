@@ -158,13 +158,77 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
             </button>
           )}
         </div>
+
+        {country && (
+          <div className="flex items-center gap-2" style={{ marginTop: 10 }}>
+            <button
+              type="button"
+              onClick={() => setCountry(null)}
+              aria-label={t('directorySheet.scopeClear')}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+              style={{ background: 'rgba(15,23,42,0.06)', color: INK, fontSize: 12, fontWeight: 700 }}
+            >
+              {country}
+              <X className="h-3 w-3" style={{ color: INK_MUTE }} aria-hidden="true" />
+            </button>
+            <span style={{ fontSize: 12, color: INK_MUTE }}>
+              {t('directorySheet.scopeChip', { country })}
+            </span>
+          </div>
+        )}
       </div>
 
       <div ref={scrollerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 pb-8">
         {!enabled ? (
-          <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
-            {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
-          </p>
+          <div>
+            <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
+              {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
+            </p>
+
+            {recents.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <div className="flex items-baseline justify-between" style={{ marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      color: INK_MUTE,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('directorySheet.recentHeading')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearRecents}
+                    style={{ fontSize: 11, fontWeight: 800, color: INK }}
+                  >
+                    {t('directorySheet.recentClear')}
+                  </button>
+                </div>
+                {recents.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => onRecentTap(r.id)}
+                    className="w-full text-left py-3"
+                    style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}
+                  >
+                    <span className="block truncate" style={{ fontSize: 14, fontWeight: 700, color: INK }}>
+                      {r.name}
+                    </span>
+                    <span
+                      className="block truncate"
+                      style={{ fontSize: 12, color: INK_MUTE, marginTop: 2 }}
+                    >
+                      {r.location}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         ) : isLoading ? (
           <div className="mt-3 space-y-2">
             {[0, 1, 2, 3, 4].map((i) => (
@@ -176,9 +240,25 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
             ))}
           </div>
         ) : rows.length === 0 ? (
-          <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
-            {t('directorySheet.noResults')}
-          </p>
+          <div style={{ marginTop: 20 }}>
+            <p style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.5 }}>
+              {t('directorySheet.noResults')}
+            </p>
+            <button
+              type="button"
+              onClick={onRequestCourse}
+              style={{
+                marginTop: 12,
+                fontSize: 13.5,
+                fontWeight: 800,
+                color: INK,
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+              }}
+            >
+              {t('directorySheet.addCourse', { query: debounced })}
+            </button>
+          </div>
         ) : (
           <div>
             {rows.map((row, i) => (
