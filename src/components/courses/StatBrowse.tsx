@@ -65,6 +65,14 @@ const LENS_EMOJI: Record<StatLens, string> = {
 };
 
 
+/** Short list labels for the verdict explainer sheet. */
+const LIST_LABEL: Record<string, string> = {
+  global: 'Global',
+  'gb-i': 'GB&I',
+  usa: 'USA',
+  europe: 'Europe',
+};
+
 const TRIGGER_CLS =
   'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
 
@@ -137,6 +145,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     courseName: string;
     verdict: Verdict;
     canRate: boolean;
+    listLabel: string;
+    listCount: number;
   } | null>(null);
 
 
@@ -626,6 +636,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                         courseName: row.name,
                         verdict,
                         canRate: !!data && !data.ratedByYou,
+                        listLabel: LIST_LABEL[listSlug] ?? '',
+                        listCount:
+                          (row.global_rank != null ? 1 : 0) +
+                          (row.regional_rank != null ? 1 : 0),
                       });
                     }}
                     onRate={() => navigate(`/courses/${row.course_id}/rate`)}
