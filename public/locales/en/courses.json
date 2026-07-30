@@ -406,8 +406,8 @@
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",
       "lower": "Members rate {{course}} lower than its rank",
-      "ratingRank": "ranked {{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100 list",
-      "ratingRankNoList": "ranked {{position}} of {{poolSize}} rated courses on this list"
+      "ratingRank": "Ranked {{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100 list",
+      "ratingRankNoList": "Ranked {{position}} of {{poolSize}} rated courses on this list"
     },
     "verdictSheet": {
       "title": "How this compares",
