@@ -140,7 +140,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   }, [editPostId]);
 
 
-  // Composer is a light #F8FAFC surface -> dark status-bar icons.
+  // Composer is a light canvas surface -> dark status-bar icons.
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {

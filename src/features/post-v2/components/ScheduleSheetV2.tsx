@@ -140,7 +140,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         <SectionLabel>Time</SectionLabel>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
           <Stepper value={hour} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpHour(1)} onDec={() => bumpHour(-1)} />
-          <div style={{ fontSize: 34, fontWeight: 200, color: CT.ink, fontVariantNumeric: 'tabular-nums' }}>:</div>
+          <div style={{ fontSize: 34, fontWeight: 700, color: CT.ink, fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"zero" 0' }}>:</div>
           <Stepper value={minute} format={(v) => String(v).padStart(2, '0')} onInc={() => bumpMinute(15)} onDec={() => bumpMinute(-15)} />
         </div>
 
@@ -219,7 +219,7 @@ function Stepper({ value, format, onInc, onDec }: { value: number; format: (n: n
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
       <button onClick={onInc} aria-label="Increase" style={stepBtn}><ChevronUp size={18} color={CT.secondary} /></button>
-      <div style={{ fontSize: 34, fontWeight: 200, color: CT.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1.05, minWidth: 56, textAlign: 'center' }}>{format(value)}</div>
+      <div style={{ fontSize: 34, fontWeight: 700, color: CT.ink, fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"zero" 0', lineHeight: 1.05, minWidth: 56, textAlign: 'center' }}>{format(value)}</div>
       <button onClick={onDec} aria-label="Decrease" style={stepBtn}><ChevronDown size={18} color={CT.secondary} /></button>
     </div>
   );

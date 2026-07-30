@@ -32,7 +32,7 @@ export default function CoverFrameSheet({ open, onClose, item, onApply }: Props)
           src={item.previewUrl}
           playsInline
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-          style={{ width: '100%', maxHeight: 240, background: CT.dark, borderRadius: 10 }}
+          style={{ width: '100%', maxHeight: 240, background: CT.dark, borderRadius: 12 }}
         />
         <label style={{ fontSize: 12, color: CT.ink, display: 'flex', flexDirection: 'column', gap: 6 }}>
           Poster time: {ts.toFixed(2)}s

@@ -2,7 +2,7 @@
 // success screens. Modeled after AchievementImmersive.
 //  - fixed inset, zIndex 12500 (clears BottomSheet ~1401, Z.sheet 12003,
 //    Z.toast 12000; below Z.logHud 13000).
-//  - amber radial tint over #0A0B0D base, blurred backdrop.
+//  - amber radial tint over the shell base, blurred backdrop.
 //  - When onTapClose is provided, tapping the overlay dismisses; children
 //    are automatically stop-propagation wrapped so taps on the island do
 //    not close. Omit onTapClose for a destination screen with real actions.
@@ -49,7 +49,7 @@ export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, 
         inset: 0,
         zIndex: 12500,
         background:
-          'radial-gradient(ellipse 120% 90% at 50% 16%, rgba(247,147,30,0.14) 0%, rgba(247,147,30,0.05) 32%, #0A0B0D 62%), #0A0B0D',
+          `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(247,147,30,0.14) 0%, rgba(247,147,30,0.05) 32%, ${CT.shellBg} 62%), ${CT.shellBg}`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         color: 'rgba(255,255,255,0.96)',

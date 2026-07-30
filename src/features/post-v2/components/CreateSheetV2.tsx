@@ -85,7 +85,7 @@ function OptionRow({ glyph, title, subtitle, onClick }: { glyph: React.ReactNode
         padding: '12px',
         background: CT.ghost,
         border: '1px solid rgba(15,23,42,0.08)',
-        borderRadius: 16,
+        borderRadius: CT.cardRadius,
         cursor: 'pointer',
         textAlign: 'left',
       }}
