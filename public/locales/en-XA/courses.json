@@ -269,6 +269,12 @@
       "distributionNote_one": "From 1 member rating so far.",
       "distributionNote_other": "From {{count}} member ratings so far.",
       "rateCta": "Rate this course"
+    },
+    "progress": {
+      "emptyTitle": "You have not played any of these yet.",
+      "emptyBody": "Play one and it lands here, with your rating alongside the published rank.",
+      "signedOutTitle": "Track your Top 100.",
+      "signedOutBody": "Sign in to track which of these you have played."
     }
   },
   "userCourses": {
