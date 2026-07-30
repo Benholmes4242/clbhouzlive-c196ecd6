@@ -37,24 +37,6 @@ function fillBuckets(rows: { created_at: string }[], days: number): DailyBucket[
   }
   return Object.entries(b).map(([date, value]) => ({ date, value }));
 }
-function uniqueDailyUsers(
-  rows: { created_at: string; user_id: string | null }[],
-  days: number,
-): DailyBucket[] {
-  const dayMap: Record<string, Set<string>> = {};
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    dayMap[toDateKey(d)] = new Set();
-  }
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = toDateKey(r.created_at);
-    if (k in dayMap) dayMap[k].add(r.user_id);
-  }
-  return Object.entries(dayMap).map(([date, set]) => ({ date, value: set.size }));
-}
-
 // ─── Platform ─────────────────────────────────────────────────────────────────
 
 export interface PlatformAnalyticsData {
@@ -76,27 +58,30 @@ async function fetchPlatform(period: AnalyticsPeriod): Promise<PlatformAnalytics
   const days = periodToDays(period);
   const since = startOf(period).toISOString();
 
-  const [allUsers, newUsers, activeEvents, wauRes, mauRes, echoRes] = await Promise.all([
+  const [allUsers, newUsers, activityRes, echoRes] = await Promise.all([
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
     supabase.from('user_profiles').select('created_at').gte('created_at', since).is('deleted_at', null),
-    supabase.from('analytics_events').select('created_at, user_id').gte('created_at', since).not('user_id', 'is', null).limit(50000),
-    supabase.from('analytics_events').select('user_id').gte('created_at', new Date(Date.now() - 7 * 86400_000).toISOString()).not('user_id', 'is', null).limit(50000),
-    supabase.from('analytics_events').select('user_id').gte('created_at', new Date(Date.now() - 30 * 86400_000).toISOString()).not('user_id', 'is', null).limit(50000),
+    // Distinct-user counting is an aggregation: it runs in the database, not the browser.
+    supabase.rpc('get_platform_activity', { p_days: days }),
     supabase.from('analytics_events').select('user_id').eq('name', 'echo_query').gte('created_at', since).limit(5000),
   ]);
 
   const signupTrend = fillBuckets(newUsers.data ?? [], days);
-  const dau = uniqueDailyUsers((activeEvents.data ?? []) as any, days);
-  const dauValues = dau.map(d => d.value);
-  const avgDau = dauValues.length ? Math.round(dauValues.reduce((a, b) => a + b, 0) / dauValues.length) : 0;
-  const peakDau = dauValues.length ? Math.max(...dauValues) : 0;
-  const wau = new Set((wauRes.data ?? []).map(r => r.user_id)).size;
-  const mau = new Set((mauRes.data ?? []).map(r => r.user_id)).size;
+
+  const activity = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
+  const dau: DailyBucket[] = Array.isArray(activity?.trend)
+    ? (activity!.trend as unknown as DailyBucket[])
+    : [];
+  const avgDau = activity?.avg_dau ?? 0;
+  const peakDau = activity?.peak_dau ?? 0;
+  const wau = activity?.wau ?? 0;
+  const mau = activity?.mau ?? 0;
   const dauMauRatio = mau > 0 ? Math.round((avgDau / mau) * 1000) / 10 : 0;
 
   const echoRows = echoRes.data ?? [];
   const echoTotal = echoRows.length;
   const echoUniqueUsers = new Set(echoRows.filter(r => r.user_id).map(r => r.user_id!)).size;
+
 
   return {
     period,
