@@ -374,7 +374,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                     style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
                   />
                 )}
-                <span className="min-w-0">
+                <span className="flex-1 min-w-0">
                   <span
                     className="block truncate"
                     style={{ fontSize: 14, fontWeight: 700, color: INK }}
@@ -388,6 +388,9 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                     {locationLine(row)}
                   </span>
                 </span>
+                {row.average_rating !== null && (
+                  <CourseCommunityRating rating={row.average_rating} size="sm" />
+                )}
               </button>
             ))}
 
