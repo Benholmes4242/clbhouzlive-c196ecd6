@@ -78,8 +78,10 @@
     "aceA11y": "Hole in one",
     "clubGuide": {
       "title": "How the course plays",
-      "bodySignedIn": "Built from {{count}} official rounds — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedOut": "Built from {{count}} official rounds — the community's scoring on every hole."
+      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
     "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
