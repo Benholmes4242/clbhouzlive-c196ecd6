@@ -409,6 +409,70 @@
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses"
+    },
+    "wizard": {
+      "rail": {
+        "score": "スコア",
+        "breakdown": "内訳",
+        "words": "コメント"
+      },
+      "backA11y": "戻る",
+      "deleteA11y": "レビューを削除",
+      "a11yStep": "ステップ {{n}} / 3、{{label}}",
+      "continue": "次へ",
+      "save": "レビューを保存",
+      "post": "レビューを投稿",
+      "saving": "保存中...",
+      "posting": "投稿中...",
+      "step0": {
+        "heading": "10点満点でどのくらい？",
+        "captionEmpty": "ドラッグしてスコアを設定",
+        "captionSet": "あなたの総合スコア",
+        "gate": "スコアを設定",
+        "a11y": "総合スコア、1〜10"
+      },
+      "step1": {
+        "heading": "項目別に評価",
+        "body": "4項目すべてが必要です。これがコミュニティの数値に意味を与えます。",
+        "gate_one": "残り {{count}} 項目",
+        "gate_other": "残り {{count}} 項目"
+      },
+      "hint": {
+        "design": "ルーティング、ショットの多様性、記憶に残るか",
+        "condition": "当日のグリーン、フェアウェイ、バンカー",
+        "clubhouse": "接客、食事、雰囲気",
+        "facilities": "練習場、練習エリア、更衣室"
+      },
+      "step2": {
+        "wordsEyebrow": "あなたのコメント",
+        "placeholder": "ここでプレーする前に他のゴルファーが知っておくべきことは？",
+        "optionalNote": "任意です。以下もすべて任意です。",
+        "photosEyebrow": "写真",
+        "teesEyebrow": "プレーしたティー",
+        "shareTitle": "クラブハウスに共有",
+        "shareSub": "レビューがフィードに表示されます"
+      },
+      "receipt": {
+        "eyebrow": "レビューを投稿しました",
+        "didEyebrow": "この投稿の効果",
+        "rowA": "<cnt>{{count}}</cnt> 人のメンバーが {{course}} を <avg>{{avg}}</avg> と評価",
+        "rowADeltaAbove": "平均より {{delta}} 高い評価です",
+        "rowADeltaBelow": "平均より {{delta}} 低い評価です",
+        "rowB": "このコースを最初に評価しました",
+        "rowBSub": "あなたのスコアがコミュニティ平均になります",
+        "rowC": "{{list}} Top 100 で <b>#{{rank}}</b> 位",
+        "rowCRight_one": "{{count}} 件評価",
+        "rowCRight_other": "{{count}} 件評価",
+        "rowD": "あなたの評価で <b>{{ordinal}}</b> 番目に高いコース",
+        "rowDRight_one": "{{count}} 件中",
+        "rowDRight_other": "{{count}} 件中",
+        "nextEyebrow_one": "未評価のプレー済みコース {{count}} 件",
+        "nextEyebrow_other": "未評価のプレー済みコース {{count}} 件",
+        "nextPlayed": "{{date}} にプレー",
+        "nextRate": "評価する",
+        "actionClubhouse": "クラブハウスで見る",
+        "actionBack": "{{course}} に戻る"
+      }
     }
   },
   "courseDetail": {

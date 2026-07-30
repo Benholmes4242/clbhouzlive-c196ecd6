@@ -416,6 +416,70 @@
       "signInRequired": "Sign in required",
       "voteBody": "Please sign in to vote on reviews",
       "rateBody": "Please sign in to rate courses"
+    },
+    "wizard": {
+      "rail": {
+        "score": "Wertung",
+        "breakdown": "Details",
+        "words": "Worte"
+      },
+      "backA11y": "Zurück",
+      "deleteA11y": "Bewertung entfernen",
+      "a11yStep": "Schritt {{n}} von 3, {{label}}",
+      "continue": "Weiter",
+      "save": "Bewertung speichern",
+      "post": "Bewertung posten",
+      "saving": "Wird gespeichert ...",
+      "posting": "Wird gepostet ...",
+      "step0": {
+        "heading": "Wie gut ist er, von zehn?",
+        "captionEmpty": "Ziehen, um deine Wertung zu setzen",
+        "captionSet": "Deine Gesamtwertung",
+        "gate": "Wertung festlegen",
+        "a11y": "Gesamtwertung, 1 bis 10"
+      },
+      "step1": {
+        "heading": "Im Detail",
+        "body": "Alle vier sind nötig. Nur so bekommen die Community-Zahlen Bedeutung.",
+        "gate_one": "Noch {{count}} Kategorie",
+        "gate_other": "Noch {{count}} Kategorien"
+      },
+      "hint": {
+        "design": "Routing, Schlagvielfalt, Einprägsamkeit",
+        "condition": "Grüns, Fairways, Bunker am Spieltag",
+        "clubhouse": "Empfang, Essen, Atmosphäre",
+        "facilities": "Range, Übungsbereiche, Umkleiden"
+      },
+      "step2": {
+        "wordsEyebrow": "Deine Worte",
+        "placeholder": "Was sollte ein anderer Golfer vorher wissen?",
+        "optionalNote": "Optional. Alles Weitere unten auch.",
+        "photosEyebrow": "Fotos",
+        "teesEyebrow": "Gespielte Abschläge",
+        "shareTitle": "Im Clubhouse teilen",
+        "shareSub": "Deine Bewertung erscheint im Feed"
+      },
+      "receipt": {
+        "eyebrow": "Bewertung gepostet",
+        "didEyebrow": "Was das bewirkt hat",
+        "rowA": "<cnt>{{count}}</cnt> Mitglieder bewerten {{course}} mit <avg>{{avg}}</avg>",
+        "rowADeltaAbove": "Du hast {{delta}} über dem Durchschnitt bewertet",
+        "rowADeltaBelow": "Du hast {{delta}} unter dem Durchschnitt bewertet",
+        "rowB": "Du bist der Erste, der diesen Platz bewertet",
+        "rowBSub": "Deine Wertung setzt den Community-Durchschnitt",
+        "rowC": "Platz <b>#{{rank}}</b> der {{list}} Top 100",
+        "rowCRight_one": "{{count}} bewertet",
+        "rowCRight_other": "{{count}} bewertet",
+        "rowD": "Dein <b>{{ordinal}}</b> bestbewerteter Platz",
+        "rowDRight_one": "von {{count}} bewertet",
+        "rowDRight_other": "von {{count}} bewertet",
+        "nextEyebrow_one": "{{count}} gespielter Platz noch unbewertet",
+        "nextEyebrow_other": "{{count}} gespielte Plätze noch unbewertet",
+        "nextPlayed": "Gespielt am {{date}}",
+        "nextRate": "Bewerten",
+        "actionClubhouse": "Im Clubhouse ansehen",
+        "actionBack": "Zurück zu {{course}}"
+      }
     }
   },
   "courseDetail": {
