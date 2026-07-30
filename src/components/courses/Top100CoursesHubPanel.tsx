@@ -300,6 +300,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           data={data}
           verdict={verdict}
           ratingRank={ratingRankMap.get(courseId) ?? null}
+          listLabel={activeListShortLabel}
           onOpenVerdict={() => {
             if (!verdict || !courseName) return;
             const standing = ratingRankMap.get(courseId) ?? null;
@@ -319,7 +320,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         />
       );
     },
-    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, navigate, allCourses],
+    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, activeListShortLabel, navigate, allCourses],
   );
 
 
