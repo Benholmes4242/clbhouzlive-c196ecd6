@@ -27,6 +27,8 @@ interface Props {
    *  - search results still include them, with a small amber REVIEWED badge
    */
   excludeReviewedForUserId?: string | null;
+  /** 'single' commits on tap and closes. Default 'multi' for post tagging. */
+  selectionMode?: 'single' | 'multi';
 }
 
 interface Row extends StageCourse {
@@ -42,7 +44,9 @@ export default function CourseTagSheet({
   userId,
   title = 'Tag a course',
   excludeReviewedForUserId = null,
+  selectionMode = 'multi',
 }: Props) {
+  const isSingle = selectionMode === 'single';
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
   const [searching, setSearching] = useState(false);
@@ -100,6 +104,7 @@ export default function CourseTagSheet({
   const selectedIds = useMemo(() => new Set(draft.map(d => d.id)), [draft]);
 
   const toggle = (c: StageCourse) => {
+    if (isSingle) { onDone([c]); onClose(); return; }
     setDraft((cur) => {
       if (cur.some((r) => r.id === c.id)) return cur.filter((r) => r.id !== c.id);
       return [...cur, c];
@@ -180,7 +185,7 @@ export default function CourseTagSheet({
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           {showPopular ? (
             <>
-              {popularPinned.pinned.length > 0 && (
+              {!isSingle && popularPinned.pinned.length > 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {popularPinned.pinned.map((r) => (
@@ -189,7 +194,7 @@ export default function CourseTagSheet({
                 </>
               )}
               {/* Selected courses NOT in popular list — pin them at the very top */}
-              {draft.filter((d) => !popular.some((p) => p.id === d.id)).length > 0 && popularPinned.pinned.length === 0 && (
+              {!isSingle && draft.filter((d) => !popular.some((p) => p.id === d.id)).length > 0 && popularPinned.pinned.length === 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {draft.filter((d) => !popular.some((p) => p.id === d.id)).map((r) => (
@@ -226,7 +231,7 @@ export default function CourseTagSheet({
             </>
           ) : (
             <>
-              {searchPinned.pinned.length > 0 && (
+              {!isSingle && searchPinned.pinned.length > 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {searchPinned.pinned.map((r) => (
@@ -263,37 +268,39 @@ export default function CourseTagSheet({
         {/* Done bar — amber; disabled at zero selections still calls onDone
             to preserve the "clears the tag" behaviour when the user tapped
             all their picks off, matching today's untag path. */}
-        <div
-          style={{
-            flexShrink: 0,
-            padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
-            borderTop: '1px solid rgba(15,23,42,0.08)',
-            background: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <div style={{ flex: 1, fontSize: 12, color: '#64748B' }}>
-            {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
-          </div>
-          <button
-            onClick={handleDone}
+        {!isSingle && (
+          <div
             style={{
-              background: '#F7931E',
-              color: '#15171F',
-              border: 0,
-              borderRadius: 999,
-              padding: '8px 18px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              opacity: draft.length === 0 && selected.length === 0 ? 0.5 : 1,
+              flexShrink: 0,
+              padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
+              borderTop: '1px solid rgba(15,23,42,0.08)',
+              background: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
             }}
           >
-            Done
-          </button>
-        </div>
+            <div style={{ flex: 1, fontSize: 12, color: '#64748B' }}>
+              {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
+            </div>
+            <button
+              onClick={handleDone}
+              style={{
+                background: '#F7931E',
+                color: '#15171F',
+                border: 0,
+                borderRadius: 999,
+                padding: '8px 18px',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+                opacity: draft.length === 0 && selected.length === 0 ? 0.5 : 1,
+              }}
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
     </BottomSheet>
   );

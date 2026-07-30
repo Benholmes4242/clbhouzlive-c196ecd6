@@ -19731,6 +19731,24 @@ export type Database = {
           target_user_id: string
         }[]
       }
+      get_review_receipt: {
+        Args: { p_rating_id: string }
+        Returns: {
+          avg_before: number
+          community_avg: number
+          next_course_id: string
+          next_course_name: string
+          next_played_at: string
+          rating_count: number
+          subscore_threshold_met: boolean
+          top100_list: string
+          top100_rank: number
+          unrated_count: number
+          your_rank_of_rated: number
+          your_rated_in_list: number
+          your_total_rated: number
+        }[]
+      }
       get_reviewer_stats: {
         Args: { p_user_id: string }
         Returns: {
