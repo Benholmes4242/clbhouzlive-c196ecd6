@@ -99,7 +99,7 @@ const barFigureStyle: React.CSSProperties = {
 
 function bandColor(score: number): string {
   if (score >= 9) return GREEN;
-  if (score >= 7.5) return AMBER;
+  if (score >= 5) return AMBER;
   return RED;
 }
 
