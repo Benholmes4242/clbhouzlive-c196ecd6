@@ -438,7 +438,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </button>
             <button
               type="button"
-              onClick={() => openDirectory(country)}
+              onClick={() => openDirectory(country, 'empty_state')}
               className="w-full mt-2 h-11 rounded-xl text-[14px] font-semibold"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
