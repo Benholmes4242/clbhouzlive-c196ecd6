@@ -268,37 +268,39 @@ export default function CourseTagSheet({
         {/* Done bar — amber; disabled at zero selections still calls onDone
             to preserve the "clears the tag" behaviour when the user tapped
             all their picks off, matching today's untag path. */}
-        <div
-          style={{
-            flexShrink: 0,
-            padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
-            borderTop: '1px solid rgba(15,23,42,0.08)',
-            background: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <div style={{ flex: 1, fontSize: 12, color: '#64748B' }}>
-            {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
-          </div>
-          <button
-            onClick={handleDone}
+        {!isSingle && (
+          <div
             style={{
-              background: '#F7931E',
-              color: '#15171F',
-              border: 0,
-              borderRadius: 999,
-              padding: '8px 18px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              opacity: draft.length === 0 && selected.length === 0 ? 0.5 : 1,
+              flexShrink: 0,
+              padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
+              borderTop: '1px solid rgba(15,23,42,0.08)',
+              background: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
             }}
           >
-            Done
-          </button>
-        </div>
+            <div style={{ flex: 1, fontSize: 12, color: '#64748B' }}>
+              {draft.length === 0 ? 'No courses selected' : `${draft.length} selected`}
+            </div>
+            <button
+              onClick={handleDone}
+              style={{
+                background: '#F7931E',
+                color: '#15171F',
+                border: 0,
+                borderRadius: 999,
+                padding: '8px 18px',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+                opacity: draft.length === 0 && selected.length === 0 ? 0.5 : 1,
+              }}
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
     </BottomSheet>
   );
