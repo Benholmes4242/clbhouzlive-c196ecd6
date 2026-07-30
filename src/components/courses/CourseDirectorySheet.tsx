@@ -41,20 +41,24 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [term, setTerm] = useState('');
+  const [country, setCountry] = useState<string | null>(initialCountry);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const trackedFor = useRef<string | null>(null);
 
-  const { rows, isLoading, isPaging, hasMore, loadMore, enabled, debounced } =
-    useCourseDirectorySearch(term, initialCountry);
+  const { items: recents, save: saveRecent, clear: clearRecents } = useDirectoryRecents();
 
-  /* Reset the field each time the sheet opens. */
+  const { rows, isLoading, isPaging, hasMore, loadMore, enabled, debounced } =
+    useCourseDirectorySearch(term, country);
+
+  /* Reset the field (and the scope) each time the sheet opens. */
   useEffect(() => {
     if (open) {
       setTerm('');
+      setCountry(initialCountry);
       trackedFor.current = null;
     }
-  }, [open]);
+  }, [open, initialCountry]);
 
   /* One search event per settled query — length only, never the text. */
   useEffect(() => {
@@ -86,9 +90,25 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       course_id: row.id,
       position: index + 1,
     });
+    saveRecent({ id: row.id, name: row.name, location: locationLine(row) });
     onClose();
     navigate(`/courses/${row.id}`);
   };
+
+  const onRecentTap = (id: string) => {
+    onClose();
+    navigate(`/courses/${id}`);
+  };
+
+  const onRequestCourse = () => {
+    analyticsEvents.track('course_directory_request_opened', {
+      query_length: debounced.length,
+    });
+    const q = debounced;
+    onClose();
+    setTimeout(() => openRequestCourseSheet(q), 0);
+  };
+
 
   return (
     <BottomSheet
