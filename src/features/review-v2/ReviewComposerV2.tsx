@@ -819,7 +819,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                   lineHeight: '1.55',
                   minHeight: 72,
                   maxHeight: 260,
-                  padding: 0,
+                  padding: '0',
                   color: RV2.ink,
                   caretColor: RV2.ink,
                 }}
