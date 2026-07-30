@@ -5,6 +5,8 @@ import type { VerdictConfig } from '@/components/top100/verdict';
 export interface Top100Config extends VerdictConfig {
   /** Minimum member ratings before the four sub-score bars are shown. */
   subscoreMinRatings: number;
+  /** Minimum courses played on the active list before the progress panel renders. */
+  minPlayed: number;
 }
 
 /**
@@ -22,6 +24,7 @@ const KEYS = [
   't100_verdict_anchor',
   't100_verdict_slope',
   't100_subscore_min_ratings',
+  't100_progress_min_played',
 ] as const;
 
 const FALLBACK: Top100Config = {
@@ -31,7 +34,9 @@ const FALLBACK: Top100Config = {
   anchor: 9.36,
   slope: 0.01,
   subscoreMinRatings: 3,
+  minPlayed: 5,
 };
+
 
 export function useTop100Config(): Top100Config {
   const { data } = useQuery({
