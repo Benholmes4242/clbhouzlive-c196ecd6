@@ -184,8 +184,11 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     writeUrl({ region: next });
   };
 
-  const openDirectory = (withCountry: string | null) => {
-    analyticsEvents.track('stat_browse_directory_opened', { lens, country });
+  const openDirectory = (
+    withCountry: string | null,
+    entry: 'filter_bar' | 'footer' | 'empty_state',
+  ) => {
+    analyticsEvents.track('stat_browse_directory_opened', { lens, country, entry });
     onOpenDirectory(withCountry);
   };
 
