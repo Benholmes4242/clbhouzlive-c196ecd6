@@ -13,6 +13,8 @@ import {
 } from '@/lib/ratingTier';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+
 
 // Representative score per distribution tier — drives bar colour via rampForRating
 const TIER_REP_SCORE: Record<string, number> = {
