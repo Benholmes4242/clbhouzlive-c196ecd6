@@ -24,12 +24,6 @@ const TIER_REP_SCORE: Record<string, number> = {
   poor: 2.0,
 };
 
-// Computed once — reduced-motion users get static gold rings/bars.
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 interface CommunityScoreCardProps {
   courseId: string;
   courseName?: string;
@@ -123,8 +117,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       ? [
           { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
           { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
-          { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
           { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
+          { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
         ].filter((cat) => cat.score !== null && cat.score !== undefined)
       : [];
 
