@@ -27,6 +27,8 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import { CourseTeeCard } from '@/features/courses/components/holes/CourseTeeCard';
+
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseCTA from './ClaimCourseCTA';
