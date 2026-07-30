@@ -225,6 +225,13 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less"
+    },
+    "shapeNarrative": {
+      "beast": "The {{hole}} is the beast: {{value}} for the field.",
+      "withYou": "{{clause}} — and your line stays under everyone's on {{beat}} of {{total}}. {{beast}}",
+      "clauseFinish": "It builds to the finish",
+      "clauseEarly": "It bites early",
+      "clauseMiddle": "The middle sets the test"
     }
   },
   "scorecard": {
@@ -806,6 +813,12 @@
       "legends": "Champions",
       "course": "Course",
       "you": "You"
+    },
+    "blocks": {
+      "theCard": "THE CARD",
+      "howItPlays": "HOW IT PLAYS",
+      "whoPlaysHere": "WHO PLAYS HERE",
+      "aboutThisPlace": "ABOUT THIS PLACE"
     }
   },
   "network": {
