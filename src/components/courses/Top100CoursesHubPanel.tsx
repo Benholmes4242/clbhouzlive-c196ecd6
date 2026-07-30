@@ -198,7 +198,15 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const [progressSheet, setProgressSheet] = useState<Top100ListProgress | null>(null);
   const [moversSheetOpen, setMoversSheetOpen] = useState(false);
   const [verdictSheet, setVerdictSheet] = useState<
-    { courseId: string; courseName: string; verdict: Verdict; canRate: boolean } | null
+    {
+      courseId: string;
+      courseName: string;
+      verdict: Verdict;
+      canRate: boolean;
+      listCount: number;
+      ratingRank: number | null;
+      ratingPoolSize: number | null;
+    } | null
   >(null);
 
   // Rank within the list currently on screen, keyed for O(1) lookup.
@@ -293,18 +301,24 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           ratingRank={ratingRankMap.get(courseId) ?? null}
           onOpenVerdict={() => {
             if (!verdict || !courseName) return;
+            const standing = ratingRankMap.get(courseId) ?? null;
+            const course = allCourses.find((c) => c.id === courseId);
+            const memberships = (course?.list_memberships ?? []) as CourseListMembership[];
             setVerdictSheet({
               courseId,
               courseName,
               verdict,
               canRate: !!data && !data.ratedByYou,
+              listCount: memberships.length,
+              ratingRank: standing?.position ?? null,
+              ratingPoolSize: standing?.poolSize ?? null,
             });
           }}
           onRate={() => navigate(`/courses/${courseId}/rate`)}
         />
       );
     },
-    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, navigate],
+    [enrichment, verdictFor, courseNameById, rankMap, ratingRankMap, selectedList, navigate, allCourses],
   );
 
 
@@ -572,6 +586,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           rank={verdictSheet.verdict.rank}
           rating={verdictSheet.verdict.rating}
           ratingCount={verdictSheet.verdict.ratingCount}
+          listCount={verdictSheet.listCount}
+          ratingRank={verdictSheet.ratingRank}
+          ratingPoolSize={verdictSheet.ratingPoolSize}
           canRate={verdictSheet.canRate}
           onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
         />

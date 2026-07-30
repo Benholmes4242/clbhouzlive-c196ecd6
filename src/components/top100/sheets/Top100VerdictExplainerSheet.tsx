@@ -15,6 +15,8 @@ import { useQuery } from '@tanstack/react-query';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { expectedRating } from '@/components/top100/verdict';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -23,6 +25,22 @@ import {
 } from '@/features/courses/_shared/tokens';
 
 const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
+
+/** 1st / 2nd / 3rd / 4th ... */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
 
 /** Score bands used for the distribution bars. */
 const BANDS: { label: string; min: number; max: number }[] = [
@@ -42,6 +60,11 @@ interface Props {
   rank: number;
   rating: number;
   ratingCount: number;
+  /** Number of Top 100 lists this course sits on. */
+  listCount: number;
+  /** Standing in the member-rating pool of this list, from the panel memo. */
+  ratingRank: number | null;
+  ratingPoolSize: number | null;
   /** Viewer has a tracked round here but has not rated it. */
   canRate: boolean;
   onRate: () => void;
@@ -56,10 +79,15 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
   rank,
   rating,
   ratingCount,
+  listCount,
+  ratingRank,
+  ratingPoolSize,
   canRate,
   onRate,
 }) => {
   const { t } = useTranslation('courses');
+  const config = useTop100Config();
+  const expected = expectedRating(rank, config);
 
   const { data: distribution = [] } = useQuery({
     queryKey: ['top100-verdict-distribution', courseId],
@@ -166,6 +194,36 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
             </div>
           </div>
 
+          {ratingRank != null && ratingPoolSize != null && (
+            <div style={{ marginTop: 12 }}>
+              <div
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(15,23,42,0.42)',
+                }}
+              >
+                {t('top100.verdictSheet.ratingRankLabel')}
+              </div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: INK,
+                  marginTop: 3,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {t('top100.verdictSheet.ratingRank', {
+                  position: ordinal(ratingRank),
+                  poolSize: ratingPoolSize,
+                })}
+              </div>
+            </div>
+          )}
+
           <p
             style={{
               fontSize: 13.5,
@@ -179,9 +237,24 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
             {t('top100.verdictSheet.explanation', {
               rank,
               rating: rating.toFixed(1),
-              count: ratingCount,
+              ratingCount,
+              expected: expected.toFixed(1),
             })}
           </p>
+
+          {listCount > 1 && (
+            <div
+              style={{
+                fontSize: 11.5,
+                fontWeight: 500,
+                color: INK_MUTE,
+                lineHeight: 1.4,
+                marginTop: 8,
+              }}
+            >
+              {t('top100.verdictSheet.listNote', { listLabel })}
+            </div>
+          )}
 
           {distribution.some((n) => n > 0) && (
             <div style={{ marginTop: 18 }}>
@@ -248,6 +321,16 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                   </span>
                 </div>
               ))}
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 500,
+                  color: INK_MUTE,
+                  marginTop: 8,
+                }}
+              >
+                {t('top100.verdictSheet.distributionNote', { count: ratingCount })}
+              </div>
             </div>
           )}
 
