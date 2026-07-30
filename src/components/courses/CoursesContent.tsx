@@ -408,23 +408,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 <>
                   {shellTabsNode}
                   <div className="px-4 pt-0">
-                    {showDirectory ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => setShowDirectory(false)}
-                          className="flex items-center gap-1.5 mb-3 text-[13px] font-semibold"
-                          style={{ color: '#0F172A' }}
-                        >
-                          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                          {t('statBrowse.directory.back')}
-                        </button>
-                        <CourseExplorer />
-                      </>
-                    ) : (
-                      <StatBrowse onOpenDirectory={() => setShowDirectory(true)} />
-                    )}
+                    <StatBrowse
+                      onOpenDirectory={(c) => {
+                        setDirectoryCountry(c);
+                        setDirectoryOpen(true);
+                      }}
+                    />
                   </div>
+
                 </>
               )}
 
