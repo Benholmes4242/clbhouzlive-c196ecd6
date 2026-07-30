@@ -184,12 +184,20 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
 
-  const categories = [
-    { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
-    { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
-    { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
-    { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
-  ].filter((cat) => cat.score !== null && cat.score !== undefined);
+  // Sub-scores are gated behind the SAME threshold the Top 100 panel uses
+  // (t100_subscore_min_ratings, default 3). One number, both surfaces move
+  // together. Below it: headline, tier, distribution and count only.
+  const categories =
+    totalRatings >= subscoreMinRatings
+      ? [
+          { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
+          { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
+          { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+          { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
+        ].filter((cat) => cat.score !== null && cat.score !== undefined)
+      : [];
+
+
 
 
   // Distribution counts (fallback to zeros)
