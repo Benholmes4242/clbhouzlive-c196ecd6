@@ -91,7 +91,9 @@ export const CourseHolesTab: React.FC<Props> = ({
   }
 
   if (isError) {
+    if (suppressStatus) return null;
     return (
+
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: INK_MUTE, marginBottom: 16 }}>
           {t('courses:holes.errorLoading')}
