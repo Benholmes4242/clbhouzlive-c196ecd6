@@ -26,7 +26,8 @@ import {
   INK_TINT_04,
 } from '@/features/courses/_shared/tokens';
 
-const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
+/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+const MONO = 'inherit';
 
 type Segment = 'all' | 'played' | 'not_played' | 'rated';
 
@@ -106,6 +107,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
             style={{
               fontFamily: MONO,
               fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"zero" 0, "tnum" 1',
               fontSize: 11.5,
               fontWeight: 700,
               color: INK_MUTE,
@@ -185,6 +187,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
                     style={{
                       fontFamily: MONO,
                       fontVariantNumeric: 'tabular-nums',
+                      fontFeatureSettings: '"zero" 0, "tnum" 1',
                       fontSize: 12,
                       fontWeight: 800,
                       color: 'rgba(15,23,42,0.35)',

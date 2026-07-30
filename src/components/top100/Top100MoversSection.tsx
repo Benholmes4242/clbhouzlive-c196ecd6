@@ -11,7 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { AMBER, HAIRLINE_INK_8, INK, INK_MUTE, INK_TINT_04, SURFACE } from '@/features/courses/_shared/tokens';
 import type { Top100Mover } from '@/hooks/top100/useTop100Movers';
 
-const MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
+/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+const MONO = 'inherit';
 const GREEN = '#047857';
 const RED = '#B91C1C';
 
@@ -91,6 +92,7 @@ export const MoverRow: React.FC<{
         style={{
           fontFamily: MONO,
           fontVariantNumeric: 'tabular-nums',
+          fontFeatureSettings: '"zero" 0, "tnum" 1',
           fontSize: 13,
           fontWeight: 800,
           letterSpacing: '-0.02em',
