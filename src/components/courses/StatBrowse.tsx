@@ -674,6 +674,24 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </button>
         </div>
       )}
+
+      {verdictSheet && (
+        <Top100VerdictExplainerSheet
+          open
+          onClose={() => setVerdictSheet(null)}
+          courseId={verdictSheet.courseId}
+          courseName={verdictSheet.courseName}
+          listLabel={verdictSheet.listLabel}
+          rank={verdictSheet.verdict.rank}
+          rating={verdictSheet.verdict.rating}
+          ratingCount={verdictSheet.verdict.ratingCount}
+          listCount={verdictSheet.listCount}
+          ratingRank={null}
+          ratingPoolSize={null}
+          canRate={verdictSheet.canRate}
+          onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
+        />
+      )}
     </div>
   );
 };
