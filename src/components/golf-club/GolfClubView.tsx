@@ -626,7 +626,6 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
           background: 'rgba(248,250,252,0.72)',
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
         }}
       >
         <CourseDetailShellTabs
