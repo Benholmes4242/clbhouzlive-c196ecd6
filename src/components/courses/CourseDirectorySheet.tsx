@@ -108,10 +108,29 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
     navigate(`/courses/${id}`);
   };
 
+  const onRatedTap = (c: DirectoryRatedCourse, index: number) => {
+    analyticsEvents.track('course_directory_recent_rated_tapped', {
+      course_id: c.course_id,
+      position: index + 1,
+    });
+    analyticsEvents.track('course_directory_result_tapped', {
+      course_id: c.course_id,
+      position: index + 1,
+    });
+    saveRecent({
+      id: c.course_id,
+      name: c.course_name,
+      location: [c.sub_country, c.country].filter(Boolean).join(', '),
+    });
+    onClose();
+    navigate(`/courses/${c.course_id}`);
+  };
+
   const onRequestCourse = () => {
     analyticsEvents.track('course_directory_request_opened', {
       query_length: debounced.length,
     });
+
     const q = debounced;
     onClose();
     setTimeout(() => openRequestCourseSheet(q), 0);
