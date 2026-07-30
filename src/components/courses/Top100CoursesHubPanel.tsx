@@ -278,7 +278,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
       if (data.ratingCount < verdictConfig.minRatings) continue;
       pool.push({ id: course.id, rating: data.rating, count: data.ratingCount });
     }
-    pool.sort((a, b) => b.rating - a.rating || b.count - a.count);
+    /* Final id tiebreak mirrors get_course_rating_standing so the Courses tab
+       and this tab can never disagree on a position. */
+    pool.sort((a, b) => b.rating - a.rating || b.count - a.count || a.id.localeCompare(b.id));
     const map = new Map<string, { position: number; poolSize: number }>();
     pool.forEach((entry, index) => {
       map.set(entry.id, { position: index + 1, poolSize: pool.length });

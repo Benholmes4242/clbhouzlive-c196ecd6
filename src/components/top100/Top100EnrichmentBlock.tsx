@@ -54,6 +54,7 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
             verdict={verdict}
             ratingRank={ratingRank}
             list={list}
+            listLabel={listLabel}
             onOpen={onOpenVerdict}
           />
         </div>

@@ -171,7 +171,12 @@ export const Top100VerdictBand: React.FC<Props> = ({
         {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
           course: shortenCourseName(courseName),
         })}
+        {/* Geometric glyph, not emoji: takes the band ink and scales with the
+            font. Plain space, never a margin, so it cannot wrap alone. */}
+        {' '}
+        <span aria-hidden="true">{higher ? '\u25B2' : '\u25BC'}</span>
       </span>
+
       {ratingRank && (
         <span
           style={{
