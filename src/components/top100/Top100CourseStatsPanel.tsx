@@ -28,6 +28,10 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
 const RED = '#DC2626';
 const GREEN = '#047857';
+/** Difficulty band inks. Relative difficulty only - see BRIEF_TOP100_DIFFICULTY_BANDS. */
+const BAND_RED = '#C8372B';
+const BAND_GREEN = '#0F8F4A';
+const BAND_INK = '#0E1216';
 const LABEL_INK = 'rgba(15,23,42,0.42)';
 const MUTED_INK = 'rgba(15,23,42,0.55)';
 /** Deliberately colourless: this is an invitation, not a data value. */
@@ -45,6 +49,7 @@ const NUMERALS: React.CSSProperties = {
 /** Fires once per course per session, not per mount. */
 const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
+const seenDifficulty = new Set<string>();
 
 const headingStyle: React.CSSProperties = {
   fontSize: 8.5,
@@ -125,8 +130,9 @@ const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label, score 
 
 export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data, onRate }) => {
   const { t } = useTranslation('courses');
-  const { subscoreMinRatings } = useTop100Config();
+  const { subscoreMinRatings, bandLow, bandHigh } = useTop100Config();
   const barsRef = useRef<HTMLDivElement | null>(null);
+  const difficultyRef = useRef<HTMLDivElement | null>(null);
   const noRoundsRef = useRef<HTMLDivElement | null>(null);
 
   const rating = data?.rating ?? null;
@@ -190,6 +196,31 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
     return () => io.disconnect();
   }, [courseId, showNoRounds, rank, list]);
 
+  // One-shot per course per session: which difficulty band did we render?
+  useEffect(() => {
+    const el = difficultyRef.current;
+    if (!el || seenDifficulty.has(courseId)) return;
+    const pct = harderPct == null ? null : Math.round(harderPct);
+    if (pct == null) return;
+    const band = pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || seenDifficulty.has(courseId)) return;
+        seenDifficulty.add(courseId);
+        io.disconnect();
+        analyticsEvents.track('t100_difficulty_band_shown', {
+          course_id: courseId,
+          band,
+          pct,
+          avg_over_par: avgOverPar,
+        });
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [courseId, harderPct, avgOverPar, bandLow, bandHigh, showNoRounds]);
+
   // Nothing to say about a course no member has rated.
   if (!hasRating) return null;
 
@@ -203,50 +234,58 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   });
 
   /**
-   * The difficulty reading, in three directions.
-   *  above par  -> "Plays X above par on average" / "Harder than N% of courses"
-   *  below par  -> "Plays X below par on average" / "Easier than (100-N)% of courses"
-   *  level par  -> "Plays level par on average"   / "Middle of the pack for difficulty"
-   * The percentile INVERTS below par: a course playing under par is not
-   * "harder than 4%", it is easier than 96%.
+   * The difficulty reading.
+   *
+   * The WORDING of line 1 comes from avg_over_par (above / level / below par).
+   * The COLOUR of both numerals and the whole of line 2 come from the BAND,
+   * which is derived from harder_than_pct only. One source, so the figure and
+   * the sentence beneath it can never disagree.
+   *
+   * A NULL percentile means no band and therefore NO difficulty lines at all -
+   * it must never fall through into the easy band.
    */
   const renderDifficulty = (): React.ReactNode => {
-    if (avgOverPar == null) return null;
+    if (avgOverPar == null || harderPct == null) return null;
 
-    if (avgOverPar === 0) {
-      return (
-        <>
-          <div style={difficultyLineStyle}>{t('top100.stats.playsLevel')}</div>
-          <div style={difficultyLineStyle}>{t('top100.stats.middleOfPack')}</div>
-        </>
-      );
-    }
+    const pct = Math.round(harderPct);
+    const band: 'hard' | 'middle' | 'easy' =
+      pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
+    const color = band === 'hard' ? BAND_RED : band === 'easy' ? BAND_GREEN : BAND_INK;
 
-    const above = avgOverPar > 0;
-    const color = above ? RED : GREEN;
-    const abs = Math.abs(avgOverPar).toFixed(1);
+    const wordingKey =
+      avgOverPar > 0
+        ? 'top100.stats.playsAbove'
+        : avgOverPar < 0
+          ? 'top100.stats.playsBelow'
+          : null;
 
     return (
-      <>
+      <div ref={difficultyRef}>
         <div style={difficultyLineStyle}>
-          <Trans
-            i18nKey={above ? 'top100.stats.playsAbove' : 'top100.stats.playsBelow'}
-            ns="courses"
-            values={{ value: abs }}
-            components={{ 1: <span style={figureStyleFor(color)} /> }}
-          />
-        </div>
-        {harderPct != null && (
-          <div style={difficultyLineStyle}>
+          {wordingKey ? (
             <Trans
-              i18nKey={above ? 'top100.stats.harderThan' : 'top100.stats.easierThan'}
+              i18nKey={wordingKey}
               ns="courses"
-              values={{ pct: above ? Math.round(harderPct) : 100 - Math.round(harderPct) }}
+              values={{ value: Math.abs(avgOverPar).toFixed(1) }}
               components={{ 1: <span style={figureStyleFor(color)} /> }}
             />
-          </div>
-        )}
-      </>
+          ) : (
+            t('top100.stats.playsLevel')
+          )}
+        </div>
+        <div style={difficultyLineStyle}>
+          {band === 'middle' ? (
+            t('top100.stats.middleOfPack')
+          ) : (
+            <Trans
+              i18nKey={band === 'hard' ? 'top100.stats.harderThan' : 'top100.stats.easierThan'}
+              ns="courses"
+              values={{ pct: band === 'hard' ? pct : 100 - pct }}
+              components={{ 1: <span style={figureStyleFor(color)} /> }}
+            />
+          )}
+        </div>
+      </div>
     );
   };
 
