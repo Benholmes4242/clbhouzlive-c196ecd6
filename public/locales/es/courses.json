@@ -683,6 +683,11 @@
     "openA11y": "Search the full course directory",
     "prompt": "Type at least {{count}} characters to search the full directory.",
     "noResults": "No courses matched that. Check the spelling and try again.",
-    "loadingMore": "Loading more courses..."
+    "loadingMore": "Loading more courses...",
+    "scopeChip": "Searching {{country}} only",
+    "scopeClear": "Search everywhere",
+    "recentHeading": "Recent",
+    "recentClear": "Clear",
+    "addCourse": "Add \"{{query}}\""
   }
 }
