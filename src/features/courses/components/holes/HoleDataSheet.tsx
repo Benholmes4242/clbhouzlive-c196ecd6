@@ -482,11 +482,19 @@ const SkylineCard: React.FC<{
     if (seg.length > 0) segments.push(seg);
   }
 
-  const clause = characterClause(hardest.hole_no);
-  const beastFrag = `The ${ord(hardest.hole_no)} is the beast: ${fmtToPar(hardest.avg_to_par)} for the field.`;
+  const beastFrag = t('courses:holes.shapeNarrative.beast', {
+    hole: ord(hardest.hole_no),
+    value: fmtToPar(hardest.avg_to_par),
+  });
   const caption = viewerHasPlayed
-    ? `${clause} — and your gold line stays under everyone\u2019s on ${beatFieldCount} of ${sorted.length}. ${beastFrag}`
+    ? t('courses:holes.shapeNarrative.withYou', {
+        clause: t(characterClauseKey(hardest.hole_no)),
+        beat: beatFieldCount,
+        total: sorted.length,
+        beast: beastFrag,
+      })
     : beastFrag;
+
 
   return (
     <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
