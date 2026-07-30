@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMyRoundsAtCourse, pickPreselectedRound, daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
 import AttachRoundSheet, { formatRoundLabel } from './components/AttachRoundSheet';
+import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
@@ -50,6 +51,14 @@ import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 import { CT } from '@/features/_shared/composerTokens';
+
+const EYEBROW: React.CSSProperties = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: CT.amber,
+  textTransform: 'uppercase',
+  letterSpacing: '0.14em',
+};
 
 interface Props {
   onClose: () => void;
@@ -359,9 +368,26 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     if (match) setAttachedRound(match);
   }, [state.attachedRound, roundsAtCourse, setAttachedRound]);
 
+  // When nothing is attached yet, surface the candidate the sheet would
+  // pre-select so the row is not blank work. Tapping still opens the sheet.
+  const preselectCandidate = useMemo(
+    () => (state.attachedRound ? null : pickPreselectedRound(roundsAtCourse)),
+    [state.attachedRound, roundsAtCourse],
+  );
+  const candidateLabel = useMemo(() => {
+    if (!preselectCandidate?.playDate) return null;
+    const days = daysSinceRound(preselectCandidate.playDate);
+    const day = days === 0
+      ? 'Today'
+      : days === 1
+        ? 'Yesterday'
+        : formatWeekdayDayMonthShortGB(new Date(`${preselectCandidate.playDate.slice(0, 10)}T00:00:00`));
+    return preselectCandidate.grossScore != null ? `${day}, ${preselectCandidate.grossScore}` : day;
+  }, [preselectCandidate]);
+
   const attachRoundLabel = state.attachedRound
     ? (state.attachedRound.playDate ? formatRoundLabel(state.attachedRound) : t('attachRound.attached'))
-    : null;
+    : candidateLabel;
 
   const openRoundSheet = useCallback(() => {
     openDetail('round');
@@ -651,12 +677,13 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     return (
       <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
         {/* Header mirror: close X + "Edit post" title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
-          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 8 }}>
-            <X size={22} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+            {'\u2039'}
           </button>
-          <div style={{ fontSize: 14, fontWeight: 600, color: CT.ink }}>Edit post</div>
-          <div style={{ flex: 1 }} />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Edit post</div>
+          </div>
         </div>
         {/* Stage block */}
         <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
