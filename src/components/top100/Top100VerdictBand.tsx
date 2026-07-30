@@ -20,7 +20,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import type { Verdict } from './verdict';
+import { shortenCourseName, type Verdict } from './verdict';
 
 const GREEN_BG = 'rgba(16,185,129,0.10)';
 const GREEN_LINE = 'rgba(16,185,129,0.28)';
@@ -64,6 +64,8 @@ interface Props {
   /** Standing within the rated pool of the selected list, when known. */
   ratingRank?: VerdictRatingRank | null;
   list?: string;
+  /** Short label of the active list (Global, GB&I, USA, Europe). */
+  listLabel?: string;
   onOpen: () => void;
 }
 
@@ -73,6 +75,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
   verdict,
   ratingRank,
   list,
+  listLabel,
   onOpen,
 }) => {
   const { t } = useTranslation('courses');
@@ -161,7 +164,9 @@ export const Top100VerdictBand: React.FC<Props> = ({
           lineHeight: 1.3,
         }}
       >
-        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', { course: courseName })}
+        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
+          course: shortenCourseName(courseName),
+        })}
       </span>
       {ratingRank && (
         <span
@@ -173,10 +178,16 @@ export const Top100VerdictBand: React.FC<Props> = ({
             opacity: 0.78,
           }}
         >
-          {t('top100.verdict.ratingRank', {
-            position: ordinal(ratingRank.position),
-            poolSize: ratingRank.poolSize,
-          })}
+          {listLabel && listLabel.trim()
+            ? t('top100.verdict.ratingRank', {
+                position: ordinal(ratingRank.position),
+                poolSize: ratingRank.poolSize,
+                listLabel: listLabel.trim(),
+              })
+            : t('top100.verdict.ratingRankNoList', {
+                position: ordinal(ratingRank.position),
+                poolSize: ratingRank.poolSize,
+              })}
         </span>
       )}
     </button>

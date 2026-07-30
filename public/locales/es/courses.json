@@ -263,9 +263,10 @@
       "noRoundsCta": "Be the first."
     },
     "verdict": {
-      "higher": "Members rate {{course}} higher than its rank suggests",
-      "lower": "Members rate {{course}} lower than its rank suggests",
-      "ratingRank": "{{position}} of {{poolSize}} rated courses on this list"
+      "higher": "Members rate {{course}} higher than its rank",
+      "lower": "Members rate {{course}} lower than its rank",
+      "ratingRank": "{{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100",
+      "ratingRankNoList": "{{position}} of {{poolSize}} rated courses on this list"
     },
     "verdictSheet": {
       "title": "How this compares",

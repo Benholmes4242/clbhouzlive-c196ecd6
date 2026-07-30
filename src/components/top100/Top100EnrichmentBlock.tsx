@@ -23,6 +23,8 @@ interface Props {
   data: Top100Enrichment | undefined;
   verdict: Verdict | null;
   ratingRank?: VerdictRatingRank | null;
+  /** Short label of the active list (Global, GB&I, USA, Europe). */
+  listLabel?: string;
   onOpenVerdict: () => void;
   onRate: () => void;
 }
@@ -35,6 +37,7 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
   data,
   verdict,
   ratingRank,
+  listLabel,
   onOpenVerdict,
   onRate,
 }) => {
