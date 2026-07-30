@@ -553,7 +553,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             </div>
 
             {front9.map((h, idx) => (
-              <Row key={h.hole_no} h={h} zebra={idx % 2 === 1} />
+              <Row key={h.hole_no} h={h} />
             ))}
 
             <SubtotalRow
@@ -563,7 +563,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
             />
 
             {back9.map((h, idx) => (
-              <Row key={h.hole_no} h={h} zebra={idx % 2 === 1} />
+              <Row key={h.hole_no} h={h} />
             ))}
 
             <SubtotalRow
