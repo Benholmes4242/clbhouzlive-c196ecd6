@@ -1,6 +1,6 @@
 /**
  * StatBrowse — stat-led browse over the courses this community actually
- * plays. Sits in the Courses explore tab ahead of the full directory.
+ * plays. Sits in the Courses explore tab ahead of the directory sheet.
  *
  * Presentation only: rows arrive already ordered from the RPC and are
  * rendered in the order received.
@@ -45,7 +45,7 @@ import {
 } from '@/features/courses/_shared/tokens';
 
 interface StatBrowseProps {
-  /** Reveal CourseExplorer (the full directory) — owned by the parent. */
+  /** Open the course directory sheet — owned by the parent. */
   onOpenDirectory: (country: string | null) => void;
 }
 

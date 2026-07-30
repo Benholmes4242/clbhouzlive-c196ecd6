@@ -1,6 +1,6 @@
 /**
  * TimeRangeFilter - Time-based leaderboard filter dropdown
- * Matches CourseExplorer region/sub-region dropdown style
+ * Matches the courses region/sub-region dropdown style
  */
 
 import React from 'react';
