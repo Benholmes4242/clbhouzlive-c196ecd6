@@ -541,25 +541,12 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         </button>
       )}
 
-      {showCrSlope && (
-        <p
-          className="drop-shadow-lg mb-2"
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: 'rgba(255,255,255,0.7)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {[
-            courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
-            courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-      )}
+      {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
+          one tee while CourseTeeCard resolves the member's own tee, so the two
+          figures legitimately differ. The tee card, 300px below, owns and
+          labels tee data. Fallback chain is now: rounds -> stat band, no
+          rounds -> name and location only. */}
+
 
       {(hasRank || communityRating != null) && (
         <div
