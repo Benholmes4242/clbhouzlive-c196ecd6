@@ -502,7 +502,8 @@ const SkylineCard: React.FC<{
 
 
   return (
-    <section style={{ ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
+    <section style={embedded ? { scrollMarginTop: STICKY_SAFE } : { ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
         <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
