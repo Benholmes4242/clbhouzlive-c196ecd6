@@ -75,6 +75,7 @@ const COMPACT_TRIGGER_CLS =
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadSentinelRef = useRef<HTMLDivElement | null>(null);
