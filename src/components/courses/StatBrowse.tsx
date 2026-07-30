@@ -73,6 +73,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const loadSentinelRef = useRef<HTMLDivElement | null>(null);
   const [condensed, setCondensed] = useState(false);
   const viewedRef = useRef(false);
 
