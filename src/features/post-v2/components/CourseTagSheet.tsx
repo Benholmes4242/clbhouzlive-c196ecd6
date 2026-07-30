@@ -231,7 +231,7 @@ export default function CourseTagSheet({
             </>
           ) : (
             <>
-              {searchPinned.pinned.length > 0 && (
+              {!isSingle && searchPinned.pinned.length > 0 && (
                 <>
                   <SectionLabel>SELECTED</SectionLabel>
                   {searchPinned.pinned.map((r) => (
