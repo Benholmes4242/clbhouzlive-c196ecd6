@@ -18531,6 +18531,15 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      get_course_rating_standing: {
+        Args: { p_course_id: string; p_list_slug: string }
+        Returns: {
+          list_label: string
+          list_slug: string
+          pool_size: number
+          standing: number
+        }[]
+      }
       get_course_regions: {
         Args: never
         Returns: {
