@@ -393,13 +393,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               {region ? regionSelect(true) : countrySelect(true)}
             </div>
             <div className="min-w-0 flex-1">{lensSelect(true)}</div>
+            {directorySearchButton(true)}
           </div>
         ) : (
           <>
             <div className="flex items-center gap-2">
               <div className="flex-1 min-w-0">{countrySelect(false)}</div>
               <div className="flex-1 min-w-0">{regionSelect(false)}</div>
+              {directorySearchButton(false)}
             </div>
+
 
             {/* Count + lens */}
             <div className="flex items-center justify-between gap-3 mt-2.5">
