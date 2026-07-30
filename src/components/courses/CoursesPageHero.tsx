@@ -5,7 +5,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
 import { useExploreMood, type ExploreMoodId } from '@/components/explore-tab-new/hooks/useExploreMood';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { formatRatingValue } from '@/utils/formatters';
+import { formatNumber, formatRatingValue } from '@/utils/formatters';
+import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import {
   buildOverviewHeroBackground,
   COURSE_GRADIENT,
@@ -280,7 +281,7 @@ function CoursesPageHeroInner() {
               </div>
             )}
 
-            {contextLine && (
+            {factLine && (
               <div
                 style={{
                   marginTop: blurb ? 10 : 12,
@@ -309,7 +310,7 @@ function CoursesPageHeroInner() {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {contextLine.text}
+                  {factLine}
                 </span>
               </div>
             )}
