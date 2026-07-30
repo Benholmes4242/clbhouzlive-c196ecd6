@@ -131,9 +131,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   onSeeAllReviews,
 }) => {
   const { t } = useTranslation('courses');
+  const { subscoreMinRatings } = useTop100Config();
   const totalRatings = ratingAggregates?.review_count || 0;
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
+
 
 
   // Empty state — invitation card with 0–10 numeric language
