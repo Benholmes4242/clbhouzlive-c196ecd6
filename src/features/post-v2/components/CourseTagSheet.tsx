@@ -27,6 +27,8 @@ interface Props {
    *  - search results still include them, with a small amber REVIEWED badge
    */
   excludeReviewedForUserId?: string | null;
+  /** 'single' commits on tap and closes. Default 'multi' for post tagging. */
+  selectionMode?: 'single' | 'multi';
 }
 
 interface Row extends StageCourse {
@@ -42,7 +44,9 @@ export default function CourseTagSheet({
   userId,
   title = 'Tag a course',
   excludeReviewedForUserId = null,
+  selectionMode = 'multi',
 }: Props) {
+  const isSingle = selectionMode === 'single';
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
   const [searching, setSearching] = useState(false);
