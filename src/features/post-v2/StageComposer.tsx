@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMyRoundsAtCourse, pickPreselectedRound, daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
 import AttachRoundSheet, { formatRoundLabel } from './components/AttachRoundSheet';
+import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
@@ -49,6 +50,15 @@ import CoverFrameSheet from './components/CoverFrameSheet';
 import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
+import { CT } from '@/features/_shared/composerTokens';
+
+const EYEBROW: React.CSSProperties = {
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: CT.amber,
+  textTransform: 'uppercase',
+  letterSpacing: '0.14em',
+};
 
 interface Props {
   onClose: () => void;
@@ -139,7 +149,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   }, [editPostId]);
 
 
-  // Composer is a light #F8FAFC surface -> dark status-bar icons.
+  // Composer is a light canvas surface -> dark status-bar icons.
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
@@ -358,9 +368,26 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     if (match) setAttachedRound(match);
   }, [state.attachedRound, roundsAtCourse, setAttachedRound]);
 
+  // When nothing is attached yet, surface the candidate the sheet would
+  // pre-select so the row is not blank work. Tapping still opens the sheet.
+  const preselectCandidate = useMemo(
+    () => (state.attachedRound ? null : pickPreselectedRound(roundsAtCourse)),
+    [state.attachedRound, roundsAtCourse],
+  );
+  const candidateLabel = useMemo(() => {
+    if (!preselectCandidate?.playDate) return null;
+    const days = daysSinceRound(preselectCandidate.playDate);
+    const day = days === 0
+      ? 'Today'
+      : days === 1
+        ? 'Yesterday'
+        : formatWeekdayDayMonthShortGB(new Date(`${preselectCandidate.playDate.slice(0, 10)}T00:00:00`));
+    return preselectCandidate.grossScore != null ? `${day}, ${preselectCandidate.grossScore}` : day;
+  }, [preselectCandidate]);
+
   const attachRoundLabel = state.attachedRound
     ? (state.attachedRound.playDate ? formatRoundLabel(state.attachedRound) : t('attachRound.attached'))
-    : null;
+    : candidateLabel;
 
   const openRoundSheet = useCallback(() => {
     openDetail('round');
@@ -395,16 +422,18 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Post');
   const primaryStyle: React.CSSProperties = {
-    background: (!isEditMode && state.scheduledAt) ? '#F7931E' : '#15171F',
-    color: (!isEditMode && state.scheduledAt) ? '#15171F' : '#F5F6F7',
-    border: 0,
-    borderRadius: 999,
-    padding: '8px 16px',
-    fontSize: 14,
-    fontWeight: 600,
+    width: '100%',
+    padding: 16,
+    borderRadius: CT.panelRadius,
+    border: 'none',
+    fontSize: 14.5,
+    fontWeight: 700,
+    background: canSubmit ? CT.amber : 'rgba(15,23,42,0.10)',
+    color: canSubmit ? '#fff' : CT.secondary,
+    boxShadow: canSubmit ? '0 6px 16px rgba(247,147,30,0.28)' : undefined,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
-    opacity: (canSubmit || submitting || saving) ? 1 : 0.4,
   };
+
 
   const authorName = useMemo(() => activeActor?.name ?? profile?.display_name ?? 'You', [activeActor, profile]);
   const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
@@ -618,7 +647,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (saveSuccess) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2
           result={{ kind: 'published', postId: editPostId ?? '' }}
           onDone={() => { setSaveSuccess(false); onPosted?.(); onClose(); }}
@@ -629,7 +658,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (success) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
       </div>
     );
@@ -646,14 +675,15 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // post is being fetched for editing.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
     return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
         {/* Header mirror: close X + "Edit post" title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
-          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
-            <X size={22} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+            {'\u2039'}
           </button>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
-          <div style={{ flex: 1 }} />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Edit post</div>
+          </div>
         </div>
         {/* Stage block */}
         <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
@@ -676,10 +706,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Edit target failed to load or does not exist.
   if (isEditMode && !editable.isLoading && !editable.data) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Couldn't load this post</div>
-        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
-        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Couldn't load this post</div>
+        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
+        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
@@ -687,38 +717,40 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#1F2428' }}>Can't edit this post</div>
-        <div style={{ fontSize: 13, color: '#5A6270', textAlign: 'center' }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Can't edit this post</div>
+        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
           {editable.data.blockedReason === 'review-derived'
             ? 'Review posts are edited from the course page.'
             : "You don't have permission to edit this post."}
         </div>
-        <button onClick={onClose} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: '#F8FAFC', borderBottom: '1px solid rgba(0,0,0,0.07)', flex: 'none' }}>
-        <button onClick={handleClose} aria-label="Close" style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 8 }}>
-          <X size={22} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
+        <button onClick={handleClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+          {'\u2039'}
         </button>
-        {isEditMode ? (
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F2428' }}>Edit post</div>
-        ) : drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={{ background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 999, padding: '4px 10px', fontSize: 12, color: '#1F2428', cursor: 'pointer' }}>
-            Drafts - {drafts.drafts.length}
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {isEditMode ? 'Edit post' : 'New post'}
+          </div>
+          {activeActor?.name && (
+            <div style={{ fontSize: 11.5, color: CT.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {`Posting as ${activeActor.name}`}
+            </div>
+          )}
+        </div>
+        {!isEditMode && drafts.drafts.length > 0 && (
+          <button onClick={() => setSheet('drafts')} style={{ background: 'none', border: 0, fontSize: 12.5, fontWeight: 700, color: CT.secondary, cursor: 'pointer' }}>
+            Drafts
           </button>
         )}
-        <div style={{ flex: 1 }} />
-        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
-          {(submitting || saving)
-            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block' }} />
-            : primaryLabel}
-        </button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -739,32 +771,56 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       </div>
 
       {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
-      <div style={{ flex: 'none', maxHeight: '55dvh', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom), 12px)', background: '#F8FAFC' }}>
-        <MediaTray
-          media={state.media}
-          activeIndex={state.activeIndex}
-          onSelect={setActiveIndex}
-          onRemove={handleRemoveAt}
-          onReorder={reorder}
-          onAddFiles={handleAddFiles}
-        />
-        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
-        <DetailRows
-          course={state.course}
-          courses={state.courses}
-          onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
-          actor={activeActor}
-          onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
-          scheduledAt={state.scheduledAt}
-          onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
-          actorLocked={isEditMode}
-          showSchedule={showScheduleRow}
-          showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
-          attachRoundLabel={attachRoundLabel}
-          onOpenAttachRound={openRoundSheet}
-        />
+      <div style={{ flex: 'none', maxHeight: '48dvh', overflowY: 'auto', padding: '0 16px', background: CT.canvas }}>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>PHOTOS</div>
+          <MediaTray
+            media={state.media}
+            activeIndex={state.activeIndex}
+            onSelect={setActiveIndex}
+            onRemove={handleRemoveAt}
+            onReorder={reorder}
+            onAddFiles={handleAddFiles}
+          />
+        </div>
 
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>IN YOUR WORDS</div>
+          <div style={{ background: CT.cardBg, borderRadius: CT.panelRadius, border: `1px solid ${CT.hairline}`, padding: 14, minHeight: 96 }}>
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ ...EYEBROW, marginBottom: 9 }}>DETAILS</div>
+          <div style={{ background: CT.cardBg, borderRadius: CT.cardRadius, border: `1px solid ${CT.hairline}`, padding: '2px 16px' }}>
+            <DetailRows
+              course={state.course}
+              courses={state.courses}
+              onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
+              actor={activeActor}
+              onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
+              scheduledAt={state.scheduledAt}
+              onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
+              actorLocked={isEditMode}
+              showSchedule={showScheduleRow}
+              showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
+              attachRoundLabel={attachRoundLabel}
+              onOpenAttachRound={openRoundSheet}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Action bar — sibling of the scrolling stack, so it never scrolls away */}
+      <div style={{ flex: 'none', background: CT.canvas, borderTop: `1px solid ${CT.hairline}`, padding: '12px 16px max(env(safe-area-inset-bottom), 18px)' }}>
+        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
+          {(submitting || saving)
+            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
+            : primaryLabel}
+        </button>
+      </div>
+
 
       {/* Sheets */}
       <CourseTagSheet
@@ -832,14 +888,14 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           {!isEditMode && (
             <>
               {state.media.length > 0 && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: '#8A9099', marginBottom: 8, textAlign: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: CT.secondary, marginBottom: 8, textAlign: 'center' }}>
                   {t('closeGuard.mediaNotSaved', { count: state.media.length })}
                 </div>
               )}
-              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
+              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#B00020' }}>Discard</button>
+          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: `1px solid ${CT.hairlineStrong}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.danger }}>Discard</button>
         </div>
       </BottomSheet>
     </div>

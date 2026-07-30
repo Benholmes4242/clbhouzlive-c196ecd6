@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
 import PostEmptyStage from './PostEmptyStage';
+import { CT } from '@/features/_shared/composerTokens';
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
   original: null,
@@ -64,7 +65,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenC
       })()
     : { width: '100%', height: '100%' };
   return (
-    <div ref={stageRef} style={{ flex: 1, background: '#15171F', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div ref={stageRef} style={{ flex: 1, background: CT.dark, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div style={{ ...boxStyle, transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)' }}>
         {item.type === 'video' ? (
           <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -73,7 +74,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenC
         )}
       </div>
       {total > 1 && (
-        <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(0,0,0,0.55)', color: '#F5F6F7', fontSize: 12, padding: '4px 8px', borderRadius: 999 }}>
+        <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(0,0,0,0.55)', color: CT.onDark, fontSize: 12, padding: '4px 8px', borderRadius: 999 }}>
           {index + 1} / {total}
         </div>
       )}
@@ -91,7 +92,7 @@ export default function MediaStageV2({ item, index, total, onOpenAdjust, onOpenC
 
 const chipStyle: React.CSSProperties = {
   background: 'rgba(0,0,0,0.55)',
-  color: '#F5F6F7',
+  color: CT.onDark,
   border: 0,
   fontSize: 12,
   padding: '6px 10px',

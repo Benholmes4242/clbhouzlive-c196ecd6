@@ -39,5 +39,8 @@
   "closeGuard": {
     "mediaNotSaved_one": "{{count}} photo will not be saved",
     "mediaNotSaved_other": "{{count}} photos will not be saved"
+  },
+  "detailRows": {
+    "optional": "Optional"
   }
 }

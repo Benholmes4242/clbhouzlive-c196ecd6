@@ -1,10 +1,11 @@
-// DetailRows - three tap-through rows: course, actor, schedule.
+// DetailRows - tap-through rows: course, round, actor, schedule.
 
 import { ChevronRight, MapPin, User2, Clock, Flag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { StageCourse } from '../hooks/useStageComposer';
 import type { ActiveActor } from '@/types/actor';
 import { formatSchedule } from '../lib/formatSchedule';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   course: StageCourse | null;
@@ -32,21 +33,40 @@ export default function DetailRows({ course, courses, onOpenCourse, actor, onOpe
     : list.length === 1
       ? list[0].name
       : `${list[0].name} +${list.length - 1}`;
+
+  // The row set is variable, so the divider owner is computed from what is
+  // actually rendered rather than assumed.
+  const rows: Array<{ key: string; icon: React.ReactNode; label: string; value: string | null; optional: boolean; onClick: () => void; disabled?: boolean }> = [];
+  rows.push({ key: 'course', icon: <MapPin size={16} />, label: 'Tag a course', value: courseLabel, optional: true, onClick: onOpenCourse });
+  if (showAttachRound && onOpenAttachRound) {
+    rows.push({ key: 'round', icon: <Flag size={16} />, label: t('attachRound.row'), value: attachRoundLabel ?? null, optional: true, onClick: onOpenAttachRound });
+  }
+  rows.push({ key: 'actor', icon: <User2 size={16} />, label: 'Posting as', value: actor?.name ?? null, optional: false, onClick: onOpenActor, disabled: actorLocked });
+  if (showSchedule) {
+    rows.push({ key: 'schedule', icon: <Clock size={16} />, label: 'Schedule for later', value: scheduledAt ? formatSchedule(scheduledAt) : null, optional: true, onClick: onOpenSchedule });
+  }
+
   return (
-    <div style={{ background: '#F8FAFC' }}>
-      <Row icon={<MapPin size={16} color="#F7931E" />} label="Tag a course" value={courseLabel} onClick={onOpenCourse} />
-      {showAttachRound && onOpenAttachRound && (
-        <Row icon={<Flag size={16} color="#F7931E" />} label={t('attachRound.row')} value={attachRoundLabel ?? null} onClick={onOpenAttachRound} />
-      )}
-      <Row icon={<User2 size={16} color="#F7931E" />} label="Posting as" value={actor?.name ?? null} onClick={onOpenActor} disabled={actorLocked} />
-      {showSchedule && (
-        <Row icon={<Clock size={16} color="#F7931E" />} label="Schedule for later" value={scheduledAt ? formatSchedule(scheduledAt) : null} onClick={onOpenSchedule} />
-      )}
+    <div>
+      {rows.map((r, i) => (
+        <Row
+          key={r.key}
+          icon={r.icon}
+          label={r.label}
+          value={r.value}
+          optional={r.optional}
+          onClick={r.onClick}
+          disabled={r.disabled}
+          last={i === rows.length - 1}
+        />
+      ))}
     </div>
   );
 }
 
-function Row({ icon, label, value, onClick, disabled }: { icon: React.ReactNode; label: string; value: string | null; onClick: () => void; disabled?: boolean }) {
+function Row({ icon, label, value, optional, onClick, disabled, last }: { icon: React.ReactNode; label: string; value: string | null; optional: boolean; onClick: () => void; disabled?: boolean; last: boolean }) {
+  const { t } = useTranslation('composer');
+  const display = value ?? (optional ? t('detailRows.optional') : '');
   return (
     <button
       onClick={disabled ? undefined : onClick}
@@ -58,19 +78,19 @@ function Row({ icon, label, value, onClick, disabled }: { icon: React.ReactNode;
         width: '100%',
         background: 'transparent',
         border: 0,
-        padding: '12px 16px',
-        borderTop: '1px solid rgba(0,0,0,0.07)',
+        padding: '13px 0',
+        borderBottom: last ? undefined : `1px solid ${CT.hairline}`,
         cursor: disabled ? 'default' : 'pointer',
         textAlign: 'left',
         opacity: disabled ? 0.75 : 1,
       }}
     >
-      <span style={{ color: '#8A9099' }}>{icon}</span>
-      <span style={{ color: '#1F2428', fontSize: 14, flex: '0 0 auto' }}>{label}</span>
-      <span style={{ color: value ? '#1F2428' : '#AEB4BC', fontWeight: value ? 600 : 400, fontSize: 13, marginLeft: 'auto', maxWidth: '55%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-        {value ?? 'Not set'}
+      <span style={{ display: 'flex', color: value ? CT.amber : CT.muted }}>{icon}</span>
+      <span style={{ color: CT.ink, fontSize: 13.5, fontWeight: 600, flex: '0 0 auto' }}>{label}</span>
+      <span style={{ color: value ? CT.secondary : CT.muted, fontSize: 12, marginLeft: 'auto', maxWidth: 140, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+        {display}
       </span>
-      {!disabled && <ChevronRight size={16} color="#AEB4BC" />}
+      {!disabled && <ChevronRight size={15} color={CT.muted} />}
     </button>
   );
 }

@@ -1,0 +1,27 @@
+/**
+ * Shared composer tokens. Used by review-v2 and post-v2.
+ * Warm light canvas + editorial ink. Do not add a second grey scale.
+ */
+
+export const CT = {
+  canvas: '#F8FAFC',
+  ink: '#1F2428',
+  secondary: '#8A9099',
+  muted: '#AEB4BC',
+  hairline: 'rgba(0,0,0,0.07)',
+  hairlineStrong: 'rgba(0,0,0,0.12)',
+  dark: '#15171F',
+  onDark: '#F5F6F7',
+  amber: '#F7931E',
+  amberDeep: '#C2620A',
+  amberSoft: 'rgba(247,147,30,0.10)',
+  ghost: '#EEF1F4',
+  ghostRadius: 6,
+  cardBg: '#FFFFFF',
+  cardRadius: 18,
+  panelRadius: 14,
+  pillRadius: 999,
+  danger: '#B00020',
+  success: '#0F8F4A',
+  shellBg: '#0A0B0D',
+} as const;

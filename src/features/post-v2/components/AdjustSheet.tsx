@@ -16,6 +16,7 @@ import {
   clampScale,
   frameRatio,
 } from '../lib/frameCropMath';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -166,7 +167,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
     <BottomSheet open={open} title="Adjust" onClose={onClose}>
       <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Frame stage */}
-        <div style={{ background: '#0F172A', borderRadius: 14, height: STAGE_H, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ background: CT.ink, borderRadius: 14, height: STAGE_H, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           <div
             ref={stageRef}
             onPointerDown={onPointerDown}
@@ -219,7 +220,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
 
         {/* Zoom slider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, color: '#94A3B8', width: 40 }}>ZOOM</span>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, color: CT.secondary, width: 40 }}>ZOOM</span>
           <input
             type="range"
             min={MIN_SCALE}
@@ -229,22 +230,22 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
             onChange={(e) => setScale(clampScale(parseFloat(e.target.value)))}
             onPointerDown={() => setInteracting(true)}
             onPointerUp={() => setInteracting(false)}
-            style={{ flex: 1, accentColor: '#15171F', cursor: 'pointer' }}
+            style={{ flex: 1, accentColor: CT.dark, cursor: 'pointer' }}
           />
-          <span style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums', color: '#0F172A', width: 40, textAlign: 'right' }}>{scale.toFixed(2)}x</span>
+          <span style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums', color: CT.ink, width: 40, textAlign: 'right' }}>{scale.toFixed(2)}x</span>
         </div>
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={reset}
-            style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: '#0F172A', fontWeight: 600 }}
+            style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink, fontWeight: 600 }}
           >
             Reset
           </button>
           <button
             onClick={done}
-            style={{ flex: 2, background: '#15171F', color: '#F5F6F7', border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 2, background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
           >
             Done
           </button>

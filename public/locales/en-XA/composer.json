@@ -33,5 +33,8 @@
   "closeGuard": {
     "mediaNotSaved_one": "[~~{{count}} ƥĥőţő ŵíļļ ñőţ ƀé šáṽéđ~~]",
     "mediaNotSaved_other": "[~~{{count}} ƥĥőţőš ŵíļļ ñőţ ƀé šáṽéđ~~]"
+  },
+  "detailRows": {
+    "optional": "Optional"
   }
 }

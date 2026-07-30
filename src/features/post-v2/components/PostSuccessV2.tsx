@@ -13,9 +13,10 @@ import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
+import { CT } from '@/features/_shared/composerTokens';
 
-const AMBER = '#F7931E';
-const GREEN = '#22C55E';
+const AMBER = CT.amber;
+const GREEN = CT.success;
 const NEUTRAL = 'rgba(255,255,255,0.5)';
 
 interface Props {
@@ -214,7 +215,7 @@ function GlyphTile({ accent, noGlow, children }: { accent: string; noGlow?: bool
       width: 104, height: 104,
       background: 'rgba(255,255,255,0.04)',
       border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 30,
+      borderRadius: CT.cardRadius,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       filter: noGlow ? undefined : `drop-shadow(0 0 24px ${accent}55) drop-shadow(0 0 8px ${accent}66)`,
     }}>
@@ -235,7 +236,7 @@ function RingTile({ progress, accent, showCheck }: { progress: number; accent: s
       width: size, height: size,
       background: 'rgba(255,255,255,0.04)',
       border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 30,
+      borderRadius: CT.cardRadius,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative',
       filter: `drop-shadow(0 0 24px ${accent}55) drop-shadow(0 0 8px ${accent}66)`,

@@ -11,6 +11,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useProfileData } from '@/hooks/useProfileData';
 import BottomSheet from './BottomSheet';
 import CourseTagSheet from './CourseTagSheet';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -38,13 +39,13 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
       <BottomSheet open={open && !courseOpen} title="Create" onClose={onClose}>
         <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <OptionRow
-            glyph={<ImageIcon size={22} color="#F7931E" />}
+            glyph={<ImageIcon size={22} color={CT.amber} />}
             title="Post"
             subtitle="Share photos, clips or words to your feed"
             onClick={handlePost}
           />
           <OptionRow
-            glyph={<Star size={22} color="#F7931E" />}
+            glyph={<Star size={22} color={CT.amber} />}
             title="Course review"
             subtitle="Rate and review a course you've played"
             onClick={handleReview}
@@ -82,9 +83,9 @@ function OptionRow({ glyph, title, subtitle, onClick }: { glyph: React.ReactNode
         alignItems: 'center',
         gap: 12,
         padding: '12px',
-        background: '#F1F5F9',
+        background: CT.ghost,
         border: '1px solid rgba(15,23,42,0.08)',
-        borderRadius: 16,
+        borderRadius: CT.cardRadius,
         cursor: 'pointer',
         textAlign: 'left',
       }}
@@ -94,7 +95,7 @@ function OptionRow({ glyph, title, subtitle, onClick }: { glyph: React.ReactNode
           width: 44,
           height: 44,
           borderRadius: 14,
-          background: '#FFFFFF',
+          background: CT.cardBg,
           border: '1px solid rgba(15,23,42,0.06)',
           display: 'flex',
           alignItems: 'center',
@@ -105,8 +106,8 @@ function OptionRow({ glyph, title, subtitle, onClick }: { glyph: React.ReactNode
         {glyph}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', letterSpacing: -0.1 }}>{title}</div>
-        <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>{subtitle}</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: CT.ink, letterSpacing: -0.1 }}>{title}</div>
+        <div style={{ fontSize: 12, color: CT.secondary, marginTop: 2 }}>{subtitle}</div>
       </div>
     </button>
   );

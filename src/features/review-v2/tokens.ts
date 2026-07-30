@@ -1,24 +1,12 @@
 /**
  * Review Composer v2 design tokens.
- * Messaging-v2 aligned: warm light canvas + editorial ink.
+ * Values live in the shared composer token file so review-v2 and post-v2
+ * cannot drift apart.
  */
 
-export const RV2 = {
-  canvas: '#F8FAFC',
-  ink: '#1F2428',
-  secondary: '#8A9099',
-  muted: '#AEB4BC',
-  hairline: 'rgba(0,0,0,0.07)',
-  hairlineStrong: 'rgba(0,0,0,0.12)',
-  dark: '#15171F',
-  amber: '#F7931E',
-  amberSoft: 'rgba(247,147,30,0.10)',
-  ghost: '#EEF1F4',
-  ghostRadius: 6,
-  cardBg: '#FFFFFF',
-  cardRadius: 18,
-  panelRadius: 14,
-} as const;
+import { CT } from '@/features/_shared/composerTokens';
+
+export const RV2 = CT;
 
 export const VERDICTS = [
   { slug: 'must_play', label: 'Must play' },

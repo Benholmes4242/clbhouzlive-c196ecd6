@@ -4,6 +4,7 @@
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
+import { CT } from '@/features/_shared/composerTokens';
 
 interface Props {
   open: boolean;
@@ -40,7 +41,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
           width: '100%',
           maxHeight: fixedHeight ?? (fullHeight ? '92vh' : '85dvh'),
           height: fixedHeight ?? (fullHeight ? '92vh' : 'auto'),
-          background: '#F8FAFC',
+          background: CT.canvas,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           display: 'flex',
@@ -55,11 +56,11 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         </div>
         {title && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px' }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: -0.2 }}>{title}</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: CT.ink, letterSpacing: -0.2 }}>{title}</div>
             <button
               onClick={onClose}
               aria-label={t('action.close')}
-              style={{ background: 'transparent', border: 0, color: '#1F2428', cursor: 'pointer', padding: 4 }}
+              style={{ background: 'transparent', border: 0, color: CT.ink, cursor: 'pointer', padding: 4 }}
             >
               <X size={20} />
             </button>
