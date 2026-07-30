@@ -209,9 +209,12 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       <div ref={scrollerRef} className="flex-1 overflow-y-auto overscroll-contain px-4 pb-8">
         {!enabled ? (
           <div>
-            <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
-              {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
-            </p>
+            {recents.length === 0 && ratedRows.length === 0 && (
+              <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
+                {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
+              </p>
+            )}
+
 
             {recents.length > 0 && (
               <div style={{ marginTop: 18 }}>
