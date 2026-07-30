@@ -8,16 +8,9 @@ import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
-import { getRatingTier } from '@/lib/ratingTier';
 import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
-
-// Computed once — reduced-motion users get static gold rings/bars.
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ReviewText component with line clamping
 const ReviewText: React.FC<{ text: string }> = ({ text }) => {
