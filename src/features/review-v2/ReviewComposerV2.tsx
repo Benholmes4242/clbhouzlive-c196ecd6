@@ -1,17 +1,16 @@
 /**
- * ReviewComposerV2 — the sheet/page shell.
+ * ReviewComposerV2 - the three-step review wizard shell.
  *
- * Live-assembling feed-card preview at the top; verdict / overall /
- * categories / mentions-aware textarea / media tray / share toggle stack
- * below; pinned submit bar. All writes flow through the v2 RPCs — the
- * client never touches course_ratings, posts, notifications,
- * user_courses, or user_top10_exclusions directly.
+ * Step 0 Score, step 1 Breakdown, step 2 Words, then the confirmation
+ * receipt. All writes flow through the v2 RPCs - the client never touches
+ * course_ratings, posts, notifications, user_courses, or
+ * user_top10_exclusions directly.
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
@@ -20,50 +19,42 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import AccessControl from '@/components/AccessControl';
+import { useTranslation } from 'react-i18next';
 
 import { RV2 } from './tokens';
-import { useReviewComposer } from './hooks/useReviewComposer';
+import { useReviewComposer, type WizardStep } from './hooks/useReviewComposer';
 import { useReviewSubmit } from './hooks/useReviewSubmit';
 import { useReviewMediaPipeline } from './hooks/useReviewMediaPipeline';
-import { LivePreviewCard } from './components/LivePreviewCard';
 import { VoiceDictateButton } from './components/VoiceDictateButton';
 import { OverallScrubber } from './components/OverallScrubber';
-import { CategoryGrid } from './components/CategoryGrid';
+import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
-import { SuccessScreenV2 } from './components/SuccessScreenV2';
+import { ReviewReceipt } from './components/ReviewReceipt';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
-import type { ExistingMedia, ExistingReview, ReviewV2Course } from './types';
+import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import { useCourseTeeSets, type TeeSet } from '@/features/courses/hooks/useCourseTeeSets';
-import { useTranslation } from 'react-i18next';
 
-
-
-function Section({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <section style={{ padding: '0 16px 12px' }}>
-      <div
-        style={{
-          fontSize: 10.5,
-          fontWeight: 700,
-          color: RV2.amber,
-          textTransform: 'uppercase',
-          letterSpacing: '0.14em',
-          marginBottom: 12,
-        }}
-      >
-        {eyebrow}
-      </div>
+    <div
+      style={{
+        fontSize: 10.5,
+        fontWeight: 700,
+        color: RV2.amber,
+        textTransform: 'uppercase',
+        letterSpacing: '0.14em',
+        marginBottom: 12,
+      }}
+    >
       {children}
-    </section>
+    </div>
   );
 }
 
-// L6 - Optional tee chip row. Renders only when at least one colour tee exists.
-// Reuses useCourseTeeSets (no new fetch path). Selected chip filled ink; tapping
-// the selected chip clears the selection back to null.
+// Optional tee chip row. Renders only when at least one colour tee exists.
 function TeeChipRow({
   courseId,
   value,
@@ -80,8 +71,6 @@ function TeeChipRow({
     [data],
   );
 
-  // Preselect from L3 continuity key when nothing is picked yet and the stored
-  // label matches a returned colour tee. Never required. One-shot per mount.
   const preseededRef = useRef(false);
   useEffect(() => {
     if (preseededRef.current) return;
@@ -104,19 +93,8 @@ function TeeChipRow({
   if (colourTees.length === 0) return null;
 
   return (
-    <section style={{ padding: '0 16px 12px' }}>
-      <div
-        style={{
-          fontSize: 10.5,
-          fontWeight: 700,
-          color: RV2.amber,
-          textTransform: 'uppercase',
-          letterSpacing: '0.14em',
-          marginBottom: 10,
-        }}
-      >
-        {t('review.teesPlayed.eyebrow', { defaultValue: 'TEES PLAYED (OPTIONAL)' })}
-      </div>
+    <section style={{ padding: '0 16px 16px' }}>
+      <Eyebrow>{t('review.wizard.step2.teesEyebrow')}</Eyebrow>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {colourTees.map((tee) => {
           const selected = value === tee.tee_label;
@@ -164,9 +142,6 @@ function InnerComposer() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id ?? null;
 
-
-
-
   const courseQ = useQuery({
     queryKey: ['rv2-course', courseId],
     enabled: !!courseId,
@@ -185,7 +160,6 @@ function InnerComposer() {
     queryKey: ['rv2-existing', courseId, userId],
     enabled: !!courseId && !!userId,
     queryFn: async () => {
-      // L6: 'tee_label' column may not yet exist in generated types until DB migration ships.
       const { data } = await (supabase.from('course_ratings') as any)
         .select('id, rating, design_score, condition_score, clubhouse_score, facilities_score, review, verdict, share_to_feed, tee_label')
         .eq('course_id', courseId!)
@@ -224,7 +198,7 @@ function InnerComposer() {
     !!courseQ.data &&
     !sessionLoading &&
     (!userId
-      ? true // signed-out: nothing to prefill
+      ? true
       : !profileQ.isLoading && !existingQ.isLoading && (!existingQ.data || !existingMediaQ.isLoading));
 
   if (courseQ.isError) {
@@ -329,6 +303,8 @@ interface ComposerProps {
 
 function Composer({ course, userId, existing, existingMedia, author, onExit }: ComposerProps) {
   const isEditMode = !!existing;
+  const mode = isEditMode ? 'edit' : 'new';
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeActor } = useActiveActor();
@@ -350,14 +326,55 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         }
       : undefined,
   });
-  const composer = useReviewComposer(existing, media.hasNewMedia);
+  const composer = useReviewComposer(existing, course.id);
   const submit = useReviewSubmit();
-
 
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
-  const [exitGuardOpen, setExitGuardOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
+
+  const step = composer.step;
+  const stepLabels = [
+    t('review.wizard.rail.score'),
+    t('review.wizard.rail.breakdown'),
+    t('review.wizard.rail.words'),
+  ];
+
+  // ---- instrumentation -------------------------------------------------
+  const mountedAtRef = useRef(Date.now());
+  const stepEnteredAtRef = useRef(Date.now());
+  const submittedRef = useRef(false);
+  const abandonRef = useRef({ step: 0, hasOverall: false, catsSet: 0 });
+  abandonRef.current = {
+    step,
+    hasOverall: composer.state.overall != null,
+    catsSet: composer.catsSet,
+  };
+
+  useEffect(() => {
+    // review_wizard_opened
+    analyticsEvents.track('review_wizard_opened', { course_id: course.id, mode });
+    return () => {
+      if (submittedRef.current) return;
+      // review_wizard_abandoned
+      analyticsEvents.track('review_wizard_abandoned', {
+        course_id: course.id,
+        step: abandonRef.current.step,
+        has_overall: abandonRef.current.hasOverall,
+        cats_set: abandonRef.current.catsSet,
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const seenStepsRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    stepEnteredAtRef.current = Date.now();
+    if (seenStepsRef.current.has(step)) return;
+    seenStepsRef.current.add(step);
+    // review_step_viewed
+    analyticsEvents.track('review_step_viewed', { course_id: course.id, step, mode });
+  }, [step, course.id, mode]);
 
   // rating_modal_opened: fired once when the composer mounts (open == mounted)
   useEffect(() => {
@@ -369,7 +386,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // rating_slider_changed: first slider interaction per open (ref guard, no state churn)
+  // rating_slider_changed: first slider interaction per open
   const sliderFiredRef = useRef(false);
   useEffect(() => {
     if (sliderFiredRef.current) return;
@@ -382,7 +399,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     ) return;
     sliderFiredRef.current = true;
     const s = composer.state.scores;
-    const first: 'overall' | 'design' | 'condition' | 'clubhouse' | 'facilities' =
+    const first: 'overall' | CategoryKey =
       composer.state.overall != null ? 'overall'
       : s.design != null ? 'design'
       : s.condition != null ? 'condition'
@@ -399,37 +416,15 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     });
   }, [composer.state.overall, composer.state.scores, course.id, course.name]);
 
-  const isDirty = useMemo(() => {
-    if (isEditMode) {
-      return (
-        composer.state.overall !== (existing?.rating ?? null) ||
-        composer.state.reviewText !== (existing?.review ?? '') ||
-        composer.state.shareToFeed !== (existing?.share_to_feed !== false) ||
-        composer.state.scores.design !== (existing?.design_score ?? null) ||
-        composer.state.scores.condition !== (existing?.condition_score ?? null) ||
-        composer.state.scores.clubhouse !== (existing?.clubhouse_score ?? null) ||
-        composer.state.scores.facilities !== (existing?.facilities_score ?? null) ||
-        media.hasNewMedia()
-      );
-    }
-    return (
-      composer.state.overall != null ||
-      composer.state.reviewText.trim().length > 0 ||
-      composer.state.scores.design != null ||
-      composer.state.scores.condition != null ||
-      composer.state.scores.clubhouse != null ||
-      composer.state.scores.facilities != null ||
-      media.hasNewMedia()
-    );
-  }, [isEditMode, existing, composer.state, media]);
-
+  // ---- navigation ------------------------------------------------------
   const handleBack = useCallback(() => {
-    if (isDirty && !success) {
-      setExitGuardOpen(true);
+    if (step > 0) {
+      composer.setStep((step - 1) as WizardStep);
       return;
     }
+    composer.clearDraft();
     onExit();
-  }, [isDirty, success, onExit]);
+  }, [step, composer, onExit]);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -437,10 +432,24 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         courseId: course.id,
         state: composer.state,
       });
-      // Fire uploads AFTER the RPC (media picked before submit is held locally).
+      submittedRef.current = true;
+      composer.clearDraft();
       media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
       setSuccess({ ratingId, shareToFeed });
+      // review_submitted
+      analyticsEvents.track('review_submitted', {
+        course_id: course.id,
+        mode,
+        overall: composer.state.overall ?? 0,
+        cats_set: composer.catsSet,
+        has_text: composer.state.reviewText.trim().length > 0,
+        text_len: composer.state.reviewText.trim().length,
+        media_count: media.items.length,
+        tee_set: composer.state.teeLabel != null,
+        share_to_feed: shareToFeed,
+        total_ms: Math.round(Date.now() - mountedAtRef.current),
+      });
       analyticsEvents.ratings.submitted({
         courseId: course.id,
         courseName: course.name,
@@ -454,14 +463,33 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
-  }, [submit, media, composer.state, course.id, qc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode]);
+
+  const handlePrimary = useCallback(() => {
+    if (step < 2) {
+      // review_step_completed
+      analyticsEvents.track('review_step_completed', {
+        course_id: course.id,
+        step,
+        ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
+      });
+      composer.setStep((step + 1) as WizardStep);
+      return;
+    }
+    analyticsEvents.track('review_step_completed', {
+      course_id: course.id,
+      step,
+      ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
+    });
+    void handleSubmit();
+  }, [step, composer, course.id, handleSubmit]);
 
   const handleRemove = useCallback(async () => {
     if (!existing) return;
     try {
       await submit.remove(existing.id);
       invalidateCourseRatingCaches(qc);
-      // Clean up any storage assets for existing media in ONE call.
       if (existingMedia.length > 0) {
         supabase.functions
           .invoke('cleanup-review-media', {
@@ -483,43 +511,49 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     }
   }, [existing, submit, existingMedia, onExit, qc]);
 
-
+  // ---- confirmation ----------------------------------------------------
   if (success) {
-    const courseUrl = `${window.location.origin}/courses/${course.id}`;
     return (
-      <SuccessScreenV2
+      <ReviewReceipt
+        ratingId={success.ratingId}
         course={course}
-        author={author}
         overall={composer.state.overall}
-        verdict={composer.state.verdict}
-        reviewText={composer.state.reviewText}
         scores={composer.state.scores}
-        media={media.items}
         shareToFeed={success.shareToFeed}
-        onViewReview={() => navigate(`/courses/${course.id}`, { replace: true })}
-        onShare={async () => {
-          const title = `My review of ${course.name}`;
-          if (typeof navigator !== 'undefined' && navigator.share) {
-            try {
-              await navigator.share({ title, url: courseUrl });
-              return;
-            } catch (err) {
-              if ((err as Error)?.name === 'AbortError') return;
-              // fall through to clipboard
-            }
-          }
-          try {
-            await navigator.clipboard.writeText(courseUrl);
-            const { toast } = await import('sonner');
-            toast.success('Link copied');
-          } catch {
-            /* noop */
-          }
+        onClubhouse={() => navigate('/clubhouse')}
+        onBack={() => navigate(`/courses/${course.id}`, { replace: true })}
+        onNextCourse={(nextId) => {
+          navigate(`/courses/${nextId}/review`, { replace: true });
         }}
-        onDone={onExit}
       />
     );
   }
+
+  // ---- gates and label -------------------------------------------------
+  const gateMet = step === 0 ? composer.step0Gate : step === 1 ? composer.step1Gate : true;
+  const remaining = 4 - composer.catsSet;
+
+  let buttonLabel: string;
+  if (submit.submitting) {
+    buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
+  } else if (step === 2) {
+    buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.post');
+  } else if (!gateMet) {
+    buttonLabel = step === 0
+      ? t('review.wizard.step0.gate')
+      : t('review.wizard.step1.gate', { count: remaining });
+  } else {
+    buttonLabel = t('review.wizard.continue');
+  }
+
+  const cats: CategoryCopy[] = [
+    { key: 'design', label: t('review.subscore.design'), hint: t('review.wizard.hint.design') },
+    { key: 'condition', label: t('review.subscore.condition'), hint: t('review.wizard.hint.condition') },
+    { key: 'clubhouse', label: t('review.subscore.clubhouse'), hint: t('review.wizard.hint.clubhouse') },
+    { key: 'facilities', label: t('review.subscore.facilities'), hint: t('review.wizard.hint.facilities') },
+  ];
+
+  const region = [course.region, course.sub_country || course.country].filter(Boolean).join(', ');
 
   return (
     <div
@@ -531,7 +565,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         flexDirection: 'column',
       }}
     >
-      {/* Header — pinned under the notch (fixed, so no --sat race) */}
+      {/* Header */}
       <header
         style={{
           position: 'fixed',
@@ -543,26 +577,18 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
           maxWidth: 480,
           zIndex: 50,
           background: RV2.canvas,
-          borderBottom: `0.5px solid ${RV2.hairline}`,
+          borderBottom: `1px solid ${RV2.hairline}`,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
         }}
       >
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '6px 12px 10px',
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px 10px' }}>
           <button
             type="button"
             onClick={handleBack}
-            aria-label="Back"
+            aria-label={t('review.wizard.backA11y')}
             style={{
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
               borderRadius: 10,
               border: 'none',
               background: 'transparent',
@@ -570,19 +596,20 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
+              fontSize: 21,
+              lineHeight: 1,
+              color: RV2.ink,
             }}
           >
-            <ChevronLeft size={20} color={RV2.ink} />
+            {'\u2039'}
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink, letterSpacing: '-0.01em' }}>
-              {isEditMode ? 'Edit review' : 'Write a review'}
-            </div>
             <div
               style={{
-                fontSize: 11.5,
-                color: RV2.secondary,
-                marginTop: 1,
+                fontSize: 14.5,
+                fontWeight: 800,
+                letterSpacing: '-0.015em',
+                color: RV2.ink,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -590,15 +617,16 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             >
               {course.name}
             </div>
+            <div style={{ fontSize: 11.5, color: RV2.secondary }}>{region}</div>
           </div>
           {isEditMode && (
             <button
               type="button"
               onClick={() => setRemoveOpen(true)}
-              aria-label="Remove review"
+              aria-label={t('review.wizard.deleteA11y')}
               style={{
-                width: 36,
-                height: 36,
+                width: 44,
+                height: 44,
                 borderRadius: 10,
                 border: 'none',
                 background: 'transparent',
@@ -613,151 +641,252 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
             </button>
           )}
         </div>
-        {/* Amber progress hairline */}
-        <div style={{ height: 2, background: RV2.hairline, position: 'relative' }}>
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${composer.progressPct}%`,
-              background: RV2.amber,
-              transition: 'width 200ms ease',
-            }}
-          />
-        </div>
       </header>
-      {/* Spacer: reserves the fixed header's content height in flow.
-          (.app-shell's own --sat padding covers the safe area.) */}
       <div aria-hidden style={{ height: 54, flexShrink: 0 }} />
 
-      {/* Live preview */}
-
-      <div style={{ padding: '16px 16px 12px' }}>
-        <LivePreviewCard
-          course={course}
-          author={author}
-          overall={composer.state.overall}
-          verdict={composer.state.verdict}
-          reviewText={composer.state.reviewText}
-          scores={composer.state.scores}
-          media={media.items}
-        />
+      {/* Step rail */}
+      <div
+        aria-hidden="true"
+        style={{ display: 'flex', gap: 6, padding: '14px 16px 18px' }}
+      >
+        {stepLabels.map((label, i) => (
+          <div key={label} style={{ flex: 1 }}>
+            <div
+              style={{
+                height: 3,
+                borderRadius: 999,
+                marginBottom: 6,
+                background: i <= step ? RV2.amber : 'rgba(15,23,42,0.10)',
+              }}
+            />
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: i <= step ? RV2.ink : RV2.muted,
+              }}
+            >
+              {label}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Overall */}
-      <Section eyebrow="Overall">
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: `1px solid ${RV2.hairline}`,
-            borderRadius: RV2.panelRadius,
-            padding: '12px 16px 12px',
-          }}
-        >
-          <OverallScrubber value={composer.state.overall} onChange={composer.setOverall} />
-        </div>
-      </Section>
+      <div
+        aria-live="polite"
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {t('review.wizard.a11yStep', { n: step + 1, label: stepLabels[step] })}
+      </div>
 
-      {/* Categories */}
-      <Section eyebrow="Category scores">
-        <CategoryGrid values={composer.state.scores} onChange={composer.setCategory} />
-      </Section>
-
-      {/* L6 - Optional tees played (renders only when colour tees exist for this course) */}
-      <TeeChipRow
-        courseId={course.id}
-        value={composer.state.teeLabel}
-        onChange={composer.setTeeLabel}
-      />
-
-      {/* Words */}
-      <section style={{ padding: '0 16px 12px' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 12,
-          }}
-        >
-          <div
+      {/* Step 0 - Score */}
+      {step === 0 && (
+        <section style={{ padding: '0 16px 16px' }}>
+          <h1
             style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: RV2.amber,
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              marginBottom: 16,
+              color: RV2.ink,
             }}
           >
-            Words
-          </div>
-          <VoiceDictateButton
-            onAppend={(text) => {
-              const prev = composer.state.reviewText;
-              const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
-              composer.setReviewText(`${prev}${joiner}${text}`);
-              setDictationFlashKey((k) => k + 1);
+            {t('review.wizard.step0.heading')}
+          </h1>
+          <div
+            style={{
+              background: RV2.cardBg,
+              borderRadius: RV2.cardRadius,
+              border: `1px solid ${RV2.hairline}`,
+              padding: '18px 18px 16px',
             }}
+          >
+            <OverallScrubber
+              value={composer.state.overall}
+              onChange={composer.setOverall}
+              caption={
+                composer.state.overall == null
+                  ? t('review.wizard.step0.captionEmpty')
+                  : t('review.wizard.step0.captionSet')
+              }
+              ariaLabel={t('review.wizard.step0.a11y')}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Step 1 - Breakdown */}
+      {step === 1 && (
+        <section style={{ padding: '0 16px 16px' }}>
+          <h1
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              marginBottom: 4,
+              color: RV2.ink,
+            }}
+          >
+            {t('review.wizard.step1.heading')}
+          </h1>
+          <p
+            style={{
+              fontSize: 12.5,
+              color: RV2.secondary,
+              lineHeight: 1.55,
+              marginBottom: 16,
+            }}
+          >
+            {t('review.wizard.step1.body')}
+          </p>
+          <CategoryGrid
+            values={composer.state.scores}
+            onChange={composer.setCategory}
+            cats={cats}
           />
-        </div>
-        <div
-          key={dictationFlashKey}
-          style={{
-            background: '#FFFFFF',
-            border: `1px solid ${RV2.hairline}`,
-            borderRadius: RV2.panelRadius,
-            padding: '4px 12px',
-            minHeight: 96,
-            animation: dictationFlashKey > 0 ? 'rv2-dictation-flash 900ms ease-out' : 'none',
-          }}
-        >
-          <style>{`
-            @keyframes rv2-dictation-flash {
-              0%   { background-color: rgba(247,147,30,0.16); box-shadow: 0 0 0 2px rgba(247,147,30,0.28); }
-              100% { background-color: #FFFFFF; box-shadow: 0 0 0 0 rgba(247,147,30,0); }
-            }
-            @media (prefers-reduced-motion: reduce) {
-              [data-rv2-flash="1"] { animation: none !important; }
-            }
-          `}</style>
-          <MentionsComposerInput
-            value={composer.state.reviewText}
-            onChange={composer.setReviewText}
-            placeholder="Best hole? Green speeds? @mention your fourball..."
-            currentUserId={userId}
-            textStyle={{ fontSize: 14, lineHeight: '20px', minHeight: 80, maxHeight: 260, padding: '10px 0', color: RV2.ink, caretColor: RV2.ink }}
+        </section>
+      )}
+
+      {/* Step 2 - Words */}
+      {step === 2 && (
+        <>
+          <section style={{ padding: '0 16px 16px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 12,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: RV2.amber,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                }}
+              >
+                {t('review.wizard.step2.wordsEyebrow')}
+              </div>
+              <VoiceDictateButton
+                onAppend={(text) => {
+                  const prev = composer.state.reviewText;
+                  const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
+                  composer.setReviewText(`${prev}${joiner}${text}`);
+                  setDictationFlashKey((k) => k + 1);
+                }}
+              />
+            </div>
+            <div
+              key={dictationFlashKey}
+              style={{
+                background: '#FFFFFF',
+                border: `1px solid ${RV2.hairline}`,
+                borderRadius: 14,
+                padding: 14,
+                minHeight: 100,
+                boxSizing: 'border-box',
+                animation: dictationFlashKey > 0 ? 'rv2-dictation-flash 900ms ease-out' : 'none',
+              }}
+            >
+              <style>{`
+                @keyframes rv2-dictation-flash {
+                  0%   { background-color: rgba(247,147,30,0.16); box-shadow: 0 0 0 2px rgba(247,147,30,0.28); }
+                  100% { background-color: #FFFFFF; box-shadow: 0 0 0 0 rgba(247,147,30,0); }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  [data-rv2-flash="1"] { animation: none !important; }
+                }
+              `}</style>
+              <MentionsComposerInput
+                value={composer.state.reviewText}
+                onChange={composer.setReviewText}
+                placeholder={t('review.wizard.step2.placeholder')}
+                currentUserId={userId}
+                textStyle={{
+                  fontSize: 14,
+                  lineHeight: '1.55',
+                  minHeight: 72,
+                  maxHeight: 260,
+                  padding: 0,
+                  color: RV2.ink,
+                  caretColor: RV2.ink,
+                }}
+              />
+            </div>
+            <div style={{ fontSize: 11, color: RV2.muted, marginTop: 8 }}>
+              {t('review.wizard.step2.optionalNote')}
+            </div>
+          </section>
+
+          <section style={{ padding: '0 16px 16px' }}>
+            <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
+            <MediaTray
+              items={media.items}
+              onPick={media.addFiles}
+              onRemove={media.removeItem}
+              pickerError={media.pickerError}
+              onClearError={media.clearPickerError}
+            />
+          </section>
+
+          <TeeChipRow
+            courseId={course.id}
+            value={composer.state.teeLabel}
+            onChange={composer.setTeeLabel}
           />
-        </div>
-      </section>
 
-
-
-
-      {/* Media */}
-      <Section eyebrow="Photos & video">
-        <MediaTray
-          items={media.items}
-          onPick={media.addFiles}
-          onRemove={media.removeItem}
-          pickerError={media.pickerError}
-          onClearError={media.clearPickerError}
-        />
-      </Section>
-
-      {/* Share toggle */}
-      <div style={{ padding: '0 16px 12px' }}>
-        <ShareToggle value={composer.state.shareToFeed} onChange={composer.setShareToFeed} />
-      </div>
+          <div style={{ padding: '0 16px 16px' }}>
+            <div
+              style={{
+                background: RV2.cardBg,
+                borderRadius: 14,
+                border: `1px solid ${RV2.hairline}`,
+                padding: '13px 14px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 600, color: RV2.ink }}>
+                    {t('review.wizard.step2.shareTitle')}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: RV2.secondary }}>
+                    {t('review.wizard.step2.shareSub')}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <ShareToggle value={composer.state.shareToFeed} onChange={composer.setShareToFeed} />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <div style={{ flex: 1, minHeight: 16 }} />
 
       <SubmitBar
-        canSubmit={composer.canSubmit}
-        submitting={submit.submitting}
-        onSubmit={handleSubmit}
-        isEditMode={isEditMode}
+        label={buttonLabel}
+        enabled={gateMet && !submit.submitting}
+        onPress={handlePrimary}
       />
 
       <RemoveReviewSheetV2
@@ -766,104 +895,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
         onCancel={() => setRemoveOpen(false)}
         onConfirm={handleRemove}
       />
-
-      <DiscardReviewSheet
-        open={exitGuardOpen}
-        onKeep={() => setExitGuardOpen(false)}
-        onDiscard={() => {
-          setExitGuardOpen(false);
-          onExit();
-        }}
-      />
-    </div>
-  );
-}
-
-function DiscardReviewSheet({
-  open,
-  onKeep,
-  onDiscard,
-}: {
-  open: boolean;
-  onKeep: () => void;
-  onDiscard: () => void;
-}) {
-  if (!open) return null;
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 10000,
-        background: 'rgba(15,23,42,0.4)',
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-      }}
-      onClick={onKeep}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 480,
-          background: '#FFFFFF',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
-        </div>
-        <div style={{ padding: '4px 4px 0' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink }}>Discard this review?</div>
-          <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 4 }}>
-            Your scores and words won't be saved.
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            type="button"
-            onClick={onKeep}
-            style={{
-              flex: 1,
-              padding: 12,
-              borderRadius: 12,
-              background: '#FFFFFF',
-              border: `1px solid ${RV2.hairline}`,
-              fontSize: 14,
-              fontWeight: 600,
-              color: RV2.ink,
-              cursor: 'pointer',
-            }}
-          >
-            Keep writing
-          </button>
-          <button
-            type="button"
-            onClick={onDiscard}
-            style={{
-              flex: 1,
-              padding: 12,
-              borderRadius: 12,
-              background: '#EF4444',
-              border: 'none',
-              fontSize: 14,
-              fontWeight: 700,
-              color: '#FFFFFF',
-              cursor: 'pointer',
-            }}
-          >
-            Discard
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
