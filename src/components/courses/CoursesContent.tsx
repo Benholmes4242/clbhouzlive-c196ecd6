@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CoursesPageHero from './CoursesPageHero';
-import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
@@ -11,6 +10,7 @@ import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
 import RateNudge from './RateNudge';
 import StatBrowse from './StatBrowse';
+import CourseDirectorySheet from './CourseDirectorySheet';
 
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -21,7 +21,7 @@ import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
-import { Search, X, Star, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, X, Star, ChevronRight } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -197,8 +197,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
-  // Explore tab local view toggle: stat browse (default) vs full directory.
-  const [showDirectory, setShowDirectory] = useState(false);
+  // Full directory now lives in a bottom sheet, opened from three doors.
+  const [directoryOpen, setDirectoryOpen] = useState(false);
+  const [directoryCountry, setDirectoryCountry] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -428,6 +429,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         <ScrollToTopGlass />
         {/* Rate sheet portal */}
         <RateCourseSheet open={rateSheetOpen} onClose={() => setRateSheetOpen(false)} />
+        {/* Full course directory sheet */}
+        <CourseDirectorySheet
+          open={directoryOpen}
+          onClose={() => setDirectoryOpen(false)}
+          initialCountry={directoryCountry}
+        />
       </div>
     </CoursesErrorBoundary>
   );
