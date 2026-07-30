@@ -208,6 +208,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     };
   }, [flush]);
 
+  const directoryRemaining = Math.max(
+    0,
+    (facets?.directory_total ?? 0) - (facets?.played_total ?? 0),
+  );
 
 
   /* ── Analytics ─────────────────────────────────────────────────── */
