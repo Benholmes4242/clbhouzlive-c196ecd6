@@ -166,32 +166,48 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     return () => io.disconnect();
   }, [loadMore, isPaging, rows.length]);
 
-  /* Depth reached, once per page load. */
+  /* Depth reached, once per lens/country the member actually browsed. */
   const depthRef = useRef({ rows: 0, total: 0, lens, country, sent: false });
   useEffect(() => {
     depthRef.current.rows = rows.length;
     depthRef.current.total = totalCount;
+  }, [rows.length, totalCount]);
+
+  const flush = useCallback(() => {
+    if (depthRef.current.sent) return;
+    if (depthRef.current.rows === 0) return;
+    depthRef.current.sent = true;
+    analyticsEvents.track('stat_browse_scroll_depth', {
+      lens: depthRef.current.lens,
+      country: depthRef.current.country,
+      rows_loaded: depthRef.current.rows,
+      total_count: depthRef.current.total,
+    });
+  }, []);
+
+  /* Lens or country change: flush the OUTGOING measurement, then reset. */
+  const firstDepthScope = useRef(true);
+  useEffect(() => {
+    if (firstDepthScope.current) {
+      firstDepthScope.current = false;
+      return;
+    }
+    flush();
+    depthRef.current.sent = false;
+    depthRef.current.rows = 0;
+    depthRef.current.total = 0;
     depthRef.current.lens = lens;
     depthRef.current.country = country;
-  }, [rows.length, totalCount, lens, country]);
+  }, [lens, country, flush]);
+
   useEffect(() => {
-    const send = () => {
-      if (depthRef.current.sent) return;
-      depthRef.current.sent = true;
-      analyticsEvents.track('stat_browse_scroll_depth', {
-        lens: depthRef.current.lens,
-        country: depthRef.current.country,
-        rows_loaded: depthRef.current.rows,
-        total_count: depthRef.current.total,
-      });
-    };
-    window.addEventListener('pagehide', send);
+    window.addEventListener('pagehide', flush);
     return () => {
-      window.removeEventListener('pagehide', send);
-      send();
+      window.removeEventListener('pagehide', flush);
+      flush();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [flush]);
+
 
 
   /* ── Analytics ─────────────────────────────────────────────────── */
