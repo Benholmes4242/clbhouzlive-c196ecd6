@@ -22,20 +22,9 @@ export function formatAttainedAt(iso: string): string {
   return formatDay2MonthYearShortGB(iso);
 }
 
-/** Rank tier colour — used for rank chips, champion card border, etc. */
-export const RANK_TIER = {
-  gold: { color: '#FBBC2E', bg: 'rgba(251,188,46,0.14)', border: 'rgba(251,188,46,0.40)' },
-  silver: { color: '#C0C0C0', bg: 'rgba(192,192,192,0.10)', border: 'rgba(192,192,192,0.30)' },
-  bronze: { color: '#CD7F32', bg: 'rgba(205,127,50,0.10)', border: 'rgba(205,127,50,0.30)' },
-  neutral: { color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)' },
-};
+/* RANK_TIER / rankTier removed with the tinted rank chips
+   (BRIEF_COURSE_CHAMPIONS_TAB_TREATMENT §2) — rank is a plain figure now. */
 
-export function rankTier(rank: number) {
-  if (rank === 1) return RANK_TIER.gold;
-  if (rank === 2) return RANK_TIER.silver;
-  if (rank === 3) return RANK_TIER.bronze;
-  return RANK_TIER.neutral;
-}
 
 /** Entries newer than this get the green "NEW" badge */
 export const NEW_BADGE_DAYS = 7;
