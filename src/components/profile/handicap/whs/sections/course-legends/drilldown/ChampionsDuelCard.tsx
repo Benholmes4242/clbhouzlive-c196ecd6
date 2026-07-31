@@ -1,13 +1,37 @@
+/**
+ * ChampionsBoardPanel (file kept as ChampionsDuelCard for callsite stability).
+ *
+ * The duel graphic is gone: two avatars either side of a crossed-swords icon
+ * over a track with more faces on it was an illustration of a rivalry.
+ * CHAMPION / YOU / TO THE CROWN is the rivalry, and the gap - the single most
+ * useful number on the board - is now a headline figure rather than 12px grey
+ * under a bar.
+ *
+ * One Panel per category: three-up, gauge, rows, footer action.
+ * Amber means the viewing member and nothing else.
+ */
 import React from 'react';
-import { Crown, Swords, type LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import type { LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
-import { MovementCell } from './_shared/MovementCell';
-import { duelLine, chaseProgress } from './_shared/duelTension';
+import { chaseProgress } from './_shared/duelTension';
+import { formatGapFromChampion } from './_shared/helpers';
+import { formatLegendGap } from '@/lib/gam/visuals';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { StatRow } from '@/components/explore-tab-new/StatRow';
-
+import {
+  A,
+  Panel,
+  StatRow,
+  Action,
+  SANS,
+} from '@/features/courses/components/holes/analytical/tokens';
+import {
+  BoardHeaderRow,
+  BoardRow,
+  CrownGauge,
+  ordinalSuffix,
+} from './_shared/boardParts';
 
 export interface DuelRow {
   rank: number;
@@ -32,6 +56,8 @@ interface ChampionsDuelCardProps {
   holdDuration: string;
   totalCount: number;
   onFullLeaderboardTap: () => void;
+  /** Column-header unit for the value column, e.g. "Gross", "Eagles". */
+  unitLabel?: string;
   proBenchmark?: {
     pro: ProProfile;
     base: ProBandBase;
@@ -39,545 +65,163 @@ interface ChampionsDuelCardProps {
     sub: string;
     chaseLine?: string;
   } | null;
-  /** Backdrop theme for the embedded rows/avatars. Default 'dark'. */
+  /** Accepted for signature compat. This tab is light-only. */
   theme?: 'light' | 'dark';
-  /** When true, section sits on a soft alternating band (matches the
-   *  course-records ledger on the discover page). No card chrome either way. */
+  /** Accepted for signature compat; the analytical treatment has no bands. */
   banded?: boolean;
-  /** Optional kicker override — replaces the category label in the section header. */
+  /** Optional title override — replaces the category label in the panel header. */
   titleOverride?: string;
-  /** Optional CTA sentence rendered beneath the chase caption (used by
-   *  the "Your closest duel" section to name the gap in category units). */
+  /** Optional CTA sentence rendered beneath the rows. */
   chaseCta?: string;
-  /** Suppresses the top hairline border — used when the card sits directly
-   *  beneath an eyebrow/explainer block with no visual separation needed. */
+  /** Accepted for signature compat; panels have no top hairline. */
   suppressTopBorder?: boolean;
 }
 
-
-const INK = 'var(--hcp-t-100)';
-const INK_55 = 'var(--hcp-t-60)';
-const DEEP_AMBER = 'var(--hcp-amber)';
-const GOLD = '#FBBC2E';
-
-const SQUIRCLE_MASK_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
-const squircleMaskStyle: React.CSSProperties = {
-  WebkitMaskImage: SQUIRCLE_MASK_URL,
-  maskImage: SQUIRCLE_MASK_URL,
-  WebkitMaskSize: '100% 100%',
-  maskSize: '100% 100%',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
+const CAPTION: React.CSSProperties = {
+  fontSize: 12.5,
+  lineHeight: 1.5,
+  color: A.MUTE,
+  margin: '12px 0 0',
 };
-
-function ChampionsSquircle({ photoUrl, size = 38, dashed = false, ringColor = 'rgba(255,255,255,0.22)' }: { photoUrl: string | null; size?: number; dashed?: boolean; ringColor?: string }) {
-  if (dashed) {
-    // Dashed = empty-slot ghost, not an avatar — canon exception, no hairline overlay.
-    return (
-      <div
-        aria-hidden
-        style={{
-          width: size,
-          height: size,
-          borderRadius: '34%',
-          border: '1.5px dashed var(--hcp-dash)',
-          flexShrink: 0,
-        }}
-      />
-    );
-  }
-  const photoBg = photoUrl
-    ? `url(${photoUrl}) center/cover`
-    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
-  return (
-    <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
-      <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      {/* Traced hairline (theme-aware) */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '34%',
-          border: `1px solid ${ringColor}`,
-          pointerEvents: 'none',
-        }}
-      />
-    </div>
-  );
-}
-
-/** Mini avatar (22px squircle) for the chase track. Crowned variant adds the mini crown. */
-function TrackFace({
-  entry,
-  crowned = false,
-  style,
-  ringColor = 'rgba(15,23,42,0.10)',
-}: {
-  entry: DuelRow | null;
-  crowned?: boolean;
-  style?: React.CSSProperties;
-  ringColor?: string;
-}) {
-  const size = 22;
-  const photoUrl = entry?.photoUrl ?? null;
-  const initials = (entry?.name ?? '?')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase() || '?';
-  const photoBg = photoUrl
-    ? `url(${photoUrl}) center/cover`
-    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
-  return (
-    <div style={{ width: size, height: size, position: 'relative', flexShrink: 0, ...style }} aria-hidden>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: photoBg,
-          borderRadius: '34%',
-          overflow: 'hidden',
-          boxShadow: `0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px ${ringColor}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {!photoUrl && initials}
-      </div>
-    </div>
-  );
-}
 
 function firstName(name: string): string {
   if (!name) return name;
-  if (name === 'You') return 'You';
   return name.split(' ')[0];
+}
+
+/** Unit word only, taken from the shared gap formatter ("6 strokes" → "strokes"). */
+function gapUnitWord(cat: LegendCategory, gap: number): string {
+  return formatLegendGap(cat, gap).replace(/^[\d.,+\-\u2212]+\s*/, '');
 }
 
 export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   category,
   categoryLabel,
-  categoryIcon: CatIcon,
   rows,
   yourRank,
-  holdDuration,
   totalCount,
   onFullLeaderboardTap,
+  unitLabel,
   proBenchmark,
-  theme = 'dark',
-  banded = false,
   titleOverride,
   chaseCta,
-  suppressTopBorder = false,
 }) => {
-  const isLight = theme === 'light';
-  const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
+  const { t } = useTranslation('courses');
 
-  // Track mini-avatars: preserve current dark rendering (slate 10%) so the
-  // handicap compete drilldown stays pixel-for-pixel. Light theme uses the
-  // canonical ink-12% traced hairline.
-  const trackRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.10)';
-  const champion = rows[0];
-  const defending = champion?.isSelf === true;
-  const standsAlone = rows.length === 1;
+  const champion = rows[0] ?? null;
   const selfRow = rows.find((r) => r.isSelf) ?? null;
-  const selfOnBoard = selfRow != null;
+  const standsAlone = rows.length === 1;
+  const topRows = rows.slice(0, 5);
 
-  // Right side opponent
-  let right: DuelRow | null = null;
-  if (defending) {
-    right = rows[1] ?? null;
-  } else {
-    right = selfRow;
-  }
+  const gapRaw = selfRow && champion ? selfRow.value - champion.value : null;
+  const level = selfRow != null && champion != null && Math.abs(gapRaw ?? 0) < 0.005;
 
-  // (legacy showBar removed — chase track uses showTrack below)
-  const leftValue = champion?.value ?? 0;
-  const rightValue = right?.value ?? 0;
+  // Direction: chaseProgress is category-aware (count categories use the
+  // ratio, value categories use the gap closing toward the champion), so a
+  // gross record of 71 against 65 reads as a partial gauge, never 109%.
+  const pct =
+    selfRow && champion ? chaseProgress(category, champion.value, selfRow.value) * 100 : 0;
 
-  // Chase track participants — champion = crown holder, chaser = the other face.
-  const trackChampion: DuelRow | null = champion ?? null;
-  const trackChaser: DuelRow | null = defending ? (right ?? null) : selfRow;
-  const showTrack = !standsAlone && trackChampion != null && trackChaser != null;
-  const rawProgress = showTrack
-    ? chaseProgress(category, trackChampion!.value, trackChaser!.value)
-    : 0;
-  const pos = Math.max(0.04, Math.min(0.90, rawProgress));
+  // The gap string comes from the shared helper — never computed inline here.
+  const gapSigned =
+    selfRow && champion ? formatGapFromChampion(category, selfRow.value, champion.value) : null;
+  const gapFigure = gapSigned ? gapSigned.replace(/^[+\-\u2212]/, '') : '';
+  const gapUnit = gapRaw != null ? gapUnitWord(category, gapRaw) : '';
 
-  let line: string;
-  let isNormalDuelLine = false;
-  if (standsAlone) {
-    line = 'The champion stands alone. Be the first to challenge.';
-  } else if (!selfOnBoard && !defending) {
-    line = 'Not on the board yet — log a round here';
-  } else if (defending && !right) {
-    line = 'The champion stands alone. Be the first to challenge.';
-  } else {
-    line = duelLine(category, leftValue, rightValue, defending, false, (champion?.name ?? '').split(' ')[0]);
-    isNormalDuelLine = true;
-  }
-  if (isNormalDuelLine && proBenchmark?.chaseLine) {
-    line = `${line} — ${proBenchmark.chaseLine}`;
-  }
-
-  // Status pill text
-  const pillText = defending
-    ? `DEFENDING · ${holdDuration.toUpperCase()}`
-    : yourRank != null
-      ? `CHASE · YOU'RE #${yourRank}`
-      : 'CHASE';
-
-  // Inline ranks 2–5
-  const inlineRows = rows.filter((r) => r.rank >= 2 && r.rank <= 5);
-
-  // Section band tone — mirrors The Record Book's alternating ledger on
-  // the discover page (light BAND_BG on light theme, faint white on dark).
-  const bandBg = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.025)';
-  const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
+  const thirdCell = level
+    ? { label: t('champions.toTheCrown'), value: t('champions.level'), tone: A.AMBER }
+    : selfRow
+      ? { label: t('champions.toTheCrown'), value: gapFigure, sub: gapUnit }
+      : {
+          label: t('champions.toTheCrown'),
+          value: (
+            <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, letterSpacing: 0 }}>
+              {t('champions.entryRequirement')}
+            </span>
+          ),
+        };
 
   return (
-    <div
-      data-category-section
-      style={{
-        background: banded ? bandBg : 'transparent',
-        borderTop: suppressTopBorder
-          ? 'none'
-          : defending
-            ? `2px solid ${GOLD}`
-            : `0.5px solid ${hairline}`,
-        padding: '18px 16px',
-      }}
-
-    >
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <SectionHeader
-            role="section"
-            kicker={(titleOverride ?? categoryLabel).toUpperCase()}
-            inlineIcon
-            icon={CatIcon}
-          />
-        </div>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.10em',
-            padding: '3px 8px',
-            borderRadius: 999,
-            background: defending ? 'rgba(251,188,46,0.16)' : 'var(--hcp-tint-1)',
-            color: defending ? DEEP_AMBER : INK_55,
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          {pillText}
-        </span>
-      </div>
-
-      {/* Duel row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
-        {/* LEFT: crown holder */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <span
-            aria-hidden
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: DEEP_AMBER,
-              fontVariantNumeric: 'tabular-nums',
-              width: 12,
-              textAlign: 'right',
-              flexShrink: 0,
-            }}
-          >
-            1
-          </span>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} ringColor={avatarRing} />
-          </div>
-          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                wordBreak: 'break-word',
-              }}
-            >
-              {firstName(champion?.name ?? '—')}
-            </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 8,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {champion?.valueDisplay ?? '—'}
-              </span>
-              {champion && champion.delta != null && champion.delta !== 0 && (
-                <MovementCell
-                  delta={champion.delta}
-                  rank30d={champion.rank30d}
-                  theme={theme}
-                  size="chip"
-                />
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* CENTER */}
-        <Swords size={15} color="var(--hcp-t-40)" strokeWidth={2} aria-hidden />
-
-        {/* RIGHT */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, justifyContent: 'flex-end' }}>
-          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right' }}>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                wordBreak: 'break-word',
-                maxWidth: '100%',
-              }}
-            >
-              {defending
-                ? right ? firstName(right.name) : '—'
-                : selfOnBoard ? 'You' : 'You'}
-            </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 8,
-              }}
-            >
-              {(() => {
-                const rightEntry = defending ? right : selfRow;
-                if (rightEntry && rightEntry.delta != null && rightEntry.delta !== 0) {
-                  return (
-                    <MovementCell
-                      delta={rightEntry.delta}
-                      rank30d={rightEntry.rank30d}
-                      theme={theme}
-                      size="chip"
-                    />
-                  );
-                }
-                return null;
-              })()}
-              <span
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {defending
-                  ? right ? right.valueDisplay : '—'
-                  : selfOnBoard ? (selfRow?.valueDisplay ?? '—') : '—'}
-              </span>
-            </span>
-          </div>
-          {defending ? (
-            right ? (
-              <ChampionsSquircle photoUrl={right.photoUrl} size={38} ringColor={avatarRing} />
-            ) : (
-              <ChampionsSquircle photoUrl={null} size={38} dashed />
-            )
-          ) : selfOnBoard ? (
-            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} ringColor={avatarRing} />
-          ) : (
-            <ChampionsSquircle photoUrl={null} size={38} dashed />
-          )}
-        </div>
-      </div>
-
-      {/* Chase track: champion at the finish, chaser travelling toward them */}
-      {showTrack && (
-        <div style={{ position: 'relative', height: 24, marginTop: 10 }}>
-          {/* rail */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: '50%',
-              height: 4,
-              transform: 'translateY(-50%)',
-              borderRadius: 999,
-              background: 'var(--hcp-bar-neutral)',
-            }}
-          />
-          {/* progress fill behind the chaser — flat, reduced-strength amber so it
-              never competes with the 2px gold defending border. */}
-          <div
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: '50%',
-              height: 4,
-              width: `${pos * 100}%`,
-              transform: 'translateY(-50%)',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.55)',
-              transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
-            }}
-          />
-          {/* chaser mini-avatar */}
-          <TrackFace
-            entry={trackChaser}
-            ringColor={trackRing}
-            style={{
-              position: 'absolute',
-              left: `calc(${(1 - pos) * 100}% - 11px)`,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
-            }}
-          />
-          {/* champion mini-avatar at the finish, crowned */}
-          <TrackFace
-            entry={trackChampion}
-            crowned
-            ringColor={trackRing}
-            style={{
-              position: 'absolute',
-              left: -2,
-              top: '50%',
-              transform: 'translateY(-50%)',
-            }}
-          />
-        </div>
-      )}
-
-      {/* Chase-line caption */}
-      <div
-        style={{
-          marginTop: showTrack ? 8 : 12,
-          marginBottom: 6,
-        }}
+    <div style={{ padding: '0 14px 12px', fontFamily: SANS }}>
+      <Panel
+        title={titleOverride ?? categoryLabel}
+        aside={
+          yourRank != null
+            ? t('champions.youreNth', { rank: yourRank, suffix: ordinalSuffix(yourRank) })
+            : t('champions.notOnBoard')
+        }
       >
-        <span
-          style={{
-            display: 'block',
-            fontSize: 11,
-            fontWeight: 600,
-            color: defending ? DEEP_AMBER : INK_55,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {line}
-        </span>
-        {chaseCta && (
-          <span
-            style={{
-              display: 'block',
-              marginTop: 4,
-              fontSize: 12,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.005em',
-            }}
-          >
-            {chaseCta}
-          </span>
-        )}
-      </div>
-
-      {/* Inline top 5 — StatRow canonical */}
-      <div
-        style={{
-          marginLeft: -16,
-          marginRight: -16,
-        }}
-      >
-        {standsAlone ? null : (
-          <>
-            {inlineRows.map((row, i) => (
-              <StatRow
-                key={`${row.rank}-${i}`}
-                rank={row.rank}
-                avatarUrl={row.photoUrl}
-                avatarUserId={row.userId ?? null}
-                name={row.isSelf ? 'You' : row.name}
-                subline={row.gapToChampion ?? undefined}
-                statValue={row.valueDisplay}
-                isLast={i === inlineRows.length - 1}
-                density="compact"
-              />
-            ))}
-          </>
-        )}
-        <div style={{ padding: '8px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            onClick={onFullLeaderboardTap}
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: INK,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            {totalCount > 5 ? `FULL LEADERBOARD (${totalCount}) ›` : 'FULL LEADERBOARD ›'}
-          </button>
-        </div>
-      </div>
-
-      {/* Pro benchmark — section footer. Sits last so the path from the section
-          title to the champion is uninterrupted. */}
-      {proBenchmark && (
-        <ProBenchmarkBand
-          pro={proBenchmark.pro}
-          base={proBenchmark.base}
-          value={proBenchmark.value}
-          sub={proBenchmark.sub}
+        <StatRow
+          items={[
+            {
+              label: t('champions.champion'),
+              value: champion?.valueDisplay ?? '',
+              sub: champion ? firstName(champion.name) : undefined,
+            },
+            {
+              label: t('champions.you'),
+              value: selfRow?.valueDisplay ?? '',
+              tone: A.AMBER,
+              sub: selfRow ? unitLabel || undefined : undefined,
+            },
+            thirdCell,
+          ]}
         />
-      )}
 
+        {selfRow && champion && (
+          <CrownGauge
+            pct={pct}
+            level={level}
+            youLabel={t('champions.you')}
+            crownLabel={t('champions.crown')}
+          />
+        )}
+
+        <div style={{ marginTop: selfRow && champion ? 14 : 18 }}>
+          <BoardHeaderRow
+            rankLabel={t('champions.colRank')}
+            memberLabel={t('champions.colMember')}
+            movementLabel={t('champions.col30d')}
+            unitLabel={unitLabel || categoryLabel}
+          />
+          {topRows.map((r) => (
+            <BoardRow
+              key={`${r.rank}-${r.name}`}
+              row={{
+                rank: r.rank,
+                name: r.name,
+                photoUrl: r.photoUrl,
+                valueDisplay: r.valueDisplay,
+                isSelf: r.isSelf,
+                rank30d: r.rank30d,
+                delta: r.delta,
+              }}
+            />
+          ))}
+        </div>
+
+        {standsAlone && <p style={CAPTION}>{t('champions.standsAlone')}</p>}
+        {!standsAlone && chaseCta && <p style={CAPTION}>{chaseCta}</p>}
+
+        <Action
+          label={
+            totalCount > topRows.length
+              ? `${t('champions.fullLeaderboard')} \u00B7 ${totalCount}`
+              : t('champions.fullLeaderboard')
+          }
+          onClick={onFullLeaderboardTap}
+          style={{ width: '100%', marginTop: 6 }}
+        />
+
+        {proBenchmark && (
+          <ProBenchmarkBand
+            pro={proBenchmark.pro}
+            base={proBenchmark.base}
+            value={proBenchmark.value}
+            sub={proBenchmark.sub}
+          />
+        )}
+      </Panel>
     </div>
   );
 };

@@ -1,73 +1,41 @@
+/**
+ * Unclaimed board. Still an invitation - it just stops shouting: no
+ * alternating band, no full-width amber headline, body weight copy.
+ */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
+import { A, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface ChampionsUnclaimedCardProps {
   category: LegendCategory;
   categoryLabel: string;
   categoryIcon: LucideIcon;
-  /** Alternating band matching the discover page course-records ledger. */
+  /** Accepted for signature compat; the analytical treatment has no bands. */
   banded?: boolean;
-  /** Backdrop theme. */
+  /** Accepted for signature compat; this tab is light-only. */
   theme?: 'light' | 'dark';
 }
-
-const AMBER = '#F7931E';
 
 export const ChampionsUnclaimedCard: React.FC<ChampionsUnclaimedCardProps> = ({
   category,
   categoryLabel,
-  categoryIcon: CatIcon,
-  banded = false,
-  theme = 'dark',
 }) => {
-  const isLight = theme === 'light';
-  const isAlbatross = category === 'most_albatrosses_90d' || category === 'most_albatrosses_all_time';
+  const { t } = useTranslation('courses');
+  const isAlbatross =
+    category === 'most_albatrosses_90d' || category === 'most_albatrosses_all_time';
   const headline = isAlbatross
-    ? 'No champion yet — your first albatross takes the crown'
-    : 'No champion yet — be the first to claim this crown';
-
-  const bandBg = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.025)';
-  const hairline = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
+    ? t('champions.unclaimedAlbatross')
+    : t('champions.unclaimedFirst');
 
   return (
-    <div
-      style={{
-        padding: '18px 16px',
-        borderTop: `0.5px solid ${hairline}`,
-        background: banded ? bandBg : 'transparent',
-        textAlign: 'center',
-      }}
-    >
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: 'var(--hcp-t-60)',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          marginBottom: 6,
-        }}
-      >
-        <CatIcon size={11} strokeWidth={2.4} />
-        {categoryLabel} · Unclaimed
-      </div>
-      <div
-        style={{
-          fontSize: 13.5,
-          fontWeight: 700,
-          color: AMBER,
-          letterSpacing: '-0.005em',
-        }}
-      >
-        {headline}
-      </div>
+    <div style={{ padding: '0 14px 12px', fontFamily: SANS }}>
+      <Panel title={categoryLabel} aside={t('champions.unclaimed')}>
+        <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5, color: A.MUTE }}>{headline}</p>
+      </Panel>
     </div>
   );
 };
 
 export default ChampionsUnclaimedCard;
-
