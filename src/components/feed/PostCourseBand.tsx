@@ -30,6 +30,8 @@ const RED = '#EF4444';
 const AMBER = '#F7931E';
 const LINE = 'rgba(255,255,255,0.10)';
 const SURFACE = 'rgba(255,255,255,0.035)';
+/** Solid feed card surface, used to keep the actions row off the photo backdrop. */
+const OPAQUE_SURFACE = '#15171F';
 
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
@@ -112,6 +114,8 @@ interface Props {
   actions: React.ReactNode;
   /** Extra content (C3 you-vs-them row) rendered under row one. */
   extra?: React.ReactNode;
+  /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
+  surface?: 'solid' | 'glass';
 }
 
 export const PostCourseBand: React.FC<Props> = ({
@@ -122,6 +126,7 @@ export const PostCourseBand: React.FC<Props> = ({
   onOpenStats,
   actions,
   extra,
+  surface = 'solid',
 }) => {
   const { t } = useTranslation('common');
 
@@ -274,8 +279,15 @@ export const PostCourseBand: React.FC<Props> = ({
     border: 'none',
   };
 
+  const glass = surface === 'glass';
+
   return (
-    <div style={{ background: SURFACE, borderTop: `1px solid ${LINE}` }}>
+    <div
+      style={{
+        background: glass ? 'transparent' : SURFACE,
+        borderTop: `1px solid ${LINE}`,
+      }}
+    >
       {tappable ? (
         <button
           type="button"
@@ -295,7 +307,16 @@ export const PostCourseBand: React.FC<Props> = ({
 
       {extra ? <div style={{ padding: '0 14px 8px' }}>{extra}</div> : null}
 
-      <div style={{ borderTop: `1px solid ${LINE}` }}>{actions}</div>
+      {/* In glass mode the actions row is the ONE opaque block: the photo
+          backdrop stops here. */}
+      <div
+        style={{
+          borderTop: `1px solid ${LINE}`,
+          background: glass ? OPAQUE_SURFACE : undefined,
+        }}
+      >
+        {actions}
+      </div>
     </div>
   );
 };

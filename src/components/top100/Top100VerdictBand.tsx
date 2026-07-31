@@ -14,7 +14,7 @@
  * Analytics callsites:
  *  - top100_verdict_shown  { course_id, direction, gap, rating_count } —
  *    once per course per session, first intersection only (same one-shot
- *    IntersectionObserver pattern as PostCourseDataLine).
+ *    IntersectionObserver pattern used across feed panels).
  *  - top100_verdict_tapped { course_id, direction }
  */
 import React, { useEffect, useRef } from 'react';

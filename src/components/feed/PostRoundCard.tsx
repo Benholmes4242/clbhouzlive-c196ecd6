@@ -2,13 +2,13 @@
  * PostRoundCard — the scorecard block for a Clubhouse post with a round
  * attached (BRIEF_ROUND_POST_CARD).
  *
- * Full bleed: no radius, no border, no horizontal margin. Renders a course
- * photo with a dark glass panel over its lower part; when there is no course
- * photo the panel sits on the flat feed surface with NO backdrop filter.
+ * Full bleed: no radius, no border, no horizontal margin. The course photo
+ * backdrop and its glass surface are owned by FeedCard at card level; this
+ * block is transparent and applies no backdrop filter of its own.
  *
  * Data comes from the batched `usePostRounds` map at page level — this
  * component NEVER fetches. Scoring marks come from the shared ScoreMark
- * renderer; feat chips from the shared RoundFeatChips.
+ * renderer.
  *
  * Analytics:
  *  - round_post_shown  { post_id, notability, has_holes, has_crown } — once
@@ -19,8 +19,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Crown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { RoundFeatChips } from '@/components/explore-tab-new/RoundFeatChips';
-import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import {
   SC_FILL_GOLD,
@@ -37,7 +35,6 @@ const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
 const GREEN = '#34D77F';
 const RED = '#FF6B60';
-const FLAT_SURFACE = '#111418';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 
 const NUM: React.CSSProperties = {
@@ -77,7 +74,6 @@ interface Props {
   notability?: number | null;
   courseName?: string | null;
   courseRegion?: string | null;
-  coursePhotoUrl?: string | null;
   /** Only rendered when a previous holder can be resolved. */
   crown?: RoundCrown | null;
 }
@@ -247,24 +243,10 @@ export const PostRoundCard: React.FC<Props> = ({
   notability,
   courseName,
   courseRegion,
-  coursePhotoUrl,
   crown,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
-
-  const feats = useMemo(
-    () =>
-      deriveRoundFeats({
-        birdies: round.birdies,
-        eagles: round.eagles,
-        albatrosses: round.albatrosses,
-        holes_in_one: round.holesInOne,
-        beat_par: round.beatPar,
-        clean_card: round.cleanCard,
-      }),
-    [round],
-  );
 
   const holes = round.holeShape ?? [];
   const hasHoles = holes.length > 0;
@@ -280,7 +262,6 @@ export const PostRoundCard: React.FC<Props> = ({
         io.disconnect();
         analyticsEvents.track('feed_round_card_shown', {
           has_holes: hasHoles,
-          feat_count: feats.length,
         });
         const key = postId ?? round.whsScoreId;
         if (!seenRoundPosts.has(key)) {
@@ -298,26 +279,20 @@ export const PostRoundCard: React.FC<Props> = ({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasHoles, feats.length, postId, notability, showCrown, round.whsScoreId]);
+  }, [hasHoles, postId, notability, showCrown, round.whsScoreId]);
 
   const gross = round.grossScore;
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
   const kicker = dateKicker(round.playDate);
-  const hasPhoto = !!coursePhotoUrl;
 
-  const panelStyle: React.CSSProperties = hasPhoto
-    ? {
-        background: 'rgba(11,13,16,0.66)',
-        backdropFilter: 'blur(22px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(22px) saturate(150%)',
-        borderTop: `1px solid ${HAIRLINE}`,
-        padding: '14px 14px 16px',
-      }
-    : {
-        background: FLAT_SURFACE,
-        borderTop: `1px solid ${HAIRLINE}`,
-        padding: '14px 14px 16px',
-      };
+  // The card-level backdrop and glass now live in FeedCard. This block is
+  // transparent and never applies a backdrop filter of its own.
+  const panelStyle: React.CSSProperties = {
+    background: 'transparent',
+    borderTop: `1px solid ${HAIRLINE}`,
+    padding: '14px 14px 16px',
+  };
+
 
   const handleTap = onTap
     ? (e: React.MouseEvent) => {
@@ -338,30 +313,16 @@ export const PostRoundCard: React.FC<Props> = ({
       role={onTap ? 'button' : undefined}
       tabIndex={onTap ? 0 : undefined}
       onClick={handleTap}
-      style={{ cursor: onTap ? 'pointer' : 'default', background: FLAT_SURFACE }}
+      style={{ cursor: onTap ? 'pointer' : 'default', background: 'transparent' }}
     >
-      <div
-        style={{
-          position: 'relative',
-          minHeight: 200,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          backgroundImage: hasPhoto ? `url(${coursePhotoUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundColor: FLAT_SURFACE,
-        }}
-      >
+      <div style={{ position: 'relative' }}>
         {showCrown && (
           <div
             style={{
-              position: 'absolute',
-              top: 12,
-              left: 12,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
+              margin: '12px 0 0 14px',
               padding: '4px 8px',
               borderRadius: 999,
               background: 'rgba(11,13,16,0.66)',
@@ -377,6 +338,8 @@ export const PostRoundCard: React.FC<Props> = ({
             {crown?.category}
           </div>
         )}
+
+
 
         <div style={panelStyle}>
           {kicker && (
@@ -482,6 +445,7 @@ export const PostRoundCard: React.FC<Props> = ({
         </div>
       </div>
 
+
       {showCrown && crown && (
         <div
           style={{
@@ -491,7 +455,7 @@ export const PostRoundCard: React.FC<Props> = ({
             gap: 10,
             padding: '10px 14px',
             borderTop: `1px solid ${HAIRLINE}`,
-            background: FLAT_SURFACE,
+            background: 'transparent',
           }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -514,20 +478,6 @@ export const PostRoundCard: React.FC<Props> = ({
               {crown.margin}
             </span>
           )}
-        </div>
-      )}
-
-      {feats.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 5,
-            padding: '10px 14px',
-            background: FLAT_SURFACE,
-          }}
-        >
-          <RoundFeatChips feats={feats} />
         </div>
       )}
     </div>

@@ -44,7 +44,6 @@ import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
-import { PostCourseDataLine } from './PostCourseDataLine';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
 import { PostRoundCard } from './PostRoundCard';
@@ -402,8 +401,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       img.removeEventListener('error', onError);
     };
   }, [isFirstCard, isMulti, media, fireContentReady]);
-
-
+  // Photo backdrop only for round posts that actually have a course photo.
+  const hasRoundBackdrop = Boolean(postRound && post.courseThumbnailImage);
 
   return (
     <article
@@ -420,6 +419,38 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {reviewRating != null && (
         <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
       )}
+
+      {/* Round posts with a course photo: card-level photo backdrop. Everything
+          above the actions row paints on one glass surface over it. No photo
+          means no backdrop and no backdrop-filter anywhere. */}
+      {hasRoundBackdrop && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            backgroundImage: `url(${post.courseThumbnailImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
+
+      <div
+        style={
+          hasRoundBackdrop
+            ? {
+                position: 'relative',
+                zIndex: 1,
+                background: 'rgba(11,13,16,0.66)',
+                backdropFilter: 'blur(22px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+              }
+            : { position: 'relative', zIndex: 1 }
+        }
+      >
+
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
@@ -526,7 +557,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           notability={post.roundNotability ?? null}
           courseName={post.courseName ?? null}
           courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
-          coursePhotoUrl={post.courseThumbnailImage ?? null}
+          
           onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
         />
       )}
@@ -667,7 +698,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
 
         if (!hasCourse) {
-          return <div style={{ borderTop: `0.5px solid ${LINE}` }}>{actionsRow}</div>;
+          return (
+            <div
+              style={{
+                borderTop: `0.5px solid ${LINE}`,
+                background: hasRoundBackdrop ? CARD : undefined,
+              }}
+            >
+              {actionsRow}
+            </div>
+          );
         }
 
         return (
@@ -679,15 +719,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               actions={actionsRow}
-              extra={
-                courseContext && postRound?.grossScore != null ? (
-                  <PostCourseDataLine
-                    ctx={courseContext}
-                    theirGross={postRound.grossScore}
-                    panel={false}
-                  />
-                ) : null
-              }
+              surface={hasRoundBackdrop ? 'glass' : 'solid'}
             />
             {post.courseId && statsOpen && (
               <CourseStatsSheet
@@ -702,6 +734,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </>
         );
       })()}
+      </div>
     </article>
   );
 };
