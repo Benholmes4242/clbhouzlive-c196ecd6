@@ -1,15 +1,20 @@
 /**
- * CourseStatusToggle - Equal-width pill buttons for course status
+ * CourseStatusToggle - "Your status" as a control, not a badge.
+ *
+ * BRIEF_COURSE_YOU_TAB_TREATMENT s2: the amber-tinted hero card, gradient star
+ * tile and tinted "Played" pill are gone. Two selectable pills say what the
+ * copy used to. Mutation, loading and error behaviour are unchanged.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Star, Check, Bookmark } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
+import { A, LABEL, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
 
 interface CourseStatusToggleProps {
   courseId: string;
@@ -18,10 +23,21 @@ interface CourseStatusToggleProps {
   className?: string;
 }
 
+const pillStyle = (active: boolean): React.CSSProperties => ({
+  border: `1px solid ${active ? A.INK : A.BORDER}`,
+  background: active ? A.INK : A.PANEL,
+  color: active ? A.PANEL : A.INK,
+  borderRadius: 999,
+  padding: '8px 16px',
+  fontSize: 12.5,
+  fontWeight: 700,
+  fontFamily: SANS,
+  cursor: 'pointer',
+  minHeight: 40,
+});
+
 export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   courseId,
-  courseName,
-  userRating,
   className,
 }) => {
   const { user } = useSupabaseSession();
@@ -31,7 +47,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   if (!user) {
     return (
-      <div className={cn("space-y-3", className)}>
+      <div className={cn('space-y-3', className)}>
         <p className="text-sm text-muted-foreground">{t('phase5.statusToggle.signInPrompt')}</p>
         <Button variant="outline" size="sm" onClick={() => navigate('/auth')} className="w-full">
           {t('phase5.statusToggle.signIn')}
@@ -42,7 +58,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("flex items-center justify-center py-4", className)}>
+      <div className={cn('flex items-center justify-center py-4', className)}>
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     );
@@ -63,135 +79,25 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
-  
 
   return (
-    <div className={cn('space-y-3', className)}>
-      {/* HERO — Played / Rate (amber-star language from the reviews page) */}
-      {isPlayed ? (
-        <button
-          onClick={handlePlayedClick}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: 16,
-            borderRadius: 18,
-            cursor: 'pointer',
-            textAlign: 'left',
-            background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
-            border: '1.5px solid rgba(247,147,30,0.15)',
-          }}
-        >
-          <div style={{
-            width: 46, height: 46, borderRadius: 13, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-          }}>
-            <Star size={22} color="#fff" fill="#fff" strokeWidth={0} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-              {t('phase5.statusToggle.playedTitle')}
-            </div>
-            <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
-              {t('phase5.statusToggle.playedSub')}
-            </div>
-          </div>
-          <span style={{
-            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '7px 13px', borderRadius: 999,
-            background: 'rgba(247,147,30,0.12)', color: '#F7931E',
-            fontSize: 12.5, fontWeight: 700,
-          }}>
-            <Check size={15} strokeWidth={2.5} /> {t('phase5.statusToggle.playedBadge')}
-          </span>
+    <Panel style={{ fontFamily: SANS }}>
+      <div style={{ ...LABEL, marginBottom: 10 }}>{t('courseDetail.you.status')}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button type="button" onClick={handlePlayedClick} style={pillStyle(isPlayed)}>
+          {t('courseDetail.you.played')}
         </button>
-      ) : (
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: 16,
-            borderRadius: 18,
-            background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
-            border: '1.5px solid rgba(247,147,30,0.15)',
-          }}
-        >
-          <div style={{
-            width: 46, height: 46, borderRadius: 13, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-          }}>
-            <Star size={22} color="#fff" fill="#fff" strokeWidth={0} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-              {t('phase5.statusToggle.notPlayedTitle')}
-            </div>
-            <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
-              {t('phase5.statusToggle.notPlayedSub')}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handlePlayedClick}
-            disabled={isUpdating}
-            style={{
-              flexShrink: 0, padding: '9px 18px', borderRadius: 999,
-              fontSize: 13, fontWeight: 700, color: '#fff', border: 'none',
-              background: '#F7931E', boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
-              cursor: 'pointer',
-            }}
-          >
-            {t('phase5.statusToggle.rate')}
-          </button>
-        </div>
-      )}
-
-      {/* WANT TO PLAY — subtle toggle row; hidden once played */}
-      {!isPlayed && (
         <button
+          type="button"
           onClick={handleWantToPlayClick}
-          disabled={isUpdating}
-          style={{
-            width: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 14px', borderRadius: 14, cursor: 'pointer',
-            background: '#fff', border: '1px solid rgba(15,23,42,0.07)',
-          }}
+          disabled={isUpdating || isPlayed}
+          style={{ ...pillStyle(isWantToPlay), opacity: isPlayed ? 0.4 : 1 }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5, fontWeight: 600, color: '#0F172A' }}>
-            <Bookmark
-              size={19}
-              strokeWidth={2}
-              color={isWantToPlay ? '#F7931E' : '#64748B'}
-              fill={isWantToPlay ? '#F7931E' : 'none'}
-            />
-            {isWantToPlay ? t('phase5.statusToggle.onBucketList') : t('phase5.statusToggle.addBucketList')}
-          </span>
-          {isUpdating ? (
-            <Loader2 className="h-4 w-4 animate-spin" style={{ color: '#94A3B8' }} />
-          ) : (
-            <span style={{
-              width: 44, height: 26, borderRadius: 999, position: 'relative', flexShrink: 0,
-              background: isWantToPlay ? '#F7931E' : '#E2E8F0',
-              transition: 'background 0.18s ease',
-            }}>
-              <span style={{
-                position: 'absolute', top: 3, left: isWantToPlay ? 21 : 3,
-                width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.18s ease',
-              }} />
-            </span>
-          )}
+          {t('courseDetail.you.wantToPlay')}
         </button>
-      )}
-
-    </div>
+        {isUpdating && <Loader2 className="h-4 w-4 animate-spin" style={{ color: A.DIM }} />}
+      </div>
+    </Panel>
   );
 };
 
