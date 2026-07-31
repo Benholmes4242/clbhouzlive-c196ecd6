@@ -22,8 +22,12 @@ export function shortCourseName(name: string, max = 26): string {
   const paren = m ? m[2] : '';
 
   const trimmedStem = stem.replace(CLUB_SUFFIX, '').trim() || stem;
-  const out = (paren ? `${trimmedStem} ${paren}` : trimmedStem).trim();
+  // The max applies to the stem only: a parenthetical is a disambiguator and is
+  // never dropped or clipped. CSS ellipsis is the second guard on width.
+  const clipped =
+    trimmedStem.length <= max
+      ? trimmedStem
+      : `${trimmedStem.slice(0, Math.max(0, max - 1)).trimEnd()}\u2026`;
 
-  if (out.length <= max) return out;
-  return `${out.slice(0, Math.max(0, max - 1)).trimEnd()}\u2026`;
+  return (paren ? `${clipped} ${paren}` : clipped).trim();
 }
