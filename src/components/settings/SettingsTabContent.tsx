@@ -13,6 +13,8 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
+import { useTranslation } from 'react-i18next';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -60,6 +62,7 @@ type SettingsProfileRow = {
   is_public?: boolean | null;
   handicap_visibility?: VisibilityLevel | null;
   leaderboard_visibility?: VisibilityLevel | null;
+  auto_post_rounds?: boolean | null;
   hide_handicap_chip?: boolean | null;
   eg_handicap_index?: number | null;
   manual_handicap_index?: number | null;
@@ -75,6 +78,7 @@ interface WindowWithMedian extends Window {
 
 export function SettingsTabContent() {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile: profileRaw, loading } = useProfileData();
   const profile = profileRaw as SettingsProfileRow;
@@ -96,7 +100,13 @@ export function SettingsTabContent() {
     !!profile?.is_public,
     (profile?.handicap_visibility ?? 'public') as VisibilityLevel,
     (profile?.leaderboard_visibility ?? 'public') as VisibilityLevel,
+    profile?.auto_post_rounds ?? true,
   );
+
+  const handleToggleAutoPostRounds = (enabled: boolean) => {
+    analyticsEvents.track('settings_auto_post_rounds_toggled', { enabled });
+    void privacy.toggleAutoPostRounds(enabled);
+  };
 
   const deleteAccount = useDeleteAccount(user?.id);
   const { data: whsConnection } = useWhsConnection(user?.id);
@@ -252,6 +262,15 @@ export function SettingsTabContent() {
             value={privacy.leaderboardVisibility}
             disabled={privacy.isUpdatingLeaderboardVisibility}
             onChange={privacy.setLeaderboardVisibilityLevel}
+          />
+          <SettingsToggleRow
+            icon={<Eye size={18} />}
+            title={t('settings.autoPostRounds.title')}
+            subtitle={t('settings.autoPostRounds.subtitle')}
+            iconTheme="privacy"
+            checked={privacy.autoPostRounds}
+            disabled={privacy.isUpdatingAutoPostRounds}
+            onCheckedChange={handleToggleAutoPostRounds}
           />
           <SettingsChevronRow
             icon={<UserX size={18} />}

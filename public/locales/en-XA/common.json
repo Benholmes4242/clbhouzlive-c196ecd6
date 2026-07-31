@@ -78,5 +78,11 @@
     "tryAgainLater": "[~~Ƥļéášé ţřý áĝáíñ ļáţéř.~~]",
     "updated": "[~~Úƥđáţéđ~~]",
     "uploading": "[~~Úƥļőáđíñĝ...~~]"
+  },
+  "settings": {
+    "autoPostRounds": {
+      "title": "[Pöst mý röünds äütömätïcällý]",
+      "subtitle": "[Ýöür röünds äppëär ïn thë Clübhöüsë whën ýöü lög thëm. Önlý ständöüt röünds rëäch mëmbërs whö dö nöt föllöw ýöü.]"
+    }
   }
 }

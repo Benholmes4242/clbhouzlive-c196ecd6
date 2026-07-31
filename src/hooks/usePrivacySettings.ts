@@ -14,12 +14,15 @@ export function usePrivacySettings(
   initialIsPublic: boolean,
   initialHandicapVisibility: VisibilityLevel = 'public',
   initialLeaderboardVisibility: VisibilityLevel = 'public',
+  initialAutoPostRounds: boolean = true,
 ) {
   const queryClient = useQueryClient();
 
   const [isPublic, setIsPublic] = useState(initialIsPublic);
   const [handicapVisibility, setHandicapVisibility] = useState<VisibilityLevel>(initialHandicapVisibility);
   const [leaderboardVisibility, setLeaderboardVisibility] = useState<VisibilityLevel>(initialLeaderboardVisibility);
+  const [autoPostRounds, setAutoPostRounds] = useState(initialAutoPostRounds);
+  const [isUpdatingAutoPostRounds, setIsUpdatingAutoPostRounds] = useState(false);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [isUpdatingHandicapVisibility, setIsUpdatingHandicapVisibility] = useState(false);
   const [isUpdatingLeaderboardVisibility, setIsUpdatingLeaderboardVisibility] = useState(false);
@@ -27,6 +30,7 @@ export function usePrivacySettings(
   useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
   useEffect(() => { setHandicapVisibility(initialHandicapVisibility); }, [initialHandicapVisibility]);
   useEffect(() => { setLeaderboardVisibility(initialLeaderboardVisibility); }, [initialLeaderboardVisibility]);
+  useEffect(() => { setAutoPostRounds(initialAutoPostRounds); }, [initialAutoPostRounds]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -101,8 +105,31 @@ export function usePrivacySettings(
     }
   };
 
+  const toggleAutoPostRounds = async (value: boolean) => {
+    if (!userId) return;
+    setIsUpdatingAutoPostRounds(true);
+    const prev = autoPostRounds;
+    setAutoPostRounds(value);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ auto_post_rounds: value })
+        .eq('id', userId);
+      if (error) throw error;
+      invalidate();
+    } catch {
+      setAutoPostRounds(prev);
+      toast.error('Could not update round posting setting.');
+    } finally {
+      setIsUpdatingAutoPostRounds(false);
+    }
+  };
+
   return {
     isPublic,
+    autoPostRounds,
+    isUpdatingAutoPostRounds,
+    toggleAutoPostRounds,
     handicapVisibility,
     leaderboardVisibility,
     isUpdatingPrivacy,

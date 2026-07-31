@@ -41,6 +41,8 @@ export interface PostRound {
   holesInOne: number | null;
   beatPar: boolean | null;
   cleanCard: boolean | null;
+  slopeRating: number | null;
+  longestBirdieRun: number | null;
   /** null when the round has no hole detail - render without the strip. */
   holeShape: PostRoundHole[] | null;
 }
@@ -100,7 +102,7 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
         supabase
           .from('gam_round_stats')
           .select(
-            'whs_score_id, gross_score, course_par, delta_index, play_date, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card',
+            'whs_score_id, gross_score, course_par, delta_index, play_date, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, slope_rating, longest_birdie_run',
           )
           .in('whs_score_id', ids),
         supabase
@@ -141,6 +143,8 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
           holesInOne: (r.holes_in_one as number | null) ?? null,
           beatPar: (r.beat_par as boolean | null) ?? null,
           cleanCard: (r.clean_card as boolean | null) ?? null,
+          slopeRating: (r.slope_rating as number | null) ?? null,
+          longestBirdieRun: (r.longest_birdie_run as number | null) ?? null,
           // Sorted defensively: the `.order` above covers the query, this
           // covers the grouping.
           holeShape:
