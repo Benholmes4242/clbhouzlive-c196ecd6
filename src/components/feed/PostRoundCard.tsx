@@ -1,42 +1,52 @@
 /**
  * PostRoundCard — the scorecard block for a Clubhouse post with a round
- * attached (C3). Renders ABOVE media, inside the dark feed card.
+ * attached (BRIEF_ROUND_POST_CARD).
+ *
+ * Full bleed: no radius, no border, no horizontal margin. Renders a course
+ * photo with a dark glass panel over its lower part; when there is no course
+ * photo the panel sits on the flat feed surface with NO backdrop filter.
  *
  * Data comes from the batched `usePostRounds` map at page level — this
- * component NEVER fetches. Feat chips use the SHARED RoundFeatChips so the
- * feed can never drift from Discover.
+ * component NEVER fetches. Scoring marks come from the shared ScoreMark
+ * renderer; feat chips from the shared RoundFeatChips.
  *
  * Analytics:
- *  - feed_round_card_shown  { has_holes, feat_count } — once per post, on
- *    first intersection.
- *  - feed_round_card_tapped { whs_score_id } — on tap through to the round.
+ *  - round_post_shown  { post_id, notability, has_holes, has_crown } — once
+ *    per post per session.
+ *  - round_post_tapped { post_id, notability }
+ *  - feed_round_card_shown / feed_round_card_tapped — existing, untouched.
  */
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Crown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RoundFeatChips } from '@/components/explore-tab-new/RoundFeatChips';
 import { deriveRoundFeats } from '@/lib/gam/roundFeats';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import {
+  SC_FILL_GOLD,
+  SC_FILL_BIRDIE,
+  SC_FILL_BOGEY,
+  SC_FILL_DOUBLE,
+} from '@/features/courses/components/holes/_constants';
+import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 
-const T100 = '#F8FAFC';
-const T60 = 'rgba(248,250,252,0.65)';
-const T40 = 'rgba(248,250,252,0.45)';
-const LINE = 'rgba(248,250,252,0.10)';
-const UNDER = '#34D399';
-const OVER = '#F87171';
+const INK = '#F4F7F9';
+const MUTE = 'rgba(255,255,255,0.62)';
+const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
+const GREEN = '#34D77F';
+const RED = '#FF6B60';
+const FLAT_SURFACE = '#111418';
+const HAIRLINE = 'rgba(255,255,255,0.08)';
 
-const MONO =
-  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
-
-const kickerStyle: React.CSSProperties = {
-  fontSize: 9.5,
-  fontWeight: 800,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  color: T40,
-  lineHeight: 1,
+const NUM: React.CSSProperties = {
+  fontVariantNumeric: 'tabular-nums',
+  fontFeatureSettings: '"zero" 0',
 };
+
+/** Once-per-session impression guard. */
+const seenRoundPosts = new Set<string>();
 
 function fmtToPar(n: number | null): string {
   if (n == null) return '—';
@@ -44,63 +54,202 @@ function fmtToPar(n: number | null): string {
 }
 
 function toParColor(n: number | null): string {
-  if (n == null || n === 0) return T60;
-  return n < 0 ? UNDER : OVER;
+  if (n == null) return MUTE;
+  if (n === 0) return INK;
+  return n < 0 ? RED : MUTE;
 }
 
-/** Hole-by-hole shape strip. Colour reads relative to par. */
-const HoleStrip: React.FC<{ holes: NonNullable<PostRound['holeShape']> }> = ({ holes }) => {
-  const rel = holes.map((h) =>
-    h.gross != null && h.par != null ? h.gross - h.par : null,
-  );
-  const max = Math.max(2, ...rel.map((r) => (r == null ? 0 : Math.abs(r))));
-  return (
-    <div
-      aria-hidden
-      style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: 2,
-        height: 34,
-        marginTop: 10,
-      }}
-    >
-      {rel.map((r, i) => {
-        const mag = r == null ? 0 : Math.abs(r);
-        const h = r == null ? 3 : Math.max(3, Math.round((mag / max) * 30));
-        const bg =
-          r == null
-            ? 'rgba(248,250,252,0.14)'
-            : r < 0
-              ? UNDER
-              : r === 0
-                ? 'rgba(248,250,252,0.32)'
-                : OVER;
-        return (
-          <div
-            key={i}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              height: h,
-              borderRadius: 1.5,
-              background: bg,
-              opacity: r == null ? 1 : r === 0 ? 1 : 0.5 + Math.min(0.5, mag * 0.25),
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
+function dateKicker(playDate: string | null): string | null {
+  if (!playDate) return null;
+  return `${formatWeekdayShortGB(playDate)}, ${formatDayMonthShortGB(playDate)}`;
+}
+
+export interface RoundCrown {
+  category: string;
+  previousHolderName: string;
+  margin?: string | null;
+}
 
 interface Props {
   round: PostRound;
   onTap?: () => void;
+  postId?: string | null;
+  notability?: number | null;
+  courseName?: string | null;
+  courseRegion?: string | null;
+  coursePhotoUrl?: string | null;
+  /** Only rendered when a previous holder can be resolved. */
+  crown?: RoundCrown | null;
 }
 
-export const PostRoundCard: React.FC<Props> = ({ round, onTap }) => {
-  const { t } = useTranslation('common');
+type Hole = NonNullable<PostRound['holeShape']>[number];
+
+const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | null }> = ({
+  label,
+  total,
+  toPar,
+}) => (
+  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
+    <span
+      style={{
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color: DIM,
+      }}
+    >
+      {label}
+    </span>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+      <span style={{ ...NUM, fontSize: 13.5, fontWeight: 800, color: INK }}>{total ?? '—'}</span>
+      <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: toParColor(toPar) }}>
+        {fmtToPar(toPar)}
+      </span>
+    </span>
+  </div>
+);
+
+const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) => {
+  if (holes.length === 0) return null;
+  let total = 0;
+  let par = 0;
+  let any = false;
+  for (const h of holes) {
+    if (h.gross != null && h.par != null) {
+      total += h.gross;
+      par += h.par;
+      any = true;
+    }
+  }
+  return (
+    <div style={{ marginTop: 12 }}>
+      <LabelRow label={label} total={any ? total : null} toPar={any ? total - par : null} />
+      <div style={{ display: 'flex', gap: 3 }}>
+        {holes.map((h) => (
+          <div
+            key={h.holeNo}
+            style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <span style={{ ...NUM, fontSize: 9, fontWeight: 700, color: DIM, lineHeight: 1.2 }}>
+              {h.holeNo}
+            </span>
+            <span
+              style={{ ...NUM, fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.26)', lineHeight: 1.3 }}
+            >
+              {h.par ?? '·'}
+            </span>
+            <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
+  const pts = useMemo(() => {
+    let cum = 0;
+    const out: { cum: number; kind: 'eagle' | 'birdie' | 'bogey' | 'double' | null }[] = [];
+    for (const h of holes) {
+      if (h.gross == null || h.par == null) continue;
+      const d = h.gross - h.par;
+      cum += d;
+      let kind: 'eagle' | 'birdie' | 'bogey' | 'double' | null = null;
+      if (d <= -2) kind = 'eagle';
+      else if (d === -1) kind = 'birdie';
+      else if (d === 1) kind = 'bogey';
+      else if (d >= 2) kind = 'double';
+      out.push({ cum, kind });
+    }
+    return out;
+  }, [holes]);
+
+  if (pts.length < 2) return null;
+
+  const w = 320;
+  const height = 74;
+  const padX = 5;
+  const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
+  const n = pts.length;
+  const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
+  const y0 = height / 2;
+  const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 10);
+  const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)},${y(p.cum).toFixed(1)}`).join(' ');
+  const final = pts[pts.length - 1].cum;
+
+  const fillFor = (kind: NonNullable<(typeof pts)[number]['kind']>) =>
+    kind === 'eagle'
+      ? SC_FILL_GOLD
+      : kind === 'birdie'
+        ? SC_FILL_BIRDIE
+        : kind === 'bogey'
+          ? SC_FILL_BOGEY
+          : SC_FILL_DOUBLE;
+
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        borderRadius: 14,
+        padding: '12px 14px 10px',
+        border: `1px solid ${HAIRLINE}`,
+        background: 'rgba(11,13,16,0.66)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: DIM,
+          }}
+        >
+          Trajectory
+        </span>
+        <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: toParColor(final) }}>
+          {fmtToPar(final)}
+        </span>
+      </div>
+      <svg width="100%" viewBox={`0 0 ${w} ${height}`} style={{ display: 'block' }} aria-hidden>
+        <line
+          x1={padX}
+          x2={w - padX}
+          y1={y0}
+          y2={y0}
+          stroke="rgba(255,255,255,0.18)"
+          strokeWidth="1"
+          strokeDasharray="3 4"
+        />
+        <path
+          d={path}
+          fill="none"
+          stroke={INK}
+          strokeWidth="2"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {pts.map((p, i) =>
+          p.kind ? <circle key={i} cx={x(i)} cy={y(p.cum)} r="3.2" fill={fillFor(p.kind)} /> : null,
+        )}
+      </svg>
+    </div>
+  );
+};
+
+export const PostRoundCard: React.FC<Props> = ({
+  round,
+  onTap,
+  postId,
+  notability,
+  courseName,
+  courseRegion,
+  coursePhotoUrl,
+  crown,
+}) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
 
@@ -117,7 +266,9 @@ export const PostRoundCard: React.FC<Props> = ({ round, onTap }) => {
     [round],
   );
 
-  const hasHoles = !!round.holeShape && round.holeShape.length > 0;
+  const holes = round.holeShape ?? [];
+  const hasHoles = holes.length > 0;
+  const showCrown = (notability ?? 0) === 3 && !!crown && !!crown.previousHolderName;
 
   useEffect(() => {
     const el = ref.current;
@@ -131,135 +282,252 @@ export const PostRoundCard: React.FC<Props> = ({ round, onTap }) => {
           has_holes: hasHoles,
           feat_count: feats.length,
         });
+        const key = postId ?? round.whsScoreId;
+        if (!seenRoundPosts.has(key)) {
+          seenRoundPosts.add(key);
+          // round_post_shown — once per post per session
+          analyticsEvents.track('round_post_shown', {
+            post_id: postId ?? null,
+            notability: notability ?? null,
+            has_holes: hasHoles,
+            has_crown: showCrown,
+          });
+        }
       },
       { threshold: 0.5 },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasHoles, feats.length]);
+  }, [hasHoles, feats.length, postId, notability, showCrown, round.whsScoreId]);
 
   const gross = round.grossScore;
-  const toPar =
-    gross != null && round.coursePar != null ? gross - round.coursePar : null;
+  const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
+  const kicker = dateKicker(round.playDate);
+  const hasPhoto = !!coursePhotoUrl;
 
-  // Under/over summary from the shape (silent when there is no hole detail).
-  const summary = useMemo(() => {
-    if (!round.holeShape) return null;
-    let under = 0;
-    let over = 0;
-    for (const h of round.holeShape) {
-      if (h.gross == null || h.par == null) continue;
-      if (h.gross < h.par) under += 1;
-      else if (h.gross > h.par) over += 1;
-    }
-    return { under, over };
-  }, [round.holeShape]);
+  const panelStyle: React.CSSProperties = hasPhoto
+    ? {
+        background: 'rgba(11,13,16,0.66)',
+        backdropFilter: 'blur(22px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+        borderTop: `1px solid ${HAIRLINE}`,
+        padding: '14px 14px 16px',
+      }
+    : {
+        background: FLAT_SURFACE,
+        borderTop: `1px solid ${HAIRLINE}`,
+        padding: '14px 14px 16px',
+      };
 
-  const delta = round.deltaIndex;
+  const handleTap = onTap
+    ? (e: React.MouseEvent) => {
+        e.stopPropagation();
+        analyticsEvents.track('feed_round_card_tapped', { whs_score_id: round.whsScoreId });
+        // round_post_tapped
+        analyticsEvents.track('round_post_tapped', {
+          post_id: postId ?? null,
+          notability: notability ?? null,
+        });
+        onTap();
+      }
+    : undefined;
 
   return (
     <div
       ref={ref}
       role={onTap ? 'button' : undefined}
       tabIndex={onTap ? 0 : undefined}
-      onClick={
-        onTap
-          ? (e) => {
-              e.stopPropagation();
-              analyticsEvents.track('feed_round_card_tapped', {
-                whs_score_id: round.whsScoreId,
-              });
-              onTap();
-            }
-          : undefined
-      }
-      style={{
-        padding: '12px 14px 14px',
-        borderTop: `0.5px solid ${LINE}`,
-        borderBottom: `0.5px solid ${LINE}`,
-        cursor: onTap ? 'pointer' : 'default',
-      }}
+      onClick={handleTap}
+      style={{ cursor: onTap ? 'pointer' : 'default', background: FLAT_SURFACE }}
     >
-      <div style={kickerStyle}>{t('feed.roundCard.kicker')}</div>
-
       <div
         style={{
+          position: 'relative',
+          minHeight: 200,
           display: 'flex',
-          alignItems: 'baseline',
-          gap: 10,
-          marginTop: 8,
-          flexWrap: 'wrap',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          backgroundImage: hasPhoto ? `url(${coursePhotoUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: FLAT_SURFACE,
         }}
       >
-        <span
-          style={{
-            fontFamily: MONO,
-            fontVariantNumeric: 'tabular-nums',
-            fontSize: 44,
-            lineHeight: 1,
-            fontWeight: 700,
-            color: T100,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {gross ?? '—'}
-        </span>
-        <span
-          style={{
-            fontFamily: MONO,
-            fontVariantNumeric: 'tabular-nums',
-            fontSize: 18,
-            fontWeight: 700,
-            color: toParColor(toPar),
-            lineHeight: 1,
-          }}
-        >
-          {fmtToPar(toPar)}
-        </span>
-        {delta != null && delta !== 0 && (
-          <span
+        {showCrown && (
+          <div
             style={{
-              fontFamily: MONO,
-              fontVariantNumeric: 'tabular-nums',
-              fontSize: 11,
-              fontWeight: 700,
-              color: delta < 0 ? AMBER : T60,
-              lineHeight: 1,
+              position: 'absolute',
+              top: 12,
+              left: 12,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '4px 8px',
+              borderRadius: 999,
+              background: 'rgba(11,13,16,0.66)',
+              border: `1px solid ${HAIRLINE}`,
+              color: AMBER,
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
             }}
           >
-            {t('feed.roundCard.index')} {delta > 0 ? '+' : '−'}
-            {Math.abs(delta).toFixed(1)}
-          </span>
+            <Crown size={11} color={AMBER} aria-hidden />
+            {crown?.category}
+          </div>
         )}
+
+        <div style={panelStyle}>
+          {kicker && (
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: AMBER,
+              }}
+            >
+              {kicker}
+            </div>
+          )}
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginTop: 6,
+            }}
+          >
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  color: '#FFFFFF',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {courseName ?? ''}
+              </div>
+              {courseRegion && (
+                <div style={{ fontSize: 11.5, color: MUTE, marginTop: 2 }}>{courseRegion}</div>
+              )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexShrink: 0 }}>
+              <span
+                style={{
+                  ...NUM,
+                  fontSize: 34,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  color: '#FFFFFF',
+                  lineHeight: 1,
+                }}
+              >
+                {gross ?? '—'}
+              </span>
+              <span style={{ ...NUM, fontSize: 15, fontWeight: 800, color: toParColor(toPar) }}>
+                {fmtToPar(toPar)}
+              </span>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginTop: 10,
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {round.coursePar != null && (
+              <span style={{ color: DIM }}>
+                Par <span style={{ ...NUM, color: INK }}>{round.coursePar}</span>
+              </span>
+            )}
+            {round.slopeRating != null && (
+              <span style={{ color: DIM }}>
+                Slope <span style={{ ...NUM, color: INK }}>{round.slopeRating}</span>
+              </span>
+            )}
+            {round.deltaIndex != null && (
+              <span style={{ color: DIM, marginLeft: 'auto' }}>
+                Index{' '}
+                <span style={{ ...NUM, color: round.deltaIndex < 0 ? GREEN : INK }}>
+                  {round.deltaIndex > 0 ? '+' : ''}
+                  {round.deltaIndex.toFixed(1)}
+                </span>
+              </span>
+            )}
+          </div>
+
+          {hasHoles && (
+            <>
+              <Trajectory holes={holes} />
+              <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
+              <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
+            </>
+          )}
+        </div>
       </div>
 
-      {feats.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10 }}>
-          <RoundFeatChips feats={feats} />
-        </div>
-      )}
-
-      {hasHoles && <HoleStrip holes={round.holeShape as NonNullable<PostRound['holeShape']>} />}
-
-      {summary && (summary.under > 0 || summary.over > 0) && (
+      {showCrown && crown && (
         <div
           style={{
             display: 'flex',
-            gap: 14,
-            marginTop: 8,
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: T40,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            padding: '10px 14px',
+            borderTop: `1px solid ${HAIRLINE}`,
+            background: FLAT_SURFACE,
           }}
         >
-          <span style={{ color: UNDER }}>
-            {summary.under} {t('feed.roundCard.under')}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <Crown size={13} color={AMBER} aria-hidden />
+            <span
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: INK,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              Took {crown.category} from {crown.previousHolderName}
+            </span>
           </span>
-          <span style={{ color: OVER }}>
-            {summary.over} {t('feed.roundCard.over')}
-          </span>
+          {crown.margin && (
+            <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: AMBER, flexShrink: 0 }}>
+              {crown.margin}
+            </span>
+          )}
+        </div>
+      )}
+
+      {feats.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 5,
+            padding: '10px 14px',
+            background: FLAT_SURFACE,
+          }}
+        >
+          <RoundFeatChips feats={feats} />
         </div>
       )}
     </div>
