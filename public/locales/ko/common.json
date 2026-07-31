@@ -78,5 +78,11 @@
     "tryAgainLater": "Please try again later.",
     "updated": "Updated",
     "uploading": "Uploading..."
+  },
+  "settings": {
+    "autoPostRounds": {
+      "title": "라운드 자동 게시",
+      "subtitle": "라운드를 기록하면 클럽하우스에 표시됩니다. 눈에 띄는 라운드만 팔로워가 아닌 회원에게도 노출됩니다."
+    }
   }
 }

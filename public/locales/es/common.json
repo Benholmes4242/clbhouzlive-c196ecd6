@@ -78,5 +78,11 @@
     "tryAgainLater": "Please try again later.",
     "updated": "Updated",
     "uploading": "Uploading..."
+  },
+  "settings": {
+    "autoPostRounds": {
+      "title": "Publicar mis rondas automáticamente",
+      "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
+    }
   }
 }

@@ -78,5 +78,11 @@
     "tryAgainLater": "Please try again later.",
     "updated": "Updated",
     "uploading": "Uploading..."
+  },
+  "settings": {
+    "autoPostRounds": {
+      "title": "ラウンドを自動的に投稿",
+      "subtitle": "記録したラウンドはクラブハウスに表示されます。特筆すべきラウンドのみ、フォロワー以外にも届きます。"
+    }
   }
 }

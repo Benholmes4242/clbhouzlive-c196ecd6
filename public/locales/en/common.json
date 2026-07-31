@@ -183,5 +183,11 @@
       "viewCourse": "View course",
       "footnote": "Computed from official WHS rounds posted by members."
     }
+  },
+  "settings": {
+    "autoPostRounds": {
+      "title": "Post my rounds automatically",
+      "subtitle": "Your rounds appear in the Clubhouse when you log them. Only standout rounds reach members who do not follow you."
+    }
   }
 }
