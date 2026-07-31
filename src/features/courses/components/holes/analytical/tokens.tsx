@@ -74,12 +74,14 @@ export function toParParts(v: number | null | undefined, digits = 1): ToParParts
 
 export const Panel: React.FC<{
   kicker?: string;
+  /** Panel-level heading (13/800 INK). Used where a panel titles itself. */
+  title?: string;
   aside?: string;
   footer?: string;
   onOpen?: () => void;
   children: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ kicker, aside, footer, onOpen, children, style }) => (
+}> = ({ kicker, title, aside, footer, onOpen, children, style }) => (
   <section
     style={{
       background: A.PANEL,
@@ -91,7 +93,7 @@ export const Panel: React.FC<{
       ...style,
     }}
   >
-    {(kicker || aside) && (
+    {(kicker || title || aside) && (
       <header
         style={{
           display: 'flex',
@@ -102,6 +104,7 @@ export const Panel: React.FC<{
         }}
       >
         {kicker && <span style={KICKER}>{kicker}</span>}
+        {title && !kicker && <span style={TITLE}>{title}</span>}
         {aside && <span style={{ ...LABEL, textAlign: 'right' }}>{aside}</span>}
       </header>
     )}
