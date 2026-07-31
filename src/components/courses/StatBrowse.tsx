@@ -518,10 +518,22 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
             {/* Count + lens */}
             <div className="flex items-center justify-between gap-3 mt-2.5">
-              <span style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.3 }}>
-                <strong style={{ color: INK, fontWeight: 800 }}>{formatNumber(totalCount)}</strong>{' '}
-                {trackedTotal > 0 && totalCount !== trackedTotal
-                  ? t('statBrowse.countOfTracked', {
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '5px 11px',
+                  borderRadius: 999,
+                  background: 'rgba(15,23,42,0.05)',
+                  border: `0.5px solid rgba(15,23,42,0.08)`,
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: INK,
+                  lineHeight: 1.35,
+                }}
+              >
+                {trackedTotal > 0
+                  ? t(`statBrowse.countLens.${lens}`, {
                       count: totalCount,
                       total: formatNumber(trackedTotal),
                     })
