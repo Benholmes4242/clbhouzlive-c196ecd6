@@ -129,7 +129,8 @@
     "noFriendsPlayed": "[~~Ñő ƒříéñđš ƥļáýéđ ýéţ~~]",
     "aiQuoteLoading": "[~~Ĝéñéřáţíñĝ ʠúőţé...~~]",
     "aiQuoteFallback": "[~~Á ĝőļƒ éẋƥéříéñĉé ļíǩé ñő őţĥéř~~]",
-    "experiencePoints": "[~~Éẋƥéříéñĉé Ƥőíñţš Éářñéđ~~]"
+    "experiencePoints": "[~~Éẋƥéříéñĉé Ƥőíñţš Éářñéđ~~]",
+    "yourRounds": "[Ýöür röünds]"
   },
   "explorer": {
     "unableToLoadTitle": "[~~Úñáƀļé ţő ļőáđ ĉőúřšéš~~]",
@@ -257,7 +258,11 @@
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
-      "noRoundsCta": "Be the first."
+      "noRoundsCta": "Be the first.",
+      "ratingLabel": "[Rätïng]",
+      "avgToParLabel": "[Ävg tö pär]",
+      "harderThanLabel": "[Härdér thän]",
+      "easierThanLabel": "[Éäsïér thän]"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",

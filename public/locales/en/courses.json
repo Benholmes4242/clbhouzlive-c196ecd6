@@ -256,7 +256,8 @@
     "aiQuoteFallback": "A golf experience like no other",
     "experiencePoints": "Experience Points Earned",
     "yourStats": "Your stats",
-    "rated": "Rated"
+    "rated": "Rated",
+    "yourRounds": "Your rounds"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
@@ -394,7 +395,11 @@
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
-      "noRoundsCta": "Be the first."
+      "noRoundsCta": "Be the first.",
+      "ratingLabel": "Rating",
+      "avgToParLabel": "Avg to par",
+      "harderThanLabel": "Harder than",
+      "easierThanLabel": "Easier than"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",

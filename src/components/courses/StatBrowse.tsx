@@ -20,6 +20,7 @@ import {
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
@@ -40,6 +41,7 @@ import {
   type StatBrowseRow,
   type StatLens,
 } from './useStatBrowse';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -164,6 +166,21 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const rankedIds = useMemo(() => rankedRows.map((r) => r.course_id), [rankedRows]);
   const enrichment = useTop100Enrichment(rankedIds, user?.id);
   const verdictConfig = useTop100Config();
+  /**
+   * Viewer status resolver — same shape as VirtualizedCourseList's, which is the
+   * reference. Enrichment answers for ranked courses; the user-stats map covers
+   * the unranked majority of this tab. Rated outranks played.
+   */
+  const yourRoundsMap = useUserStatsCourseMap();
+  const viewerStatusFor = useCallback(
+    (courseId: string): 'rated' | 'played' | null => {
+      const data = enrichment.get(courseId);
+      if (data?.ratedByYou) return 'rated';
+      if ((data?.yourRounds ?? 0) > 0) return 'played';
+      return (yourRoundsMap.get(courseId) ?? 0) > 0 ? 'played' : null;
+    },
+    [enrichment, yourRoundsMap],
+  );
   const [verdictSheet, setVerdictSheet] = useState<{
     courseId: string;
     courseName: string;
@@ -441,7 +458,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         className={
           compact
             ? COMPACT_TRIGGER_CLS
-            : 'h-8 rounded-xl border bg-white px-3 text-[12px] font-semibold w-auto'
+            : `${TRIGGER_CLS} w-full`
         }
         style={{ borderColor: HAIRLINE_INK_10, color: INK }}
         aria-label={t('statBrowse.selectLensA11y')}
@@ -516,11 +533,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </div>
 
 
-            {/* Lens picker. The "x of y tracked courses" badge was removed —
-                the headline copy already states the lens basis. */}
-            <div className="flex items-center justify-end gap-3 mt-2.5">
-              {lensSelect(false)}
-            </div>
+            {/* Lens picker owns its own full-width row: it is the control that
+                changes what every card on the page means. */}
+            <div className="mt-2.5">{lensSelect(false)}</div>
 
           </>
         )}
@@ -531,8 +546,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
         <div
           style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
-            textTransform: 'uppercase', color: AMBER,
+            ...KICKER,
           }}
         >
           {t('statBrowse.eyebrow')}
@@ -639,7 +653,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                   variant="vertical"
                   showRankBadges
                   showRating
-                  showPlayedStatus
+                  viewerStatus={viewerStatusFor(row.course_id)}
                   /* The lens chip renders unless it would duplicate a figure
                      already on the card — 'rated' repeats the community rating. */
                   statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}

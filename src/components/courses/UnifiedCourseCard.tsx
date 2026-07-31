@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Check, Calendar, Star } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { FlagChip } from './FlagChip';
@@ -33,8 +33,6 @@ interface UnifiedCourseCardProps {
   variant?: 'vertical' | 'horizontal';
   showRankBadges?: boolean;
   showRating?: boolean;
-  showPlayedStatus?: boolean;
-  showRateChip?: boolean;
   showGhostRank?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
@@ -86,8 +84,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   variant = 'vertical',
   showRankBadges = true,
   showRating = true,
-  showPlayedStatus = false,
-  showRateChip = false,
   showGhostRank = false,
   showFriendsContext = false,
   showLastPlayed = false,
@@ -118,7 +114,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 
   const regionalRank = course.ranks?.usa ?? course.ranks?.regional ?? null;
   const regionalBadgeSlug = getRegionalBadgeSlug(course);
-  const isPlayed = course.context?.isPlayedByViewer;
 
   // ============ HORIZONTAL VARIANT ============
   if (variant === 'horizontal') {
@@ -248,7 +243,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         })()}
 
         {/* Combined rank pill — single horizontal capsule with internal divider */}
-        {showRankBadges && (course.ranks?.global || regionalRank) && (
+        {/* Capsule renders on status alone: most non-Top-100 courses are unranked. */}
+        {showRankBadges && (course.ranks?.global || regionalRank || viewerStatus) && (
+
           <div className="absolute top-3 left-3">
             <div
               style={{
@@ -280,7 +277,14 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               )}
               {viewerStatus && (
                 <>
-                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  {/* Divider collapses when the capsule holds the status alone. */}
+                  {(((!activeListSlug || activeListSlug === 'global') && course.ranks?.global) ||
+                    ((!activeListSlug || activeListSlug === regionalBadgeSlug) &&
+                      regionalRank &&
+                      regionalBadgeSlug)) && (
+                    <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  )}
+
                   <span
                     style={{
                       fontSize: 8.5,
@@ -315,7 +319,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <div
               style={{
                 fontSize: 17, fontWeight: 800, color: '#fff',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
                 letterSpacing: '-0.015em',
               }}
             >
@@ -332,40 +336,15 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           </div>
         )}
 
-        {/* Played / Rate chip — top-right */}
-        {showRateChip ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/rate`); }}
-            style={{
-              position: 'absolute', top: statChip ? 54 : 10, right: 10,
-              display: 'flex', alignItems: 'center', gap: 4,
-              background: '#F7931E',
-              borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(247,147,30,0.40)',
-            }}
-          >
-            <Star size={10} fill="white" color="white" />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>{t('card.rate')}</span>
-          </button>
-        ) : showPlayedStatus && isPlayed ? (
-          <div
-            className="absolute right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white"
-            style={{ top: statChip ? 54 : 12 }}
-          >
-            <Check className="w-2.5 h-2.5" />
-            <span>{t('card.played')}</span>
-          </div>
-        ) : null}
-
-
-        {/* Context tag — top-right when no played status */}
-        {contextTag && !showPlayedStatus && (
+        {/* Context tag — top-right */}
+        {contextTag && (
           <div className="absolute top-3 right-3">
             <span className="text-[10px] font-medium bg-black/60 text-white px-2 py-1 rounded-sq-xs backdrop-blur-sm">
               {contextTag}
             </span>
           </div>
         )}
+
 
         {/* Bottom row — name/location left, rating right — all inside image */}
         <div className="absolute bottom-0 left-0 right-0 px-3 pb-2.5 pt-2 flex items-end justify-between gap-3">

@@ -131,7 +131,8 @@
     "noFriendsPlayed": "No friends played yet",
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
-    "experiencePoints": "Experience Points Earned"
+    "experiencePoints": "Experience Points Earned",
+    "yourRounds": "あなたのラウンド"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
@@ -259,7 +260,11 @@
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
-      "noRoundsCta": "Be the first."
+      "noRoundsCta": "Be the first.",
+      "ratingLabel": "評価",
+      "avgToParLabel": "平均対パー",
+      "harderThanLabel": "難しい",
+      "easierThanLabel": "易しい"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",
