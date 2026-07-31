@@ -365,13 +365,22 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         {shellTabs}
         <div className="px-4 pt-2">
           {rateNudge}
-          <SectionHeader
-            role="section"
-            accent="#F7931E"
-            kicker="TOP 100"
-            title={t('top100.sectionTitle', { defaultValue: "The world's best" })}
-            cutLine={false}
-          />
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ ...KICKER, marginBottom: 5 }}>TOP 100</div>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontSize: 20,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: '#0F172A',
+                lineHeight: 1.2,
+              }}
+            >
+              {t('top100.sectionTitle', { defaultValue: "The world's best" })}
+            </h2>
+          </div>
           {/* Provenance subhead — masthead-line mock */}
           <p
             style={{
