@@ -298,7 +298,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
           <div
             style={{
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
@@ -323,7 +323,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                     alignItems: 'center',
                     padding: '3px 6px',
                     borderRadius: 4,
-                    fontSize: 9.5,
+                    fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: '0.07em',
                     lineHeight: 1,
@@ -346,7 +346,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             <div
               style={{
                 marginTop: 10,
-                fontSize: 12.5,
+                fontSize: 13.5,
                 lineHeight: 1.45,
                 maxWidth: 330,
                 color: 'rgba(255,255,255,0.9)',
@@ -410,7 +410,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                 style={{
                   background: '#FFFFFF',
                   color: '#15171F',
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   fontWeight: 700,
                   padding: '9px 15px',
                   borderRadius: 999,
@@ -438,7 +438,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             className="tabular-nums"
             style={{
-              fontSize: 52,
+              fontSize: 56,
               fontWeight: 800,
               letterSpacing: '-0.035em',
               lineHeight: 0.9,
