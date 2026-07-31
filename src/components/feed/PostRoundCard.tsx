@@ -468,6 +468,8 @@ export const PostRoundCard: React.FC<Props> = ({
             </>
           )}
         </div>
+      </div>
+
 
       {showCrown && crown && (
         <div
