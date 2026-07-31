@@ -268,11 +268,27 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   );
 
   /**
-   * Tracked total across every country — the denominator of "N of M courses
-   * tracked". played_total is exactly the sum of facets.countries[].courses
-   * (both 121 live), so the direct field is used rather than summing here.
+   * Tracked total denominator — derived from the same filters the numerator
+   * uses so the sentence compares the same population. Falls back to 0 on a
+   * missing facet row rather than silently showing the global total.
    */
-  const trackedTotal = facets?.played_total ?? 0;
+  const trackedTotal = (() => {
+    if (!facets) return 0;
+    if (country && region) {
+      return (
+        facets.regions.find(
+          (r) => r.sub_country === country && r.region === region,
+        )?.courses ?? 0
+      );
+    }
+    if (country) {
+      return (
+        facets.countries.find((c) => c.sub_country === country)?.courses ?? 0
+      );
+    }
+    return facets.played_total;
+  })();
+
 
 
 
