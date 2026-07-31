@@ -40,6 +40,7 @@ import {
   type StatBrowseRow,
   type StatLens,
 } from './useStatBrowse';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -516,11 +517,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </div>
 
 
-            {/* Lens picker. The "x of y tracked courses" badge was removed —
-                the headline copy already states the lens basis. */}
-            <div className="flex items-center justify-end gap-3 mt-2.5">
-              {lensSelect(false)}
-            </div>
+            {/* Lens picker owns its own full-width row: it is the control that
+                changes what every card on the page means. */}
+            <div className="mt-2.5">{lensSelect(false)}</div>
 
           </>
         )}
@@ -531,8 +530,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
         <div
           style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
-            textTransform: 'uppercase', color: AMBER,
+            ...KICKER,
           }}
         >
           {t('statBrowse.eyebrow')}
@@ -639,7 +637,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                   variant="vertical"
                   showRankBadges
                   showRating
-                  showPlayedStatus
+                  viewerStatus={viewerStatusFor(row.course_id)}
                   /* The lens chip renders unless it would duplicate a figure
                      already on the card — 'rated' repeats the community rating. */
                   statChip={lens === 'rated' ? null : chipForLens(lens, row, unitLabel)}
