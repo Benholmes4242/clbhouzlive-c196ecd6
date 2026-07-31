@@ -338,30 +338,16 @@ export const PostRoundCard: React.FC<Props> = ({
       role={onTap ? 'button' : undefined}
       tabIndex={onTap ? 0 : undefined}
       onClick={handleTap}
-      style={{ cursor: onTap ? 'pointer' : 'default', background: FLAT_SURFACE }}
+      style={{ cursor: onTap ? 'pointer' : 'default', background: 'transparent' }}
     >
-      <div
-        style={{
-          position: 'relative',
-          minHeight: 200,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          backgroundImage: hasPhoto ? `url(${coursePhotoUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundColor: FLAT_SURFACE,
-        }}
-      >
+      <div style={{ position: 'relative' }}>
         {showCrown && (
           <div
             style={{
-              position: 'absolute',
-              top: 12,
-              left: 12,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
+              margin: '12px 0 0 14px',
               padding: '4px 8px',
               borderRadius: 999,
               background: 'rgba(11,13,16,0.66)',
@@ -377,6 +363,8 @@ export const PostRoundCard: React.FC<Props> = ({
             {crown?.category}
           </div>
         )}
+
+
 
         <div style={panelStyle}>
           {kicker && (
