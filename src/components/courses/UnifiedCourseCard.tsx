@@ -332,40 +332,15 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           </div>
         )}
 
-        {/* Played / Rate chip — top-right */}
-        {showRateChip ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/rate`); }}
-            style={{
-              position: 'absolute', top: statChip ? 54 : 10, right: 10,
-              display: 'flex', alignItems: 'center', gap: 4,
-              background: '#F7931E',
-              borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(247,147,30,0.40)',
-            }}
-          >
-            <Star size={10} fill="white" color="white" />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>{t('card.rate')}</span>
-          </button>
-        ) : showPlayedStatus && isPlayed ? (
-          <div
-            className="absolute right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm bg-emerald-500/90 text-white"
-            style={{ top: statChip ? 54 : 12 }}
-          >
-            <Check className="w-2.5 h-2.5" />
-            <span>{t('card.played')}</span>
-          </div>
-        ) : null}
-
-
-        {/* Context tag — top-right when no played status */}
-        {contextTag && !showPlayedStatus && (
+        {/* Context tag — top-right */}
+        {contextTag && (
           <div className="absolute top-3 right-3">
             <span className="text-[10px] font-medium bg-black/60 text-white px-2 py-1 rounded-sq-xs backdrop-blur-sm">
               {contextTag}
             </span>
           </div>
         )}
+
 
         {/* Bottom row — name/location left, rating right — all inside image */}
         <div className="absolute bottom-0 left-0 right-0 px-3 pb-2.5 pt-2 flex items-end justify-between gap-3">
