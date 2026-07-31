@@ -7,7 +7,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses, type BusinessMembership } from '@/hooks/useMyBusinesses';
-import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
+import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 import { AppLog } from '@/lib/logger';
 
 interface ClaimCourseSheetProps {
@@ -139,21 +139,10 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   // --- Render ---
   const renderHeader = () => (
     <div style={{ padding: '4px 0 12px' }}>
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          background: 'rgba(247,147,30,0.12)',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 12,
-        }}
-      >
-        <BadgeCheck size={20} color={AMBER} strokeWidth={2.2} />
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C2620A' }}>
+        {t('courseDetail.claim.sheet.kicker')}
       </div>
-      <h2 style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.02em' }}>
+      <h2 style={{ fontSize: 18, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1.25 }}>
         {t('courseDetail.claim.sheet.title', { clubName })}
       </h2>
     </div>
@@ -273,10 +262,6 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
             {t('courseDetail.claim.sheet.claimAs', { name: claimable.find((m) => m.business.id === selectedId)?.business.name ?? t('courseDetail.claim.sheet.claimAsFallback') })}
           </PrimaryButton>
 
-          <p style={{ fontSize: 11, color: INK_FAINT, marginTop: 10, textAlign: 'center' }}>
-            {t('courseDetail.claim.sheet.footnote')}
-          </p>
-
           <button
             type="button"
             onClick={goToCreate}
@@ -359,6 +344,19 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
       <div style={{ padding: '20px 20px 28px' }}>
         {renderHeader()}
         {renderBody()}
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.13em',
+            textTransform: 'uppercase',
+            color: '#A2A9B2',
+            textAlign: 'center',
+            marginTop: 14,
+          }}
+        >
+          {t('courseDetail.claim.sheet.reviewNotice')}
+        </div>
       </div>
     </BottomSheet>
   );
