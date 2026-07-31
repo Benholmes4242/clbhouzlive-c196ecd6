@@ -26,8 +26,8 @@ import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
-import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
-import { CourseTeeCard } from '@/features/courses/components/holes/CourseTeeCard';
+import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
+import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
