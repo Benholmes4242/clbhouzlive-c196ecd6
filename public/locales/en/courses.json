@@ -1147,5 +1147,8 @@
     "noneYet": "None yet.",
     "jumpToYou": "Jump to you · #{{rank}}",
     "close": "Close"
+  },
+  "search": {
+    "yourRounds": "Your rounds"
   }
 }
