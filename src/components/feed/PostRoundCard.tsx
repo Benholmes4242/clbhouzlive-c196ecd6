@@ -2,13 +2,13 @@
  * PostRoundCard — the scorecard block for a Clubhouse post with a round
  * attached (BRIEF_ROUND_POST_CARD).
  *
- * Full bleed: no radius, no border, no horizontal margin. Renders a course
- * photo with a dark glass panel over its lower part; when there is no course
- * photo the panel sits on the flat feed surface with NO backdrop filter.
+ * Full bleed: no radius, no border, no horizontal margin. The course photo
+ * backdrop and its glass surface are owned by FeedCard at card level; this
+ * block is transparent and applies no backdrop filter of its own.
  *
  * Data comes from the batched `usePostRounds` map at page level — this
  * component NEVER fetches. Scoring marks come from the shared ScoreMark
- * renderer; feat chips from the shared RoundFeatChips.
+ * renderer.
  *
  * Analytics:
  *  - round_post_shown  { post_id, notability, has_holes, has_crown } — once
@@ -35,7 +35,6 @@ const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
 const GREEN = '#34D77F';
 const RED = '#FF6B60';
-const FLAT_SURFACE = '#111418';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 
 const NUM: React.CSSProperties = {
