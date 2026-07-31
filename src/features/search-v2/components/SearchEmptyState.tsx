@@ -27,10 +27,8 @@ import {
   type EmptyStateSuggestion,
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
-const AMBER = '#F7931E';
-const GOLD_GRADIENT =
-  'linear-gradient(90deg, #B8860B 0%, #F7C948 45%, #FFD97A 60%, #F7C948 80%, #B8860B 100%)';
 
 interface Props {
   onSelect: () => void; // called before navigation (parent uses to close)
