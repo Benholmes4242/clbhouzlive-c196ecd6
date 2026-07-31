@@ -248,7 +248,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         })()}
 
         {/* Combined rank pill — single horizontal capsule with internal divider */}
-        {showRankBadges && (course.ranks?.global || regionalRank) && (
+        {/* Capsule renders on status alone: most non-Top-100 courses are unranked. */}
+        {showRankBadges && (course.ranks?.global || regionalRank || viewerStatus) && (
+
           <div className="absolute top-3 left-3">
             <div
               style={{
