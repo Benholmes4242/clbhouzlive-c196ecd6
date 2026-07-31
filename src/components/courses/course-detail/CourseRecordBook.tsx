@@ -1,22 +1,24 @@
 /**
  * CourseRecordBook - the Champions content promoted onto the Course tab.
  *
- * Renders the rank-1 holder for the headline all-time boards as edge-to-edge
- * alternating bands (no cards, per the Champions legibility pass), plus a
- * "See all boards" affordance that opens the full drilldown in a 75dvh sheet.
+ * Analytical treatment (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 3a):
+ *   - one Panel, no zebra bands, no tinted pills, no internal dividers
+ *   - rows are a 26px / 1fr / 58px grid: avatar, label + name, value
+ *   - colour means one thing: amber = the viewing member holds this record
+ *   - the crown marks the course record row (lowest gross, all time) only
  *
  * Data comes from the existing useCourseLegends RPC via useCourseRecordSummary
  * - no new query is introduced.
  */
 import React from 'react';
-import { Crown, ChevronRight } from 'lucide-react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { legendCategoryLabel, formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { AMBER, INK, INK_MUTE, HAIRLINE_INK_7 } from '@/features/courses/_shared/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { A, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   courseId: string;
@@ -28,23 +30,21 @@ interface Props {
   initialCategory?: string | null;
   /** Opens the Champions tab - the record book no longer lives in a sheet. */
   onSeeAll?: () => void;
-  /** The page owns the block header (WHO PLAYS HERE) - suppress the local one. */
+  /** Retained for API compatibility; the panel owns its own kicker. */
   hideHeader?: boolean;
 }
 
 export const CourseRecordBook: React.FC<Props> = ({
   courseId,
   courseName,
-  courseRegion = null,
-  courseCountry = null,
-  courseType = null,
   initialCategory = null,
   onSeeAll,
-  hideHeader = false,
 }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { isLoading, previewRows, unclaimedCount, hasAnyHolder } =
     useCourseRecordSummary(courseId, user?.id ?? null);
+
   const openBoards = React.useCallback(() => {
     analyticsEvents.track('course_record_book_opened', { course_id: courseId });
     onSeeAll?.();
@@ -60,131 +60,93 @@ export const CourseRecordBook: React.FC<Props> = ({
 
   if (isLoading) {
     return (
-      <section style={{ padding: '4px 0 0' }}>
-        {!hideHeader && <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <Panel kicker={t('courseDetail.records.kicker')}>
+        <div style={{ display: 'grid', gap: 14 }}>
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                height: 56,
-                background: i % 2 === 0 ? '#FFFFFF' : 'rgba(15,23,42,0.02)',
-                borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
-              }}
-            />
+            <div key={i} style={{ height: 26, borderRadius: 8, background: A.TRACK }} />
           ))}
         </div>
-      </section>
+      </Panel>
     );
   }
 
-  return (
-    <section style={{ padding: '4px 0 0' }}>
-      {!hideHeader && <SectionHeader role="section" kicker="THE RECORD BOOK" paddingX={16} />}
+  const footer =
+    unclaimedCount > 0
+      ? t('courseDetail.records.seeAllUnclaimed', { count: unclaimedCount })
+      : t('courseDetail.records.seeAll');
 
+  return (
+    <Panel
+      kicker={t('courseDetail.records.kicker')}
+      footer={footer}
+      onOpen={openBoards}
+    >
       {hasAnyHolder ? (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {previewRows.map(({ category, row }, i) => (
-            <button
-              key={category}
-              type="button"
-              onClick={openBoards}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                width: '100%',
-                textAlign: 'left',
-                border: 0,
-                cursor: 'pointer',
-                padding: '12px 16px',
-                background: i % 2 === 0 ? '#FFFFFF' : 'rgba(15,23,42,0.02)',
-                borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
-              }}
-            >
-              <SquircleAvatar
-                src={row.user_photo_url}
-                alt={row.user_display_name ?? 'Golfer'}
-                userId={row.user_id}
-                size={34}
-                thinRing
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    letterSpacing: '0.06em',
-                    color: INK_MUTE,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {legendCategoryLabel[category]}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: INK,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                  }}
-                >
-                  {i === 0 && <Crown size={13} color={AMBER} strokeWidth={2.4} />}
-                  {row.user_display_name ?? 'Golfer'}
-                </div>
-              </div>
-              <div
+        <div style={{ display: 'grid', gap: 14 }}>
+          {previewRows.map(({ category, row }) => {
+            const isYou = !!user?.id && row.user_id === user.id;
+            const tone = isYou ? A.AMBER_DEEP : A.INK;
+            const isCourseRecord = category === 'lowest_gross_all_time';
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={openBoards}
                 style={{
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
+                  display: 'grid',
+                  gridTemplateColumns: '26px 1fr 58px',
+                  alignItems: 'center',
+                  gap: 12,
+                  width: '100%',
+                  textAlign: 'left',
+                  border: 'none',
+                  background: 'transparent',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontFamily: SANS,
                 }}
               >
-                {formatLegendValueCompact(category, row.value)}
-              </div>
-              <ChevronRight size={16} color={INK_MUTE} />
-            </button>
-          ))}
+                <SquircleAvatar
+                  src={row.user_photo_url}
+                  alt={row.user_display_name ?? 'Golfer'}
+                  userId={row.user_id}
+                  size={26}
+                  thinRing
+                />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ ...LABEL, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {isCourseRecord && <Crown size={10} color={A.AMBER} strokeWidth={2.6} />}
+                    {legendCategoryLabel[category]}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: isYou ? 800 : 700,
+                      color: tone,
+                      marginTop: 2,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {isYou
+                      ? t('courseDetail.records.you')
+                      : row.user_display_name ?? 'Golfer'}
+                  </div>
+                </div>
+                <div style={{ ...NUM, fontSize: 15, color: tone, textAlign: 'right' }}>
+                  {formatLegendValueCompact(category, row.value)}
+                </div>
+              </button>
+            );
+          })}
         </div>
       ) : (
-        <p style={{ margin: 0, padding: '0 16px', fontSize: 13, color: INK_MUTE, lineHeight: 1.5 }}>
-          No boards claimed at {courseName} yet. Every record here is up for grabs.
+        <p style={{ margin: 0, fontSize: 13, color: A.MUTE, lineHeight: 1.5 }}>
+          {t('courseDetail.records.empty', { courseName })}
         </p>
       )}
-
-      <div style={{ padding: '12px 16px 0' }}>
-        <button
-          type="button"
-          onClick={openBoards}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            padding: '11px 0',
-            borderRadius: 14,
-            background: 'rgba(247,147,30,0.06)',
-            border: '1.5px solid rgba(247,147,30,0.2)',
-            fontSize: 13,
-            fontWeight: 700,
-            color: AMBER,
-            cursor: 'pointer',
-          }}
-        >
-          {unclaimedCount > 0
-            ? `See all boards - ${unclaimedCount} unclaimed`
-            : 'See all boards'}
-        </button>
-      </div>
-
-    </section>
+    </Panel>
   );
 };
 

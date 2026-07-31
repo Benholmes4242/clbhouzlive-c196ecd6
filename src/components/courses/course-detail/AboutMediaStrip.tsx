@@ -10,6 +10,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface AboutMediaStripProps {
@@ -17,19 +18,32 @@ interface AboutMediaStripProps {
   onSeeAllClick: () => void;
 }
 
-const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () => void }> = ({
+/**
+ * Analytical header (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 4c): uppercase
+ * micro-label plus a count aside. No "See all" pill - the overflow tile is
+ * the only affordance into the media tab.
+ */
+const Header: React.FC<{ photoCount: number; videoCount: number }> = ({
   photoCount,
   videoCount,
-  onSeeAll,
 }) => (
-  <SectionHeader
-    role="section"
-    kicker="MEDIA"
-    sub={`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
-    action={onSeeAll ? { label: 'See all', onClick: onSeeAll } : undefined}
-    paddingX={16}
-  />
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: 12,
+      padding: '0 16px',
+      marginBottom: 10,
+    }}
+  >
+    <span style={KICKER}>MEDIA</span>
+    <span style={LABEL}>
+      {`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} \u00B7 ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
+    </span>
+  </div>
 );
+
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const { t } = useTranslation('courses');
@@ -200,7 +214,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         <div
           style={
             isMobile
-              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
               : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
           }
         >
@@ -209,8 +223,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={
                 isMobile && i === 0
-                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14, background: 'rgba(15,23,42,0.06)' }
-                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10, background: 'rgba(15,23,42,0.06)' }
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10, background: 'rgba(15,23,42,0.06)' }
+                  : { height: '100%', borderRadius: 8, background: 'rgba(15,23,42,0.06)' }
               }
             />
           ))}
@@ -304,12 +318,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   return (
     <div>
-      <Header photoCount={photoCount} videoCount={videoCount} onSeeAll={onSeeAllClick} />
+      <Header photoCount={photoCount} videoCount={videoCount} />
 
       <div
         style={
           isMobile
-            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
             : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
         }
       >
@@ -350,8 +364,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               style={{
                 position: 'relative',
                 ...(isHero
-                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14 }
-                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10 }),
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10 }
+                  : { height: isMobile ? '100%' : undefined, aspectRatio: isMobile ? undefined : '1', borderRadius: 8 }),
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
@@ -394,7 +408,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
+                    background: '#2A313A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

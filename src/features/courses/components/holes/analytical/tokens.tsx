@@ -158,3 +158,38 @@ export const StatRow: React.FC<{
     ))}
   </div>
 );
+
+/**
+ * Quiet uppercase text affordance shared by the lower Course-tab blocks.
+ * Never a filled pill - the analytical treatment has no tinted buttons.
+ */
+export const Action: React.FC<{
+  label: string;
+  onClick: () => void;
+  align?: 'left' | 'center';
+  tone?: string;
+  style?: React.CSSProperties;
+}> = ({ label, onClick, align = 'center', tone = A.AMBER_DEEP, style }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    style={{
+      minHeight: 44,
+      border: 'none',
+      background: 'transparent',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: align === 'center' ? 'center' : 'flex-start',
+      gap: 6,
+      padding: 0,
+      fontFamily: SANS,
+      ...style,
+    }}
+  >
+    <span style={{ ...LABEL, color: tone }}>{label}</span>
+    <span style={{ fontSize: 12, color: tone, fontWeight: 800 }} aria-hidden="true">
+      {'\u203A'}
+    </span>
+  </button>
+);

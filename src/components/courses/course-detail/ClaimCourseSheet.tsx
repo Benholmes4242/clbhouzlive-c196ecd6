@@ -41,7 +41,7 @@ const PrimaryButton: React.FC<{
     disabled={disabled || loading}
     className="w-full h-[52px] rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
     style={{
-      background: disabled ? 'rgba(15,23,42,0.06)' : AMBER,
+      background: disabled ? 'rgba(15,23,42,0.06)' : INK,
       color: disabled ? 'rgba(15,23,42,0.38)' : '#FFFFFF',
       border: 'none',
       cursor: disabled || loading ? 'not-allowed' : 'pointer',
@@ -204,7 +204,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                     padding: '12px 16px',
                     borderRadius: 14,
                     background: '#FFFFFF',
-                    border: `1.5px solid ${selected ? AMBER : HAIRLINE}`,
+                    border: `1.5px solid ${selected ? INK : HAIRLINE}`,
                   }}
                 >
                   <div
@@ -244,7 +244,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                         width: 22,
                         height: 22,
                         borderRadius: '50%',
-                        background: AMBER,
+                        background: INK,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -281,7 +281,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
             type="button"
             onClick={goToCreate}
             className="w-full mt-3 text-[13px] font-semibold"
-            style={{ color: AMBER, padding: '8px 0' }}
+            style={{ color: INK_FAINT, padding: '8px 0' }}
           >
             {t('courseDetail.claim.sheet.setupInstead')}
           </button>

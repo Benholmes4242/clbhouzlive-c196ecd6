@@ -84,21 +84,12 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             colorful={colorful}
           />
         </div>
-        {/* Footer rail */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 14px' }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 11, flexShrink: 0,
-            background: 'rgba(247,147,30,0.10)', color: '#F7931E',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <MapPin size={16} strokeWidth={2} />
-          </div>
+        {/* Footer rail — analytical treatment: no tinted tiles or pills */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px' }}>
+          <MapPin size={14} strokeWidth={2} color="#68707B" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1216', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {locationText}
-            </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 1 }}>
-              Tap map to explore
             </div>
           </div>
           <button
@@ -106,15 +97,17 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             onClick={() => setExpanded(true)}
             style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
-              background: 'rgba(247,147,30,0.10)', color: '#F7931E',
-              border: 'none', borderRadius: 999, padding: '8px 14px',
-              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              background: 'transparent', color: '#C2620A',
+              border: 'none', padding: '8px 0', minHeight: 44,
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.13em',
+              textTransform: 'uppercase', cursor: 'pointer',
             }}
           >
-            <Navigation size={13} strokeWidth={2.2} />
+            <Navigation size={12} strokeWidth={2.2} />
             Directions
           </button>
         </div>
+
       </div>
 
       <MapExpandedView

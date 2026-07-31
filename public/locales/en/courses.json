@@ -780,7 +780,9 @@
     "about": {
       "editRating": "Edit your rating",
       "locationUnavailable": "Location data isn't available yet.",
-      "officialWebsite": "Official Course Website"
+      "officialWebsite": "Official Course Website",
+      "readMore": "Read more",
+      "showLess": "Show less"
     },
     "locationPills": {
       "separator": "›"
@@ -842,6 +844,23 @@
       "sheetSub_one": "From {{rounds}} round with hole-by-hole detail",
       "sheetSub_other": "From {{rounds}} rounds with hole-by-hole detail",
       "yards": "Yards"
+    },
+    "records": {
+      "kicker": "THE RECORD BOOK",
+      "seeAll": "See all boards",
+      "seeAllUnclaimed": "See all boards — {{count}} unclaimed",
+      "you": "You",
+      "empty": "No boards claimed at {{courseName}} yet. Every record here is up for grabs."
+    },
+    "rating": {
+      "kicker": "COMMUNITY RATING",
+      "overall": "OVERALL",
+      "yours": "YOUR RATING",
+      "friends": "FRIENDS AVG"
+    },
+    "friends": {
+      "kicker": "FRIENDS WHO PLAYED HERE",
+      "namesAndMore": "{{names}} and {{count}} more"
     }
   },
   "network": {
