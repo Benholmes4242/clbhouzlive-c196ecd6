@@ -169,11 +169,9 @@ const LeftCapsule: React.FC<{
           height: 26,
           width: 26,
           objectFit: 'contain',
-          // On dark chrome the mark is inverted to white (CompactHeader keeps
-          // the amber mark on light and uses the same asset over dark surfaces
-          // by force; mirror that behavior here).
-          filter: tone === 'dark' ? 'brightness(0) invert(1)' : 'none',
+          // The amber mark is the brand on EVERY tone — never inverted to white.
         }}
+
       />
     </button>
   );
