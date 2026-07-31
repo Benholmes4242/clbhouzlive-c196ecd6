@@ -516,20 +516,6 @@ export const PostRoundCard: React.FC<Props> = ({
           )}
         </div>
       )}
-
-      {feats.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 5,
-            padding: '10px 14px',
-            background: FLAT_SURFACE,
-          }}
-        >
-          <RoundFeatChips feats={feats} />
-        </div>
-      )}
     </div>
   );
 };
