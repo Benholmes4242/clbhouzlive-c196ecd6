@@ -421,6 +421,38 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
       )}
 
+      {/* Round posts with a course photo: card-level photo backdrop. Everything
+          above the actions row paints on one glass surface over it. No photo
+          means no backdrop and no backdrop-filter anywhere. */}
+      {hasRoundBackdrop && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            backgroundImage: `url(${post.courseThumbnailImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
+
+      <div
+        style={
+          hasRoundBackdrop
+            ? {
+                position: 'relative',
+                zIndex: 1,
+                background: 'rgba(11,13,16,0.66)',
+                backdropFilter: 'blur(22px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+              }
+            : { position: 'relative', zIndex: 1 }
+        }
+      >
+
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
         <button
