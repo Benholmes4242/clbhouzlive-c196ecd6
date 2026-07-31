@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
@@ -45,6 +46,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   nearby,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const secondaryMarkersRef = useRef<mapboxgl.Marker[]>([]);
@@ -209,12 +211,12 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 
   const destinations = isIOS
     ? [
-        { label: 'Open in Apple Maps', url: appleMapsUrl },
-        { label: 'Open in Google Maps', url: googleMapsUrl },
+        { label: t('map.openAppleMaps'), url: appleMapsUrl },
+        { label: t('map.openGoogleMaps'), url: googleMapsUrl },
       ]
     : [
-        { label: 'Open in Google Maps', url: googleMapsUrl },
-        { label: 'Open in Apple Maps', url: appleMapsUrl },
+        { label: t('map.openGoogleMaps'), url: googleMapsUrl },
+        { label: t('map.openAppleMaps'), url: appleMapsUrl },
       ];
 
   return (
@@ -238,7 +240,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
         >
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C2620A' }}>
-              Location
+              {t('map.kicker')}
             </div>
             <div style={{ fontSize: 17, fontWeight: 800, color: '#0E1216', marginTop: 3, letterSpacing: '-0.01em' }}>
               {name}
@@ -250,7 +252,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            aria-label="Close"
+            aria-label={t('map.close')}
             className="flex-none"
             style={{ border: 'none', background: 'transparent', color: '#68707B', cursor: 'pointer', padding: 0, lineHeight: 1 }}
           >
