@@ -38,7 +38,7 @@ const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
  * Single source of truth for the score-distribution colours.
  * Used by the mix strip on every hole row and by the collapsed-state legend.
  */
-const DIST_SEG_COLORS = {
+export const DIST_SEG_COLORS = {
   eaglePlus: GOLD,
   birdie: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)`,
   par: INK_20,
@@ -65,11 +65,6 @@ function ord(n: number): string {
   return `${n}${ordinalSuffix(n)}`;
 }
 
-function characterClauseKey(hardestHole: number): string {
-  if (hardestHole >= 16) return 'courses:holes.shapeNarrative.clauseFinish';
-  if (hardestHole <= 3) return 'courses:holes.shapeNarrative.clauseEarly';
-  return 'courses:holes.shapeNarrative.clauseMiddle';
-}
 
 
 function pctSum(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
@@ -524,18 +519,6 @@ const SkylineCard: React.FC<{
     if (seg.length > 0) segments.push(seg);
   }
 
-  const beastFrag = t('courses:holes.shapeNarrative.beast', {
-    hole: ord(hardest.hole_no),
-    value: fmtToPar(hardest.avg_to_par),
-  });
-  const caption = viewerHasPlayed
-    ? t('courses:holes.shapeNarrative.withYou', {
-        clause: t(characterClauseKey(hardest.hole_no)),
-        beat: beatFieldCount,
-        total: sorted.length,
-        beast: beastFrag,
-      })
-    : beastFrag;
 
 
   return (
