@@ -41,6 +41,8 @@ export interface PostRound {
   holesInOne: number | null;
   beatPar: boolean | null;
   cleanCard: boolean | null;
+  slopeRating: number | null;
+  longestBirdieRun: number | null;
   /** null when the round has no hole detail - render without the strip. */
   holeShape: PostRoundHole[] | null;
 }
