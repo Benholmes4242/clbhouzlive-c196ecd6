@@ -528,16 +528,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </div>
         ) : (
           <>
+            {/* Row 1: country and region are a genuine 50/50 pair. */}
             <div className="flex items-center gap-2">
               <div className="flex-1 min-w-0">{countrySelect(false)}</div>
               <div className="flex-1 min-w-0">{regionSelect(false)}</div>
+            </div>
+
+            {/* Row 2: toolbar — lens at its natural width, search at the end. */}
+            <div className="mt-2.5 flex items-center justify-between gap-2">
+              <div className="min-w-0">{lensSelect(false)}</div>
               {directorySearchButton(false)}
             </div>
 
-
-            {/* Lens picker owns its own full-width row: it is the control that
-                changes what every card on the page means. */}
-            <div className="mt-2.5">{lensSelect(false)}</div>
 
           </>
         )}
