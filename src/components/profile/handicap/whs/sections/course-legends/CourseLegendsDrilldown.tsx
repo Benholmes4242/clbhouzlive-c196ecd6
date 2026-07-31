@@ -484,30 +484,29 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               : undefined;
             return (
               <div data-closest-duel>
-                {/* Eyebrow + explainer — teaches the section, then the card
+                {/* Eyebrow + explainer — teaches the section, then the panel
                     below headlines the actual crown name. */}
-                <div style={{ padding: '4px 16px 0' }}>
+                <div style={{ padding: '4px 16px 8px' }}>
                   <div
                     style={{
                       fontSize: 10,
-                      fontWeight: 800,
-                      letterSpacing: '0.14em',
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      color: 'var(--hcp-t-60)',
+                      color: '#C2620A',
                     }}
                   >
-                    Your closest duel
+                    {t('courseDetail.legends.closestDuel')}
                   </div>
                   <div
                     style={{
-                      marginTop: 2,
-                      fontSize: 11.5,
-                      fontWeight: 500,
-                      color: 'var(--hcp-t-40)',
-                      lineHeight: 1.35,
+                      marginTop: 4,
+                      fontSize: 12.5,
+                      color: '#68707B',
+                      lineHeight: 1.5,
                     }}
                   >
-                    The crown you're closest to taking at this club.
+                    {t('courseDetail.legends.closestDuelBody')}
                   </div>
                 </div>
                 <ChampionsDuelCard
@@ -518,6 +517,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   yourRank={yourRanks[cat] ?? null}
                   holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
                   totalCount={entry.total}
+                  unitLabel={UNITS[cat] || SHORT_LABELS[cat]}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
                   proBenchmark={null}
                   theme={theme}
@@ -526,6 +526,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   suppressTopBorder
                 />
               </div>
+
             );
           })()}
 
@@ -573,6 +574,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   yourRank={yourRanks[cat] ?? null}
                   holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
                   totalCount={entry.total}
+                  unitLabel={UNITS[cat] || SHORT_LABELS[cat]}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
                   proBenchmark={
                     proBenchmarkPick && cat === `${proBenchmarkPick.base}_all_time`
@@ -584,6 +586,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                 />
               </div>
             );
+
           })}
 
         </>
