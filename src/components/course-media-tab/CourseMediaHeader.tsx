@@ -56,7 +56,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
               display: 'inline-flex', alignItems: 'center', gap: 5,
               height: 34, padding: '0 13px', borderRadius: 17,
               background: isActive ? INK : '#FFFFFF',
-              border: isActive ? `1px solid ${INK}` : '1px solid rgba(15,23,42,0.12)',
+              border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE_INK_10}`,
               fontSize: 12.5, fontWeight: isActive ? 700 : 600,
               color: isActive ? '#FFFFFF' : INK,
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
@@ -66,7 +66,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             {hasMedia && (
               <span style={{
                 fontSize: 11, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: isActive ? 'rgba(255,255,255,0.6)' : INK_FAINT,
+                color: isActive ? 'rgba(255,255,255,0.6)' : A.DIM,
               }}>
                 {count}
               </span>
@@ -81,11 +81,11 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
           aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
-            background: '#F7931E', color: '#FFFFFF', border: 'none',
+            background: A.INK, color: '#FFFFFF', border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
-            boxShadow: '0 3px 10px rgba(247,147,30,0.28)',
           }}
+
         >
           <Plus className="w-4 h-4" strokeWidth={2.4} />
         </button>
