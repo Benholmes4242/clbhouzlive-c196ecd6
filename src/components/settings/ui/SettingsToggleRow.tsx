@@ -62,7 +62,7 @@ export function SettingsToggleRow({
               
             </div>
             {subtitle && (
-              <p className="text-[13px] text-muted-foreground line-clamp-2 mt-1">{subtitle}</p>
+              <p className="text-[13px] text-muted-foreground leading-snug mt-1">{subtitle}</p>
             )}
           </div>
         </div>
@@ -72,7 +72,10 @@ export function SettingsToggleRow({
             checked={checked}
             onCheckedChange={onCheckedChange}
             disabled={disabled || isLoading}
-            className="data-[state=checked]:bg-[#0F172A] data-[state=unchecked]:bg-[rgba(15,23,42,0.15)]"
+            className={cn(
+              'relative before:absolute before:content-[""] before:-inset-y-2.5 before:-inset-x-1',
+              'data-[state=checked]:bg-[#0F172A] data-[state=unchecked]:bg-[rgba(15,23,42,0.15)]',
+            )}
           />
         </div>
 
