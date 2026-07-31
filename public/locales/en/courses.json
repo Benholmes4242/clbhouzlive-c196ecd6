@@ -667,7 +667,7 @@
         "title": "Claim {{clubName}}",
         "signInBody": "Sign in to claim this course.",
         "signIn": "Sign in",
-        "reviewBody": "Claim this course for your golf club profile. We will review it before it goes live.",
+        "reviewBody": "Claim this course to respond to reviews, update course information and manage this listing.",
         "claimAs": "Claim as {{name}}",
         "claimAsFallback": "business",
         "footnote": "Claiming covers all listings of this club on clbhouz.",
@@ -677,11 +677,13 @@
         "setupGolfClubShort": "Set up Golf Club profile",
         "stateCSingle": "Your golf club profile {{name}} already manages another club. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
         "stateCMulti": "Your golf club profiles already manage other clubs. A business can manage one club, so set up a separate Golf Club profile for {{clubName}}.",
-        "needsGolfClub": "Claiming a course needs a Golf Club profile. Your {{category}} profile cannot manage a course. Set up a Golf Club profile to claim {{clubName}}.",
+        "needsGolfClub": "Claiming a course needs a Golf Club profile. Set one up and you can respond to reviews, update course information and manage this listing.",
         "categoryFallback": "business",
-        "stateDBody": "Set up a Golf Club profile to claim this course and manage its details, reviews, and updates.",
+        "stateDBody": "Claiming a course needs a Golf Club profile. Set one up and you can respond to reviews, update course information and manage this listing.",
         "submitted": "Claim submitted for review.",
-        "submitError": "Could not submit claim. Please try again."
+        "submitError": "Could not submit claim. Please try again.",
+        "kicker": "Course management",
+        "reviewNotice": "Claims are reviewed before a course is handed over"
       }
     },
     "nearby": {
