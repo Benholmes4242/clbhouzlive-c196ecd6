@@ -61,11 +61,12 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
     );
   }
 
-  const eyebrow = course.tier === 'played' ? "YOU HAVEN'T RATED YET" : 'TRY RATING';
-  const sub =
-    course.tier === 'played'
-      ? `${course.region ? `${course.region} · ` : ''}Played, not rated`
-      : `${course.region ?? 'Suggested for you'}`;
+  const eyebrow =
+    course.tier === 'played' ? t('rateNudge.playedEyebrow') : t('rateNudge.suggestedEyebrow');
+  const playedSub = course.region
+    ? t('rateNudge.playedSubWithRegion', { region: course.region })
+    : t('rateNudge.playedSubNoRegion');
+  const sub = course.tier === 'played' ? playedSub : (course.region ?? t('rateNudge.suggestedForYou'));
 
   return (
     <button
