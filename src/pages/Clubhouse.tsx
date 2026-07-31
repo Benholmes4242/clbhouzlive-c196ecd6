@@ -8,6 +8,8 @@ import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
