@@ -45,34 +45,22 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   }
 
   return (
-    <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Section header — canonical SectionHeader */}
-      <div style={{ marginBottom: -14 }}>
-        <SectionHeader role="section" kicker="YOUR JOURNEY" paddingX={16}
-        cutLine={false}
-      />
-      </div>
+    <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* ONE kicker for the whole journey block; panel titles carry the rest. */}
+      <div style={KICKER}>{t('courseDetail.you.journey')}</div>
 
-      {/* Status toggle */}
-      <div style={{ padding: '0 16px' }}>
-        <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
-      </div>
+      <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
 
       {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
-        <div style={{ padding: '0 16px' }}>
-          <PersonalReviewCard courseId={courseId} rating={userRating} communityAverage={communityAverage} />
-        </div>
+        <PersonalReviewCard courseId={courseId} rating={userRating} communityAverage={communityAverage} />
       )}
 
       {/* Course moments — only if played */}
-      {hasPlayed && (
-        <div style={{ padding: '0 16px' }}>
-          <CourseMoments courseId={courseId} courseName={courseName} />
-        </div>
-      )}
+      {hasPlayed && <CourseMoments courseId={courseId} courseName={courseName} />}
     </section>
   );
 };
+
 
 export default PersonalSection;

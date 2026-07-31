@@ -98,28 +98,23 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {/* Header */}
-      <SectionHeader
-        role="section"
-        kicker="YOUR MOMENTS"
-        count={moments.length}
-        cutLine={false}
-      />
-
-      {/* Gallery */}
+    <Panel
+      title={t('courseDetail.you.moments')}
+      aside={t('courseDetail.you.momentsCount', { count: moments.length })}
+    >
+      {/* Gallery - a horizontal rail of discrete objects; tiles stay tiles. */}
       <div
         style={{
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
-          paddingBottom: 4,
           margin: '0 -16px',
           padding: '0 16px 4px',
           scrollbarWidth: 'none',
         }}
       >
         {moments.slice(0, 6).map((moment, index) => (
+
           <div
             key={moment.id}
             onClick={() => handleMomentTap(index)}
