@@ -667,7 +667,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
 
         if (!hasCourse) {
-          return <div style={{ borderTop: `0.5px solid ${LINE}` }}>{actionsRow}</div>;
+          return (
+            <div
+              style={{
+                borderTop: `0.5px solid ${LINE}`,
+                background: hasRoundBackdrop ? CARD : undefined,
+              }}
+            >
+              {actionsRow}
+            </div>
+          );
         }
 
         return (
@@ -679,15 +688,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               actions={actionsRow}
-              extra={
-                courseContext && postRound?.grossScore != null ? (
-                  <PostCourseDataLine
-                    ctx={courseContext}
-                    theirGross={postRound.grossScore}
-                    panel={false}
-                  />
-                ) : null
-              }
+              surface={hasRoundBackdrop ? 'glass' : 'solid'}
             />
             {post.courseId && statsOpen && (
               <CourseStatsSheet
