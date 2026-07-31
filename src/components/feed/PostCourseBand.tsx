@@ -112,6 +112,8 @@ interface Props {
   actions: React.ReactNode;
   /** Extra content (C3 you-vs-them row) rendered under row one. */
   extra?: React.ReactNode;
+  /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
+  surface?: 'solid' | 'glass';
 }
 
 export const PostCourseBand: React.FC<Props> = ({
@@ -122,6 +124,7 @@ export const PostCourseBand: React.FC<Props> = ({
   onOpenStats,
   actions,
   extra,
+  surface = 'solid',
 }) => {
   const { t } = useTranslation('common');
 
