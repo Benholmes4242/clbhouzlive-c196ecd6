@@ -37,7 +37,7 @@ export function CourseRow({ course, query, onSelect }: Props) {
         {yourStatsRounds != null && (
           <div className="flex items-center gap-1.5" style={{ color: A.AMBER_DEEP }}>
             <BarChartGlyph size={10} />
-            <span style={{ ...LABEL, fontSize: 8.5, color: A.AMBER_DEEP }}>
+            <span style={{ ...LABEL, fontSize: 12, color: A.AMBER_DEEP }}>
               {t('search.yourRounds', 'Your rounds')}
             </span>
             <span style={{ ...NUM, fontSize: 12, color: A.AMBER_DEEP }}>{yourStatsRounds}</span>

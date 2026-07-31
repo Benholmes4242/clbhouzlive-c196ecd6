@@ -27,10 +27,8 @@ import {
   type EmptyStateSuggestion,
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
-const AMBER = '#F7931E';
-const GOLD_GRADIENT =
-  'linear-gradient(90deg, #B8860B 0%, #F7C948 45%, #FFD97A 60%, #F7C948 80%, #B8860B 100%)';
 
 interface Props {
   onSelect: () => void; // called before navigation (parent uses to close)
@@ -178,34 +176,17 @@ export function SearchEmptyState({ onSelect }: Props) {
 }
 
 // ─── Eyebrow ───────────────────────────────────────────────────────────
+// Single eyebrow treatment: shared KICKER token, identical to the "Recent"
+// section header. No amber/gold variants — all sections read the same.
 function SectionEyebrow({
   label,
-  gold = false,
+  gold: _gold = false,
   rightChip = null,
 }: {
   label: string;
   gold?: boolean;
   rightChip?: React.ReactNode;
 }) {
-  const textStyle: React.CSSProperties = gold
-    ? {
-        fontSize: 10.5,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-        backgroundImage: GOLD_GRADIENT,
-        WebkitBackgroundClip: 'text',
-        backgroundClip: 'text',
-        color: 'transparent',
-        WebkitTextFillColor: 'transparent',
-      }
-    : {
-        fontSize: 10.5,
-        fontWeight: 800,
-        color: AMBER,
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-      };
   return (
     <div
       style={{
@@ -216,7 +197,7 @@ function SectionEyebrow({
         gap: 8,
       }}
     >
-      <span style={textStyle} className="truncate">
+      <span style={KICKER} className="truncate">
         {label}
       </span>
       {rightChip}
