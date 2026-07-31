@@ -17,10 +17,15 @@ interface CourseCommunityRatingProps {
 /**
  * Displays the community rating score.
  * This is the SINGLE source of truth for rating display in course cards.
- * 
- * Rating tier colors (5-tier system, Apr 2026):
- * - Exceptional (≥9.0): amber-500 (brand accent) — unless forceNeutral is set
- * - Excellent / Good / Fair / Poor (< 9.0): foreground (neutral)
+ *
+ * Colour comes from the one member-score band scale (scoreBands):
+ * - >= 9.0  BAND_GREEN  #047857
+ * - >= 5.0  BAND_AMBER  #F7931E
+ * -  < 5.0  BAND_RED    #DC2626
+ *
+ * `forceNeutral` overrides the band entirely: foreground on light, near-white
+ * when `onDark` is also set. All three band colours read on a dark scrim, so
+ * `onDark` has no effect on the banded case.
  */
 export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   rating,
@@ -56,12 +61,19 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
         className={cn(
           textClasses,
           'font-semibold tabular-nums',
-          forceNeutral ? (onDark ? '' : 'text-foreground') : 'text-amber-500'
+          forceNeutral && !onDark ? 'text-foreground' : ''
         )}
-        style={forceNeutral && onDark ? { color: 'rgba(255,255,255,0.95)' } : undefined}
+        style={
+          forceNeutral
+            ? onDark
+              ? { color: 'rgba(255,255,255,0.95)' }
+              : undefined
+            : { color: bandColor(rating) }
+        }
       >
         {formatRatingValue(rating)}
       </span>
+
     </div>
   );
 };
