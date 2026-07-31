@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Play, Plus } from 'lucide-react';
+import { Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
@@ -10,7 +10,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { Action, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface AboutMediaStripProps {
