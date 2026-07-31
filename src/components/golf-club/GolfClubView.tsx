@@ -249,7 +249,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        minHeight: 'calc(clamp(240px, 30dvh, 340px) + env(safe-area-inset-top, 0px))',
+        minHeight: 'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))',
         background: heroBackground,
         backgroundColor: '#0F172A',
         display: 'flex',

@@ -8,7 +8,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 const HERO_MIN_HEIGHT =
-  'calc(clamp(240px, 30dvh, 340px) + env(safe-area-inset-top, 0px))';
+  'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
 
 export const CoursesHubSkeleton = () => {
   return (
