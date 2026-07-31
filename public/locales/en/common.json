@@ -189,5 +189,11 @@
       "title": "Post my rounds automatically",
       "subtitle": "Your rounds appear in the Clubhouse when you log them. Only standout rounds reach members who do not follow you."
     }
+  },
+  "map": {
+    "kicker": "Location",
+    "openAppleMaps": "Open in Apple Maps",
+    "openGoogleMaps": "Open in Google Maps",
+    "close": "Close"
   }
 }

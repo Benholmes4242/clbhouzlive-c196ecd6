@@ -2,8 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { MapPin, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
@@ -45,6 +46,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   nearby,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const secondaryMarkersRef = useRef<mapboxgl.Marker[]>([]);
@@ -129,7 +131,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       });
 
       map.on('error', (e) => {
-        if ((e as any)?.error?.message?.includes('WebGL')) {
+        if ((e as { error?: { message?: string } })?.error?.message?.includes('WebGL')) {
           console.error('[MapExpandedView] WebGL error, removing map', e);
           map.remove();
           mapRef.current = null;
@@ -207,95 +209,93 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
     };
   }, [open, nearby, navigate, onOpenChange]);
 
+  const destinations = isIOS
+    ? [
+        { label: t('map.openAppleMaps'), url: appleMapsUrl },
+        { label: t('map.openGoogleMaps'), url: googleMapsUrl },
+      ]
+    : [
+        { label: t('map.openGoogleMaps'), url: googleMapsUrl },
+        { label: t('map.openAppleMaps'), url: appleMapsUrl },
+      ];
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[75dvh] p-0 !rounded-t-2xl overflow-hidden immersive-map-sheet expanded-map-glass-controls"
+        className="h-[75dvh] p-0 !rounded-t-2xl overflow-hidden flex flex-col immersive-map-sheet expanded-map-glass-controls"
+        style={{ background: '#FFFFFF' }}
         hideCloseButton
       >
-        {/* Map IS the sheet */}
-        <div ref={mapContainerRef} className="absolute inset-0" />
+        {/* Grabber */}
+        <div className="flex-none flex justify-center pt-2.5 pb-1">
+          <div style={{ width: 38, height: 4, borderRadius: 2, background: '#DDE2E8' }} aria-hidden="true" />
+        </div>
 
-        {/* Floating grabber (affordance only) */}
-        <div className="pointer-events-none absolute top-2.5 left-1/2 -translate-x-1/2 w-9 h-1 rounded-full bg-black/25" />
-
-        {/* Floating header card - swipe down here closes */}
+        {/* Header — kicker / title / place, no icon tile. Swipe down closes. */}
         <div
           {...swipeHandlers}
-          className="absolute top-[18px] left-3 right-3 flex items-center gap-3 rounded-2xl px-3.5 py-3"
-          style={{
-            background: 'rgba(255,255,255,0.92)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            border: '1px solid rgba(15,23,42,0.08)',
-            boxShadow: '0 8px 24px rgba(15,23,42,0.15)',
-          }}
+          className="flex-none flex items-start justify-between gap-3"
+          style={{ padding: '6px 16px 12px' }}
         >
-          <div style={{
-            width: 34, height: 34, borderRadius: 11, flexShrink: 0,
-            background: 'rgba(247,147,30,0.12)', color: '#F7931E',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <MapPin size={16} strokeWidth={2} />
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C2620A' }}>
+              {t('map.kicker')}
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: '#0E1216', marginTop: 3, letterSpacing: '-0.01em' }}>
               {name}
             </div>
             {locationText && (
-              <div style={{ fontSize: 10.5, color: '#64748B', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {locationText}
-              </div>
+              <div style={{ fontSize: 13, color: '#68707B', marginTop: 2 }}>{locationText}</div>
             )}
           </div>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            aria-label="Close"
-            className="shrink-0 flex items-center justify-center"
-            style={{ width: 30, height: 30, borderRadius: 15, background: 'rgba(15,23,42,0.06)', border: 'none', color: '#64748B', cursor: 'pointer' }}
+            aria-label={t('map.close')}
+            className="flex-none"
+            style={{ border: 'none', background: 'transparent', color: '#68707B', cursor: 'pointer', padding: 0, lineHeight: 1 }}
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Floating launch dock */}
+        {/* Map fills the remaining height */}
+        <div className="flex-1 min-h-0 relative">
+          <div ref={mapContainerRef} className="absolute inset-0" />
+        </div>
+
+        {/* Two equal destination rows, platform-ordered */}
         <div
-          className="pointer-events-none absolute left-3 right-3 flex gap-2.5"
-          style={{ bottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)) + 4px)' }}
+          className="flex-none"
+          style={{
+            borderTop: '1px solid #EDF0F3',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          }}
         >
-          {isIOS && (
+          {destinations.map((d, i) => (
             <button
+              key={d.label}
               type="button"
-              onClick={() => openMapsUrl(appleMapsUrl)}
-              className="pointer-events-auto flex-1"
+              onClick={() => openMapsUrl(d.url)}
+              className="w-full flex items-center justify-between text-left"
               style={{
-                height: 50, borderRadius: 999, border: 'none', cursor: 'pointer',
-                background: '#F7931E', color: '#fff',
-                fontSize: 13.5, fontWeight: 700,
-                boxShadow: '0 8px 24px rgba(15,23,42,0.2)',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                padding: '15px 16px',
+                borderBottom: i === destinations.length - 1 ? 'none' : '1px solid #EDF0F3',
               }}
             >
-              Open in Apple Maps
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#0E1216' }}>{d.label}</span>
+              <span
+                aria-hidden="true"
+                style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.13em', color: '#C2620A' }}
+              >
+                {'\u2197'}
+              </span>
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => openMapsUrl(googleMapsUrl)}
-            className="pointer-events-auto flex-1"
-            style={{
-              height: 50, borderRadius: 999, cursor: 'pointer',
-              background: isIOS ? 'rgba(255,255,255,0.92)' : '#F7931E',
-              color: isIOS ? '#0F172A' : '#fff',
-              border: isIOS ? '1px solid rgba(15,23,42,0.08)' : 'none',
-              backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
-              fontSize: 13.5, fontWeight: 700,
-              boxShadow: '0 8px 24px rgba(15,23,42,0.2)',
-            }}
-          >
-            {isIOS ? 'Google Maps' : 'Open in Google Maps'}
-          </button>
+          ))}
         </div>
       </SheetContent>
     </Sheet>
@@ -303,3 +303,4 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
 };
 
 export default MapExpandedView;
+
