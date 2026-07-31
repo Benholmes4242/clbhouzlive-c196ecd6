@@ -131,7 +131,8 @@
     "noFriendsPlayed": "No friends played yet",
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
-    "experiencePoints": "Experience Points Earned"
+    "experiencePoints": "Experience Points Earned",
+    "yourRounds": "내 라운드"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
@@ -259,7 +260,11 @@
       "facilities": "Facilities",
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
-      "noRoundsCta": "Be the first."
+      "noRoundsCta": "Be the first.",
+      "ratingLabel": "평점",
+      "avgToParLabel": "평균 대비 파",
+      "harderThanLabel": "더 어려움",
+      "easierThanLabel": "더 쉬움"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",

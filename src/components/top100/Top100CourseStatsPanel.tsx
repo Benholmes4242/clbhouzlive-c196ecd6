@@ -6,8 +6,8 @@
  * at the top of the tab already carries that ask, and ninety-odd identical
  * prompts drown the courses that actually hold data.
  *
- * Row one pairs the member rating (left) with the difficulty reading (right).
- * The four rating sub-scores that already live in course_rating_aggregates
+ * Row one is a centred three-up: rating (band-coloured), average to par and the
+ * difficulty percentile. The four rating sub-scores that already live in course_rating_aggregates
  * follow as 2x2 bars, gated behind t100_subscore_min_ratings (default 3) so a
  * single member's afternoon is never presented as analysis.
  *
@@ -29,15 +29,6 @@ import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/course
 
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
-/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
-const MONO = 'inherit';
-
-/** Slashed zeros are switched off wherever tabular figures appear here. */
-const NUMERALS: React.CSSProperties = {
-  fontVariantNumeric: 'tabular-nums',
-  fontFeatureSettings: '"zero" 0',
-};
-
 /** Fires once per course per session, not per mount. */
 const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
