@@ -94,6 +94,8 @@ export interface FeedPost {
   /** Community rating (avg_overall_score from course_rating_aggregates), null when unrated */
   courseRating?: number | null;
   courseThumbnailImage?: string | null;
+  /** 0-4 notability of an auto-posted round. */
+  roundNotability?: number | null;
   courseLatitude?: number | null;
   courseLongitude?: number | null;
   courseGlobalRank?: number | null;

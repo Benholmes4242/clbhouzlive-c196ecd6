@@ -522,6 +522,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {postRound && (
         <PostRoundCard
           round={postRound}
+          postId={post.id}
+          notability={post.roundNotability ?? null}
+          courseName={post.courseName ?? null}
+          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
+          coursePhotoUrl={post.courseThumbnailImage ?? null}
           onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
         />
       )}
