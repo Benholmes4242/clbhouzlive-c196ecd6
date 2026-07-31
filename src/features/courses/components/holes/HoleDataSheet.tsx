@@ -16,6 +16,18 @@ import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
+import {
+  A, Panel, toParParts, LABEL as LABEL_A, NUM as NUM_A,
+} from './analytical/tokens';
+
+interface HookCell {
+  key: string;
+  emoji: string;
+  label: string;
+  value: string;
+  tone?: string;
+  note: string;
+}
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
