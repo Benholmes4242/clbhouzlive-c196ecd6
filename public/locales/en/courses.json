@@ -691,7 +691,9 @@
       "title": "Food & stays nearby"
     },
     "legends": {
-      "errorLoading": "Couldn't load course crowns"
+      "errorLoading": "Couldn't load course crowns",
+      "closestDuel": "Your closest duel",
+      "closestDuelBody": "The crown you're closest to taking at this club."
     },
     "exploreLinks": {
       "kicker": "KEEP EXPLORING",
