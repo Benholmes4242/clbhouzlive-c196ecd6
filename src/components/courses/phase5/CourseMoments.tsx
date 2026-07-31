@@ -126,7 +126,6 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
               borderRadius: 10,
               overflow: 'hidden',
               cursor: 'pointer',
-              boxShadow: '0 1px 3px rgba(15,23,42,0.06)',
             }}
           >
             {moment.mediaType === 'video' ? (
