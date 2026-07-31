@@ -190,9 +190,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         : t('courses:courseDetail.you.levelPar');
 
   const split = [
-    { key: 'par', label: t('courses:courseDetail.you.parOrBetterFlat', { defaultValue: 'Par or better' }), pct: pctPar, holes: sumPar, tone: UNDER },
+    { key: 'par', label: t('courses:courseDetail.you.parOrBetter'), pct: pctPar, holes: sumPar, tone: UNDER },
     { key: 'bog', label: t('courses:holes.scoringBreakdown.bogey'), pct: pctBog, holes: sumBog, tone: BAND_AMBER },
-    { key: 'dbl', label: t('courses:courseDetail.you.doubleOrWorseFlat', { defaultValue: 'Double or worse' }), pct: pctDbl, holes: sumDbl, tone: OVER },
+    { key: 'dbl', label: t('courses:courseDetail.you.doubleOrWorse'), pct: pctDbl, holes: sumDbl, tone: OVER },
   ];
 
   return (

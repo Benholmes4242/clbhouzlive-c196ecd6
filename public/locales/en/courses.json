@@ -900,7 +900,9 @@
       "yourBattle": "Your battle · hole {{n}}",
       "oneToGo": "One to go",
       "fullHouse": "Full house",
-      "birdieMap": "Birdie map"
+      "birdieMap": "Birdie map",
+      "parOrBetter": "Par or better",
+      "doubleOrWorse": "Double or worse"
     }
   },
   "network": {
