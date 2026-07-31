@@ -696,6 +696,24 @@
       "ordinal_ordinal_other": "{{count}}th"
     }
   },
+  "statBrowse": {
+    "countTracked_one": "추적된 코스",
+    "countTracked_other": "추적된 코스",
+    "countLens": {
+      "toughest_one": "{{total}}개 코스 중 {{count}}개 코스에 난이도 데이터가 있습니다",
+      "toughest_other": "{{total}}개 코스 중 {{count}}개 코스에 난이도 데이터가 있습니다",
+      "scoreable_one": "{{total}}개 코스 중 {{count}}개 코스에 스코어링 데이터가 있습니다",
+      "scoreable_other": "{{total}}개 코스 중 {{count}}개 코스에 스코어링 데이터가 있습니다",
+      "played_one": "{{total}}개 코스 중 {{count}}개 코스에 라운드 데이터가 있습니다",
+      "played_other": "{{total}}개 코스 중 {{count}}개 코스에 라운드 데이터가 있습니다",
+      "longest_one": "{{total}}개 코스 중 {{count}}개 코스에 길이 데이터가 있습니다",
+      "longest_other": "{{total}}개 코스 중 {{count}}개 코스에 길이 데이터가 있습니다",
+      "rated_one": "{{total}}개 코스 중 {{count}}개 코스에 평가가 있습니다",
+      "rated_other": "{{total}}개 코스 중 {{count}}개 코스에 평가가 있습니다",
+      "chase_one": "{{total}}개 코스 중 {{count}}개 코스에 깨지지 않은 기록이 있습니다",
+      "chase_other": "{{total}}개 코스 중 {{count}}개 코스에 깨지지 않은 기록이 있습니다"
+    }
+  },
   "directorySheet": {
     "placeholder": "Search all courses",
     "clear": "Clear search",

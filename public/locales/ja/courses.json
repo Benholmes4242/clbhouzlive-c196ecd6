@@ -696,6 +696,24 @@
       "ordinal_ordinal_other": "{{count}}th"
     }
   },
+  "statBrowse": {
+    "countTracked_one": "トラック済みコース",
+    "countTracked_other": "トラック済みコース",
+    "countLens": {
+      "toughest_one": "{{total}}コース中{{count}}コースが難易度データを持っています",
+      "toughest_other": "{{total}}コース中{{count}}コースが難易度データを持っています",
+      "scoreable_one": "{{total}}コース中{{count}}コースがスコアリングデータを持っています",
+      "scoreable_other": "{{total}}コース中{{count}}コースがスコアリングデータを持っています",
+      "played_one": "{{total}}コース中{{count}}コースがラウンドデータを持っています",
+      "played_other": "{{total}}コース中{{count}}コースがラウンドデータを持っています",
+      "longest_one": "{{total}}コース中{{count}}コースが距離データを持っています",
+      "longest_other": "{{total}}コース中{{count}}コースが距離データを持っています",
+      "rated_one": "{{total}}コース中{{count}}コースが評価を持っています",
+      "rated_other": "{{total}}コース中{{count}}コースが評価を持っています",
+      "chase_one": "{{total}}コース中{{count}}コースが未達成の記録を持っています",
+      "chase_other": "{{total}}コース中{{count}}コースが未達成の記録を持っています"
+    }
+  },
   "directorySheet": {
     "placeholder": "Search all courses",
     "clear": "Clear search",

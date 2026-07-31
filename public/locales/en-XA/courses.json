@@ -694,6 +694,24 @@
       "ordinal_ordinal_other": "{{count}}th"
     }
   },
+  "statBrowse": {
+    "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",
+    "countTracked_other": "[~~ĉőűřšéš ţŕáĉǩéđ~~]",
+    "countLens": {
+      "toughest_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ƥļáýš ţőűĝĥ éñőűĝĥ ţő ŕáñǩ~~]",
+      "toughest_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ƥļáý ţőűĝĥ éñőűĝĥ ţő ŕáñǩ~~]",
+      "scoreable_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé íš šĉőŕéáɓļé~~]",
+      "scoreable_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš áŕé šĉőŕéáɓļé~~]",
+      "played_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ɓééñ ƥļáýéđ~~]",
+      "played_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ɓééñ ƥļáýéđ~~]",
+      "longest_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ĺéñĝţĥ~~]",
+      "longest_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ĺéñĝţĥ~~]",
+      "rated_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ŕáţíñĝš~~]",
+      "rated_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕáţíñĝš~~]",
+      "chase_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ŕéĉőŕđš ţő ĉĥášé~~]",
+      "chase_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕéĉőŕđš ţő ĉĥášé~~]"
+    }
+  },
   "directorySheet": {
     "placeholder": "Search all courses",
     "clear": "Clear search",

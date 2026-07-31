@@ -743,6 +743,24 @@
       "ordinal_ordinal_other": "{{count}}th"
     }
   },
+  "statBrowse": {
+    "countTracked_one": "curso seguido",
+    "countTracked_other": "cursos seguidos",
+    "countLens": {
+      "toughest_one": "{{count}} de {{total}} curso seguido es de los más difíciles",
+      "toughest_other": "{{count}} de {{total}} cursos seguidos son de los más difíciles",
+      "scoreable_one": "{{count}} de {{total}} curso seguido es scoreable",
+      "scoreable_other": "{{count}} de {{total}} cursos seguidos son scoreables",
+      "played_one": "{{count}} de {{total}} curso seguido tiene rondas",
+      "played_other": "{{count}} de {{total}} cursos seguidos tienen rondas",
+      "longest_one": "{{count}} de {{total}} curso seguido tiene longitud",
+      "longest_other": "{{count}} de {{total}} cursos seguidos tienen longitud",
+      "rated_one": "{{count}} de {{total}} curso seguido tiene valoraciones",
+      "rated_other": "{{count}} de {{total}} cursos seguidos tienen valoraciones",
+      "chase_one": "{{count}} de {{total}} curso seguido tiene récords por batir",
+      "chase_other": "{{count}} de {{total}} cursos seguidos tienen récords por batir"
+    }
+  },
   "directorySheet": {
     "placeholder": "Search all courses",
     "clear": "Clear search",

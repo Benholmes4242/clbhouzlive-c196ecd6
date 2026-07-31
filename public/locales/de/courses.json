@@ -743,6 +743,24 @@
       "ordinal_ordinal_other": "{{count}}th"
     }
   },
+  "statBrowse": {
+    "countTracked_one": "Kurs verfolgt",
+    "countTracked_other": "Kurse verfolgt",
+    "countLens": {
+      "toughest_one": "{{count}} von {{total}} verfolgtem Kurs spielt schwer genug, um zu ranken",
+      "toughest_other": "{{count}} von {{total}} verfolgten Kursen spielen schwer genug, um zu ranken",
+      "scoreable_one": "{{count}} von {{total}} verfolgtem Kurs ist scorebar",
+      "scoreable_other": "{{count}} von {{total}} verfolgten Kursen sind scorebar",
+      "played_one": "{{count}} von {{total}} verfolgtem Kurs hat Runden",
+      "played_other": "{{count}} von {{total}} verfolgten Kursen haben Runden",
+      "longest_one": "{{count}} von {{total}} verfolgtem Kurs hat Länge",
+      "longest_other": "{{count}} von {{total}} verfolgten Kursen haben Länge",
+      "rated_one": "{{count}} von {{total}} verfolgtem Kurs hat Bewertungen",
+      "rated_other": "{{count}} von {{total}} verfolgten Kursen haben Bewertungen",
+      "chase_one": "{{count}} von {{total}} verfolgtem Kurs hat offene Rekorde",
+      "chase_other": "{{count}} von {{total}} verfolgten Kursen haben offene Rekorde"
+    }
+  },
   "directorySheet": {
     "placeholder": "Search all courses",
     "clear": "Clear search",
