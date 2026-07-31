@@ -497,7 +497,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           background: 'rgba(255,255,255,0.72)',
           backdropFilter: 'blur(var(--glass-blur))',
           WebkitBackdropFilter: 'blur(var(--glass-blur))',
-          borderBottom: `1px solid ${HAIRLINE_INK_8}`,
         }}
       >
         {condensed ? (
