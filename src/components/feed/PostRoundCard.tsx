@@ -491,7 +491,7 @@ export const PostRoundCard: React.FC<Props> = ({
             gap: 10,
             padding: '10px 14px',
             borderTop: `1px solid ${HAIRLINE}`,
-            background: FLAT_SURFACE,
+            background: 'transparent',
           }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
