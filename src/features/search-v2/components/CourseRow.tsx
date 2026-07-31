@@ -5,7 +5,7 @@ import { Highlight } from './Highlight';
 import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
 import { BarChartGlyph } from '@/components/courses/YourStatsChip';
 import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
-import { A, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
+import { A, KICKER, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ResultTile } from './ResultTile';
 
 interface Props { course: CourseHit; query: string; onSelect: () => void }
