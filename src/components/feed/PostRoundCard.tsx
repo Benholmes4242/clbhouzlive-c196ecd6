@@ -247,24 +247,10 @@ export const PostRoundCard: React.FC<Props> = ({
   notability,
   courseName,
   courseRegion,
-  coursePhotoUrl,
   crown,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
-
-  const feats = useMemo(
-    () =>
-      deriveRoundFeats({
-        birdies: round.birdies,
-        eagles: round.eagles,
-        albatrosses: round.albatrosses,
-        holes_in_one: round.holesInOne,
-        beat_par: round.beatPar,
-        clean_card: round.cleanCard,
-      }),
-    [round],
-  );
 
   const holes = round.holeShape ?? [];
   const hasHoles = holes.length > 0;
@@ -280,7 +266,6 @@ export const PostRoundCard: React.FC<Props> = ({
         io.disconnect();
         analyticsEvents.track('feed_round_card_shown', {
           has_holes: hasHoles,
-          feat_count: feats.length,
         });
         const key = postId ?? round.whsScoreId;
         if (!seenRoundPosts.has(key)) {
@@ -298,26 +283,20 @@ export const PostRoundCard: React.FC<Props> = ({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasHoles, feats.length, postId, notability, showCrown, round.whsScoreId]);
+  }, [hasHoles, postId, notability, showCrown, round.whsScoreId]);
 
   const gross = round.grossScore;
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
   const kicker = dateKicker(round.playDate);
-  const hasPhoto = !!coursePhotoUrl;
 
-  const panelStyle: React.CSSProperties = hasPhoto
-    ? {
-        background: 'rgba(11,13,16,0.66)',
-        backdropFilter: 'blur(22px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(22px) saturate(150%)',
-        borderTop: `1px solid ${HAIRLINE}`,
-        padding: '14px 14px 16px',
-      }
-    : {
-        background: FLAT_SURFACE,
-        borderTop: `1px solid ${HAIRLINE}`,
-        padding: '14px 14px 16px',
-      };
+  // The card-level backdrop and glass now live in FeedCard. This block is
+  // transparent and never applies a backdrop filter of its own.
+  const panelStyle: React.CSSProperties = {
+    background: 'transparent',
+    borderTop: `1px solid ${HAIRLINE}`,
+    padding: '14px 14px 16px',
+  };
+
 
   const handleTap = onTap
     ? (e: React.MouseEvent) => {
