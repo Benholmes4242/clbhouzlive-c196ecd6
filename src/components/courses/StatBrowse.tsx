@@ -20,6 +20,7 @@ import {
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
@@ -165,6 +166,21 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const rankedIds = useMemo(() => rankedRows.map((r) => r.course_id), [rankedRows]);
   const enrichment = useTop100Enrichment(rankedIds, user?.id);
   const verdictConfig = useTop100Config();
+  /**
+   * Viewer status resolver — same shape as VirtualizedCourseList's, which is the
+   * reference. Enrichment answers for ranked courses; the user-stats map covers
+   * the unranked majority of this tab. Rated outranks played.
+   */
+  const yourRoundsMap = useUserStatsCourseMap();
+  const viewerStatusFor = useCallback(
+    (courseId: string): 'rated' | 'played' | null => {
+      const data = enrichment.get(courseId);
+      if (data?.ratedByYou) return 'rated';
+      if ((data?.yourRounds ?? 0) > 0) return 'played';
+      return (yourRoundsMap.get(courseId) ?? 0) > 0 ? 'played' : null;
+    },
+    [enrichment, yourRoundsMap],
+  );
   const [verdictSheet, setVerdictSheet] = useState<{
     courseId: string;
     courseName: string;
@@ -442,7 +458,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         className={
           compact
             ? COMPACT_TRIGGER_CLS
-            : 'h-8 rounded-xl border bg-white px-3 text-[12px] font-semibold w-auto'
+            : `${TRIGGER_CLS} w-full`
         }
         style={{ borderColor: HAIRLINE_INK_10, color: INK }}
         aria-label={t('statBrowse.selectLensA11y')}
