@@ -19,8 +19,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Crown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { RoundFeatChips } from '@/components/explore-tab-new/RoundFeatChips';
-import { deriveRoundFeats } from '@/lib/gam/roundFeats';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import {
   SC_FILL_GOLD,
@@ -77,7 +75,6 @@ interface Props {
   notability?: number | null;
   courseName?: string | null;
   courseRegion?: string | null;
-  coursePhotoUrl?: string | null;
   /** Only rendered when a previous holder can be resolved. */
   crown?: RoundCrown | null;
 }
