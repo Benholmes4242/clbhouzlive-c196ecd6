@@ -17,7 +17,7 @@ import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
 import {
-  A, Panel, toParParts, LABEL as LABEL_A, NUM as NUM_A,
+  A, Panel, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
 } from './analytical/tokens';
 
 interface HookCell {
@@ -262,6 +262,11 @@ export const HoleDataSheet: React.FC<Props> = ({
           viewerHasPlayed={viewerHasPlayed}
           beatFieldCount={beatFieldCount}
         />
+      )}
+
+      {/* The second and last kicker on the You tab. */}
+      {section === 'you' && (
+        <div style={{ ...KICKER_A, marginBottom: -8 }}>{t('courses:courseDetail.you.shotsGo')}</div>
       )}
 
       {/* 3. Story tiles */}
