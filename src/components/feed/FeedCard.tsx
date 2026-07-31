@@ -44,7 +44,6 @@ import type { ActiveActor } from '@/types/actor';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
-import { PostCourseDataLine } from './PostCourseDataLine';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
 import { PostRoundCard } from './PostRoundCard';
