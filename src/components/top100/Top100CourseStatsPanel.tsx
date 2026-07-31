@@ -20,19 +20,13 @@
  *  - t100_no_rounds_line_shown { course_id, rank, list } (see noRoundsRef IO)
  */
 import React, { useEffect, useRef } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { AMBER, HAIRLINE_INK_8, INK } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
 import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 
-/** Difficulty band inks. Relative difficulty only - see BRIEF_TOP100_DIFFICULTY_BANDS. */
-const BAND_RED = '#C8372B';
-const BAND_GREEN = '#0F8F4A';
-const BAND_INK = '#0E1216';
-const MUTED_INK = 'rgba(15,23,42,0.55)';
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
 /** Numerals stay in the Geist stack: monospace faces slash their zeros. */
@@ -50,24 +44,6 @@ const seenNoRounds = new Set<string>();
 const seenDifficulty = new Set<string>();
 
 const headingStyle: React.CSSProperties = { ...KICKER, lineHeight: 1 };
-
-const ratingStyle: React.CSSProperties = {
-  ...NUMERALS,
-  fontFamily: MONO,
-  fontSize: 22,
-  fontWeight: 800,
-  letterSpacing: '-0.04em',
-  lineHeight: 1.05,
-  color: INK,
-};
-
-const difficultyLineStyle: React.CSSProperties = {
-  fontSize: 11.5,
-  fontWeight: 500,
-  color: MUTED_INK,
-  lineHeight: 1.35,
-  letterSpacing: '-0.005em',
-};
 
 interface Props {
   courseId: string;
@@ -172,15 +148,6 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
 
   // Nothing to say about a course no member has rated.
   if (!hasRating) return null;
-
-  const figureStyleFor = (color: string): React.CSSProperties => ({
-    ...NUMERALS,
-    fontFamily: MONO,
-    fontSize: 12.5,
-    fontWeight: 800,
-    color,
-    letterSpacing: '-0.02em',
-  });
 
   /**
    * The stat row.
