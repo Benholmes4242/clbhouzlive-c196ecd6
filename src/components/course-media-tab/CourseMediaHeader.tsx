@@ -4,7 +4,9 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
-import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
+import { INK, HAIRLINE_INK_10 } from '@/features/courses/_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 
 interface CourseMediaHeaderProps {
