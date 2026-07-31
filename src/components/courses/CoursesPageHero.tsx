@@ -203,7 +203,7 @@ function CoursesPageHeroInner() {
             {eyebrowParts.length > 0 && (
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: 800,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -220,7 +220,7 @@ function CoursesPageHeroInner() {
               {hero.list_rank != null && (
                 <span
                   style={{
-                    fontSize: 44,
+                    fontSize: 36,
                     fontWeight: 800,
                     color: '#fff',
                     lineHeight: 1,
@@ -234,7 +234,7 @@ function CoursesPageHeroInner() {
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    fontSize: 19,
+                    fontSize: 17,
                     fontWeight: 800,
                     color: '#fff',
                     lineHeight: 1.15,
@@ -250,7 +250,7 @@ function CoursesPageHeroInner() {
                 {locationText && (
                   <div
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 11,
                       color: 'rgba(255,255,255,0.72)',
                       marginTop: 2,
                       whiteSpace: 'nowrap',
@@ -268,11 +268,11 @@ function CoursesPageHeroInner() {
             {blurb && (
               <div
                 style={{
-                  fontSize: 14,
+                  fontSize: 12.5,
                   color: 'rgba(255,255,255,0.9)',
                   lineHeight: 1.45,
                   maxWidth: 340,
-                  marginTop: 12,
+                  marginTop: 10,
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical',
@@ -304,7 +304,7 @@ function CoursesPageHeroInner() {
                 />
                 <span
                   style={{
-                    fontSize: 12.5,
+                    fontSize: 11.5,
                     color: 'rgba(255,255,255,0.72)',
                     minWidth: 0,
                     overflow: 'hidden',
@@ -333,10 +333,10 @@ function CoursesPageHeroInner() {
                 style={{
                   background: '#fff',
                   color: '#15171F',
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: 800,
                   letterSpacing: '-0.005em',
-                  padding: '10px 16px',
+                  padding: '9px 15px',
                   borderRadius: 999,
                   border: 'none',
                   cursor: 'pointer',
