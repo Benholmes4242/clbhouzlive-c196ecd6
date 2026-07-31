@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   count: number;
@@ -27,31 +28,27 @@ export const BarChartGlyph: React.FC<{ size: number }> = ({ size }) => (
 );
 
 /**
- * Phase E: "Your stats {DOT} N" chip. Two tones:
- * - dark: overlaid on photo cards (UnifiedCourseCard)
- * - light: inside the search overlay row
+ * "YOUR ROUNDS N" — the member's own figure on a card whose other figures
+ * belong to the course. Two tones:
+ * - dark: glass capsule overlaid on photo cards (UnifiedCourseCard), amber text
+ * - light: no fill, no border, AMBER_DEEP (amber fails contrast below 12px)
  */
 export const YourStatsChip: React.FC<Props> = ({ count, tone, onClick, ariaLabel }) => {
   const { t } = useTranslation('courses');
-  const label = t('card.yourStats');
+  const label = t('card.yourRounds');
   const glyphSize = tone === 'dark' ? 10 : 9;
 
   const darkStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 5,
-    background: 'rgba(247,147,30,0.86)',
+    gap: 6,
+    background: 'rgba(12,18,14,0.58)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
-    border: '0.5px solid rgba(255,255,255,0.28)',
-    padding: '4px 9px',
-    borderRadius: 9999,
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: '#fff',
-    letterSpacing: '-0.005em',
-    fontVariantNumeric: 'tabular-nums',
-    boxShadow: '0 1px 6px rgba(0,0,0,0.28)',
+    border: '1px solid rgba(255,255,255,0.18)',
+    padding: '5px 10px',
+    borderRadius: 999,
+    color: A.AMBER,
     whiteSpace: 'nowrap',
     lineHeight: 1,
     cursor: onClick ? 'pointer' : 'default',
@@ -60,26 +57,34 @@ export const YourStatsChip: React.FC<Props> = ({ count, tone, onClick, ariaLabel
   const lightStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 4,
-    background: 'rgba(247,147,30,0.13)',
-    border: '1px solid rgba(247,147,30,0.34)',
-    color: '#B45309',
-    fontSize: 10.5,
-    fontWeight: 800,
-    padding: '2px 6px',
-    borderRadius: 6,
-    fontVariantNumeric: 'tabular-nums',
+    gap: 5,
+    background: 'transparent',
+    border: 'none',
+    padding: 0,
+    color: A.AMBER_DEEP,
     whiteSpace: 'nowrap',
-    lineHeight: 1.15,
+    lineHeight: 1,
+    cursor: onClick ? 'pointer' : 'default',
   };
 
   const style = tone === 'dark' ? darkStyle : lightStyle;
+  const labelStyle: React.CSSProperties = {
+    fontSize: 9,
+    fontWeight: 800,
+    letterSpacing: '0.10em',
+    textTransform: 'uppercase',
+  };
+  const figureStyle: React.CSSProperties = {
+    ...FIGS,
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '-0.02em',
+  };
   const content = (
     <>
       <BarChartGlyph size={glyphSize} />
-      <span>
-        {label} {'\u00B7'} {count}
-      </span>
+      <span style={labelStyle}>{label}</span>
+      <span style={figureStyle}>{count}</span>
     </>
   );
 
@@ -89,7 +94,7 @@ export const YourStatsChip: React.FC<Props> = ({ count, tone, onClick, ariaLabel
         type="button"
         onClick={onClick}
         aria-label={ariaLabel}
-        style={{ ...style, border: style.border, appearance: 'none' as React.CSSProperties['appearance'] }}
+        style={{ ...style, appearance: 'none' as React.CSSProperties['appearance'] }}
       >
         {content}
       </button>
