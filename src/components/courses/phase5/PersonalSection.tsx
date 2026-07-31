@@ -26,6 +26,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   courseName,
   className,
 }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data: userRating, isLoading: ratingLoading } = useUserCourseRating(courseId, user?.id);
   const { status, isLoading: statusLoading } = useCoursePersonalStatus(courseId);
