@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Check, Calendar, Star } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { CourseCommunityRating } from './CourseCommunityRating';
 import { FlagChip } from './FlagChip';
@@ -33,8 +33,6 @@ interface UnifiedCourseCardProps {
   variant?: 'vertical' | 'horizontal';
   showRankBadges?: boolean;
   showRating?: boolean;
-  showPlayedStatus?: boolean;
-  showRateChip?: boolean;
   showGhostRank?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
@@ -86,8 +84,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
   variant = 'vertical',
   showRankBadges = true,
   showRating = true,
-  showPlayedStatus = false,
-  showRateChip = false,
   showGhostRank = false,
   showFriendsContext = false,
   showLastPlayed = false,
@@ -324,7 +320,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <div
               style={{
                 fontSize: 17, fontWeight: 800, color: '#fff',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
                 letterSpacing: '-0.015em',
               }}
             >
