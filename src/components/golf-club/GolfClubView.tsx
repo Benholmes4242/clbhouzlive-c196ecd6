@@ -405,12 +405,12 @@ const MONO_FIGURE: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0',
   letterSpacing: '-0.03em',
   fontWeight: 800,
-  fontSize: 12,
+  fontSize: 13,
   color: 'rgba(255,255,255,0.95)',
 };
 
 const CELL_LABEL: React.CSSProperties = {
-  fontSize: 8.5,
+  fontSize: 9.5,
   fontWeight: 700,
   letterSpacing: '0.1em',
   textTransform: 'uppercase',
@@ -492,14 +492,14 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1]">
       <h1
-        className="text-[21px] md:text-[24px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
+        className="text-[23px] md:text-[26px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
         style={{ lineHeight: 1.15 }}
       >
         {course.name}
       </h1>
       <p
         className="drop-shadow-lg mb-1"
-        style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
+        style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
       >
         {formatCourseLocation(course)}
       </p>
@@ -537,7 +537,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
               {showBand && rounds < 10 && (
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 9.5,
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
