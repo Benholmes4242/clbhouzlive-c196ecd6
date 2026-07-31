@@ -267,6 +267,7 @@ const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProf
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
 const BusinessSocialListRoute = lazy(() => import("./features/social-lists-v2/BusinessSocialListRoute"));
+const ToggleTestPage = lazy(() => import("./pages/_test/ToggleTest"));
 
 
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
