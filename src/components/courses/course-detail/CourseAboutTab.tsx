@@ -26,8 +26,8 @@ import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
-import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
-import { CourseTeeCard } from '@/features/courses/components/holes/CourseTeeCard';
+import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
+import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
@@ -143,13 +143,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
-  // Fire once per mount when the collapsed hole table is opened.
-  const holesExpandFired = React.useRef(false);
-  const handleHolesExpand = React.useCallback(() => {
-    if (holesExpandFired.current) return;
-    holesExpandFired.current = true;
-    analyticsEvents.track('course_holes_expanded', { course_id: course.id });
-  }, [course.id]);
 
   const handleRateClick = () => {
     if (!user) {
@@ -167,28 +160,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
       <CourseLocationPills course={course} />
-      <CourseTeeCard courseId={course.id} />
+      <CourseCardPanel courseId={course.id} />
+
+      <div style={{ height: 12 }} />
+
+      {/* ══ BLOCK 2 + 3 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
+      <CourseAnalyticsPanels courseId={course.id} />
 
       <div style={{ margin: '20px 0' }}><Divider /></div>
 
-      {/* ══ BLOCK 2 — HOW IT PLAYS (one dataset, one header, three depths) ══ */}
-      <SectionHeader role="section" kicker={t('courseDetail.blocks.howItPlays')} paddingX={16} />
-      {/* Chart + Beast / Best Chance callouts, anchored together */}
-      <CourseHolesTab courseId={course.id} section="shape" showTeeCard={false} showGhost={false} />
-      {/* Detail — hole by hole, collapsed. Status branches deferred to the mount above. */}
-      <CourseHolesTab
-        courseId={course.id}
-        section="holes"
-        showTeeCard={false}
-        showGhost={false}
-        showEmptyState={false}
-        suppressStatus
-        collapsible
-        defaultCollapsed
-        onExpand={handleHolesExpand}
-      />
-
-      <div style={{ margin: '20px 0' }}><Divider /></div>
 
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
       <SectionHeader role="section" kicker={t('courseDetail.blocks.whoPlaysHere')} paddingX={16} />

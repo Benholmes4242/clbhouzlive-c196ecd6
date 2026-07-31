@@ -225,13 +225,6 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less"
-    },
-    "shapeNarrative": {
-      "beast": "The {{hole}} is the beast: {{value}} for the field.",
-      "withYou": "{{clause}} — and your line stays under everyone's on {{beat}} of {{total}}. {{beast}}",
-      "clauseFinish": "It builds to the finish",
-      "clauseEarly": "It bites early",
-      "clauseMiddle": "The middle sets the test"
     }
   },
   "scorecard": {
@@ -819,6 +812,36 @@
       "howItPlays": "HOW IT PLAYS",
       "whoPlaysHere": "WHO PLAYS HERE",
       "aboutThisPlace": "ABOUT THIS PLACE"
+    },
+    "card": {
+      "seeFull": "See the full card and scorecard",
+      "sheetTitle": "{{tee}} tees",
+      "yards_one": "{{yards}} yd",
+      "yards_other": "{{yards}} yds"
+    },
+    "plays": {
+      "fieldAvg": "Field avg",
+      "yourAvg": "Your avg",
+      "youBeat": "You beat field on",
+      "hardestHole": "Hardest hole",
+      "fieldVsYou": "Field vs you",
+      "fieldOnly": "Field",
+      "rounds_one": "{{rounds}} round",
+      "rounds_other": "{{rounds}} rounds",
+      "beastLabel": "Beast · hole {{hole}}",
+      "bestLabel": "Best · hole {{hole}}"
+    },
+    "holes": {
+      "tapHint": "Tap a hole for detail",
+      "colHole": "Hole",
+      "colParSi": "Par · SI",
+      "colDist": "Distribution",
+      "colField": "Field",
+      "colYou": "You",
+      "sheetTitle": "How the field scores",
+      "sheetSub_one": "From {{rounds}} round with hole-by-hole detail",
+      "sheetSub_other": "From {{rounds}} rounds with hole-by-hole detail",
+      "yards": "Yards"
     }
   },
   "network": {

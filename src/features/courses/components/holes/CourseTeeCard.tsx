@@ -20,6 +20,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   courseId: string | undefined;
+  /**
+   * Suppress this card's own kicker + title + collapse affordance when a
+   * sheet header already provides them (mirrors CourseRecordBook.hideHeader).
+   * Implies always-expanded.
+   */
+  hideHeader?: boolean;
 }
 
 const NUM: React.CSSProperties = {
@@ -37,7 +43,7 @@ const HOLE_GRID_COLUMNS =
 // numbers remain readable at 320dp rather than being crushed together.
 const HOLE_TABLE_MIN_WIDTH = 280;
 
-function storageKey(courseId: string) {
+export function storageKey(courseId: string) {
   return `tee-card:${courseId}`;
 }
 
@@ -70,7 +76,7 @@ function mostSampled(list: TeeSet[]): TeeSet | undefined {
   })[0];
 }
 
-function resolveDefaultTee(
+export function resolveDefaultTee(
   tees: TeeSet[],
   courseId: string,
   gender: string | null | undefined,
@@ -102,7 +108,7 @@ function resolveDefaultTee(
 }
 
 
-export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
+export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
   const { user } = useSupabaseSession();
@@ -114,7 +120,10 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
   const [specialOpen, setSpecialOpen] = useState(false);
   const [viewedFired, setViewedFired] = useState(false);
   // Always starts collapsed on mount. Not persisted across sessions.
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpandedRaw] = useState(false);
+  // hideHeader (sheet mount) has no collapse affordance, so it is always open.
+  const setExpanded = setExpandedRaw;
+  const isOpen = hideHeader || expanded;
   const [reducedMotion, setReducedMotion] = useState(false);
   const panelId = React.useId();
 
@@ -223,7 +232,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
       }}
       aria-label={t('courses:teeCard.a11yBlock') as string}
     >
-      {/* Collapsible header (toggle button) */}
+      {/* Collapsible header (toggle button) - owned by the sheet when hidden */}
+      {!hideHeader && (
       <button
         type="button"
         onClick={toggleExpanded}
@@ -292,7 +302,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
 
         {/* Compact stat strip: PAR / CR / SLOPE only (yards is in title).
             Hidden when expanded — the four-up row below owns the trio then. */}
-        {!expanded && (
+        {!isOpen && (
         <div
           style={{
             display: 'grid',
@@ -347,20 +357,21 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId }) => {
         )}
 
       </button>
+      )}
 
       {/* Collapsible panel */}
       <div
         id={panelId}
         style={{
           display: 'grid',
-          gridTemplateRows: expanded ? '1fr' : '0fr',
+          gridTemplateRows: isOpen ? '1fr' : '0fr',
           transition: reducedMotion ? 'none' : 'grid-template-rows 220ms ease',
           overflow: 'hidden',
           minWidth: 0,
           maxWidth: '100%',
         }}
       >
-        <div style={{ minHeight: 0, minWidth: 0, maxWidth: '100%' }} aria-hidden={!expanded}>
+        <div style={{ minHeight: 0, minWidth: 0, maxWidth: '100%' }} aria-hidden={!isOpen}>
           <div style={{ height: 12 }} />
 
           {/* Colour tee pills — horizontal carousel with edge fades. */}
