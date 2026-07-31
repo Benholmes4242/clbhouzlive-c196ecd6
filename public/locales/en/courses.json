@@ -382,6 +382,7 @@
     },
     "stats": {
       "heading": "Course stats",
+      "courseStatsLabel": "Course stats",
       "fromRatings_one": "from {{count}} rating",
       "fromRatings_other": "from {{count}} ratings",
       "playsAbove": "Plays <1>{{value}}</1> above par on average",
