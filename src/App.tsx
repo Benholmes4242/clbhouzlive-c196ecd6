@@ -482,6 +482,7 @@ function AppRoutes() {
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
 
         
+        <Route path="/_test/toggle" element={<Suspense fallback={<GenericPageSkeleton />}><ToggleTestPage /></Suspense>} />
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
