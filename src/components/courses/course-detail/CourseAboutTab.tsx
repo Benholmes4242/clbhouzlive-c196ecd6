@@ -143,13 +143,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
-  // Fire once per mount when the collapsed hole table is opened.
-  const holesExpandFired = React.useRef(false);
-  const handleHolesExpand = React.useCallback(() => {
-    if (holesExpandFired.current) return;
-    holesExpandFired.current = true;
-    analyticsEvents.track('course_holes_expanded', { course_id: course.id });
-  }, [course.id]);
 
   const handleRateClick = () => {
     if (!user) {
