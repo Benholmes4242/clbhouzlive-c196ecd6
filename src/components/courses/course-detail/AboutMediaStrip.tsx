@@ -233,21 +233,19 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
-  // Empty state — sibling of ratings empty state
+  // Empty state — analytical: dashed placeholders + one quiet text affordance
   if (!hasMedia) {
     return (
       <div>
-        <div style={{ marginBottom: 12 }}>
-          <SectionHeader role="section" kicker="MEDIA" paddingX={16} />
-        </div>
+        <Header photoCount={0} videoCount={0} />
 
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 6,
+            gap: 4,
             padding: '0 16px',
-            marginBottom: 12,
+            marginBottom: 10,
           }}
         >
           {[0, 1, 2].map((i) => (
@@ -255,61 +253,30 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={{
                 aspectRatio: '1',
-                borderRadius: 4,
-                background: 'rgba(15,23,42,0.04)',
-                border: '1.5px dashed rgba(15,23,42,0.10)',
+                borderRadius: 8,
+                background: 'rgba(15,23,42,0.03)',
+                border: '1px dashed rgba(15,23,42,0.10)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              {i === 0 && (
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '50%',
-                    background: 'rgba(247,147,30,0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Plus size={18} strokeWidth={2} color={AMBER} />
-                </div>
-              )}
+              {i === 0 && <Plus size={16} strokeWidth={2} color="#A2A9B2" />}
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 12px', lineHeight: 1.5, textAlign: 'center' as const }}>
+        <p style={{ fontSize: 12, color: '#68707B', margin: '0 16px', lineHeight: 1.5 }}>
           {t('courseDetail.mediaStrip.helpDiscover')}
         </p>
 
         <div style={{ padding: '0 16px' }}>
-          <button
-            type="button"
+          <Action
+            label={t('courseDetail.mediaStrip.share')}
             onClick={() => navigate(`/courses/${clubId}/rate`)}
-            style={{
-              width: '100%',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              padding: '12px 0',
-              borderRadius: 13,
-              background: AMBER,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
-            }}
-          >
-            <Camera size={16} strokeWidth={2} />
-            {t('courseDetail.mediaStrip.share')}
-          </button>
+            align="left"
+          />
+
         </div>
       </div>
     );
