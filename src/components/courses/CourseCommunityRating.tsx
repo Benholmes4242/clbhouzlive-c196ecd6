@@ -1,6 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
+import { bandColor } from '@/features/courses/_shared/scoreBands';
+
 
 interface CourseCommunityRatingProps {
   rating: number;
