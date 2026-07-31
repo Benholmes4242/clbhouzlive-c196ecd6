@@ -6,6 +6,7 @@ import { useRateNudgeCourse } from '@/hooks/useRateNudgeCourse';
 import { AMBER, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import CourseImageFallback from '@/components/whs/CourseImageFallback';
 import { Skeleton } from '@/components/ui/skeleton';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   userId: string;
@@ -154,7 +155,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           alignItems: 'center',
           gap: 4,
           padding: '6px 12px',
-          background: AMBER,
+          background: A.INK,
           color: '#fff',
           borderRadius: 999,
           fontSize: 12,
@@ -162,7 +163,6 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           flexShrink: 0,
         }}
       >
-        <Star size={12} fill="#fff" color="#fff" strokeWidth={0} />
         {t('rateNudge.rateCta')}
       </div>
     </button>

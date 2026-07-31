@@ -25,7 +25,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
-import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
+import { A, KICKER, LABEL, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
@@ -61,6 +62,8 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
   const barsRef = useRef<HTMLDivElement | null>(null);
   const difficultyRef = useRef<HTMLDivElement | null>(null);
   const noRoundsRef = useRef<HTMLDivElement | null>(null);
+
+  const shortName = courseName ? shortCourseName(courseName) : '';
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
@@ -202,7 +205,20 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
 
   return (
     <div style={{ paddingTop: 10 }}>
-      <div style={{ ...headingStyle, marginBottom: 10 }}>{t('top100.stats.heading')}</div>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
+          marginBottom: 10,
+        }}
+      >
+        {shortName ? <span style={headingStyle}>{shortName}</span> : null}
+        <span style={{ ...LABEL, flex: 'none', lineHeight: 1 }}>
+          {shortName ? t('top100.stats.courseStatsLabel') : t('top100.stats.heading')}
+        </span>
+      </header>
 
       <div ref={difficultyRef}>
         <StatRow items={buildItems()} />

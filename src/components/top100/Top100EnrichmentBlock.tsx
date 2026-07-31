@@ -62,6 +62,7 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
 
       <Top100CourseStatsPanel
         courseId={courseId}
+        courseName={courseName}
         rank={rank}
         list={list}
         data={data}
