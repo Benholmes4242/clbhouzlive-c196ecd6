@@ -37,9 +37,11 @@ const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
 
 const figureValueStyle: React.CSSProperties = {
-  fontFamily: MONO,
+  // Geist tabular numerals rather than the mono stack: Menlo/Consolas draw a
+  // slashed zero by default, which the "zero" feature flag cannot switch off.
   fontVariantNumeric: 'tabular-nums',
-  fontSize: 17,
+  fontFeatureSettings: '"zero" 0',
+  fontSize: 16,
   fontWeight: 800,
   letterSpacing: '-0.03em',
   lineHeight: 1,
