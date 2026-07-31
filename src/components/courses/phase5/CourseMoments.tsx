@@ -8,7 +8,7 @@ import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Panel } from '@/features/courses/components/holes/analytical/tokens';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface CourseMomentsProps {
@@ -181,7 +181,8 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </Panel>
+
   );
 };
 

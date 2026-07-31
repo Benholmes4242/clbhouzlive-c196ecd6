@@ -1,7 +1,9 @@
 /**
- * PersonalSection - Container for all Phase 5 personal components
+ * PersonalSection - Container for all Phase 5 personal components.
+ * Carries the single "Your journey" kicker for the whole block.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -9,7 +11,8 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
+
 
 
 interface PersonalSectionProps {
