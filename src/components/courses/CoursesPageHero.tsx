@@ -41,7 +41,7 @@ import {
  */
 
 const HERO_MIN_HEIGHT =
-  'calc(clamp(240px, 30dvh, 340px) + env(safe-area-inset-top, 0px))';
+  'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
 
 /** 1st, 2nd, 3rd, 11th - never "The 11 plays hardest". */
 function ordinal(n: number): string {
@@ -203,7 +203,7 @@ function CoursesPageHeroInner() {
             {eyebrowParts.length > 0 && (
               <div
                 style={{
-                  fontSize: 9.5,
+                  fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -220,7 +220,7 @@ function CoursesPageHeroInner() {
               {hero.list_rank != null && (
                 <span
                   style={{
-                    fontSize: 36,
+                    fontSize: 39,
                     fontWeight: 800,
                     color: '#fff',
                     lineHeight: 1,
@@ -234,7 +234,7 @@ function CoursesPageHeroInner() {
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    fontSize: 17,
+                    fontSize: 18.5,
                     fontWeight: 800,
                     color: '#fff',
                     lineHeight: 1.15,
@@ -268,7 +268,7 @@ function CoursesPageHeroInner() {
             {blurb && (
               <div
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   color: 'rgba(255,255,255,0.9)',
                   lineHeight: 1.45,
                   maxWidth: 340,
@@ -304,7 +304,7 @@ function CoursesPageHeroInner() {
                 />
                 <span
                   style={{
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     color: 'rgba(255,255,255,0.72)',
                     minWidth: 0,
                     overflow: 'hidden',
