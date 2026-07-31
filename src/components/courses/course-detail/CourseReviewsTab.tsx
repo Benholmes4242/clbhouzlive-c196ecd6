@@ -37,7 +37,8 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor, rampForRating } from '@/lib/ratingTier';
+import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
+import { bandColor } from '@/features/courses/_shared/scoreBands';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -630,8 +631,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   const count = reviewCountsByTier[key] ?? 0;
                   const selected = ratingFilter === key;
                   const pct = Math.round((count / maxTierCount) * 100);
-                  const ramp = rampForRating(TIER_REP_SCORE[key]);
-                  const isExceptionalRow = key === 'exceptional' && count > 0;
+                  const barColor = bandColor(TIER_REP_SCORE[key]);
                   const label = t(labelKey);
                   return (
                     <button
@@ -648,12 +648,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       </span>
                       <span style={{ flex: 1, minWidth: 0, height: 6, borderRadius: 999, background: INK_TINT_06, overflow: 'hidden', boxShadow: selected ? `0 0 0 1.5px ${AMBER}` : 'none', transition: 'box-shadow 160ms ease' }}>
                         <span
-                          className={isExceptionalRow ? 'clbhouz-gold-shimmer-bar' : undefined}
                           style={{
                             display: 'block',
                             height: '100%',
                             width: `${pct}%`,
-                            background: isExceptionalRow ? undefined : `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`,
+                            background: count > 0 ? barColor : 'transparent',
                             borderRadius: 999,
                             transition: 'width 220ms ease',
                           }}

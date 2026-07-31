@@ -1,21 +1,24 @@
+/**
+ * CommunityScoreCard - Block 3b of the Course tab.
+ *
+ * Analytical treatment (BRIEF_COURSE_TAB_LOWER_BLOCKS):
+ *   - headline trio: community overall, your rating, friends average
+ *   - distribution bars use FLAT band colours (no gradients, no shimmer)
+ *   - sub-scores stay gated behind t100_subscore_min_ratings
+ *   - actions are quiet uppercase text affordances, never filled pills
+ */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
-import {
-  getRatingTier,
-  HERO_NUMBER_STYLE,
-  TIER_LABEL_STYLE,
-  rampForRating,
-} from '@/lib/ratingTier';
+import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
 import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
-import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { A, Action, LABEL, NUM, Panel } from '@/features/courses/components/holes/analytical/tokens';
 
-
-// Representative score per distribution tier — drives bar colour via rampForRating
+// Representative score per distribution tier — drives the flat bar colour
 const TIER_REP_SCORE: Record<string, number> = {
   exceptional: 9.5,
   excellent: 8.0,
@@ -30,6 +33,8 @@ interface CommunityScoreCardProps {
   ratingAggregates: CourseRatingAggregate | null | undefined;
   userRating: UserCourseRating | null | undefined;
   distribution?: RatingTierDistributionData | null;
+  /** Average of friends' overall ratings, when any friend has rated. */
+  friendsAvg?: number | null;
   onRateClick: () => void;
   onSeeAllReviews?: () => void;
 }
@@ -44,12 +49,12 @@ const TIERS: { key: keyof RatingTierDistributionData; labelKey: string }[] = [
   { key: 'poor', labelKey: 'review.filter.optionPoor' },
 ];
 
-
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseName,
   ratingAggregates,
   userRating,
   distribution,
+  friendsAvg = null,
   onRateClick,
   onSeeAllReviews,
 }) => {
@@ -59,59 +64,33 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
 
-
-
-  // Empty state — invitation card with 0–10 numeric language
+  // Empty state — invitation panel with 0–10 numeric language
   if (totalRatings === 0) {
     return (
-      <div
-        style={{
-          background: SURFACE,
-          borderRadius: 20,
-          border: `1px solid ${HAIRLINE_INK_7}`,
-          padding: '28px 24px',
-          textAlign: 'center' as const,
-          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 2, marginBottom: 14 }}>
-          <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: 'rgba(247,147,30,0.30)', lineHeight: 1 }}>{t('courseDetail.communityScore.dashPlaceholder')}</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
+      <Panel kicker={t('courseDetail.rating.kicker')} style={{ textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 2, marginBottom: 12 }}>
+          <span style={{ ...NUM, fontSize: 44, color: A.DIM, lineHeight: 1 }}>
+            {t('courseDetail.communityScore.dashPlaceholder')}
+          </span>
+          <span style={{ ...NUM, fontSize: 16, color: A.DIM }}>/10</span>
         </div>
-        <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginBottom: 5 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em', marginBottom: 5 }}>
           {t('courseDetail.communityScore.beFirst')}
         </div>
-        <p style={{ fontSize: 13, color: INK_MUTE, lineHeight: 1.5, maxWidth: 260, margin: '0 auto 18px' }}>
-          {t('courseDetail.communityScore.noOneRated', { courseName: courseName || t('courseDetail.communityScore.thisCourse') })}
+        <p style={{ fontSize: 12.5, color: A.MUTE, lineHeight: 1.5, maxWidth: 260, margin: '0 auto' }}>
+          {t('courseDetail.communityScore.noOneRated', {
+            courseName: courseName || t('courseDetail.communityScore.thisCourse'),
+          })}
         </p>
-        <button
-          type="button"
-          onClick={onRateClick}
-          style={{
-            width: '100%',
-            padding: '13px 0',
-            borderRadius: 13,
-            background: AMBER,
-            border: 'none',
-            color: '#fff',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
-          }}
-        >
-          {t('courseDetail.communityScore.rateThis')}
-        </button>
-      </div>
+        <Action label={t('courseDetail.communityScore.rateThis')} onClick={onRateClick} style={{ width: '100%', marginTop: 10 }} />
+      </Panel>
     );
   }
 
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
-
   // Sub-scores are gated behind the SAME threshold the Top 100 panel uses
-  // (t100_subscore_min_ratings, default 3). One number, both surfaces move
-  // together. Below it: headline, tier, distribution and count only.
+  // (t100_subscore_min_ratings, default 3).
   const categories =
     totalRatings >= subscoreMinRatings
       ? [
@@ -122,10 +101,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         ].filter((cat) => cat.score !== null && cat.score !== undefined)
       : [];
 
-
-
-
-  // Distribution counts (fallback to zeros)
   const distCounts: Record<string, number> = {
     exceptional: distribution?.exceptional ?? 0,
     excellent: distribution?.excellent ?? 0,
@@ -135,67 +110,71 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   };
   const maxCount = Math.max(...Object.values(distCounts), 1);
 
+  const yourScore = userRating?.rating ?? null;
+
+  const headline: { label: string; value: string; tone: string }[] = [
+    {
+      label: t('courseDetail.rating.overall'),
+      value: formatScore(communityAverage),
+      tone: bandColor(communityAverage),
+    },
+  ];
+  if (yourScore != null) {
+    headline.push({
+      label: t('courseDetail.rating.yours'),
+      value: formatScore(yourScore),
+      tone: A.AMBER_DEEP,
+    });
+  }
+  if (friendsAvg != null && Number.isFinite(friendsAvg)) {
+    headline.push({
+      label: t('courseDetail.rating.friends'),
+      value: formatScore(friendsAvg),
+      tone: A.INK,
+    });
+  }
+
   return (
-    <div
-      style={{
-        background: SURFACE,
-        borderRadius: 20,
-        border: `1px solid ${HAIRLINE_INK_7}`,
-        padding: '24px 20px',
-        boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-      }}
+    <Panel
+      kicker={t('courseDetail.rating.kicker')}
+      aside={`${t('courseDetail.communityScore.basedOn', { count: totalRatings })}${
+        onlyUserHasRated ? t('courseDetail.communityScore.onlyYouSuffix') : ''
+      }`}
     >
-      {/* Score header — number left, tier/count/comparison stacked right */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
-          <span
-            style={{
-              fontSize: 58,
-              ...HERO_NUMBER_STYLE,
-              color: bandColor(communityAverage),
-              lineHeight: 1,
-            }}
-          >
-            {formatScore(communityAverage)}
-          </span>
-          <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>
-            /10
-          </span>
-        </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
-          <div>
-            <div
-              style={{
-                fontSize: 12,
-                ...TIER_LABEL_STYLE,
-                color: bandColor(communityAverage),
-              }}
-            >
-              {tierLabel}
-            </div>
-            <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
-              {t('courseDetail.communityScore.basedOn', { count: totalRatings })}
-              {onlyUserHasRated ? t('courseDetail.communityScore.onlyYouSuffix') : ''}
+      {/* Headline trio */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${headline.length}, minmax(0, 1fr))`,
+          marginBottom: 6,
+        }}
+      >
+        {headline.map((h, i) => (
+          <div key={h.label} style={{ minWidth: 0, textAlign: i === 0 ? 'left' : 'center' }}>
+            <div style={LABEL}>{h.label}</div>
+            <div style={{ ...NUM, fontSize: 30, color: h.tone, marginTop: 4, whiteSpace: 'nowrap' }}>
+              {h.value}
             </div>
           </div>
-        </div>
-
+        ))}
       </div>
 
+      <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: bandColor(communityAverage), marginBottom: 16 }}>
+        {tierLabel}
+      </div>
 
-      {/* Distribution bars — taller, gradient, zero tiers de-emphasised */}
-      <div style={{ marginBottom: 14 }}>
+      {/* Distribution — flat band colours, no gradients or shimmer */}
+      <div style={{ display: 'grid', gap: 8 }}>
         {TIERS.map(({ key, labelKey }) => {
           const count = distCounts[key] || 0;
           const pct = (count / maxCount) * 100;
           const has = count > 0;
-          const isExceptionalRow = key === 'exceptional' && has;
           return (
-            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span
                 style={{
                   fontSize: 11.5,
-                  color: has ? INK : INK_FAINT,
+                  color: has ? A.INK : A.DIM,
                   fontWeight: has ? 600 : 500,
                   width: 82,
                   flexShrink: 0,
@@ -203,42 +182,23 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               >
                 {t(labelKey)}
               </span>
-
-              <div
-                style={{
-                  flex: 1,
-                  height: 7,
-                  borderRadius: 4,
-                  background: 'rgba(15,23,42,0.05)',
-                  overflow: 'hidden',
-                }}
-              >
+              <div style={{ flex: 1, height: 6, borderRadius: 3, background: A.TRACK, overflow: 'hidden' }}>
                 <div
-                  className={isExceptionalRow ? 'clbhouz-gold-shimmer-bar' : undefined}
                   style={{
                     height: '100%',
                     width: `${pct}%`,
-                    background: isExceptionalRow
-                      ? undefined
-                      : has
-                        ? (() => {
-                            const ramp = rampForRating(TIER_REP_SCORE[key as string] ?? 0);
-                            return `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`;
-                          })()
-                        : 'transparent',
-                    borderRadius: 4,
-                    transition: 'width 0.5s ease',
+                    background: has ? bandColor(TIER_REP_SCORE[key as string] ?? 0) : 'transparent',
+                    borderRadius: 3,
                   }}
                 />
               </div>
               <span
                 style={{
+                  ...NUM,
                   fontSize: 12,
-                  color: has ? INK : 'rgba(15,23,42,0.25)',
-                  fontWeight: has ? 800 : 600,
+                  color: has ? A.INK : A.DIM,
                   width: 16,
-                  textAlign: 'right' as const,
-                  fontVariantNumeric: 'tabular-nums',
+                  textAlign: 'right',
                 }}
               >
                 {count}
@@ -248,26 +208,13 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         })}
       </div>
 
-      {/* Category breakdown — eyebrow + score rings */}
+      {/* Category breakdown */}
       {categories.length > 0 && (
         <>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: INK_FAINT,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase' as const,
-              textAlign: 'center' as const,
-              marginTop: 8,
-              paddingTop: 16,
-              borderTop: `0.5px solid ${HAIRLINE_INK_7}`,
-              marginBottom: 10,
-            }}
-          >
+          <div style={{ ...LABEL, marginTop: 18, marginBottom: 10 }}>
             {t('courseDetail.communityScore.categoryScores')}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', gap: 16 }}>
               {categories.slice(0, 2).map((cat) => (
                 <SubScoreBar key={cat.id} label={t(cat.labelKey)} score={cat.score || 0} />
@@ -284,26 +231,22 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </>
       )}
 
-      {/* See all reviews — quiet text link */}
-      {onSeeAllReviews && (
-        <button
-          type="button"
-          onClick={onSeeAllReviews}
-          style={{
-            width: '100%',
-            padding: '14px 0 4px',
-            background: 'none',
-            border: 'none',
-            fontSize: 13,
-            fontWeight: 600,
-            color: INK_FAINT,
-            cursor: 'pointer',
-          }}
-        >
-          {t('courseDetail.communityScore.seeAllReviews')}
-        </button>
-      )}
-    </div>
+      {/* Actions — quiet text affordances */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+        <Action
+          label={yourScore != null ? t('courseDetail.about.editRating') : t('courseDetail.communityScore.rateThis')}
+          onClick={onRateClick}
+          align="left"
+        />
+        {onSeeAllReviews && (
+          <Action
+            label={t('courseDetail.communityScore.seeAllReviews')}
+            onClick={onSeeAllReviews}
+            tone={A.MUTE}
+          />
+        )}
+      </div>
+    </Panel>
   );
 };
 

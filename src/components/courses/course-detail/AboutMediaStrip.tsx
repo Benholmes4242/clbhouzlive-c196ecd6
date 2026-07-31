@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Play, Plus } from 'lucide-react';
+import { Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
@@ -10,6 +10,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Action, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface AboutMediaStripProps {
@@ -17,19 +18,32 @@ interface AboutMediaStripProps {
   onSeeAllClick: () => void;
 }
 
-const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () => void }> = ({
+/**
+ * Analytical header (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 4c): uppercase
+ * micro-label plus a count aside. No "See all" pill - the overflow tile is
+ * the only affordance into the media tab.
+ */
+const Header: React.FC<{ photoCount: number; videoCount: number }> = ({
   photoCount,
   videoCount,
-  onSeeAll,
 }) => (
-  <SectionHeader
-    role="section"
-    kicker="MEDIA"
-    sub={`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
-    action={onSeeAll ? { label: 'See all', onClick: onSeeAll } : undefined}
-    paddingX={16}
-  />
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: 12,
+      padding: '0 16px',
+      marginBottom: 10,
+    }}
+  >
+    <span style={KICKER}>MEDIA</span>
+    <span style={LABEL}>
+      {`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} \u00B7 ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
+    </span>
+  </div>
 );
+
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const { t } = useTranslation('courses');
@@ -200,7 +214,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         <div
           style={
             isMobile
-              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
               : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
           }
         >
@@ -209,8 +223,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={
                 isMobile && i === 0
-                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14, background: 'rgba(15,23,42,0.06)' }
-                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10, background: 'rgba(15,23,42,0.06)' }
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10, background: 'rgba(15,23,42,0.06)' }
+                  : { height: '100%', borderRadius: 8, background: 'rgba(15,23,42,0.06)' }
               }
             />
           ))}
@@ -219,21 +233,19 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
-  // Empty state — sibling of ratings empty state
+  // Empty state — analytical: dashed placeholders + one quiet text affordance
   if (!hasMedia) {
     return (
       <div>
-        <div style={{ marginBottom: 12 }}>
-          <SectionHeader role="section" kicker="MEDIA" paddingX={16} />
-        </div>
+        <Header photoCount={0} videoCount={0} />
 
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 6,
+            gap: 4,
             padding: '0 16px',
-            marginBottom: 12,
+            marginBottom: 10,
           }}
         >
           {[0, 1, 2].map((i) => (
@@ -241,61 +253,30 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={{
                 aspectRatio: '1',
-                borderRadius: 4,
-                background: 'rgba(15,23,42,0.04)',
-                border: '1.5px dashed rgba(15,23,42,0.10)',
+                borderRadius: 8,
+                background: 'rgba(15,23,42,0.03)',
+                border: '1px dashed rgba(15,23,42,0.10)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              {i === 0 && (
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '50%',
-                    background: 'rgba(247,147,30,0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Plus size={18} strokeWidth={2} color={AMBER} />
-                </div>
-              )}
+              {i === 0 && <Plus size={16} strokeWidth={2} color="#A2A9B2" />}
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: '#94A3B8', margin: '0 16px 12px', lineHeight: 1.5, textAlign: 'center' as const }}>
+        <p style={{ fontSize: 12, color: '#68707B', margin: '0 16px', lineHeight: 1.5 }}>
           {t('courseDetail.mediaStrip.helpDiscover')}
         </p>
 
         <div style={{ padding: '0 16px' }}>
-          <button
-            type="button"
+          <Action
+            label={t('courseDetail.mediaStrip.share')}
             onClick={() => navigate(`/courses/${clubId}/rate`)}
-            style={{
-              width: '100%',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              padding: '12px 0',
-              borderRadius: 13,
-              background: AMBER,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(247,147,30,0.28)',
-            }}
-          >
-            <Camera size={16} strokeWidth={2} />
-            {t('courseDetail.mediaStrip.share')}
-          </button>
+            align="left"
+          />
+
         </div>
       </div>
     );
@@ -304,12 +285,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   return (
     <div>
-      <Header photoCount={photoCount} videoCount={videoCount} onSeeAll={onSeeAllClick} />
+      <Header photoCount={photoCount} videoCount={videoCount} />
 
       <div
         style={
           isMobile
-            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 5, padding: '0 16px' }
+            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
             : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
         }
       >
@@ -350,8 +331,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               style={{
                 position: 'relative',
                 ...(isHero
-                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 14 }
-                  : { aspectRatio: '1', borderRadius: isMobile ? 12 : 10 }),
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10 }
+                  : { height: isMobile ? '100%' : undefined, aspectRatio: isMobile ? undefined : '1', borderRadius: 8 }),
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
@@ -394,7 +375,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
+                    background: '#2A313A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
