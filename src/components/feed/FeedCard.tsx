@@ -702,6 +702,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </>
         );
       })()}
+      </div>
     </article>
   );
 };
