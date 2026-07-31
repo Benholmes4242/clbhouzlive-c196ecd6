@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react';
 import type { RecentItem } from '../hooks/useRecentSearchesV2';
-import { SectionHeader } from './SectionHeader';
+import { SectionHeader, ACTION } from './SectionHeader';
 
 interface Props {
   items: RecentItem[];
@@ -12,41 +12,14 @@ export function RecentsList({ items, onPick, onClear }: Props) {
   if (items.length === 0) return null;
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          padding: '18px 16px 8px',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            color: '#F7931E',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Recent
-        </span>
-        <button
-          type="button"
-          onClick={onClear}
-          style={{
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#0F172A',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          Clear
-        </button>
-      </div>
+      <SectionHeader
+        label="Recent"
+        right={
+          <button type="button" onClick={onClear} style={ACTION}>
+            Clear
+          </button>
+        }
+      />
       {items.map((item) => (
         <button
           key={item.id}
@@ -63,7 +36,6 @@ export function RecentsList({ items, onPick, onClear }: Props) {
           <span className="text-[14px]" style={{ color: '#0F172A' }}>{item.query}</span>
         </button>
       ))}
-      {SectionHeader ? null : null}
     </div>
   );
 }

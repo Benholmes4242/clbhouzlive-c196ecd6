@@ -1,3 +1,9 @@
+/**
+ * RECORDED EXCEPTION (BRIEF_SEARCH_OVERLAY_ALIGNMENT §6): amber here means
+ * "this is why this result matched", not "the viewing member". Kept
+ * deliberately - highlighting is a strong convention and the overlay has no
+ * "you" context to confuse it with. Do not "fix" this to AMBER_DEEP or ink.
+ */
 const AMBER = '#F7931E';
 
 export function Highlight({ text, query }: { text: string; query: string }) {

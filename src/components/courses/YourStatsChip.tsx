@@ -9,7 +9,8 @@ interface Props {
   ariaLabel?: string;
 }
 
-const BarChartGlyph: React.FC<{ size: number }> = ({ size }) => (
+/** Single definition of the bar-chart category marker. Reused by search rows. */
+export const BarChartGlyph: React.FC<{ size: number }> = ({ size }) => (
   <svg
     width={size}
     height={size}
