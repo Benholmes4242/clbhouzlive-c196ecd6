@@ -1,15 +1,17 @@
 import { MapPin } from 'lucide-react';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { useTranslation } from 'react-i18next';
 import type { CourseHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
-import { YourStatsChip } from '@/components/courses/YourStatsChip';
+import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
+import { BarChartGlyph } from '@/components/courses/YourStatsChip';
 import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
-
-const AMBER = '#F7931E';
+import { A, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
+import { ResultTile } from './ResultTile';
 
 interface Props { course: CourseHit; query: string; onSelect: () => void }
 
 export function CourseRow({ course, query, onSelect }: Props) {
+  const { t } = useTranslation('courses');
   const sub = [course.sub_country, course.country].filter(Boolean).join(', ');
   const yourStatsRounds = useUserStatsRoundsForCourse(course.id);
   return (
@@ -18,46 +20,27 @@ export function CourseRow({ course, query, onSelect }: Props) {
       onClick={onSelect}
       className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left"
     >
-      <div
-        className="relative w-[42px] h-[42px] rounded-[12px] flex items-center justify-center shrink-0"
-        style={{ background: 'rgba(15,23,42,0.06)' }}
-      >
-        <MapPin size={18} color="#475569" strokeWidth={2.25} />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[12px]"
-          style={{ border: `1px solid ${LIGHT_HAIRLINE}` }}
-        />
-      </div>
+      <ResultTile>
+        <MapPin size={18} color={A.MUTE} strokeWidth={2.25} />
+      </ResultTile>
       <div className="flex-1 min-w-0 flex flex-col gap-1">
-        {/* Row 1: name + rating. The Your Stats pill lives on its own row below. */}
+        {/* Row 1: name + rating (single source of truth: CourseCommunityRating). */}
         <div className="flex items-center gap-2 min-w-0">
           <p className="text-[14px] font-medium truncate min-w-0" style={{ color: '#0F172A' }}>
             <Highlight text={course.name} query={query} />
           </p>
           {course.avg_rating != null && (
-            <span
-              className="shrink-0"
-              style={{
-                fontSize: 10.5,
-                fontWeight: 800,
-                color: '#fff',
-                background: AMBER,
-                padding: '2px 6px',
-                borderRadius: 6,
-                letterSpacing: '-0.01em',
-                fontFeatureSettings: '"kern" 1, "liga" 1',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {course.avg_rating.toFixed(1)}
-            </span>
+            <CourseCommunityRating rating={course.avg_rating} size="sm" />
           )}
         </div>
 
         {yourStatsRounds != null && (
-          <div className="flex items-center">
-            <YourStatsChip count={yourStatsRounds} tone="light" />
+          <div className="flex items-center gap-1.5" style={{ color: A.AMBER_DEEP }}>
+            <BarChartGlyph size={10} />
+            <span style={{ ...LABEL, fontSize: 8.5, color: A.AMBER_DEEP }}>
+              {t('search.yourRounds', 'Your rounds')}
+            </span>
+            <span style={{ ...NUM, fontSize: 12, color: A.AMBER_DEEP }}>{yourStatsRounds}</span>
           </div>
         )}
 
@@ -70,4 +53,3 @@ export function CourseRow({ course, query, onSelect }: Props) {
     </button>
   );
 }
-

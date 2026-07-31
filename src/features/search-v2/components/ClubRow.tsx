@@ -1,8 +1,6 @@
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { ClubHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
-
-const AMBER = '#F7931E';
+import { ResultTile, TILE_INITIALS } from './ResultTile';
 
 interface Props { club: ClubHit; query: string; onSelect: () => void }
 
@@ -14,26 +12,13 @@ export function ClubRow({ club, query, onSelect }: Props) {
       onClick={onSelect}
       className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left"
     >
-      <div
-        className="relative w-[42px] h-[42px] rounded-[12px] overflow-hidden shrink-0 flex items-center justify-center"
-        style={{
-          background: club.logo_url ? '#fff' : 'rgba(247,147,30,0.14)',
-          color: AMBER,
-          fontSize: 16,
-          fontWeight: 800,
-        }}
-      >
+      <ResultTile white={!!club.logo_url}>
         {club.logo_url ? (
           <img src={club.logo_url} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span>{initial}</span>
+          <span style={TILE_INITIALS}>{initial}</span>
         )}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[12px]"
-          style={{ border: `1px solid ${LIGHT_HAIRLINE}` }}
-        />
-      </div>
+      </ResultTile>
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-medium truncate" style={{ color: '#0F172A' }}>
           <Highlight text={club.name} query={query} />

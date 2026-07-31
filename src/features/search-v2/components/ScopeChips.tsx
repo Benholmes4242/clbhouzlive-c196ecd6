@@ -38,10 +38,10 @@ export function ScopeChips({ scope, onChange }: Props) {
             onClick={() => onChange(c.key)}
             style={{
               flexShrink: 0,
-              padding: '6px 14px',
+              padding: '9px 16px',
               borderRadius: 999,
               fontSize: 12,
-              fontWeight: 600,
+              fontWeight: active ? 700 : 600,
               border: `1px solid ${active ? INK : BORDER}`,
               background: active ? INK : '#fff',
               color: active ? '#fff' : INK_SOFT,

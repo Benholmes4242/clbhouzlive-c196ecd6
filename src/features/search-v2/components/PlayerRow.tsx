@@ -1,5 +1,6 @@
 import type { PlayerHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
+import { ResultTile, TILE_INITIALS } from './ResultTile';
 
 interface Props { player: PlayerHit; query: string; onSelect: () => void }
 
@@ -19,18 +20,11 @@ export function PlayerRow({ player, query, onSelect }: Props) {
       onClick={onSelect}
       className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left"
     >
-      <div
-        className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center shrink-0"
-        style={{
-          background: '#0F172A',
-          color: '#fff',
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '0.02em',
-        }}
-      >
-        {initials(player.full_name)}
-      </div>
+      <ResultTile>
+        <span style={{ ...TILE_INITIALS, letterSpacing: '0.02em' }}>
+          {initials(player.full_name)}
+        </span>
+      </ResultTile>
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-medium truncate" style={{ color: '#0F172A' }}>
           <Highlight text={player.full_name} query={query} />
