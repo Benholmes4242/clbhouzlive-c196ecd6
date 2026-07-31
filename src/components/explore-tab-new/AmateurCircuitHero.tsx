@@ -285,7 +285,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 600,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
@@ -298,7 +298,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
           <div
             style={{
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
@@ -345,8 +345,8 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           {storyLine ? (
             <div
               style={{
-                marginTop: 11,
-                fontSize: 14,
+                marginTop: 10,
+                fontSize: 12.5,
                 lineHeight: 1.45,
                 maxWidth: 330,
                 color: 'rgba(255,255,255,0.9)',
@@ -366,7 +366,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             }}
           >
             <SquircleAvatar
-              size={26}
+              size={24}
               src={story.holder_avatar}
               alt={holder}
               fallback={initials(holder)}
@@ -375,7 +375,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             />
             <span
               style={{
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: 600,
                 color: '#FFFFFF',
                 whiteSpace: 'nowrap',
@@ -389,7 +389,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             {story.happened_at ? (
               <span
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 11,
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.60)',
                   whiteSpace: 'nowrap',
@@ -410,9 +410,9 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                 style={{
                   background: '#FFFFFF',
                   color: '#15171F',
-                  fontSize: 13.5,
+                  fontSize: 12.5,
                   fontWeight: 700,
-                  padding: '10px 16px',
+                  padding: '9px 15px',
                   borderRadius: 999,
                   border: 'none',
                   cursor: 'pointer',
@@ -438,7 +438,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             className="tabular-nums"
             style={{
-              fontSize: 62,
+              fontSize: 52,
               fontWeight: 800,
               letterSpacing: '-0.035em',
               lineHeight: 0.9,
