@@ -277,8 +277,15 @@ export const PostCourseBand: React.FC<Props> = ({
     border: 'none',
   };
 
+  const glass = surface === 'glass';
+
   return (
-    <div style={{ background: SURFACE, borderTop: `1px solid ${LINE}` }}>
+    <div
+      style={{
+        background: glass ? 'transparent' : SURFACE,
+        borderTop: `1px solid ${LINE}`,
+      }}
+    >
       {tappable ? (
         <button
           type="button"
@@ -298,7 +305,16 @@ export const PostCourseBand: React.FC<Props> = ({
 
       {extra ? <div style={{ padding: '0 14px 8px' }}>{extra}</div> : null}
 
-      <div style={{ borderTop: `1px solid ${LINE}` }}>{actions}</div>
+      {/* In glass mode the actions row is the ONE opaque block: the photo
+          backdrop stops here. */}
+      <div
+        style={{
+          borderTop: `1px solid ${LINE}`,
+          background: glass ? OPAQUE_SURFACE : undefined,
+        }}
+      >
+        {actions}
+      </div>
     </div>
   );
 };
