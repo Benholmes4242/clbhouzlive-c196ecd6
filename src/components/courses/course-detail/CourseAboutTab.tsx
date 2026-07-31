@@ -167,28 +167,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
       <CourseLocationPills course={course} />
-      <CourseTeeCard courseId={course.id} />
+      <CourseCardPanel courseId={course.id} />
+
+      <div style={{ height: 12 }} />
+
+      {/* ══ BLOCK 2 + 3 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
+      <CourseAnalyticsPanels courseId={course.id} />
 
       <div style={{ margin: '20px 0' }}><Divider /></div>
 
-      {/* ══ BLOCK 2 — HOW IT PLAYS (one dataset, one header, three depths) ══ */}
-      <SectionHeader role="section" kicker={t('courseDetail.blocks.howItPlays')} paddingX={16} />
-      {/* Chart + Beast / Best Chance callouts, anchored together */}
-      <CourseHolesTab courseId={course.id} section="shape" showTeeCard={false} showGhost={false} />
-      {/* Detail — hole by hole, collapsed. Status branches deferred to the mount above. */}
-      <CourseHolesTab
-        courseId={course.id}
-        section="holes"
-        showTeeCard={false}
-        showGhost={false}
-        showEmptyState={false}
-        suppressStatus
-        collapsible
-        defaultCollapsed
-        onExpand={handleHolesExpand}
-      />
-
-      <div style={{ margin: '20px 0' }}><Divider /></div>
 
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
       <SectionHeader role="section" kicker={t('courseDetail.blocks.whoPlaysHere')} paddingX={16} />
