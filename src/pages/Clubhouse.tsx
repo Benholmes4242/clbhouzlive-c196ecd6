@@ -8,6 +8,8 @@ import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
@@ -128,12 +130,36 @@ const ClubhouseContent = () => {
   // gated by pathname to avoid leaking Clubhouse chrome onto other routes
   // when the user navigates away.
   const isClubhouseRoute = pathname === '/' || pathname === '/clubhouse';
+  // Feed tab instrumentation (measurement only — no behaviour change).
+  // tabSwitchCountRef: 1-based session_position for feed_tab_changed.
+  const tabSwitchCountRef = useRef(0);
+  // Set guard so feed_tab_viewed fires once per session per tab, never on re-render.
+  const seenFeedTabsRef = useRef<Set<'foryou' | 'friends'>>(new Set());
+  const trackFeedTabViewed = useCallback((tab: 'foryou' | 'friends') => {
+    if (seenFeedTabsRef.current.has(tab)) return;
+    seenFeedTabsRef.current.add(tab);
+    analyticsEvents.track('feed_tab_viewed', { tab });
+  }, []);
+  // Mount: record the tab the session lands on.
+  useEffect(() => {
+    trackFeedTabViewed(activeTab as 'foryou' | 'friends');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleIslandTabChange = useCallback((tab: 'foryou' | 'friends') => {
     if (tab === activeTab) return;
+    // Fires only after the no-op guard, so never on re-render or same-tab taps.
+    tabSwitchCountRef.current += 1;
+    analyticsEvents.track('feed_tab_changed', {
+      from: activeTab,
+      to: tab,
+      session_position: tabSwitchCountRef.current,
+    });
+    trackFeedTabViewed(tab);
     // Preserve outgoing tab's Virtuoso snapshot before the keyed remount.
     cardFeedRef.current?.captureSnapshot();
     setActiveTab(tab);
-  }, [activeTab, setActiveTab]);
+  }, [activeTab, setActiveTab, trackFeedTabViewed]);
+
   const islandSlot = useMemo(
     () =>
       isClubhouseRoute ? (

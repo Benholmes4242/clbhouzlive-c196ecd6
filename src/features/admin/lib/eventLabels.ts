@@ -190,6 +190,11 @@ export const EVENT_LABELS: Record<string, string> = {
   review_receipt_viewed: 'Review receipt viewed',
   review_receipt_action: 'Review receipt action tapped',
   review_next_course_tapped: 'Review next course tapped',
+
+  // Clubhouse feed tab toggle (pre-removal measurement)
+  feed_tab_changed: 'Feed tab changed',
+  feed_tab_viewed: 'Feed tab viewed',
+
 };
 
 
