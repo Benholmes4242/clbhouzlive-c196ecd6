@@ -11,7 +11,7 @@ import { Search, Award, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
