@@ -282,7 +282,14 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               )}
               {viewerStatus && (
                 <>
-                  <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  {/* Divider collapses when the capsule holds the status alone. */}
+                  {(((!activeListSlug || activeListSlug === 'global') && course.ranks?.global) ||
+                    ((!activeListSlug || activeListSlug === regionalBadgeSlug) &&
+                      regionalRank &&
+                      regionalBadgeSlug)) && (
+                    <span style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.20)' }} />
+                  )}
+
                   <span
                     style={{
                       fontSize: 8.5,
