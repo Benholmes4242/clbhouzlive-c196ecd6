@@ -15,8 +15,9 @@ interface Props {
   delta: number | null | undefined;
   rank30d: number | null | undefined;
   theme?: 'light' | 'dark';
-  /** 'row' = list row (11px); 'chip' = compact hero chip (10px). */
-  size?: 'row' | 'chip';
+  /** 'row' = list row (11px); 'chip' = compact hero chip (10px);
+   *  'figure' = analytical board row (11.5px, grid-managed width). */
+  size?: 'row' | 'chip' | 'figure';
 }
 
 export const MovementCell: React.FC<Props> = ({
@@ -30,19 +31,20 @@ export const MovementCell: React.FC<Props> = ({
   const dropped = isLight ? 'rgba(15,23,42,0.45)' : 'rgba(255,255,255,0.45)';
   const dash    = isLight ? 'rgba(15,23,42,0.30)' : 'rgba(255,255,255,0.30)';
 
-  const fontSize = size === 'chip' ? 10 : 11;
+  const fontSize = size === 'chip' ? 10 : size === 'figure' ? 11.5 : 11;
   const base: React.CSSProperties = {
     fontSize,
-    fontWeight: 800,
-    fontVariantNumeric: 'tabular-nums',
-    letterSpacing: '0.01em',
+    fontWeight: size === 'figure' ? 700 : 800,
+    fontVariantNumeric: 'tabular-nums lining',
+    letterSpacing: size === 'figure' ? '0' : '0.01em',
     lineHeight: 1,
     display: 'inline-block',
-    minWidth: size === 'chip' ? 22 : 26,
-    textAlign: 'center',
+    minWidth: size === 'figure' ? 0 : size === 'chip' ? 22 : 26,
+    textAlign: size === 'figure' ? 'right' : 'center',
     whiteSpace: 'nowrap',
     flexShrink: 0,
   };
+
 
   if (rank30d == null) {
     // Absent from the 30d board → NEW. The name-side NEW badge already
