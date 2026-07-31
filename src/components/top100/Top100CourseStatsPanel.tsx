@@ -25,7 +25,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { AMBER, HAIRLINE_INK_8, INK } from '@/features/courses/_shared/tokens';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
+import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 
 /** Difficulty band inks. Relative difficulty only - see BRIEF_TOP100_DIFFICULTY_BANDS. */
 const BAND_RED = '#C8372B';
@@ -48,14 +49,7 @@ const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
 const seenDifficulty = new Set<string>();
 
-const headingStyle: React.CSSProperties = {
-  fontSize: 8.5,
-  fontWeight: 800,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase',
-  color: AMBER,
-  lineHeight: 1,
-};
+const headingStyle: React.CSSProperties = { ...KICKER, lineHeight: 1 };
 
 const ratingStyle: React.CSSProperties = {
   ...NUMERALS,
@@ -189,110 +183,87 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   });
 
   /**
-   * The difficulty reading.
+   * The stat row.
    *
-   * The WORDING of line 1 comes from avg_over_par (above / level / below par).
-   * The COLOUR of both numerals and the whole of line 2 come from the BAND,
-   * which is derived from harder_than_pct only. One source, so the figure and
-   * the sentence beneath it can never disagree.
+   * AVG TO PAR rounds FIRST, then branches, so a fractional under-par average
+   * never renders "-0.0" and level reads "E".
    *
-   * A NULL percentile means no band and therefore NO difficulty lines at all -
-   * it must never fall through into the easy band.
+   * The percentile inverts below par - a course playing under par reads
+   * EASIER THAN (100 - pct). At level par (the middle band) the cell is omitted
+   * entirely: a midpoint percentile says nothing. Null cells are omitted and
+   * the row rebalances. No placeholder dashes.
    */
-  const renderDifficulty = (): React.ReactNode => {
-    if (avgOverPar == null || harderPct == null) return null;
+  const buildItems = (): StatItem[] => {
+    const items: StatItem[] = [
+      {
+        label: t('top100.stats.ratingLabel'),
+        value: rating.toFixed(1),
+        tone: bandColor(rating),
+        sub: t('top100.stats.fromRatings', { count: ratingCount }),
+      },
+    ];
 
-    const pct = Math.round(harderPct);
-    const band: 'hard' | 'middle' | 'easy' =
-      pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
-    const color = band === 'hard' ? BAND_RED : band === 'easy' ? BAND_GREEN : BAND_INK;
+    const toPar = toParParts(avgOverPar);
+    if (toPar) {
+      items.push({
+        label: t('top100.stats.avgToParLabel'),
+        value: toPar.text,
+        tone: toPar.tone,
+      });
+    }
 
-    const wordingKey =
-      avgOverPar > 0
-        ? 'top100.stats.playsAbove'
-        : avgOverPar < 0
-          ? 'top100.stats.playsBelow'
-          : null;
+    if (harderPct != null) {
+      const pct = Math.round(harderPct);
+      const band: 'hard' | 'middle' | 'easy' =
+        pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
+      if (band !== 'middle') {
+        items.push({
+          label:
+            band === 'hard'
+              ? t('top100.stats.harderThanLabel')
+              : t('top100.stats.easierThanLabel'),
+          value: `${band === 'hard' ? pct : 100 - pct}%`,
+          tone: A.INK,
+        });
+      }
+    }
 
-    return (
-      <div ref={difficultyRef}>
-        <div style={difficultyLineStyle}>
-          {wordingKey ? (
-            <Trans
-              i18nKey={wordingKey}
-              ns="courses"
-              values={{ value: Math.abs(avgOverPar).toFixed(1) }}
-              components={{ 1: <span style={figureStyleFor(color)} /> }}
-            />
-          ) : (
-            t('top100.stats.playsLevel')
-          )}
-        </div>
-        <div style={difficultyLineStyle}>
-          {band === 'middle' ? (
-            t('top100.stats.middleOfPack')
-          ) : (
-            <Trans
-              i18nKey={band === 'hard' ? 'top100.stats.harderThan' : 'top100.stats.easierThan'}
-              ns="courses"
-              values={{ pct: band === 'hard' ? pct : 100 - pct }}
-              components={{ 1: <span style={figureStyleFor(color)} /> }}
-            />
-          )}
-        </div>
-      </div>
-    );
+    return items;
   };
 
   return (
     <div style={{ paddingTop: 10 }}>
-      <div style={{ ...headingStyle, marginBottom: 8 }}>{t('top100.stats.heading')}</div>
+      <div style={{ ...headingStyle, marginBottom: 10 }}>{t('top100.stats.heading')}</div>
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-        <div style={{ flexShrink: 0 }}>
-          <div style={ratingStyle}>{rating.toFixed(1)}</div>
-          <div
-            style={{
-              fontSize: 11.5,
-              fontWeight: 500,
-              color: MUTED_INK,
-              lineHeight: 1.3,
-              marginTop: 2,
-            }}
-          >
-            {t('top100.stats.fromRatings', { count: ratingCount })}
-          </div>
-        </div>
-        <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
-          {showNoRounds ? (
-            <div
-              ref={noRoundsRef}
-              style={{
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: NO_ROUNDS_INK,
-                lineHeight: 1.3,
-              }}
-            >
-              <div>{t('top100.stats.noRoundsTitle')}</div>
-              <div>{t('top100.stats.noRoundsCta')}</div>
-            </div>
-          ) : (
-            renderDifficulty()
-          )}
-        </div>
+      <div ref={difficultyRef}>
+        <StatRow items={buildItems()} />
       </div>
+
+      {showNoRounds && (
+        <div
+          ref={noRoundsRef}
+          style={{
+            fontSize: 11.5,
+            fontWeight: 500,
+            color: NO_ROUNDS_INK,
+            lineHeight: 1.3,
+            marginTop: 10,
+            textAlign: 'center',
+          }}
+        >
+          <div>{t('top100.stats.noRoundsTitle')}</div>
+          <div>{t('top100.stats.noRoundsCta')}</div>
+        </div>
+      )}
 
       <div ref={barsRef}>
         {showBars && subs && (
           <div
             style={{
-              marginTop: 9,
+              marginTop: 16,
               display: 'flex',
               flexDirection: 'column',
               gap: 6,
-              borderTop: `1px solid ${HAIRLINE_INK_8}`,
-              paddingTop: 9,
             }}
           >
             <div style={{ display: 'flex', gap: 16 }}>

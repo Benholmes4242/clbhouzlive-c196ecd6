@@ -41,7 +41,7 @@ import {
   type StatBrowseRow,
   type StatLens,
 } from './useStatBrowse';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import {
   AMBER,
   HAIRLINE_INK_8,
