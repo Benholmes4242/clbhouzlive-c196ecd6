@@ -34,17 +34,28 @@ const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
 const seenDifficulty = new Set<string>();
 
-const headingStyle: React.CSSProperties = { ...KICKER, lineHeight: 1 };
+const headingStyle: React.CSSProperties = {
+  ...KICKER,
+  lineHeight: 1,
+  flex: 1,
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
 
 interface Props {
   courseId: string;
+  /** Names the card this block belongs to. Null → the quiet label renders alone. */
+  courseName?: string | null;
   rank: number | null;
   list: string;
   data: Top100Enrichment | undefined;
   onRate: () => void;
 }
 
-export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data, onRate }) => {
+export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, rank, list, data, onRate }) => {
+
   const { t } = useTranslation('courses');
   const { subscoreMinRatings, bandLow, bandHigh } = useTop100Config();
   const barsRef = useRef<HTMLDivElement | null>(null);
