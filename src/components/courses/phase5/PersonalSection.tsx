@@ -1,7 +1,9 @@
 /**
- * PersonalSection - Container for all Phase 5 personal components
+ * PersonalSection - Container for all Phase 5 personal components.
+ * Carries the single "Your journey" kicker for the whole block.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -9,7 +11,8 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
+
 
 
 interface PersonalSectionProps {
@@ -23,6 +26,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   courseName,
   className,
 }) => {
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data: userRating, isLoading: ratingLoading } = useUserCourseRating(courseId, user?.id);
   const { status, isLoading: statusLoading } = useCoursePersonalStatus(courseId);
@@ -45,34 +49,22 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   }
 
   return (
-    <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Section header — canonical SectionHeader */}
-      <div style={{ marginBottom: -14 }}>
-        <SectionHeader role="section" kicker="YOUR JOURNEY" paddingX={16}
-        cutLine={false}
-      />
-      </div>
+    <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* ONE kicker for the whole journey block; panel titles carry the rest. */}
+      <div style={KICKER}>{t('courseDetail.you.journey')}</div>
 
-      {/* Status toggle */}
-      <div style={{ padding: '0 16px' }}>
-        <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
-      </div>
+      <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={userRating?.rating} />
 
       {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
-        <div style={{ padding: '0 16px' }}>
-          <PersonalReviewCard courseId={courseId} rating={userRating} communityAverage={communityAverage} />
-        </div>
+        <PersonalReviewCard courseId={courseId} rating={userRating} communityAverage={communityAverage} />
       )}
 
       {/* Course moments — only if played */}
-      {hasPlayed && (
-        <div style={{ padding: '0 16px' }}>
-          <CourseMoments courseId={courseId} courseName={courseName} />
-        </div>
-      )}
+      {hasPlayed && <CourseMoments courseId={courseId} courseName={courseName} />}
     </section>
   );
 };
+
 
 export default PersonalSection;

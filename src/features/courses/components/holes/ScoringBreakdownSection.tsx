@@ -5,24 +5,35 @@ import {
   useCourseScoringBreakdown,
   type ScoringBreakdownHole,
 } from './useCourseScoringBreakdown';
+import { A, Panel, LABEL, NUM, SANS, StatRow, FIGS } from './analytical/tokens';
+import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const INK = '#0E1013';
-const INK_60 = 'rgba(15,23,42,0.60)';
-const INK_45 = 'rgba(15,23,42,0.45)';
-const HAIR = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const GREEN = '#12A150';
-const WARN = '#E8890C';
-const RED = '#E5484D';
-const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
+/**
+ * "Where your shots go" in the analytical treatment
+ * (BRIEF_COURSE_YOU_TAB_TREATMENT s6-s11).
+ *
+ *   - four flat panels, no internal dividers, no tinted chips or cards
+ *   - the three percentage rings become ONE stacked bar plus three figures
+ *   - every damaging-hole bar is OVER; length alone ranks them
+ *   - the worst third is inked, unless the spread is below the noise floor
+ *   - the coaching sentences are untouched, restyled to CAPTION weight
+ */
 
-const CARD: React.CSSProperties = {
-  background: '#FFFFFF',
-  borderRadius: 18,
-  border: `1px solid ${HAIR}`,
-  boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
+const OVER = '#C8372B';
+const UNDER = '#0F8F4A';
+
+/** The coaching line. Caption weight - it advises, it does not narrate. */
+const CAPTION: React.CSSProperties = {
+  fontSize: 12.5,
+  lineHeight: 1.5,
+  color: A.MUTE,
+  margin: '12px 0 0',
 };
+
+const DAMAGE_GRID = '30px 1fr 56px';
+
+/** Noise floor shared with the s3 caption logic - do not change. */
+const THIRDS_NOISE_FLOOR = 1.5;
 
 function listGrammar(items: string[]): string {
   if (items.length === 0) return '';
@@ -49,18 +60,11 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   if (isLoading) {
     return (
-      <section style={{ padding: '0 16px', fontFamily: FONT }}>
-        <div style={{ ...CARD, padding: 16 }}>
-          <Skeleton className="h-12 w-40 mb-4" />
-          <Skeleton className="h-[210px] w-full mb-3" />
-          <div style={{ borderTop: `1px solid ${HAIR}`, paddingTop: 12 }}>
-            <Skeleton className="h-[190px] w-full mb-3" />
-          </div>
-          <div style={{ borderTop: `1px solid ${HAIR}`, paddingTop: 12 }}>
-            <Skeleton className="h-[200px] w-full" />
-          </div>
-        </div>
-      </section>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
+        <Panel><Skeleton className="h-[64px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[190px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[150px] w-full" /></Panel>
+      </div>
     );
   }
 
@@ -68,7 +72,6 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   const { rounds, total, holes } = parsed;
   const hasInterpretation = rounds >= 5;
-
 
   // Stratum 1: top 5 by shots_over_par desc
   const damaging = [...holes]
@@ -114,6 +117,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     if (v < thirdSums[bestIdx] || !thirdHas[bestIdx]) bestIdx = i;
   });
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
+  /** Same threshold the caption uses: below it, ink nothing. */
+  const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
 
   // Sentences
   const s1Holes = damaging.slice(0, 3);
@@ -139,7 +144,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       : t('courses:holes.scoringBreakdown.s2SentenceLow');
 
   let s3Sentence: string;
-  if (spread < 1.5 || worstIdx === bestIdx) {
+  if (thirdsEven) {
     s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEven');
   } else {
     const bestLabel = thirdLabels[bestIdx].toLowerCase();
@@ -164,422 +169,209 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     }
   }
 
-
-
-
-
-  // Renderers
-  const Sentence: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <p
-      style={{
-        margin: 0,
-        marginTop: 13,
-        fontSize: 13.5,
-        fontWeight: 500,
-        color: INK_60,
-        lineHeight: 1.45,
-      }}
-    >
-      {children}
-    </p>
+  const Caption: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <p style={CAPTION}>{children}</p>
   );
 
-  const stratumHeader = (title: string, sub: string) => (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.005em' }}>
-        {title}
-      </div>
-      <div style={{ fontSize: 12, fontWeight: 500, color: INK_45, marginTop: 2 }}>{sub}</div>
-    </div>
-  );
+  // Headline: round before branching so -0.04 never renders "-0.0".
+  const roundedTotal = Math.round(total * 10) / 10;
+  const headlineTone = roundedTotal > 0 ? OVER : roundedTotal < 0 ? UNDER : A.INK;
+  const headlineText =
+    roundedTotal > 0
+      ? `+${roundedTotal.toFixed(1)}`
+      : roundedTotal < 0
+        ? `\u2212${Math.abs(roundedTotal).toFixed(1)}`
+        : 'E';
+  const headlineLabel =
+    roundedTotal > 0
+      ? t('courses:courseDetail.you.shotsOverPar')
+      : roundedTotal < 0
+        ? t('courses:courseDetail.you.shotsUnderPar')
+        : t('courses:courseDetail.you.levelPar');
+
+  const split = [
+    { key: 'par', label: t('courses:courseDetail.you.parOrBetter'), pct: pctPar, holes: sumPar, tone: UNDER },
+    { key: 'bog', label: t('courses:holes.scoringBreakdown.bogey'), pct: pctBog, holes: sumBog, tone: BAND_AMBER },
+    { key: 'dbl', label: t('courses:courseDetail.you.doubleOrWorse'), pct: pctDbl, holes: sumDbl, tone: OVER },
+  ];
 
   return (
-    <section style={{ padding: '0 16px', fontFamily: FONT }}>
-      {/* Section heading OUTSIDE card */}
-      <div style={{ padding: '0 2px', marginBottom: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS, ...FIGS }}>
+      {/* An average round here */}
+      <Panel
+        title={t('courses:courseDetail.you.avgRound')}
+        aside={t('courses:courseDetail.you.roundsCount', { count: rounds })}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ ...NUM, fontSize: 44, lineHeight: 1, color: headlineTone }}>{headlineText}</div>
+          <div style={{ ...LABEL, marginTop: 8 }}>{headlineLabel}</div>
+        </div>
+      </Panel>
+
+      {/* Your most damaging holes */}
+      <Panel
+        title={t('courses:courseDetail.you.damagingHoles')}
+        aside={t('courses:courseDetail.you.byShotsLost')}
+      >
         <div
           style={{
-            fontSize: 10,
-            fontWeight: 800,
-            color: AMBER,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
+            display: 'grid',
+            gridTemplateColumns: DAMAGE_GRID,
+            gap: 11,
+            alignItems: 'baseline',
           }}
         >
-          {t('courses:holes.scoringBreakdown.eyebrow')}
+          <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.you.colHole')}</span>
+          <span style={LABEL}>{t('courses:holes.scoringBreakdown.s1Sub')}</span>
+          <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCost')}</span>
         </div>
-        <h2
-          style={{
-            margin: '4px 0 0',
-            fontSize: 19,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.3px',
-          }}
+        {damaging.map((h) => {
+          const barW = Math.max(4, Math.min(100, (h.shots_over_par / top1) * 100));
+          return (
+            <div
+              key={h.hole_no}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: DAMAGE_GRID,
+                gap: 11,
+                alignItems: 'center',
+                padding: '9px 0',
+              }}
+            >
+              <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
+              <span style={{ minWidth: 0 }}>
+                <span style={{ ...LABEL, display: 'block' }}>
+                  {t('courses:holes.scoringBreakdown.parYouAvg', {
+                    par: h.par,
+                    avg: h.avg_score.toFixed(2),
+                  })}
+                </span>
+                <span
+                  style={{
+                    display: 'block',
+                    height: 5,
+                    borderRadius: 3,
+                    background: A.TRACK,
+                    marginTop: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      height: 5,
+                      borderRadius: 3,
+                      width: `${barW}%`,
+                      background: OVER,
+                    }}
+                  />
+                </span>
+              </span>
+              <span style={{ textAlign: 'right' }}>
+                <span style={{ ...NUM, fontSize: 14, color: OVER, display: 'block' }}>
+                  +{h.shots_over_par.toFixed(1)}
+                </span>
+                <span style={{ ...LABEL, fontSize: 8, display: 'block', marginTop: 2 }}>
+                  {t('courses:courseDetail.you.aRound')}
+                </span>
+              </span>
+            </div>
+          );
+        })}
+        {hasInterpretation ? (
+          <Caption>{s1Sentence}</Caption>
+        ) : (
+          <Caption>{t('courses:holes.scoringBreakdown.moreRoundsHint')}</Caption>
+        )}
+      </Panel>
+
+      {/* What's costing you the shots - one distribution, one bar */}
+      <Panel
+        title={t('courses:courseDetail.you.costingShots')}
+        aside={t('courses:courseDetail.you.everyHole')}
+      >
+        <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
+          {split
+            .filter((s) => s.pct > 0)
+            .map((s) => (
+              <span
+                key={s.key}
+                style={{ height: 6, flex: s.pct, background: s.tone, borderRadius: 3 }}
+              />
+            ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+          {split.map((s) => (
+            <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
+              <div style={LABEL}>{s.label}</div>
+              <div style={{ ...NUM, fontSize: 20, color: s.tone, marginTop: 3 }}>
+                {s.pct}
+                <span style={{ fontSize: 12, fontWeight: 700 }}>%</span>
+              </div>
+              <div style={{ ...LABEL, fontSize: 8, marginTop: 2 }}>
+                {t('courses:holes.scoringBreakdown.nHoles', { count: s.holes })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {topDoubles.length > 0 && (
+          <>
+            <div style={{ ...LABEL, marginTop: 20, marginBottom: 10 }}>
+              {t('courses:courseDetail.you.doublesFrom')}
+            </div>
+            <StatRow
+              size={18}
+              items={topDoubles.map((h) => ({
+                label: t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no }),
+                value: String(h.doubles_plus),
+                tone: OVER,
+              }))}
+            />
+          </>
+        )}
+
+        {hasInterpretation && <Caption>{s2Sentence}</Caption>}
+      </Panel>
+
+      {/* How your round unfolds - the worst third is inked */}
+      {hasInterpretation && (
+        <Panel
+          title={t('courses:courseDetail.you.roundUnfolds')}
+          aside={t('courses:courseDetail.you.byThird')}
         >
-          {t('courses:holes.scoringBreakdown.title')}
-        </h2>
-      </div>
-
-      <div style={CARD}>
-        {/* 3a. Headline */}
-        <div style={{ padding: '18px 16px', borderBottom: `1px solid ${HAIR}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div
-              style={{
-                fontSize: 48,
-                fontWeight: 800,
-                letterSpacing: '-2.2px',
-                color: INK,
-                lineHeight: 1,
-                ...NUM,
-              }}
-            >
-              +{total.toFixed(1)}
-            </div>
-            <div
-              style={{
-                fontSize: 13.5,
-                fontWeight: 700,
-                color: INK_60,
-                lineHeight: 1.25,
-                whiteSpace: 'pre-line',
-              }}
-            >
-              {t('courses:holes.scoringBreakdown.headlineUnit')}
-            </div>
-          </div>
-          <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_45, marginTop: 10 }}>
-            {t('courses:holes.scoringBreakdown.builtFrom', { count: rounds })}
-          </div>
-        </div>
-
-        {/* 3b. Stratum 1 */}
-        <div style={{ padding: '16px', borderBottom: `1px solid ${HAIR}` }}>
-          {stratumHeader(
-            t('courses:holes.scoringBreakdown.s1Title'),
-            t('courses:holes.scoringBreakdown.s1Sub'),
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {damaging.map((h, i) => {
-              const isTop = i < 3;
-              const chipBg = isTop ? 'rgba(229,72,77,0.10)' : 'rgba(15,23,42,0.05)';
-              const chipInk = isTop ? RED : INK_45;
-              const barW = Math.max(4, Math.min(100, (h.shots_over_par / top1) * 100));
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gap: 12,
+              alignItems: 'end',
+            }}
+          >
+            {thirdSums.map((v, i) => {
+              const isWorst = !thirdsEven && i === worstIdx;
               return (
-                <div key={h.hole_no} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div key={i} style={{ textAlign: 'center', minWidth: 0 }}>
+                  <div
+                    style={{ ...NUM, fontSize: 17, color: isWorst ? A.INK : A.MUTE, marginBottom: 6 }}
+                  >
+                    +{v.toFixed(1)}
+                  </div>
                   <div
                     style={{
-                      width: 44,
-                      height: 32,
-                      borderRadius: 8,
-                      background: chipBg,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
+                      height: Math.max(10, (v / maxThird) * 62),
+                      borderRadius: 4,
+                      background: isWorst ? A.INK : A.TRACK,
                     }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 7,
-                        fontWeight: 800,
-                        color: chipInk,
-                        letterSpacing: '0.08em',
-                        lineHeight: 1,
-                      }}
-                    >
-                      HOLE
-                    </div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: chipInk, lineHeight: 1.1, ...NUM }}>
-                      {h.hole_no}
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: INK, marginBottom: 4 }}>
-                      {t('courses:holes.scoringBreakdown.parYouAvg', {
-                        par: h.par,
-                        avg: h.avg_score.toFixed(2),
-                      })}
-                    </div>
-                    <div
-                      style={{
-                        height: 4,
-                        borderRadius: 2,
-                        background: 'rgba(15,23,42,0.06)',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: `${barW}%`,
-                          height: '100%',
-                          background: isTop ? RED : 'rgba(15,23,42,0.25)',
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: 14.5, fontWeight: 800, color: INK, ...NUM }}>
-                      +{h.shots_over_par.toFixed(1)}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 8.5,
-                        fontWeight: 700,
-                        color: INK_45,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {t('courses:holes.scoringBreakdown.aRound')}
-                    </div>
-                  </div>
+                  />
+                  <div style={{ ...LABEL, marginTop: 7 }}>{thirdLabels[i]}</div>
                 </div>
               );
             })}
           </div>
-          {hasInterpretation ? (
-            <Sentence>{s1Sentence}</Sentence>
-          ) : (
-            <p
-              style={{
-                margin: 0,
-                marginTop: 13,
-                fontSize: 12.5,
-                fontWeight: 500,
-                color: INK_45,
-                lineHeight: 1.45,
-              }}
-            >
-              {t('courses:holes.scoringBreakdown.moreRoundsHint')}
-            </p>
-          )}
-        </div>
-
-
-        {/* 3c. Stratum 2 */}
-        <div style={{ padding: '16px', borderBottom: hasInterpretation ? `1px solid ${HAIR}` : 'none' }}>
-          {stratumHeader(
-            t('courses:holes.scoringBreakdown.s2Title'),
-            t('courses:holes.scoringBreakdown.s2Sub'),
-          )}
-          {(() => {
-            const cols = [
-              { key: 'par', v: sumPar, pct: pctPar, label: t('courses:holes.scoringBreakdown.parOrBetter'), color: GREEN },
-              { key: 'bog', v: sumBog, pct: pctBog, label: t('courses:holes.scoringBreakdown.bogey'), color: WARN },
-              { key: 'dbl', v: sumDbl, pct: pctDbl, label: t('courses:holes.scoringBreakdown.doubleOrWorse'), color: RED },
-            ];
-            const SIZE = 96;
-            const STROKE = 9;
-            const R = (SIZE - STROKE) / 2;
-            const C = 2 * Math.PI * R;
-            return (
-              <div style={{ display: 'flex', gap: 6 }}>
-                {cols.map((c) => {
-                  const dash = (c.pct / 100) * C;
-                  const trackColor = c.color + '21'; // ~0.13 alpha
-                  return (
-                    <div
-                      key={c.key}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div style={{ position: 'relative', width: SIZE, height: SIZE }}>
-                        <svg
-                          width={SIZE}
-                          height={SIZE}
-                          style={{ transform: 'rotate(-90deg)' }}
-                        >
-                          <circle
-                            cx={SIZE / 2}
-                            cy={SIZE / 2}
-                            r={R}
-                            fill="none"
-                            stroke={trackColor}
-                            strokeWidth={STROKE}
-                          />
-                          <circle
-                            cx={SIZE / 2}
-                            cy={SIZE / 2}
-                            r={R}
-                            fill="none"
-                            stroke={c.color}
-                            strokeWidth={STROKE}
-                            strokeLinecap="round"
-                            strokeDasharray={`${dash} ${C - dash}`}
-                          />
-                        </svg>
-                        <div
-                          style={{
-                            position: 'absolute',
-                            inset: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 1,
-                          }}
-                        >
-                          <span style={{ fontSize: 21, fontWeight: 800, color: INK, letterSpacing: '-0.5px', ...NUM }}>
-                            {c.pct}
-                          </span>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: INK_45 }}>%</span>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 9.5,
-                          fontWeight: 800,
-                          letterSpacing: '0.5px',
-                          color: INK_45,
-                          textAlign: 'center',
-                          marginTop: 10,
-                          whiteSpace: 'pre-line',
-                          lineHeight: 1.35,
-                          minHeight: 26,
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {c.label}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: c.color,
-                          textAlign: 'center',
-                          marginTop: 4,
-                          ...NUM,
-                        }}
-                      >
-                        {t('courses:holes.scoringBreakdown.nHoles', { count: c.v })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-
-
-
-          {topDoubles.length > 0 && (
-            <>
-              <div
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 800,
-                  color: INK_45,
-                  letterSpacing: '0.07em',
-                  textTransform: 'uppercase',
-                  marginTop: 14,
-                  marginBottom: 8,
-                }}
-              >
-                {t('courses:holes.scoringBreakdown.doublesFrom')}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
-                {topDoubles.map((h) => (
-                  <div
-                    key={h.hole_no}
-                    style={{
-                      background: 'rgba(229,72,77,0.06)',
-                      borderRadius: 12,
-                      padding: '8px 4px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: 12, fontWeight: 800, color: INK, lineHeight: 1.15, ...NUM }}>
-                      {t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no })}
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: RED, marginTop: 3, lineHeight: 1, ...NUM }}>
-                      {h.doubles_plus}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 8.5,
-                        fontWeight: 800,
-                        color: INK_45,
-                        letterSpacing: '0.06em',
-                        marginTop: 2,
-                      }}
-                    >
-                      {t('courses:holes.scoringBreakdown.doublesLabel')}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {hasInterpretation && <Sentence>{s2Sentence}</Sentence>}
-        </div>
-
-        {/* 3d. Stratum 3 — interpretation only */}
-        {hasInterpretation && (
-          <div style={{ padding: '16px' }}>
-            {stratumHeader(
-              t('courses:holes.scoringBreakdown.s3Title'),
-              t('courses:holes.scoringBreakdown.s3Sub'),
-            )}
-            {(() => {
-              const MIN_H = 52;
-              const MAX_H = 92;
-              const neutralAll = spread < 1.5;
-              return (
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 150 }}>
-                  {thirdSums.map((v, i) => {
-                    const safeMax = maxThird > 0 ? maxThird : 1;
-                    const barH = Math.round(MIN_H + (v / safeMax) * (MAX_H - MIN_H));
-                    const color = neutralAll
-                      ? 'rgba(15,23,42,0.20)'
-                      : i === worstIdx
-                        ? RED
-                        : 'rgba(232,137,12,0.75)';
-                    return (
-                      <div
-                        key={i}
-                        style={{
-                          flex: 1,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                          gap: 6,
-                          height: '100%',
-                        }}
-                      >
-                        <div style={{ fontSize: 15.5, fontWeight: 800, color: INK, ...NUM }}>
-                          +{v.toFixed(1)}
-                        </div>
-                        <div
-                          style={{
-                            width: '100%',
-                            height: `${barH}px`,
-                            background: color,
-                            borderRadius: '9px 9px 5px 5px',
-                          }}
-                        />
-                        <div style={{ width: '100%', height: 2, background: 'rgba(15,23,42,0.10)' }} />
-                        <div style={{ fontSize: 10.5, fontWeight: 800, color: INK_60 }}>{thirdLabels[i]}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-            <Sentence>{s3Sentence}</Sentence>
-          </div>
-        )}
-
-      </div>
-    </section>
+          <Caption>{s3Sentence}</Caption>
+        </Panel>
+      )}
+    </div>
   );
 };
 

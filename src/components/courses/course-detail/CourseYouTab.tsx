@@ -31,10 +31,6 @@ interface Props {
   courseName: string;
 }
 
-const Divider = () => (
-  <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '16px' }} />
-);
-
 const ordinal = (n: number) => {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
@@ -347,7 +343,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   return wrap(
     <>
       <PersonalSection courseId={courseId} courseName={courseName} />
-      <Divider />
       <CourseHolesTab
         courseId={courseId}
         section="you"

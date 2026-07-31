@@ -16,6 +16,18 @@ import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
+import {
+  A, Panel, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
+} from './analytical/tokens';
+
+interface HookCell {
+  key: string;
+  emoji: string;
+  label: string;
+  value: string;
+  tone?: string;
+  note: string;
+}
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
@@ -250,6 +262,11 @@ export const HoleDataSheet: React.FC<Props> = ({
           viewerHasPlayed={viewerHasPlayed}
           beatFieldCount={beatFieldCount}
         />
+      )}
+
+      {/* The second and last kicker on the You tab. */}
+      {section === 'you' && (
+        <div style={{ ...KICKER_A, marginBottom: -8 }}>{t('courses:courseDetail.you.shotsGo')}</div>
       )}
 
       {/* 3. Story tiles */}
@@ -707,7 +724,81 @@ const StoryTiles: React.FC<{
     );
   }
 
-  const tiles: React.ReactNode[] = scope === 'personal' ? [] : [...communityTiles];
+  // Personal scope (the You tab): one Panel, two centred cells, figures pulled
+  // out of the prose. BRIEF_COURSE_YOU_TAB_TREATMENT s5.
+  if (scope === 'personal') {
+    const hooks: HookCell[] = [];
+
+    if (nemesis) {
+      const fieldRow = holes.find((h) => h.hole_no === nemesis.hole_no);
+      const fieldStr = fieldRow ? fmtToPar(fieldRow.avg_to_par) : fmtToPar(0);
+      const youBeats = fieldRow ? nemesis.avg_to_par <= fieldRow.avg_to_par + 0.005 : false;
+      const parts = toParParts(nemesis.avg_to_par, 2);
+      hooks.push({
+        key: 'battle',
+        emoji: '🥊',
+        label: `Your battle · hole ${nemesis.hole_no}`,
+        value: parts?.text ?? '',
+        tone: parts?.tone,
+        note: youBeats
+          ? 'Better than most here, still unbeaten'
+          : `The field plays it to ${fieldStr}. Time to settle it.`,
+      });
+    }
+
+    if (birdiedCount === totalHoles) {
+      hooks.push({
+        key: 'full',
+        emoji: '🏆',
+        label: 'Full house',
+        value: `${birdiedCount}/${totalHoles}`,
+        note: "You've birdied every hole on this course.",
+      });
+    } else if (birdiedCount === totalHoles - 1 && missingBirdieHole) {
+      hooks.push({
+        key: 'onetogo',
+        emoji: '⛳',
+        label: 'One to go',
+        value: `${birdiedCount}/${totalHoles}`,
+        note: `Only the ${ord(missingBirdieHole)} has never given you a birdie.`,
+      });
+    } else if (totalHoles > 0) {
+      hooks.push({
+        key: 'map',
+        emoji: '⛳',
+        label: 'Birdie map',
+        value: `${birdiedCount}/${totalHoles}`,
+        note: `${totalHoles - birdiedCount} still waiting for your first birdie.`,
+      });
+    }
+
+    if (hooks.length === 0) return null;
+
+    return (
+      <Panel style={{ scrollMarginTop: STICKY_SAFE }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${hooks.length}, minmax(0, 1fr))`,
+            gap: 16,
+          }}
+        >
+          {hooks.map((h) => (
+            <div key={h.key} style={{ textAlign: 'center', minWidth: 0 }}>
+              <div style={{ fontSize: 17, lineHeight: 1, marginBottom: 6 }} aria-hidden>{h.emoji}</div>
+              <div style={LABEL_A}>{h.label}</div>
+              <div style={{ ...NUM_A, fontSize: 17, color: h.tone ?? A.INK, marginTop: 3 }}>{h.value}</div>
+              <div style={{ fontSize: 11.5, lineHeight: 1.45, color: A.MUTE, marginTop: 5 }}>{h.note}</div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    );
+  }
+
+  const tiles: React.ReactNode[] = [...communityTiles];
+
+
 
 
   // Your battle
