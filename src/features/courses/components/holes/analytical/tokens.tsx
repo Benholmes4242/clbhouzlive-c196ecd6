@@ -137,7 +137,7 @@ export const Panel: React.FC<{
   </section>
 );
 
-export interface StatItem { label: string; value: React.ReactNode; tone?: string }
+export interface StatItem { label: string; value: React.ReactNode; tone?: string; sub?: string }
 
 export const StatRow: React.FC<{
   items: StatItem[];
@@ -157,10 +157,25 @@ export const StatRow: React.FC<{
         <div style={{ ...NUM, fontSize: size, color: it.tone ?? A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>
           {it.value}
         </div>
+        {it.sub ? (
+          <div
+            style={{
+              ...LABEL,
+              fontSize: 8,
+              marginTop: 3,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {it.sub}
+          </div>
+        ) : null}
       </div>
     ))}
   </div>
 );
+
 
 /**
  * Quiet uppercase text affordance shared by the lower Course-tab blocks.
