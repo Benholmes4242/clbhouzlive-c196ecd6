@@ -30,6 +30,8 @@ const RED = '#EF4444';
 const AMBER = '#F7931E';
 const LINE = 'rgba(255,255,255,0.10)';
 const SURFACE = 'rgba(255,255,255,0.035)';
+/** Solid feed card surface, used to keep the actions row off the photo backdrop. */
+const OPAQUE_SURFACE = '#15171F';
 
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
