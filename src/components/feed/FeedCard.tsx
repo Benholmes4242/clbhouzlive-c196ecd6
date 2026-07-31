@@ -402,8 +402,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       img.removeEventListener('error', onError);
     };
   }, [isFirstCard, isMulti, media, fireContentReady]);
-
-
+  // Photo backdrop only for round posts that actually have a course photo.
+  const hasRoundBackdrop = Boolean(postRound && post.courseThumbnailImage);
 
   return (
     <article
