@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ClubhouseIslandTabs } from '@/components/clubhouse/ClubhouseIslandTabs';
 import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -21,13 +20,13 @@ import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkelet
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { usePageReady } from '@/perf/usePageReady';
-import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
+import { ClubhouseTabProvider } from '@/contexts/ClubhouseTabContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 
 
 // ── New feed components ──
-import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
+import { CardFeed } from '@/components/feed/CardFeed';
 import { FeedErrorBoundary } from '@/components/feed/FeedErrorBoundary';
 import { safeInitialState } from '@/components/feed/feedSnapshot';
 import type { StateSnapshot } from 'react-virtuoso';
@@ -37,7 +36,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
-import { useFriendsFeed } from '@/hooks/useFriendsFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
@@ -72,6 +70,12 @@ import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState'
 
 
 
+// Stage 4 of the feed merge: one feed, no toggle. get_suggested_feed_v3 now
+// carries the merged candidate set and ranking. This constant remains the
+// per-tab key for store slots and Virtuoso snapshots, which are keyed by
+// string and still need a stable owner.
+const FEED_TAB = 'foryou';
+
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
 
@@ -100,12 +104,6 @@ const ClubhouseContent = () => {
   const navigate = useNavigate();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   
-  // Tab state from context
-  const tabContext = useClubhouseTab();
-  const activeTab = tabContext?.activeTab ?? 'foryou';
-  const setActiveTab = tabContext?.setActiveTab ?? (() => {});
-  const isBusinessActor = tabContext?.isBusinessActor ?? false;
-  
   // Auth + actor context
   const { user, loading: authLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -122,68 +120,34 @@ const ClubhouseContent = () => {
   // (FeedOverlayLayer, top-bar carousel chip, FullscreenCarouselOverlay)
   // read the correct tab's slot after a switch.
   useEffect(() => {
-    setStoreActiveTab(activeTab);
-  }, [activeTab, setStoreActiveTab]);
+    setStoreActiveTab(FEED_TAB);
+  }, [setStoreActiveTab]);
 
   // H4b — ChromeIsland integration.
   // The page is keep-alive-mounted, so slot + suppress registrations are
   // gated by pathname to avoid leaking Clubhouse chrome onto other routes
   // when the user navigates away.
   const isClubhouseRoute = pathname === '/' || pathname === '/clubhouse';
-  // Feed tab instrumentation (measurement only — no behaviour change).
-  // tabSwitchCountRef: 1-based session_position for feed_tab_changed.
-  const tabSwitchCountRef = useRef(0);
-  // Set guard so feed_tab_viewed fires once per session per tab, never on re-render.
-  const seenFeedTabsRef = useRef<Set<'foryou' | 'friends'>>(new Set());
-  const trackFeedTabViewed = useCallback((tab: 'foryou' | 'friends') => {
-    if (seenFeedTabsRef.current.has(tab)) return;
-    seenFeedTabsRef.current.add(tab);
-    analyticsEvents.track('feed_tab_viewed', { tab });
-  }, []);
-  // Mount: record the tab the session lands on.
+  // Feed reach instrumentation. One feed, so this fires once per session as a
+  // "a session reached the feed" signal.
+  const feedViewedRef = useRef(false);
   useEffect(() => {
-    trackFeedTabViewed(activeTab as 'foryou' | 'friends');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (feedViewedRef.current) return;
+    feedViewedRef.current = true;
+    analyticsEvents.track('feed_tab_viewed', { tab: 'merged' });
   }, []);
-  const handleIslandTabChange = useCallback((tab: 'foryou' | 'friends') => {
-    if (tab === activeTab) return;
-    // Fires only after the no-op guard, so never on re-render or same-tab taps.
-    tabSwitchCountRef.current += 1;
-    analyticsEvents.track('feed_tab_changed', {
-      from: activeTab,
-      to: tab,
-      session_position: tabSwitchCountRef.current,
-    });
-    trackFeedTabViewed(tab);
-    // Preserve outgoing tab's Virtuoso snapshot before the keyed remount.
-    cardFeedRef.current?.captureSnapshot();
-    setActiveTab(tab);
-  }, [activeTab, setActiveTab, trackFeedTabViewed]);
 
-  const islandSlot = useMemo(
-    () =>
-      isClubhouseRoute ? (
-        <ClubhouseIslandTabs
-          activeTab={activeTab}
-          onTabChange={handleIslandTabChange}
-          isBusinessActor={isBusinessActor}
-        />
-      ) : null,
-    [isClubhouseRoute, activeTab, handleIslandTabChange, isBusinessActor],
-  );
-  useSetChromeLeftSlot(islandSlot);
+  // Clear any previously registered Clubhouse island slot (the Suggested /
+  // Friends toggle was the only occupant).
+  useSetChromeLeftSlot(null);
   // PGA "This Week" card takeover — suppress both island capsules while active.
   useSetChromeSuppressed(isClubhouseRoute && isTournamentCardActive);
 
 
 
-  // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
-  // and restored on switch-BACK so each tab retains its exact scroll offset.
+  // Virtuoso snapshot store — retained for remount-after-error-recovery and
+  // pull-to-refresh eviction. Keyed by FEED_TAB now that there is one feed.
   const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
-  // Imperative ref into CardFeed so we can capture the outgoing tab's
-  // snapshot BEFORE flipping activeTab (the keyed remount tears down the
-  // instance, which makes a post-flip capture impossible).
-  const cardFeedRef = useRef<CardFeedHandle | null>(null);
   // Per-tab last-known posts length. When a feed shrinks (PTR trims, cache
   // eviction, refetch resets) below the snapshot's referenced ranges,
   // restoring the snapshot crashes Virtuoso. Evict the snapshot in that
@@ -208,15 +172,7 @@ const ClubhouseContent = () => {
   // ── Feed hooks ──
   // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
   // Clubhouse feed is now purely social posts + algorithmic suggestions.
-  const suggestedFeed = useSuggestedFeed(user?.id);
-  const friendsFeed = useFriendsFeed({
-    userId: user?.id,
-    mode: 'latest',
-    interleave: true,
-    pageSize: 10,
-    enabled: activeTab === 'friends',
-  });
-  const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
+  const activeFeed = useSuggestedFeed(user?.id);
 
   const posts = activeFeed.posts;
 
@@ -272,7 +228,7 @@ const ClubhouseContent = () => {
       setSkeletonTimedOut(true);
     }, 12000);
     return () => window.clearTimeout(id);
-  }, [isLoading, posts.length, activeTab, user, authLoading]);
+  }, [isLoading, posts.length, user, authLoading]);
 
   // Effect 2: Once feed is ready, gate on tournament card state.
   // Also restore nav on terminal empty/error states and skeleton timeout so
@@ -293,13 +249,13 @@ const ClubhouseContent = () => {
   // no longer exist. Restoring it would iterate an undefined item and
   // crash on `.index`. Evict on shrink so the next mount is fresh.
   useEffect(() => {
-    const last = lastPostsLenRef.current[activeTab] ?? 0;
+    const last = lastPostsLenRef.current[FEED_TAB] ?? 0;
     const curr = posts.length;
     if (curr < last) {
-      virtuosoSnapshots.current[activeTab] = undefined;
+      virtuosoSnapshots.current[FEED_TAB] = undefined;
     }
-    lastPostsLenRef.current[activeTab] = curr;
-  }, [activeTab, posts.length]);
+    lastPostsLenRef.current[FEED_TAB] = curr;
+  }, [posts.length]);
   
   // ── Active post derivation ──
   const { activePost } = useActivePostDerived(posts, activeIndex);
@@ -338,7 +294,7 @@ const ClubhouseContent = () => {
   // Skeleton single owner: onTabSwitch (post-commit). Re-show only when the
   // now-active feed has never loaded (uncached). Cached -> instant, like IG/TikTok.
   const { handleNearEnd, handleRefresh } = useClubhouseFeedNav({
-    activeTab,
+    activeTab: FEED_TAB,
     activeFeed,
     onTabSwitch: () => {
       resetFollows();
@@ -431,7 +387,7 @@ const ClubhouseContent = () => {
   if (!isLoading && posts.length === 0) {
     return (
       <ClubhouseEmptyState
-        activeTab={activeTab}
+        activeTab={FEED_TAB}
         user={user}
         isError={activeFeed.isError}
         onSignIn={() => navigate('/auth')}
@@ -502,7 +458,7 @@ const ClubhouseContent = () => {
       {/* ═══ MAIN FEED AREA ═══ */}
       {(skeletonTimedOut && posts.length === 0) ? (
         <ClubhouseEmptyState
-          activeTab={activeTab}
+          activeTab={FEED_TAB}
           user={user}
           isError={activeFeed.isError}
           onSignIn={() => navigate('/auth')}
@@ -513,19 +469,18 @@ const ClubhouseContent = () => {
       ) : posts.length > 0 ? (
         <>
           <FeedErrorBoundary
-            resetKey={`${activeTab}:${feedResetKey}`}
+            resetKey={`${FEED_TAB}:${feedResetKey}`}
             onRecover={() => {
               // Evict the offending snapshot and force a fresh remount.
-              virtuosoSnapshots.current[activeTab] = undefined;
+              virtuosoSnapshots.current[FEED_TAB] = undefined;
               setFeedResetKey((k) => k + 1);
             }}
           >
             <CardFeed
-              ref={cardFeedRef}
-              key={`${activeTab}:${feedResetKey}`}
-              tab={activeTab}
-              initialState={safeInitialState(virtuosoSnapshots.current[activeTab], posts.length)}
-              onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
+              key={`${FEED_TAB}:${feedResetKey}`}
+              tab={FEED_TAB}
+              initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], posts.length)}
+              onSnapshot={(s) => { virtuosoSnapshots.current[FEED_TAB] = s; }}
               posts={posts}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
@@ -557,7 +512,7 @@ const ClubhouseContent = () => {
                 // PTR — the list may be trimmed/rebuilt. Drop the active
                 // tab's snapshot so we don't restore stale ranges after
                 // the refetch resolves.
-                virtuosoSnapshots.current[activeTab] = undefined;
+                virtuosoSnapshots.current[FEED_TAB] = undefined;
                 return handleRefresh();
               }}
               isRefreshing={activeFeed.isRefetching}
