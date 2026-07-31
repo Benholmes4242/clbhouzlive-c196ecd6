@@ -516,33 +516,12 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </div>
 
 
-            {/* Count + lens */}
-            <div className="flex items-center justify-between gap-3 mt-2.5">
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  padding: '5px 11px',
-                  borderRadius: 999,
-                  background: 'rgba(15,23,42,0.05)',
-                  border: `0.5px solid rgba(15,23,42,0.08)`,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: INK,
-                  lineHeight: 1.35,
-                }}
-              >
-                {trackedTotal > 0
-                  ? t(`statBrowse.countLens.${lens}`, {
-                      count: totalCount,
-                      total: formatNumber(trackedTotal),
-                    })
-                  : t('statBrowse.countTracked', { count: totalCount })}
-              </span>
+            {/* Lens picker. The "x of y tracked courses" badge was removed —
+                the headline copy already states the lens basis. */}
+            <div className="flex items-center justify-end gap-3 mt-2.5">
               {lensSelect(false)}
             </div>
+
           </>
         )}
       </div>
