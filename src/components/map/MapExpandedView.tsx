@@ -131,7 +131,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       });
 
       map.on('error', (e) => {
-        if ((e as any)?.error?.message?.includes('WebGL')) {
+        if ((e as { error?: { message?: string } })?.error?.message?.includes('WebGL')) {
           console.error('[MapExpandedView] WebGL error, removing map', e);
           map.remove();
           mapRef.current = null;
