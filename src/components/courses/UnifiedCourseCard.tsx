@@ -114,7 +114,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 
   const regionalRank = course.ranks?.usa ?? course.ranks?.regional ?? null;
   const regionalBadgeSlug = getRegionalBadgeSlug(course);
-  const isPlayed = course.context?.isPlayedByViewer;
 
   // ============ HORIZONTAL VARIANT ============
   if (variant === 'horizontal') {
