@@ -458,7 +458,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         className={
           compact
             ? COMPACT_TRIGGER_CLS
-            : `${TRIGGER_CLS} w-full`
+            // Sized to its content: a short label ("Toughest") must not leave
+            // a wide gap between text and chevron.
+            : `${TRIGGER_CLS} w-auto gap-2`
         }
         style={{ borderColor: HAIRLINE_INK_10, color: INK }}
         aria-label={t('statBrowse.selectLensA11y')}
