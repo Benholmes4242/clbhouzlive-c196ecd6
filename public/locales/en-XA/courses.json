@@ -199,7 +199,12 @@
   },
   "rateNudge": {
     "emptyLabel": "[~~Řáţé á ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
-    "rateCta": "[~~Řáţé~~]"
+    "rateCta": "[~~Řáţé~~]",
+    "playedEyebrow": "[~~Ÿőú ĥáṽéŋ'ţ ŕáţéđ ýéţ~~]",
+    "suggestedEyebrow": "[~~ŦŔŶ ŔÁŦĨŃĜ~~]",
+    "playedSubWithRegion": "[~~{{region}} · Ƥļáýéđ, ŋőţ ŕáţéđ~~]",
+    "playedSubNoRegion": "[~~Ƥļáýéđ, ŋőţ ŕáţéđ~~]",
+    "suggestedForYou": "[~~Śúĝĝéśţéď ƒőŕ ýőú~~]"
   },
   "request": {
     "hero": {
