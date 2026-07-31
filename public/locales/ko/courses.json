@@ -201,7 +201,12 @@
   },
   "rateNudge": {
     "emptyLabel": "Rate a course you've played",
-    "rateCta": "Rate"
+    "rateCta": "Rate",
+    "playedEyebrow": "YOU HAVEN'T RATED YET",
+    "suggestedEyebrow": "TRY RATING",
+    "playedSubWithRegion": "{{region}} · Played, not rated",
+    "playedSubNoRegion": "Played, not rated",
+    "suggestedForYou": "Suggested for you"
   },
   "request": {
     "hero": {
