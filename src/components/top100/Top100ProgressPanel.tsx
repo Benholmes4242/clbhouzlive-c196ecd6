@@ -4,6 +4,7 @@
  * Scoped to the active list only: one bar for the list currently selected by
  * the scope pill. Tapping it opens the list progress sheet.
  */
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
@@ -90,11 +91,11 @@ export const Top100ProgressPanel: React.FC<Props> = ({ list, onOpenList }) => {
       >
         <span
           style={{
-            fontSize: 8.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: A.AMBER_DEEP,
           }}
         >
           {t('top100.progressPanel.heading')}
