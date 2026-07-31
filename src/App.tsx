@@ -267,7 +267,6 @@ const OwnProfileSocialRedirect = lazy(() => import("./components/profile/OwnProf
 const FriendsRedirectToFollowing = lazy(() => import("./pages/FriendsRedirectToFollowing"));
 const ProfileSocialListRoute = lazy(() => import("./features/social-lists-v2/ProfileSocialListRoute"));
 const BusinessSocialListRoute = lazy(() => import("./features/social-lists-v2/BusinessSocialListRoute"));
-const ToggleTestPage = lazy(() => import("./pages/_test/ToggleTest"));
 
 
 const CreateProfileRedirect = lazy(() => import("./components/redirects/CreateProfileRedirect"));
@@ -482,7 +481,6 @@ function AppRoutes() {
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
 
         
-        <Route path="/_test/toggle" element={<Suspense fallback={<GenericPageSkeleton />}><ToggleTestPage /></Suspense>} />
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
