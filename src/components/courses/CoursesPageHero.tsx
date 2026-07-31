@@ -41,7 +41,7 @@ import {
  */
 
 const HERO_MIN_HEIGHT =
-  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+  'calc(clamp(380px, 30dvh, 460px) + env(safe-area-inset-top, 0px))';
 
 /** 1st, 2nd, 3rd, 11th - never "The 11 plays hardest". */
 function ordinal(n: number): string {

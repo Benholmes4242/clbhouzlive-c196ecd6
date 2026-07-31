@@ -21,7 +21,7 @@ const GOLD = '#FBBC2E';
 const UNDER_PAR = '#FF4D57';
 
 const HERO_MIN_HEIGHT =
-  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+  'calc(clamp(380px, 30dvh, 460px) + env(safe-area-inset-top, 0px))';
 
 const KIND_LABEL: Record<HeroStoryKind, string> = {
   course_record: 'COURSE RECORD',
