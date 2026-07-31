@@ -3,7 +3,7 @@
  *  client-filters posts to authors who are currently active (is_active_recently). */
 export type LoopMode = 'latest' | 'popular' | 'live_now';
 
-/** RPC-supported subset (see useFriendsFeed). */
+/** RPC-supported subset. */
 export type FriendsRpcMode = 'latest' | 'popular';
 
 export function loopModeToRpcMode(mode: LoopMode): FriendsRpcMode {
