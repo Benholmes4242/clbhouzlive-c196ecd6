@@ -831,7 +831,7 @@
       "aboutThisPlace": "ABOUT THIS PLACE"
     },
     "card": {
-      "seeFull": "See the full card and scorecard",
+      "seeFull": "See the full course card",
       "sheetTitle": "{{tee}} tees",
       "yards_one": "{{yards}} yd",
       "yards_other": "{{yards}} yds"

@@ -17,7 +17,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
 import { CourseTeeCard, resolveDefaultTee } from '../CourseTeeCard';
-import { A, KICKER, Panel, StatRow } from './tokens';
+import { A, Action, KICKER, Panel, StatRow } from './tokens';
 
 interface Props {
   courseId: string | undefined;
@@ -66,9 +66,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
               })}`
             : active.tee_label
         }
-        footer={t('courses:courseDetail.card.seeFull')}
-        onOpen={openSheet}
-        style={{ margin: '0 16px' }}
+        style={{ margin: '0 16px', paddingBottom: 8 }}
       >
         <StatRow
           items={[
@@ -80,6 +78,12 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
               ? [{ label: t('courses:teeCard.stat.slope'), value: Math.round(active.slope_rating) }]
               : []),
           ]}
+        />
+        <Action
+          label={t('courses:courseDetail.card.seeFull')}
+          onClick={openSheet}
+          align="center"
+          style={{ marginTop: 8, minHeight: 32 }}
         />
       </Panel>
 
