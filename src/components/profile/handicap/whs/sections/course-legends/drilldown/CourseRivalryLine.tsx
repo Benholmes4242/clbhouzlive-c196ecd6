@@ -5,6 +5,7 @@ import { Swords, ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
@@ -83,7 +84,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         cursor: 'pointer',
       }}
     >
-      <Swords size={12} strokeWidth={2.4} color={AMBER} style={{ flexShrink: 0 }} />
+      <Swords size={12} strokeWidth={2.4} color={A.AMBER_DEEP} style={{ flexShrink: 0 }} />
       <SquircleAvatar
         size={26}
         srcCandidates={data.rival_avatar ? [data.rival_avatar] : []}
