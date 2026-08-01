@@ -19754,6 +19754,15 @@ export type Database = {
           user_wins: number
         }[]
       }
+      get_round_crowns: {
+        Args: { p_score_ids: string[] }
+        Returns: {
+          category: string
+          margin: number
+          previous_holder_name: string
+          whs_score_id: string
+        }[]
+      }
       get_screen_analytics: {
         Args: { p_days?: number }
         Returns: {
