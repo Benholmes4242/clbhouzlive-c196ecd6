@@ -77,10 +77,12 @@ export const HoleRow: React.FC<{
         }}
       >
         <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{row.hole_no}</span>
-        <span style={{ ...NUM, fontSize: 11.5, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
-          {row.stroke_index != null ? `${row.par}${THIN_DOT}${row.stroke_index}` : row.par}
+        <span style={{ ...NUM, fontSize: 13, color: A.MUTE, textAlign: 'center' }}>{row.par}</span>
+        <span style={{ ...NUM, fontSize: 13, color: A.MUTE, textAlign: 'center' }}>
+          {row.stroke_index ?? ''}
         </span>
         <span style={{ height: 5, borderRadius: 3, overflow: 'hidden', display: 'flex', background: A.TRACK }}>
+
           {segs.map((s) => (
             <i key={s.label} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
           ))}
