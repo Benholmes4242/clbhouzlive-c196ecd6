@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { ChampionsGhost } from '@/components/handicap/ConnectGhostPreviews';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
@@ -34,10 +34,10 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
   <div
     style={{
       position: 'relative',
-      padding: '12px 38px 12px 16px',
+      padding: '16px 38px 16px 16px',
       background,
       border,
-      borderRadius: 14,
+      borderRadius: 16,
       fontFamily: FONT,
       boxSizing: 'border-box',
     }}
@@ -52,7 +52,7 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
       }}
     >
-      <X size={11} color="var(--hcp-t-60)" strokeWidth={2.6} />
+      <X size={11} color={A.DIM} strokeWidth={2.6} />
     </button>
     {children}
   </div>
@@ -87,17 +87,17 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
     <div style={{ margin: '12px 16px 0' }}>
       <CardShell
         onDismiss={dismiss}
-        background="linear-gradient(180deg, rgba(251,188,46,0.09), rgba(251,188,46,0.03))"
-        border="0.5px solid rgba(251,188,46,0.35)"
+        background={A.PANEL}
+        border={`1px solid ${A.BORDER}`}
       >
-        <SectionHeader role="section" kicker="CHAMPIONS · OFFICIAL WHS SCORES" inlineIcon icon={ShieldCheck} />
-        <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
+        <div style={{ ...LABEL, marginBottom: 8 }}>CHAMPIONS &middot; OFFICIAL WHS SCORES</div>
+        <p style={{ fontSize: 12, fontWeight: 500, color: A.MUTE, lineHeight: 1.55, margin: 0 }}>
           The clubhouse records board, digitalised - lowest gross, best stableford,
           most birdies and more, ranked from{' '}
-          <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official WHS scores</b>{' '}
+          <b style={{ color: A.INK, fontWeight: 700 }}>official WHS scores</b>{' '}
           at this course, {window === 'all_time' ? 'all time' : 'over the last 90 days'}.
           Only rounds logged on your{' '}
-          <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>{' '}
+          <b style={{ color: A.INK, fontWeight: 700 }}>official handicap record</b>{' '}
           count: no logged rounds, no crowns.
         </p>
       </CardShell>

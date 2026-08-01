@@ -211,3 +211,84 @@ export const Action: React.FC<{
     </span>
   </button>
 );
+
+/**
+ * EmptyState - the single empty-state treatment for every Course-detail tab
+ * (BRIEF_COURSE_DETAIL_EMPTY_STATES).
+ *
+ * No icon tile at any size or shape, no tinted surface, no filled amber. The
+ * kicker already says which surface this is. A filled button appears only where
+ * the action is the surface's purpose, and it is INK.
+ */
+export const EmptyState: React.FC<{
+  kicker?: string;
+  title: string;
+  body?: string;
+  primary?: { label: string; onClick: () => void };
+  action?: { label: string; onClick: () => void };
+  guidance?: { title: string; body: string }[];
+  guidanceHeading?: string;
+  /** Quiet reassurance under the primary (e.g. "Takes about 30 seconds"). */
+  footnote?: string;
+  style?: React.CSSProperties;
+}> = ({ kicker, title, body, primary, action, guidance, guidanceHeading, footnote, style }) => (
+  <Panel style={style}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: 8,
+      }}
+    >
+      {kicker && <span style={KICKER}>{kicker}</span>}
+      <div style={{ fontSize: 16, fontWeight: 800, color: A.INK, lineHeight: 1.25 }}>{title}</div>
+      {body && (
+        <p style={{ fontSize: 13.5, lineHeight: 1.5, color: A.MUTE, margin: 0, maxWidth: '34em' }}>
+          {body}
+        </p>
+      )}
+      {primary && (
+        <button
+          type="button"
+          onClick={primary.onClick}
+          style={{
+            marginTop: 6,
+            border: 'none',
+            background: A.INK,
+            color: A.PANEL,
+            borderRadius: 999,
+            padding: '12px 22px',
+            fontSize: 13.5,
+            fontWeight: 800,
+            fontFamily: SANS,
+            cursor: 'pointer',
+          }}
+        >
+          {primary.label}
+        </button>
+      )}
+      {action && <Action label={action.label} onClick={action.onClick} />}
+      {footnote && (
+        <div style={{ fontSize: 12, fontWeight: 600, color: A.DIM }}>{footnote}</div>
+      )}
+    </div>
+
+    {guidance && guidance.length > 0 && (
+      <div style={{ marginTop: 18, textAlign: 'left' }}>
+        {guidanceHeading && <div style={{ ...LABEL, marginBottom: 12 }}>{guidanceHeading}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {guidance.map((g) => (
+            <div key={g.title}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{g.title}</div>
+              <div style={{ fontSize: 12.5, lineHeight: 1.45, color: A.MUTE, marginTop: 2 }}>
+                {g.body}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </Panel>
+);

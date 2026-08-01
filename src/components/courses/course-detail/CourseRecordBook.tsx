@@ -18,7 +18,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, EmptyState, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   courseId: string;
@@ -75,13 +75,23 @@ export const CourseRecordBook: React.FC<Props> = ({
       ? t('courseDetail.records.seeAllUnclaimed', { count: unclaimedCount })
       : t('courseDetail.records.seeAll');
 
+  if (!hasAnyHolder) {
+    return (
+      <EmptyState
+        kicker={t('courseDetail.records.kicker')}
+        title={t('courseDetail.records.empty', { courseName })}
+        action={{ label: footer, onClick: openBoards }}
+      />
+    );
+  }
+
   return (
     <Panel
       kicker={t('courseDetail.records.kicker')}
       footer={footer}
       onOpen={openBoards}
     >
-      {hasAnyHolder ? (
+
         <div style={{ display: 'grid', gap: 14 }}>
           {previewRows.map(({ category, row }) => {
             const isYou = !!user?.id && row.user_id === user.id;
@@ -141,11 +151,6 @@ export const CourseRecordBook: React.FC<Props> = ({
             );
           })}
         </div>
-      ) : (
-        <p style={{ margin: 0, fontSize: 13, color: A.MUTE, lineHeight: 1.5 }}>
-          {t('courseDetail.records.empty', { courseName })}
-        </p>
-      )}
     </Panel>
   );
 };

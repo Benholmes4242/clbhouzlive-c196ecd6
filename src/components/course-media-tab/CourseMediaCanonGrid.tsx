@@ -19,23 +19,16 @@
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, AlertCircle, Camera, Film, Flag, Sunrise, Building2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
-import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
-import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
-import {
-  AMBER,
-  HAIRLINE_INK_7,
-  INK,
-  INK_FAINT,
-} from '@/features/courses/_shared/tokens';
 
 const FONT_FAMILY =
   'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -206,50 +199,22 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
   if (posts.length === 0) {
     return (
-      <div style={{ paddingBottom: 0 }}>
-        <div style={{ padding: '40px 24px 16px', textAlign: 'center' }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 18,
-              background: 'rgba(247,147,30,0.07)',
-              border: '1.5px solid rgba(247,147,30,0.18)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}
-          >
-            <Camera size={30} strokeWidth={1.8} color={AMBER} />
-          </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>
-            {t('courses:media.emptyTitle')}
-          </div>
-          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 270, margin: '0 auto 24px' }}>
-            <Trans
-              i18nKey="courses:media.emptyBody"
-              values={{ courseName: courseName || t('courses:media.emptyCourseFallback') }}
-              components={[<span key="c" />]}
-            />
-          </p>
-          <PrimaryAmberCTA
-            onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
-            leadingIcon={<Camera size={15} strokeWidth={2} />}
-          >
-            {t('courses:media.shareExperience')}
-          </PrimaryAmberCTA>
-        </div>
-
-        <div style={{ height: '0.5px', background: HAIRLINE_INK_7, margin: '0 16px 16px' }} />
-
-        <EmptyStateGuide
-          kicker={t('courses:media.guide.kicker')}
-          items={[
-            { icon: Flag, label: t('courses:media.guide.signatureHoles'), sub: t('courses:media.guide.signatureHolesSub') },
-            { icon: Film, label: t('courses:media.guide.shots'), sub: t('courses:media.guide.shotsSub') },
-            { icon: Sunrise, label: t('courses:media.guide.views'), sub: t('courses:media.guide.viewsSub') },
-            { icon: Building2, label: t('courses:media.guide.clubhouse'), sub: t('courses:media.guide.clubhouseSub') },
+      <div style={{ padding: '20px 16px' }}>
+        <EmptyState
+          title={t('courses:media.emptyTitle')}
+          body={t('courses:media.emptyBody', {
+            courseName: courseName || t('courses:media.emptyCourseFallback'),
+          })}
+          primary={{
+            label: t('courses:media.shareExperience'),
+            onClick: () => courseId && navigate(`/courses/${courseId}/rate`),
+          }}
+          guidanceHeading={t('courses:media.guide.kicker')}
+          guidance={[
+            { title: t('courses:media.guide.signatureHoles'), body: t('courses:media.guide.signatureHolesSub') },
+            { title: t('courses:media.guide.shots'), body: t('courses:media.guide.shotsSub') },
+            { title: t('courses:media.guide.views'), body: t('courses:media.guide.viewsSub') },
+            { title: t('courses:media.guide.clubhouse'), body: t('courses:media.guide.clubhouseSub') },
           ]}
         />
       </div>
