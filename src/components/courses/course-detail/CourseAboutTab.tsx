@@ -193,7 +193,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </div>
 
       {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '24px 16px 0' }}>
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         {(course.description || course.id) && (
           <Panel kicker={t('courseDetail.blocks.aboutThisPlace')}>
             <div
