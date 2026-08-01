@@ -82,8 +82,8 @@ export const HoleRow: React.FC<{
           {row.stroke_index ?? ''}
         </span>
         <span style={{ height: 5, borderRadius: 3, overflow: 'hidden', display: 'flex', background: A.TRACK }}>
-
           {segs.map((s) => (
+
             <i key={s.label} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
           ))}
         </span>
