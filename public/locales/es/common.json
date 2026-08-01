@@ -84,5 +84,16 @@
       "title": "Publicar mis rondas automáticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
+  },
+  "feed": {
+    "crownCategory": {
+      "lowest_gross_all_time": "Golpes brutos mas bajos",
+      "best_score_diff_all_time": "Mejor diferencial de score",
+      "best_stableford_all_time": "Mejor stableford",
+      "most_aces_all_time": "Mas hoyos en uno",
+      "most_albatrosses_all_time": "Mas albatros",
+      "most_eagles_all_time": "Mas eagles",
+      "most_birdies_all_time": "Mas birdies"
+    }
   }
 }

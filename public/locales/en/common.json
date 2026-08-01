@@ -186,6 +186,15 @@
       "hardestHoleMeta": "par {{par}}, plays to",
       "viewCourse": "View course",
       "footnote": "Computed from official WHS rounds posted by members."
+    },
+    "crownCategory": {
+      "lowest_gross_all_time": "Lowest gross",
+      "best_score_diff_all_time": "Best score differential",
+      "best_stableford_all_time": "Best stableford",
+      "most_aces_all_time": "Most holes in one",
+      "most_albatrosses_all_time": "Most albatrosses",
+      "most_eagles_all_time": "Most eagles",
+      "most_birdies_all_time": "Most birdies"
     }
   },
   "settings": {
