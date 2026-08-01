@@ -155,15 +155,18 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
       <CourseLocationPills course={course} />
-      <CourseCardPanel courseId={course.id} />
 
-      <div style={{ height: 12 }} />
+      {/* One owner for the seams between blocks: grid gap, so a block that
+          renders nothing (no tee card, no hole analytics) leaves no gap
+          behind it. Fixed spacers used to strand 36px under the pills. */}
+      <div style={{ display: 'grid', gap: 24 }}>
+        <CourseCardPanel courseId={course.id} />
 
-      {/* ══ BLOCK 2 + 3 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
-      <CourseAnalyticsPanels courseId={course.id} />
+        {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
+        <CourseAnalyticsPanels courseId={course.id} />
 
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '24px 16px 0' }}>
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         <CourseRecordBook
           courseId={course.id}
           courseName={course.name}
