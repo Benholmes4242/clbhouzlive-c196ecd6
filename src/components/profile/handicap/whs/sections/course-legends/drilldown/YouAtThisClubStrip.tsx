@@ -253,19 +253,15 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         </div>
         <div
           style={{
-            fontSize: 9.5,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: emphasize ? AMBER : MUTE,
+            ...KICKER,
             lineHeight: 1.2,
             maxWidth: '100%',
             textAlign: 'center',
-
           }}
         >
           {label}
         </div>
+
 
       </div>
     );
