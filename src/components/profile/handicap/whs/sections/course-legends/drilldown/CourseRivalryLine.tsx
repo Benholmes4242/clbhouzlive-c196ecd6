@@ -10,7 +10,6 @@ import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const MUTE = 'var(--hcp-t-60)';
-const AMBER = 'var(--hcp-amber)';
 const HAIRLINE = 'var(--hcp-line)';
 
 interface RivalRow {
