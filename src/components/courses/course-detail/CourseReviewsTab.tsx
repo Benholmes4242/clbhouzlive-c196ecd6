@@ -603,25 +603,24 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               }}
             >
               {/* Score block */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, flexShrink: 0, minWidth: 88 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0, minWidth: 88 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
                   <span
-                    className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-                    style={{ fontSize: 44, ...HERO_NUMBER_STYLE, ...(isExceptional ? {} : { color: tierColor }), lineHeight: 1 }}
+                    style={{ fontSize: 44, ...HERO_NUMBER_STYLE, color: bandColor(communityScore), lineHeight: 1 }}
                   >
                     {communityScore.toFixed(1)}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
                 </div>
                 <div
-                  className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-                  style={{ fontSize: 11, ...TIER_LABEL_STYLE, ...(isExceptional ? {} : { color: tierColor }) }}
+                  style={{ fontSize: 11, ...TIER_LABEL_STYLE, color: bandColor(communityScore), textAlign: 'center' }}
                 >
                   {getScoreTier(communityScore).label}
                 </div>
-                <div style={{ fontSize: 11, color: INK_FAINT }}>
+                <div style={{ fontSize: 11, color: INK_FAINT, textAlign: 'center' }}>
                   {t('review.ratingCount', { count: ratingCount })}
                 </div>
+
 
               </div>
 
