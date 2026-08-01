@@ -37,7 +37,7 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
+import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE } from '@/lib/ratingTier';
 import { bandColor } from '@/features/courses/_shared/scoreBands';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -585,8 +585,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 32, background: SLATE_50, minHeight: '100%' }}>
       {(() => {
-        const isExceptional = getScoreTier(communityScore).isExceptional;
-        const tierColor = ratingTextColor(communityScore);
         const maxTierCount = Math.max(...TIER_ROWS.map(t => reviewCountsByTier[t.key] ?? 0), 1);
         return (
           <div style={{ padding: '16px 16px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -603,25 +601,24 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               }}
             >
               {/* Score block */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, flexShrink: 0, minWidth: 88 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0, minWidth: 88 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
                   <span
-                    className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-                    style={{ fontSize: 44, ...HERO_NUMBER_STYLE, ...(isExceptional ? {} : { color: tierColor }), lineHeight: 1 }}
+                    style={{ fontSize: 44, ...HERO_NUMBER_STYLE, color: bandColor(communityScore), lineHeight: 1 }}
                   >
                     {communityScore.toFixed(1)}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
                 </div>
                 <div
-                  className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-                  style={{ fontSize: 11, ...TIER_LABEL_STYLE, ...(isExceptional ? {} : { color: tierColor }) }}
+                  style={{ fontSize: 11, ...TIER_LABEL_STYLE, color: bandColor(communityScore), textAlign: 'center' }}
                 >
                   {getScoreTier(communityScore).label}
                 </div>
-                <div style={{ fontSize: 11, color: INK_FAINT }}>
+                <div style={{ fontSize: 11, color: INK_FAINT, textAlign: 'center' }}>
                   {t('review.ratingCount', { count: ratingCount })}
                 </div>
+
 
               </div>
 
