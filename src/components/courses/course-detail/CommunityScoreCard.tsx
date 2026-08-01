@@ -112,11 +112,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const yourScore = userRating?.rating ?? null;
 
-  const headline: { label: string; value: string; tone: string }[] = [
+  const headline: { label: string; value: string; tone: string; tier?: string }[] = [
     {
       label: t('courseDetail.rating.overall'),
       value: formatScore(communityAverage),
       tone: bandColor(communityAverage),
+      tier: tierLabel,
     },
   ];
   if (yourScore != null) {
