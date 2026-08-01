@@ -262,6 +262,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <ClaimedCourseProfileLink business={claimStatus.business} />
         )}
       </div>
+      </div>
 
       <div style={{ height: 20 }} />
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
