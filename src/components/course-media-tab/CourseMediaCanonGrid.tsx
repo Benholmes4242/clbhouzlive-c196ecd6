@@ -204,7 +204,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
           title={t('courses:media.emptyTitle')}
           body={t('courses:media.emptyBody', {
             courseName: courseName || t('courses:media.emptyCourseFallback'),
-          })}
+          }).replace(/<\/?1>/g, '')}
           primary={{
             label: t('courses:media.shareExperience'),
             onClick: () => courseId && navigate(`/courses/${courseId}/rate`),
