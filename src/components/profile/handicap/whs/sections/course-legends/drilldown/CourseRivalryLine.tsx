@@ -108,16 +108,13 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         </span>
         <span
           style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: AMBER,
+            ...KICKER,
             whiteSpace: 'nowrap',
           }}
         >
           Your rival here
         </span>
+
         {data.last_event_desc ? (
           <span
             style={{

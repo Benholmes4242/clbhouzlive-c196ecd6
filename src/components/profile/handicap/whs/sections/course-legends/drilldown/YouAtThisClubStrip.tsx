@@ -132,18 +132,10 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
 
   const body = (
     <>
-      <div
-        style={{
-          fontSize: 9.5,
-          fontWeight: 700,
-          letterSpacing: '0.10em',
-          textTransform: 'uppercase',
-          color: MUTE,
-          marginBottom: 8,
-        }}
-      >
+      <div style={{ ...KICKER, marginBottom: 8 }}>
         You at this club
       </div>
+
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <Cell
           icon="👑"
