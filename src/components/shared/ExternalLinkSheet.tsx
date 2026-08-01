@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Globe, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface ExternalLinkSheetProps {
   isOpen: boolean;

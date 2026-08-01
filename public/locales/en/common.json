@@ -59,6 +59,10 @@
     "genericBody": "We couldn't load this content. Please try again.",
     "sectionLoadFailed": "Couldn't load {{section}}."
   },
+  "externalLink": {
+    "overline": "Leaving clbhouz",
+    "copied": "Copied"
+  },
   "smoke": "ok",
   "state": {
     "copied": "Copied",
