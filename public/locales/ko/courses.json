@@ -529,16 +529,6 @@
       "top100Suffix": "{{region}} Top 100",
       "exploreList": "Explore the full list"
     },
-    "top100Summary": {
-      "heading": "Your Top 100 Progress",
-      "ratedCoursesLine_one": "You've rated 1 Top 100 course across {{regionsText}}.",
-      "ratedCoursesLine_other": "You've rated {{count}} Top 100 courses across {{regionsText}}.",
-      "regionsCount_one": "1 region",
-      "regionsCount_other": "{{count}} regions",
-      "nextMilestone_one": "Next milestone: 1 more course to {{tierName}}",
-      "nextMilestone_other": "Next milestone: {{count}} more courses to {{tierName}}",
-      "percentComplete": "{{pct}}% complete"
-    },
     "suggestEdit": {
       "title": "Suggest an edit",
       "descriptionLabel": "Description",
@@ -616,15 +606,6 @@
     },
     "locationPills": {
       "separator": "›"
-    },
-    "top100Spotlight": {
-      "title": "Top 100 Spotlight",
-      "appearsIn_one": "Appears in 1 prestigious list",
-      "appearsIn_other": "Appears in {{count}} prestigious lists",
-      "tapToView": "Tap to view list",
-      "youvePlayed": "You've played {{played}}/{{total}}",
-      "journeyLabel": "Your Top 100 Journey",
-      "progressPlayed": "{{played}} of {{total}} played"
     },
     "a11y": {
       "openMediaTab": "Open Media tab",
