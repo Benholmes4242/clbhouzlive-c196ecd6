@@ -677,6 +677,7 @@ const StoryTiles: React.FC<{
   hardest, easiest, nemesis, holes, myByHole, viewerHasPlayed,
   birdiedCount, totalHoles, missingBirdieHole, scope = 'all',
 }) => {
+  const { t } = useTranslation(['courses']);
   const communityTiles: React.ReactNode[] = [];
   if (hardest) {
     const overPct = Math.round(pctSum(hardest, ['bogey', 'double']));
