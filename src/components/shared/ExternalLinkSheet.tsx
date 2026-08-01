@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Globe, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface ExternalLinkSheetProps {
   isOpen: boolean;
@@ -27,6 +29,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
   url,
   title = DEFAULT_TITLE,
 }) => {
+  const { t } = useTranslation(['common']);
   const [copied, setCopied] = useState(false);
 
   const domain = extractDomain(url);
@@ -62,120 +65,86 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
 
         <div className="px-6">
           {/* Overline */}
+          <div className="text-center" style={{ ...KICKER, display: 'block' }}>
+            {t('common:externalLink.overline')}
+          </div>
+
+          {/* Domain */}
           <div
-            className="text-center uppercase"
+            className="w-full truncate text-center"
             style={{
-              fontSize: '10.5px',
-              fontWeight: 600,
-              letterSpacing: '0.06em',
+              marginTop: 12,
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              color: '#0F172A',
+            }}
+            title={domain}
+          >
+            {domain}
+          </div>
+
+          {/* Context line */}
+          <div
+            className="w-full truncate text-center"
+            style={{
+              marginTop: 3,
+              fontSize: 11.5,
+              fontWeight: 500,
               color: 'rgba(15,23,42,0.45)',
             }}
           >
-            LEAVING CLBHOUZ
+            {contextLine}
           </div>
 
-          {/* Plaque */}
-          <div
-            className="flex flex-col items-center text-center"
-            style={{
-              marginTop: 12,
-              background: '#ffffff',
-              border: '0.5px solid rgba(15,23,42,0.08)',
-              borderRadius: 16,
-              boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-              padding: '18px 16px',
-            }}
-          >
-            {/* Globe squircle */}
-            <div
-              className="flex items-center justify-center"
+          {/* Split actions */}
+          <div className="w-full flex" style={{ gap: 9, marginTop: 18 }}>
+            <button
+              type="button"
+              onClick={handleCopyLink}
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: 'rgba(247,147,30,0.1)',
-                border: '1px solid rgba(247,147,30,0.25)',
-              }}
-            >
-              <Globe style={{ width: 22, height: 22, color: '#F7931E' }} />
-            </div>
-
-            {/* Domain */}
-            <div
-              className="w-full truncate"
-              style={{
-                marginTop: 10,
-                fontSize: 16,
+                flex: 1,
+                background: '#ffffff',
+                border: '1px solid #EDF0F3',
+                color: copied ? '#16a34a' : '#0F172A',
+                fontSize: 13.5,
                 fontWeight: 700,
-                letterSpacing: '-0.01em',
-                color: '#0F172A',
+                borderRadius: 14,
+                padding: '13px 0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
               }}
-              title={domain}
             >
-              {domain}
-            </div>
-
-            {/* Context line */}
-            <div
-              className="w-full truncate"
+              {copied ? (
+                <>
+                  <Check style={{ width: 14, height: 14 }} />
+                  {t('common:externalLink.copied')}
+                </>
+              ) : (
+                'Copy link'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleOpenWebsite}
               style={{
-                marginTop: 3,
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: 'rgba(15,23,42,0.45)',
+                flex: 2,
+                background: A.INK,
+                border: 'none',
+                color: '#ffffff',
+                fontSize: 13.5,
+                fontWeight: 700,
+                borderRadius: 14,
+                padding: '13px 0',
               }}
             >
-              {contextLine}
-            </div>
-
-            {/* Split actions */}
-            <div className="w-full flex" style={{ gap: 9, marginTop: 14 }}>
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                style={{
-                  flex: 1,
-                  background: '#ffffff',
-                  border: '0.5px solid rgba(15,23,42,0.08)',
-                  color: copied ? '#16a34a' : '#0F172A',
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  borderRadius: 14,
-                  padding: '13px 0',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                }}
-              >
-                {copied ? (
-                  <>
-                    <Check style={{ width: 14, height: 14 }} />
-                    Copied
-                  </>
-                ) : (
-                  'Copy link'
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenWebsite}
-                style={{
-                  flex: 2,
-                  background: '#F7931E',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  borderRadius: 14,
-                  padding: '13px 0',
-                }}
-              >
-                Visit website
-              </button>
-            </div>
+              Visit website
+            </button>
           </div>
         </div>
+
       </SheetContent>
     </Sheet>
   );
