@@ -206,11 +206,6 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
   const inPar = back9.reduce((s, h) => s + (h.par || 0), 0);
   const totalYards = active.total_yards ?? outYards + inYards;
 
-  const roundsCopy =
-    active.rounds_sampled === 1
-      ? t('courses:teeCard.reconstructedOne')
-      : t('courses:teeCard.reconstructedMany', { count: active.rounds_sampled });
-
   const subhead = t('courses:teeCard.subhead', {
     tee: active.tee_label,
     yards: fmtInt(totalYards),
@@ -587,21 +582,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
               label={t('courses:teeCard.total') as string}
               par={active.par_total}
               yards={totalYards}
-              strong
             />
           </div>
-          </div>
-
-          {/* Honesty caption */}
-          <div
-            style={{
-              fontSize: 12,
-              color: INK_MUTE,
-              marginTop: 10,
-              marginBottom: 4,
-            }}
-          >
-            {roundsCopy}
           </div>
         </div>
       </div>
@@ -824,17 +806,17 @@ const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: numb
 );
 
 
-const SubtotalRow: React.FC<{ label: string; par: number; yards: number; strong?: boolean }> = ({ label, par, yards, strong }) => (
+const SubtotalRow: React.FC<{ label: string; par: number; yards: number }> = ({ label, par, yards }) => (
   <div
     role="row"
     style={{
       display: 'grid',
       gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
-      background: strong ? '#F1F5F9' : '#F8FAFC',
+      background: '#F8FAFC',
       borderTop: `1px solid ${HAIRLINE_INK_8}`,
       fontSize: 13,
-      fontWeight: strong ? 800 : 700,
+      fontWeight: 700,
       color: INK,
       ...NUM,
     }}
