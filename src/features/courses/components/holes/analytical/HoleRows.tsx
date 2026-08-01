@@ -24,13 +24,15 @@ export const HoleColumnHeader: React.FC = () => {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: HOLE_GRID, gap: 10, paddingBottom: 8 }}>
       <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colHole')}</span>
-      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colParSi')}</span>
+      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colPar')}</span>
+      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colSi')}</span>
       <span style={LABEL}>{t('courses:courseDetail.holes.colDist')}</span>
       <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colField')}</span>
       <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colYou')}</span>
     </div>
   );
 };
+
 
 export const HoleRow: React.FC<{
   row: CourseHole;
