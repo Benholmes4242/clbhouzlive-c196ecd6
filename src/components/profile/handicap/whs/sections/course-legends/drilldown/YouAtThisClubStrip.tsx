@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const MUTE = 'var(--hcp-t-60)';
-const AMBER = 'var(--hcp-amber)';
 const HAIRLINE = 'var(--hcp-line)';
 
 interface UnderThreatRow {
@@ -132,18 +132,10 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
 
   const body = (
     <>
-      <div
-        style={{
-          fontSize: 9.5,
-          fontWeight: 700,
-          letterSpacing: '0.10em',
-          textTransform: 'uppercase',
-          color: MUTE,
-          marginBottom: 8,
-        }}
-      >
+      <div style={{ ...KICKER, marginBottom: 8 }}>
         You at this club
       </div>
+
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <Cell
           icon="👑"
@@ -260,19 +252,15 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         </div>
         <div
           style={{
-            fontSize: 9.5,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: emphasize ? AMBER : MUTE,
+            ...KICKER,
             lineHeight: 1.2,
             maxWidth: '100%',
             textAlign: 'center',
-
           }}
         >
           {label}
         </div>
+
 
       </div>
     );

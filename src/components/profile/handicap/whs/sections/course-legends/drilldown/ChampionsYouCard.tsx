@@ -1,9 +1,9 @@
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
 
 import type { LegendWindow } from '@/lib/gam/types';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 
 import { YouAtThisClubStrip } from './YouAtThisClubStrip';
 import { CrownCabinet, type CabinetSlot } from './CrownCabinet';
@@ -84,20 +84,15 @@ export const ChampionsYouCard: React.FC<Props> = ({
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <SectionHeader role="section" kicker="YOUR CROWN CABINET" />
+                  <span style={KICKER}>Your crown cabinet</span>
                 </div>
                 <span
                   style={{
+                    ...KICKER,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 5,
-                    fontSize: 11,
-                    fontWeight: 800,
-                    color: 'var(--hcp-gold-text)',
-                    background: 'rgba(251,188,46,0.16)',
-                    borderRadius: 999,
-                    padding: '4px 10px',
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                     whiteSpace: 'nowrap',
                     lineHeight: 1,
                   }}
@@ -105,6 +100,7 @@ export const ChampionsYouCard: React.FC<Props> = ({
                   <Crown size={11} strokeWidth={2.6} />
                   {heldCount} / {slots.length}
                 </span>
+
               </div>
               <CrownCabinet
                 slots={slots}

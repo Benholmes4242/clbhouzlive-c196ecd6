@@ -5,11 +5,11 @@ import { Swords, ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const MUTE = 'var(--hcp-t-60)';
-const AMBER = 'var(--hcp-amber)';
 const HAIRLINE = 'var(--hcp-line)';
 
 interface RivalRow {
@@ -83,7 +83,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         cursor: 'pointer',
       }}
     >
-      <Swords size={12} strokeWidth={2.4} color={AMBER} style={{ flexShrink: 0 }} />
+      <Swords size={12} strokeWidth={2.4} color={A.AMBER_DEEP} style={{ flexShrink: 0 }} />
       <SquircleAvatar
         size={26}
         srcCandidates={data.rival_avatar ? [data.rival_avatar] : []}
@@ -108,16 +108,13 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         </span>
         <span
           style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: AMBER,
+            ...KICKER,
             whiteSpace: 'nowrap',
           }}
         >
           Your rival here
         </span>
+
         {data.last_event_desc ? (
           <span
             style={{

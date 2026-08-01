@@ -1,8 +1,8 @@
+import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { WindowToggleVariant } from '../CourseLegendsSection';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
 
@@ -157,20 +157,15 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 6 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <SectionHeader role="section" kicker="YOUR CROWN CABINET" />
+          <span style={KICKER}>Your crown cabinet</span>
         </div>
         <span
           style={{
+            ...KICKER,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
-            fontSize: 11,
-            fontWeight: 800,
-            color: 'var(--hcp-gold-text)',
-            background: 'rgba(251,188,46,0.16)',
-            borderRadius: 999,
-            padding: '4px 10px',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             whiteSpace: 'nowrap',
             lineHeight: 1,
           }}
@@ -178,6 +173,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           <Crown size={11} strokeWidth={2.6} />
           {heldCount} / {slots.length}
         </span>
+
       </div>
       <div
         className="no-scrollbar"
