@@ -1,46 +1,21 @@
-import { GAM } from '../../../gam/tokens';
 import React from 'react';
-import { Crown } from 'lucide-react';
-import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
+import { EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = 'var(--hcp-t-100)';
-const SLATE = 'var(--hcp-t-60)';
+/**
+ * Champions empty states (BRIEF_COURSE_DETAIL_EMPTY_STATES).
+ *
+ * No amber circle, no crown glyph, no icon tile. A crown is claimed by posting
+ * a round, not by tapping here, so the true empty carries no button.
+ */
 
-/** No legends in ANY window — the true empty. */
+/** No legends in ANY window - the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
-  <div style={{ padding: '40px 24px 32px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
-    <EmptyStateTile tint="amber">
-      <Crown size={30} color={GAM.AMBER} strokeWidth={1.8} />
-    </EmptyStateTile>
-    <div
-      style={{
-        fontSize: 10.5,
-        fontWeight: 800,
-        color: 'var(--hcp-t-100)',
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
-        marginBottom: 8,
-      }}
-    >
-      Champions
-    </div>
-    <div
-      style={{
-        fontSize: 20,
-        fontWeight: 800,
-        color: INK,
-        letterSpacing: '-0.02em',
-        marginBottom: 8,
-        lineHeight: 1.15,
-      }}
-    >
-      Claim the first crown
-    </div>
-    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 300, margin: '0 auto' }}>
-      No one's posted a round at{' '}
-      <strong style={{ color: INK, fontWeight: 700 }}>{courseName ?? 'this course'}</strong> yet.
-      Post your first and you'll top every leaderboard — gross, birdies, stableford — until someone beats you.
-    </div>
+  <div style={{ padding: '20px 16px' }}>
+    <EmptyState
+      kicker="Champions"
+      title="Claim the first crown"
+      body={`No one's posted a round at ${courseName ?? 'this course'} yet. Post your first and you'll top every leaderboard - gross, birdies, stableford - until someone beats you.`}
+    />
   </div>
 );
 
@@ -49,47 +24,19 @@ export const ChampionsWindowEmptyState: React.FC<{
   window: '90d' | 'all_time';
   onSwitch: () => void;
 }> = ({ window, onSwitch }) => (
-  <div style={{ padding: '40px 24px 32px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
-    <EmptyStateTile tint="slate">
-      <Crown size={30} color="var(--hcp-t-60)" strokeWidth={1.8} />
-    </EmptyStateTile>
-    <div
-      style={{
-        fontSize: 18,
-        fontWeight: 800,
-        color: INK,
-        letterSpacing: '-0.02em',
-        marginBottom: 8,
-        lineHeight: 1.2,
+  <div style={{ padding: '20px 16px' }}>
+    <EmptyState
+      kicker="Champions"
+      title={window === '90d' ? 'No crowns in the last 90 days' : 'No all-time crowns yet'}
+      body={
+        window === '90d'
+          ? 'No rounds posted here recently - but the all-time leaderboards are stacked.'
+          : 'Nothing in this window yet.'
+      }
+      action={{
+        label: window === '90d' ? 'View all-time' : 'View last 90 days',
+        onClick: onSwitch,
       }}
-    >
-      {window === '90d' ? 'No crowns in the last 90 days' : 'No all-time crowns yet'}
-    </div>
-    <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 290, margin: '0 auto 16px' }}>
-      {window === '90d'
-        ? 'No rounds posted here recently — but the all-time leaderboards are stacked.'
-        : 'Nothing in this window yet.'}
-    </div>
-    <button
-      onClick={onSwitch}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        background: 'var(--hcp-t-100)',
-        color: 'var(--hcp-bg-1)',
-        border: 'none',
-        borderRadius: 999,
-        padding: '9px 18px',
-        fontSize: 12.5,
-        fontWeight: 800,
-        letterSpacing: '0.02em',
-        cursor: 'pointer',
-        fontFamily: GAM.FONT_GEIST,
-      }}
-    >
-      {window === '90d' ? 'View all-time' : 'View last 90 days'}{' '}
-      <span style={{ fontSize: 14 }}>→</span>
-    </button>
+    />
   </div>
 );

@@ -82,19 +82,6 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
           fontFamily: FONT,
         }}
       >
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
-            background: 'rgba(247,147,30,0.10)',
-            display: 'grid',
-            placeItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <Icon size={16} color={AMBER} strokeWidth={2.25} />
-        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
             {benefit}
@@ -120,7 +107,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
   }
 
 
-  // Holes + Champions: amber card
+  // Holes + Champions: plain card
   return (
     <div style={{ padding: '12px 16px 4px' }}>
       <div
@@ -133,19 +120,6 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              background: 'rgba(247,147,30,0.10)',
-              display: 'grid',
-              placeItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Icon size={18} color={AMBER} strokeWidth={2.25} />
-          </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
               {benefit}

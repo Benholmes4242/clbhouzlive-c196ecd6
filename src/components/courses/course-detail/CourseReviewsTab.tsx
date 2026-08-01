@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -21,10 +22,8 @@ import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/Rev
 import type { RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
+import { Search, X, Pencil, ArrowUpDown, ListChecks } from 'lucide-react';
 
-import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
-import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { Button } from '@/components/ui/button';
 import type { ScoreTier } from '@/utils/getScoreTier';
@@ -541,31 +540,18 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   if (!hasRatings) {
     return (
       <div style={{ paddingBottom: 32 }}>
-        {/* Hero */}
-        <div style={{ padding: '40px 24px 0', textAlign: 'center' }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(247,147,30,0.07)', border: '1.5px solid rgba(247,147,30,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-            <MessageSquarePlus size={26} strokeWidth={2} color={AMBER} />
-          </div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: INK, letterSpacing: '-0.03em', marginBottom: 6 }}>{t('review.empty.title')}</div>
-          <p style={{ fontSize: 13, color: INK_FAINT, lineHeight: 1.6, maxWidth: 260, margin: '0 auto 24px' }}>
-            {t('review.empty.body', { courseName })}
-          </p>
-          <PrimaryAmberCTA onClick={handleRateClick}>
-            {t('review.empty.cta')}
-          </PrimaryAmberCTA>
-        </div>
-        <div style={{ margin: '16px' }}><Divider /></div>
-        {/* What to include guide */}
-        <div style={{ padding: 0 }}>
-          <EmptyStateGuide
-            kicker={t('review.empty.kicker')}
-            items={[
-              { icon: Flag,      label: t('review.emptyGuide.condition.title'),  sub: t('review.emptyGuide.condition.sub') },
-              { icon: Map,       label: t('review.emptyGuide.layout.title'),     sub: t('review.emptyGuide.layout.sub') },
-              { icon: Building2, label: t('review.emptyGuide.facilities.title'), sub: t('review.emptyGuide.facilities.sub') },
-              { icon: Tag,       label: t('review.emptyGuide.value.title'),      sub: t('review.emptyGuide.value.sub') },
+        <div style={{ padding: '20px 16px' }}>
+          <EmptyState
+            title={t('review.empty.title')}
+            body={t('review.empty.body', { courseName })}
+            primary={{ label: t('review.empty.cta'), onClick: handleRateClick }}
+            guidanceHeading={t('review.empty.kicker')}
+            guidance={[
+              { title: t('review.emptyGuide.condition.title'), body: t('review.emptyGuide.condition.sub') },
+              { title: t('review.emptyGuide.layout.title'), body: t('review.emptyGuide.layout.sub') },
+              { title: t('review.emptyGuide.facilities.title'), body: t('review.emptyGuide.facilities.sub') },
+              { title: t('review.emptyGuide.value.title'), body: t('review.emptyGuide.value.sub') },
             ]}
-
           />
         </div>
         <ScrollToTopGlass />
@@ -794,7 +780,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: '#FFFFFF', border: `1px solid ${A.BORDER}`, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
           >
             {t('review.writePromptInline')}
           </button>

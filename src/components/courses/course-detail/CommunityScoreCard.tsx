@@ -16,7 +16,7 @@ import { RatingTierDistributionData } from '@/components/courses/review/RatingTi
 import { getRatingTier, TIER_LABEL_STYLE } from '@/lib/ratingTier';
 import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
-import { A, Action, LABEL, NUM, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { A, Action, LABEL, NUM, Panel, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 
 // Representative score per distribution tier — drives the flat bar colour
 const TIER_REP_SCORE: Record<string, number> = {
@@ -67,23 +67,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   // Empty state — invitation panel with 0–10 numeric language
   if (totalRatings === 0) {
     return (
-      <Panel kicker={t('courseDetail.rating.kicker')} style={{ textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 2, marginBottom: 12 }}>
-          <span style={{ ...NUM, fontSize: 44, color: A.DIM, lineHeight: 1 }}>
-            {t('courseDetail.communityScore.dashPlaceholder')}
-          </span>
-          <span style={{ ...NUM, fontSize: 16, color: A.DIM }}>/10</span>
-        </div>
-        <div style={{ fontSize: 14, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em', marginBottom: 5 }}>
-          {t('courseDetail.communityScore.beFirst')}
-        </div>
-        <p style={{ fontSize: 12.5, color: A.MUTE, lineHeight: 1.5, maxWidth: 260, margin: '0 auto' }}>
-          {t('courseDetail.communityScore.noOneRated', {
-            courseName: courseName || t('courseDetail.communityScore.thisCourse'),
-          })}
-        </p>
-        <Action label={t('courseDetail.communityScore.rateThis')} onClick={onRateClick} style={{ width: '100%', marginTop: 10 }} />
-      </Panel>
+      <EmptyState
+        kicker={t('courseDetail.rating.kicker')}
+        title={t('courseDetail.communityScore.beFirst')}
+        body={t('courseDetail.communityScore.noOneRated', {
+          courseName: courseName || t('courseDetail.communityScore.thisCourse'),
+        })}
+        action={{ label: t('courseDetail.communityScore.rateThis'), onClick: onRateClick }}
+      />
     );
   }
 
