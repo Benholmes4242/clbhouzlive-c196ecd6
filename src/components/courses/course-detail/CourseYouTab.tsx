@@ -11,7 +11,6 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
@@ -22,9 +21,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
-import {
-  AMBER, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_7, INK_TINT_04, INK_TINT_06,
-} from '@/features/courses/_shared/tokens';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
+import { A, EmptyState, FIGS, LABEL, Panel } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   courseId: string;
@@ -37,110 +35,33 @@ const ordinal = (n: number) => {
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
 
-const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color = AMBER }) => (
-  <div
-    style={{
-      fontSize: 10,
-      fontWeight: 800,
-      letterSpacing: '0.11em',
-      textTransform: 'uppercase',
-      color,
-      marginBottom: 6,
-    }}
-  >
-    {children}
-  </div>
-);
-
 const Notice: React.FC<{ title: string; body: string; cta?: { label: string; onClick: () => void } }> = ({
   title, body, cta,
 }) => (
-  <div
-    style={{
-      margin: '0 16px',
-      background: '#FFFFFF',
-      border: `1px solid ${HAIRLINE_INK_7}`,
-      borderRadius: 16,
-      padding: 16,
-    }}
-  >
-    <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>{title}</div>
-    <p style={{ margin: '6px 0 0', fontSize: 13, color: INK_MUTE, lineHeight: 1.55 }}>{body}</p>
-    {cta && (
-      <button
-        type="button"
-        onClick={cta.onClick}
-        style={{
-          marginTop: 12,
-          width: '100%',
-          minHeight: 44,
-          padding: '11px 0',
-          borderRadius: 14,
-          background: 'rgba(247,147,30,0.06)',
-          border: '1.5px solid rgba(247,147,30,0.2)',
-          fontSize: 13,
-          fontWeight: 700,
-          color: AMBER,
-          cursor: 'pointer',
-        }}
-      >
-        {cta.label}
-      </button>
-    )}
+  <div style={{ padding: '0 16px' }}>
+    <EmptyState title={title} body={body} primary={cta ? { label: cta.label, onClick: cta.onClick } : undefined} />
   </div>
 );
 
-/** Warm-wash hook card shared by states B and C. */
+/** Course-specific hook shared by states B and C - plain panel, INK primary. */
 const HookCard: React.FC<{
   headline: string;
   body: string;
   cta?: { label: string; onClick: () => void };
   footnote?: string;
 }> = ({ headline, body, cta, footnote }) => (
-  <div
-    style={{
-      margin: '0 16px',
-      background: 'rgba(247,147,30,0.06)',
-      border: '1px solid rgba(247,147,30,0.22)',
-      borderRadius: 16,
-      padding: 16,
-    }}
-  >
-    <Eyebrow>Your game here</Eyebrow>
-    <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: INK, lineHeight: 1.2 }}>
-      {headline}
-    </div>
-    <p style={{ margin: '6px 0 0', fontSize: 13.5, color: INK_MUTE, lineHeight: 1.5 }}>{body}</p>
-    {cta && (
-      <button
-        type="button"
-        onClick={cta.onClick}
-        style={{
-          marginTop: 14,
-          width: '100%',
-          minHeight: 44,
-          padding: '13px 0',
-          background: AMBER,
-          color: '#FFFFFF',
-          border: 'none',
-          borderRadius: 13,
-          fontSize: 14,
-          fontWeight: 800,
-          cursor: 'pointer',
-        }}
-      >
-        {cta.label}
-      </button>
-    )}
-    {footnote && (
-      <div style={{ marginTop: 10, fontSize: 12, fontWeight: 600, color: INK_FAINT, textAlign: 'center' }}>
-        {footnote}
-      </div>
-    )}
+  <div style={{ padding: '0 16px' }}>
+    <EmptyState
+      kicker="Your game here"
+      title={headline}
+      body={body}
+      primary={cta ? { label: cta.label, onClick: cta.onClick } : undefined}
+      footnote={footnote}
+    />
   </div>
 );
 
-/** State C block 2 - no invented figures, dashes and ranges only. */
+/** State C block 2 - no invented figures, ranges only. */
 const UnlockList: React.FC<{ unclaimedCount: number }> = ({ unclaimedCount }) => {
   const rows: { label: string; hint: string }[] = [
     { label: 'Your average score here', hint: '+ -' },
@@ -153,36 +74,23 @@ const UnlockList: React.FC<{ unclaimedCount: number }> = ({ unclaimedCount }) =>
   }
 
   return (
-    <div
-      style={{
-        margin: '0 16px',
-        background: '#FFFFFF',
-        border: `1px solid ${HAIRLINE_INK_7}`,
-        borderRadius: 16,
-        padding: 16,
-      }}
-    >
-      <Eyebrow color={INK_FAINT}>What you'd unlock</Eyebrow>
-      <div style={{ fontSize: 15, fontWeight: 800, color: INK, letterSpacing: '-0.01em', marginBottom: 12 }}>
-        Your side of this course
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {rows.map((r) => (
-          <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div
-              aria-hidden="true"
-              style={{ width: 32, height: 32, borderRadius: 10, background: INK_TINT_06, flexShrink: 0 }}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>{r.label}</div>
-              <div style={{ marginTop: 5, height: 4, borderRadius: 999, background: INK_TINT_04 }}>
-                <div style={{ width: '45%', height: '100%', borderRadius: 999, background: 'rgba(15,23,42,0.12)' }} />
+    <div style={{ padding: '0 16px' }}>
+      <Panel>
+        <div style={{ ...LABEL, marginBottom: 12 }}>What you'd unlock</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em', marginBottom: 14 }}>
+          Your side of this course
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {rows.map((r) => (
+            <div key={r.label} style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK }}>{r.label}</div>
+              <div style={{ ...FIGS, fontSize: 12.5, fontWeight: 700, color: A.DIM, whiteSpace: 'nowrap' }}>
+                {r.hint}
               </div>
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: INK_FAINT, whiteSpace: 'nowrap' }}>{r.hint}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Panel>
     </div>
   );
 };
@@ -193,35 +101,26 @@ const UpForGrabs: React.FC<{
   holderName: string | null;
   unclaimedCount: number;
 }> = ({ recordLabel, holderName, unclaimedCount }) => (
-  <div
-    style={{
-      margin: '0 16px',
-      background: '#FFFFFF',
-      border: `1px solid ${HAIRLINE_INK_7}`,
-      borderRadius: 16,
-      padding: 16,
-    }}
-  >
-    <Eyebrow color={INK_FAINT}>Up for grabs</Eyebrow>
-    {recordLabel ? (
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <Crown size={16} color={AMBER} strokeWidth={2.4} style={{ marginTop: 2, flexShrink: 0 }} />
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: INK }}>
+  <div style={{ padding: '0 16px' }}>
+    <Panel>
+      <div style={{ ...LABEL, marginBottom: 10 }}>Up for grabs</div>
+      {recordLabel ? (
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: A.INK }}>
             {`Course record: ${recordLabel}${holderName ? ` by ${holderName}` : ''}`}
           </div>
           {unclaimedCount > 0 && (
-            <div style={{ marginTop: 4, fontSize: 13, color: INK_MUTE, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 4, fontSize: 13, color: A.MUTE, lineHeight: 1.5 }}>
               {`${unclaimedCount} more crowns here have never been claimed`}
             </div>
           )}
         </div>
-      </div>
-    ) : (
-      <div style={{ fontSize: 14, fontWeight: 700, color: INK, lineHeight: 1.5 }}>
-        No course record yet - it is there for the taking.
-      </div>
-    )}
+      ) : (
+        <div style={{ fontSize: 14, fontWeight: 700, color: A.INK, lineHeight: 1.5 }}>
+          No course record yet - it is there for the taking.
+        </div>
+      )}
+    </Panel>
   </div>
 );
 
