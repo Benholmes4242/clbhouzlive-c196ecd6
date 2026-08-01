@@ -12,8 +12,8 @@ import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { DIST_SEG_COLORS } from '../HoleDataSheet';
 import { A, LABEL, NUM, SANS, StatRow, toParParts } from './tokens';
 
-export const HOLE_GRID = '26px 62px 1fr 52px 48px';
-const THIN_DOT = '\u2009\u00B7\u2009';
+export const HOLE_GRID = '26px 32px 32px 1fr 52px 48px';
+
 
 function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
