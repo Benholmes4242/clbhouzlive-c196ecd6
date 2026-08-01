@@ -47,8 +47,10 @@ import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
 import { PostRoundCard } from './PostRoundCard';
+import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
@@ -557,9 +559,21 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           notability={post.roundNotability ?? null}
           courseName={post.courseName ?? null}
           courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
-          
+          crown={
+            postRound.crown
+              ? {
+                  category: crownCategoryLabel(postRound.crown.category),
+                  previousHolderName: postRound.crown.previousHolderName,
+                  margin:
+                    postRound.crown.margin != null
+                      ? String(postRound.crown.margin)
+                      : null,
+                }
+              : null
+          }
           onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
         />
+
       )}
 
       {/* Media */}

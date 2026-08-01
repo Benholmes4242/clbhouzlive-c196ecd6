@@ -84,5 +84,16 @@
       "title": "Meine Runden automatisch posten",
       "subtitle": "Deine Runden erscheinen im Clubhouse, sobald du sie erfasst. Nur herausragende Runden erreichen Mitglieder, die dir nicht folgen."
     }
+  },
+  "feed": {
+    "crownCategory": {
+      "lowest_gross_all_time": "Niedrigstes Brutto",
+      "best_score_diff_all_time": "Beste Score-Differenz",
+      "best_stableford_all_time": "Bestes Stableford",
+      "most_aces_all_time": "Meiste Hole-in-One",
+      "most_albatrosses_all_time": "Meiste Albatrosse",
+      "most_eagles_all_time": "Meiste Eagles",
+      "most_birdies_all_time": "Meiste Birdies"
+    }
   }
 }

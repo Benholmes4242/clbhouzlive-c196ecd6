@@ -84,5 +84,16 @@
       "title": "ラウンドを自動的に投稿",
       "subtitle": "記録したラウンドはクラブハウスに表示されます。特筆すべきラウンドのみ、フォロワー以外にも届きます。"
     }
+  },
+  "feed": {
+    "crownCategory": {
+      "lowest_gross_all_time": "最少グロス",
+      "best_score_diff_all_time": "最高スコアディファレンシャル",
+      "best_stableford_all_time": "最高ステーブルフォード",
+      "most_aces_all_time": "ホールインワン最多",
+      "most_albatrosses_all_time": "アルバトロス最多",
+      "most_eagles_all_time": "イーグル最多",
+      "most_birdies_all_time": "バーディー最多"
+    }
   }
 }

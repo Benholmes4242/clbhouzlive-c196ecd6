@@ -45,6 +45,16 @@ export interface PostRound {
   longestBirdieRun: number | null;
   /** null when the round has no hole detail - render without the strip. */
   holeShape: PostRoundHole[] | null;
+  /**
+   * Present only when this round displaced a named previous holder
+   * (get_round_crowns). null for every other round, including a crown held by
+   * default because nobody else has played the course.
+   */
+  crown?: {
+    category: string;
+    previousHolderName: string;
+    margin: number | null;
+  } | null;
 }
 
 export type PostRoundMap = Map<string, PostRound>;
@@ -96,9 +106,9 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async (): Promise<PostRoundMap> => {
-      // Two reads for the whole page, run together: the round counters and
-      // the hole-by-hole shape for the same set of score ids.
-      const [statsRes, holesRes] = await Promise.all([
+      // Three reads for the whole page, run together: the round counters, the
+      // hole-by-hole shape, and the crowns taken, all for the same score ids.
+      const [statsRes, holesRes, crownsRes] = await Promise.all([
         supabase
           .from('gam_round_stats')
           .select(
@@ -110,10 +120,33 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
           .select('score_id, hole_no, par, actual_gross')
           .in('score_id', ids)
           .order('hole_no', { ascending: true }),
+        supabase.rpc('get_round_crowns', { p_score_ids: ids }),
       ]);
 
       if (statsRes.error) throw statsRes.error;
       if (holesRes.error) throw holesRes.error;
+      if (crownsRes.error) throw crownsRes.error;
+
+      // At most one row per score id; a round with no crown simply has no row.
+      const crowns = new Map<
+        string,
+        { category: string; previousHolderName: string; margin: number | null }
+      >();
+      for (const c of (crownsRes.data ?? []) as {
+        whs_score_id: string;
+        category: string | null;
+        previous_holder_name: string | null;
+        margin: number | null;
+      }[]) {
+        const name = (c.previous_holder_name ?? '').trim();
+        // The card requires a name: no name, no crown.
+        if (!name || !c.category) continue;
+        crowns.set(c.whs_score_id, {
+          category: c.category,
+          previousHolderName: name,
+          margin: c.margin ?? null,
+        });
+      }
 
       const shapes = new Map<string, PostRoundHole[]>();
       for (const h of (holesRes.data ?? []) as {
@@ -151,6 +184,7 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
             shape && shape.length > 0
               ? [...shape].sort((a, b) => a.holeNo - b.holeNo)
               : null,
+          crown: crowns.get(id) ?? null,
         });
       }
       return map;

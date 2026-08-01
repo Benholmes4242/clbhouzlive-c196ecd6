@@ -84,5 +84,16 @@
       "title": "라운드 자동 게시",
       "subtitle": "라운드를 기록하면 클럽하우스에 표시됩니다. 눈에 띄는 라운드만 팔로워가 아닌 회원에게도 노출됩니다."
     }
+  },
+  "feed": {
+    "crownCategory": {
+      "lowest_gross_all_time": "최저 그로스",
+      "best_score_diff_all_time": "최고 스코어 디퍼렌셜",
+      "best_stableford_all_time": "최고 스테이블포드",
+      "most_aces_all_time": "홀인원 최다",
+      "most_albatrosses_all_time": "알바트로스 최다",
+      "most_eagles_all_time": "이글 최다",
+      "most_birdies_all_time": "버디 최다"
+    }
   }
 }
