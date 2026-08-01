@@ -33,8 +33,8 @@ export const HoleColumnHeader: React.FC = () => {
   );
 };
 
-
 export const HoleRow: React.FC<{
+
   row: CourseHole;
   mine: MyHolePerformanceRow | null;
   open: boolean;
