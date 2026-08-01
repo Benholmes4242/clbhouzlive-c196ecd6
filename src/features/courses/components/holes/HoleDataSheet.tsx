@@ -677,6 +677,7 @@ const StoryTiles: React.FC<{
   hardest, easiest, nemesis, holes, myByHole, viewerHasPlayed,
   birdiedCount, totalHoles, missingBirdieHole, scope = 'all',
 }) => {
+  const { t } = useTranslation(['courses']);
   const communityTiles: React.ReactNode[] = [];
   if (hardest) {
     const overPct = Math.round(pctSum(hardest, ['bogey', 'double']));
@@ -737,12 +738,12 @@ const StoryTiles: React.FC<{
       hooks.push({
         key: 'battle',
         emoji: '🥊',
-        label: `Your battle · hole ${nemesis.hole_no}`,
+        label: t('courses:courseDetail.you.yourBattle', { n: nemesis.hole_no }),
         value: parts?.text ?? '',
         tone: parts?.tone,
         note: youBeats
-          ? 'Better than most here, still unbeaten'
-          : `The field plays it to ${fieldStr}. Time to settle it.`,
+          ? t('courses:holes.battle.youBeat')
+          : t('courses:holes.battle.fieldBeats', { field: fieldStr }),
       });
     }
 
@@ -808,8 +809,8 @@ const StoryTiles: React.FC<{
     const fieldStr = fieldRow ? fmtToPar(fieldRow.avg_to_par) : fmtToPar(0);
     const youBeats = fieldRow ? nemesis.avg_to_par <= fieldRow.avg_to_par + 0.005 : false;
     const sentence = youBeats
-      ? `You play it to ${youStr} — better than most, still unbeaten.`
-      : `You play it to ${youStr} against the field's ${fieldStr}. Time to settle it.`;
+      ? t('courses:holes.battle.tileYouBeat', { you: youStr })
+      : t('courses:holes.battle.tileFieldBeats', { you: youStr, field: fieldStr });
     tiles.push(
       <StoryTile
         key="battle"

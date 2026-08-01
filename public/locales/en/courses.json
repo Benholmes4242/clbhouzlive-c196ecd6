@@ -225,6 +225,12 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less"
+    },
+    "battle": {
+      "youBeat": "Better than most here, but still your worst hole",
+      "fieldBeats": "The field plays it to {{field}}. Time to settle it.",
+      "tileYouBeat": "You play it to {{you}}, better than most, but still your worst hole.",
+      "tileFieldBeats": "You play it to {{you}} against the field's {{field}}. Time to settle it."
     }
   },
   "scorecard": {
@@ -854,7 +860,6 @@
       "colPar": "Par",
       "colSi": "SI",
       "colDist": "Distribution",
-
       "colField": "Field",
       "colYou": "You",
       "sheetTitle": "How the field scores",
