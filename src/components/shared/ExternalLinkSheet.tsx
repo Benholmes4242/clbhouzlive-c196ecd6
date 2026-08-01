@@ -29,6 +29,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
   url,
   title = DEFAULT_TITLE,
 }) => {
+  const { t } = useTranslation(['common']);
   const [copied, setCopied] = useState(false);
 
   const domain = extractDomain(url);
