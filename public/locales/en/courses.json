@@ -25,7 +25,11 @@
       "viewsSub": "Sunsets, landscapes, the feeling of being there",
       "clubhouse": "Clubhouse & facilities",
       "clubhouseSub": "Help others know what to expect before they visit"
-    }
+    },
+    "countPhotos_one": "{{count}} photo",
+    "countPhotos_other": "{{formatted}} photos",
+    "countVideos_one": "{{count}} video",
+    "countVideos_other": "{{formatted}} videos"
   },
   "teeCard": {
     "eyebrow": "The course card",

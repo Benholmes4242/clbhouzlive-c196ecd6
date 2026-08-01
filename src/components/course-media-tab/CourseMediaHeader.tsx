@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -32,9 +32,54 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   const navigate = useNavigate();
 
   const hasMedia = mediaCounts.total > 0;
+  const hasBothTypes = mediaCounts.photos > 0 && mediaCounts.videos > 0;
+
+  useEffect(() => {
+    if (!hasBothTypes && activeFilter !== 'all') {
+      onFilterChange('all');
+    }
+  }, [hasBothTypes, activeFilter, onFilterChange]);
 
   const countFor = (key: CourseMediaFilter) =>
     key === 'all' ? mediaCounts.total : key === 'photos' ? mediaCounts.photos : mediaCounts.videos;
+
+  if (!hasMedia) return null;
+
+  const onlyPhotos = mediaCounts.photos > 0;
+  const rawCount = onlyPhotos ? mediaCounts.photos : mediaCounts.videos;
+  const formatted = rawCount.toLocaleString();
+
+  if (!hasBothTypes) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}>
+        <span
+          style={{
+            fontSize: 9, fontWeight: 800, letterSpacing: '0.13em',
+            textTransform: 'uppercase', color: A.DIM,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {t(onlyPhotos ? 'courses:media.countPhotos' : 'courses:media.countVideos', {
+            count: rawCount,
+            formatted,
+          })}
+        </span>
+
+        <button
+          onClick={() => navigate(`/courses/${courseId}/rate`)}
+          aria-label={t('courses:media.addMediaA11y')}
+          style={{
+            marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
+            background: A.INK, color: '#FFFFFF', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', flexShrink: 0,
+          }}
+        >
+          <Plus className="w-4 h-4" strokeWidth={2.4} />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -63,7 +108,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             }}
           >
             {t(i18nKey)}
-            {hasMedia && (
+            {(
               <span style={{
                 fontSize: 11, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
                 color: isActive ? 'rgba(255,255,255,0.6)' : A.DIM,
@@ -75,7 +120,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         );
       })}
 
-      {hasMedia && (
+      {(
         <button
           onClick={() => navigate(`/courses/${courseId}/rate`)}
           aria-label={t('courses:media.addMediaA11y')}
