@@ -14,7 +14,9 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
       <EmptyState
         kicker={t('courses:holes.empty.eyebrow')}
         title={t('courses:holes.empty.title')}
-        body={t('courses:holes.empty.body', { courseName: resolvedName })}
+        body={t('courses:holes.empty.body', { courseName: resolvedName })
+          // the string carries <1> emphasis tags for Trans; this panel is plain text
+          .replace(/<\/?1>/g, '')}
       />
     </div>
   );
