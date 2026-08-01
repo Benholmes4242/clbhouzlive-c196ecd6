@@ -575,7 +575,7 @@
       "basedOn_other": "Based on {{count}} ratings",
       "onlyYouSuffix": " · Only you",
       "categoryScores": "Category Scores",
-      "seeAllReviews": "See all reviews →"
+      "seeAllReviews": "See all reviews"
     },
     "handicapCue": {
       "bannerAction": "Connect →",
