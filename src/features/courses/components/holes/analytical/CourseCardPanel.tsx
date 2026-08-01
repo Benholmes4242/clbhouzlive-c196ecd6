@@ -17,7 +17,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
 import { CourseTeeCard, resolveDefaultTee } from '../CourseTeeCard';
-import { A, KICKER, Panel, StatRow } from './tokens';
+import { A, Action, KICKER, Panel, StatRow } from './tokens';
 
 interface Props {
   courseId: string | undefined;
