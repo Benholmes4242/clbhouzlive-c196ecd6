@@ -20,10 +20,9 @@ import CourseLocationPills from './CourseLocationPills';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
-import { CourseTop100Spotlight } from './CourseTop100Spotlight';
+import { CourseTop100RankRow } from './CourseTop100RankRow';
 import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
 import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 
@@ -191,7 +190,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
       <div style={{ display: 'grid', gap: 12, padding: '24px 16px 0' }}>
-        {course.description && (
+        {(course.description || course.id) && (
           <Panel kicker={t('courseDetail.blocks.aboutThisPlace')}>
             <div
               style={{
@@ -217,15 +216,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 align="left"
               />
             )}
+            {course.id && <CourseTop100RankRow courseId={course.id} />}
           </Panel>
-        )}
-
-        {/* Top 100 spotlight + summary */}
-        {course.id && (
-          <>
-            <CourseTop100Spotlight courseId={course.id} courseName={course.name} />
-            <CourseTop100Summary />
-          </>
         )}
 
         {/* Location */}

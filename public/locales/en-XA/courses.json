@@ -527,16 +527,6 @@
       "top100Suffix": "[~~{{region}} Ţőƥ 100~~]",
       "exploreList": "[~~Éẋƥļőřé ţĥé ƒúļļ ļíšţ~~]"
     },
-    "top100Summary": {
-      "heading": "[~~Ýőúř Ţőƥ 100 Ƥřőĝřéšš~~]",
-      "ratedCoursesLine_one": "[~~Ýőú'ṽé řáţéđ 1 Ţőƥ 100 ĉőúřšé áĉřőšš {{regionsText}}.~~]",
-      "ratedCoursesLine_other": "[~~Ýőú'ṽé řáţéđ {{count}} Ţőƥ 100 ĉőúřšéš áĉřőšš {{regionsText}}.~~]",
-      "regionsCount_one": "[~~1 řéĝíőñ~~]",
-      "regionsCount_other": "[~~{{count}} řéĝíőñš~~]",
-      "nextMilestone_one": "[~~Ñéẋţ ɱíļéšţőñé: 1 ɱőřé ĉőúřšé ţő {{tierName}}~~]",
-      "nextMilestone_other": "[~~Ñéẋţ ɱíļéšţőñé: {{count}} ɱőřé ĉőúřšéš ţő {{tierName}}~~]",
-      "percentComplete": "[~~{{pct}}% ĉőɱƥļéţé~~]"
-    },
     "suggestEdit": {
       "title": "[~~Šúĝĝéšţ áñ éđíţ~~]",
       "descriptionLabel": "[~~Đéšĉříƥţíőñ~~]",
@@ -614,15 +604,6 @@
     },
     "locationPills": {
       "separator": "[~~›~~]"
-    },
-    "top100Spotlight": {
-      "title": "[~~Ţőƥ 100 Šƥőţļíĝĥţ~~]",
-      "appearsIn_one": "[~~Áƥƥéářš íñ 1 ƥřéšţíĝíőúš ļíšţ~~]",
-      "appearsIn_other": "[~~Áƥƥéářš íñ {{count}} ƥřéšţíĝíőúš ļíšţš~~]",
-      "tapToView": "[~~Ţáƥ ţő ṽíéŵ ļíšţ~~]",
-      "youvePlayed": "[~~Ýőú'ṽé ƥļáýéđ {{played}}/{{total}}~~]",
-      "journeyLabel": "[~~Ýőúř Ţőƥ 100 Ĵőúřñéý~~]",
-      "progressPlayed": "[~~{{played}} őƒ {{total}} ƥļáýéđ~~]"
     },
     "a11y": {
       "openMediaTab": "[~~Őƥéñ Ṁéđíá ţáƀ~~]",
