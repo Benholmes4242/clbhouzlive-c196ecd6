@@ -83,8 +83,9 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           label={t('courses:courseDetail.card.seeFull')}
           onClick={openSheet}
           align="center"
-          style={{ marginTop: 8, minHeight: 32 }}
+          style={{ marginTop: 8, minHeight: 32, width: '100%' }}
         />
+
       </Panel>
 
       <BottomSheet
