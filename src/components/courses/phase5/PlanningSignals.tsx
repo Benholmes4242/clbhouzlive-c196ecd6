@@ -23,9 +23,12 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { t } = useTranslation('courses');
-  const { status, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
+  const { status, isLoading: statusLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) return null;
+
+  // Nothing renders from status until the query has settled.
+  if (statusLoading || !status) return null;
 
   // If already played, don't show planning signals
   if (status.status === 'played') return null;

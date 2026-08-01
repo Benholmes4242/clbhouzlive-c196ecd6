@@ -118,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   );
 
 
-  const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
+  const { data: ratingAggregates, isLoading: ratingAggregatesLoading } = useCourseRatingAggregates(course.id);
   const { data: distribution } = useCourseRatingDistribution(course.id);
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
@@ -178,6 +178,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           courseId={course.id}
           courseName={course.name}
           ratingAggregates={ratingAggregates}
+          isLoading={ratingAggregatesLoading}
           userRating={userRating}
           distribution={distribution}
           friendsAvg={friendsAvg}

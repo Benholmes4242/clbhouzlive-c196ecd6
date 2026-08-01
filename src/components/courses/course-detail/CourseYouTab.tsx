@@ -22,6 +22,7 @@ import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
+import { Skeleton } from '@/components/ui/skeleton';
 import { A, EmptyState, FIGS, LABEL, Panel } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
@@ -127,8 +128,9 @@ const UpForGrabs: React.FC<{
 export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data: connection } = useWhsConnection(user?.id);
-  const { status, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
+  const { data: connection, isLoading: connectionLoading } = useWhsConnection(user?.id);
+  const { status, isLoading: statusLoading, setWantToPlay, isUpdating } =
+    useCoursePersonalStatus(courseId);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
 
@@ -152,8 +154,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
     };
   }, [analysis]);
 
-  const hasPlayed = status.status === 'played';
-  const emptyState: 'not_connected' | 'not_played' | null = !user
+  const hasPlayed = status?.status === 'played';
+  const emptyState: 'not_connected' | 'not_played' | null = !user || statusLoading || !status
     ? null
     : !connection
       ? 'not_connected'
@@ -188,6 +190,18 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
           body={`Sign in to track your rounds, ratings and hole-by-hole scoring at ${courseName}.`}
           cta={{ label: 'Sign in', onClick: () => navigate('/auth') }}
         />
+      </div>,
+    );
+  }
+
+  // An empty state is a claim about the data. While either query is in flight we
+  // show a skeleton, never a statement that there is nothing here.
+  if (statusLoading || !status || connectionLoading) {
+    return wrap(
+      <div style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ padding: '0 16px' }}>
+          <Skeleton className="h-[128px] w-full rounded-[16px]" />
+        </div>
       </div>,
     );
   }
@@ -228,7 +242,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
           headline={`You haven't played ${courseName} yet`}
           body={body}
           cta={
-            status.status === 'want_to_play'
+            status?.status === 'want_to_play'
               ? undefined
               : { label: isUpdating ? 'Adding...' : 'Add to my list', onClick: () => setWantToPlay(true) }
           }

@@ -10,6 +10,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
@@ -35,6 +37,8 @@ interface CommunityScoreCardProps {
   distribution?: RatingTierDistributionData | null;
   /** Average of friends' overall ratings, when any friend has rated. */
   friendsAvg?: number | null;
+  /** True while the rating aggregates query is in flight. Blocks the empty state. */
+  isLoading?: boolean;
   onRateClick: () => void;
   onSeeAllReviews?: () => void;
 }
@@ -55,6 +59,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   userRating,
   distribution,
   friendsAvg = null,
+  isLoading = false,
   onRateClick,
   onSeeAllReviews,
 }) => {
@@ -64,7 +69,13 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const communityAverage = ratingAggregates?.avg_overall_score || 0;
   const tierLabel = getRatingTier(communityAverage);
 
-  // Empty state — invitation panel with 0–10 numeric language
+  // While the aggregates are in flight, totalRatings reads 0 and the empty state
+  // would state something untrue. Skeleton until the query settles.
+  if (isLoading) {
+    return <Skeleton className="h-[128px] w-full rounded-[16px]" />;
+  }
+
+  // Empty state — invitation panel with 0-10 numeric language
   if (totalRatings === 0) {
     return (
       <EmptyState
