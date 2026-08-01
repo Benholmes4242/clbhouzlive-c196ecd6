@@ -37,7 +37,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   if (!user) return null;
 
   const isLoading = ratingLoading || statusLoading;
-  const hasPlayed = status.status === 'played';
+  const hasPlayed = status?.status === 'played';
 
   if (isLoading) {
     return (

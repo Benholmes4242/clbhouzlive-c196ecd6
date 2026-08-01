@@ -36,8 +36,8 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
       }
     : fetchedData;
   const { status, isLoading: statusLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
-  const isPlayed = status.status === 'played';
-  const isWantToPlay = status.status === 'want_to_play';
+  const isPlayed = !statusLoading && status?.status === 'played';
+  const isWantToPlay = !statusLoading && status?.status === 'want_to_play';
 
   const mapUrl = courseData?.latitude && courseData?.longitude
     ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${courseData.longitude},${courseData.latitude},14,0/320x90@2x?access_token=${mapboxToken}`

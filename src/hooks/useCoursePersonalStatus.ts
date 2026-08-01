@@ -122,7 +122,9 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
   });
 
   return {
-    status: query.data ?? { status: 'none' as const },
+    // Loading is NOT representable as data. A null status forces every consumer
+    // to handle the in-flight case instead of being told 'none' and being wrong.
+    status: query.data ?? null,
     isLoading: query.isLoading,
     setWantToPlay: (want: boolean) => setWantToPlayMutation.mutate(want),
     isUpdating: setWantToPlayMutation.isPending,

@@ -57,7 +57,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     );
   }
 
-  if (isLoading) {
+  if (isLoading || !status) {
     return (
       <div className={cn('flex items-center justify-center py-4', className)}>
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
