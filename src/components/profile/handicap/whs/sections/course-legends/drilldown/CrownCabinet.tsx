@@ -3,7 +3,6 @@ import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { WindowToggleVariant } from '../CourseLegendsSection';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
 

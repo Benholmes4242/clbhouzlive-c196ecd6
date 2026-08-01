@@ -4,7 +4,6 @@ import { Crown } from 'lucide-react';
 
 import type { LegendWindow } from '@/lib/gam/types';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 
 import { YouAtThisClubStrip } from './YouAtThisClubStrip';
 import { CrownCabinet, type CabinetSlot } from './CrownCabinet';
