@@ -1,9 +1,10 @@
 /**
- * CourseStatusToggle - "Your status" as a control, not a badge.
+ * CourseStatusToggle - a want-to-play control, nothing else.
  *
- * BRIEF_COURSE_YOU_TAB_TREATMENT s2: the amber-tinted hero card, gradient star
- * tile and tinted "Played" pill are gone. Two selectable pills say what the
- * copy used to. Mutation, loading and error behaviour are unchanged.
+ * BRIEF_YOU_TAB_STATUS_PANEL supersedes BRIEF_COURSE_YOU_TAB_TREATMENT s2.
+ * "Played" is derived from having rated, so a rated member's pill was inert and
+ * said what the rating panel below already says twice: the whole panel is
+ * hidden in that state. What remains is one toggling bucket-list pill.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,10 +65,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     );
   }
 
-  const handlePlayedClick = () => navigate(`/courses/${courseId}/rate`);
-
   const handleWantToPlayClick = async () => {
-    if (status.status === 'played') return;
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
       toast(t('phase5.statusToggle.removedFromBucket'), { duration: 2000 });
@@ -77,21 +75,20 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     }
   };
 
-  const isPlayed = status.status === 'played';
+  // Rated == played. Nothing to control, and the rating panel below states it.
+  if (status.status === 'played') return null;
+
   const isWantToPlay = status.status === 'want_to_play';
 
   return (
     <Panel style={{ fontFamily: SANS }}>
-      <div style={{ ...LABEL, marginBottom: 10 }}>{t('courseDetail.you.status')}</div>
+      <div style={{ ...LABEL, marginBottom: 10 }}>{t('courseDetail.you.wantToPlay')}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button type="button" onClick={handlePlayedClick} style={pillStyle(isPlayed)}>
-          {t('courseDetail.you.played')}
-        </button>
         <button
           type="button"
           onClick={handleWantToPlayClick}
-          disabled={isUpdating || isPlayed}
-          style={{ ...pillStyle(isWantToPlay), opacity: isPlayed ? 0.4 : 1 }}
+          disabled={isUpdating}
+          style={pillStyle(isWantToPlay)}
         >
           {t('courseDetail.you.wantToPlay')}
         </button>
