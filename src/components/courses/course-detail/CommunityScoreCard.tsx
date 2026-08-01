@@ -155,11 +155,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         {headline.map((h) => (
           <div key={h.label} style={{ minWidth: 0, textAlign: 'center' }}>
             <div style={LABEL}>{h.label}</div>
-            <div style={{ ...NUM, fontSize: 30, color: h.tone, marginTop: 4, whiteSpace: 'nowrap' }}>
+            <div style={{ ...NUM, fontSize: 30, color: h.tone, marginTop: 4, lineHeight: 1, whiteSpace: 'nowrap' }}>
               {h.value}
             </div>
             {h.tier ? (
-              <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: h.tone, marginTop: 2, textAlign: 'center' }}>
+              <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: h.tone, marginTop: 4, textAlign: 'center' }}>
                 {h.tier}
               </div>
             ) : null}
