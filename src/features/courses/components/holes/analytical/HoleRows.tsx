@@ -12,19 +12,20 @@ import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { DIST_SEG_COLORS } from '../HoleDataSheet';
 import { A, LABEL, NUM, SANS, StatRow, toParParts } from './tokens';
 
-export const HOLE_GRID = '26px 62px 1fr 52px 48px';
-const THIN_DOT = '\u2009\u00B7\u2009';
+export const HOLE_GRID = '26px 32px 32px 1fr 52px 48px';
 
 function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
+
 
 export const HoleColumnHeader: React.FC = () => {
   const { t } = useTranslation(['courses']);
   return (
     <div style={{ display: 'grid', gridTemplateColumns: HOLE_GRID, gap: 10, paddingBottom: 8 }}>
       <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colHole')}</span>
-      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colParSi')}</span>
+      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colPar')}</span>
+      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colSi')}</span>
       <span style={LABEL}>{t('courses:courseDetail.holes.colDist')}</span>
       <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colField')}</span>
       <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colYou')}</span>
@@ -33,6 +34,7 @@ export const HoleColumnHeader: React.FC = () => {
 };
 
 export const HoleRow: React.FC<{
+
   row: CourseHole;
   mine: MyHolePerformanceRow | null;
   open: boolean;
@@ -75,12 +77,34 @@ export const HoleRow: React.FC<{
         }}
       >
         <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{row.hole_no}</span>
-        <span style={{ ...NUM, fontSize: 11.5, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
-          {row.stroke_index != null ? `${row.par}${THIN_DOT}${row.stroke_index}` : row.par}
+        <span
+          style={{
+            fontFamily: SANS,
+            fontVariantNumeric: 'tabular-nums lining',
+            fontSize: 12,
+            fontWeight: 600,
+            color: A.MUTE,
+            textAlign: 'center',
+          }}
+        >
+          {row.par}
+        </span>
+        <span
+          style={{
+            fontFamily: SANS,
+            fontVariantNumeric: 'tabular-nums lining',
+            fontSize: 12,
+            fontWeight: 600,
+            color: A.MUTE,
+            textAlign: 'center',
+          }}
+        >
+          {row.stroke_index ?? ''}
         </span>
         <span style={{ height: 5, borderRadius: 3, overflow: 'hidden', display: 'flex', background: A.TRACK }}>
           {segs.map((s) => (
             <i key={s.label} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
+
           ))}
         </span>
         <span style={{ ...NUM, fontSize: 13, color: field?.tone ?? A.INK, textAlign: 'right' }}>

@@ -146,11 +146,13 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${headline.length}, minmax(0, 1fr))`,
+          gap: 8,
+          justifyItems: 'center',
           marginBottom: 6,
         }}
       >
-        {headline.map((h, i) => (
-          <div key={h.label} style={{ minWidth: 0, textAlign: i === 0 ? 'left' : 'center' }}>
+        {headline.map((h) => (
+          <div key={h.label} style={{ minWidth: 0, textAlign: 'center' }}>
             <div style={LABEL}>{h.label}</div>
             <div style={{ ...NUM, fontSize: 30, color: h.tone, marginTop: 4, whiteSpace: 'nowrap' }}>
               {h.value}
@@ -158,6 +160,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
         ))}
       </div>
+
 
       <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: bandColor(communityAverage), marginBottom: 16 }}>
         {tierLabel}

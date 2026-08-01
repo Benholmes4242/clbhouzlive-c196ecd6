@@ -751,7 +751,7 @@
       "basedOn_other": "Based on {{count}} ratings",
       "onlyYouSuffix": " · Only you",
       "categoryScores": "Category Scores",
-      "seeAllReviews": "See all reviews →"
+      "seeAllReviews": "See all reviews"
     },
     "handicapCue": {
       "bannerAction": "Connect →",
@@ -851,8 +851,10 @@
     "holes": {
       "tapHint": "Tap a hole for detail",
       "colHole": "Hole",
-      "colParSi": "Par · SI",
+      "colPar": "Par",
+      "colSi": "SI",
       "colDist": "Distribution",
+
       "colField": "Field",
       "colYou": "You",
       "sheetTitle": "How the field scores",
