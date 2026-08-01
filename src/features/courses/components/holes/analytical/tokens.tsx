@@ -192,7 +192,7 @@ export const Action: React.FC<{
     type="button"
     onClick={onClick}
     style={{
-      minHeight: 44,
+      minHeight: 32,
       border: 'none',
       background: 'transparent',
       cursor: 'pointer',
