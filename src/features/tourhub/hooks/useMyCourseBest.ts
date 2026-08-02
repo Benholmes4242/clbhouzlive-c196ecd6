@@ -27,7 +27,8 @@ export function useMyCourseBest(courseId: string | null | undefined) {
       } as never);
       // Signed out / no row / RPC failure all resolve to "no cell".
       if (error) return null;
-      const row = Array.isArray(data) ? data[0] : (data ?? null);
+      const payload = (data ?? null) as unknown;
+      const row = Array.isArray(payload) ? payload[0] : payload;
       return (row as MyCourseBest | undefined) ?? null;
     },
   });
