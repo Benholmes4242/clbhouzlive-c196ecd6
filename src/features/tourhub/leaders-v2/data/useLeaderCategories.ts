@@ -135,7 +135,7 @@ export interface LeaderCategoriesResult {
 }
 
 
-// ── formatting helpers ────────────────────────────────────────────────
+// -- formatting helpers
 function fmtMoneyCompact(v: number): string {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
   if (v >= 1_000) return `$${Math.round(v / 1000)}K`;

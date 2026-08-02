@@ -1,9 +1,9 @@
 /**
  * FullListSheet - the deep almanac for a single Boards category.
  *
- * Canonicalized to match the Course Champions / Courses Discover Dispatch
- * bottom sheet UI: 75dvh, SLATE_50 surface, amber metadata eyebrow, ink title,
- * and a white-card ranked ledger (rank 1 rendered in gold).
+ * 75dvh, SLATE_50 surface, flat ranked ledger: no alternating fill, no rule
+ * between rows, no gold or amber on any row. The gap to the leader sits
+ * beneath each value; the leader's own row shows nothing there.
  */
 
 import { useCallback } from 'react';
