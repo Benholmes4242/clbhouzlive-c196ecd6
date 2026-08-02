@@ -61,7 +61,7 @@ function LiveMarker({
   const live = s === 'inprogress';
   const final = s === 'closed' || s === 'completed' || s === 'complete';
   const text = live
-    ? t('tour.roundInProgress', { n: currentRound ?? 1 })
+    ? t('tour.roundShort', { n: currentRound ?? 1 })
     : final
     ? t('tour.final')
     : t('tour.roundUpcoming', { n: currentRound ?? 1 });
