@@ -1,15 +1,12 @@
 /**
- * players-v2/PlayersTab - "The Field" - a this-week panel, one shared ledger
- * row, a column header, and an honest sample-size caption.
+ * players-v2/PlayersTab - "The Field" - one shared ledger row, a column
+ * header, and an honest sample-size caption.
  *
  * Wiring:
  *   - Tour: LOCAL lens (per-section by design; NOT TourSelectionContext).
  *     ?tour= honored once on mount; ?sort= honored for old inbound links.
- *   - Data: usePlayersRanking(tour) + useLivePlayerIds() + useLiveTournaments()
+ *   - Data: usePlayersRanking(tour) + useLivePlayerIds()
  *     + useWorldRankLookup(loaded ids).
- *   - This-week panel: derived CLIENT-SIDE from the loaded field crossed with
- *     the live leaderboard map. Renders ONLY when the active tour has an
- *     inprogress tournament; otherwise nothing at all.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,7 +20,6 @@ import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import {
   AMBER_DEEP,
   FONT,
@@ -32,16 +28,10 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
-import { Panel, StatRow, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
 
-import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/usePlayersRanking';
-import { useLivePlayerIds } from './data/useLivePlayerIds';
-import { useWorldRankLookup } from './data/useWorldRankLookup';
-import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
-import { formatNumberMaxFrac } from '@/i18n/format';
 
 type SortKey = 'ranking' | 'live';
 
