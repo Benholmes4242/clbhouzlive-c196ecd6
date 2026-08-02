@@ -10,6 +10,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
@@ -19,7 +20,6 @@ const INK = '#0F172A';
 const MUTED = '#94A3B8';
 const SOFT = '#475569';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
 const OVER_RED = '#D2222D';
 const UNDER_GREEN = '#059669';
 const PILL_BG = 'rgba(15,23,42,0.04)';
@@ -377,7 +377,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: AMBER,
+              color: A.AMBER,
             }}
           >
             Course by course

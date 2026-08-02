@@ -1,8 +1,9 @@
 /**
  * ProfileSheetV2 · ActorCards
  *
- * Horizontal rail of "posting as" actor cards. Active card gets an amber
- * ring; inactive cards tap to switch. Per-actor unread
+ * Horizontal rail of "posting as" actor cards. Selection is marked with a 2px
+ * INK border (amber means the viewing member, and BOTH cards are the viewing
+ * member, so amber cannot tell them apart); inactive cards tap to switch. Per-actor unread
  * badges (notifications + DMs) via useActorUnreadCounts. A trailing
  * dashed "+ Business" door is rendered ONLY when the user has no
  * business actors yet.
@@ -12,10 +13,8 @@ import React from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
-const AMBER = '#F7931E';
-const INK = '#0F172A';
-const MUTED = '#94A3B8';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 const DOT = '\u00B7';
 
 export interface ActorCardsProfile {
@@ -68,7 +67,7 @@ export default function ActorCards({
           fontSize: 10,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: AMBER,
+          color: A.AMBER_DEEP,
           padding: '0 20px 8px',
         }}
       >
@@ -121,15 +120,17 @@ export default function ActorCards({
                 width: 220,
                 background: '#fff',
                 borderRadius: 16,
-                padding: '12px 14px',
+                padding: active ? 13 : 14,
                 display: 'flex',
                 flexDirection: 'row',
                 gap: 12,
                 alignItems: 'center',
                 cursor: active ? 'default' : 'pointer',
+                // 2px INK when selected; the padding above compensates so the
+                // cards never shift as selection moves.
                 border: active
-                  ? `1px solid ${AMBER}`
-                  : `1px solid ${HAIRLINE}`,
+                  ? `2px solid ${A.INK}`
+                  : `1px solid ${A.BORDER}`,
                 opacity: switchingId === p.id ? 0.55 : 1,
                 transition: 'opacity 120ms ease',
               }}
@@ -151,8 +152,8 @@ export default function ActorCards({
                         inset: 0,
                         borderRadius: '34%',
                         overflow: 'hidden',
-                        background: 'linear-gradient(135deg,#F7931E,#d97a10)',
-                        color: '#fff',
+                        background: p.type === 'business' ? A.INK : A.TRACK,
+                        color: p.type === 'business' ? A.AMBER : A.MUTE,
                         fontWeight: 800,
                         fontSize: 16,
                         display: 'flex',
@@ -169,7 +170,7 @@ export default function ActorCards({
                         position: 'absolute',
                         inset: 0,
                         borderRadius: '34%',
-                        border: '1px solid rgba(15,23,42,0.12)',
+                        border: `1px solid ${A.BORDER}`,
                         pointerEvents: 'none',
                       }}
                     />
@@ -181,7 +182,7 @@ export default function ActorCards({
                   style={{
                     fontWeight: 700,
                     fontSize: 14,
-                    color: INK,
+                    color: A.INK,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -193,7 +194,7 @@ export default function ActorCards({
                   style={{
                     fontWeight: 500,
                     fontSize: 11,
-                    color: MUTED,
+                    color: A.MUTE,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -214,14 +215,14 @@ export default function ActorCards({
                     height: 18,
                     padding: '0 5px',
                     borderRadius: 999,
-                    background: AMBER,
-                    color: '#fff',
+                    background: A.AMBER,
+                    color: A.PANEL,
                     fontWeight: 700,
                     fontSize: 10,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '2px solid #fff',
+                    border: `2px solid ${A.PANEL}`,
                     boxSizing: 'content-box',
                   }}
                 >
@@ -256,10 +257,10 @@ export default function ActorCards({
               padding: '13px 8px',
             }}
           >
-            <div style={{ fontWeight: 800, fontSize: 16, color: AMBER, lineHeight: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: A.AMBER_DEEP, lineHeight: 1 }}>
               +
             </div>
-            <div style={{ fontWeight: 600, fontSize: 10, color: MUTED, marginTop: 4 }}>
+            <div style={{ fontWeight: 600, fontSize: 10, color: A.MUTE, marginTop: 4 }}>
               Business
             </div>
           </div>
