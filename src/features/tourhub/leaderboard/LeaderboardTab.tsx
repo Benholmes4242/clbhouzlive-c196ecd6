@@ -510,18 +510,18 @@ export function LeaderboardTab() {
       )}
 
 
-      {/* COLUMN HEADER (sticky) */}
+      {/* COLUMN HEADER (sticky) — SAME grid template as every body row. */}
       <div
         style={{
           position: 'sticky',
           top: 'var(--sat, 0px)',
           zIndex: 2,
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: boardGridTemplate(headerCols),
           alignItems: 'center',
           padding: '8px 16px',
           background: SURFACE,
           borderBottom: `1px solid ${HAIRLINE}`,
-          borderTop: showTabs ? 'none' : `1px solid ${HAIRLINE}`,
           fontFamily: F,
           fontSize: 8,
           fontWeight: 800,
@@ -530,21 +530,15 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        {(() => {
-          const cols = computeBoardColumns(filteredEntries, currentRound);
-          return (
-            <>
-              <div style={{ width: cols.posBlockW, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
-              <div style={{ flex: 1, minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
-              <BoardHeaderCells
-                columns={cols}
-                thruLabel={t('board.columns.thru')}
-                totLabel={t('board.columns.tot')}
-              />
-            </>
-          );
-        })()}
+        <div style={{ whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
+        <div style={{ minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <BoardHeaderCells
+          columns={headerCols}
+          thruLabel={t('board.columns.thru')}
+          totLabel={t('board.columns.tot')}
+        />
       </div>
+
 
       {/* BOARD */}
       {boardLoading && filteredEntries.length === 0 ? (

@@ -92,33 +92,32 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           </div>
         </div>
 
-        {/* Column header (matches BoardTable footprint) */}
-        <div
-          style={{
-            display: 'flex', alignItems: 'center',
-            padding: '8px 16px',
-            fontSize: 10, fontWeight: 800, color: INK_FAINT,
-            letterSpacing: '0.10em', textTransform: 'uppercase',
-            background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-          }}
-        >
-          {(() => {
-            const cols = computeBoardColumns(entries, meta?.current_round ?? null);
-            return (
-              <>
-                <div style={{ width: cols.posBlockW, flexShrink: 0 }}>{t('board.columns.pos')}</div>
-                <div style={{ flex: 1, minWidth: 0, paddingLeft: 4 }}>{t('board.columns.player')}</div>
-                <BoardHeaderCells
-                  columns={cols}
-                  thruLabel={t('board.columns.thru')}
-                  totLabel={t('board.columns.tot')}
-                />
-              </>
-            );
-          })()}
+        {/* Column header (shares BoardTable's grid template) */}
+        {(() => {
+          const cols = computeBoardColumns(entries, meta?.current_round ?? null);
+          return (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: boardGridTemplate(cols),
+                alignItems: 'center',
+                padding: '8px 16px',
+                fontSize: 10, fontWeight: 800, color: INK_FAINT,
+                letterSpacing: '0.10em', textTransform: 'uppercase',
+                background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+              }}
+            >
+              <div>{t('board.columns.pos')}</div>
+              <div style={{ minWidth: 0, paddingLeft: 4 }}>{t('board.columns.player')}</div>
+              <BoardHeaderCells
+                columns={cols}
+                thruLabel={t('board.columns.thru')}
+                totLabel={t('board.columns.tot')}
+              />
+            </div>
+          );
+        })()}
 
-
-        </div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           <BoardTable
