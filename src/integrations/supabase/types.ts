@@ -11187,6 +11187,7 @@ export type Database = {
           defending_champion: string | null
           end_date: string | null
           event_type: string | null
+          golf_course_id: string | null
           id: string
           is_featured: boolean | null
           last_live_sync: string | null
@@ -11232,6 +11233,7 @@ export type Database = {
           defending_champion?: string | null
           end_date?: string | null
           event_type?: string | null
+          golf_course_id?: string | null
           id?: string
           is_featured?: boolean | null
           last_live_sync?: string | null
@@ -11277,6 +11279,7 @@ export type Database = {
           defending_champion?: string | null
           end_date?: string | null
           event_type?: string | null
+          golf_course_id?: string | null
           id?: string
           is_featured?: boolean | null
           last_live_sync?: string | null
@@ -11310,6 +11313,27 @@ export type Database = {
           winning_share?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sr_tournaments_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "sr_tournaments_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_tournaments_golf_course_id_fkey"
+            columns: ["golf_course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
           {
             foreignKeyName: "sr_tournaments_season_id_fkey"
             columns: ["season_id"]
@@ -20401,6 +20425,18 @@ export type Database = {
           players: number
         }[]
       }
+      get_tournament_venue_record: {
+        Args: { p_tournament_id: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          course_place: string
+          list_label: string
+          list_rank: number
+          rating: number
+          review_count: number
+        }[]
+      }
       get_trending_courses: {
         Args: { p_days_back?: number; p_limit?: number; p_region_slug?: string }
         Returns: {
@@ -21140,6 +21176,7 @@ export type Database = {
         }
         Returns: Json
       }
+      golf_name_key: { Args: { p: string }; Returns: string }
       has_recently_nudged_whs: {
         Args: { p_recipient_id: string }
         Returns: boolean
@@ -21226,6 +21263,18 @@ export type Database = {
       is_user_blocked: {
         Args: { p_blocked_id: string; p_blocker_id: string }
         Returns: boolean
+      }
+      link_tournament_venue: {
+        Args: {
+          p_course_name: string
+          p_course_place?: string
+          p_venue_name: string
+        }
+        Returns: {
+          course_name: string
+          rows_linked: number
+          venue_name: string
+        }[]
       }
       log_user_achievement: {
         Args: { p_event: string; p_metadata: Json; p_user_id: string }
@@ -22488,6 +22537,20 @@ export type Database = {
           p_reported_user_id?: string
         }
         Returns: string
+      }
+      suggest_tournament_venue_matches: {
+        Args: { p_limit_per_tournament?: number; p_min_similarity?: number }
+        Returns: {
+          course_id: string
+          course_name: string
+          course_place: string
+          rn: number
+          score: number
+          tournament_id: string
+          tournament_name: string
+          venue_country: string
+          venue_name: string
+        }[]
       }
       sweep_orphaned_processing_posts: { Args: never; Returns: Json }
       sync_user_email: {
