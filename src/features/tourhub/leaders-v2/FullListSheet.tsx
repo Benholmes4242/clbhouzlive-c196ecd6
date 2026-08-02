@@ -16,8 +16,6 @@ import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import {
   FONT,
-  GOLD_DEEP,
-  GOLD_BORDER,
   HAIRLINE_INK_10,
   INK,
   INK_FAINT,
