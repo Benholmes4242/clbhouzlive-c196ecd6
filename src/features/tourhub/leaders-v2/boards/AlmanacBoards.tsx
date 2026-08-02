@@ -267,7 +267,7 @@ function StatBoardRowsInner({
             liveMap={liveMap}
             onTap={(pid) => onPlayerTap(pid, r.rank)}
           />
-          <div style={{ width: 84, flex: '0 0 84px', textAlign: 'right' }}>
+          <div style={{ width: 96, flex: '0 0 96px', textAlign: 'right' }}>
             <div
               style={{
                 fontSize: 14,
@@ -286,6 +286,7 @@ function StatBoardRowsInner({
                   ...LABEL,
                   marginTop: 3,
                   color: INK_FAINT,
+                  whiteSpace: 'nowrap',
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >

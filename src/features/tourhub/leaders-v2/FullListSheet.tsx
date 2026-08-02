@@ -206,8 +206,8 @@ export function FullListSheet({
                   </div>
                   <div
                     style={{
-                      width: 84,
-                      flex: '0 0 84px',
+                      width: 96,
+                      flex: '0 0 96px',
                       textAlign: 'right',
                     }}
                   >
@@ -232,6 +232,7 @@ export function FullListSheet({
                           letterSpacing: '0.13em',
                           textTransform: 'uppercase',
                           color: INK_FAINT,
+                          whiteSpace: 'nowrap',
                           lineHeight: 1,
                           fontVariantNumeric: 'tabular-nums',
                         }}
