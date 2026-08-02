@@ -424,7 +424,7 @@ export function PlayersTab() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <SectionTourLens
                   value={activeTour}
-                  onChange={(t) => t && t !== 'champ' && setActiveTour(t as PlayersTourId)}
+                  onChange={(t) => t && t !== 'champ' && changeTour(t as PlayersTourId)}
                   showAllTours={false}
                   excludeTours={['champ']}
                 />
@@ -547,7 +547,7 @@ export function PlayersTab() {
 
       {/* THE FIELD. The kicker is the only amber on this page: there is no
           viewing member on a tour surface, so nothing else earns brand colour. */}
-      <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+      <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', gap: 10 }}>
         <span
           style={{
             fontSize: 10,
@@ -555,13 +555,23 @@ export function PlayersTab() {
             letterSpacing: '0.16em',
             color: AMBER_DEEP,
             textTransform: 'uppercase',
+            flexShrink: 0,
           }}
         >
           {t('players.field.eyebrow')}
         </span>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div
+          className="overflow-x-auto scrollbar-hide"
+          style={{ display: 'flex', gap: 4, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}
+        >
           {sortOptions.map((k) => {
             const active = k === sort;
+            const label =
+              k === 'ranking'
+                ? t('players.sort.ranking')
+                : k === 'live'
+                  ? t('players.sort.playingNow')
+                  : t(STAT_LENS[k].labelKey);
             return (
               <button
                 key={k}
@@ -581,14 +591,17 @@ export function PlayersTab() {
                   textTransform: 'uppercase',
                   cursor: 'pointer',
                   lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
-                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
+                {label}
               </button>
             );
           })}
         </div>
       </div>
+
 
       {rankingLoading ? (
         <div style={{ padding: '0 16px' }}>
