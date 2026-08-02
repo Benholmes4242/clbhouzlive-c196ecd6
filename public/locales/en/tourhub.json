@@ -912,6 +912,7 @@
   },
   "tour": {
     "roundInProgress": "R{{n}} in progress",
+    "roundShort": "R{{n}}",
     "roundUpcoming": "R{{n}} upcoming",
     "final": "Final",
     "par": "Par",
