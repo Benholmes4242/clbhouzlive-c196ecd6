@@ -183,46 +183,39 @@ export function LeadersTab() {
         <TourHubEmptyState variant="leaderboard" />
       ) : (
         <div style={{ padding: '16px 0 88px', display: 'flex', flexDirection: 'column', gap: 22 }}>
-          {categories.map((cat, idx) => {
-            const mapped: Anatomy = ANATOMY_BY_KEY[cat.key] ?? 'money';
-            // First board of every tour = marquee (WorldBoard treatment).
-            const anatomy: Anatomy = idx === 0 ? 'world' : mapped;
+          {categories.map((cat) => {
+            // No marquee: every board uses the anatomy its key maps to. The
+            // first board is first because it is the most important stat.
+            const anatomy: Anatomy = ANATOMY_BY_KEY[cat.key] ?? 'stat';
             const onOpen = () => openCategory(cat.key);
             const key = cat.key;
 
-            if (anatomy === 'world') {
-              const isWorldRank = cat.key === 'world_rank';
-              // Marquee overline/title: world_rank uses its own copy; other
-              // marquees (LPGA/EUR/LIV points) use the brand label from the
-              // category itself + a generic marquee title.
-              const overline = isWorldRank
-                ? t('leaders.almanac.world.overline')
-                : t(cat.labelKey).toUpperCase();
-              const title = isWorldRank
-                ? t('leaders.almanac.world.title')
-                : t('leaders.almanac.pointsMarquee.title');
-              const championSubline = isWorldRank
-                ? t('leaders.almanac.world.no1')
-                : t('leaders.almanac.marquee.no1');
+            if (anatomy === 'winners') {
               return (
-                <WorldBoard
+                <WinnersCircle
                   key={key}
                   category={cat}
                   liveMap={liveMap ?? {}}
                   onOpen={onOpen}
-                  overline={overline}
-                  title={title}
-                  championSubline={championSubline}
+                  onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
                 />
               );
             }
-            if (anatomy === 'money') {
-              return <MoneyBoard key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
-            }
-            if (anatomy === 'scoring') {
-              return <ScoringBoard key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
-            }
-            return <WinnersCircle key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
+            const overline =
+              cat.key === 'world_rank'
+                ? t('leaders.almanac.world.overline')
+                : t(cat.shortKey);
+            return (
+              <StatBoardRows
+                key={key}
+                category={cat}
+                liveMap={liveMap ?? {}}
+                onOpen={onOpen}
+                onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
+                overline={overline}
+                showMovement={cat.key === 'world_rank'}
+              />
+            );
           })}
           <div
             style={{
