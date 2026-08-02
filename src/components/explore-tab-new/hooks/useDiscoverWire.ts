@@ -109,7 +109,7 @@ function actorOf(row: FeatRow): string {
 
 function numeric(v: unknown): number | null {
   if (typeof v === 'number' && Number.isFinite(v)) return v;
-  const n = parseFloat(String(v ?? '').replace(/[^\d.\-]/g, ''));
+  const n = parseFloat(String(v ?? '').replace(/[^\d.-]/g, ''));
   return Number.isFinite(n) ? n : null;
 }
 

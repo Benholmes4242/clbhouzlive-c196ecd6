@@ -7,6 +7,7 @@ import {
   SANS,
   TITLE,
 } from '@/features/courses/components/holes/analytical/tokens';
+import { formatNumber } from '@/i18n/format';
 import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
 import { ACTION_DEFAULTS, wireWhen } from '../hooks/useDiscoverWire';
 import type { NewsCourse } from '../hooks/useNewsCourses';
@@ -232,7 +233,7 @@ export function CoursesInTheNews({ courses, isLoading, onCardPress, onBrowseAll 
                           {t('discover.ratingCount', {
                             defaultValue: '{{value}} ratings',
                             count: c.ratingCount,
-                            value: c.ratingCount.toLocaleString(),
+                            value: formatNumber(c.ratingCount),
                           })}
                         </span>
                       )}
