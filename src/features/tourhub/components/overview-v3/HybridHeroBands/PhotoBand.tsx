@@ -74,11 +74,12 @@ function statePillText(
         tone: 'upcoming',
       };
     }
-    // Match tournament details hero chip: "LIVE · R{n}".
+    // Platform live marker copy — same string as the leaderboard masthead.
     return {
-      text: `${t('status.live')} \u00B7 R${state.round}`.toUpperCase(),
+      text: t('tour.roundInProgress', { n: state.round }),
       tone: 'live',
     };
+
   }
   if (state.kind === 'results') {
     if (state.variant === 'cancelled') return { text: t('overview.pillState.cancelled'), tone: 'final' };
