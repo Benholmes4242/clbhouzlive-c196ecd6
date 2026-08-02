@@ -140,7 +140,7 @@ export const Panel: React.FC<{
   </section>
 );
 
-export interface StatItem { label: string; value: React.ReactNode; tone?: string; sub?: string }
+export interface StatItem { label: string; value: React.ReactNode; tone?: string; sub?: string; subTone?: string }
 
 export const StatRow: React.FC<{
   items: StatItem[];
