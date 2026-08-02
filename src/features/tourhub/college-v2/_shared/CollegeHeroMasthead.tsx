@@ -3,9 +3,9 @@
  * hub (leader spotlight) and the College profile page.
  *
  * Layout: crest (66 squircle, gold ring at rank 1) + name/meta stack +
- * optional right-hand actions slot, anchored to the bottom of a
- * clamp(380px, 44dvh, 460px) container with a 180deg brand-to-charcoal
- * gradient. Brand tint comes from `brandHex` (stored per college in
+ * optional right-hand actions slot, anchored inside a HERO_MIN_H container
+ * (the canonical tour hero height, see _shared/tokens) with a 180deg
+ * brand-to-charcoal gradient. Brand tint comes from `brandHex` (stored per college in
  * `college_media.brand_hex`); null renders the charcoal fallback cleanly.
  *
  * No runtime pixel extraction, no CORS dependency, no async color state.
@@ -126,8 +126,7 @@ export function CollegeHeroMasthead({
     <div
       style={{
         background: heroBackground,
-        minHeight:
-          'calc(clamp(280px, 34dvh, 360px) + env(safe-area-inset-top, 0px))',
+        minHeight: HERO_MIN_H,
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 16,
         paddingRight: 16,

@@ -5,9 +5,7 @@
  * jump-free.
  */
 import { Skeleton } from '@/components/ui/skeleton';
-
-const HERO_MIN_H =
-  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
 
 const SLATE_50 = '#F8FAFC';
 const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';

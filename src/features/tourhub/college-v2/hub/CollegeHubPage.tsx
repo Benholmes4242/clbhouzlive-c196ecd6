@@ -182,8 +182,7 @@ export function CollegeHubPage() {
           <header
             style={{
               background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
-              minHeight:
-                'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+              minHeight: HERO_MIN_H,
               paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
               paddingLeft: 16,
               paddingRight: 16,
