@@ -1066,6 +1066,9 @@
     },
     "kicker": "The amateur circuit",
     "headline": "What's been happening",
+    "hero": {
+      "viewScorecard": "View scorecard"
+    },
     "eventCount_one": "{{count}} event",
     "eventCount_other": "{{count}} events",
     "newsTitle": "Courses in the news",

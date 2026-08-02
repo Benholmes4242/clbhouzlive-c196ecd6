@@ -683,6 +683,9 @@
       "ordinal_ordinal_two": "{{count}}nd",
       "ordinal_ordinal_few": "{{count}}rd",
       "ordinal_ordinal_other": "{{count}}th"
+    },
+    "hero": {
+      "viewScorecard": "[~~ṽíéŵ šĉőŕéĉáŕð~~]"
     }
   },
   "statBrowse": {
