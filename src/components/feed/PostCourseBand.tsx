@@ -263,7 +263,7 @@ export const PostCourseBand: React.FC<Props> = ({
         <ChevronRight
           size={16}
           color={T40}
-          style={{ flexShrink: 0, marginLeft: 6 }}
+          style={{ flexShrink: 0, marginLeft: 'auto' }}
         />
       )}
     </div>
