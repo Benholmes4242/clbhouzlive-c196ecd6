@@ -1,8 +1,9 @@
 /**
- * CollegeProfilePage — "The Season Story".
+ * CollegeProfilePage - "The Season Story".
  *
- * Composes: Masthead (charcoal, safe-area padded) · ThisWeek (self-hides
- * when empty) · TheClass (full roster, ported star rule). Uses the yearbook
+ * Composes: Masthead (charcoal, safe-area padded) - ThisWeek (self-hides
+ * when empty) - TheClass (full roster, ranked by earnings). Uses the yearbook
+
  * standings query to derive the college's rank + points; falls back
  * gracefully when unranked. Not-found state renders when standings load
  * and no matching slug exists.
