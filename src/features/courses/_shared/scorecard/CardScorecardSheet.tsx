@@ -187,23 +187,25 @@ const Nine: React.FC<{
 
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
-  const keys: { d: number; label: string }[] = [
-    { d: -1, label: t('courses:scorecard.legendBirdie') },
-    { d: -2, label: t('courses:scorecard.legendEagle') },
-    { d: 1, label: t('courses:scorecard.legendBogey') },
-    { d: 2, label: t('courses:scorecard.legendDouble') },
+  const keys: { strokes: number; label: string }[] = [
+    { strokes: 3, label: t('courses:scorecard.legendBirdie') },
+    { strokes: 2, label: t('courses:scorecard.legendEagle') },
+    { strokes: 1, label: t('courses:scorecard.legendAce') },
+    { strokes: 5, label: t('courses:scorecard.legendBogey') },
+    { strokes: 6, label: t('courses:scorecard.legendDouble') },
   ];
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
       {keys.map((k) => (
-        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <ScoreCell strokes={4 + k.d} par={4} />
+        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+          <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
           <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
         </span>
       ))}
     </div>
   );
 };
+
 
 /* ------------------------------------------------------ round breakdown */
 
