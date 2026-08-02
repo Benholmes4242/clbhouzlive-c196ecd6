@@ -16,7 +16,8 @@ import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, t
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { resolveCutDisplay } from '../../_shared/cutDisplay';
-import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, AMBER } from '../../_shared/tokens';
+import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   open: boolean;
@@ -69,23 +70,30 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
   };
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      variant="light"
+      surfaceColor={A.PANEL}
+      ariaLabelledBy="tournament-full-board-sheet-title"
+      style={{ height: '75dvh', maxHeight: '75dvh' }}
+    >
       <div
         style={{
-          background: SLATE_50, fontFamily: FONT,
+          background: A.PANEL, fontFamily: FONT,
           height: '75dvh', maxHeight: '75dvh',
           display: 'flex', flexDirection: 'column',
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ fontSize: 10, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {t('tournament.fullBoard.title')}
-
-          </div>
+          <div style={KICKER}>{t('tournament.fullBoard.title')}</div>
           {meta?.name && (
-            <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
+            <h2
+              id="tournament-full-board-sheet-title"
+              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+            >
               {meta.name}
-            </div>
+            </h2>
           )}
           <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
             {t('overview.fieldStrength.playersCount', { count: entries.length })}
@@ -105,7 +113,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
                 padding: '8px 16px',
                 fontSize: 10, fontWeight: 800, color: INK_FAINT,
                 letterSpacing: '0.10em', textTransform: 'uppercase',
-                background: SLATE_50, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+                background: A.PANEL, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
               }}
             >
               <div>{t('board.columns.pos')}</div>
