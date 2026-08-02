@@ -327,7 +327,7 @@ export function ScheduleTab() {
           <span style={KICKER}>{t('schedule.eyebrow.season')}</span>
           <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>
             {tourLens
-              ? `${yearLabel} · ${TOUR_CONFIG[tourLens]?.label ?? tourLens}`
+              ? `${yearLabel} · ${TOUR_CONFIG[tourLens]?.name ?? tourLens}`
               : `${yearLabel}`}
           </span>
         </div>

@@ -48,7 +48,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
 
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} subline={t('overview.comingUp.subline')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=schedule')}>
+      <SectionShell eyebrow={t('overview.comingUp.eyebrow')} subline={t('overview.comingUp.subline')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule')}>
 
         <div style={{ margin: '0 16px' }}>
           <V4Card style={{ overflow: 'hidden' }}>
@@ -79,7 +79,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
   if (rows.length === 0) return null;
 
   return (
-    <SectionShell eyebrow={t('overview.comingUp.eyebrow')} subline={t('overview.comingUp.subline')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=schedule')}>
+    <SectionShell eyebrow={t('overview.comingUp.eyebrow')} subline={t('overview.comingUp.subline')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule')}>
       <div style={{ margin: '0 16px' }}>
         <V4Card style={{ overflow: 'hidden' }}>
           <div

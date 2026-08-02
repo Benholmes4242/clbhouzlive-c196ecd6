@@ -73,17 +73,25 @@
     "badge": {
       "major": "MAJOR",
       "playoffs": "PLAYOFFS",
-      "champion": "CHAMPION"
+      "champion": "CHAMPION",
+      "defends": "DEFENDS"
     },
     "rail": {
       "daysUnit_one": "DAY",
       "daysUnit_other": "DAYS"
     },
     "leader": {
-      "suffix": "leads"
+      "suffix": "leads",
+      "tied": "{{count}} tied"
     },
     "champion": {
       "defendsSuffix": "{{name}} defends"
+    },
+    "stats": {
+      "played": "PLAYED",
+      "remaining": "REMAINING",
+      "nextMajor": "NEXT MAJOR",
+      "daysSuffix": "D"
     }
   },
   "overview": {
