@@ -3,8 +3,6 @@ import {
   INK,
   SC_FILL_GOLD,
   SC_FILL_BIRDIE,
-  SC_FILL_BOGEY,
-  SC_FILL_DOUBLE,
   SC_PAR,
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
@@ -12,22 +10,24 @@ import {
 /**
  * ScoreMark - the universal scoring-mark renderer.
  *
- * "World Feed" filled-chip system, shared across:
- *  - Tour scorecard sheet (PlayerScorecardSheet / leaderboard ScorecardSheet)
- *  - Handicap personal scorecard (RoundHoleCell / RoundDetailSheet)
- *  - Course Holes tab
+ * House grammar is OUTLINES, not fills (CORRECTION_ONE_SCORING_MARK).
+ * Shared across:
+ *  - Card scorecard sheet (CardScorecardSheet)
+ *  - Handicap personal scorecard
+ *  - Course Holes tab legend
+ *  - Clubhouse feed round card (surface="dark")
  *
  * Grammar:
- *  - birdie: solid red disc, white numeral
- *  - eagle:  solid gold disc, INK numeral
- *  - alba / hio: solid gold disc, INK numeral, + one outer gold ring (rarity)
- *  - bogey:  solid blue rounded square, white numeral
- *  - doub / triple: solid navy rounded square, white numeral, + one outer navy frame
- *  - par:    bare numeral, no chip
- *  - empty:  bare dot
+ *  - birdie (-1)        circle,        under-par red
+ *  - eagle (-2)         double circle, under-par red
+ *  - albatross (-3)     double circle, under-par red, + outer GOLD ring
+ *  - hole in one (1)    double circle, under-par red, + outer GOLD ring
+ *  - par (0)            bare numeral, no mark
+ *  - bogey (+1)         square,        over-par ink
+ *  - double or worse    double square, over-par ink
+ *  - no score           bare dot
  *
- * Fills are shared across light and dark surfaces. Only the par numeral ink
- * and the outer ring "gap" colour (surface bg) differ by surface.
+ * Only the over-par mark and the par numeral vary by surface. Red reads on both.
  */
 
 type Variant =
@@ -38,8 +38,7 @@ type Variant =
   | 'alba'
   | 'hio'
   | 'bogey'
-  | 'doub'
-  | 'triple';
+  | 'doub';
 
 const variantFor = (strokes: number | null | undefined, par: number): Variant => {
   if (strokes == null || strokes <= 0) return 'empty';
@@ -50,29 +49,11 @@ const variantFor = (strokes: number | null | undefined, par: number): Variant =>
   if (diff === -1) return 'birdie';
   if (diff === 0) return 'par';
   if (diff === 1) return 'bogey';
-  if (diff === 2) return 'doub';
-  return 'triple';
+  return 'doub';
 };
 
-interface ChipSpec {
-  shape: 'circle' | 'square' | null;
-  fill: string;
-  ink: string;   // numeral colour on chip
-  ring: boolean; // outer rarity ring (alba/hio for gold, doub/triple for navy)
-  ringStroke: string;
-}
-
-const CHIP: Record<Variant, ChipSpec> = {
-  empty:  { shape: null,     fill: 'transparent',   ink: '#CBD5E1', ring: false, ringStroke: 'transparent' },
-  par:    { shape: null,     fill: 'transparent',   ink: SC_PAR,    ring: false, ringStroke: 'transparent' },
-  birdie: { shape: 'circle', fill: SC_FILL_BIRDIE,  ink: '#FFFFFF', ring: false, ringStroke: 'transparent' },
-  eagle:  { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: false, ringStroke: 'transparent' },
-  alba:   { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: true,  ringStroke: SC_FILL_GOLD },
-  hio:    { shape: 'circle', fill: SC_FILL_GOLD,    ink: INK,       ring: true,  ringStroke: SC_FILL_GOLD },
-  bogey:  { shape: 'square', fill: SC_FILL_BOGEY,   ink: '#FFFFFF', ring: false, ringStroke: 'transparent' },
-  doub:   { shape: 'square', fill: SC_FILL_DOUBLE,  ink: '#FFFFFF', ring: true,  ringStroke: SC_FILL_DOUBLE },
-  triple: { shape: 'square', fill: SC_FILL_DOUBLE,  ink: '#FFFFFF', ring: true,  ringStroke: SC_FILL_DOUBLE },
-};
+const OVER_INK_LIGHT = INK;
+const OVER_INK_DARK = '#F2F4F7';
 
 export interface ScoreMarkProps {
   strokes: number | null | undefined;
@@ -85,7 +66,7 @@ export interface ScoreMarkProps {
   colourOverride?: string;
   /** Custom font for the numeral. */
   fontFamily?: string;
-  /** Surface the mark lives on. Defaults to 'light'. Affects par ink only. */
+  /** Surface the mark lives on. Defaults to 'light'. */
   surface?: 'light' | 'dark';
 }
 
@@ -101,64 +82,84 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);
-  const chip = CHIP[variant];
 
-  // Chip inset from tile edge (leaves room for the outer rarity ring).
-  // With ring: leave ~4.5px total (2px stroke + 2.5px gap) at size=38.
-  const RING_STROKE = Math.max(1.4, size * (2 / 38));
-  const RING_GAP    = Math.max(1.6, size * (2.5 / 38));
-  const CHIP_INSET  = chip.ring ? RING_STROKE + RING_GAP : 0;
-  const chipSize    = size - CHIP_INSET * 2;
+  const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba' || variant === 'hio';
+  const over = variant === 'bogey' || variant === 'doub';
+  const shape: 'circle' | 'square' | null = under ? 'circle' : over ? 'square' : null;
+  const doubleMark = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub';
+  const goldRing = variant === 'alba' || variant === 'hio';
 
-  const numeral = strokes == null ? '\u00B7' : strokes;
-
+  const overInk = surface === 'dark' ? OVER_INK_DARK : OVER_INK_LIGHT;
   const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
+
+  const tone = under ? SC_FILL_BIRDIE : overInk;
+
+  const STROKE = Math.max(1.3, size * (1.5 / 26));
+  const OUTER_R = shape === 'square' ? Math.max(3, size * 0.12) : '50%';
+  const INNER_INSET = Math.max(2, size * 0.09);
+  const INNER_R = shape === 'square' ? Math.max(2, size * 0.09) : '50%';
+
+  // Gold rarity ring sits outside the mark; inset the mark to make room.
+  const RING_GAP = Math.max(1.6, size * (2.5 / 38));
+  const MARK_INSET = goldRing ? STROKE + RING_GAP : 0;
+
+  const numeral = strokes == null || strokes <= 0 ? '\u00B7' : strokes;
 
   let numColour: string;
   if (colourOverride) numColour = colourOverride;
   else if (variant === 'empty') numColour = emptyInk;
   else if (variant === 'par') numColour = parInk;
-  else numColour = chip.ink;
+  else numColour = tone;
 
   const numWeight = variant === 'par' || variant === 'empty' ? 700 : 800;
 
   return (
-    <div
+    <span
       style={{
         position: 'relative',
         width: size,
         height: size,
-        display: 'flex',
+        flex: 'none',
+        display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        flexShrink: 0,
+        lineHeight: 1,
         overflow: 'visible',
       }}
     >
-      {chip.ring && (
-        <div
-          aria-hidden
+      {goldRing && (
+        <span
+          aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
-            borderRadius: chip.shape === 'square' ? Math.round(size * 0.22) : '50%',
-            border: `${RING_STROKE}px solid ${chip.ringStroke}`,
+            borderRadius: '50%',
+            border: `${STROKE}px solid ${SC_FILL_GOLD}`,
             pointerEvents: 'none',
           }}
         />
       )}
-      {chip.shape && (
-        <div
-          aria-hidden
+      {shape && (
+        <span
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            left: CHIP_INSET,
-            top: CHIP_INSET,
-            width: chipSize,
-            height: chipSize,
-            borderRadius: chip.shape === 'square' ? Math.round(chipSize * 0.22) : '50%',
-            background: chip.fill,
+            inset: MARK_INSET,
+            borderRadius: OUTER_R,
+            border: `${STROKE}px solid ${tone}`,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {shape && doubleMark && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: MARK_INSET + INNER_INSET,
+            borderRadius: INNER_R,
+            border: `${STROKE}px solid ${tone}`,
             pointerEvents: 'none',
           }}
         />
@@ -180,7 +181,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
           {numeral}
         </span>
       )}
-    </div>
+    </span>
   );
 };
 
