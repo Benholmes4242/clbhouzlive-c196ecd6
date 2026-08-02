@@ -1,24 +1,22 @@
 /**
- * ComingUpSlot - adapter that mounts the v4 ComingUp section on the live
- * Overview with a per-section tour lens (local state, defaults to All Tours).
+ * ComingUpSlot — mounts the v4 ComingUp section on the live Overview.
  *
- * All Tours (tourLens === null): ComingUp renders a single chronological
- * merged list across all tours (soonest first). A selected tour filters
- * to that tour only.
+ * Driven by the GLOBAL tour chip (TourSelectionContext), not a per-section
+ * lens: one control on the page. The synthetic 'major' pseudo-tour and the
+ * "All tours" selection both resolve to null, which makes ComingUp render a
+ * single chronological merged list across every tour (soonest first).
  */
-import { useState } from 'react';
 import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
-import { SectionTourLens } from '@/features/tourhub/overview/sections/SectionTourLens';
+import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
+const SCHEDULE_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
+
 export function ComingUpSlot() {
-  const [tourLens, setTourLens] = useState<TourId | null>(null);
-  return (
-    <>
-      <SectionTourLens value={tourLens} onChange={setTourLens} />
-      <ComingUp tour={tourLens} />
-    </>
-  );
+  const { selectedTourSlug, viewingTourSlug } = useTourSelection();
+  const active = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const tour = SCHEDULE_TOURS.has(active) ? (active as TourId) : null;
+  return <ComingUp tour={tour} />;
 }
 
 export default ComingUpSlot;
