@@ -491,7 +491,8 @@
     "scorecard": {
       "roundEyebrow": "ROUND {{round}}",
       "eyebrowFallback": "SCORECARD",
-      "courseFallback": "Scorecard"
+      "courseFallback": "Scorecard",
+      "position": "Position"
     },
     "shell": {
       "board": {

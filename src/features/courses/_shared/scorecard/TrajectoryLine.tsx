@@ -1,21 +1,31 @@
 import React from 'react';
-import {
-  SC_FILL_GOLD,
-  SC_FILL_BIRDIE,
-  SC_FILL_BOGEY,
-  SC_FILL_DOUBLE,
-} from '@/features/courses/components/holes/_constants';
+import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
-const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-const INK = '#0F172A';
-const MUTED = '#94A3B8';
-const BASELINE = 'rgba(15,23,42,0.12)';
-const UNDER_FILL = 'rgba(210,34,45,0.05)';
+/**
+ * Cumulative to-par across the round.
+ *
+ * Two series: the viewing member (or the player) in AMBER, and the field in a
+ * muted grey. The gap between the lines is the story, so no copy is needed.
+ * Over par plots UP.
+ *
+ * Beads mark only the holes that swung the round:
+ *   birdie or better -> GREEN (eagle+ drawn larger)
+ *   double or worse  -> RED
+ *   bogey            -> no bead at all
+ *
+ * The bead colours are set here rather than in `holes/_constants`, which is
+ * shared with HolesScoringKey / ScoreMark / PostRoundCard.
+ */
+
+const FIELD_LINE = '#C3CAD2';
+const BASELINE = 'rgba(15,23,42,0.10)';
 
 export interface TrajectoryHole {
   holeNo: number;
   par: number | null;
   strokes: number | null;
+  /** Optional field average for the hole. Absent = the field line stops. */
+  fieldAvg?: number | null;
 }
 
 interface Props {
@@ -23,105 +33,120 @@ interface Props {
   height?: number;
 }
 
-type Bead = { x: number; y: number; kind: 'eagle' | 'birdie' | 'bogey' | 'double' };
-
-/**
- * Cumulative vs-par line across the round. Light-only. Skips holes
- * without both par and strokes; renders nothing when fewer than 2
- * plottable holes. Under par plots DOWN (improvement descends) --
- * matches the house sparkline convention.
- *
- * Every non-par hole gets a bead: eagle-or-better = gold disc,
- * birdie = red disc, bogey = blue square, double+ = navy square.
- */
-export const TrajectoryLine: React.FC<Props> = ({ holes, height = 88 }) => {
-  const w = 358;
-  const padX = 6;
+export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
   const plottable = holes.filter(
     (h) => h.par != null && h.strokes != null && (h.strokes as number) > 0,
   );
   if (plottable.length < 2) return null;
 
-  let cum = 0;
-  const pts = plottable.map((h) => {
+  const w = 340;
+  const padX = 4;
+  const padY = 14;
+  const n = plottable.length;
+
+  let cumYou = 0;
+  let cumField = 0;
+  const you: number[] = [];
+  const field: number[] = [];
+  const beads: { i: number; cum: number; tone: string; big: boolean }[] = [];
+
+  // The field series stops at the first hole with no field average — a live
+  // tournament round gates holes the field has not finished, and interpolating
+  // (or extending flat) would invent data.
+  let fieldOpen = true;
+  plottable.forEach((h, i) => {
     const d = (h.strokes as number) - (h.par as number);
-    cum += d;
-    let kind: Bead['kind'] | null = null;
-    if (d <= -2) kind = 'eagle';
-    else if (d === -1) kind = 'birdie';
-    else if (d === 1) kind = 'bogey';
-    else if (d >= 2) kind = 'double';
-    return { cum, kind };
+    cumYou += d;
+    you.push(cumYou);
+
+    if (fieldOpen && h.fieldAvg != null) {
+      cumField += (h.fieldAvg as number) - (h.par as number);
+      field.push(cumField);
+    } else {
+      fieldOpen = false;
+    }
+
+    if (d <= -1) beads.push({ i, cum: cumYou, tone: A.GREEN, big: d <= -2 });
+    else if (d >= 2) beads.push({ i, cum: cumYou, tone: A.RED, big: false });
   });
 
-  const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
-  const n = plottable.length;
-  const x = (i: number) => padX + (n === 1 ? 0 : (i / (n - 1)) * (w - padX * 2));
-  const y0 = height / 2;
-  const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 12);
+  const hasField = field.length >= 2;
+  const all = hasField ? [...you, ...field, 0] : [...you, 0];
+  const min = Math.min(...all);
+  const max = Math.max(...all);
+  const span = Math.max(max - min, 1);
 
-  const linePts = pts.map((p, idx) => `${x(idx).toFixed(1)},${y(p.cum).toFixed(1)}`);
-  const path = linePts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p}`).join(' ');
+  const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
+  const y = (v: number) => padY + ((max - v) / span) * (height - padY * 2);
+  const path = (arr: number[]) =>
+    arr.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
 
-  // Under-par area fill: clip the polygon to the region below the E baseline
-  // (i.e. y > y0). Build a closed polygon under the line, and rely on the
-  // clipPath rect to render only the below-baseline slice.
-  const areaPath = `${path} L ${x(n - 1).toFixed(1)} ${y0} L ${x(0).toFixed(1)} ${y0} Z`;
-
-  const nineIdx = plottable.findIndex((h) => h.holeNo > 9);
-  const clipId = React.useId();
-
-  const beadFor = (kind: Bead['kind']) => {
-    switch (kind) {
-      case 'eagle':  return SC_FILL_GOLD;
-      case 'birdie': return SC_FILL_BIRDIE;
-      case 'bogey':  return SC_FILL_BOGEY;
-      case 'double': return SC_FILL_DOUBLE;
-    }
-  };
+  const ticks = [...new Set([0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1])];
 
   return (
-    <svg width="100%" viewBox={`0 0 ${w} ${height}`} style={{ display: 'block' }} aria-hidden>
-      <defs>
-        <clipPath id={clipId}>
-          <rect x="0" y={y0} width={w} height={height - y0} />
-        </clipPath>
-      </defs>
+    <>
+      <svg
+        viewBox={`0 0 ${w} ${height}`}
+        width="100%"
+        height={height}
+        style={{ display: 'block' }}
+        aria-hidden="true"
+      >
+        {/* level par */}
+        <line
+          x1={padX}
+          x2={w - padX}
+          y1={y(0)}
+          y2={y(0)}
+          stroke={BASELINE}
+          strokeWidth={1}
+          strokeDasharray="3 4"
+        />
 
-      {/* dashed E baseline */}
-      <line x1={padX} x2={w - padX} y1={y0} y2={y0}
-        stroke={BASELINE} strokeWidth="1" strokeDasharray="3 4" />
-      <text x={w - padX} y={y0 - 3} fill={MUTED} fontSize="8.5"
-        fontWeight="700" textAnchor="end" fontFamily={GEIST}>E</text>
+        {hasField && (
+          <path
+            d={path(field)}
+            fill="none"
+            stroke={FIELD_LINE}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        )}
 
-      {/* under-par area fill */}
-      <path d={areaPath} fill={UNDER_FILL} clipPath={`url(#${clipId})`} />
+        <path
+          d={path(you)}
+          fill="none"
+          stroke={A.AMBER}
+          strokeWidth={2.5}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
 
-      {/* nine divider */}
-      {nineIdx > 0 && (
-        <line x1={x(nineIdx - 0.5)} x2={x(nineIdx - 0.5)} y1={6} y2={height - 6}
-          stroke={BASELINE} strokeWidth="1" />
-      )}
+        {beads.map((b) => (
+          <circle
+            key={b.i}
+            cx={x(b.i)}
+            cy={y(b.cum)}
+            r={b.big ? 5 : 3.6}
+            fill={b.tone}
+            stroke="#FFFFFF"
+            strokeWidth={1.5}
+          />
+        ))}
+      </svg>
 
-      {/* line */}
-      <path d={path} fill="none" stroke={INK} strokeWidth="1.6"
-        strokeLinejoin="round" strokeLinecap="round" />
-
-      {/* beads on every non-par hole */}
-      {pts.map((p, i) => {
-        if (!p.kind) return null;
-        const cx = x(i);
-        const cy = y(p.cum);
-        const fill = beadFor(p.kind);
-        if (p.kind === 'eagle' || p.kind === 'birdie') {
-          return <circle key={i} cx={cx} cy={cy} r="3.4" fill={fill} />;
-        }
-        return (
-          <rect key={i} x={cx - 3.2} y={cy - 3.2} width="6.4" height="6.4"
-            rx="1.4" fill={fill} />
-        );
-      })}
-    </svg>
+      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '2px 2px 0' }}>
+        {ticks.map((i) => (
+          <span
+            key={i}
+            style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: i === n - 1 ? A.INK : A.DIM }}
+          >
+            {plottable[i].holeNo}
+          </span>
+        ))}
+      </div>
+    </>
   );
 };
 
