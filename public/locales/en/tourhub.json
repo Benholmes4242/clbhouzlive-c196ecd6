@@ -876,6 +876,14 @@
     "projectedCut": "Projected cut",
     "cut": "Cut",
     "nAdvance": "{{n}} advance",
-    "movementLegend": "Movement is places gained today · tap a player for their card"
+    "movementLegend": "Movement is places gained today · tap a player for their card",
+    "menu": {
+      "inActionNow": "In action now",
+      "nLive": "{{count}} live",
+      "nLive_one": "{{count}} live",
+      "roundN": "Round {{n}}",
+      "nTied": "{{count}} tied",
+      "nTied_one": "{{count}} tied"
+    }
   }
 }
