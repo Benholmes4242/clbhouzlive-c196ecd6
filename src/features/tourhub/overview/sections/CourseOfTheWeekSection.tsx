@@ -40,6 +40,8 @@ function CotwStat({
 export function CourseOfTheWeekSection() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useCourseOfTheWeek();
+  // No row (never played / signed out) => two-cell stat row, no error surface.
+  const { data: myBest } = useMyCourseBest(data?.course_id);
 
   // Loading: skeleton mirrors card geometry, no reservation beyond it.
   if (isLoading && !data) {
