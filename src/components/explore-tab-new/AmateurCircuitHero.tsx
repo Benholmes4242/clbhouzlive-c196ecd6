@@ -283,14 +283,15 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Type scale mirrors CoursesPageHero: 10/800 eyebrow, 18.5 title. */}
           <div
             style={{
               fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: GOLD,
-              marginBottom: 10,
+              marginBottom: 8,
               lineHeight: 1,
             }}
           >
@@ -298,10 +299,10 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: 18.5,
               fontWeight: 800,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.15,
               color: '#FFFFFF',
               display: '-webkit-box',
               WebkitLineClamp: 2,
