@@ -101,6 +101,7 @@ export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate bord
 // ============================================================================
 export const AMBER = '#F7931E';
 export const AMBER_INK = '#D97706';
+export const AMBER_DEEP = '#C2620A';                         // analytical KICKER amber — contrast-safe below 12px on white
 export const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';        // faint amber selection/tint (canonical zero-padded name)
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files
