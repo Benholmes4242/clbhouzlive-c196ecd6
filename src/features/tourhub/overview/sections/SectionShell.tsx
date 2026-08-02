@@ -1,11 +1,14 @@
 /**
  * Shared SectionShell — dispatch section header + optional right link.
- * Spec: eyebrow 10.5/800/0.14em amber, right link 11/700 muted.
+ * Spec (analytical): eyebrow is the KICKER token in AMBER_DEEP,
+ * right link 11/700 muted.
  */
 
 import type { ReactNode } from 'react';
 import { V4 } from '../tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SPACE } from '@/lib/spacing';
+
 
 export function SectionShell({
   eyebrow,
@@ -28,9 +31,10 @@ export function SectionShell({
     <section style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: eyebrowColor ?? V4.slate, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <span style={{ ...KICKER, color: eyebrowColor ?? A.AMBER_DEEP }}>
             {eyebrow}
           </span>
+
           {subline && (
             <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
               {subline}

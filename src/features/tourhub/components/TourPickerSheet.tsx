@@ -8,7 +8,7 @@
  * whichever tour is currently in view on the hero.
  */
 import React, { useMemo } from 'react';
-import { Trophy } from 'lucide-react';
+import { Globe2, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
@@ -108,7 +108,55 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
 
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* All tours — no filter: the hero river stays as it is and every
+            section that can express "all" (Coming up) merges chronologically. */}
+        <button
+          key="all"
+          type="button"
+          onClick={() => {
+            selectTour('all');
+            onClose();
+          }}
+          aria-pressed={activeTourSlug === 'all'}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '12px 16px',
+            background: activeTourSlug === 'all' ? AMBER_TINT_04 : 'transparent',
+            border: 'none',
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: FONT,
+          }}
+        >
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 6,
+              background: INK_TINT_07,
+            }}
+          >
+            <Globe2 size={15} strokeWidth={2.2} color={INK} aria-hidden />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              {t('picker.allTours')}
+            </div>
+            <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR }}>
+              {t('picker.allToursSub')}
+            </div>
+          </div>
+        </button>
         {activeMajor && (
+
           <button
             key="major"
             type="button"

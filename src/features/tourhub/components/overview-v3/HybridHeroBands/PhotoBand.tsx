@@ -74,11 +74,12 @@ function statePillText(
         tone: 'upcoming',
       };
     }
-    // Match tournament details hero chip: "LIVE · R{n}".
+    // Platform live marker copy — same string as the leaderboard masthead.
     return {
-      text: `${t('status.live')} \u00B7 R${state.round}`.toUpperCase(),
+      text: t('tour.roundInProgress', { n: state.round }),
       tone: 'live',
     };
+
   }
   if (state.kind === 'results') {
     if (state.variant === 'cancelled') return { text: t('overview.pillState.cancelled'), tone: 'final' };
@@ -125,18 +126,19 @@ export function PhotoBand({
   const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
 
-  // Live tone mirrors the tournament details hero chip (LIVE · R{n}):
-  // green tint, rectangular, no pulsing dot. Other tones unchanged.
+  // Live tone is the platform live marker: a 7px green dot with a soft halo
+  // followed by a plain label. No capsule, no tint, no pulse (broadcast
+  // convention, shared with the leaderboard masthead and the tour menu).
   const pillTone =
     pill.tone === 'live'
       ? {
-          bg: 'rgba(16,185,129,0.14)',
-          color: '#6EE7B7',
-          border: 'rgba(110,231,183,0.55)',
-          radius: 4,
-          padding: '4px 8px',
-          fontSize: 9.5,
-          letterSpacing: '0.10em',
+          bg: 'transparent',
+          color: 'rgba(255,255,255,0.98)',
+          border: 'transparent',
+          radius: 0,
+          padding: 0,
+          fontSize: 10,
+          letterSpacing: '0.14em',
         }
       : pill.tone === 'final'
         ? {
@@ -157,6 +159,7 @@ export function PhotoBand({
             fontSize: 10,
             letterSpacing: '0.14em',
           };
+
 
   // Insight overflow detection — only render "Read more" when the clamped
   // insight actually overflows its 2-line box. Re-measures on value + resize.
@@ -265,11 +268,11 @@ export function PhotoBand({
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
-        {/* State pill */}
+        {/* State pill — live is a dot + label, other states keep the capsule */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
+              display: 'inline-flex', alignItems: 'center', gap: 7,
               padding: pillTone.padding,
               borderRadius: pillTone.radius,
               background: pillTone.bg,
@@ -282,13 +285,28 @@ export function PhotoBand({
               letterSpacing: pillTone.letterSpacing,
               textTransform: 'uppercase',
               ...NUMERIC_STYLE,
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
+              backdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
+              WebkitBackdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
             }}
           >
+            {pill.tone === 'live' && (
+              <span
+                aria-hidden
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  background: '#22C55E',
+                  boxShadow: '0 0 0 3px rgba(34,197,94,0.18)',
+                  display: 'inline-block',
+                  flexShrink: 0,
+                }}
+              />
+            )}
             {pill.text}
           </span>
         </div>
+
 
         {/* Insight line — italic pulled quote (clamped to 2 lines) */}
         {insight && (
