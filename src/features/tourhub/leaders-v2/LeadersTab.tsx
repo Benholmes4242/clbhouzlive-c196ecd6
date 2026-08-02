@@ -90,14 +90,43 @@ export function LeadersTab() {
 
   const openCategory = useCallback(
     (key: string) => {
+      analyticsEvents.track('tour_leaders_full_list_opened', { tour: activeTour, category: key });
       setOpenKey(key);
       const p = new URLSearchParams(searchParams);
       p.set('tab', 'leaderboards');
       p.set('category', key);
       setSearchParams(p, { replace: true });
     },
-    [searchParams, setSearchParams],
+    [searchParams, setSearchParams, activeTour],
   );
+
+  // Shared board tap handler: track, then navigate.
+  const onPlayerTap = useCallback(
+    (category: string, playerId: string, rank: number) => {
+      if (!playerId) return;
+      analyticsEvents.track('tour_leaders_player_tapped', {
+        tour: activeTour,
+        category,
+        player_id: playerId,
+        rank,
+      });
+      navigate(`/tourhub/player/${playerId}`);
+    },
+    [navigate, activeTour],
+  );
+
+  // Analytics: viewed once per mount, after the categories resolve.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    if (isLoading || isError || !categories.length) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_leaders_viewed', {
+      tour: activeTour,
+      category_count: categories.length,
+      pool_size: categories.reduce((n, c) => n + (c.poolSize ?? 0), 0),
+    });
+  }, [categories, isLoading, isError, activeTour]);
 
   const closeCategory = useCallback(() => {
     setOpenKey(null);
