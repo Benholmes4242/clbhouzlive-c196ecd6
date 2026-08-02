@@ -14,14 +14,15 @@ import {
   useTournamentHoleAnalysis,
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
+import { FONT, INK_MUTE, INK_FAINT, AMBER } from '../../_shared/tokens';
 import {
-  FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, AMBER,
-  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
-} from '../../_shared/tokens';
+  A, CAPTION, KICKER, LABEL, NUM, Panel, toParParts,
+} from '@/features/courses/components/holes/analytical/tokens';
 import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
 import type { SharedHole } from '@/features/courses/_shared/holes/types';
 import { formatNumber } from '@/i18n/format';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
+
 
 interface Props { tournamentId: string }
 
