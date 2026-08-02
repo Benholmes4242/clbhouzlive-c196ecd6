@@ -107,51 +107,11 @@ function toParColor(n: number | null): string {
 const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
 /**
- * Result marks — shape AND colour together. Shape survives a colourblind
- * reader and a screenshot; colour makes it scannable. Par is unmarked on
- * purpose: marking every hole marks nothing.
+ * Result marks come from the shared ScoreMark renderer — one grammar across the
+ * sheet, the feed card and the Holes legend. Par is unmarked on purpose:
+ * marking every hole marks nothing.
  */
-const ScoreCell: React.FC<{ strokes: number | null; par: number | null }> = ({ strokes, par }) => {
-  if (strokes == null || strokes <= 0) {
-    return <span style={{ ...NUM, fontSize: 13, color: A.DIM }}>{'\u2014'}</span>;
-  }
-  const d = par == null ? 0 : strokes - par;
-  const under = d <= -1;
-  const over = d >= 1;
-  // Over par carries no colour of its own — the SHAPE carries it, exactly as a
-  // paper card works. Only under par is coloured.
-  const tone = under ? TOPAR_UNDER_LIGHT : TOPAR_OVER_LIGHT;
-  const dbl = d <= -2 || d >= 2;
 
-  return (
-    <span
-      style={{
-        width: '100%', maxWidth: 26, aspectRatio: '1 / 1', display: 'inline-flex',
-        alignItems: 'center', justifyContent: 'center', position: 'relative',
-      }}
-    >
-      {(under || over) && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 0, border: `1.5px solid ${tone}`,
-            borderRadius: under ? '50%' : 3,
-          }}
-        />
-      )}
-      {dbl && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 3, border: `1.5px solid ${tone}`,
-            borderRadius: under ? '50%' : 2,
-          }}
-        />
-      )}
-      <span style={{ ...NUM, fontSize: 13.5, color: tone, position: 'relative' }}>{strokes}</span>
-    </span>
-  );
-};
 
 const CardRow: React.FC<{
   label: string;
