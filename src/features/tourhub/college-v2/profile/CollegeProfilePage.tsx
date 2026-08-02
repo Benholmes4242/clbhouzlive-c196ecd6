@@ -195,10 +195,27 @@ export function CollegeProfilePage() {
         {!isError && !notFound && slug && (
           <>
             <ThisWeek slug={slug} collegeName={displayName} />
+            <div style={{ height: 10 }} />
             <TheClass slug={slug} collegeName={displayName} />
+            <div
+              style={{
+                padding: '16px 24px 0',
+                textAlign: 'center',
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: INK_FAINT,
+                letterSpacing: '0.01em',
+              }}
+            >
+              {t('college.profile.footer', { year: new Date().getFullYear() })}
+            </div>
           </>
         )}
+
+        {/* Bottom nav clearance */}
+        <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
       </div>
+
     </TourHubShell>
   );
 }
