@@ -20,7 +20,7 @@ import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
-import { BoardTable, BoardHeaderCells, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
+import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
@@ -311,6 +311,8 @@ export function LeaderboardTab() {
   // FIELD_GATE completed rounds. Absent below the gate (no provisional figure).
   const fieldRound = isLive ? currentRound : cutHasHappened ? currentRound : null;
   const field = fieldAverageToday(boardEntries, fieldRound);
+
+  const headerCols = computeBoardColumns(filteredEntries, currentRound);
 
 
   // Footnote: our thru column stores 0-18 integers only; no back-nine marker
