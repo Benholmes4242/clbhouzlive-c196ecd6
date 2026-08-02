@@ -220,57 +220,49 @@ function HolesSheet({
 }
 
 
-const FeatureMini: React.FC<{ tone: 'hard' | 'easy'; h: TournamentHole; maxAbs: number }> = ({ tone, h, maxAbs }) => {
+/**
+ * FeaturePair - HARDEST / EASIEST in ONE analytical Panel.
+ *
+ * Correctness: the figure is the hole's scoring average RELATIVE TO PAR
+ * (canonical toParParts), never the gross average - a par 3 that plays to
+ * 3.4 is "+0.4", and that is the only number that compares across holes.
+ * Difficulty colour follows the canonical grammar: over par reads RED,
+ * under par reads GREEN.
+ */
+const FeatureHalf: React.FC<{ tone: string; label: string; h: TournamentHole }> = ({ tone, label, h }) => {
   const { t } = useTranslation(['tourhub', 'courses']);
-  const tint = tone === 'hard' ? 'rgba(29,93,191,0.05)' : 'rgba(210,34,45,0.05)';
-  const border = tone === 'hard' ? 'rgba(29,93,191,0.18)' : 'rgba(210,34,45,0.18)';
-  const eyebrow = tone === 'hard' ? TOPAR_OVER_LIGHT : TOPAR_UNDER_LIGHT;
-  const label = tone === 'hard' ? t('holes.hardest', { ns: 'courses' }) : t('holes.easiest', { ns: 'courses' });
-  const playsTo = (h.par + h.avg_to_par).toFixed(1);
-  const magnitude = Math.min(1, Math.abs(h.avg_to_par) / Math.max(0.01, maxAbs)) * 50;
-  const isOver = h.avg_to_par > AVG_EPSILON;
-  const isUnder = h.avg_to_par < -AVG_EPSILON;
+  const parts = toParParts(h.avg_to_par, 1);
   return (
-    <div
-      style={{
-        flex: 1,
-        background: tint,
-        border: `1px solid ${border}`,
-        borderRadius: 14,
-        padding: '12px 14px',
-        fontFamily: FONT,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-      }}
-    >
-      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: eyebrow }}>
-        {label}
+    <div style={{ minWidth: 0, flex: 1 }}>
+      <div style={{ ...LABEL, color: tone }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
+        <span style={{ ...NUM, fontSize: 28, color: A.INK, lineHeight: 1 }}>{h.hole_no}</span>
+        {parts && (
+          <span style={{ ...NUM, fontSize: 15, color: parts.tone, lineHeight: 1 }}>{parts.text}</span>
+        )}
       </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <div style={{ fontSize: 40, fontWeight: 200, color: INK, letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-          {h.hole_no}
-        </div>
-        <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
-          {t('holes.playsToInline', { ns: 'courses', playsTo })}
-        </div>
-      </div>
-      <div style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: -2, fontVariantNumeric: 'tabular-nums' }}>
+      <div style={{ ...CAPTION, marginTop: 6 }}>
         {t('board.meta.par', { ns: 'tourhub', par: h.par })}
-      </div>
-
-      <div
-        aria-hidden
-        style={{ position: 'relative', width: '100%', height: 4, background: 'rgba(15,23,42,0.06)', borderRadius: 4, overflow: 'hidden' }}
-      >
-        <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, background: 'rgba(15,23,42,0.14)', transform: 'translateX(-0.5px)' }} />
-        {isUnder && (
-          <div style={{ position: 'absolute', top: 0, bottom: 0, right: '50%', width: `${magnitude}%`, background: TOPAR_UNDER_LIGHT }} />
-        )}
-        {isOver && (
-          <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: `${magnitude}%`, background: TOPAR_OVER_LIGHT }} />
-        )}
+        {h.yards != null
+          ? ` \u00B7 ${t('courses:courseDetail.holes.yards')} ${formatNumber(h.yards)}`
+          : ''}
       </div>
     </div>
   );
 };
+
+const FeaturePair: React.FC<{ hardest: TournamentHole; easiest: TournamentHole }> = ({ hardest, easiest }) => {
+  const { t } = useTranslation(['tourhub', 'courses']);
+  return (
+    <div style={{ padding: '0 16px 4px' }}>
+      <Panel>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          <FeatureHalf tone={A.OVER} label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
+          <div style={{ width: 1, alignSelf: 'stretch', background: A.BORDER }} aria-hidden="true" />
+          <FeatureHalf tone={A.UNDER} label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
+        </div>
+      </Panel>
+    </div>
+  );
+};
+
