@@ -1,5 +1,5 @@
 /**
- * CollegeHeroMasthead — the shared single-row hero used by both the College
+ * CollegeHeroMasthead - the shared single-row hero used by both the College
  * hub (leader spotlight) and the College profile page.
  *
  * Layout: crest (66 squircle, gold ring at rank 1) + name/meta stack +
@@ -11,18 +11,36 @@
  * No runtime pixel extraction, no CORS dependency, no async color state.
  */
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  AMBER,
   CHARCOAL,
   FONT,
   GOLD,
-  STATUS_LIVE,
+  STATUS_LIVE_ON_DARK,
   WHITE_ALPHA_10,
-  WHITE_ALPHA_18,
   WHITE_ALPHA_55,
-  WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
+import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
+
+/* Figure-row typography. Labels use WHITE_ALPHA_55 - the light-surface A.DIM
+   token does not read on this dark gradient. */
+const LABEL_STYLE: CSSProperties = {
+  fontSize: 9,
+  fontWeight: 800,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: WHITE_ALPHA_55,
+};
+
+const FIGURE_STYLE: CSSProperties = {
+  fontSize: 22,
+  fontWeight: 800,
+  letterSpacing: '-0.02em',
+  color: '#FFFFFF',
+  marginTop: 4,
+  lineHeight: 1.05,
+};
 
 const CHARCOAL_R = 0x14;
 const CHARCOAL_G = 0x16;
@@ -61,12 +79,8 @@ function darkenTowardCharcoal(hex: string, amount = 0.4): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatPoints(n: number): string {
-  if (!n) return '$0';
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
-}
+/* Money formatting lives in _shared/formatEarnings.ts - one implementation. */
+
 
 interface Props {
   displayName: string;
@@ -76,7 +90,11 @@ interface Props {
   pointsTotal: number;
   alumniCount: number;
   playingNow: number;
-  /** Positive = climbed; negative = fell; null/0 = hide chip. */
+  /**
+   * Kept for API compatibility with the profile page. No longer rendered:
+   * the hub hero describes the No.1 college (whose rank cannot move without
+   * the whole board changing) and the movement is stated on its row below.
+   */
   rankChange?: number | null;
   /** Right-hand action slot (Follow / Compare buttons). */
   actions?: ReactNode;
@@ -90,21 +108,19 @@ export function CollegeHeroMasthead({
   pointsTotal,
   alumniCount,
   playingNow,
-  rankChange = null,
   actions,
 }: Props) {
+  const { t } = useTranslation('tourhub');
   const isRankOne = rank === 1;
+
+  const showEarnings = !!pointsTotal && pointsTotal > 0;
+  const showAlumni = alumniCount > 0;
+  const showPlaying = playingNow > 0;
 
   const heroBackground = brandHex
     ? `linear-gradient(180deg, ${darkenTowardCharcoal(brandHex, 0.4)} 0%, ${CHARCOAL} 100%)`
     : `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`;
 
-  const trend =
-    rankChange == null || rankChange === 0
-      ? null
-      : rankChange > 0
-      ? { label: `\u25B2${rankChange}`, color: '#4ADE80' }
-      : { label: `\u25BC${Math.abs(rankChange)}`, color: '#F87171' };
 
   return (
     <div
@@ -124,7 +140,7 @@ export function CollegeHeroMasthead({
         textAlign: 'center',
       }}
     >
-      {/* Crest 128 — unboxed, floats on the hero. Rank-1 gets an amber glow;
+      {/* Crest 128 - unboxed, floats on the hero. Rank-1 gets an amber glow;
           others a neutral soft drop shadow for separation from busy gradients. */}
       <div
         style={{
@@ -169,13 +185,13 @@ export function CollegeHeroMasthead({
         )}
       </div>
 
-      {/* Name + meta (centred) */}
+      {/* Name + figures (centred) */}
       <div style={{ width: '100%', minWidth: 0 }}>
         <div
           style={{
-            fontSize: 9.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: WHITE_ALPHA_55,
             marginBottom: 4,
@@ -198,57 +214,53 @@ export function CollegeHeroMasthead({
         >
           {displayName}
         </h1>
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 11,
-            fontWeight: 600,
-            color: WHITE_ALPHA_65,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            columnGap: 6,
-            rowGap: 4,
-            flexWrap: 'wrap',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          <span style={{ color: isRankOne ? GOLD : AMBER, fontWeight: 800 }}>
-            {formatPoints(pointsTotal)}
-          </span>
-          <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-          <span>{alumniCount} alumni on tour</span>
-          {trend && (
-            <>
-              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  padding: '2px 6px',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: `0.5px solid ${WHITE_ALPHA_18}`,
-                  color: trend.color,
-                  fontWeight: 800,
-                  fontSize: 10,
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {trend.label}
-              </span>
-            </>
-          )}
-          {playingNow > 0 && (
-            <>
-              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-              <span style={{ color: STATUS_LIVE, fontWeight: 700 }}>
-                {playingNow} playing now
-              </span>
-            </>
-          )}
-        </div>
+
+        {/* Three-figure row. Each cell self-hides; the row hides when empty. */}
+        {(showEarnings || showAlumni || showPlaying) && (
+          <div
+            style={{
+              marginTop: 16,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              gap: 28,
+              fontVariantNumeric: 'tabular-nums lining',
+            }}
+          >
+            {showEarnings && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.earnings')}</div>
+                <div style={FIGURE_STYLE}>{formatEarnings(pointsTotal)}</div>
+              </div>
+            )}
+            {showAlumni && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.alumni')}</div>
+                <div style={FIGURE_STYLE}>{alumniCount}</div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: WHITE_ALPHA_55,
+                    marginTop: 2,
+                  }}
+                >
+                  {t('college.hero.alumniSub')}
+                </div>
+              </div>
+            )}
+            {showPlaying && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.playingNow')}</div>
+                <div style={{ ...FIGURE_STYLE, color: STATUS_LIVE_ON_DARK }}>
+                  {playingNow}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
 
       {actions && (
         <div

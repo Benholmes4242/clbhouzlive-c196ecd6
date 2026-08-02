@@ -1,5 +1,5 @@
 /**
- * CollegeHubPage — "The Yearbook".
+ * CollegeHubPage - "The Yearbook".
  *
  * Colleges ranked by their alumni on tour. Header: THE FRANCHISE eyebrow +
  * year + expanding search icon. Feed: YearbookCard per college. Search
@@ -7,18 +7,21 @@
  *
  * No ShellSlot, no CollegeShellRow, no framer-motion.
  * Entry point wiring: /tourhub/college-golf (App.tsx route). TourHubMainPage
- * navigates to this path when 'college' is chosen from the side menu — the
+ * navigates to this path when 'college' is chosen from the side menu - the
  * page swap in App.tsx is sufficient to cut both entries over.
  */
 
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { Search, X, Swords } from 'lucide-react';
+import { Search, X, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { TourHubShell } from '@/features/tourhub/components';
 
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
+  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -38,6 +41,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 
 export function CollegeHubPage() {
+  const { t } = useTranslation('tourhub');
   const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
 
@@ -57,7 +61,7 @@ export function CollegeHubPage() {
   const leader = standings[0];
   const leaderPlayingNow = leader ? liveByCollege[leader.normalizedName] ?? 0 : 0;
 
-  // ── Compare pick mode ────────────────────────────────────────────────
+  // -- Compare pick mode ------------------------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const compareParam = searchParams.get('compare');
@@ -66,8 +70,13 @@ export function CollegeHubPage() {
   const [pickC2, setPickC2] = useState<string | null>(null);
 
   // If ?compare=slug arrives later, sync into state.
+  const deepLinkTrackedRef = useRef(false);
   useEffect(() => {
     if (compareParam) {
+      if (!deepLinkTrackedRef.current) {
+        deepLinkTrackedRef.current = true;
+        analyticsEvents.track('tour_college_compare_started', { from: 'deeplink' });
+      }
       setPickMode(true);
       setPickC1((prev) => prev ?? compareParam);
     }
@@ -80,6 +89,7 @@ export function CollegeHubPage() {
   }, [standings]);
 
   const enterPickMode = () => {
+    analyticsEvents.track('tour_college_compare_started', { from: 'header' });
     setPickMode(true);
     setPickC1(null);
     setPickC2(null);
@@ -102,7 +112,7 @@ export function CollegeHubPage() {
       return;
     }
     if (slug === pickC1) return; // ignore same pick
-    // Both chosen → route to duel.
+    // Both chosen -> route to duel.
     navigate(collegeH2HRoute(pickC1, slug));
   };
 
@@ -118,12 +128,35 @@ export function CollegeHubPage() {
 
   const editorialLine =
     totalLive > 0
-      ? `Colleges ranked by their alumni on tour \u2014 ${totalLive} ${totalLive === 1 ? 'alumnus is' : 'alumni are'} on the course right now.`
-      : `Colleges ranked by their alumni on tour.`;
+      ? t('college.hub.subtitle', { count: totalLive })
+      : t('college.hub.subtitleIdle');
+
+  // ---- Analytics -----------------------------------------------------
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current || standings.length === 0) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_college_hub_viewed', {
+      year,
+      colleges: standings.length,
+      total_live: totalLive,
+    });
+  }, [standings.length, year, totalLive]);
+
+  const searchedRef = useRef('');
+  useEffect(() => {
+    const q = debouncedSearch.trim();
+    if (!q || searchedRef.current === q) return;
+    searchedRef.current = q;
+    analyticsEvents.track('tour_college_searched', {
+      query_length: q.length,
+      results: filtered.length,
+    });
+  }, [debouncedSearch, filtered.length]);
 
   return (
     <TourHubShell showBack={false} immersiveStatusBar>
-      {/* Hero bleeds into the notch — no GlassHeaderPlate veil (matches profile page). */}
+      {/* Hero bleeds into the notch - no GlassHeaderPlate veil (matches profile page). */}
 
       <div
         className="pb-22"
@@ -133,14 +166,14 @@ export function CollegeHubPage() {
           fontFamily: FONT,
         }}
       >
-        {/* Hero — leader takes the hero (or charcoal fallback when no standings). */}
+        {/* Hero - leader takes the hero (or charcoal fallback when no standings). */}
         {leader ? (
           <CollegeHeroMasthead
             displayName={leader.collegeName}
             logoUrl={leader.logoUrl}
             brandHex={leader.brandHex}
             rank={leader.rank}
-            pointsTotal={leader.pointsTotal}
+            pointsTotal={leader.earningsTotal}
             alumniCount={leader.alumniCount}
             playingNow={leaderPlayingNow}
             rankChange={leader.rankChange}
@@ -202,7 +235,7 @@ export function CollegeHubPage() {
         )}
 
 
-        {/* Sticky glass search row — locks under island band; filters the feed. */}
+        {/* Sticky glass search row - locks under island band; filters the feed. */}
         <div
           style={{
             position: 'sticky',
@@ -228,7 +261,7 @@ export function CollegeHubPage() {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search colleges…"
+              placeholder={t('college.hub.searchPlaceholder')}
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onFocus={() => setSearchExpanded(true)}
@@ -250,7 +283,7 @@ export function CollegeHubPage() {
             {searchValue && (
               <button
                 type="button"
-                aria-label="Clear search"
+                aria-label={t('college.hub.clearSearchAria')}
                 onClick={() => setSearchValue('')}
                 style={{
                   position: 'absolute',
@@ -282,7 +315,6 @@ export function CollegeHubPage() {
               fontFamily: FONT,
             }}
           >
-            <Swords size={14} color={AMBER} strokeWidth={2.4} />
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div
                 style={{
@@ -293,7 +325,7 @@ export function CollegeHubPage() {
                   color: INK_FAINT,
                 }}
               >
-                {pickC1 ? 'Pick one more school' : 'Pick two schools to compare'}
+                {pickC1 ? t('college.hub.pickOneMore') : t('college.hub.pickTwo')}
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {pickC1 && (
@@ -314,7 +346,7 @@ export function CollegeHubPage() {
                     {nameForSlug[pickC1] ?? pickC1}
                     <button
                       type="button"
-                      aria-label="Remove school"
+                      aria-label={t('college.hub.removeSchoolAria')}
                       onClick={() => setPickC1(null)}
                       style={{
                         background: 'transparent',
@@ -352,13 +384,26 @@ export function CollegeHubPage() {
         ) : (
           <div
             style={{
-              padding: '8px 16px',
+              padding: '10px 16px',
               display: 'flex',
-              justifyContent: 'flex-end',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
               background: SURFACE,
               borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
             }}
           >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: AMBER_DEEP,
+              }}
+            >
+              {t('college.hub.kicker')}
+            </div>
             <button
               type="button"
               onClick={enterPickMode}
@@ -366,22 +411,20 @@ export function CollegeHubPage() {
                 fontFamily: FONT,
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 5,
-                height: 26,
-                padding: '0 10px',
-                borderRadius: 999,
-                border: `1px solid ${HAIRLINE_INK_10}`,
-                background: SURFACE,
-                color: INK,
-                fontSize: 10.5,
+                gap: 3,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                color: AMBER_DEEP,
+                fontSize: 10,
                 fontWeight: 800,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.13em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
             >
-              <Swords size={12} color={AMBER} strokeWidth={2.4} />
-              Compare schools
+              {t('college.hub.compare')}
+              <ChevronRight size={12} strokeWidth={2.4} />
             </button>
           </div>
         )}
@@ -431,7 +474,7 @@ export function CollegeHubPage() {
             >
               {debouncedSearch
                 ? `No colleges match "${debouncedSearch}".`
-                : 'No franchises ranked yet this season.'}
+                : t('college.hub.empty')}
             </div>
           ) : (
             filtered.map((s) => (
@@ -441,9 +484,32 @@ export function CollegeHubPage() {
                 liveCount={liveByCollege[s.normalizedName] ?? 0}
                 onSelect={pickMode ? handleSelectForCompare : undefined}
                 selected={pickMode && pickC1 === s.normalizedName}
+                onTap={(mode) =>
+                  analyticsEvents.track('tour_college_tapped', {
+                    slug: s.normalizedName,
+                    rank: s.rank,
+                    live_count: liveByCollege[s.normalizedName] ?? 0,
+                    mode,
+                  })
+                }
               />
             ))
           )}
+        </div>
+
+        {/* Footer: sample and method, always visible. */}
+        <div
+          style={{
+            padding: '14px 16px 0',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            color: INK_FAINT,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {t('college.hub.footer', { year })}
         </div>
       </div>
     </TourHubShell>

@@ -91,7 +91,7 @@ export function CollegeProfilePage() {
             slug={slug}
             displayName={displayName}
             rank={standing.rank}
-            pointsTotal={standing.pointsTotal}
+            pointsTotal={standing.earningsTotal}
             alumniCount={standing.alumniCount}
             playingNow={playingNow}
             brandHex={standing.brandHex}

@@ -195,8 +195,8 @@ export function ComparePage() {
             <>
               <TugStat
                 label="Franchise Points"
-                leftValue={left?.pointsTotal ?? 0}
-                rightValue={right?.pointsTotal ?? 0}
+                leftValue={left?.earningsTotal ?? 0}
+                rightValue={right?.earningsTotal ?? 0}
                 format={formatCurrency}
               />
               <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
