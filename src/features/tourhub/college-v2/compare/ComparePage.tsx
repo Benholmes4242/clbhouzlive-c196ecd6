@@ -270,8 +270,8 @@ export function ComparePage() {
             right={right}
             liveLeft={liveLeft}
             liveRight={liveRight}
-            onChangeLeft={() => setPickerTarget('c1')}
-            onChangeRight={() => setPickerTarget('c2')}
+            onChangeLeft={() => openPicker('c1')}
+            onChangeRight={() => openPicker('c2')}
           />
         )}
 
