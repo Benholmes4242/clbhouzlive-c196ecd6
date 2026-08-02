@@ -342,7 +342,7 @@ export function LeaderboardTab() {
     <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F, paddingTop: 'calc(var(--sat, 0px) + 69px)' }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
-        {/* TITLE ROW — heading in line with the search control. flex-start so
+        {/* TITLE ROW - heading in line with the search control. flex-start so
             the icon tracks the FIRST line of a two-line title. */}
         <div
           style={{
@@ -411,7 +411,7 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* SEARCH — its own full-width row; the masthead stays legible. */}
+        {/* SEARCH - its own full-width row; the masthead stays legible. */}
         {searchOpen && (
           <div
             style={{
@@ -445,7 +445,7 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* META ROW — round state left, date range right. */}
+        {/* META ROW - round state left, date range right. */}
         {(metaStatus || currentRound != null || dates) && (
           <div
             style={{
@@ -463,7 +463,7 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* STAT ROW — par / yards / field average. */}
+        {/* STAT ROW - par / yards / field average. */}
         {(par != null || yardage != null || field != null) && (
           <div
             style={{
