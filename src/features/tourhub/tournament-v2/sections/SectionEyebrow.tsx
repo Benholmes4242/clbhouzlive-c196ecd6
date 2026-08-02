@@ -1,8 +1,11 @@
 /**
- * SectionEyebrow — TD1 section header: kicker + optional right action.
- * Dispatch grammar: canonical slate eyebrow + right chevron affordance.
+ * SectionEyebrow - TD1 section header: kicker + optional right action.
+ *
+ * Analytical grammar (BRIEF_TOUR_TOURNAMENT_PAGE): the kicker is the canonical
+ * KICKER token (amber-deep, 0.16em) and the action is the canonical quiet
+ * Action - never a filled pill, never a raw chevron glyph.
  */
-import { FONT, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
+import { A, KICKER, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   kicker: string;
@@ -14,30 +17,33 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
   return (
     <div
       style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '16px 16px 12px', fontFamily: FONT,
+        display: 'flex', alignItems: 'baseline', gap: 12,
+        padding: '16px 16px 12px', fontFamily: SANS,
       }}
     >
-      <span
-        style={{
-          fontSize: 11, fontWeight: 800, color: INK_FAINT,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-        }}
-      >
-        {kicker}
-      </span>
+      <span style={KICKER}>{kicker}</span>
       {actionLabel && onAction && (
         <button
           type="button"
           onClick={onAction}
           style={{
-            marginLeft: 'auto', background: 'transparent', border: 'none',
-            fontSize: 11, fontWeight: 700, color: INK_MUTE,
-            cursor: 'pointer', padding: 0, fontFamily: FONT,
+            marginLeft: 'auto',
+            minHeight: 32,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            fontFamily: SANS,
           }}
           className="active:opacity-70 transition-opacity"
         >
-          {actionLabel} <span style={{ color: INK_FAINT }}>›</span>
+          <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{actionLabel}</span>
+          <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+            {'\u203A'}
+          </span>
         </button>
       )}
     </div>
