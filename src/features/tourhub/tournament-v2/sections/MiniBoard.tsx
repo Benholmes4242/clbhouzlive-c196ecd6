@@ -1,5 +1,5 @@
 /**
- * MiniBoard — TD1 top-5 compressed board.
+ * MiniBoard - TD1 top-5 compressed board.
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
  * Row tap opens ScorecardSheet.
  */
