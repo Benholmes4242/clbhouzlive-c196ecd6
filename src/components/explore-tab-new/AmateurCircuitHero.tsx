@@ -404,8 +404,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
 
           {showCta ? (
-            <div style={{ marginTop: 12 }}>
-              {/* Same pill as the Courses hero CTA: 12/800, 9x15. */}
+            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
               <button
                 type="button"
                 onClick={handleCta}
@@ -422,7 +421,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                   cursor: 'pointer',
                 }}
               >
-                View scorecard
+                {t('discover.hero.viewScorecard', 'View scorecard')}
               </button>
             </div>
           ) : null}
