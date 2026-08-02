@@ -342,93 +342,61 @@ export function LeaderboardTab() {
     <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F, paddingTop: 'calc(var(--sat, 0px) + 69px)' }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
+        {/* TITLE ROW — heading in line with the search control. flex-start so
+            the icon tracks the FIRST line of a two-line title. */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'space-between',
             gap: 10,
           }}
         >
-          <LiveMarker
-            status={metaStatus}
-            currentRound={currentRound}
-          />
+          <h1
+            style={{
+              margin: 0,
+              flex: 1,
+              minWidth: 0,
+              fontFamily: F,
+              fontSize: 26,
+              fontWeight: 800,
+              color: A.INK,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {meta?.name ?? selected.name}
+          </h1>
 
-          {searchOpen ? (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                flex: 1,
-                marginLeft: 10,
-                background: '#F1F5F9',
-                border: `1px solid ${HAIRLINE}`,
-                borderRadius: 8,
-                padding: '5px 8px',
-              }}
-            >
-              <Search size={13} color={MUTED} strokeWidth={2.5} />
-              <input
-                ref={searchInputRef}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('board.search.placeholder')}
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  background: 'transparent',
-                  fontFamily: F,
-                  fontSize: 12.5,
-                  color: INK,
-                  minWidth: 0,
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSearchOpen(false);
-                }}
-                aria-label={t('board.search.closeAria')}
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex' }}
-              >
-                <X size={13} color={MUTED} />
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label={t('board.search.openAria')}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 4,
-                cursor: 'pointer',
-                display: 'flex',
-              }}
-            >
+          <button
+            type="button"
+            onClick={() => {
+              if (searchOpen) {
+                setSearchQuery('');
+                setSearchOpen(false);
+              } else {
+                setSearchOpen(true);
+              }
+            }}
+            aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
+            style={{
+              flex: 'none',
+              marginTop: 4,
+              background: 'none',
+              border: 'none',
+              padding: 4,
+              cursor: 'pointer',
+              display: 'flex',
+            }}
+          >
+            {searchOpen ? (
+              <X size={16} color={INK} strokeWidth={2.5} />
+            ) : (
               <Search size={16} color={INK} strokeWidth={2.5} />
-            </button>
-          )}
+            )}
+          </button>
         </div>
 
-        <h1
-          style={{
-            margin: '10px 0 0',
-            fontFamily: F,
-            fontSize: 26,
-            fontWeight: 800,
-            color: A.INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
-          }}
-        >
-          {meta?.name ?? selected.name}
-        </h1>
         {venueLine && (
           <div
             style={{
@@ -443,11 +411,63 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* STAT ROW — par / yards / field average, dates beneath. */}
-        {(par != null || yardage != null || field != null || dates) && (
+        {/* SEARCH — its own full-width row; the masthead stays legible. */}
+        {searchOpen && (
           <div
             style={{
-              marginTop: 14,
+              marginTop: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: '#F1F5F9',
+              border: `1px solid ${HAIRLINE}`,
+              borderRadius: 8,
+              padding: '5px 8px',
+            }}
+          >
+            <Search size={13} color={MUTED} strokeWidth={2.5} />
+            <input
+              ref={searchInputRef}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('board.search.placeholder')}
+              style={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontFamily: F,
+                fontSize: 12.5,
+                color: INK,
+                minWidth: 0,
+              }}
+            />
+          </div>
+        )}
+
+        {/* META ROW — round state left, date range right. */}
+        {(metaStatus || currentRound != null || dates) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginTop: 10,
+            }}
+          >
+            {(metaStatus || currentRound != null) && (
+              <LiveMarker status={metaStatus} currentRound={currentRound} />
+            )}
+            {dates && <div style={{ ...LABEL, color: A.DIM, textAlign: 'right' }}>{dates}</div>}
+          </div>
+        )}
+
+        {/* STAT ROW — par / yards / field average. */}
+        {(par != null || yardage != null || field != null) && (
+          <div
+            style={{
+              marginTop: 12,
               background: A.PANEL,
               border: `1px solid ${A.BORDER}`,
               borderRadius: 16,
@@ -471,11 +491,9 @@ export function LeaderboardTab() {
                 />
               )}
             </div>
-            {dates && (
-              <div style={{ ...LABEL, textAlign: 'center', marginTop: 14 }}>{dates}</div>
-            )}
           </div>
         )}
+
 
       </div>
 
