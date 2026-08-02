@@ -33,7 +33,7 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { analyticsEvents } from '@/lib/analyticsEvents';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   fieldAverageToday,
   lowRoundToday,
