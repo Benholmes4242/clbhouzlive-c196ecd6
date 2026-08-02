@@ -6,7 +6,10 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
-import { TREND_UP, TREND_DOWN } from '@/features/tourhub/_shared/tokens';
+import {
+  TREND_UP, TREND_DOWN,
+  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT, TOPAR_EVEN_LIGHT,
+} from '@/features/tourhub/_shared/tokens';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -16,7 +19,14 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
-const EVEN_GRAY = '#8A9099';
+/**
+ * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
+ * INK, even par is muted. One source of truth with the tour surfaces
+ * (`tourhub/_shared/scoreColor`), so a member card and a tour card colour the
+ * same score identically. Course DIFFICULTY (red harder / green easier) is a
+ * different semantic surface and does not appear on a scorecard.
+ */
+const EVEN_GRAY = TOPAR_EVEN_LIGHT;
 
 export interface CardScorecardHole {
   holeNo: number;
@@ -107,7 +117,9 @@ const ScoreCell: React.FC<{ strokes: number | null; par: number | null }> = ({ s
   const d = par == null ? 0 : strokes - par;
   const under = d <= -1;
   const over = d >= 1;
-  const tone = under ? A.GREEN : over ? A.RED : A.INK;
+  // Over par carries no colour of its own — the SHAPE carries it, exactly as a
+  // paper card works. Only under par is coloured.
+  const tone = under ? TOPAR_UNDER_LIGHT : TOPAR_OVER_LIGHT;
   const dbl = d <= -2 || d >= 2;
 
   return (
@@ -451,12 +463,16 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         });
       }
     } else if (courseContext?.yourAvgToPar != null) {
-      const parts = toParParts(courseContext.yourAvgToPar);
+      const avgHere = courseContext.yourAvgToPar;
+      const parts = toParParts(avgHere);
       if (parts) {
         items.push({
           label: t('courses:scorecard.yourAvgHere'),
           value: parts.text,
-          tone: A.AMBER,
+          // The member's own scoring average is a PLAYER SCORE, so it takes the
+          // to-par rule. The label already says "Your"; amber is not needed to
+          // carry the possessive.
+          tone: toParColor(avgHere),
           sub: courseContext.roundsHere != null
             ? t('courses:scorecard.roundsHere', { count: courseContext.roundsHere })
             : undefined,
@@ -499,10 +515,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const split = useMemo(() => {
     const d = (h: CardScorecardHole) => (h.strokes as number) - (h.par as number);
     return [
-      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: A.GREEN },
-      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: A.DIM },
-      { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: A.AMBER },
-      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: A.RED },
+      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: TOPAR_UNDER_LIGHT },
+      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: TOPAR_EVEN_LIGHT },
+      { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: A.MUTE },
+      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: TOPAR_OVER_LIGHT },
     ];
   }, [played, t]);
 

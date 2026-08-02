@@ -1,5 +1,6 @@
 import React from 'react';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
 
 /**
  * Cumulative to-par across the round.
@@ -9,12 +10,14 @@ import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/t
  * Over par plots UP.
  *
  * Beads mark only the holes that swung the round:
- *   birdie or better -> GREEN (eagle+ drawn larger)
- *   double or worse  -> RED
- *   bogey            -> no bead at all
+ *   birdie or better -> TOPAR_UNDER red, good in golf (eagle+ drawn larger)
+ *   double or worse  -> TOPAR_OVER ink
+ *   bogey            -> no bead at all (a normal outcome; marking every one
+ *                       turns the line into noise)
  *
- * The bead colours are set here rather than in `holes/_constants`, which is
- * shared with HolesScoringKey / ScoreMark / PostRoundCard.
+ * The to-par tokens come from `tourhub/_shared/tokens` so a member card and a
+ * tour card colour the same score identically. Course difficulty (red harder /
+ * green easier) is a different semantic surface and is not used here.
  */
 
 const FIELD_LINE = '#C3CAD2';
@@ -66,8 +69,8 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
       fieldOpen = false;
     }
 
-    if (d <= -1) beads.push({ i, cum: cumYou, tone: A.GREEN, big: d <= -2 });
-    else if (d >= 2) beads.push({ i, cum: cumYou, tone: A.RED, big: false });
+    if (d <= -1) beads.push({ i, cum: cumYou, tone: TOPAR_UNDER_LIGHT, big: d <= -2 });
+    else if (d >= 2) beads.push({ i, cum: cumYou, tone: TOPAR_OVER_LIGHT, big: false });
   });
 
   const hasField = field.length >= 2;
