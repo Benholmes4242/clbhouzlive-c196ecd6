@@ -19,10 +19,13 @@ export const MONO = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans
 // and No.1 surfaces. Do not substitute one for the other.
 // -----------------------------------------------------------------------------
 
-export const SC_FILL_GOLD   = '#FFD200'; // ace / albatross / eagle disc
-export const SC_FILL_BIRDIE = '#D2222D'; // birdie disc
-export const SC_FILL_BOGEY  = '#1D5DBF'; // bogey square
-export const SC_FILL_DOUBLE = '#0F2E63'; // double-plus square
+export const SC_FILL_GOLD   = '#FFD200'; // ace / albatross rarity ring
+// Canonical under-par red lives in tourhub/_shared/tokens (TOPAR_UNDER_LIGHT).
+// SC_FILL_BIRDIE is a re-export alias so #D2222D is declared exactly once.
+export { TOPAR_UNDER_LIGHT as SC_FILL_BIRDIE } from '@/features/tourhub/_shared/tokens';
+export const SC_FILL_BOGEY  = '#1D5DBF'; // legacy fill grammar - see ship report
+export const SC_FILL_DOUBLE = '#0F2E63'; // legacy fill grammar - see ship report
+
 
 // Text tokens - light surfaces (stats, totals, distribution labels).
 export const SC_ACE       = '#8A6400';
