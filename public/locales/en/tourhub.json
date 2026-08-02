@@ -773,14 +773,17 @@
     "search": {
       "placeholder": "Search players",
       "openAria": "Search players",
-      "closeAria": "Clear search"
+      "closeAria": "Clear search",
+      "noneInField": "No match in the top {{count}}. Try the full player directory."
     },
     "editorial": {
-      "leaderAt": "{{tournament}} — {{leader}} LEADS AT {{score}}",
+      "leaderAt": "{{tournament}} . {{leader}} LEADS AT {{score}}",
       "startsOn": "{{tournament}} STARTS {{day}}"
     },
     "field": {
-      "eyebrow": "THE FIELD"
+      "eyebrow": "THE FIELD",
+      "playingNow": "PLAYING NOW",
+      "lead": "LEAD"
     },
     "sort": {
       "ranking": "Ranking",
@@ -789,11 +792,14 @@
     "sub": {
       "wins_one": "{{count}} WIN",
       "wins_other": "{{count}} WINS",
-      "top10s": "{{count}} TOP-10"
+      "top10s": "{{count}} TOP-10",
+      "worldRank": "WORLD {{rank}}",
+      "fedexRank": "{{label}} {{rank}}"
     },
     "footer": {
       "synced": "Season ranking · live dot = on the course right now",
-      "unsynced": "Ranked by world ranking — season statistics arrive with the sync"
+      "unsynced": "Ranked by world ranking — season statistics arrive with the sync",
+      "sample": "Top {{count}} by season ranking . live dot = on the course now"
     },
     "error": {
       "title": "Couldn't load the ranking",
@@ -810,6 +816,10 @@
       "lpga": "CME PTS",
       "pgad": "POINTS",
       "liv": "LIV PTS"
+    },
+    "header": {
+      "rank": "#",
+      "player": "PLAYER"
     }
   },
   "player": {
