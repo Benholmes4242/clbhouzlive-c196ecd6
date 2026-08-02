@@ -58,55 +58,135 @@ interface Props {
   leaderboard: LbEntry[] | undefined;
 }
 
-function fmtScoreSigned(n: number | null | undefined): string {
-  if (n == null) return '—';
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : String(n);
-}
-
-function CountdownTile({ value, label }: { value: number; label: string }) {
+/**
+ * Figure - one hero figure. Flat: no glass tile, no border, no backdrop
+ * filter. Three of these sit in ONE row for every state, so the hero has a
+ * single figure grammar instead of a per-state widget.
+ */
+function Figure({ value, label, tone }: { value: string; label: string; tone?: string }) {
   return (
-    <div
-      style={{
-        minWidth: 52,
-        padding: '8px 10px',
-        borderRadius: 10,
-        background: 'rgba(255,255,255,0.10)',
-        backdropFilter: 'blur(10px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(10px) saturate(140%)',
-        border: '0.5px solid rgba(255,255,255,0.16)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
-      }}
-    >
-      <span
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div
         style={{
-          fontSize: 17,
+          fontSize: 22,
           fontWeight: 800,
           lineHeight: 1,
-          color: '#fff',
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
+          color: tone ?? '#fff',
+          fontVariantNumeric: 'tabular-nums lining',
+          letterSpacing: '-0.02em',
+          textShadow: TEXT_SHADOW,
         }}
       >
         {value}
-      </span>
-      <span
+      </div>
+      <div
         style={{
-          fontSize: 7.5,
-          fontWeight: 700,
+          marginTop: 5,
+          fontSize: 8.5,
+          fontWeight: 800,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
+          textShadow: TEXT_SHADOW,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
         {label}
-      </span>
+      </div>
     </div>
   );
 }
+
+/**
+ * PersonLockup - the ONE person treatment in the hero. Leader (live),
+ * defending champion (upcoming) and champion (completed) all render through
+ * this so the avatar, label, name and sub-line never drift apart.
+ */
+function PersonLockup({
+  label,
+  labelTone,
+  icon,
+  name,
+  sub,
+  playerId,
+  photoUrl,
+  tourCode,
+  showAvatar,
+}: {
+  label: string;
+  labelTone?: string;
+  icon?: React.ReactNode;
+  name: string;
+  sub?: string | null;
+  playerId?: string | null;
+  photoUrl?: string | null;
+  tourCode: string;
+  showAvatar?: boolean;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+      {showAvatar && (
+        <PlayerAvatar
+          playerId={playerId ?? ''}
+          playerName={name}
+          tourCode={tourCode}
+          photoUrl={photoUrl ?? null}
+          size="md"
+          ringColor={LIGHT_HAIRLINE}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: labelTone ?? 'rgba(255,255,255,0.62)',
+            textTransform: 'uppercase',
+            textShadow: TEXT_SHADOW,
+          }}
+        >
+          {icon}
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 17,
+            fontWeight: 800,
+            color: '#fff',
+            marginTop: 3,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textShadow: TEXT_SHADOW,
+          }}
+        >
+          {name}
+        </div>
+        {sub && (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: WHITE_ALPHA_65,
+              marginTop: 2,
+              fontVariantNumeric: 'tabular-nums lining',
+              textShadow: TEXT_SHADOW,
+            }}
+          >
+            {sub}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Props) {
   const { t } = useTranslation('tourhub');
