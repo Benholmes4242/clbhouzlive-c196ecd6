@@ -98,13 +98,14 @@ function useMarginCaption(
   if (outcome.incomplete) return null;
   if (outcome.tied) return t('college.compare.tied');
   if (leftValue == null || rightValue == null) return null;
-  // Margin is taken from the DISPLAYED values, not the raw ones, so the caption
-  // can never disagree with the two numbers above it (70.80 vs 70.75 -> 0.05).
-  const displayed = (n: number) => {
-    const parsed = Number.parseFloat(format(n).replace(/[^0-9.+-]/g, ''));
-    return Number.isFinite(parsed) ? parsed : n;
-  };
-  const margin = stripSign(format(Math.abs(displayed(leftValue) - displayed(rightValue))));
+  // For plain numeric formats (70.80) the margin is taken from the DISPLAYED
+  // values so the caption can never disagree with the two numbers above it.
+  // Formats that scale or add units ($24.6M, 309.6 yds) keep the raw diff.
+  const PLAIN = /^[+-]?\d+(\.\d+)?$/;
+  const plain = PLAIN.test(format(leftValue).trim()) && PLAIN.test(format(rightValue).trim());
+  const val = (n: number) => (plain ? Number.parseFloat(format(n)) : n);
+  const margin = stripSign(format(Math.abs(val(leftValue) - val(rightValue))));
+
 
   const name = outcome.leftWinning ? leftName : rightName;
   if (!name) return null;
