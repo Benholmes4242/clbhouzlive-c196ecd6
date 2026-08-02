@@ -79,8 +79,10 @@ export function OverviewPageV3() {
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 2 : 12 }}
           >
             <OnTheCourseSlot />
+            <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
             <TISlot />
           </motion.div>
+
         </AnimatePresence>
 
         <div
