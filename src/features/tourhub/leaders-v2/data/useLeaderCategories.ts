@@ -1,9 +1,9 @@
 /**
- * useLeaderCategories — "The Boards" data source of truth (per-tour).
+ * useLeaderCategories - "The Boards" data source of truth (per-tour).
  *
  * Per-tour category reality (fields ARE real; nothing is faked):
  *
- *   pga (sr_player_statistics) — 11 categories:
+ *   pga (sr_player_statistics) - 11 categories:
  *     earnings                  (desc)  USD
  *     scoring_average           (asc)   AVG
  *     wins                      (desc)  WINS
@@ -20,13 +20,13 @@
  *     points  (desc)  PTS  (per-tour brand label: Race to Dubai / CME Points / LIV Points / Season Points)
  *     wins    (desc)  WINS (only when wins column has any nonzero)
  *
- *   all tours (sr_world_rankings) — PGA-only per editorial policy:
+ *   all tours (sr_world_rankings) - PGA-only per editorial policy:
  *     world_rank (asc rank -> desc points, latest ranking_date)  OWGR PTS
  *
- * ONE fetch per data source per tour — categories share the pool. The
+ * ONE fetch per data source per tour - categories share the pool. The
  * FullListSheet reads the same top-50 slice; the board slices to 3.
  *
- * i18n — LEADER_STAT_LABELS is the canonical registry of category KEY ->
+ * i18n - LEADER_STAT_LABELS is the canonical registry of category KEY ->
  * { labelKey, shortKey, unitKey } consumed by StatBoard, FullListSheet, and
  * (Wave 3e.iv Turn C.3) player-v2/StatsSheet. One source of truth per stat.
  */
@@ -101,7 +101,7 @@ export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
   strokes_gained_putting:      { labelKey: 'leaders.stat.strokes_gained_putting.label',      shortKey: 'leaders.stat.strokes_gained_putting.short',      unitKey: 'leaders.stat.strokes_gained_putting.unit' },
   world_rank:                  { labelKey: 'leaders.stat.world_rank.label',                  shortKey: 'leaders.stat.world_rank.short',                  unitKey: 'leaders.stat.world_rank.unit' },
   points:                      { labelKey: 'leaders.stat.points.label',                      shortKey: 'leaders.stat.points.short',                      unitKey: 'leaders.stat.points.unit' },
-  // Wave 3e.iv Turn C.3 extensions — consumed by player-v2/StatsSheet.
+  // Wave 3e.iv Turn C.3 extensions - consumed by player-v2/StatsSheet.
   events_played:               { labelKey: 'leaders.stat.events_played.label',               shortKey: 'leaders.stat.events_played.short',               unitKey: 'leaders.stat.events_played.unit' },
   top_25:                      { labelKey: 'leaders.stat.top_25.label',                      shortKey: 'leaders.stat.top_25.short',                      unitKey: 'leaders.stat.top_25.unit' },
   cuts_made:                   { labelKey: 'leaders.stat.cuts_made.label',                   shortKey: 'leaders.stat.cuts_made.short',                   unitKey: 'leaders.stat.cuts_made.unit' },
@@ -188,7 +188,7 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 }
 
 // PGA category definitions (accessor + sort + format). Labels are resolved via
-// LEADER_STAT_LABELS[key] at render — no display strings live here.
+// LEADER_STAT_LABELS[key] at render - no display strings live here.
 type PgaStatRow = {
   player_id: string | null;
   earnings: number | null;
@@ -256,7 +256,7 @@ async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
 }
 
 async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
-  // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
+  // World ranking (OWGR) is PGA-centric / male-tour - restricted to PGA only.
   const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
     .select('player_id, rank, prior_rank, points, ranking_date')
@@ -288,7 +288,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
         tourCode: p.tour_codes?.[0] ?? 'pga',
         value: pts,
         valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${i + 1}`,
-        // Shared arithmetic — do not re-derive movement locally.
+        // Shared arithmetic - do not re-derive movement locally.
         movement: movementFrom(r.rank, r.prior_rank ?? null),
         behindFormatted: null,
       };
@@ -466,7 +466,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     }
   }
 
-  // World ranking is PGA-only per editorial policy — not appended to other tours.
+  // World ranking is PGA-only per editorial policy - not appended to other tours.
 
   return { synced: categories.length > 0, categories, year };
 }
@@ -478,7 +478,7 @@ export function useLeaderCategories(tour: TourId) {
     gcTime: 30 * 60_000,
     queryFn: async () => {
       if (tour === 'pga') return fetchPgaCategories();
-      // champ is not offered on the leaders page — hook coerces to pga just in case.
+      // champ is not offered on the leaders page - hook coerces to pga just in case.
       if (tour === 'champ') return fetchPgaCategories();
       return fetchSeasonRankingsCategories(tour);
     },

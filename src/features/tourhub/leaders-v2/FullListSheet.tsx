@@ -1,5 +1,5 @@
 /**
- * FullListSheet — the deep almanac for a single Boards category.
+ * FullListSheet - the deep almanac for a single Boards category.
  *
  * Canonicalized to match the Course Champions / Courses Discover Dispatch
  * bottom sheet UI: 75dvh, SLATE_50 surface, amber metadata eyebrow, ink title,

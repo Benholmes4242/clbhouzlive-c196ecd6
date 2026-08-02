@@ -1,12 +1,12 @@
 /**
- * leaders-v2/LeadersTab — "The Boards" — category cards + deep sheets.
+ * leaders-v2/LeadersTab - "The Boards" - category cards + deep sheets.
  * Overview grammar; no framer-motion; no shell-row dependency.
  *
  * Wiring:
  *   - Tour: TourSelectionContext (selectTour); ?tour= honored once on mount.
  *   - ?category= auto-opens the FullListSheet for that key (Overview deep-links).
  *   - Data: useLeaderCategories(tour) + useLivePlayerIds().
- *   - Sheet nav: closes first, then navigates — no stuck overlay.
+ *   - Sheet nav: closes first, then navigates - no stuck overlay.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -158,8 +158,8 @@ export function LeadersTab() {
       }}
     >
 
-      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
-          (no All Tours; PGA default). CHAMP taps are ignored — no board
+      {/* Tour lens - sticky glass wrapper; chips from SectionTourLens
+          (no All Tours; PGA default). CHAMP taps are ignored - no board
           coverage for that tour. */}
       <div
         style={{
