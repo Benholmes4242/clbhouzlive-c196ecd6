@@ -126,9 +126,8 @@ export function FullListSheet({
             {t('leaders.sheet.empty')}
           </div>
         ) : (
-          <div style={{ padding: '0 16px' }}>
+          <div style={{ padding: '0 4px' }}>
             {rows.map((r) => {
-              const isTop = r.rank === 1;
               const live = !!liveMap[r.playerId];
               return (
                 <button
@@ -140,13 +139,9 @@ export function FullListSheet({
                     alignItems: 'center',
                     gap: 11,
                     width: '100%',
-                    borderRadius: 12,
-                    padding: '10px 12px',
-                    background: isTop ? 'linear-gradient(100deg, #fff, #fff6e8)' : '#fff',
-                    border: isTop
-                      ? `1px solid ${GOLD_BORDER}`
-                      : '1px solid rgba(15,23,42,0.07)',
-                    marginBottom: 6,
+                    padding: '11px 12px',
+                    background: 'transparent',
+                    border: 'none',
                     fontFamily: FONT,
                     textAlign: 'left',
                     cursor: 'pointer',
@@ -155,12 +150,12 @@ export function FullListSheet({
                   <div
                     style={{
                       width: 24,
-                      textAlign: 'center',
-                      flexShrink: 0,
-                      fontSize: 14,
-                      fontWeight: 900,
+                      flex: '0 0 24px',
+                      textAlign: 'right',
+                      fontSize: 12,
+                      fontWeight: 500,
                       fontVariantNumeric: 'tabular-nums',
-                      color: isTop ? GOLD_DEEP : '#94A3B8',
+                      color: INK_MUTE,
                       lineHeight: 1,
                     }}
                   >
@@ -177,7 +172,7 @@ export function FullListSheet({
                       alt={r.name}
                       userId={r.playerId}
                       hairlineRing
-                      ringColor={isTop ? GOLD_DEEP : LIGHT_HAIRLINE}
+                      ringColor={LIGHT_HAIRLINE}
                     />
                     {live && (
                       <span
@@ -213,18 +208,15 @@ export function FullListSheet({
                   </div>
                   <div
                     style={{
-                      flexShrink: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      minWidth: 42,
+                      width: 84,
+                      flex: '0 0 84px',
+                      textAlign: 'right',
                     }}
                   >
                     <div
                       style={{
-                        fontSize: 15,
-                        fontWeight: 900,
+                        fontSize: 14,
+                        fontWeight: 800,
                         color: INK,
                         lineHeight: 1,
                         fontVariantNumeric: 'tabular-nums',
@@ -232,19 +224,23 @@ export function FullListSheet({
                     >
                       {r.valueFormatted}
                     </div>
-                    <div
-                      style={{
-                        marginTop: 2,
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        color: '#94A3B8',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {t(category.shortKey)}
-                    </div>
+                    {/* Leader row renders nothing here: rank 1 already says it. */}
+                    {r.behindFormatted && (
+                      <div
+                        style={{
+                          marginTop: 3,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          letterSpacing: '0.13em',
+                          textTransform: 'uppercase',
+                          color: INK_FAINT,
+                          lineHeight: 1,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {t('leaders.behind', { gap: r.behindFormatted })}
+                      </div>
+                    )}
                   </div>
                 </button>
               );
