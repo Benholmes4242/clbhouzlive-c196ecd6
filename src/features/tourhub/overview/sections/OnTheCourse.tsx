@@ -25,6 +25,8 @@ import { useTeeTimesAll, type TeeGroup } from '@/features/tourhub/tournament-v2/
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { resolveCutDisplay } from '../../_shared/cutDisplay';
+import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { todayFromEntry } from '../../leaderboard/BoardTable';
 
@@ -235,6 +237,39 @@ function StatCell({ label, value, sub }: { label: string; value: string; sub?: s
           {sub}
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * CutWatchLine — one line under the stat band during the cut round only.
+ * Projections are only ever shown while current_round === cut_round (see
+ * resolveCutDisplay); a stale projection after the cut has landed is never
+ * displayed. Tours without a projection (LPGA, Champions, Evans) render
+ * nothing — no heading, no placeholder, and no derived figure.
+ */
+function CutWatchLine({ tournamentId }: { tournamentId: string | undefined }) {
+  const { t } = useTranslation('tourhub');
+  const { data: meta } = useTournamentMeta(tournamentId ?? null, { live: true });
+
+  const cut = resolveCutDisplay({
+    status: meta?.status ?? null,
+    currentRound: meta?.current_round ?? null,
+    cutRound: meta?.cut_round ?? null,
+    cutline: meta?.cutline ?? null,
+    projectedCutline: meta?.projected_cutline ?? null,
+  });
+
+  if (cut.kind !== 'projected' || cut.cutline == null) return null;
+
+  return (
+    <div style={{ padding: `0 ${SPACE.pagePadX}px 10px` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{t('tour.projectedCut')}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, ...FIGS }}>
+          {formatToPar(cut.cutline)}
+        </span>
+      </div>
     </div>
   );
 }
