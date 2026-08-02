@@ -4,16 +4,20 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import {
-  AMBER,
   FONT,
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
 } from '@/features/tourhub/_shared/tokens';
+import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { Skeleton } from '@/components/ui/skeleton';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -27,6 +31,14 @@ import {
   User,
   LogOut,
 } from 'lucide-react';
+
+/**
+ * Amber in this drawer means nothing but the group headers — there is no
+ * viewing member on these screens. The live dot is GREEN because a live
+ * indicator is a broadcast convention, not a score.
+ */
+const LIVE_GREEN = '#22C55E';
+
 
 
 export interface TourSideMenuProps {
@@ -76,11 +88,15 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onSignOut,
 }) => {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
-  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const { data: liveTournaments, isFetched: liveFetched, isLoading: liveLoading } = useLiveTournaments();
+  const inProgress = (liveTournaments ?? []).filter((tt) => (tt.status || '').toLowerCase() === 'inprogress');
+  const liveCount = inProgress.length;
   const showLive = liveFetched && (liveTournaments?.length ?? 0) > 0;
+
 
   // Mount on open; unmount after exit transition.
   useEffect(() => {
@@ -197,7 +213,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           </div>
 
           {/* Nav list */}
-          <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
+          <nav style={{ marginTop: 4, flexShrink: 0 }}>
             {DESTINATIONS.filter(({ id }) => id !== 'live' || showLive).map(({ id, labelKey, Icon }) => {
               const isActive = id === activeTab;
               return (
@@ -217,26 +233,72 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                     padding: '12px 14px',
                     border: 'none',
                     borderRadius: 14,
-                    background: isActive ? '#FFFFFF' : 'transparent',
-                    color: INK,
+                    background: isActive ? A.INK : 'transparent',
+                    color: isActive ? '#FFFFFF' : A.INK,
                     fontFamily: 'inherit',
                     fontSize: 16,
                     fontWeight: isActive ? 800 : 600,
                     letterSpacing: '-0.01em',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    boxShadow: isActive ? '0 1px 2px rgba(15,23,42,0.05)' : 'none',
                     transition: 'background 150ms ease',
                   }}
                 >
                   <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
-                    <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
+                    <Icon size={20} color={isActive ? '#FFFFFF' : A.INK} strokeWidth={isActive ? 2.4 : 2} />
                   </span>
-                  {t(labelKey)}
+                  <span style={{ flex: 1, minWidth: 0 }}>{t(labelKey)}</span>
+                  {id === 'live' && liveCount > 0 && (
+                    <LiveCountBadge count={liveCount} onInk={isActive} />
+                  )}
                 </button>
               );
             })}
           </nav>
+
+          {/* In action now — the drawer answers "is anything happening?" */}
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 0 8px' }}>
+            {liveLoading ? (
+              <div style={{ padding: '0 16px' }}>
+                <Skeleton className="h-3 w-24 mb-3" />
+                <Skeleton className="h-16 w-full rounded-2xl" />
+              </div>
+            ) : inProgress.length > 0 ? (
+              <>
+                <div style={{ padding: '0 24px', marginBottom: 8 }}>
+                  <div style={KICKER}>{t('tour.menu.inActionNow')}</div>
+                </div>
+                <div
+                  style={{
+                    margin: '0 16px',
+                    background: A.PANEL,
+                    border: `1px solid ${A.BORDER}`,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {inProgress.slice(0, 3).map((tt, i) => (
+                    <LiveRow
+                      key={tt.id}
+                      name={tt.name}
+                      round={tt.currentRound}
+                      leaderName={tt.leaderName}
+                      leaderCount={tt.leaderCount}
+                      leaderToPar={tt.leaderToPar}
+                      onTap={() => {
+                        analyticsEvents.track('tour_menu_live_tapped', {
+                          tournament_id: tt.id,
+                          position: i + 1,
+                        });
+                        onClose();
+                        navigate(`/tourhub/tournament/${tt.id}`);
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </div>
 
           {/* Secondary group header */}
           <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
@@ -257,15 +319,153 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   );
 };
 
+/** Green live dot; halo dropped on ink fills where a glow reads as an artefact. */
+function LiveDot({ size = 6, halo = true }: { size?: number; halo?: boolean }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 999,
+        background: LIVE_GREEN,
+        boxShadow: halo ? `0 0 0 3px rgba(34,197,94,0.16)` : 'none',
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
+function LiveCountBadge({ count, onInk }: { count: number; onInk: boolean }) {
+  const { t } = useTranslation('tourhub');
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+      <LiveDot halo={!onInk} />
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 8.5,
+          color: onInk ? 'rgba(255,255,255,0.72)' : A.DIM,
+          ...FIGS,
+        }}
+      >
+        {t('tour.menu.nLive', { count, value: String(count) })}
+      </span>
+    </span>
+  );
+}
+
+/** "Patrick Cantlay" → "P. Cantlay" */
+function shortLeaderName(full: string | null): string | null {
+  if (!full) return null;
+  const parts = full.trim().split(/\s+/);
+  if (parts.length < 2) return full.trim();
+  return `${parts[0][0]}. ${parts[parts.length - 1]}`;
+}
+
+function LiveRow({
+  name,
+  round,
+  leaderName,
+  leaderCount,
+  leaderToPar,
+  onTap,
+}: {
+  name: string;
+  round: number | null;
+  leaderName: string | null;
+  leaderCount: number;
+  leaderToPar: number | null;
+  onTap: () => void;
+}) {
+  const { t } = useTranslation('tourhub');
+  const scoreText =
+    leaderToPar == null ? null : leaderToPar === 0 ? 'E' : leaderToPar > 0 ? `+${leaderToPar}` : `${leaderToPar}`;
+  const who =
+    leaderCount > 1
+      ? t('tour.menu.nTied', { count: leaderCount, value: String(leaderCount) })
+      : shortLeaderName(leaderName);
+
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        padding: '12px 14px',
+        fontFamily: 'inherit',
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+    >
+      <LiveDot />
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span
+          style={{
+            display: 'block',
+            fontSize: 14,
+            fontWeight: 700,
+            color: A.INK,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {name}
+        </span>
+        {round != null && (
+          <span style={{ ...LABEL, display: 'block', marginTop: 3 }}>
+            {t('tour.menu.roundN', { n: round })}
+          </span>
+        )}
+      </span>
+      {scoreText && (
+        <span style={{ flexShrink: 0, maxWidth: 84, textAlign: 'right' }}>
+          <span
+            style={{
+              display: 'block',
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: getScoreColor(leaderToPar, 'light'),
+              ...FIGS,
+            }}
+          >
+            {scoreText}
+          </span>
+          {who && (
+            <span
+              style={{
+                ...LABEL,
+                display: 'block',
+                marginTop: 3,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {who}
+            </span>
+          )}
+        </span>
+      )}
+    </button>
+  );
+}
+
 function GroupHeader({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ padding: '0 24px', marginBottom: 8 }}>
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: AMBER, lineHeight: 1 }}>
-        {children}
-      </div>
+      <div style={{ ...KICKER, lineHeight: 1 }}>{children}</div>
     </div>
   );
 }
+
 
 function SecondaryLink({
   Icon,
