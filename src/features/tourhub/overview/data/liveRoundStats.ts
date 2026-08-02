@@ -13,7 +13,7 @@
  *  - topMoverToday     : biggest places-gained delta, via movementFromRounds.
  */
 
-import type { BoardEntry } from '../../hooks/useTourHubData';
+import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { movementFromRounds } from '../../leaderboard/movementFromRounds';
 
 export const FIELD_GATE = 20;
