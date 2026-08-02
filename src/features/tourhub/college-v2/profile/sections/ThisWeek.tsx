@@ -1,30 +1,37 @@
 /**
- * ThisWeek — leads with alumni playing / just-played this week.
+ * ThisWeek - leads with alumni playing / just-played this week.
  *
- * Right-side lockup per the 2026-07-17 brief:
- *   - has a score  → position pill (green if live, neutral if final) +
- *                    to-par 17/800 tabular (red when negative) + micro-caps
- *                    "THRU {n}" / "FINAL" beneath.
- *   - no score yet → tee-time 13/700 + "TEE TIME" micro-caps.
- * Event subline is muted 12/500 — no position/thru duplication.
+ * Analytical grammar (BRIEF_TOUR_COLLEGE_PROFILE):
+ *   - AMBER_DEEP kicker with a right-hand sample-size aside.
+ *   - Position is plain neutral text in a fixed 44px column, thru label
+ *     beneath it in the LABEL token, same colour live or final.
+ *   - Score sits in a fixed 46px column and is coloured by the canonical
+ *     getScoreColor helper (under RED, level MUTED, over INK).
+ *   - No pills, no row hairlines. Separation is whitespace and the grid.
  *
  * Self-hides entirely when there are zero week rows (roster leads instead).
  * Row tap navigates to the tournament page.
+ *
+ * NOTE: framer-motion is retained deliberately (height animation on a
+ * self-hiding section). Flagged for a separate decision.
  */
 
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { tournamentRoute } from '@/features/tourhub/routes';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatTimeHm } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { fmtScore } from '@/features/tourhub/utils/fmtScore';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
+  AMBER_DEEP,
   FONT,
-  HAIRLINE_INK_10,
   INK,
   INK_FAINT,
   INK_MUTE,
-  STATUS_LIVE,
   SURFACE,
 } from '@/features/tourhub/_shared/tokens';
 import { useThisWeekAlumni, type WeekAlumnusRow } from '../data/useThisWeekAlumni';
@@ -34,21 +41,26 @@ interface Props {
   collegeName: string;
 }
 
-const NEG_RED = '#D2222D';
-const PILL_LIVE_BG = 'rgba(34,197,94,0.10)';
-const PILL_LIVE_FG = '#16A34A';
-const PILL_FINAL_BG = 'rgba(15,23,42,0.05)';
-const PILL_FINAL_FG = 'rgba(15,23,42,0.55)';
+const KICKER_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: AMBER_DEEP,
+};
+
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 800,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: INK_FAINT,
+  fontVariantNumeric: 'tabular-nums',
+};
 
 function formatPos(row: WeekAlumnusRow): string | null {
   if (row.position == null) return null;
   return `${row.positionTied ? 'T' : ''}${row.position}`;
-}
-
-function fmtScore(n: number | null): string | null {
-  if (n == null) return null;
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : `${n}`;
 }
 
 function formatTee(iso: string | null): string | null {
@@ -61,6 +73,7 @@ function formatTee(iso: string | null): string | null {
 }
 
 export function ThisWeek({ slug, collegeName }: Props) {
+  const { t } = useTranslation('tourhub');
   const { data } = useThisWeekAlumni(slug);
   const rows = data ?? [];
   const show = rows.length > 0;
@@ -76,175 +89,149 @@ export function ThisWeek({ slug, collegeName }: Props) {
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           style={{ background: SURFACE, fontFamily: FONT, overflow: 'hidden' }}
         >
-      <header style={{ padding: '16px 16px 8px' }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: INK_FAINT,
-          }}
-        >
-          This Week
-        </div>
-      </header>
-      {rows.map((row) => {
-        const pos = formatPos(row);
-        const scoreVal = row.today ?? row.score;
-        const scoreStr = fmtScore(scoreVal);
-        const hasScore = scoreStr != null;
-        const isNeg = typeof scoreVal === 'number' && scoreVal < 0;
-        const isFinal = !row.isLive && hasScore;
-        const teeStr = !hasScore ? formatTee(row.teeTime) : null;
-        const microThru = row.isLive
-          ? (row.thru != null ? `THRU ${row.thru >= 18 ? 'F' : row.thru}` : null)
-          : (isFinal ? 'FINAL' : null);
-
-        return (
-          <Link
-            key={`${row.playerId}-${row.tournamentId}`}
-            {...tournamentRoute(row.tournamentId, { kind: 'college', collegeName })}
+          <header
             style={{
+              padding: '16px 16px 8px',
               display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 16px',
-              borderTop: `0.5px solid ${HAIRLINE_INK_10}`,
-              textDecoration: 'none',
-              color: 'inherit',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              gap: 12,
             }}
-            className="active:bg-black/[0.02]"
           >
-            <SquircleAvatar
-              size={30}
-              srcCandidates={getPlayerHeadshotCandidates(row.fullName, row.tourCodes?.[0] ?? 'pga')}
-              alt={row.fullName}
-              hairlineRing
-              ringColor="rgba(15,23,42,0.12)"
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: INK,
-                  letterSpacing: '-0.005em',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {row.fullName}
-              </div>
-              <div
-                style={{
-                  marginTop: 1,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: INK_MUTE,
-                  letterSpacing: '0.01em',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {row.tournamentName}
-              </div>
+            <div style={KICKER_STYLE}>{t('college.profile.thisWeek')}</div>
+            <div style={LABEL_STYLE}>
+              {t('college.profile.thisWeekAside', { count: rows.length })}
             </div>
+          </header>
 
-            {/* Right-side lockup */}
-            {hasScore ? (
-              <div
+          {rows.map((row) => {
+            const pos = formatPos(row);
+            const scoreVal = row.today ?? row.score;
+            const hasScore = scoreVal != null;
+            const scoreStr = hasScore ? fmtScore(scoreVal) : null;
+            const isFinal = !row.isLive && hasScore;
+            const teeStr = !hasScore ? formatTee(row.teeTime) : null;
+            const microThru = row.isLive
+              ? row.thru != null
+                ? t('college.profile.thru', { n: row.thru >= 18 ? 'F' : row.thru })
+                : null
+              : isFinal
+              ? t('college.profile.final')
+              : null;
+
+            return (
+              <Link
+                key={`${row.playerId}-${row.tournamentId}`}
+                {...tournamentRoute(row.tournamentId, { kind: 'college', collegeName })}
+                onClick={() => {
+                  analyticsEvents.track('tour_college_week_row_tapped', {
+                    slug,
+                    player_id: row.playerId,
+                    tournament_id: row.tournamentId,
+                    is_live: !!row.isLive,
+                    position: row.position ?? null,
+                  });
+                }}
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  gap: 2,
-                  flexShrink: 0,
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '12px 16px',
+                  textDecoration: 'none',
+                  color: 'inherit',
                 }}
+                className="active:bg-black/[0.02]"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {pos && (
+                <SquircleAvatar
+                  size={30}
+                  srcCandidates={getPlayerHeadshotCandidates(row.fullName, row.tourCodes?.[0] ?? 'pga')}
+                  alt={row.fullName}
+                  hairlineRing
+                  ringColor="rgba(15,23,42,0.12)"
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: INK,
+                      letterSpacing: '-0.005em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {row.fullName}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 1,
+                      fontSize: 11.5,
+                      fontWeight: 500,
+                      color: INK_MUTE,
+                      letterSpacing: '0.01em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {row.tournamentName}
+                  </div>
+                </div>
+
+                {/* Fixed position / thru column */}
+                <div style={{ width: 44, flex: '0 0 44px', textAlign: 'right' }}>
+                  {hasScore ? (
+                    <>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: INK_MUTE,
+                          fontVariantNumeric: 'tabular-nums',
+                          letterSpacing: '0.01em',
+                        }}
+                      >
+                        {pos ?? ''}
+                      </div>
+                      {microThru && <div style={{ ...LABEL_STYLE, marginTop: 5 }}>{microThru}</div>}
+                    </>
+                  ) : (
+                    <div style={LABEL_STYLE}>{t('college.profile.teeTime')}</div>
+                  )}
+                </div>
+
+                {/* Fixed score column */}
+                <div style={{ width: 46, flex: '0 0 46px', textAlign: 'right' }}>
+                  {hasScore ? (
                     <span
                       style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: 999,
-                        background: row.isLive ? PILL_LIVE_BG : PILL_FINAL_BG,
-                        color: row.isLive ? PILL_LIVE_FG : PILL_FINAL_FG,
+                        fontSize: 17,
+                        fontWeight: 800,
+                        color: getScoreColor(scoreVal, 'light'),
                         fontVariantNumeric: 'tabular-nums',
-                        letterSpacing: '0.01em',
+                        letterSpacing: '-0.01em',
                       }}
                     >
-                      {pos}
+                      {scoreStr}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: INK,
+                        fontVariantNumeric: 'tabular-nums',
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {teeStr ?? t('college.profile.teeTbd')}
                     </span>
                   )}
-                  <span
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 800,
-                      color: isNeg ? NEG_RED : INK,
-                      fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {scoreStr}
-                  </span>
                 </div>
-                {microThru && (
-                  <span
-                    style={{
-                      fontSize: 8.5,
-                      fontWeight: 700,
-                      color: row.isLive ? STATUS_LIVE : INK_FAINT,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {microThru}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  gap: 2,
-                  flexShrink: 0,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: INK,
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '-0.005em',
-                  }}
-                >
-                  {teeStr ?? 'TBD'}
-                </span>
-                <span
-                  style={{
-                    fontSize: 8.5,
-                    fontWeight: 700,
-                    color: INK_FAINT,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Tee Time
-                </span>
-              </div>
-            )}
-          </Link>
-        );
-      })}
+              </Link>
+            );
+          })}
         </motion.section>
       )}
     </AnimatePresence>

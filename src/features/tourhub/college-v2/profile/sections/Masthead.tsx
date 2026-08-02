@@ -1,19 +1,18 @@
 /**
- * Masthead — college profile head.
+ * Masthead - college profile head.
  *
  * Thin wrapper around the shared CollegeHeroMasthead. Owns the Compare
- * button; Follow was removed per brief (2026-07-17). Compare renders alone
- * in the actions slot and centres via the shared masthead's flex layout.
+ * button; Follow was removed per brief (2026-07-17). The crossed-swords
+ * icon was removed (2026-08-02) - an icon decorating a relationship goes.
+ * The button is an unfilled quiet Action with a trailing chevron.
  */
 
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Swords } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { collegeHubRoute } from '@/features/tourhub/routes';
-import {
-  FONT,
-  WHITE_ALPHA_18,
-} from '@/features/tourhub/_shared/tokens';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { FONT } from '@/features/tourhub/_shared/tokens';
 import { CollegeHeroMasthead } from '../../_shared/CollegeHeroMasthead';
 
 interface Props {
@@ -37,10 +36,12 @@ export function Masthead({
   brandHex,
   rankChange = null,
 }: Props) {
+  const { t } = useTranslation('tourhub');
   const logoUrl = getCollegeLogoUrl(displayName);
 
   const navigate = useNavigate();
   const handleCompare = () => {
+    analyticsEvents.track('tour_college_compare_tapped', { slug });
     navigate(`${collegeHubRoute()}?compare=${encodeURIComponent(slug)}`);
   };
 
@@ -61,28 +62,29 @@ export function Masthead({
           style={{
             flexShrink: 0,
             fontFamily: FONT,
-            height: 30,
-            padding: '0 12px',
+            height: 32,
+            padding: '0 16px',
             borderRadius: 999,
-            fontSize: 11,
+            fontSize: 9,
             fontWeight: 800,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.13em',
             textTransform: 'uppercase',
-            border: `0.75px solid ${WHITE_ALPHA_18}`,
-            background: 'rgba(255,255,255,0.06)',
+            border: '0.75px solid rgba(255,255,255,0.28)',
+            background: 'transparent',
             color: '#FFFFFF',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 6,
             transition: 'all 120ms ease',
           }}
-          aria-label="Compare vs another school"
+          aria-label={t('college.profile.compareAria')}
         >
-          <Swords size={12} strokeWidth={2.4} />
-          Compare
+          {t('college.profile.compare')}
+          <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>{'\u203A'}</span>
         </button>
       }
     />
   );
 }
+

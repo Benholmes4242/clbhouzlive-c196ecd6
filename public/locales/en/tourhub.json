@@ -966,6 +966,31 @@
       "pickOneMore": "Pick one more school",
       "empty": "No franchises ranked yet this season.",
       "footer": "{{year}} season \u00b7 ranked by alumni earnings \u00b7 live dot = on the course now"
+    },
+    "profile": {
+      "thisWeek": "THIS WEEK",
+      "thisWeekAside_one": "{{count}} in a field",
+      "thisWeekAside_other": "{{count}} in a field",
+      "theClass": "THE CLASS",
+      "alumniAside_one": "{{count}} alumnus",
+      "alumniAside_other": "{{count}} alumni",
+      "thru": "THRU {{n}}",
+      "final": "FINAL",
+      "teeTime": "TEE TIME",
+      "teeTbd": "TBD",
+      "colRank": "#",
+      "colPlayer": "PLAYER",
+      "colEarnings": "EARNINGS",
+      "worldRank": "World {{rank}}",
+      "wins_one": "{{count}} win",
+      "wins_other": "{{count}} wins",
+      "events": "{{count}} events",
+      "compareAria": "Compare against another school",
+      "compare": "COMPARE",
+      "rosterError": "Couldn't load the roster.",
+      "rosterRetry": "Retry",
+      "rosterEmpty": "No alumni found for this program.",
+      "footer": "{{year}} season \u00b7 ranked by earnings \u00b7 live dot = on the course now"
     }
   }
 }

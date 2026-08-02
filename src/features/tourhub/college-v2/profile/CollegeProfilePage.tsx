@@ -1,8 +1,9 @@
 /**
- * CollegeProfilePage — "The Season Story".
+ * CollegeProfilePage - "The Season Story".
  *
- * Composes: Masthead (charcoal, safe-area padded) · ThisWeek (self-hides
- * when empty) · TheClass (full roster, ported star rule). Uses the yearbook
+ * Composes: Masthead (charcoal, safe-area padded) - ThisWeek (self-hides
+ * when empty) - TheClass (full roster, ranked by earnings). Uses the yearbook
+
  * standings query to derive the college's rank + points; falls back
  * gracefully when unranked. Not-found state renders when standings load
  * and no matching slug exists.
@@ -10,7 +11,8 @@
  * Route contract: /tourhub/college-golf/:collegeSlug is unchanged.
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
@@ -18,12 +20,15 @@ import {
   CHARCOAL,
   FONT,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SLATE_50,
 } from '@/features/tourhub/_shared/tokens';
 import { collegeHubRoute } from '@/features/tourhub/routes';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useFranchiseStandings } from '@/features/tourhub/college-v2/hub/data/useFranchiseStandings';
 import { useLiveAlumni } from '@/features/tourhub/college-v2/hub/data/useLiveAlumni';
+import { useThisWeekAlumni } from './data/useThisWeekAlumni';
 import { Masthead } from './sections/Masthead';
 import { ThisWeek } from './sections/ThisWeek';
 import { TheClass } from './sections/TheClass';
@@ -33,9 +38,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function CollegeProfilePage() {
   const { collegeSlug } = useParams<{ collegeSlug: string }>();
   const slug = collegeSlug ?? '';
+  const { t } = useTranslation('tourhub');
 
   const { data, isLoading, isError, refetch } = useFranchiseStandings();
   const { data: liveAlumni } = useLiveAlumni();
+  const { data: weekRows } = useThisWeekAlumni(slug);
 
   // Scroll to top when slug changes.
   useEffect(() => {
@@ -53,6 +60,19 @@ export function CollegeProfilePage() {
 
   const notFound = !isLoading && !isError && data && !standing;
 
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current || !standing) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_college_profile_viewed', {
+      slug,
+      rank: standing.rank,
+      alumni: standing.alumniCount,
+      playing_now: playingNow,
+      week_rows: weekRows?.length ?? 0,
+    });
+  }, [standing, slug, playingNow, weekRows]);
+
   return (
     <TourHubShell immersiveStatusBar>
       <div
@@ -60,9 +80,9 @@ export function CollegeProfilePage() {
           background: SLATE_50,
           minHeight: '100vh',
           fontFamily: FONT,
-          paddingBottom: 88,
         }}
       >
+
         {/* Masthead skeleton while standings load */}
         {isLoading && !standing && (
           <div
@@ -176,10 +196,27 @@ export function CollegeProfilePage() {
         {!isError && !notFound && slug && (
           <>
             <ThisWeek slug={slug} collegeName={displayName} />
+            <div style={{ height: 10 }} />
             <TheClass slug={slug} collegeName={displayName} />
+            <div
+              style={{
+                padding: '16px 24px 0',
+                textAlign: 'center',
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: INK_FAINT,
+                letterSpacing: '0.01em',
+              }}
+            >
+              {t('college.profile.footer', { year: new Date().getFullYear() })}
+            </div>
           </>
         )}
+
+        {/* Bottom nav clearance */}
+        <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
       </div>
+
     </TourHubShell>
   );
 }
