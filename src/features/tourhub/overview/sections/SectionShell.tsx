@@ -31,9 +31,10 @@ export function SectionShell({
     <section style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: eyebrowColor ?? V4.slate, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          <span style={{ ...KICKER, color: eyebrowColor ?? A.AMBER_DEEP }}>
             {eyebrow}
           </span>
+
           {subline && (
             <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
               {subline}

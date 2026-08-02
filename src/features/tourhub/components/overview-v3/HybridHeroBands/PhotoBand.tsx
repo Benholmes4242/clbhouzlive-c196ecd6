@@ -125,18 +125,19 @@ export function PhotoBand({
   const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
 
-  // Live tone mirrors the tournament details hero chip (LIVE · R{n}):
-  // green tint, rectangular, no pulsing dot. Other tones unchanged.
+  // Live tone is the platform live marker: a 7px green dot with a soft halo
+  // followed by a plain label. No capsule, no tint, no pulse (broadcast
+  // convention, shared with the leaderboard masthead and the tour menu).
   const pillTone =
     pill.tone === 'live'
       ? {
-          bg: 'rgba(16,185,129,0.14)',
-          color: '#6EE7B7',
-          border: 'rgba(110,231,183,0.55)',
-          radius: 4,
-          padding: '4px 8px',
-          fontSize: 9.5,
-          letterSpacing: '0.10em',
+          bg: 'transparent',
+          color: 'rgba(255,255,255,0.98)',
+          border: 'transparent',
+          radius: 0,
+          padding: 0,
+          fontSize: 10,
+          letterSpacing: '0.14em',
         }
       : pill.tone === 'final'
         ? {
@@ -157,6 +158,7 @@ export function PhotoBand({
             fontSize: 10,
             letterSpacing: '0.14em',
           };
+
 
   // Insight overflow detection — only render "Read more" when the clamped
   // insight actually overflows its 2-line box. Re-measures on value + resize.
