@@ -408,12 +408,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         tourCode: p?.tour_codes?.[0] ?? tour,
         value: 0,
         valueFormatted: '',
+        movement: null,
+        behindFormatted: null,
       };
     };
 
     // Points
-    const pointsRows = pool
-      .filter((r) => r.points != null && Number(r.points) > 0)
+    const pointsPool = pool.filter((r) => r.points != null && Number(r.points) > 0);
+    const pointsRows = pointsPool
+      .slice()
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
       .map((r, i) => {
@@ -431,13 +434,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         labelKey: brandLabelKey ?? pointsBase.labelKey,
         shortKey: pointsBase.shortKey,
         unitKey: pointsBase.unitKey,
-        rows: pointsRows,
+        rows: applyBehind(pointsRows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+        poolSize: pointsPool.length,
       });
     }
 
     // Wins
-    const winsRows = pool
-      .filter((r) => r.wins != null && Number(r.wins) > 0)
+    const winsPool = pool.filter((r) => r.wins != null && Number(r.wins) > 0);
+    const winsRows = winsPool
+      .slice()
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
       .map((r, i) => {
@@ -448,7 +453,12 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (winsRows.length >= 3) {
-      categories.push({ key: 'wins', ...LEADER_STAT_LABELS.wins, rows: winsRows });
+      categories.push({
+        key: 'wins',
+        ...LEADER_STAT_LABELS.wins,
+        rows: applyBehind(winsRows, 'desc', fmtInt),
+        poolSize: winsPool.length,
+      });
     }
   }
 
