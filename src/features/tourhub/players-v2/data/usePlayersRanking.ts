@@ -100,7 +100,14 @@ interface PgaStatRow {
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
+  scoring_average: number | string | null;
+  driving_distance: number | string | null;
+  driving_accuracy: number | string | null;
+  greens_in_reg: number | string | null;
+  putting_average: number | string | null;
+  strokes_gained_putting: number | string | null;
 }
+
 interface PlayerRow {
   id: string;
   full_name: string | null;
