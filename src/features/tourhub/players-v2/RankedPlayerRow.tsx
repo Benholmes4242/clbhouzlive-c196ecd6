@@ -167,9 +167,20 @@ function RankedPlayerRowInner({
       >
         {statFormatted ?? (stat != null ? formatStat(stat) : '')}
       </div>
+    </>
+  );
+
+  if (!interactive) {
+    return <div style={shellStyle}>{body}</div>;
+  }
+
+  return (
+    <button type="button" onClick={onClick} style={{ ...shellStyle, cursor: 'pointer' }}>
+      {body}
     </button>
   );
 }
+
 
 export const RankedPlayerRow = memo(RankedPlayerRowInner);
 export default RankedPlayerRow;
