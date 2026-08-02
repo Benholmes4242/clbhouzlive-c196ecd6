@@ -767,7 +767,9 @@
         "wins": "Most wins",
         "top_10": "Most top tens"
       }
-    }
+    },
+    "behind": "{{gap}} behind",
+    "fromN": "from {{count}}"
   },
   "players": {
     "search": {
