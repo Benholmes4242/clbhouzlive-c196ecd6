@@ -368,7 +368,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             }}
           >
             <SquircleAvatar
-              size={24}
+              size={20}
               src={story.holder_avatar}
               alt={holder}
               fallback={initials(holder)}
@@ -377,7 +377,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             />
             <span
               style={{
-                fontSize: 12,
+                fontSize: 11.5,
                 fontWeight: 600,
                 color: '#FFFFFF',
                 whiteSpace: 'nowrap',
@@ -391,7 +391,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             {story.happened_at ? (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.60)',
                   whiteSpace: 'nowrap',
@@ -404,7 +404,8 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
 
           {showCta ? (
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 12 }}>
+              {/* Same pill as the Courses hero CTA: 12/800, 9x15. */}
               <button
                 type="button"
                 onClick={handleCta}
@@ -412,8 +413,9 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                 style={{
                   background: '#FFFFFF',
                   color: '#15171F',
-                  fontSize: 13.5,
-                  fontWeight: 700,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '-0.005em',
                   padding: '9px 15px',
                   borderRadius: 999,
                   border: 'none',
@@ -440,10 +442,11 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             className="tabular-nums"
             style={{
-              fontSize: 56,
+              // 39 is the Courses hero rank figure.
+              fontSize: 39,
               fontWeight: 800,
-              letterSpacing: '-0.035em',
-              lineHeight: 0.9,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
               color: bigColor,
             }}
           >
