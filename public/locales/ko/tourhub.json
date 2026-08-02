@@ -382,7 +382,8 @@
       "player": "PLAYER",
       "tot": "TOT",
       "thru": "THRU",
-      "today": "TODAY"
+      "today": "TODAY",
+      "round": "라운드"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",
@@ -451,7 +452,9 @@
       "defendingLabel": "Defending",
       "purseLabel": "Purse",
       "tbdPlayer": "TBD",
-      "championFallback": "Champion"
+      "championFallback": "Champion",
+      "winningLabel": "우승 스코어",
+      "marginLabel": "차이"
     },
     "story": {
       "eyebrow": "The Story",

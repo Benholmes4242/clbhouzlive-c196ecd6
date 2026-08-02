@@ -358,7 +358,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
       const out: Array<{ value: string; label: string; tone?: string }> = [
         {
           value: champion.score == null ? 'E' : fmtScore(champion.score),
-          label: t('tournament.hero.holesLabel', { defaultValue: '72 HOLES' }),
+          label: t('tournament.hero.winningLabel', { defaultValue: 'WINNING SCORE' }),
           tone: GOLD,
         },
       ];

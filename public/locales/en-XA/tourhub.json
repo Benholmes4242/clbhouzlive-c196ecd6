@@ -382,7 +382,8 @@
       "player": "[~~ƤĻÁÝÉŘ~~]",
       "tot": "[~~ŢŐŢ~~]",
       "thru": "[~~ŢĤŘÚ~~]",
-      "today": "[~~ŢŐĐÁÝ~~]"
+      "today": "[~~ŢŐĐÁÝ~~]",
+      "round": "[Round]"
     },
     "status": {
       "inProgress": "[~~Ř{{round}} · ÍÑ ƤŘŐĜŘÉŠŠ~~]",
@@ -451,7 +452,9 @@
       "defendingLabel": "[~~Đéƒéñđíñĝ~~]",
       "purseLabel": "[~~Ƥúřšé~~]",
       "tbdPlayer": "[~~ŢƁĐ~~]",
-      "championFallback": "[~~Ĉĥáɱƥíőñ~~]"
+      "championFallback": "[~~Ĉĥáɱƥíőñ~~]",
+      "winningLabel": "[Winning score]",
+      "marginLabel": "[Margin]"
     },
     "story": {
       "eyebrow": "[~~Ţĥé Šţőřý~~]",

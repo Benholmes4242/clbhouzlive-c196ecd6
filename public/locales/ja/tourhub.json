@@ -382,7 +382,8 @@
       "player": "PLAYER",
       "tot": "TOT",
       "thru": "THRU",
-      "today": "TODAY"
+      "today": "TODAY",
+      "round": "ラウンド"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",
@@ -451,7 +452,9 @@
       "defendingLabel": "Defending",
       "purseLabel": "Purse",
       "tbdPlayer": "TBD",
-      "championFallback": "Champion"
+      "championFallback": "Champion",
+      "winningLabel": "優勝スコア",
+      "marginLabel": "差"
     },
     "story": {
       "eyebrow": "The Story",
