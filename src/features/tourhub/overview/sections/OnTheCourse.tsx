@@ -344,6 +344,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
           round={round}
           tournamentId={tournamentId ?? ''}
         />
+        <CutWatchLine tournamentId={tournamentId} />
         <div
 
           ref={railRef}
