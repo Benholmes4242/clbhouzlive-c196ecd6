@@ -18,7 +18,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { SPACE } from '@/lib/spacing';
+
 
 /**
  * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_REBUILD).
@@ -180,7 +180,6 @@ export default function ExploreTabContent({
       <div
         style={{
           padding: '0 14px',
-          paddingBottom: SPACE.pageBottom,
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
@@ -209,6 +208,13 @@ export default function ExploreTabContent({
         <RarestOfAll events={legendary} onRowPress={handleRarestRow} />
 
         <YourCircle userId={userId} onRowPress={handleCircleRow} />
+
+        {/* Clears the floating bottom nav. Collapses to 16px on routes where
+            the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
+        <div
+          aria-hidden="true"
+          style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+        />
       </div>
 
       <RoundDetailSheet
