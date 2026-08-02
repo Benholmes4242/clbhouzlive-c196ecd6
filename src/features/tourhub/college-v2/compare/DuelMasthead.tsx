@@ -1,16 +1,16 @@
 /**
- * DuelMasthead — charcoal head for the compare page.
+ * DuelMasthead - charcoal head for the compare page.
  *
  * Convergence with the College profile hero (CollegeHeroMasthead):
  *   - Same vertical rhythm: min-height clamp(280px, 34dvh, 360px) + sat,
  *     paddingTop 62 + sat, paddingBottom 24. Renders full-bleed.
- *   - Crests are UNBOXED — no rings, no tile fill, drawn directly on the
+ *   - Crests are UNBOXED - no rings, no tile fill, drawn directly on the
  *     hero at 104px (largest that keeps proportional parity with the
  *     detail page's 128 while still fitting the two-up layout + centre
  *     rule at 375pt).
  *   - Rank-1 school gets the amber drop-shadow glow from the detail page;
  *     the other gets a neutral soft shadow for separation.
- *   - School names scale up to 20/800, "No.{n} · {n} live" lockup to 12s.
+ *   - School names scale up to 20/800, "No.{n} . {n} live" lockup to 12s.
  *
  * HEAD TO HEAD overline stays. CHANGE buttons unchanged (small ghost).
  */
@@ -63,7 +63,7 @@ function Column({
         minWidth: 0,
       }}
     >
-      {/* Crest — unboxed. */}
+      {/* Crest - unboxed. */}
       <div
         style={{
           width: CREST_SIZE,

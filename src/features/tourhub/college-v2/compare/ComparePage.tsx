@@ -1,23 +1,23 @@
 /**
- * ComparePage — "The Duel".
+ * ComparePage - "The Duel".
  *
  * /tourhub/college-golf/compare?c1=<slug>&c2=<slug>
  *
  * Route-param contract (ported verbatim from the old CollegeComparePage):
- *   - Both params present   → render the duel.
- *   - c1 present, c2 missing → redirect to /tourhub/college-golf/<c1>.
- *   - Both missing           → renders empty duel (both columns "—") with
+ *   - Both params present   -> render the duel.
+ *   - c1 present, c2 missing -> redirect to /tourhub/college-golf/<c1>.
+ *   - Both missing           -> renders empty duel (both columns "-") with
  *                              Change buttons wired to the PickerSheet.
- *   - Unknown/invalid slug   → column renders as "—" (no standings match);
+ *   - Unknown/invalid slug   -> column renders as "-" (no standings match);
  *                              tug bars show both-zero neutrals; Classes
  *                              hides for that side. This mirrors the old
  *                              page's silent-empty behaviour.
  *
  * Reuse:
- *   - useFranchiseStandings   → ONE source for both sides' rank/points/
+ *   - useFranchiseStandings   -> ONE source for both sides' rank/points/
  *                               alumni/wins/top10 (matches the hub exactly).
- *   - useLiveAlumni + useLivePlayerIds → live counts + row live dots.
- *   - useCollegeRoster        → both classes' top alumni (already sorted
+ *   - useLiveAlumni + useLivePlayerIds -> live counts + row live dots.
+ *   - useCollegeRoster        -> both classes' top alumni (already sorted
  *                               by earnings; we slice 5).
  *
  * No framer.
@@ -106,7 +106,7 @@ export function ComparePage() {
   const c1 = searchParams.get('c1') || '';
   const c2 = searchParams.get('c2') || '';
 
-  // Old contract: c1 present with no c2 → redirect to profile.
+  // Old contract: c1 present with no c2 -> redirect to profile.
   useEffect(() => {
     if (c1 && !c2) navigate(collegeProfileRoute(c1), { replace: true });
   }, [c1, c2, navigate]);
@@ -205,7 +205,7 @@ export function ComparePage() {
   };
 
 
-  // c1 && !c2 → we're about to redirect; render nothing.
+  // c1 && !c2 -> we're about to redirect; render nothing.
   if (c1 && !c2) return null;
 
   if (isError) {
@@ -243,7 +243,7 @@ export function ComparePage() {
           paddingBottom: 88,
         }}
       >
-        {/* Masthead — always renders (skeleton state below if loading) */}
+        {/* Masthead - always renders (skeleton state below if loading) */}
         {isLoading && !left && !right ? (
           <div
             style={{
