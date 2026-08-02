@@ -58,6 +58,14 @@ export const KICKER: React.CSSProperties = {
   color: A.AMBER_DEEP,
 };
 
+/** Quiet sentence-case caption. Not a figure and not a column label. */
+export const CAPTION: React.CSSProperties = {
+  fontSize: 10.5,
+  fontWeight: 600,
+  letterSpacing: '0.01em',
+  color: A.MUTE,
+};
+
 export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: A.INK };
 
 export interface ToParParts { text: string; tone: string }
@@ -140,7 +148,15 @@ export const Panel: React.FC<{
   </section>
 );
 
-export interface StatItem { label: string; value: React.ReactNode; tone?: string; sub?: string; subTone?: string }
+export interface StatItem {
+  label: string;
+  value: React.ReactNode;
+  tone?: string;
+  sub?: string;
+  subTone?: string;
+  /** 'label' (default) renders the sub as a micro column label; 'caption' as prose. */
+  subVariant?: 'label' | 'caption';
+}
 
 export const StatRow: React.FC<{
   items: StatItem[];
@@ -163,8 +179,7 @@ export const StatRow: React.FC<{
         {it.sub ? (
           <div
             style={{
-              ...LABEL,
-              fontSize: 8,
+              ...(it.subVariant === 'caption' ? CAPTION : { ...LABEL, fontSize: 8 }),
               marginTop: 3,
               ...(it.subTone ? { color: it.subTone } : null),
               overflow: 'hidden',
