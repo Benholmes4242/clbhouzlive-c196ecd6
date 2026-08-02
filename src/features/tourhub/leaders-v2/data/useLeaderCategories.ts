@@ -46,6 +46,35 @@ export interface LeaderRow {
   tourCode: string | null;
   value: number;
   valueFormatted: string;
+  /** prior_rank - rank. Populated for world_rank only; null everywhere else. */
+  movement: number | null;
+  /** Gap to the leader, formatted with the category's OWN formatter, always as
+   *  a positive quantity. null on the leader row and on exact ties. */
+  behindFormatted: string | null;
+}
+
+/**
+ * Stamps `behindFormatted` on a leader-first row list. The direction flips with
+ * the sort so the gap is always positive: higher-is-better reads
+ * leader - value, lower-is-better reads value - leader.
+ */
+function applyBehind(
+  rows: LeaderRow[],
+  dir: 'asc' | 'desc',
+  format: (v: number) => string,
+): LeaderRow[] {
+  if (rows.length < 2) return rows;
+  const leaderValue = rows[0].value;
+  const zero = format(0);
+  for (let i = 1; i < rows.length; i++) {
+    const gap = dir === 'desc' ? leaderValue - rows[i].value : rows[i].value - leaderValue;
+    if (!(gap > 0)) continue;
+    const s = format(gap);
+    // An exact tie formats identically to zero -> render nothing, not "0 behind".
+    if (s === zero) continue;
+    rows[i].behindFormatted = dir === 'asc' && !/^[+$]/.test(s) ? `+${s}` : s;
+  }
+  return rows;
 }
 
 // Canonical category-label registry. Keys are the stable category identifiers
