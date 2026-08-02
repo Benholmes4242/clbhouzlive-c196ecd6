@@ -18,7 +18,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { SPACE } from '@/lib/spacing';
+
 
 /**
  * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_REBUILD).
