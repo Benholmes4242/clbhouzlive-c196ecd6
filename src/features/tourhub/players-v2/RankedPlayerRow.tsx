@@ -1,5 +1,5 @@
 /**
- * RankedPlayerRow — the one shared field row for THE FIELD ledger.
+ * RankedPlayerRow - the one shared field row for THE FIELD ledger.
  * Dumb, tab-agnostic; the Leaders rebuild will consume this too.
  *
  * Separation is whitespace: no row hairline. The grid is load-bearing, so the

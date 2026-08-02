@@ -1,5 +1,5 @@
 /**
- * usePlayersRanking — the Players ledger source of truth.
+ * usePlayersRanking - the Players ledger source of truth.
  *
  * Per-tour reality (measured against sr_player_statistics + tour_season_rankings):
  *   pga   -> sr_player_statistics (fedex_points DESC), stat label "FEDEX PTS"      [synced]
@@ -47,7 +47,7 @@ export interface RankingResult {
   rows: RankedRow[];
 }
 
-/** Maps tour → i18n key under `players.statLabel.*`. */
+/** Maps tour -> i18n key under `players.statLabel.*`. */
 const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
   pga: 'players.statLabel.pga',
   euro: 'players.statLabel.euro',

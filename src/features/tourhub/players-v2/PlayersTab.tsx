@@ -1,5 +1,5 @@
 /**
- * players-v2/PlayersTab — "The Field" — one shared ledger row, a two-figure
+ * players-v2/PlayersTab - "The Field" - one shared ledger row, a two-figure
  * field band, a column header, and an honest sample-size caption.
  *
  * Wiring:
@@ -61,7 +61,7 @@ function formatDayShort(d: string | null | undefined): string | null {
   return formatWeekdayLong(dt);
 }
 
-/** Field band figure — label above figure, centred. */
+/** Field band figure - label above figure, centred. */
 function FieldFigure({
   label,
   value,
@@ -119,7 +119,7 @@ export function PlayersTab() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ── Per-section tour lens (local state, NO All Tours, PGA default).
+  // -- Per-section tour lens (local state, NO All Tours, PGA default).
   // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
   const initialTour: PlayersTourId =
@@ -128,7 +128,7 @@ export function PlayersTab() {
       : 'pga';
   const [activeTour, setActiveTour] = useState<PlayersTourId>(initialTour);
 
-  // ── Sort (honor inbound ?sort=)
+  // -- Sort (honor inbound ?sort=)
   const inboundSort = searchParams.get('sort');
   const [sort, setSortState] = useState<SortKey>(
     inboundSort === 'live' || inboundSort === 'playing-now' ? 'live' : 'ranking',
@@ -155,7 +155,7 @@ export function PlayersTab() {
     [setSearchParams, activeTour],
   );
 
-  // ── Search
+  // -- Search
   const [search, setSearch] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
   const debouncedSearch = useDebouncedValue(search, 200);
@@ -164,7 +164,7 @@ export function PlayersTab() {
     if (searchExpanded) searchInputRef.current?.focus();
   }, [searchExpanded]);
 
-  // ── Data
+  // -- Data
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
@@ -174,7 +174,7 @@ export function PlayersTab() {
   );
   const { data: worldRanks } = useWorldRankLookup(loadedIds);
 
-  // ── Editorial line (live leader → then upcoming day)
+  // -- Editorial line (live leader -> then upcoming day)
   const editorial = useMemo<string | null>(() => {
     const tours = (liveTournaments ?? []).filter((t) => t.tourSlug === activeTour);
     if (!tours.length) return null;
@@ -209,7 +209,7 @@ export function PlayersTab() {
       : null;
   }, [liveTournaments, activeTour, liveMap, ranking?.rows, t]);
 
-  // ── Rows: filter by search
+  // -- Rows: filter by search
   const filteredRows = useMemo<RankedRow[]>(() => {
     const rows = ranking?.rows ?? [];
     const q = debouncedSearch.trim().toLowerCase();
@@ -217,24 +217,24 @@ export function PlayersTab() {
     return rows.filter((r) => r.name.toLowerCase().includes(q));
   }, [ranking?.rows, debouncedSearch]);
 
-  // ── Live count from the current filtered view (tour + search)
+  // -- Live count from the current filtered view (tour + search)
   const liveCount = useMemo(
     () => filteredRows.filter((r) => (liveMap ?? {})[r.playerId]).length,
     [filteredRows, liveMap],
   );
 
-  // ── Sort options: hide "Playing now" when nobody is live
+  // -- Sort options: hide "Playing now" when nobody is live
   const sortOptions = useMemo<SortKey[]>(
     () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
     [liveCount],
   );
 
-  // ── Safety: if live filter becomes empty, revert to ranking
+  // -- Safety: if live filter becomes empty, revert to ranking
   useEffect(() => {
     if (liveCount === 0 && sort === 'live') setSort('ranking');
   }, [liveCount, sort, setSort]);
 
-  // ── Ordering when "Playing now" active
+  // -- Ordering when "Playing now" active
   const orderedRows = useMemo<RankedRow[]>(() => {
     if (sort !== 'live') return filteredRows;
     const live: RankedRow[] = [];
@@ -256,7 +256,7 @@ export function PlayersTab() {
   const statLabel = ranking?.statLabel ?? null;
   const loadedCount = ranking?.rows?.length ?? 0;
 
-  // ── Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
+  // -- Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
   const leadMargin = useMemo<number | null>(() => {
     if (sort !== 'ranking') return null;
     const rows = ranking?.rows ?? [];
@@ -284,7 +284,7 @@ export function PlayersTab() {
     [navigate, activeTour, liveMap, sort],
   );
 
-  // ── Analytics: viewed once per mount after the ranking resolves
+  // -- Analytics: viewed once per mount after the ranking resolves
   const viewedRef = useRef(false);
   useEffect(() => {
     if (viewedRef.current) return;
@@ -298,7 +298,7 @@ export function PlayersTab() {
     });
   }, [ranking, rankingLoading, rankingError, activeTour, liveCount]);
 
-  // ── Analytics: searched (debounced value only, never the query text)
+  // -- Analytics: searched (debounced value only, never the query text)
   useEffect(() => {
     const q = debouncedSearch.trim();
     if (!q) return;
@@ -321,7 +321,7 @@ export function PlayersTab() {
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* Tour lens + search — single sticky row. Pills scroll under a pinned
+      {/* Tour lens + search - single sticky row. Pills scroll under a pinned
           search button; expanding search hides the pills and fills the row. */}
       <div
         style={{
@@ -445,7 +445,7 @@ export function PlayersTab() {
         )}
       </div>
 
-      {/* FIELD BAND — renders nothing at all when neither figure qualifies. */}
+      {/* FIELD BAND - renders nothing at all when neither figure qualifies. */}
       {showBand && (
         <div
           style={{
@@ -636,7 +636,7 @@ export function PlayersTab() {
         </div>
       )}
 
-      {/* Sample-size caption — always visible, always true. */}
+      {/* Sample-size caption - always visible, always true. */}
       <div
         style={{
           padding: '16px 16px 0',
