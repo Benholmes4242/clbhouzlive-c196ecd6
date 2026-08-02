@@ -451,6 +451,8 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       return {
         playerId: pid,
         rank: 0,
+        rankLabel: '',
+        tied: false,
         name: p?.full_name ?? r.player_name ?? 'Unknown',
         country: p?.country ?? r.country ?? null,
         countryCode: p?.country_code ?? null,
@@ -464,18 +466,19 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     };
 
     // Points
+    const fmtPoints = (v: number) => formatNumberMaxFrac(v, 2);
     const pointsPool = pool.filter((r) => r.points != null && Number(r.points) > 0);
     const pointsRows = pointsPool
       .slice()
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
-      .map((r, i) => {
+      .map((r) => {
         const base = resolve(r);
-        base.rank = i + 1;
         base.value = Number(r.points);
-        base.valueFormatted = formatNumberMaxFrac(base.value, 2);
+        base.valueFormatted = fmtPoints(base.value);
         return base;
       });
+    applyCompetitionRanks(pointsRows, fmtPoints);
     if (pointsRows.length >= 3) {
       const pointsBase = LEADER_STAT_LABELS.points;
       const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
@@ -484,7 +487,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         labelKey: brandLabelKey ?? pointsBase.labelKey,
         shortKey: pointsBase.shortKey,
         unitKey: pointsBase.unitKey,
-        rows: applyBehind(pointsRows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+        rows: applyBehind(pointsRows, 'desc', fmtPoints),
         poolSize: pointsPool.length,
       });
     }
@@ -495,13 +498,13 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .slice()
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
-      .map((r, i) => {
+      .map((r) => {
         const base = resolve(r);
-        base.rank = i + 1;
         base.value = Number(r.wins);
         base.valueFormatted = fmtInt(base.value);
         return base;
       });
+    applyCompetitionRanks(winsRows, fmtInt);
     if (winsRows.length >= 3) {
       categories.push({
         key: 'wins',
@@ -510,6 +513,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         poolSize: winsPool.length,
       });
     }
+
   }
 
   // World ranking is PGA-only per editorial policy - not appended to other tours.
