@@ -229,8 +229,12 @@ function legendaryEvent(row: FeatRow, index: number, userId?: string): WireEvent
       ...(yards != null ? { yards: formatNumber(yards) } : {}),
     },
     rarity: 3,
+    holeNo: hole,
+    holePar: row.hole_par ?? null,
+    holeYards: yards,
   };
 }
+
 
 function eagleEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
   const at = whenOf(row);
