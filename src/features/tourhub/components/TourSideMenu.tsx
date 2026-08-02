@@ -88,11 +88,15 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   onSignOut,
 }) => {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const reduced = usePrefersReducedMotion();
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
-  const { data: liveTournaments, isFetched: liveFetched } = useLiveTournaments();
+  const { data: liveTournaments, isFetched: liveFetched, isLoading: liveLoading } = useLiveTournaments();
+  const inProgress = (liveTournaments ?? []).filter((tt) => (tt.status || '').toLowerCase() === 'inprogress');
+  const liveCount = inProgress.length;
   const showLive = liveFetched && (liveTournaments?.length ?? 0) > 0;
+
 
   // Mount on open; unmount after exit transition.
   useEffect(() => {
