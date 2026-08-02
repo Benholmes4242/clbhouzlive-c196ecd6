@@ -15,6 +15,7 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, SLATE_50, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   tournamentId: string;
@@ -100,12 +101,23 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
           <MomentCard key={m.id} moment={m} tourCode={tourCode} />
         ))}
       </div>
-      <BottomSheet open={open} onClose={() => setOpen(false)} variant="light" surfaceColor={SLATE_50}>
-        <div style={{ background: SLATE_50, fontFamily: FONT, maxHeight: 'calc(90vh - 24px)', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '4px 16px 12px' }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        variant="light"
+        surfaceColor={A.PANEL}
+        ariaLabelledBy="tournament-moments-sheet-title"
+        style={{ height: '75dvh', maxHeight: '75dvh' }}
+      >
+        <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '0 16px 12px' }}>
+            <div style={KICKER}>{t('tournament.moments.eyebrow')}</div>
+            <h2
+              id="tournament-moments-sheet-title"
+              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+            >
               {t('tournament.moments.sheetTitle')}
-            </div>
+            </h2>
           </div>
           <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, background: SURFACE, borderTop: `1px solid ${HAIRLINE_INK_8}`, borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
             {list.map((m, i) => {

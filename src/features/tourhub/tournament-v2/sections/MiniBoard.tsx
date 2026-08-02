@@ -1,5 +1,5 @@
 /**
- * MiniBoard — TD1 top-5 compressed board.
+ * MiniBoard - TD1 top-5 compressed board.
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
  * Row tap opens ScorecardSheet.
  */
@@ -11,8 +11,9 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT,
 } from '../../_shared/tokens';
+import { fmtScore } from '../../utils/fmtScore';
+import { getScoreColor } from '../../_shared/scoreColor';
 
 interface Row {
   id: string;
@@ -37,25 +38,22 @@ interface Props {
   currentRound?: number | null;
 }
 
-function fmt(n: number | null | undefined): string {
-  if (n == null) return '—';
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : String(n);
-}
-function color(n: number | null | undefined): string {
-  if (n == null) return INK;
-  if (n < 0) return TOPAR_UNDER_LIGHT;
-  if (n > 0) return TOPAR_OVER_LIGHT;
-  return INK;
-}
+/**
+ * Canonical scoring: fmtScore + getScoreColor(..., 'light') - the same helpers
+ * the schedule, board and college surfaces use. No local forks.
+ *
+ * Placeholders: a missing figure renders as NOTHING. An em dash is a value in
+ * a tabular column and reads as data the field does not have.
+ */
+const BLANK = '';
 function thruLabel(row: Row, today: number | null): string {
   const s = row.status?.toUpperCase();
   if (s === 'MC' || s === 'CUT') return 'MC';
   if (s === 'WD') return 'WD';
   // THRU must agree with TODAY: no round score for the active round means the
   // player has not started, so the stale top-level thru must not render.
-  if (today == null) return '—';
-  if (row.thru == null) return '—';
+  if (today == null) return BLANK;
+  if (row.thru == null) return BLANK;
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
@@ -87,7 +85,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
         {rows.map((r) => {
           const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
             : r.status === 'WD' ? 'WD'
-            : r.position == null ? '—'
+            : r.position == null ? BLANK
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
           const flag = cc ? countryFlag(cc) : null;
@@ -127,17 +125,17 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
                   <span style={{ fontSize: 10, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
                 ) : null}
                 <span style={{ fontSize: 13, fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {r.player?.full_name ?? '—'}
+                  {r.player?.full_name ?? BLANK}
                 </span>
               </div>
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: color(today), fontVariantNumeric: 'tabular-nums' }}>
-                {fmt(today)}
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+                {today == null ? BLANK : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 800, color: color(r.score), fontVariantNumeric: 'tabular-nums' }}>
-                {fmt(r.score)}
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 800, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+                {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>
           );

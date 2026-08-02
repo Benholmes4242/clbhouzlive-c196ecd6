@@ -15,7 +15,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
-import { AMBER, FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
 type RoundKey = '1' | '2' | '3' | '4';
 
@@ -93,16 +94,24 @@ export function AllTeeTimesSheet({
   );
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
-      <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '4px 16px 10px' }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {t('tournament.allTeeTimes.title')}
-          </div>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      variant="light"
+      surfaceColor={A.PANEL}
+      ariaLabelledBy="tournament-tee-times-sheet-title"
+      style={{ height: '75dvh', maxHeight: '75dvh' }}
+    >
+      <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '0 16px 10px' }}>
+          <div style={KICKER}>{t('tournament.allTeeTimes.title')}</div>
           {tournamentName && (
-            <div style={{ fontSize: 15, fontWeight: 800, color: INK, marginTop: 4, letterSpacing: '-0.01em' }}>
+            <h2
+              id="tournament-tee-times-sheet-title"
+              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+            >
               {tournamentName}
-            </div>
+            </h2>
           )}
           <div style={{ marginTop: 10 }}>
             <ScopeSegment

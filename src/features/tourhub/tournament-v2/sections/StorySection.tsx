@@ -7,7 +7,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SectionEyebrow } from './SectionEyebrow';
-import { FONT, INK, INK_MUTE, SURFACE, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { FONT, INK, SURFACE, HAIRLINE_INK_8 } from '../../_shared/tokens';
+import { Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   story: string | null;
@@ -35,24 +36,19 @@ export function StorySection({ story }: Props) {
             fontSize: 13, lineHeight: 1.55, color: INK, fontWeight: 500,
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: expanded ? 'unset' as any : 6,
+            WebkitLineClamp: expanded ? 'unset' : 6,
             overflow: expanded ? 'visible' : 'hidden',
           }}
         >
           {story}
         </p>
         {!expanded && story.length > 260 && (
-          <button
-            type="button"
+          <Action
+            label={t('tournament.story.readMore')}
             onClick={() => setExpanded(true)}
-            style={{
-              marginTop: 8, background: 'transparent', border: 'none', padding: 0,
-              fontFamily: FONT, fontSize: 11, fontWeight: 800, color: INK_MUTE,
-              letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer',
-            }}
-          >
-            {t('tournament.story.readMore')} ›
-          </button>
+            align="left"
+            style={{ marginTop: 4 }}
+          />
         )}
       </div>
     </section>

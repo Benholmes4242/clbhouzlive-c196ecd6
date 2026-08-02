@@ -15,6 +15,8 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
 import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { fmtScore } from '../../utils/fmtScore';
+import { getScoreColor } from '../../_shared/scoreColor';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
@@ -58,55 +60,135 @@ interface Props {
   leaderboard: LbEntry[] | undefined;
 }
 
-function fmtScoreSigned(n: number | null | undefined): string {
-  if (n == null) return '—';
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : String(n);
-}
-
-function CountdownTile({ value, label }: { value: number; label: string }) {
+/**
+ * Figure - one hero figure. Flat: no glass tile, no border, no backdrop
+ * filter. Three of these sit in ONE row for every state, so the hero has a
+ * single figure grammar instead of a per-state widget.
+ */
+function Figure({ value, label, tone }: { value: string; label: string; tone?: string }) {
   return (
-    <div
-      style={{
-        minWidth: 52,
-        padding: '8px 10px',
-        borderRadius: 10,
-        background: 'rgba(255,255,255,0.10)',
-        backdropFilter: 'blur(10px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(10px) saturate(140%)',
-        border: '0.5px solid rgba(255,255,255,0.16)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
-      }}
-    >
-      <span
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div
         style={{
-          fontSize: 17,
+          fontSize: 22,
           fontWeight: 800,
           lineHeight: 1,
-          color: '#fff',
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
+          color: tone ?? '#fff',
+          fontVariantNumeric: 'tabular-nums lining',
+          letterSpacing: '-0.02em',
+          textShadow: TEXT_SHADOW,
         }}
       >
         {value}
-      </span>
-      <span
+      </div>
+      <div
         style={{
-          fontSize: 7.5,
-          fontWeight: 700,
+          marginTop: 5,
+          fontSize: 8.5,
+          fontWeight: 800,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
+          textShadow: TEXT_SHADOW,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
         {label}
-      </span>
+      </div>
     </div>
   );
 }
+
+/**
+ * PersonLockup - the ONE person treatment in the hero. Leader (live),
+ * defending champion (upcoming) and champion (completed) all render through
+ * this so the avatar, label, name and sub-line never drift apart.
+ */
+function PersonLockup({
+  label,
+  labelTone,
+  icon,
+  name,
+  sub,
+  playerId,
+  photoUrl,
+  tourCode,
+  showAvatar,
+}: {
+  label: string;
+  labelTone?: string;
+  icon?: React.ReactNode;
+  name: string;
+  sub?: string | null;
+  playerId?: string | null;
+  photoUrl?: string | null;
+  tourCode: string;
+  showAvatar?: boolean;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+      {showAvatar && (
+        <PlayerAvatar
+          playerId={playerId ?? ''}
+          playerName={name}
+          tourCode={tourCode}
+          photoUrl={photoUrl ?? null}
+          size="md"
+          ringColor={LIGHT_HAIRLINE}
+        />
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: labelTone ?? 'rgba(255,255,255,0.62)',
+            textTransform: 'uppercase',
+            textShadow: TEXT_SHADOW,
+          }}
+        >
+          {icon}
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 17,
+            fontWeight: 800,
+            color: '#fff',
+            marginTop: 3,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textShadow: TEXT_SHADOW,
+          }}
+        >
+          {name}
+        </div>
+        {sub && (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: WHITE_ALPHA_65,
+              marginTop: 2,
+              fontVariantNumeric: 'tabular-nums lining',
+              textShadow: TEXT_SHADOW,
+            }}
+          >
+            {sub}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Props) {
   const { t } = useTranslation('tourhub');
@@ -202,7 +284,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     };
   })();
 
-  // Countdown tiles for upcoming.
+  // Countdown for upcoming (feeds the figure row).
   const countdown = (() => {
     if (state !== 'upcoming' || !startDate) return null;
     const totalMs = startDate.getTime() - now.getTime();
@@ -213,6 +295,89 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     const m = totalMin % 60;
     return { d, h, m };
   })();
+
+  /**
+   * THE THREE FIGURES - the same row in every state, so the hero reads as one
+   * component with a state input rather than three bespoke bands.
+   *   live      -> leader to par / thru / round
+   *   upcoming  -> days / hrs / min (or days + purse when the clock is gone)
+   *   completed -> winning score / margin / purse
+   */
+  const figures: Array<{ value: string; label: string; tone?: string }> = (() => {
+    if (state === 'live' && leader) {
+      const out: Array<{ value: string; label: string; tone?: string }> = [
+        {
+          value: leader.score == null ? 'E' : fmtScore(leader.score),
+          label: t('board.columns.tot'),
+          tone: getScoreColor(leader.score, 'dark'),
+        },
+      ];
+      if (leader.thru != null) {
+        out.push({
+          value: leader.thru >= 18 ? 'F' : String(leader.thru),
+          label: t('board.columns.thru'),
+        });
+      }
+      out.push({
+        value: `R${meta.current_round ?? 1}`,
+        label: t('board.columns.round', { defaultValue: 'ROUND' }),
+      });
+      return out;
+    }
+
+    if (state === 'upcoming') {
+      const out: Array<{ value: string; label: string; tone?: string }> = [];
+      if (countdown) {
+        if (countdown.d > 0) {
+          out.push({
+            value: String(countdown.d),
+            label: t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' }),
+          });
+        }
+        out.push({
+          value: String(countdown.h),
+          label: t('overview.cinematic.countdownHoursLabel', { defaultValue: 'HRS' }),
+        });
+        out.push({
+          value: String(countdown.m),
+          label: t('overview.cinematic.countdownMinutesLabel', { defaultValue: 'MIN' }),
+        });
+      } else if (daysUntil != null) {
+        out.push({
+          value: String(daysUntil),
+          label: t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' }),
+        });
+      }
+      if (out.length < 3 && meta.purse != null) {
+        out.push({ value: formatPurse(meta.purse), label: t('tournament.hero.purseLabel') });
+      }
+      return out.slice(0, 3);
+    }
+
+    if (state === 'completed' && champion) {
+      const out: Array<{ value: string; label: string; tone?: string }> = [
+        {
+          value: champion.score == null ? 'E' : fmtScore(champion.score),
+          label: t('tournament.hero.winningLabel', { defaultValue: 'WINNING SCORE' }),
+          tone: GOLD,
+        },
+      ];
+      if (margin != null) {
+        out.push({
+          value: margin === 0 ? 'E' : `+${margin}`,
+          label: t('tournament.hero.marginLabel', { defaultValue: 'MARGIN' }),
+        });
+      }
+      if (meta.purse != null) {
+        out.push({ value: formatPurse(meta.purse), label: t('tournament.hero.purseLabel') });
+      }
+      return out.slice(0, 3);
+    }
+
+    return [];
+  })();
+
+
 
   return (
     <div
@@ -289,247 +454,56 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           }}
         />
 
-        {/* STATE BAND: LIVE */}
+        {/* THREE FIGURES - one row, every state. */}
+        {figures.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
+            {figures.map((f) => (
+              <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
+            ))}
+          </div>
+        )}
+
+        {/* PERSON - leader / defending champion / champion, one lockup. */}
         {state === 'live' && leader && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <PlayerAvatar
-              playerId={leader.player?.id ?? ''}
-              playerName={leader.player?.full_name ?? ''}
-              tourCode={tourCode}
-              photoUrl={leader.player?.photo_url ?? null}
-              size="md"
-              ringColor={LIGHT_HAIRLINE}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {t('tournament.hero.leaderLabel')}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  marginTop: 2,
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: LEADER_RED,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {fmtScoreSigned(leader.score)}
-              </div>
-              {leader.thru != null && (
-                <div
-                  style={{
-                    fontSize: 10,
-
-                    fontWeight: 700,
-                    letterSpacing: '0.14em',
-                    color: 'rgba(255,255,255,0.62)',
-                    textTransform: 'uppercase',
-                    marginTop: 4,
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {t('tournament.hero.thru', {
-                    thru: leader.thru === 18 ? 'F' : leader.thru,
-                    defaultValue: `THRU ${leader.thru === 18 ? 'F' : leader.thru}`,
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.leaderLabel')}
+            name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
+            sub={
+              leader.today != null
+                ? t('board.columns.today') + ' ' + fmtScore(leader.today)
+                : null
+            }
+            playerId={leader.player?.id ?? null}
+            photoUrl={leader.player?.photo_url ?? null}
+            tourCode={tourCode}
+            showAvatar
+          />
         )}
 
-        {/* STATE BAND: UPCOMING */}
         {state === 'upcoming' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: GOLD,
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                <Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />
-                {t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  marginTop: 3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {defendingChamp?.name ?? meta.defending_champion ?? '—'}
-              </div>
-              {(defendingChamp?.year || defendingChamp?.score) && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: WHITE_ALPHA_65,
-                    marginTop: 2,
-                    fontVariantNumeric: 'tabular-nums',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' · ')}
-                </div>
-              )}
-            </div>
-            {countdown && (
-              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                {countdown.d > 0 && (
-                  <CountdownTile
-                    value={countdown.d}
-                    label={t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' })}
-                  />
-                )}
-                <CountdownTile
-                  value={countdown.h}
-                  label={t('overview.cinematic.countdownHoursLabel', { defaultValue: 'HRS' })}
-                />
-                <CountdownTile
-                  value={countdown.m}
-                  label={t('overview.cinematic.countdownMinutesLabel', { defaultValue: 'MIN' })}
-                />
-              </div>
-            )}
-            {!countdown && daysUntil != null && (
-              <CountdownTile
-                value={daysUntil}
-                label={t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' })}
-              />
-            )}
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
+            labelTone={GOLD}
+            icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
+            name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
+            sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
+            tourCode={tourCode}
+          />
         )}
 
-        {/* STATE BAND: FINAL */}
         {state === 'completed' && champion && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: GOLD,
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                <Trophy size={11} color={GOLD} strokeWidth={2.4} />
-                {t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  marginTop: 3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {champion.player?.full_name ?? t('tournament.hero.championFallback')}
-              </div>
-              {(margin != null || meta.purse != null) && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: WHITE_ALPHA_65,
-                    marginTop: 2,
-                    fontVariantNumeric: 'tabular-nums',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {[
-                    margin != null
-                      ? t('tournament.hero.wonBy', {
-                          margin,
-                          defaultValue: `Won by ${margin}`,
-                        })
-                      : null,
-                    meta.purse != null ? formatPurse(meta.purse) : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </div>
-              )}
-            </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: GOLD,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {fmtScoreSigned(champion.score)}
-              </div>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  marginTop: 4,
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {t('tournament.hero.holesLabel', { defaultValue: '72 HOLES' })}
-              </div>
-            </div>
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
+            labelTone={GOLD}
+            icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
+            name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
+            playerId={champion.player?.id ?? null}
+            photoUrl={champion.player?.photo_url ?? null}
+            tourCode={tourCode}
+            showAvatar
+          />
         )}
+
       </div>
     </div>
   );

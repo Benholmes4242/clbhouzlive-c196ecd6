@@ -472,7 +472,8 @@
       "player": "PLAYER",
       "tot": "TOT",
       "thru": "THRU",
-      "today": "TODAY"
+      "today": "TODAY",
+      "round": "Round"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",
@@ -549,7 +550,9 @@
       "defendingLabel": "Defending",
       "purseLabel": "Purse",
       "tbdPlayer": "TBD",
-      "championFallback": "Champion"
+      "championFallback": "Champion",
+      "winningLabel": "Winning score",
+      "marginLabel": "Margin"
     },
     "story": {
       "eyebrow": "The Story",
