@@ -147,6 +147,8 @@ export function ComparePage() {
   const rightClass = rightRoster.slice(0, CLASS_CAP);
 
   const leftCode = left?.shortName || left?.collegeName?.slice(0, 4).toUpperCase() || 'LEFT';
+  const rightCode = right?.shortName || right?.collegeName?.slice(0, 4).toUpperCase() || 'RIGHT';
+
 
   const leftName = left?.shortName || left?.collegeName || '';
   const rightName = right?.shortName || right?.collegeName || '';
