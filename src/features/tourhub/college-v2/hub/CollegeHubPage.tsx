@@ -140,7 +140,7 @@ export function CollegeHubPage() {
             logoUrl={leader.logoUrl}
             brandHex={leader.brandHex}
             rank={leader.rank}
-            pointsTotal={leader.pointsTotal}
+            pointsTotal={leader.earningsTotal}
             alumniCount={leader.alumniCount}
             playingNow={leaderPlayingNow}
             rankChange={leader.rankChange}

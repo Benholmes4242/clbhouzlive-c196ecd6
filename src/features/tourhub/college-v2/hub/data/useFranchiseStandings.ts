@@ -3,7 +3,7 @@
  *
  * Composes college_season_stats (ranking + points + alumni count),
  * college_media (name + logo), college_weekly_movers (rank movement),
- * and a single sr_players fetch (top-3 alumni faces per college).
+ * and college_weekly_movers (rank movement).
  *
  * All returns are JSON-safe (Records + arrays, no Maps).
  *
@@ -14,19 +14,11 @@
  *   college_media:        normalized_name, college_name, short_name, logo_url
  *   college_weekly_movers: normalized_name, earnings_rank_change,
  *                         season_id, week_start
- *   sr_players:           id, first_name, last_name, full_name, photo_url,
- *                         college_normalized
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentSeasonId } from '@/features/tourhub/hooks/useCollegeStats';
-
-export interface YearbookAlumnus {
-  id: string;
-  name: string;
-  photoUrl: string | null;
-}
 
 export interface YearbookStanding {
   rank: number;
@@ -35,13 +27,12 @@ export interface YearbookStanding {
   shortName: string | null;
   logoUrl: string | null;
   brandHex: string | null;
-  pointsTotal: number;
+  earningsTotal: number;
   alumniCount: number;
   winsTotal: number;
   top10Total: number;
   /** Positive = rose in rank; negative = fell; null = no data. */
   rankChange: number | null;
-  topAlumni: YearbookAlumnus[];
 }
 
 export interface FranchiseStandingsData {
@@ -121,29 +112,7 @@ export function useFranchiseStandings() {
         }
       }
 
-      // --- 5. Top-3 alumni faces per college (one batched query) ---
-      const { data: alumniRows, error: alumniErr } = await supabase
-        .from('sr_players')
-        .select('id, first_name, last_name, full_name, photo_url, college_normalized')
-        .in('college_normalized', slugs)
-        .not('photo_url', 'is', null)
-        .limit(slugs.length * 5);
-      if (alumniErr) throw alumniErr;
-
-      const alumniByCollege: Record<string, YearbookAlumnus[]> = {};
-      for (const p of alumniRows ?? []) {
-        const key = p.college_normalized;
-        if (!key) continue;
-        const bucket = (alumniByCollege[key] ??= []);
-        if (bucket.length >= 3) continue;
-        bucket.push({
-          id: p.id,
-          name: p.full_name || `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim() || 'Alumnus',
-          photoUrl: p.photo_url,
-        });
-      }
-
-      // --- 6. Assemble, rank by earnings_total desc ---
+      // --- 5. Assemble, rank by earnings_total desc ---
       const sorted = [...stats].sort((a, b) => (b.earnings_total ?? 0) - (a.earnings_total ?? 0));
       const standings: YearbookStanding[] = sorted.map((s, idx) => ({
         rank: idx + 1,
@@ -152,12 +121,11 @@ export function useFranchiseStandings() {
         shortName: mediaByName[s.normalized_name]?.short_name ?? null,
         logoUrl: mediaByName[s.normalized_name]?.logo_url ?? null,
         brandHex: mediaByName[s.normalized_name]?.brand_hex ?? null,
-        pointsTotal: Math.round(s.earnings_total ?? 0),
+        earningsTotal: Math.round(s.earnings_total ?? 0),
         alumniCount: s.player_count ?? 0,
         winsTotal: s.wins_total ?? 0,
         top10Total: s.top10_total ?? 0,
         rankChange: rankChangeByName[s.normalized_name] ?? null,
-        topAlumni: alumniByCollege[s.normalized_name] ?? [],
       }));
 
       return { year, standings };
