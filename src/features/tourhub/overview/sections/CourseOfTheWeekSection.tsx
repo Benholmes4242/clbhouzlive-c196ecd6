@@ -11,6 +11,31 @@ import { V4 } from '../tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { SPACE } from '@/lib/spacing';
+import { useMyCourseBest } from '../../hooks/useMyCourseBest';
+import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+
+/** Stat cell for the Course of the Week panel. Amber is reserved for the member. */
+function CotwStat({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  tone?: string;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 0 }}>
+      <span style={{ fontSize: 20, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
+        {value}
+      </span>
+      <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
+      {sub ? <span style={{ ...LABEL, fontSize: 8, color: A.MUTE }}>{sub}</span> : null}
+    </div>
+  );
+}
 
 export function CourseOfTheWeekSection() {
   const navigate = useNavigate();
