@@ -138,6 +138,7 @@ export function PlayerPage() {
 
         <TournamentsSection
           results={results ?? []}
+          playerId={player.id}
           playerName={player.full_name}
           liveTournamentId={liveTournamentId}
         />
