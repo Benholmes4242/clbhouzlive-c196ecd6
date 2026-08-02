@@ -247,7 +247,15 @@ export function usePlayersRanking(tour: PlayersTourId) {
           stat: r.points != null ? Number(r.points) : null,
           wins: r.wins ?? null,
           top10s: null,
+          // tour_season_rankings carries no stat columns. Null, never zero.
+          scoringAvg: null,
+          drivingDistance: null,
+          drivingAccuracy: null,
+          gir: null,
+          puttingAverage: null,
+          sgPutting: null,
         };
+
       });
       return { synced: true, statLabel: statLabelFor(tour), rows };
     },
