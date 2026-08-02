@@ -546,61 +546,88 @@ export function PlayersTab() {
       )}
 
       {/* THE FIELD. The kicker is the only amber on this page: there is no
-          viewing member on a tour surface, so nothing else earns brand colour. */}
-      <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: AMBER_DEEP,
-            textTransform: 'uppercase',
-            flexShrink: 0,
-          }}
-        >
-          {t('players.field.eyebrow')}
-        </span>
-        <div
-          className="overflow-x-auto scrollbar-hide"
-          style={{ display: 'flex', gap: 4, flex: 1, minWidth: 0, justifyContent: 'flex-end' }}
-        >
-          {sortOptions.map((k) => {
-            const active = k === sort;
-            const label =
-              k === 'ranking'
-                ? t('players.sort.ranking')
-                : k === 'live'
-                  ? t('players.sort.playingNow')
-                  : t(STAT_LENS[k].labelKey);
-            return (
-              <button
-                key={k}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setSort(k)}
+          viewing member on a tour surface, so nothing else earns brand colour.
+          With the stat lens present the pills need a full scrollable row of
+          their own; with two pills they stay inline beside the kicker. */}
+      {(() => {
+        const lensRow = activeTour === 'pga';
+        const pills = (
+          <div
+            className={lensRow ? 'overflow-x-auto scrollbar-hide' : undefined}
+            style={{
+              display: 'flex',
+              gap: 4,
+              ...(lensRow
+                ? { padding: '0 16px 2px', WebkitOverflowScrolling: 'touch' as const }
+                : {}),
+            }}
+          >
+            {sortOptions.map((k) => {
+              const active = k === sort;
+              const label =
+                k === 'ranking'
+                  ? t('players.sort.ranking')
+                  : k === 'live'
+                    ? t('players.sort.playingNow')
+                    : t(STAT_LENS[k].labelKey);
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setSort(k)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 10,
+                    border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
+                    background: active ? INK : '#FFFFFF',
+                    color: active ? '#FFFFFF' : INK_MUTE,
+                    fontFamily: 'inherit',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        );
+
+        return (
+          <>
+            <div
+              style={{
+                padding: lensRow ? '4px 16px 6px' : '4px 16px 4px',
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span
                 style={{
-                  padding: '5px 10px',
-                  borderRadius: 10,
-                  border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: active ? INK : '#FFFFFF',
-                  color: active ? '#FFFFFF' : INK_MUTE,
-                  fontFamily: 'inherit',
                   fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.10em',
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  color: AMBER_DEEP,
                   textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
                 }}
               >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                {t('players.field.eyebrow')}
+              </span>
+              {!lensRow && pills}
+            </div>
+            {lensRow && pills}
+          </>
+        );
+      })()}
+
 
 
       {rankingLoading ? (
