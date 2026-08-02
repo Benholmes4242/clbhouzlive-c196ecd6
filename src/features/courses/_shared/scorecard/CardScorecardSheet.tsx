@@ -10,6 +10,7 @@ import {
   TREND_UP, TREND_DOWN,
   TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT, TOPAR_EVEN_LIGHT,
 } from '@/features/tourhub/_shared/tokens';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -402,6 +403,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   void nineHole;
 
   const isTour = surface === 'tour';
+  const { user } = useSupabaseSession();
+  /**
+   * VOICE — this sheet opens over other members' rounds from the Clubhouse feed
+   * as often as over the viewer's own history, so running copy must not claim a
+   * stranger's round as theirs. Derived, never passed: a caller that forgets the
+   * prop would silently produce the wrong (and worse) reading. When ownership
+   * cannot be resolved we fall to the third person.
+   */
+  const isOwner = !isTour && !!playerUserId && !!user?.id && playerUserId === user.id;
+  const firstName = (playerName || '').trim().split(/\s+/)[0] || playerName || '';
+  // A first name already ending in s takes a bare apostrophe: "James' average".
+  const namePossessive = /s$/i.test(firstName) ? `${firstName}\u2019` : `${firstName}\u2019s`;
+  const subject = isOwner ? t('courses:scorecard.voiceYou') : firstName;
+  const whose = isOwner ? t('courses:scorecard.voiceYour') : namePossessive;
+  const whoseCap = isOwner ? t('courses:scorecard.voiceYourCap') : namePossessive;
   const [showCard, setShowCard] = useState(false);
   useEffect(() => { if (!open) setShowCard(false); }, [open]);
 
@@ -469,12 +485,15 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       const parts = toParParts(avgHere);
       if (parts) {
         items.push({
-          label: t('courses:scorecard.yourAvgHere'),
+          label: isOwner
+            ? t('courses:scorecard.yourAvgHere')
+            : t('courses:scorecard.avgHereOther', { whose: whoseCap }),
           value: parts.text,
           // The member's own scoring average is a PLAYER SCORE, so it takes the
           // to-par rule. The label already says "Your"; amber is not needed to
-          // carry the possessive.
-          tone: toParColor(avgHere),
+          // carry the possessive. Amber means the viewing member, so it belongs
+          // only on the member's own card.
+          tone: isOwner ? A.AMBER_DEEP : toParColor(avgHere),
           sub: courseContext.roundsHere != null
             ? t('courses:scorecard.roundsHere', { count: courseContext.roundsHere })
             : undefined,
@@ -482,7 +501,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       }
     }
     return items;
-  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, t]);
+  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, isOwner, whoseCap, t]);
 
   const captions = useMemo(() => {
     const out: string[] = [];
@@ -493,22 +512,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       if (avg != null && roundsHere > 1 && totals.played) {
         const diff = totals.toPar - avg;
         const d = Math.abs(Math.round(diff * 10) / 10);
-        if (d < 0.5) out.push(t('courses:scorecard.vsYourAvgLevel'));
-        else if (diff < 0) out.push(t('courses:scorecard.vsYourAvgBetter', { n: d.toFixed(1) }));
-        else out.push(t('courses:scorecard.vsYourAvgWorse', { n: d.toFixed(1) }));
+        if (d < 0.5) out.push(t('courses:scorecard.vsAvgLevel', { whose }));
+        else if (diff < 0) out.push(t('courses:scorecard.vsAvgBetter', { n: d.toFixed(1), whose }));
+        else out.push(t('courses:scorecard.vsAvgWorse', { n: d.toFixed(1), whose }));
       }
       if (courseContext.rankHere != null && roundsHere > 0) {
-        out.push(t('courses:scorecard.rankHere', {
+        out.push(t('courses:scorecard.rankHereVoice', {
+          whose: whoseCap,
           ordinal: formatOrdinal(courseContext.rankHere),
           count: roundsHere,
         }));
       }
     }
     return out;
-  }, [isTour, courseContext, totals, t]);
+  }, [isTour, courseContext, totals, whose, whoseCap, t]);
 
   const fieldCaption = withField && beatFieldOn != null
-    ? t(isTour ? 'courses:scorecard.beatFieldOnTour' : 'courses:scorecard.beatFieldOn', {
+    ? t(isTour ? 'courses:scorecard.beatFieldOnTour' : 'courses:scorecard.beatFieldVoice', {
+        who: subject,
         beat: beatFieldOn,
         scored: fieldHoles.length,
       })
@@ -528,6 +549,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const back = holes.filter((h) => h.holeNo > 9);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
 
+  // The card column header has no room for a name and the legend above already
+  // names the player, so a third-person card marks the column with an em dash.
+  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '\u2014';
+
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
   const hasHoles = holes.length > 0;
@@ -537,10 +562,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={A.CANVAS}
-      style={{ background: A.CANVAS, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}
+      surfaceColor={A.PANEL}
+      style={{ background: A.PANEL, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
+      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.PANEL, flex: 1, minHeight: 0, ...FIGS }}>
         {/* HEADER — course-first */}
         <div style={{ padding: '10px 16px 14px', background: A.PANEL, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <div style={{ minWidth: 0 }}>
@@ -568,6 +593,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         <div
           style={{
             flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+            background: A.CANVAS,
             padding: '12px 14px calc(env(safe-area-inset-bottom, 0px) + 24px)',
             display: 'flex', flexDirection: 'column', gap: 12,
           }}
@@ -618,7 +644,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
                   {withField && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{t('courses:scorecard.you')}</span>
+                      <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{isOwner ? t('courses:scorecard.you') : firstName}</span>
                       <span style={LABEL}>{t('courses:scorecard.field')}</span>
                     </span>
                   )}
@@ -654,9 +680,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
                 {showCard && (
                   <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <Nine rows={out} label={t('courses:scorecard.out')} withField={withField} />
+                    <Nine rows={out} label={t('courses:scorecard.out')} withField={withField} scoreLabel={cardScoreLabel} />
                     {back.length > 0 && (
-                      <Nine rows={back} label={t('courses:scorecard.in')} withField={withField} />
+                      <Nine rows={back} label={t('courses:scorecard.in')} withField={withField} scoreLabel={cardScoreLabel} />
                     )}
 
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2 }}>

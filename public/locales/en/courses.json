@@ -281,7 +281,16 @@
     "splitDouble": "Double+",
     "handicapIndex": "Handicap index",
     "roundsHere_one": "{{count}} round",
-    "roundsHere_other": "{{count}} rounds"
+    "roundsHere_other": "{{count}} rounds",
+    "voiceYou": "You",
+    "voiceYour": "your",
+    "voiceYourCap": "Your",
+    "avgHereOther": "{{whose}} avg",
+    "vsAvgLevel": "Right on {{whose}} average here.",
+    "vsAvgBetter": "{{n}} shots better than {{whose}} average here.",
+    "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
+    "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
+    "beatFieldVoice": "{{who}} beat the field average on {{beat}} of {{scored}} holes scored so far."
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
