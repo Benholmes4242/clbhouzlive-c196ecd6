@@ -936,5 +936,36 @@
       "nTied": "{{count}} tied",
       "nTied_one": "{{count}} tied"
     }
+  },
+  "college": {
+    "hero": {
+      "earnings": "EARNINGS",
+      "alumni": "ALUMNI",
+      "alumniSub": "on tour",
+      "playingNow": "PLAYING NOW"
+    },
+    "row": {
+      "alumni_one": "{{count}} alumnus",
+      "alumni_other": "{{count}} alumni",
+      "wins_one": "{{count}} win",
+      "wins_other": "{{count}} wins",
+      "top10": "{{count}} top 10",
+      "earningsLabel": "EARNINGS",
+      "live": "{{count}} LIVE"
+    },
+    "hub": {
+      "kicker": "The Yearbook",
+      "subtitle_one": "Colleges ranked by their alumni on tour. {{count}} alumnus is on the course right now.",
+      "subtitle_other": "Colleges ranked by their alumni on tour. {{count}} alumni are on the course right now.",
+      "subtitleIdle": "Colleges ranked by their alumni on tour.",
+      "searchPlaceholder": "Search colleges",
+      "clearSearchAria": "Clear search",
+      "removeSchoolAria": "Remove school",
+      "compare": "Compare schools",
+      "pickTwo": "Pick two schools to compare",
+      "pickOneMore": "Pick one more school",
+      "empty": "No franchises ranked yet this season.",
+      "footer": "{{year}} season \u00b7 ranked by alumni earnings \u00b7 live dot = on the course now"
+    }
   }
 }
