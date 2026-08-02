@@ -157,7 +157,10 @@ const Nine: React.FC<{
       <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={par || '\u2014'} muted />
       <CardRow
         label={scoreLabel}
-        cells={rows.map((h) => <ScoreCell key={h.holeNo} strokes={h.strokes} par={h.par} />)}
+        cells={rows.map((h) => (
+          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="light" />
+        ))}
+
         total={strokes || '\u2014'}
       />
 
