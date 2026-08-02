@@ -148,6 +148,7 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
                 label: t('profileSheet.handicap'),
                 value: indexText,
                 sub: deltaSub,
+                subTone: deltaTone,
               },
               ...(rounds90d != null
                 ? [{
@@ -167,9 +168,6 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
           />
         </div>
       </Panel>
-      {/* Sub-label tone lives on the figure's sub row; StatRow renders subs in
-          DIM, so the delta tone is applied by overriding it below. */}
-      <style>{`.ps2-hcp-delta{color:${deltaTone} !important}`}</style>
     </div>
   );
 }
