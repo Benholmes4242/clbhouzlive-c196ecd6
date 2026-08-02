@@ -4,16 +4,20 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import {
-  AMBER,
   FONT,
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
 } from '@/features/tourhub/_shared/tokens';
+import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { Skeleton } from '@/components/ui/skeleton';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -27,6 +31,14 @@ import {
   User,
   LogOut,
 } from 'lucide-react';
+
+/**
+ * Amber in this drawer means nothing but the group headers — there is no
+ * viewing member on these screens. The live dot is GREEN because a live
+ * indicator is a broadcast convention, not a score.
+ */
+const LIVE_GREEN = '#22C55E';
+
 
 
 export interface TourSideMenuProps {
