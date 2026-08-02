@@ -41,11 +41,13 @@ interface Props {
   onSelect?: (slug: string) => void;
   /** Visual "chosen" state during compare pick mode. */
   selected?: boolean;
+  /** Fired on tap in both navigate and pick modes (analytics). */
+  onTap?: (mode: 'navigate' | 'pick') => void;
 }
 
 const DOT = '\u00B7';
 
-function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
+function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: Props) {
   const { t } = useTranslation('tourhub');
 
   const cardBg = selected ? 'rgba(247,147,30,0.10)' : SURFACE;
@@ -253,7 +255,10 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
     return (
       <button
         type="button"
-        onClick={() => onSelect(standing.normalizedName)}
+        onClick={() => {
+          onTap?.('pick');
+          onSelect(standing.normalizedName);
+        }}
         aria-pressed={selected ? true : false}
         style={{ ...wrapperStyle, appearance: 'none' }}
       >
@@ -263,7 +268,11 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected }: Props) {
   }
 
   return (
-    <Link to={`/tourhub/college-golf/${standing.normalizedName}`} style={wrapperStyle}>
+    <Link
+      to={`/tourhub/college-golf/${standing.normalizedName}`}
+      style={wrapperStyle}
+      onClick={() => onTap?.('navigate')}
+    >
       {content}
     </Link>
   );

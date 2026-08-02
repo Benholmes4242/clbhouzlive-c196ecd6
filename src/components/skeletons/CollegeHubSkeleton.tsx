@@ -7,7 +7,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CHARCOAL = '#14161c';
-const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
 
 export const CollegeHubSkeleton = () => {
   return (
@@ -30,8 +29,19 @@ export const CollegeHubSkeleton = () => {
         }}
       >
         <Skeleton variant="dark" style={{ height: 12, width: 120, borderRadius: 4 }} />
-        <Skeleton variant="dark" style={{ height: 32, width: 220, borderRadius: 6 }} />
-        <Skeleton variant="dark" style={{ height: 12, width: 160, borderRadius: 4 }} />
+        <Skeleton variant="dark" style={{ height: 24, width: 200, borderRadius: 6 }} />
+        {/* Three-figure row: label + figure per cell (matches the masthead). */}
+        <div style={{ display: 'flex', gap: 28, marginTop: 2 }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
+            >
+              <Skeleton variant="dark" style={{ height: 8, width: 48, borderRadius: 3 }} />
+              <Skeleton variant="dark" style={{ height: 20, width: 54, borderRadius: 4 }} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Feed rows */}
@@ -41,10 +51,9 @@ export const CollegeHubSkeleton = () => {
             key={i}
             variant="light"
             style={{
-              height: 82,
+              height: 64,
               margin: '0 16px',
               borderRadius: 0,
-              borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
             }}
           />
         ))}
