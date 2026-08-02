@@ -210,3 +210,15 @@ export const FONT =
 // BAR (proportional tug/track fills on light surfaces)
 // ============================================================================
 export const BAR_NEUTRAL = '#AEB4BC';                        // losing / non-winning half of a head-to-head tug bar
+
+// ============================================================================
+// HERO HEIGHT (canonical, every tour surface EXCEPT the tour overview hero)
+// ============================================================================
+/**
+ * Canonical hero height for every tour surface EXCEPT the tour overview hero,
+ * which is deliberately taller (cinematic carousel, signed off separately at
+ * clamp(380px, 44dvh, 460px) — see overview-v3/OverviewHero + CinematicHeroFullBleed).
+ * Source of truth: the course detail hero, src/components/golf-club/GolfClubView.tsx.
+ */
+export const HERO_MIN_H =
+  'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';

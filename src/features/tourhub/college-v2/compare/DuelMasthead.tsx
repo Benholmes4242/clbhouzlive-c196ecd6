@@ -22,6 +22,7 @@ import {
   AMBER,
   CHARCOAL,
   FONT,
+  HERO_MIN_H,
   GOLD,
   STATUS_LIVE_ON_DARK,
   WHITE_ALPHA_30,
@@ -175,8 +176,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
     <div
       style={{
         background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
-        minHeight:
-          'calc(clamp(280px, 34dvh, 360px) + env(safe-area-inset-top, 0px))',
+        minHeight: HERO_MIN_H,
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 12,
         paddingRight: 12,

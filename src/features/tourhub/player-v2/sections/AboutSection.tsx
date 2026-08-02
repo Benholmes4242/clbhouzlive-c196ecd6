@@ -1,13 +1,19 @@
 /**
- * AboutSection — 2-col grid of biographical facts.
+ * AboutSection - 2-col grid of biographical facts.
+ *
  * Per-field null discipline; whole section hides when < 2 fields exist.
+ * BORN is deliberately absent: it and AGE are the same fact off the same
+ * birth_date field, so only AGE is stated. Cell rules are gone - the grid
+ * separates with rowGap, not a ladder of hairlines.
+ * The college link's affordance is AMBER_DEEP colour with no underline (an
+ * underline under a proper noun reads as a spelling error).
  */
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
-import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
-import { formatMonthDayYearShort } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { AMBER_DEEP, INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
 
 interface AboutSectionProps {
   player: TourPlayer;
@@ -35,12 +41,6 @@ export function AboutSection({ player }: AboutSectionProps) {
   const { t } = useTranslation('tourhub');
   const fields: Field[] = [];
 
-  if (player.birth_date) {
-    fields.push({
-      label: t('player.about.field.born'),
-      value: formatMonthDayYearShort(new Date(player.birth_date)),
-    });
-  }
   const age = ageOf(player.birth_date);
   if (age !== null) fields.push({ label: t('player.about.field.age'), value: String(age) });
   if (player.turned_pro) fields.push({ label: t('player.about.field.turnedPro'), value: String(player.turned_pro) });
@@ -52,7 +52,13 @@ export function AboutSection({ player }: AboutSectionProps) {
       value: player.college_normalized ? (
         <Link
           to={`/tourhub/college-golf/${player.college_normalized}`}
-          style={{ color: INK, textDecoration: 'none', borderBottom: `1px solid ${INK_TINT_07}` }}
+          onClick={() => {
+            void analyticsEvents.track('tour_player_college_tapped', {
+              player_id: player.id,
+              college_slug: player.college_normalized,
+            });
+          }}
+          style={{ color: AMBER_DEEP, textDecoration: 'none' }}
           className="active:opacity-60 transition-opacity"
         >
           {player.college}
@@ -67,40 +73,28 @@ export function AboutSection({ player }: AboutSectionProps) {
   if (fields.length < 2) return null;
 
   return (
-    <section
-      style={{
-        background: SURFACE,
-        borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '16px 16px 6px',
-      }}
-    >
+    <section style={{ background: SURFACE, padding: '16px 16px 18px' }}>
       <p
         style={{
           margin: '0 0 12px',
           fontSize: 10,
-          fontWeight: 800,
-          color: INK_FAINT,
-          letterSpacing: '0.14em',
+          fontWeight: 700,
+          color: AMBER_DEEP,
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
         }}
       >
         {t('player.about.eyebrow')}
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 20, rowGap: 16 }}>
         {fields.map((f) => (
-          <div
-            key={f.label}
-            style={{
-              padding: '12px 0',
-              borderBottom: `0.5px solid ${INK_TINT_06}`,
-            }}
-          >
+          <div key={f.label} style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
-                letterSpacing: '0.16em',
+                letterSpacing: '0.13em',
                 textTransform: 'uppercase',
                 marginBottom: 4,
               }}

@@ -17,14 +17,14 @@ import { formatNumber } from '@/i18n/format';
 import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { HERO_MIN_H } from '../../_shared/tokens';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 
-// Canonical hero height (matches GolfClubView / course detail hero).
-const HERO_MIN_H =
-  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+// Canonical hero height: HERO_MIN_H from _shared/tokens, sourced from the
+// course detail hero (GolfClubView). Do not re-declare it locally.
 
 // Same scrim as CinematicHeroFullBleed (overview hero) — grep both files.
 const CINEMATIC_SCRIM =
