@@ -28,12 +28,13 @@ import { movementFromRounds } from './movementFromRounds';
 import { countryFlag, countryFallback } from './countryFlag';
 import { getScoreColor } from '../_shared/scoreColor';
 import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
-const BAND = 'rgba(31,36,40,0.03)';
+
 const CANVAS = '#F8FAFC';
 
 const POS_NUM_W = 32;
