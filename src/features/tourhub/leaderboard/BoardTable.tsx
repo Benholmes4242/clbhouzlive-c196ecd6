@@ -28,12 +28,13 @@ import { movementFromRounds } from './movementFromRounds';
 import { countryFlag, countryFallback } from './countryFlag';
 import { getScoreColor } from '../_shared/scoreColor';
 import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';
 const HAIRLINE = 'rgba(0,0,0,0.08)';
-const BAND = 'rgba(31,36,40,0.03)';
+
 const CANVAS = '#F8FAFC';
 
 const POS_NUM_W = 32;
@@ -213,6 +214,20 @@ export const BOARD_NUM_W = NUM_W;
  * parents inside their own header bar so typography stays theirs, while the
  * widths/centring come from computeBoardColumns.
  */
+/** Fixed width of the R1..Rn block — never sized to its content. */
+export function boardRoundsWidth(c: BoardColumns): number {
+  return c.rounds.length * c.cellW + Math.max(0, c.rounds.length - 1) * c.gap;
+}
+
+/**
+ * ONE grid template shared by the header row and every body row, so the two
+ * can never drift now that the horizontal rules are gone and alignment is
+ * the only thing holding the table together.
+ */
+export function boardGridTemplate(c: BoardColumns): string {
+  return `${c.posBlockW}px minmax(0,1fr) ${boardRoundsWidth(c)}px ${NUM_W}px ${NUM_W}px`;
+}
+
 export function BoardHeaderCells({
   columns,
   thruLabel,
@@ -224,7 +239,7 @@ export function BoardHeaderCells({
 }) {
   return (
     <>
-      <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: columns.gap, width: boardRoundsWidth(columns) }}>
         {columns.rounds.map((r) => (
           <div
             key={r}
@@ -232,6 +247,9 @@ export function BoardHeaderCells({
               width: columns.cellW,
               textAlign: 'center',
               whiteSpace: 'nowrap',
+              // AMBER on this page means THE LIVE ROUND, not the viewing
+              // member. There is no viewing member on a tour board. Bounded,
+              // local, deliberate — do not "correct" this to the app-wide rule.
               color: columns.liveRound === r ? AMBER : undefined,
             }}
           >
@@ -239,11 +257,12 @@ export function BoardHeaderCells({
           </div>
         ))}
       </div>
-      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{thruLabel}</div>
-      <div style={{ width: NUM_W, flexShrink: 0, textAlign: 'center', whiteSpace: 'nowrap' }}>{totLabel}</div>
+      <div style={{ width: NUM_W, textAlign: 'center', whiteSpace: 'nowrap' }}>{thruLabel}</div>
+      <div style={{ width: NUM_W, textAlign: 'center', whiteSpace: 'nowrap' }}>{totLabel}</div>
     </>
   );
 }
+
 
 
 function isDemoted(s?: string | null): boolean {
@@ -294,40 +313,51 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
   const renderCutSentence = () => {
     if (cutState.kind === 'none') return null;
     const isProjected = cutState.kind === 'projected';
-    const label = isProjected ? t('board.cut.projected') : t('board.cut.actual');
+    const label = isProjected ? t('tour.projectedCut') : t('tour.cut');
     const cl = cutState.cutline;
     const numTxt =
       cl == null ? '' : cl === 0 ? 'E' : cl > 0 ? `+${cl}` : String(cl);
-    const extraTxt =
-      cutState.extraCount > 0 ? ` (+${cutState.extraCount})` : '';
+    // Players INSIDE the number: everyone above the insertion point when
+    // projected, every non-demoted row once the cut is actual.
+    const advanceCount = isProjected ? insertionIndex : active.length;
     return (
       <div
         key="__cut__"
         style={{
-          background: BAND,
+          background: 'rgba(15,23,42,0.03)',
           padding: '10px 16px',
+          // The ONE horizontal rule left on the board: it separates two
+          // GROUPS, not two peers.
           borderTop: `1px solid ${HAIRLINE}`,
-          borderBottom: `1px solid ${HAIRLINE}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
           fontFamily: F,
-          fontSize: 9.5,
-          fontWeight: 700,
-          color: SECONDARY,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
         }}
       >
-        {label}
-        {numTxt ? (
-          <>
-            {' '}
-            <span style={{ fontWeight: 800, color: INK }}>
-              {numTxt}
-              {extraTxt}
-            </span>
-          </>
-        ) : null}
+        <span style={{ ...LABEL, color: A.INK, flexShrink: 0 }}>{label}</span>
+        <span aria-hidden style={{ flex: 1, height: 1, background: HAIRLINE }} />
+        {numTxt && (
+          <span
+            style={{
+              fontSize: 12.5,
+              fontWeight: 800,
+              color: houseColor(cl),
+              fontVariantNumeric: 'tabular-nums',
+              flexShrink: 0,
+            }}
+          >
+            {numTxt}
+          </span>
+        )}
+        {advanceCount > 0 && (
+          <span style={{ ...LABEL, flexShrink: 0 }}>
+            {t('tour.nAdvance', { count: advanceCount, n: String(advanceCount) })}
+          </span>
+        )}
       </div>
     );
+
   };
 
   const renderRow = (e: BoardEntry, opts?: { demoted?: boolean }) => {
@@ -365,10 +395,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           }
         }}
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: boardGridTemplate(columns),
           alignItems: 'center',
           padding: '8.5px 16px',
-          borderBottom: `1px solid ${HAIRLINE}`,
           background: CANVAS,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
@@ -376,60 +406,63 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         }}
       >
         {/* POS + MOVE — two fixed sub-slots so deltas align across all rows */}
-        <div
-          style={{
-            width: POS_NUM_W,
-            flexShrink: 0,
-            fontSize: demotedRow ? 9 : 12.5,
-            fontWeight: demotedRow ? 800 : 700,
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: demotedRow ? '0.06em' : undefined,
-          }}
-        >
-          {posText}
-        </div>
-        {columns.moveW > 0 && (
-        <div
-          style={{
-            width: columns.moveW,
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          {(() => {
-            if (demotedRow) return null;
-            const pid = e.player?.id;
-            const d = pid ? movementMap.get(pid) : undefined;
-            if (d == null || d === 0) return null;
-            const climbed = d > 0;
-            const n = Math.abs(d);
-            return (
-              <span
-                aria-label={climbed ? t('board.movement.up', { count: n }) : t('board.movement.down', { count: n })}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  fontFamily: F,
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  color: climbed ? TREND_UP : TREND_DOWN,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '0.02em',
-                }}
-              >
-                <span aria-hidden style={{ fontSize: 8 }}>
-                  {climbed ? '\u25B2' : '\u25BC'}
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+          <div
+            style={{
+              width: POS_NUM_W,
+              flexShrink: 0,
+              fontSize: demotedRow ? 9 : 12.5,
+              fontWeight: demotedRow ? 800 : 700,
+              color: INK,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: demotedRow ? '0.06em' : undefined,
+            }}
+          >
+            {posText}
+          </div>
+          {columns.moveW > 0 && (
+          <div
+            style={{
+              width: columns.moveW,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+            }}
+          >
+            {(() => {
+              if (demotedRow) return null;
+              const pid = e.player?.id;
+              const d = pid ? movementMap.get(pid) : undefined;
+              if (d == null || d === 0) return null;
+              const climbed = d > 0;
+              const n = Math.abs(d);
+              return (
+                <span
+                  aria-label={climbed ? t('board.movement.up', { count: n }) : t('board.movement.down', { count: n })}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    fontFamily: F,
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    color: climbed ? TREND_UP : TREND_DOWN,
+                    fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  <span aria-hidden style={{ fontSize: 8 }}>
+                    {climbed ? '\u25B2' : '\u25BC'}
+                  </span>
+                  {n}
                 </span>
-                {n}
-              </span>
-            );
-          })()}
+              );
+            })()}
+          </div>
+          )}
         </div>
-        )}
+
 
 
         {/* PLAYER — single line */}
@@ -485,7 +518,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         </div>
 
         {/* R1..Rn */}
-        <div style={{ display: 'flex', gap: columns.gap, flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: columns.gap, width: boardRoundsWidth(columns) }}>
           {columns.rounds.map((r) => {
             const isLive = columns.liveRound === r;
             const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
@@ -500,11 +533,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                   fontWeight: isLive ? 800 : 700,
                   color: empty ? EMPTY_CELL : demotedRow ? SECONDARY : houseColor(val),
                   fontVariantNumeric: 'tabular-nums',
-                  background: isLive ? 'rgba(247,147,30,0.07)' : undefined,
-                  borderRadius: isLive ? 4 : undefined,
                   padding: '1px 0',
                 }}
               >
+
                 {empty ? EMPTY_DASH : fmtScore(val)}
               </div>
             );

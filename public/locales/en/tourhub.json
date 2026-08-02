@@ -864,5 +864,18 @@
         "strokesGained": "Strokes Gained"
       }
     }
+  },
+  "tour": {
+    "roundInProgress": "R{{n}} in progress",
+    "roundUpcoming": "R{{n}} upcoming",
+    "final": "Final",
+    "par": "Par",
+    "yards": "Yards",
+    "fieldToday": "Field today",
+    "fromNIn": "from {{n}} in",
+    "projectedCut": "Projected cut",
+    "cut": "Cut",
+    "nAdvance": "{{n}} advance",
+    "movementLegend": "Movement is places gained today · tap a player for their card"
   }
 }

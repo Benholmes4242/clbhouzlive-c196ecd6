@@ -15,16 +15,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { formatMonthDay, formatTournamentDateRange } from '@/i18n/format';
+import { formatTournamentDateRange } from '@/i18n/format';
 import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
-import { BoardTable, BoardHeaderCells, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
+import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
 import { Skeleton } from '@/components/ui/skeleton';
+import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 
 
 const F = 'Geist, system-ui, sans-serif';
@@ -40,81 +43,137 @@ function fmtDateRange(start: string | null, end: string | null): string | null {
 }
 
 
-function StatusChip({
+/**
+ * Live state marker. A 7px green dot + halo is a broadcast convention and
+ * cannot be read as a score; the old filled green capsule could, because
+ * green means under par two columns to the right on this very board.
+ */
+function LiveMarker({
   status,
   currentRound,
-  startDate,
 }: {
   status: string | null | undefined;
   currentRound: number | null | undefined;
-  startDate: string | null | undefined;
 }) {
   const { t } = useTranslation('tourhub');
   const s = (status || '').toLowerCase();
-  if (s === 'inprogress') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          background: STATUS_LIVE_GREEN,
-          color: '#fff',
-          fontFamily: F,
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          padding: '4px 8px',
-          borderRadius: 4,
-        }}
-      >
+  const live = s === 'inprogress';
+  const final = s === 'closed' || s === 'completed' || s === 'complete';
+  const text = live
+    ? t('tour.roundInProgress', { n: currentRound ?? 1 })
+    : final
+    ? t('tour.final')
+    : t('tour.roundUpcoming', { n: currentRound ?? 1 });
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      {live && (
         <span
           aria-hidden
-          style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }}
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            background: STATUS_LIVE_GREEN,
+            boxShadow: `0 0 0 3px rgba(34,197,94,0.18)`,
+            flexShrink: 0,
+          }}
         />
-        {t('board.status.inProgress', { round: currentRound ?? 1 })}
-      </span>
-    );
-  }
-  if (s === 'closed' || s === 'completed' || s === 'complete') {
-    return (
-      <span
-        style={{
-          background: INK,
-          color: '#fff',
-          fontFamily: F,
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          padding: '4px 8px',
-          borderRadius: 4,
-        }}
-      >
-        {t('board.status.final')}
-      </span>
-    );
-  }
-  const startTxt = startDate ? formatMonthDay(new Date(startDate)).toUpperCase() : '';
-  return (
-    <span
-      style={{
-        background: '#E5E7EB',
-        color: INK,
-        fontFamily: F,
-        fontSize: 9.5,
-        fontWeight: 800,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        padding: '4px 8px',
-        borderRadius: 4,
-      }}
-    >
-      {startTxt ? t('board.status.startsOn', { date: startTxt }) : t('board.status.upcoming')}
+      )}
+      <span style={{ ...LABEL, color: live ? A.INK : A.DIM }}>{text}</span>
     </span>
   );
 }
+
+/** Minimum completed rounds before a field average means anything. */
+const FIELD_GATE = 20;
+
+interface FieldAverage { avg: number; count: number }
+
+/**
+ * Average round-to-par across players who have COMPLETED the given round,
+ * from the entries already loaded. No new query. Null below the gate.
+ */
+function fieldAverageToday(
+  entries: BoardEntry[],
+  round: number | null | undefined,
+): FieldAverage | null {
+  if (round == null || round < 1 || round > 4) return null;
+  let sum = 0;
+  let count = 0;
+  for (const e of entries) {
+    const v = [e.round_1, e.round_2, e.round_3, e.round_4][round - 1];
+    if (v == null) continue;
+    if (e.thru != null && e.thru < 18) continue;
+    sum += v;
+    count += 1;
+  }
+  if (count < FIELD_GATE) return null;
+  return { avg: sum / count, count };
+}
+
+function fmtAvgToPar(v: number): string {
+  const r = Math.round(v * 10) / 10;
+  if (r > 0) return `+${r.toFixed(1)}`;
+  if (r < 0) return `\u2212${Math.abs(r).toFixed(1)}`;
+  return 'E';
+}
+
+function StatCell({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+}) {
+  return (
+    <div style={{ textAlign: 'center', minWidth: 0 }}>
+      <div style={{ ...LABEL }}>{label}</div>
+      <div
+        style={{
+          marginTop: 5,
+          fontFamily: F,
+          fontSize: 20,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          color: A.INK,
+          ...FIGS,
+        }}
+      >
+        {value}
+      </div>
+      {sub && <div style={{ ...LABEL, marginTop: 4 }}>{sub}</div>}
+    </div>
+  );
+}
+
+/** Only mounted when a field average exists, so the effect is the evidence. */
+function FieldTodayStat({
+  label,
+  field,
+  subLabel,
+  tournamentId,
+  round,
+}: {
+  label: string;
+  field: FieldAverage;
+  subLabel: string;
+  tournamentId: string;
+  round: number | null;
+}) {
+  useEffect(() => {
+    analyticsEvents.track('tour_field_average_shown', {
+      tournament_id: tournamentId,
+      round,
+      completed_count: field.count,
+    });
+  }, [tournamentId, round, field.count]);
+
+  return <StatCell label={label} value={fmtAvgToPar(field.avg)} sub={subLabel} />;
+}
+
 
 
 export function LeaderboardTab() {
@@ -248,13 +307,13 @@ export function LeaderboardTab() {
     meta?.start_date ?? selected.start_date,
     meta?.end_date ?? selected.end_date,
   );
-  const metaBits = [
-    par != null ? t('board.meta.par', { par }) : null,
-    yardage != null ? t('board.meta.yardage', { yardage }) : null,
-    dates,
-  ]
-    .filter(Boolean)
-    .join(' \u00B7 ');
+  // Field average today — computed from the entries already loaded, gated at
+  // FIELD_GATE completed rounds. Absent below the gate (no provisional figure).
+  const fieldRound = isLive ? currentRound : cutHasHappened ? currentRound : null;
+  const field = fieldAverageToday(boardEntries, fieldRound);
+
+  const headerCols = computeBoardColumns(filteredEntries, currentRound);
+
 
   // Footnote: our thru column stores 0-18 integers only; no back-nine marker
   // is encoded. Render only the 'F Finished' clause.
@@ -282,11 +341,11 @@ export function LeaderboardTab() {
             gap: 10,
           }}
         >
-          <StatusChip
+          <LiveMarker
             status={metaStatus}
             currentRound={currentRound}
-            startDate={meta?.start_date ?? selected.start_date}
           />
+
           {searchOpen ? (
             <div
               style={{
@@ -350,13 +409,13 @@ export function LeaderboardTab() {
 
         <h1
           style={{
-            margin: '12px 0 0',
+            margin: '10px 0 0',
             fontFamily: F,
-            fontSize: 17,
+            fontSize: 26,
             fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.2,
+            color: A.INK,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
           }}
         >
           {meta?.name ?? selected.name}
@@ -364,87 +423,107 @@ export function LeaderboardTab() {
         {venueLine && (
           <div
             style={{
-              marginTop: 4,
+              marginTop: 5,
               fontFamily: F,
-              fontSize: 11,
+              fontSize: 13.5,
               fontWeight: 500,
-              color: SECONDARY,
+              color: A.MUTE,
             }}
           >
             {venueLine}
           </div>
         )}
-        {metaBits && (
+
+        {/* STAT ROW — par / yards / field average, dates beneath. */}
+        {(par != null || yardage != null || field != null || dates) && (
           <div
             style={{
-              marginTop: 2,
+              marginTop: 14,
+              background: A.PANEL,
+              border: `1px solid ${A.BORDER}`,
+              borderRadius: 16,
+              padding: 16,
               fontFamily: F,
-              fontSize: 10.5,
-              color: MUTED,
-              fontVariantNumeric: 'tabular-nums',
+              ...FIGS,
             }}
           >
-            {metaBits}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around', gap: 12 }}>
+              {par != null && <StatCell label={t('tour.par')} value={String(par)} />}
+              {yardage != null && (
+                <StatCell label={t('tour.yards')} value={yardage.toLocaleString()} />
+              )}
+              {field != null && (
+                <FieldTodayStat
+                  label={t('tour.fieldToday')}
+                  field={field}
+                  tournamentId={selected.id}
+                  round={fieldRound}
+                  subLabel={t('tour.fromNIn', { count: field.count, n: String(field.count) })}
+                />
+              )}
+            </div>
+            {dates && (
+              <div style={{ ...LABEL, textAlign: 'center', marginTop: 14 }}>{dates}</div>
+            )}
           </div>
         )}
+
       </div>
 
-      {/* EVENT TABS */}
+      {/* EVENT TABS — pill treatment, matching every other scope control. */}
       {showTabs && (
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 16,
+            gap: 8,
             overflowX: 'auto',
-            padding: '2px 16px 0',
-            borderBottom: `1px solid ${HAIRLINE}`,
+            padding: '4px 16px 12px',
             background: SURFACE,
           }}
         >
-          {liveTournaments.map((t, i) => {
-            const active = t.id === selected.id;
+          {liveTournaments.map((tt) => {
+            const active = tt.id === selected.id;
             return (
               <button
-                key={t.id}
+                key={tt.id}
                 type="button"
-                onClick={() => onSelectEvent(t.id)}
+                onClick={() => onSelectEvent(tt.id)}
                 style={{
-                  position: 'relative',
-                  background: 'none',
-                  border: 'none',
-                  padding: '10px 0',
+                  flexShrink: 0,
+                  background: active ? A.INK : A.PANEL,
+                  border: active ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+                  borderRadius: 999,
+                  padding: '9px 15px',
                   cursor: 'pointer',
                   fontFamily: F,
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: active ? INK : MUTED,
-                  borderBottom: active ? `2px solid ${INK}` : '2px solid transparent',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: active ? '#FFFFFF' : A.MUTE,
                   whiteSpace: 'nowrap',
                 }}
                 aria-pressed={active}
               >
-                {t.name}
+                {tt.name}
               </button>
             );
           })}
         </div>
       )}
 
-      {/* COLUMN HEADER (sticky) */}
+
+      {/* COLUMN HEADER (sticky) — SAME grid template as every body row. */}
       <div
         style={{
           position: 'sticky',
           top: 'var(--sat, 0px)',
           zIndex: 2,
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: boardGridTemplate(headerCols),
           alignItems: 'center',
           padding: '8px 16px',
           background: SURFACE,
           borderBottom: `1px solid ${HAIRLINE}`,
-          borderTop: showTabs ? 'none' : `1px solid ${HAIRLINE}`,
           fontFamily: F,
           fontSize: 8,
           fontWeight: 800,
@@ -453,21 +532,15 @@ export function LeaderboardTab() {
           textTransform: 'uppercase',
         }}
       >
-        {(() => {
-          const cols = computeBoardColumns(filteredEntries, currentRound);
-          return (
-            <>
-              <div style={{ width: cols.posBlockW, flexShrink: 0, whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
-              <div style={{ flex: 1, minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
-              <BoardHeaderCells
-                columns={cols}
-                thruLabel={t('board.columns.thru')}
-                totLabel={t('board.columns.tot')}
-              />
-            </>
-          );
-        })()}
+        <div style={{ whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
+        <div style={{ minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <BoardHeaderCells
+          columns={headerCols}
+          thruLabel={t('board.columns.thru')}
+          totLabel={t('board.columns.tot')}
+        />
       </div>
+
 
       {/* BOARD */}
       {boardLoading && filteredEntries.length === 0 ? (
@@ -523,17 +596,31 @@ export function LeaderboardTab() {
         />
       )}
 
+      {/* MOVEMENT LEGEND — the triangles have no per-row label. */}
+      <div
+        style={{
+          ...LABEL,
+          color: A.AMBER_DEEP,
+          textAlign: 'center',
+          padding: '14px 16px 0',
+        }}
+      >
+        {t('tour.movementLegend')}
+      </div>
+
       {/* FOOTNOTE */}
       <div
         style={{
-          padding: '12px 16px 16px',
+          padding: '10px 16px 16px',
           fontFamily: F,
           fontSize: 8.5,
           color: MUTED,
+          textAlign: 'center',
         }}
       >
         {footnote}
       </div>
+
 
       <ScorecardSheet
         open={sheetTarget != null}
