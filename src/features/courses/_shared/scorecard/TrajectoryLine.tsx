@@ -51,7 +51,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
   let cumField = 0;
   const you: number[] = [];
   const field: number[] = [];
-  const beads: { i: number; cum: number; tone: string; big: boolean }[] = [];
+  const beads: { i: number; cum: number; tone: string; r: number }[] = [];
 
   // The field series stops at the first hole with no field average — a live
   // tournament round gates holes the field has not finished, and interpolating
