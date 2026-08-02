@@ -342,14 +342,15 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             </div>
           ) : null}
 
-          {/* Story line - absent story renders nothing at all */}
+          {/* Story line - absent story renders nothing at all.
+              Sized as the Courses hero fact line (12.5). */}
           {storyLine ? (
             <div
               style={{
                 marginTop: 10,
-                fontSize: 13.5,
+                fontSize: 12.5,
                 lineHeight: 1.45,
-                maxWidth: 330,
+                maxWidth: 340,
                 color: 'rgba(255,255,255,0.9)',
               }}
             >
