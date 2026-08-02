@@ -1,15 +1,12 @@
 /**
- * players-v2/PlayersTab - "The Field" - a this-week panel, one shared ledger
- * row, a column header, and an honest sample-size caption.
+ * players-v2/PlayersTab - "The Field" - one shared ledger row, a column
+ * header, and an honest sample-size caption.
  *
  * Wiring:
  *   - Tour: LOCAL lens (per-section by design; NOT TourSelectionContext).
  *     ?tour= honored once on mount; ?sort= honored for old inbound links.
- *   - Data: usePlayersRanking(tour) + useLivePlayerIds() + useLiveTournaments()
+ *   - Data: usePlayersRanking(tour) + useLivePlayerIds()
  *     + useWorldRankLookup(loaded ids).
- *   - This-week panel: derived CLIENT-SIDE from the loaded field crossed with
- *     the live leaderboard map. Renders ONLY when the active tour has an
- *     inprogress tournament; otherwise nothing at all.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -23,7 +20,6 @@ import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import {
   AMBER_DEEP,
   FONT,
@@ -32,7 +28,6 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
-import { Panel, StatRow, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
@@ -41,7 +36,7 @@ import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/us
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
-import { formatNumberMaxFrac } from '@/i18n/format';
+
 
 type SortKey = 'ranking' | 'live';
 
@@ -114,7 +109,7 @@ export function PlayersTab() {
   // -- Data
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
-  const { data: liveTournaments } = useLiveTournaments();
+  
   const loadedIds = useMemo(
     () => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean),
     [ranking?.rows],
@@ -170,83 +165,6 @@ export function PlayersTab() {
   const loadedCount = ranking?.rows?.length ?? 0;
 
 
-  // -- THIS WEEK. Only the ACTIVE TOUR's inprogress event, and every figure
-  // derived client-side from data already loaded. No new query.
-  const liveEvent = useMemo(() => {
-    const tours = (liveTournaments ?? []).filter((x) => x.tourSlug === activeTour);
-    return tours.find((x) => x.status === 'inprogress') ?? null;
-  }, [liveTournaments, activeTour]);
-
-  // Tournament-scoped, deliberately SEPARATE from `liveCount` (which counts
-  // any live event and drives the PLAYING NOW pill).
-  const thisWeek = useMemo(() => {
-    if (!liveEvent) return null;
-    const rows = ranking?.rows ?? [];
-    const map = liveMap ?? {};
-    if (!rows.length || !Object.keys(map).length) return null;
-    const inEvent = (r: RankedRow) =>
-      !!r.playerId && map[r.playerId]?.tournamentId === liveEvent.id;
-    const inField = rows.filter(inEvent).length;
-    const top10In = rows.filter((r) => r.rank <= 10 && inEvent(r)).length;
-    const leaderRows = rows.filter((r) => inEvent(r) && map[r.playerId]?.position === 1);
-    const leaderScore = leaderRows.length ? map[leaderRows[0].playerId]?.score ?? null : null;
-    return {
-      tournamentId: liveEvent.id,
-      name: liveEvent.name,
-      inField,
-      total: rows.length,
-      top10In,
-      showTop10: rows.length >= 10,
-      leaderScore,
-      leaderName: leaderRows.length === 1 ? leaderRows[0].name : null,
-      leaderTied: leaderRows.length,
-    };
-  }, [liveEvent, ranking?.rows, liveMap]);
-
-  const thisWeekItems = useMemo<StatItem[]>(() => {
-    if (!thisWeek || rankingLoading || rankingError) return [];
-    const items: StatItem[] = [
-      {
-        label: t('players.thisWeek.inField'),
-        value: `${formatNumberMaxFrac(thisWeek.inField, 0)}/${formatNumberMaxFrac(thisWeek.total, 0)}`,
-      },
-    ];
-    if (thisWeek.showTop10) {
-      items.push({
-        label: t('players.thisWeek.top10In'),
-        value: `${formatNumberMaxFrac(thisWeek.top10In, 0)}/10`,
-      });
-    }
-    if (thisWeek.leaderScore != null) {
-      items.push({
-        label: t('players.thisWeek.leader'),
-        value: fmtScore(thisWeek.leaderScore),
-        tone: getScoreColor(thisWeek.leaderScore, 'light'),
-        sub:
-          thisWeek.leaderTied > 1
-            ? t('players.thisWeek.tied', { count: thisWeek.leaderTied })
-            : thisWeek.leaderName ?? undefined,
-        subVariant: 'caption',
-      });
-    }
-    return items;
-  }, [thisWeek, rankingLoading, rankingError, t]);
-
-  const showThisWeek = thisWeekItems.length > 0;
-
-  // -- Analytics: the panel earns its space or it does not.
-  const thisWeekTrackedRef = useRef(false);
-  useEffect(() => {
-    if (thisWeekTrackedRef.current || !showThisWeek || !thisWeek) return;
-    thisWeekTrackedRef.current = true;
-    analyticsEvents.track('tour_players_this_week_shown', {
-      tour: activeTour,
-      tournament_id: thisWeek.tournamentId,
-      in_field: thisWeek.inField,
-      field_total: thisWeek.total,
-      top10_in: thisWeek.top10In,
-    });
-  }, [showThisWeek, thisWeek, activeTour]);
 
   const goPlayer = useCallback(
     (r: RankedRow) => {
@@ -405,14 +323,6 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* THIS WEEK - renders nothing at all without a live event on this tour. */}
-      {showThisWeek && thisWeek && (
-        <div style={{ padding: '12px 16px 4px' }}>
-          <Panel kicker={thisWeek.name.toUpperCase()}>
-            <StatRow items={thisWeekItems} />
-          </Panel>
-        </div>
-      )}
 
       {/* THE FIELD. The kicker is the only amber on this page: there is no
           viewing member on a tour surface, so nothing else earns brand colour.
