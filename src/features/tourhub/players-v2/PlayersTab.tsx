@@ -35,7 +35,7 @@ import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
 
-import { usePlayersRanking, type RankedRow } from './data/usePlayersRanking';
+import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/usePlayersRanking';
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
@@ -122,11 +122,11 @@ export function PlayersTab() {
   // ── Per-section tour lens (local state, NO All Tours, PGA default).
   // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
-  const initialTour: TourId =
+  const initialTour: PlayersTourId =
     inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
-      ? (inboundTour as TourId)
+      ? (inboundTour as PlayersTourId)
       : 'pga';
-  const [activeTour, setActiveTour] = useState<TourId>(initialTour);
+  const [activeTour, setActiveTour] = useState<PlayersTourId>(initialTour);
 
   // ── Sort (honor inbound ?sort=)
   const inboundSort = searchParams.get('sort');
@@ -347,7 +347,7 @@ export function PlayersTab() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <SectionTourLens
                   value={activeTour}
-                  onChange={(t) => t && setActiveTour(t)}
+                  onChange={(t) => t && t !== 'champ' && setActiveTour(t as PlayersTourId)}
                   showAllTours={false}
                   excludeTours={['champ']}
                 />
