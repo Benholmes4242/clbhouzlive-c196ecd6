@@ -197,13 +197,11 @@ function HolesSheet({
             </div>
           ) : (
             <>
-              {/* HARDEST / EASIEST feature cards */}
+              {/* HARDEST / EASIEST - one Panel, to-par figures */}
               {hardest.hole_no !== easiest.hole_no && (
-                <div style={{ padding: '4px 16px 4px', display: 'flex', gap: 12 }}>
-                  <FeatureMini tone="hard" h={hardest} maxAbs={maxAbs} />
-                  <FeatureMini tone="easy" h={easiest} maxAbs={maxAbs} />
-                </div>
+                <FeaturePair hardest={hardest} easiest={easiest} />
               )}
+
               {holes.map((h) => (
                 <SharedHoleCard
                   key={h.hole_no}
