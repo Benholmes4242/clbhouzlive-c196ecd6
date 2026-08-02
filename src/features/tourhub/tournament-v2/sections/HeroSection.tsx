@@ -369,247 +369,56 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           }}
         />
 
-        {/* STATE BAND: LIVE */}
+        {/* THREE FIGURES - one row, every state. */}
+        {figures.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
+            {figures.map((f) => (
+              <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
+            ))}
+          </div>
+        )}
+
+        {/* PERSON - leader / defending champion / champion, one lockup. */}
         {state === 'live' && leader && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <PlayerAvatar
-              playerId={leader.player?.id ?? ''}
-              playerName={leader.player?.full_name ?? ''}
-              tourCode={tourCode}
-              photoUrl={leader.player?.photo_url ?? null}
-              size="md"
-              ringColor={LIGHT_HAIRLINE}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {t('tournament.hero.leaderLabel')}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  marginTop: 2,
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: LEADER_RED,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {fmtScoreSigned(leader.score)}
-              </div>
-              {leader.thru != null && (
-                <div
-                  style={{
-                    fontSize: 10,
-
-                    fontWeight: 700,
-                    letterSpacing: '0.14em',
-                    color: 'rgba(255,255,255,0.62)',
-                    textTransform: 'uppercase',
-                    marginTop: 4,
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {t('tournament.hero.thru', {
-                    thru: leader.thru === 18 ? 'F' : leader.thru,
-                    defaultValue: `THRU ${leader.thru === 18 ? 'F' : leader.thru}`,
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.leaderLabel')}
+            name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
+            sub={
+              leader.today != null
+                ? t('board.columns.today') + ' ' + fmtScore(leader.today)
+                : null
+            }
+            playerId={leader.player?.id ?? null}
+            photoUrl={leader.player?.photo_url ?? null}
+            tourCode={tourCode}
+            showAvatar
+          />
         )}
 
-        {/* STATE BAND: UPCOMING */}
         {state === 'upcoming' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: GOLD,
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                <Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />
-                {t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  marginTop: 3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {defendingChamp?.name ?? meta.defending_champion ?? '—'}
-              </div>
-              {(defendingChamp?.year || defendingChamp?.score) && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: WHITE_ALPHA_65,
-                    marginTop: 2,
-                    fontVariantNumeric: 'tabular-nums',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' · ')}
-                </div>
-              )}
-            </div>
-            {countdown && (
-              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                {countdown.d > 0 && (
-                  <CountdownTile
-                    value={countdown.d}
-                    label={t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' })}
-                  />
-                )}
-                <CountdownTile
-                  value={countdown.h}
-                  label={t('overview.cinematic.countdownHoursLabel', { defaultValue: 'HRS' })}
-                />
-                <CountdownTile
-                  value={countdown.m}
-                  label={t('overview.cinematic.countdownMinutesLabel', { defaultValue: 'MIN' })}
-                />
-              </div>
-            )}
-            {!countdown && daysUntil != null && (
-              <CountdownTile
-                value={daysUntil}
-                label={t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' })}
-              />
-            )}
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
+            labelTone={GOLD}
+            icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
+            name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
+            sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
+            tourCode={tourCode}
+          />
         )}
 
-        {/* STATE BAND: FINAL */}
         {state === 'completed' && champion && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  color: GOLD,
-                  textTransform: 'uppercase',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                <Trophy size={11} color={GOLD} strokeWidth={2.4} />
-                {t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
-              </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 800,
-                  color: '#fff',
-                  marginTop: 3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {champion.player?.full_name ?? t('tournament.hero.championFallback')}
-              </div>
-              {(margin != null || meta.purse != null) && (
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: WHITE_ALPHA_65,
-                    marginTop: 2,
-                    fontVariantNumeric: 'tabular-nums',
-                    textShadow: TEXT_SHADOW,
-                  }}
-                >
-                  {[
-                    margin != null
-                      ? t('tournament.hero.wonBy', {
-                          margin,
-                          defaultValue: `Won by ${margin}`,
-                        })
-                      : null,
-                    meta.purse != null ? formatPurse(meta.purse) : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </div>
-              )}
-            </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: GOLD,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.01em',
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {fmtScoreSigned(champion.score)}
-              </div>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  color: 'rgba(255,255,255,0.62)',
-                  textTransform: 'uppercase',
-                  marginTop: 4,
-                  textShadow: TEXT_SHADOW,
-                }}
-              >
-                {t('tournament.hero.holesLabel', { defaultValue: '72 HOLES' })}
-              </div>
-            </div>
-          </div>
+          <PersonLockup
+            label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
+            labelTone={GOLD}
+            icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
+            name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
+            playerId={champion.player?.id ?? null}
+            photoUrl={champion.player?.photo_url ?? null}
+            tourCode={tourCode}
+            showAvatar
+          />
         )}
+
       </div>
     </div>
   );
