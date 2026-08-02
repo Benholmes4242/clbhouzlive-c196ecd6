@@ -1,18 +1,20 @@
 /**
  * SeasonRow — one row in the schedule-v2 open ledger.
  *
- * States: completed (opacity 0.78, champion strip), live (amber wash,
- * leader strip, LIVE pill), upcoming (days-away rail).
+ * States: completed (champion strip), live (leader strip + green LIVE mark),
+ * upcoming (days-away rail + defends strip). No hairlines, no row wash, no
+ * opacity dim: the column grid and whitespace carry the structure.
  *
- * Overview grammar: amber eyebrow, thin numerals for date + days-away,
- * PlayerAvatar via SquircleAvatar+resolvePlayerAvatarCandidates, gold
- * reserved for majors only.
+ * Scores follow golf convention through the canonical getScoreColor helper:
+ * under par RED, even par MUTED, over par INK.
  */
 import React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatMonthShort } from '@/i18n/format';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
+import { getScoreColor } from '../_shared/scoreColor';
+import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
@@ -20,42 +22,37 @@ import {
   FONT,
   GOLD,
   GOLD_DEEP,
-  HAIRLINE_INK_10,
   INK,
   INK_FAINT,
   INK_MUTE,
   LIVE_DOT,
-  LIVE_INK,
-  TOPAR_UNDER_LIGHT,
 } from '../_shared/tokens';
 
 const VIOLET = '#7C3AED';
 const VIOLET_TINT = 'rgba(124,58,237,0.10)';
-const AMBER_WASH = 'rgba(247,147,30,0.05)';
 
 function shortDay(iso: string): string {
   return String(parseInt(iso.slice(8, 10), 10));
 }
 function shortMonth(iso: string): string {
   // Route through Wave-1 wrapper; upper-case at call site (matches player-v2,
-  // ComingUp). Legacy MONTHS_SHORT (JAN..DEC) was locale-dependent copy that
-  // ESLint's no-literal-string doesn't fire on (words excluded); byte-identical
-  // to Intl('en', {month:'short'}).toUpperCase() for all 12 months.
+  // ComingUp).
   return formatMonthShort(new Date(iso)).toUpperCase();
 }
 
 export interface SeasonRowProps {
   event: SeasonEvent;
   anchorRef?: React.Ref<HTMLDivElement>;
+  isAnchor?: boolean;
   onSelect: (event: SeasonEvent) => void;
 }
 
 export const SeasonRow: React.FC<SeasonRowProps> = ({
   event,
   anchorRef,
+  isAnchor = false,
   onSelect,
 }) => {
-  const { t } = useTranslation('tourhub');
   const isLive = event.state === 'live';
   const isDone = event.state === 'completed';
 
@@ -63,30 +60,31 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
     display: 'flex',
     alignItems: 'stretch',
     gap: 12,
-    padding: '12px 16px',
-    background: isLive ? AMBER_WASH : 'transparent',
-    borderRadius: isLive ? 12 : 0,
-    borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+    padding: '13px 16px',
+    background: 'transparent',
     cursor: 'pointer',
-    opacity: isDone ? 0.78 : 1,
     fontFamily: FONT,
     width: '100%',
     textAlign: 'left',
-    border: isLive ? undefined : 'none',
+    border: 'none',
   };
 
+  const venueLine = [
+    event.venueName,
+    event.venueCity,
+    event.purse ? formatPurse(event.purse) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <div ref={anchorRef} style={{ padding: isLive ? '0 4px' : 0 }}>
-      <button
-        type="button"
-        onClick={() => onSelect(event)}
-        style={rowStyle}
-      >
+    <div ref={anchorRef}>
+      <button type="button" onClick={() => onSelect(event)} style={rowStyle}>
         {/* Date block ─ 34px column */}
         <div
           style={{
             width: 34,
-            flex: '0 0 auto',
+            flex: '0 0 34px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -99,7 +97,11 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               fontSize: 20,
               fontWeight: 200,
               lineHeight: 1,
-              color: event.isMajor ? GOLD_DEEP : INK,
+              // AMBER ON THIS PAGE MEANS THE ANCHOR ROW - the live event, else this
+              // week, else the next event up. There is no viewing member on a tour
+              // surface, so the app-wide "amber means you" rule does not apply here.
+              // This is the only amber figure on the schedule. Do not extend it.
+              color: isAnchor ? AMBER : INK,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.01em',
             }}
@@ -123,10 +125,19 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
 
         {/* Identity column ─ flex */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              flexWrap: 'nowrap',
+              minWidth: 0,
+            }}
+          >
             {event.tourSlug && (
               <span
                 style={{
+                  flex: 'none',
                   fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.16em',
@@ -144,11 +155,16 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             )}
             <span
               style={{
+                flex: 1,
+                minWidth: 0,
                 fontSize: 13,
                 fontWeight: 700,
                 color: INK,
                 letterSpacing: '-0.005em',
                 lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
               {event.name}
@@ -157,8 +173,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             {event.isPlayoff && !event.isMajor && <PlayoffChip />}
           </div>
 
-
-          {(event.venueName || event.venueCity) && (
+          {venueLine && (
             <div
               style={{
                 fontSize: 11,
@@ -171,19 +186,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                 whiteSpace: 'nowrap',
               }}
             >
-              {[event.venueName, event.venueCity].filter(Boolean).join(' · ')}
-              {event.state === 'upcoming' &&
-                event.isMajor &&
-                event.defendingChampion?.name && (
-                  <>
-                    {' · '}
-                    <Trans
-                      i18nKey="schedule.champion.defendsSuffix"
-                      ns="tourhub"
-                      values={{ name: event.defendingChampion.name }}
-                    />
-                  </>
-                )}
+              {venueLine}
             </div>
           )}
 
@@ -191,6 +194,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             <ChampionStrip
               name={event.champion.displayName || event.champion.name}
               scoreText={event.champion.scoreText}
+              score={event.champion.score}
               photoCandidates={resolvePlayerAvatarCandidates({
                 name: event.champion.name,
                 photoUrl: event.champion.photoUrl,
@@ -203,10 +207,23 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             <LeaderStrip
               name={event.leader.displayName || event.leader.name}
               totalText={event.leader.totalText}
+              score={event.leader.score}
+              tiedCount={event.leader.tiedCount}
               photoCandidates={resolvePlayerAvatarCandidates({
                 name: event.leader.name,
                 photoUrl: event.leader.photoUrl,
                 tourSlug: event.leader.tourCode,
+              })}
+            />
+          )}
+
+          {event.state === 'upcoming' && event.defendingChampion?.name && (
+            <DefendsStrip
+              name={event.defendingChampion.name}
+              photoCandidates={resolvePlayerAvatarCandidates({
+                name: event.defendingChampion.name,
+                photoUrl: event.defendingChampion.photoUrl,
+                tourSlug: event.tourSlug ?? null,
               })}
             />
           )}
@@ -215,16 +232,15 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
         {/* Right rail */}
         <div
           style={{
-            flex: '0 0 auto',
+            width: 52,
+            flex: '0 0 52px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-end',
             justifyContent: 'center',
-            minWidth: 44,
           }}
         >
-          {isLive && <LivePill />}
-          {isDone && <Chevron />}
+          {isLive && <LiveMark />}
           {event.state === 'upcoming' && event.daysAway !== null && (
             <UpcomingRail
               daysAway={event.daysAway}
@@ -239,23 +255,12 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
 
 // ─── Sub-components ───────────────────────────────────────────────────────
 
-/* eslint-disable i18next/no-literal-string -- typography glyph: chevron affordance, aria-hidden */
-const Chevron: React.FC = () => (
-  <span
-    style={{ fontSize: 15, color: INK_FAINT, fontWeight: 300, lineHeight: 1 }}
-    aria-hidden
-  >
-    ›
-  </span>
-);
-/* eslint-enable i18next/no-literal-string */
-
-
 const MajorChip: React.FC = () => {
   const { t } = useTranslation('tourhub');
   return (
     <span
       style={{
+        flex: 'none',
         fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.16em',
@@ -278,6 +283,7 @@ const PlayoffChip: React.FC = () => {
   return (
     <span
       style={{
+        flex: 'none',
         fontSize: 9,
         fontWeight: 800,
         letterSpacing: '0.16em',
@@ -295,35 +301,33 @@ const PlayoffChip: React.FC = () => {
   );
 };
 
-const LivePill: React.FC = () => {
+const LiveMark: React.FC = () => {
   const { t } = useTranslation('tourhub');
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 5,
-        padding: '3px 7px 3px 6px',
-        borderRadius: 999,
-        background: LIVE_INK,
-        color: '#FFFFFF',
-        fontSize: 9,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        lineHeight: 1,
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
       <span
         style={{
-          width: 5,
-          height: 5,
+          width: 7,
+          height: 7,
           borderRadius: '50%',
-          background: '#FFFFFF',
+          background: LIVE_DOT,
           display: 'inline-block',
         }}
       />
-      {t('status.live')}
-    </span>
+      <span
+        style={{
+          marginTop: 4,
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          color: LIVE_DOT,
+          textTransform: 'uppercase',
+          lineHeight: 1,
+        }}
+      >
+        {t('status.live')}
+      </span>
+    </div>
   );
 };
 
@@ -363,23 +367,35 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
   );
 };
 
+const stripStyle: React.CSSProperties = {
+  marginTop: 2,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  minWidth: 0,
+};
+
+const nameStyle: React.CSSProperties = {
+  fontSize: 11.5,
+  fontWeight: 600,
+  color: INK,
+  letterSpacing: '-0.005em',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  maxWidth: '48%',
+  lineHeight: 1.2,
+};
 
 const ChampionStrip: React.FC<{
   name: string;
   scoreText: string;
+  score: number | null;
   photoCandidates: string[];
-}> = ({ name, scoreText, photoCandidates }) => {
+}> = ({ name, scoreText, score, photoCandidates }) => {
   const { t } = useTranslation('tourhub');
   return (
-    <div
-      style={{
-        marginTop: 2,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        minWidth: 0,
-      }}
-    >
+    <div style={stripStyle}>
       <SquircleAvatar
         size={20}
         srcCandidates={photoCandidates}
@@ -387,27 +403,13 @@ const ChampionStrip: React.FC<{
         hairlineRing
         ringColor={LIGHT_HAIRLINE}
       />
-      <span
-        style={{
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: INK,
-          letterSpacing: '-0.005em',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          maxWidth: '48%',
-          lineHeight: 1.2,
-        }}
-      >
-        {name}
-      </span>
+      <span style={nameStyle}>{name}</span>
       {scoreText && (
         <span
           style={{
             fontSize: 11.5,
             fontWeight: 800,
-            color: TOPAR_UNDER_LIGHT,
+            color: getScoreColor(score, 'light'),
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1.2,
           }}
@@ -435,47 +437,32 @@ const ChampionStrip: React.FC<{
 const LeaderStrip: React.FC<{
   name: string;
   totalText: string;
+  score: number | null;
+  tiedCount: number;
   photoCandidates: string[];
-}> = ({ name, totalText, photoCandidates }) => {
+}> = ({ name, totalText, score, tiedCount, photoCandidates }) => {
   const { t } = useTranslation('tourhub');
+  const tied = tiedCount > 1;
   return (
-    <div
-      style={{
-        marginTop: 2,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        minWidth: 0,
-      }}
-    >
-      <SquircleAvatar
-        size={20}
-        srcCandidates={photoCandidates}
-        alt={name}
-        hairlineRing
-        ringColor={LIGHT_HAIRLINE}
-      />
-      <span
-        style={{
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: INK,
-          letterSpacing: '-0.005em',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          maxWidth: '50%',
-          lineHeight: 1.2,
-        }}
-      >
-        {name}
+    <div style={stripStyle}>
+      {!tied && (
+        <SquircleAvatar
+          size={20}
+          srcCandidates={photoCandidates}
+          alt={name}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+        />
+      )}
+      <span style={nameStyle}>
+        {tied ? t('schedule.leader.tied', { count: tiedCount }) : name}
       </span>
       {totalText && (
         <span
           style={{
             fontSize: 11.5,
             fontWeight: 800,
-            color: AMBER,
+            color: getScoreColor(score, 'light'),
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1.2,
           }}
@@ -492,6 +479,38 @@ const LeaderStrip: React.FC<{
         }}
       >
         {t('schedule.leader.suffix')}
+      </span>
+    </div>
+  );
+};
+
+const DefendsStrip: React.FC<{ name: string; photoCandidates: string[] }> = ({
+  name,
+  photoCandidates,
+}) => {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div style={stripStyle}>
+      <SquircleAvatar
+        size={20}
+        srcCandidates={photoCandidates}
+        alt={name}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
+      />
+      <span style={nameStyle}>{name}</span>
+      <span
+        style={{
+          marginLeft: 'auto',
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          color: INK_FAINT,
+          textTransform: 'uppercase',
+          lineHeight: 1,
+        }}
+      >
+        {t('schedule.badge.defends')}
       </span>
     </div>
   );

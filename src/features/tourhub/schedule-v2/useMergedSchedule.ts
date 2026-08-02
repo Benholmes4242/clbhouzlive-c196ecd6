@@ -29,6 +29,7 @@ import {
 } from '../hooks/useTournamentLeadersWinners';
 import { useScheduleDefendingChampionPhotos } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
+import { monthKey, monthLabelFromKey, todayNoonMs, daysUntil } from './timelineUtils';
 import type {
   SeasonEvent,
   SeasonTimeline,
@@ -51,28 +52,6 @@ interface MergedRow {
   season?: { tour_name: string | null; tour_full_name: string | null } | null;
 }
 
-const MONTH_NAMES = [
-  'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
-  'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
-];
-
-function monthKey(iso: string): string {
-  return iso.slice(0, 7);
-}
-function monthLabelFromKey(key: string): string {
-  const [y, m] = key.split('-');
-  const idx = Math.max(0, Math.min(11, parseInt(m, 10) - 1));
-  return `${MONTH_NAMES[idx]} ${y}`;
-}
-function todayNoonMs(): number {
-  const d = new Date();
-  return new Date(`${d.toISOString().split('T')[0]}T12:00:00Z`).getTime();
-}
-function daysUntil(startDate: string): number | null {
-  if (!startDate) return null;
-  const t = new Date(`${startDate}T12:00:00Z`).getTime();
-  return Math.max(0, Math.ceil((t - todayNoonMs()) / 86_400_000));
-}
 
 export function useMergedSchedule(options?: { enabled?: boolean }): {
   data: SeasonTimeline | null;
@@ -135,10 +114,10 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
     )
     .map((e) => e.id);
 
-  const { data: leadersWinnersMap } = useTournamentLeadersWinners([
-    ...liveIds,
-    ...completedIds,
-  ]);
+  const { data: leadersWinnersMap } = useTournamentLeadersWinners(
+    enabled ? [...liveIds, ...completedIds] : [],
+    1,
+  );
 
   const upcomingForDefenders = useMemo(
     () =>
@@ -152,8 +131,9 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
         .map((e) => ({ id: e.id, defending_champion: e.defending_champion })),
     [events],
   );
-  const { data: defendingChampionMap } =
-    useScheduleDefendingChampionPhotos(upcomingForDefenders);
+  const { data: defendingChampionMap } = useScheduleDefendingChampionPhotos(
+    enabled ? upcomingForDefenders : [],
+  );
 
   const timeline = useMemo<SeasonTimeline | null>(() => {
     if (!rowsQuery.data) return null;
@@ -185,6 +165,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
         venueName: r.venue_name,
         venueCity: r.venue_city,
         venueCountry: r.venue_country,
+        purse: r.purse,
         startDate: r.start_date,
         endDate: r.end_date,
         status: r.status,
@@ -209,6 +190,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
               photoUrl: w.photoUrl,
               tourCode: w.tourCode,
               scoreText: w.displayScore || '',
+              score: w.score ?? null,
             }
           : null;
       } else if (state === 'live') {
@@ -223,6 +205,8 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
               photoUrl: l.photoUrl,
               tourCode: l.tourCode,
               totalText: l.displayScore || '',
+              score: l.score ?? null,
+              tiedCount: l.tiedCount ?? 1,
             }
           : null;
       } else {
@@ -267,7 +251,7 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
       }));
 
     return {
-      seasonName: `${year} Season`,
+      seasonName: null,
       seasonYear: year,
       months,
       totalEvents: decorated.length,

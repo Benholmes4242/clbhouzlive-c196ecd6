@@ -1,22 +1,22 @@
 /**
  * schedule-v2/ScheduleTab — "The Season" open-ledger schedule view.
  *
- * Design: schedule-overview-grammar Option A body + schedule-navigation-model
- * chassis. Overview grammar throughout — amber eyebrow, thin numerals,
- * PlayerAvatar, gold reserved for majors.
+ * Analytical grammar: no row rules, a load-bearing column grid, one filled
+ * (INK) jump control, and a three-up figures header. Amber appears in exactly
+ * two places on this surface: the KICKER and the anchor row's day numeral.
  *
- * Wired to TourSelectionContext (single tour brain app-wide). Tour chips
- * dispatch selectTour(slug) — the same setter the hero picker uses.
- *
- * Not registered yet — TS2 cutover.
+ * The tour chip row is this page's ONLY tour control by design —
+ * TourSelectionContext is scoped to the overview hero. ?tour= is honoured once
+ * on mount so Coming Up's "full schedule" link keeps the member's tour.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
@@ -27,7 +27,7 @@ import { useMergedSchedule } from './useMergedSchedule';
 import { SeasonRow } from './SeasonRow';
 import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
 import {
-  AMBER,
+  AMBER_DEEP,
   FONT,
   HAIRLINE_INK_10,
   INK,
@@ -37,14 +37,39 @@ import {
   SLATE_50,
 } from '../_shared/tokens';
 
+const KICKER: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: AMBER_DEEP,
+};
+
+const LABEL: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 800,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: INK_FAINT,
+};
+
+const FIGURE: React.CSSProperties = {
+  fontSize: 21,
+  fontWeight: 800,
+  letterSpacing: '-0.02em',
+  color: INK,
+  lineHeight: 1,
+  fontVariantNumeric: 'tabular-nums lining',
+};
 
 export function ScheduleTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const [searchParams] = useSearchParams();
   const chipsRef = useRef<HTMLDivElement | null>(null);
-  const [anchorVisible, setAnchorVisible] = useState(true);
+  const monthHeaderRef = useRef<HTMLDivElement | null>(null);
   const [anchorFar, setAnchorFar] = useState(false);
+  const viewTrackedRef = useRef(false);
 
   // Publish real chips-row outer height so month headers can stack flush.
   useEffect(() => {
@@ -62,41 +87,66 @@ export function ScheduleTab() {
     return () => ro.disconnect();
   }, []);
 
-
-  // Per-section tour lens (local state, All Tours allowed).
-  // Both hooks run unconditionally; we pick which result to render based on
-  // the lens value. useMergedSchedule runs ONE query across all tours and
-  // chronologically merges (Phase 5B); useSeasonTimeline keeps the single-
-  // tour path unchanged.
-  const [tourLens, setTourLens] = useState<TourId | null>(null);
+  // Per-section tour lens (local state, All Tours allowed). Seeded ONCE from
+  // ?tour= when it names a known tour; All Tours (null) stays the default.
+  const [tourLens, setTourLens] = useState<TourId | null>(() => {
+    const param = searchParams.get('tour');
+    if (param && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, param)) {
+      return param as TourId;
+    }
+    return null;
+  });
   const singleTour: TourId = tourLens ?? 'pga';
 
-  const singleQuery = useSeasonTimeline(singleTour);
+  const singleQuery = useSeasonTimeline(singleTour, { enabled: tourLens !== null });
   const mergedQuery = useMergedSchedule({ enabled: tourLens === null });
   const { data: timeline, isLoading, error, refetch } =
     tourLens === null ? mergedQuery : singleQuery;
 
   const activeTour: TourId | 'all' = tourLens ?? 'all';
 
+  // Publish the month header's real outer height so the anchor scroll offset
+  // clears BOTH sticky layers (chips row + month header).
+  useEffect(() => {
+    const el = monthHeaderRef.current;
+    if (!el) return;
+    const publish = () => {
+      document.documentElement.style.setProperty(
+        '--tour-month-h',
+        `${Math.round(el.offsetHeight)}px`,
+      );
+    };
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [timeline?.months.length]);
 
+  const allEvents = useMemo<SeasonEvent[]>(
+    () => (timeline ? timeline.months.flatMap((m) => m.events) : []),
+    [timeline],
+  );
+  const anchorEvent = useMemo(
+    () => allEvents.find((e) => e.id === timeline?.anchorEventId) ?? null,
+    [allEvents, timeline?.anchorEventId],
+  );
+  const anchorState: 'live' | 'upcoming' | 'none' =
+    anchorEvent?.state === 'live'
+      ? 'live'
+      : anchorEvent
+        ? 'upcoming'
+        : 'none';
 
   // ── Auto-land on this-week/next row on mount + tour flip ───────────────
-  // Scrolls the row's real scroll ancestor; the app shell may own page scroll.
-  //
-  // Hardened: bounded rAF retry loop (~1500ms) until the anchor row exists,
-  // then re-asserts once more after the router's ScrollRestoration effect
-  // may fire scrollTo(0) on PUSH navigation. Offset is derived from the
-  // sticky chips row (safe-area-inset + --tour-chips-h + breathing room)
-  // instead of a hardcoded 200.
   const anchorId = timeline?.anchorEventId ?? null;
   const computeOffset = () => {
     const rootStyles = getComputedStyle(document.documentElement);
     const chipsH =
       parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10) || 47;
-    // env(safe-area-inset-top) isn't queryable directly; read the --sat var
-    // if present, else fall back to the chips top offset. 24 = breathing.
+    const monthH =
+      parseInt(rootStyles.getPropertyValue('--tour-month-h'), 10) || 32;
     const sat = parseInt(rootStyles.getPropertyValue('--sat'), 10) || 0;
-    return sat + chipsH + 24;
+    return sat + chipsH + monthH + 20;
   };
   useEffect(() => {
     if (!anchorId) return;
@@ -117,14 +167,11 @@ export function ScheduleTab() {
         scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
       };
       doScroll();
-      // Re-assert next frame in case ScrollRestoration or WebView reset
-      // stomps our scroll after the fact.
       rafId = requestAnimationFrame(() => {
         if (cancelled) return;
         doScroll();
       });
     };
-    // Wait a frame so rows have laid out.
     rafId = requestAnimationFrame(() => requestAnimationFrame(tryScroll));
     return () => {
       cancelled = true;
@@ -132,30 +179,17 @@ export function ScheduleTab() {
     };
   }, [anchorId, activeTour]);
 
-  // ── Floating "This week" chip visibility (IntersectionObserver on row scroller)
-  useEffect(() => {
-    const el = anchorRef.current;
-    if (!el || !anchorId) {
-      setAnchorVisible(true);
-      return;
-    }
-    const scroller = getScrollAncestor(el);
-    const io = new IntersectionObserver(
-      ([entry]) => setAnchorVisible(entry.isIntersecting),
-      { root: scroller ?? null, threshold: 0.1 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [anchorId, timeline?.totalEvents]);
-
   const scrollToAnchor = useCallback(() => {
     if (!anchorId) return;
+    analyticsEvents.track('tour_schedule_jump_tapped', {
+      anchor_state: anchorState,
+    });
     const el = document.getElementById(`sv2-row-${anchorId}`);
     if (!el) return;
     scrollElementIntoView(el, { offset: computeOffset(), behavior: 'auto' });
-  }, [anchorId]);
+  }, [anchorId, anchorState]);
 
-  // ── "Far from today" detector — anchor >1.5 viewports off-screen (either dir)
+  // ── "Far from today" detector — anchor >1.5 viewports off-screen ────────
   useEffect(() => {
     if (!anchorId) {
       setAnchorFar(false);
@@ -172,7 +206,6 @@ export function ScheduleTab() {
     const compute = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      // Distance from viewport center; > 1.5 viewports = far.
       const center = rect.top + rect.height / 2;
       const dist = Math.abs(center - vh / 2);
       setAnchorFar(dist > vh * 1.5);
@@ -190,25 +223,70 @@ export function ScheduleTab() {
     return () => target.removeEventListener('scroll', onScroll as EventListener);
   }, [anchorId, timeline?.totalEvents]);
 
-
   // ── Row navigation ─────────────────────────────────────────────────────
   const onSelectEvent = useCallback(
     (evt: SeasonEvent) => {
+      analyticsEvents.track('tour_schedule_row_tapped', {
+        tournament_id: evt.id,
+        state: evt.state,
+        is_major: evt.isMajor,
+        days_away: evt.daysAway,
+        mode: tourLens === null ? 'all' : 'single',
+      });
       const target = tournamentRoute(evt.id, { kind: 'schedule' });
       navigate(target.to, { state: target.state });
     },
-    [navigate],
+    [navigate, tourLens],
   );
 
-  // ── Header meta ────────────────────────────────────────────────────────
+  const onTourChange = useCallback(
+    (next: TourId | null) => {
+      analyticsEvents.track('tour_schedule_tour_changed', {
+        from: tourLens,
+        to: next,
+      });
+      setTourLens(next);
+    },
+    [tourLens],
+  );
+
+  // ── Header figures ─────────────────────────────────────────────────────
   const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
+  const played = useMemo(
+    () => allEvents.filter((e) => e.state === 'completed').length,
+    [allEvents],
+  );
+  const remaining = useMemo(
+    () => allEvents.filter((e) => e.state === 'upcoming').length,
+    [allEvents],
+  );
+  const nextMajorDays = useMemo(() => {
+    const hit = allEvents.find(
+      (e) => e.state === 'upcoming' && e.isMajor && e.daysAway !== null,
+    );
+    return hit?.daysAway ?? null;
+  }, [allEvents]);
+
   const progressPct = useMemo(() => {
     if (!timeline || timeline.totalEvents === 0) return 0;
-    const n = timeline.currentEventNumber ?? 0;
-    return Math.max(0, Math.min(1, n / timeline.totalEvents));
-  }, [timeline]);
+    return Math.max(0, Math.min(1, played / timeline.totalEvents));
+  }, [timeline, played]);
 
   const hasTimeline = !!timeline && timeline.totalEvents > 0;
+
+  // Fire once per mount, after the timeline resolves.
+  useEffect(() => {
+    if (viewTrackedRef.current || !hasTimeline) return;
+    viewTrackedRef.current = true;
+    analyticsEvents.track('tour_schedule_viewed', {
+      mode: tourLens === null ? 'all' : 'single',
+      tour: tourLens,
+      total_events: timeline!.totalEvents,
+      anchor_state: anchorState,
+    });
+  }, [hasTimeline, timeline, tourLens, anchorState]);
+
+  let monthHeaderAttached = false;
 
   return (
     <div
@@ -217,15 +295,10 @@ export function ScheduleTab() {
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
-        // Islands overlay the top band at rest; on scroll they ride away and
-        // the chips row locks at the notch.
         paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
-      {/* Tour lens — sticky glass wrapper preserves --tour-chips-h; chips
-          themselves come from the canonical SectionTourLens primitive.
-          Locks under the notch as the floating islands ride away with the
-          page (TikTok/Instagram top-chrome model). */}
+      {/* Tour lens — sticky glass wrapper preserves --tour-chips-h. */}
       <div
         ref={chipsRef}
         style={{
@@ -238,9 +311,8 @@ export function ScheduleTab() {
           borderBottom: '1px solid rgba(0,0,0,0.07)',
         }}
       >
-        <SectionTourLens value={tourLens} onChange={setTourLens} showAllTours />
+        <SectionTourLens value={tourLens} onChange={onTourChange} showAllTours />
       </div>
-
 
       {/* HEADER — scrolls under the chips row like any content. */}
       <div style={{ padding: '16px 16px 12px' }}>
@@ -252,78 +324,62 @@ export function ScheduleTab() {
             marginBottom: 12,
           }}
         >
-          <span
-            style={{
-              fontSize: 10.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              color: AMBER,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('schedule.eyebrow.season')}
-          </span>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: INK_MUTE,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {yearLabel}
+          <span style={KICKER}>{t('schedule.eyebrow.season')}</span>
+          <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>
+            {tourLens
+              ? `${yearLabel} · ${TOUR_CONFIG[tourLens]?.name ?? tourLens}`
+              : `${yearLabel}`}
           </span>
         </div>
 
-        {/* Progress strip — shimmers while loading, hidden on error/empty. */}
         {isLoading ? (
           <div>
-            <Skeleton className="h-3 w-32 rounded mb-2" />
-            <Skeleton className="h-1.5 w-full rounded-full" />
+            <Skeleton className="h-6 w-full rounded mb-2" />
+            <Skeleton className="h-1 w-full rounded-full" />
           </div>
         ) : hasTimeline ? (
           <div>
             <div
               style={{
                 display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'space-between',
-                marginBottom: 6,
+                alignItems: 'flex-start',
+                justifyContent: 'space-around',
+                gap: 12,
+                marginBottom: 12,
               }}
             >
-              <span
-                style={{
-                  fontSize: 8.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  color: INK,
-                  textTransform: 'uppercase',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {t('schedule.progress.eventOf', {
-                  current: timeline!.currentEventNumber ?? '—',
-                  total: timeline!.totalEvents,
-                })}
-              </span>
+              <StatCell label={t('schedule.stats.played')} value={String(played)} />
+              <StatCell
+                label={t('schedule.stats.remaining')}
+                value={String(remaining)}
+              />
+              {nextMajorDays !== null && (
+                <StatCell
+                  label={t('schedule.stats.nextMajor')}
+                  value={String(nextMajorDays)}
+                  suffix={t('schedule.stats.daysSuffix')}
+                />
+              )}
             </div>
-            <div
-              style={{
-                height: 3,
-                background: HAIRLINE_INK_10,
-                borderRadius: 2,
-                overflow: 'hidden',
-              }}
-            >
+            {timeline!.totalEvents > 0 && (
               <div
                 style={{
-                  width: `${Math.round(progressPct * 100)}%`,
-                  height: '100%',
-                  background: AMBER,
-                  transition: 'width 240ms ease',
+                  height: 3,
+                  background: HAIRLINE_INK_10,
+                  borderRadius: 2,
+                  overflow: 'hidden',
                 }}
-              />
-            </div>
+              >
+                <div
+                  style={{
+                    width: `${Math.round(progressPct * 100)}%`,
+                    height: '100%',
+                    background: INK,
+                    transition: 'width 240ms ease',
+                  }}
+                />
+              </div>
+            )}
           </div>
         ) : null}
       </div>
@@ -368,102 +424,59 @@ export function ScheduleTab() {
           <TourHubEmptyState variant="schedule" />
         ) : (
           <>
-            {timeline!.months.map((group) => (
-              <section key={group.key}>
-                <div
-                  style={{
-                    position: 'sticky',
-                    // Stack flush below sticky chip row (measured); -1px overlap.
-                    top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
-                    zIndex: 2,
-                    background: 'rgba(248,250,252,0.72)',
-                    backdropFilter: 'blur(14px)',
-                    WebkitBackdropFilter: 'blur(14px)',
-                    padding: '12px 16px 6px',
-                    fontSize: 10.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    color: INK_MUTE,
-                    textTransform: 'uppercase',
-                    borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
-                  }}
-                >
-
-                  {group.label}
-                </div>
-                <div>
-                  {group.events.map((evt) => {
-                    const isAnchor = evt.id === timeline!.anchorEventId;
-                    return (
-                      <div
-                        key={evt.id}
-                        id={`sv2-row-${evt.id}`}
-                      >
-                        <SeasonRow
-                          event={evt}
-                          anchorRef={isAnchor ? anchorRef : undefined}
-                          onSelect={onSelectEvent}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-            <div style={{ paddingBottom: 88 }} />
+            {timeline!.months.map((group) => {
+              const attachRef = !monthHeaderAttached;
+              if (attachRef) monthHeaderAttached = true;
+              return (
+                <section key={group.key}>
+                  <div
+                    ref={attachRef ? monthHeaderRef : undefined}
+                    style={{
+                      position: 'sticky',
+                      top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
+                      zIndex: 2,
+                      background: 'rgba(248,250,252,0.72)',
+                      backdropFilter: 'blur(14px)',
+                      WebkitBackdropFilter: 'blur(14px)',
+                      padding: '14px 16px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      color: INK_MUTE,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {group.label}
+                  </div>
+                  <div>
+                    {group.events.map((evt) => {
+                      const isAnchor = evt.id === timeline!.anchorEventId;
+                      return (
+                        <div key={evt.id} id={`sv2-row-${evt.id}`}>
+                          <SeasonRow
+                            event={evt}
+                            isAnchor={isAnchor}
+                            onSelect={onSelectEvent}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+            <div
+              aria-hidden="true"
+              style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+            />
           </>
         )}
       </div>
 
-
-      {/* Floating "This week" chip */}
-      {anchorId && !anchorVisible && (
-        <button
-          type="button"
-          onClick={scrollToAnchor}
-          style={{
-            position: 'sticky',
-            bottom: 24,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '9px 16px',
-            borderRadius: 999,
-            background: INK,
-            color: '#FFFFFF',
-            border: 'none',
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.06em',
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-            boxShadow: '0 6px 18px rgba(15,23,42,0.30)',
-            marginTop: -44,
-            width: 'max-content',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            zIndex: 5,
-          }}
-        >
-          <span
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              background: LIVE_DOT,
-              display: 'inline-block',
-            }}
-          />
-          {t('schedule.floating.thisWeek')}
-        </button>
-      )}
-
       {/* Back-to-top FAB (canonical grey chevron, portaled) */}
       <ScrollToTopGlass />
 
-      {/* TODAY pill — adjacent to FAB, appears when today is >1.5vh off-screen */}
+      {/* Jump control — the one filled button on this surface, and it is INK. */}
       {anchorId && anchorFar && createPortal(
         <button
           type="button"
@@ -476,12 +489,13 @@ export function ScheduleTab() {
             zIndex: 39,
             display: 'inline-flex',
             alignItems: 'center',
+            gap: 6,
             height: 28,
             padding: '0 12px',
             borderRadius: 999,
-            background: '#FFFFFF',
-            color: AMBER,
-            border: `1px solid ${HAIRLINE_INK_10}`,
+            background: INK,
+            color: '#FFFFFF',
+            border: 'none',
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 800,
@@ -492,15 +506,49 @@ export function ScheduleTab() {
             WebkitTapHighlightColor: 'transparent',
           }}
         >
+          {anchorState === 'live' && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: LIVE_DOT,
+                display: 'inline-block',
+              }}
+            />
+          )}
           {t('schedule.floating.today')}
         </button>,
         document.body,
       )}
-
-      {/* Silence unused imports */}
-      <span aria-hidden style={{ display: 'none', color: INK_FAINT }} />
     </div>
   );
 }
+
+const StatCell: React.FC<{ label: string; value: string; suffix?: string }> = ({
+  label,
+  value,
+  suffix,
+}) => (
+  <div
+    style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 6,
+    }}
+  >
+    <span style={LABEL}>{label}</span>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+      <span style={FIGURE}>{value}</span>
+      {suffix && (
+        <span style={{ fontSize: 11, fontWeight: 800, color: INK_MUTE }}>
+          {suffix}
+        </span>
+      )}
+    </span>
+  </div>
+);
 
 export default ScheduleTab;

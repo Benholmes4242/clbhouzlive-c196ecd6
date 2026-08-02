@@ -30,6 +30,7 @@ import {
   type DefendingChampionEntry,
 } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
+import { monthKey, monthLabelFromKey, todayNoonMs, daysUntil } from './timelineUtils';
 
 // ─── Season → tournament resolution ───────────────────────────────────────
 
@@ -100,16 +101,6 @@ async function resolveSeasonCandidates(
     );
   }
 
-  if (tour === 'pga') {
-    console.log(
-      '[schedule-v2] pga season candidates (probe order):',
-      sorted.slice(0, 6).map((r) => ({
-        id: r.id,
-        tour: r.tour_full_name,
-        year: r.year,
-      })),
-    );
-  }
   return sorted.slice(0, 8);
 }
 
@@ -169,6 +160,7 @@ export interface SeasonEvent {
   venueName: string | null;
   venueCity: string | null;
   venueCountry: string | null;
+  purse: number | null;
   startDate: string;
   endDate: string;
   status: string;
@@ -187,6 +179,8 @@ export interface SeasonEvent {
     photoUrl: string | null;
     tourCode: string | null;
     scoreText: string;
+    /** Numeric score to par — drives getScoreColor. */
+    score: number | null;
   } | null;
   /** Live leader (only populated on inprogress events). */
   leader?: {
@@ -196,6 +190,10 @@ export interface SeasonEvent {
     photoUrl: string | null;
     tourCode: string | null;
     totalText: string;
+    /** Numeric score to par — drives getScoreColor. */
+    score: number | null;
+    /** Rows sharing position 1 (1 = outright leader). */
+    tiedCount: number;
   } | null;
   /** Defending champion (upcoming rows). */
   defendingChampion?: DefendingChampionEntry | null;
@@ -238,42 +236,13 @@ function reassignMiscodedMajor(
   return tourCode;
 }
 
-function todayNoonMs(): number {
-  const d = new Date();
-  return new Date(`${d.toISOString().split('T')[0]}T12:00:00Z`).getTime();
-}
-
-function daysUntil(startDate: string): number | null {
-  if (!startDate) return null;
-  const t = new Date(`${startDate}T12:00:00Z`).getTime();
-  return Math.max(0, Math.ceil((t - todayNoonMs()) / 86_400_000));
-}
-
-function fmtScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return '';
-  if (score === 0) return 'E';
-  if (score > 0) return `+${score}`;
-  return `${score}`;
-}
-
-
-const MONTH_NAMES = [
-  'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
-  'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
-];
-
-function monthKey(iso: string): string {
-  return iso.slice(0, 7); // yyyy-MM
-}
-function monthLabelFromKey(key: string): string {
-  const [y, m] = key.split('-');
-  const idx = Math.max(0, Math.min(11, parseInt(m, 10) - 1));
-  return `${MONTH_NAMES[idx]} ${y}`;
-}
 
 // ─── The hook ─────────────────────────────────────────────────────────────
 
-export function useSeasonTimeline(tour: TourId): {
+export function useSeasonTimeline(
+  tour: TourId,
+  { enabled = true }: { enabled?: boolean } = {},
+): {
   data: SeasonTimeline | null;
   isLoading: boolean;
   error: Error | null;
@@ -282,6 +251,7 @@ export function useSeasonTimeline(tour: TourId): {
   // 1. Season + raw tournament rows for the requested tour.
   const seasonQuery = useQuery({
     queryKey: ['schedule-v2', 'season-rows', tour],
+    enabled,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const candidates = await resolveSeasonCandidates(tour);
@@ -289,16 +259,7 @@ export function useSeasonTimeline(tour: TourId): {
         console.warn('[schedule-v2] no season candidates for tour:', tour);
         return { season: null as SrSeasonRow | null, rows: [] as SrTournamentRow[] };
       }
-      const result = await probeAndFetchTournaments(tour, candidates);
-      console.log(
-        '[schedule-v2] resolved season for tour',
-        tour,
-        '→',
-        result.season?.name,
-        '(events:',
-        result.rows.length + ')',
-      );
-      return result;
+      return probeAndFetchTournaments(tour, candidates);
     },
   });
 
@@ -329,10 +290,10 @@ export function useSeasonTimeline(tour: TourId): {
     .filter((e) => COMPLETED_STATUSES.has((e.status ?? '').toLowerCase()) || endDateInPast(e.end_date))
     .map((e) => e.id);
 
-  const { data: leadersWinnersMap } = useTournamentLeadersWinners([
-    ...liveIds,
-    ...completedIds,
-  ]);
+  const { data: leadersWinnersMap } = useTournamentLeadersWinners(
+    enabled ? [...liveIds, ...completedIds] : [],
+    1,
+  );
 
   const upcomingForDefenders = useMemo(
     () =>
@@ -346,8 +307,9 @@ export function useSeasonTimeline(tour: TourId): {
         .map((e) => ({ id: e.id, defending_champion: e.defending_champion })),
     [events],
   );
-  const { data: defendingChampionMap } =
-    useScheduleDefendingChampionPhotos(upcomingForDefenders);
+  const { data: defendingChampionMap } = useScheduleDefendingChampionPhotos(
+    enabled ? upcomingForDefenders : [],
+  );
 
   // 4. Compose the timeline.
   const timeline = useMemo<SeasonTimeline | null>(() => {
@@ -356,11 +318,8 @@ export function useSeasonTimeline(tour: TourId): {
     if (!season && events.length === 0) return null;
 
     const total = events.length;
-    const noon = todayNoonMs();
 
     const decorated: SeasonEvent[] = events.map((r, idx) => {
-      const startMs = new Date(`${r.start_date}T12:00:00Z`).getTime();
-      const endMs = new Date(`${r.end_date}T12:00:00Z`).getTime();
       const statusLc = (r.status ?? '').toLowerCase();
       const isDone = COMPLETED_STATUSES.has(statusLc) || endDateInPast(r.end_date);
       const isLive = !isDone && LIVE_STATUSES.has(statusLc);
@@ -385,6 +344,7 @@ export function useSeasonTimeline(tour: TourId): {
         venueName: r.venue_name,
         venueCity: r.venue_city,
         venueCountry: r.venue_country,
+        purse: r.purse,
         startDate: r.start_date,
         endDate: r.end_date,
         status: r.status,
@@ -408,8 +368,8 @@ export function useSeasonTimeline(tour: TourId): {
             displayName: w.displayName,
             photoUrl: w.photoUrl,
             tourCode: w.tourCode,
-            scoreText:
-              w.displayScore || '',
+            scoreText: w.displayScore || '',
+            score: w.score ?? null,
           };
         } else {
           evt.champion = null;
@@ -426,6 +386,8 @@ export function useSeasonTimeline(tour: TourId): {
             photoUrl: l.photoUrl,
             tourCode: l.tourCode,
             totalText: l.displayScore || '',
+            score: l.score ?? null,
+            tiedCount: l.tiedCount ?? 1,
           };
         } else {
           evt.leader = null;
@@ -436,10 +398,6 @@ export function useSeasonTimeline(tour: TourId): {
         evt.defendingChampion = def;
       }
 
-      // suppress unused startMs/endMs — kept for readability
-      void startMs;
-      void endMs;
-      void noon;
       return evt;
     });
 
