@@ -41,9 +41,58 @@ import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
 import { formatWeekdayLong, formatNumberMaxFrac } from '@/i18n/format';
 
-type SortKey = 'ranking' | 'live';
+type StatKey = 'scoring' | 'driving' | 'accuracy' | 'gir' | 'sgPutt';
+type SortKey = 'ranking' | 'live' | StatKey;
 
 const SEP = ' . ';
+
+/**
+ * The stat lens. Direction is per stat and getting it wrong is silent, so it
+ * lives here beside the field it orders rather than inside the comparator.
+ */
+const STAT_LENS: Record<
+  StatKey,
+  {
+    field: 'scoringAvg' | 'drivingDistance' | 'drivingAccuracy' | 'gir' | 'sgPutting';
+    dir: 'asc' | 'desc';
+    labelKey: string;
+  }
+> = {
+  scoring: { field: 'scoringAvg', dir: 'asc', labelKey: 'players.stat.scoring' },
+  driving: { field: 'drivingDistance', dir: 'desc', labelKey: 'players.stat.driving' },
+  accuracy: { field: 'drivingAccuracy', dir: 'desc', labelKey: 'players.stat.accuracy' },
+  gir: { field: 'gir', dir: 'desc', labelKey: 'players.stat.gir' },
+  sgPutt: { field: 'sgPutting', dir: 'desc', labelKey: 'players.stat.sgPutt' },
+};
+
+const STAT_ORDER: StatKey[] = ['scoring', 'driving', 'accuracy', 'gir', 'sgPutt'];
+
+function isStatKey(k: SortKey): k is StatKey {
+  return k !== 'ranking' && k !== 'live';
+}
+
+function statValue(r: RankedRow, k: StatKey): number | null {
+  return r[STAT_LENS[k].field] ?? null;
+}
+
+/** Nothing in the stat column is coloured; SG is the only signed figure. */
+function formatLensValue(k: StatKey, v: number): string {
+  switch (k) {
+    case 'scoring':
+      return formatNumberMaxFrac(v, 2);
+    case 'driving':
+      return formatNumberMaxFrac(v, 1);
+    case 'accuracy':
+    case 'gir':
+      return `${formatNumberMaxFrac(v, 1)}%`;
+    case 'sgPutt': {
+      // Round first, then decide the sign, so -0.0004 never renders "-0.000".
+      const r = Math.round(v * 1000) / 1000;
+      return `${r > 0 ? '+' : ''}${formatNumberMaxFrac(r, 3)}`;
+    }
+  }
+}
+
 
 function useDebouncedValue<T>(v: T, ms: number): T {
   const [x, setX] = useState(v);
@@ -155,6 +204,17 @@ export function PlayersTab() {
     [setSearchParams, activeTour],
   );
 
+  // Switching tour while a stat pill is active must reset the sort: the stat
+  // fields are null on every non-PGA row, so the key would order invisibly.
+  const changeTour = useCallback(
+    (next: PlayersTourId) => {
+      setActiveTour(next);
+      if (isStatKey(sortRef.current)) setSort('ranking');
+    },
+    [setSort],
+  );
+
+
   // -- Search
   const [search, setSearch] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -223,19 +283,32 @@ export function PlayersTab() {
     [filteredRows, liveMap],
   );
 
-  // -- Sort options: hide "Playing now" when nobody is live
-  const sortOptions = useMemo<SortKey[]>(
-    () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
-    [liveCount],
-  );
+  // -- Sort options: "Playing now" only when somebody is live; the stat lens
+  // only on PGA, where the stat columns actually exist.
+  const sortOptions = useMemo<SortKey[]>(() => {
+    const base: SortKey[] = liveCount > 0 ? ['ranking', 'live'] : ['ranking'];
+    return activeTour === 'pga' ? [...base, ...STAT_ORDER] : base;
+  }, [liveCount, activeTour]);
 
   // -- Safety: if live filter becomes empty, revert to ranking
   useEffect(() => {
     if (liveCount === 0 && sort === 'live') setSort('ranking');
   }, [liveCount, sort, setSort]);
 
-  // -- Ordering when "Playing now" active
+  // -- Ordering: "Playing now", or the active stat lens (nulls to the bottom).
   const orderedRows = useMemo<RankedRow[]>(() => {
+    if (isStatKey(sort)) {
+      const dir = STAT_LENS[sort].dir;
+      const valued: RankedRow[] = [];
+      const nulls: RankedRow[] = [];
+      filteredRows.forEach((r) => (statValue(r, sort) == null ? nulls : valued).push(r));
+      valued.sort((a, b) => {
+        const va = statValue(a, sort) as number;
+        const vb = statValue(b, sort) as number;
+        return dir === 'asc' ? va - vb : vb - va;
+      });
+      return [...valued, ...nulls];
+    }
     if (sort !== 'live') return filteredRows;
     const live: RankedRow[] = [];
     const rest: RankedRow[] = [];
@@ -251,10 +324,14 @@ export function PlayersTab() {
     return [...live, ...rest];
   }, [sort, filteredRows, liveMap]);
 
+
   const isSearching = debouncedSearch.trim().length > 0;
   const synced = !!ranking?.synced;
   const statLabel = ranking?.statLabel ?? null;
   const loadedCount = ranking?.rows?.length ?? 0;
+  const activeStat: StatKey | null = isStatKey(sort) ? sort : null;
+  const activeStatLabel = activeStat ? t(STAT_LENS[activeStat].labelKey) : null;
+
 
   // -- Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
   const leadMargin = useMemo<number | null>(() => {
@@ -347,7 +424,7 @@ export function PlayersTab() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <SectionTourLens
                   value={activeTour}
-                  onChange={(t) => t && t !== 'champ' && setActiveTour(t as PlayersTourId)}
+                  onChange={(t) => t && t !== 'champ' && changeTour(t as PlayersTourId)}
                   showAllTours={false}
                   excludeTours={['champ']}
                 />
@@ -469,49 +546,89 @@ export function PlayersTab() {
       )}
 
       {/* THE FIELD. The kicker is the only amber on this page: there is no
-          viewing member on a tour surface, so nothing else earns brand colour. */}
-      <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: AMBER_DEEP,
-            textTransform: 'uppercase',
-          }}
-        >
-          {t('players.field.eyebrow')}
-        </span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {sortOptions.map((k) => {
-            const active = k === sort;
-            return (
-              <button
-                key={k}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setSort(k)}
+          viewing member on a tour surface, so nothing else earns brand colour.
+          With the stat lens present the pills need a full scrollable row of
+          their own; with two pills they stay inline beside the kicker. */}
+      {(() => {
+        const lensRow = activeTour === 'pga';
+        const pills = (
+          <div
+            className={lensRow ? 'overflow-x-auto scrollbar-hide' : undefined}
+            style={{
+              display: 'flex',
+              gap: 4,
+              ...(lensRow
+                ? { padding: '0 16px 2px', WebkitOverflowScrolling: 'touch' as const }
+                : {}),
+            }}
+          >
+            {sortOptions.map((k) => {
+              const active = k === sort;
+              const label =
+                k === 'ranking'
+                  ? t('players.sort.ranking')
+                  : k === 'live'
+                    ? t('players.sort.playingNow')
+                    : t(STAT_LENS[k].labelKey);
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setSort(k)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 10,
+                    border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
+                    background: active ? INK : '#FFFFFF',
+                    color: active ? '#FFFFFF' : INK_MUTE,
+                    fontFamily: 'inherit',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        );
+
+        return (
+          <>
+            <div
+              style={{
+                padding: lensRow ? '4px 16px 6px' : '4px 16px 4px',
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span
                 style={{
-                  padding: '5px 10px',
-                  borderRadius: 10,
-                  border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: active ? INK : '#FFFFFF',
-                  color: active ? '#FFFFFF' : INK_MUTE,
-                  fontFamily: 'inherit',
                   fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.10em',
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  color: AMBER_DEEP,
                   textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  lineHeight: 1,
                 }}
               >
-                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                {t('players.field.eyebrow')}
+              </span>
+              {!lensRow && pills}
+            </div>
+            {lensRow && pills}
+          </>
+        );
+      })()}
+
+
 
       {rankingLoading ? (
         <div style={{ padding: '0 16px' }}>
@@ -555,17 +672,25 @@ export function PlayersTab() {
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}
-            statLabel={synced ? statLabel : null}
+            statLabel={activeStatLabel ?? (synced ? statLabel : null)}
           />
-          {orderedRows.map((r) => {
+          {orderedRows.map((r, idx) => {
             const live = (liveMap ?? {})[r.playerId];
             const isLive = !!live;
             let sub: React.ReactNode = null;
+
+            // Under a stat lens the numeral is the position in the active sort
+            // and the tour ranking moves into the sub-line.
+            const tourRankSeg =
+              activeStat && synced && statLabel ? (
+                <span key="tr">{t('players.sub.tourRank', { label: statLabel, rank: r.rank })}</span>
+              ) : null;
 
             if (isLive && live) {
               const posStr =
                 live.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
               const segments: React.ReactNode[] = [];
+              if (tourRankSeg) segments.push(tourRankSeg);
               if (posStr) segments.push(<span key="pos">{posStr}</span>);
               if (live.score != null) {
                 segments.push(
@@ -588,17 +713,16 @@ export function PlayersTab() {
             } else {
               const wr = (worldRanks ?? {})[r.playerId];
               const segments: React.ReactNode[] = [];
+              if (tourRankSeg) segments.push(tourRankSeg);
               if (wr) {
                 segments.push(
                   <span key="wr">
-                    {t('players.sub.worldRank', { rank: wr.rank })}
-                    {wr.movement != null && wr.movement !== 0 && (
-                      <span
-                        style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: 4 }}
-                      >
-                        <MovementFigure movement={wr.movement} nullPlaceholder="none" />
-                      </span>
-                    )}
+                    {t('players.sub.worldRank', { rank: wr.rank })}{' '}
+                    <MovementFigure
+                      movement={wr.movement}
+                      nullPlaceholder="none"
+                      variant="inline"
+                    />
                   </span>,
                 );
               }
@@ -620,11 +744,12 @@ export function PlayersTab() {
               ) : null;
             }
 
+            const lensValue = activeStat ? statValue(r, activeStat) : null;
 
             return (
               <RankedPlayerRow
                 key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
-                rank={r.rank}
+                rank={activeStat ? idx + 1 : r.rank}
                 player={{
                   playerId: r.playerId,
                   name: r.name,
@@ -633,9 +758,17 @@ export function PlayersTab() {
                   photoUrl: r.photoUrl,
                   tourCode: r.tourCode,
                 }}
-                stat={synced ? r.stat : undefined}
+                stat={activeStat ? undefined : synced ? r.stat : undefined}
+                statFormatted={
+                  activeStat
+                    ? lensValue != null
+                      ? formatLensValue(activeStat, lensValue)
+                      : ''
+                    : undefined
+                }
                 live={isLive}
                 sub={sub}
+                interactive={!!r.playerId}
                 onClick={() => goPlayer(r)}
               />
             );
@@ -654,8 +787,11 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {t('players.footer.sample', { count: loadedCount })}
+        {activeStatLabel
+          ? t('players.footer.sampleSorted', { count: loadedCount, stat: activeStatLabel })
+          : t('players.footer.sample', { count: loadedCount })}
       </div>
+
       <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
     </div>
   );

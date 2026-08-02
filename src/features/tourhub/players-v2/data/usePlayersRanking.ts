@@ -39,7 +39,15 @@ export interface RankedRow {
   stat: number | null;
   wins: number | null;
   top10s: number | null;
+  /** Stat-lens fields. PGA only; null on every other tour by design. */
+  scoringAvg: number | null;
+  drivingDistance: number | null;
+  drivingAccuracy: number | null;
+  gir: number | null;
+  puttingAverage: number | null;
+  sgPutting: number | null;
 }
+
 
 export interface RankingResult {
   synced: boolean;
@@ -84,7 +92,15 @@ async function resolvePgaSeasonId(): Promise<string | null> {
   return null;
 }
 
+/** Numeric coercion that keeps null null: a 0 default would sort as real. */
+function num(v: number | string | null | undefined): number | null {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 // Minimal structural shapes for row casts.
+
 interface PgaStatRow {
   player_id: string;
   fedex_points: number | string | null;
@@ -92,7 +108,14 @@ interface PgaStatRow {
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
+  scoring_average: number | string | null;
+  driving_distance: number | string | null;
+  driving_accuracy: number | string | null;
+  greens_in_reg: number | string | null;
+  putting_average: number | string | null;
+  strokes_gained_putting: number | string | null;
 }
+
 interface PlayerRow {
   id: string;
   full_name: string | null;
@@ -129,7 +152,9 @@ export function usePlayersRanking(tour: PlayersTourId) {
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
-          .select('player_id, fedex_points, fedex_rank, wins, top_10s, events_played')
+          .select(
+            'player_id, fedex_points, fedex_rank, wins, top_10s, events_played, scoring_average, driving_distance, driving_accuracy, greens_in_reg, putting_average, strokes_gained_putting',
+          )
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
@@ -156,8 +181,15 @@ export function usePlayersRanking(tour: PlayersTourId) {
             stat: s.fedex_points != null ? Number(s.fedex_points) : null,
             wins: s.wins ?? null,
             top10s: s.top_10s ?? null,
+            scoringAvg: num(s.scoring_average),
+            drivingDistance: num(s.driving_distance),
+            drivingAccuracy: num(s.driving_accuracy),
+            gir: num(s.greens_in_reg),
+            puttingAverage: num(s.putting_average),
+            sgPutting: num(s.strokes_gained_putting),
           };
         });
+
         rows = [...rows].sort((a, b) => a.rank - b.rank);
         return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
@@ -215,7 +247,15 @@ export function usePlayersRanking(tour: PlayersTourId) {
           stat: r.points != null ? Number(r.points) : null,
           wins: r.wins ?? null,
           top10s: null,
+          // tour_season_rankings carries no stat columns. Null, never zero.
+          scoringAvg: null,
+          drivingDistance: null,
+          drivingAccuracy: null,
+          gir: null,
+          puttingAverage: null,
+          sgPutting: null,
         };
+
       });
       return { synced: true, statLabel: statLabelFor(tour), rows };
     },
