@@ -1,5 +1,5 @@
 /**
- * CollegeHeroMasthead — the shared single-row hero used by both the College
+ * CollegeHeroMasthead - the shared single-row hero used by both the College
  * hub (leader spotlight) and the College profile page.
  *
  * Layout: crest (66 squircle, gold ring at rank 1) + name/meta stack +
@@ -140,7 +140,7 @@ export function CollegeHeroMasthead({
         textAlign: 'center',
       }}
     >
-      {/* Crest 128 — unboxed, floats on the hero. Rank-1 gets an amber glow;
+      {/* Crest 128 - unboxed, floats on the hero. Rank-1 gets an amber glow;
           others a neutral soft drop shadow for separation from busy gradients. */}
       <div
         style={{

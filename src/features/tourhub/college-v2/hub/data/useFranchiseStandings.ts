@@ -1,5 +1,5 @@
 /**
- * useFranchiseStandings — the yearbook data source.
+ * useFranchiseStandings - the yearbook data source.
  *
  * Composes college_season_stats (ranking + points + alumni count),
  * college_media (name + logo), college_weekly_movers (rank movement),

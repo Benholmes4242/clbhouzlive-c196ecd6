@@ -1,5 +1,5 @@
 /**
- * CollegeHubPage — "The Yearbook".
+ * CollegeHubPage - "The Yearbook".
  *
  * Colleges ranked by their alumni on tour. Header: THE FRANCHISE eyebrow +
  * year + expanding search icon. Feed: YearbookCard per college. Search
@@ -7,7 +7,7 @@
  *
  * No ShellSlot, no CollegeShellRow, no framer-motion.
  * Entry point wiring: /tourhub/college-golf (App.tsx route). TourHubMainPage
- * navigates to this path when 'college' is chosen from the side menu — the
+ * navigates to this path when 'college' is chosen from the side menu - the
  * page swap in App.tsx is sufficient to cut both entries over.
  */
 
@@ -61,7 +61,7 @@ export function CollegeHubPage() {
   const leader = standings[0];
   const leaderPlayingNow = leader ? liveByCollege[leader.normalizedName] ?? 0 : 0;
 
-  // ── Compare pick mode ────────────────────────────────────────────────
+  // -- Compare pick mode ------------------------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const compareParam = searchParams.get('compare');
@@ -112,7 +112,7 @@ export function CollegeHubPage() {
       return;
     }
     if (slug === pickC1) return; // ignore same pick
-    // Both chosen → route to duel.
+    // Both chosen -> route to duel.
     navigate(collegeH2HRoute(pickC1, slug));
   };
 
@@ -156,7 +156,7 @@ export function CollegeHubPage() {
 
   return (
     <TourHubShell showBack={false} immersiveStatusBar>
-      {/* Hero bleeds into the notch — no GlassHeaderPlate veil (matches profile page). */}
+      {/* Hero bleeds into the notch - no GlassHeaderPlate veil (matches profile page). */}
 
       <div
         className="pb-22"
@@ -166,7 +166,7 @@ export function CollegeHubPage() {
           fontFamily: FONT,
         }}
       >
-        {/* Hero — leader takes the hero (or charcoal fallback when no standings). */}
+        {/* Hero - leader takes the hero (or charcoal fallback when no standings). */}
         {leader ? (
           <CollegeHeroMasthead
             displayName={leader.collegeName}
@@ -235,7 +235,7 @@ export function CollegeHubPage() {
         )}
 
 
-        {/* Sticky glass search row — locks under island band; filters the feed. */}
+        {/* Sticky glass search row - locks under island band; filters the feed. */}
         <div
           style={{
             position: 'sticky',

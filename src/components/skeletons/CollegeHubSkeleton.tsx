@@ -1,5 +1,5 @@
 /**
- * CollegeHubSkeleton — route-level Suspense fallback for the college hub
+ * CollegeHubSkeleton - route-level Suspense fallback for the college hub
  * and college profile routes. Hero block matches the hub's charcoal
  * fallback header exactly (gradient + minHeight formula); shimmer rows
  * follow at the yearbook feed geometry.
@@ -11,7 +11,7 @@ const CHARCOAL = '#14161c';
 export const CollegeHubSkeleton = () => {
   return (
     <div style={{ background: '#F8FAFC', minHeight: '100dvh' }}>
-      {/* Hero — matches CollegeHeroMasthead charcoal fallback exactly */}
+      {/* Hero - matches CollegeHeroMasthead charcoal fallback exactly */}
       <div
         style={{
           background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
