@@ -15,6 +15,8 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
 import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { fmtScore } from '../../utils/fmtScore';
+import { getScoreColor } from '../../_shared/scoreColor';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
