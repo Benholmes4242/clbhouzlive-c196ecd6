@@ -20,6 +20,11 @@ export interface LiveTournamentLite {
   tourSlug: TourId;
   purse: number | null;
   currentRound: number | null;
+  /** Leader of this tournament, from the leaderboard rows. */
+  leaderName: string | null;
+  /** How many players share the lowest total. */
+  leaderCount: number;
+  leaderToPar: number | null;
 }
 
 /** Tournaments that are in progress, OR scheduled with start_date === today (local). */
@@ -44,24 +49,59 @@ export function useLiveTournaments() {
         .order('purse', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
-      return (data ?? []).map((t: any) => ({
-        id: t.id,
-        name: t.name,
-        status: t.status,
-        start_date: t.start_date,
-        end_date: t.end_date ?? null,
-        venue_name: t.venue_name ?? null,
-        venue_course_name: t.venue_course_name ?? null,
-        venue_city: t.venue_city ?? null,
-        venue_country: t.venue_country ?? null,
-        venue_yardage: t.venue_yardage ?? null,
-        venue_par: t.venue_par ?? null,
-        defending_champion: t.defending_champion ?? null,
-        tour_name: t.season?.tour_name ?? null,
-        tourSlug: mapTourSlug(t.season?.tour_name ?? ''),
-        purse: t.purse ?? null,
-        currentRound: t.current_round ?? null,
-      }));
+      const rows = data ?? [];
+
+      // Companion query: who leads each of these tournaments. Kept here rather
+      // than in components so the menu never depends on a leaderboard page
+      // having been visited first.
+      const leaders = new Map<string, { name: string | null; count: number; toPar: number | null }>();
+      const ids = rows.map((t: any) => t.id).filter(Boolean);
+      if (ids.length > 0) {
+        const { data: lb } = await supabase
+          .from('sr_leaderboards')
+          .select('tournament_id, score, player:sr_players!sr_leaderboards_player_id_fkey(full_name, first_name, last_name)')
+          .in('tournament_id', ids);
+        for (const r of (lb ?? []) as any[]) {
+          if (r.score === null || r.score === undefined) continue;
+          const tid = r.tournament_id as string;
+          const name =
+            r.player?.full_name ??
+            [r.player?.first_name, r.player?.last_name].filter(Boolean).join(' ') ??
+            null;
+          const cur = leaders.get(tid);
+          if (!cur || cur.toPar === null || r.score < cur.toPar) {
+            leaders.set(tid, { name: name || null, count: 1, toPar: r.score });
+          } else if (r.score === cur.toPar) {
+            leaders.set(tid, { ...cur, count: cur.count + 1 });
+          }
+        }
+      }
+
+      return rows.map((t: any) => {
+        const lead = leaders.get(t.id);
+        return {
+          id: t.id,
+          name: t.name,
+          status: t.status,
+          start_date: t.start_date,
+          end_date: t.end_date ?? null,
+          venue_name: t.venue_name ?? null,
+          venue_course_name: t.venue_course_name ?? null,
+          venue_city: t.venue_city ?? null,
+          venue_country: t.venue_country ?? null,
+          venue_yardage: t.venue_yardage ?? null,
+          venue_par: t.venue_par ?? null,
+          defending_champion: t.defending_champion ?? null,
+          tour_name: t.season?.tour_name ?? null,
+          tourSlug: mapTourSlug(t.season?.tour_name ?? ''),
+          purse: t.purse ?? null,
+          currentRound: t.current_round ?? null,
+          leaderName: lead?.name ?? null,
+          leaderCount: lead?.count ?? 0,
+          leaderToPar: lead?.toPar ?? null,
+        };
+      });
     },
   });
 }
+
