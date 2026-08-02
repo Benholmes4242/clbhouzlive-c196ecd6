@@ -342,13 +342,16 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           tourCode: p.tour_codes?.[0] ?? 'pga',
           value: r.value,
           valueFormatted: cat.format(r.value),
+          movement: null,
+          behindFormatted: null,
         } as LeaderRow;
       });
       if (top.length < 3) return null;
       return {
         key: cat.key,
         ...LEADER_STAT_LABELS[cat.key],
-        rows: top,
+        rows: applyBehind(top, cat.dir, cat.format),
+        poolSize: rows.length,
       } as LeaderCategoryDef;
     })
     .filter((c): c is LeaderCategoryDef => !!c);
