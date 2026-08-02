@@ -1,16 +1,14 @@
 /**
- * players-v2/PlayersTab — "The Ranking" — podium + honest degrade + one shared
- * row. Overview grammar, no framer-motion, no shell-row dependency, no
- * ShellSlot identity chrome.
+ * players-v2/PlayersTab — "The Field" — one shared ledger row, a two-figure
+ * field band, a column header, and an honest sample-size caption.
  *
  * Wiring:
- *   - Tour: TourSelectionContext (selectTour); ?tour= honored once on mount,
- *     ?sort= honored (Ranking | Playing now) for old inbound links.
- *   - Data: usePlayersRanking(tour) + useLivePlayerIds() + useLiveTournaments().
+ *   - Tour: LOCAL lens (per-section by design; NOT TourSelectionContext).
+ *     ?tour= honored once on mount; ?sort= honored for old inbound links.
+ *   - Data: usePlayersRanking(tour) + useLivePlayerIds() + useLiveTournaments()
+ *     + useWorldRankLookup(loaded ids).
  *   - Editorial line: derived from the live/next tournament for the tour;
  *     self-hides when nothing to say.
- *
- * Not registered — PL2 flips TourHubMainPage to import from here.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -22,26 +20,30 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import {
-  AMBER,
-  AMBER_TINT_10,
+  AMBER_DEEP,
   FONT,
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
+import { getScoreColor } from '../_shared/scoreColor';
+import { MovementFigure } from '../_shared/movement';
+import { fmtScore } from '../utils/fmtScore';
 
 import { usePlayersRanking, type RankedRow } from './data/usePlayersRanking';
 import { useLivePlayerIds } from './data/useLivePlayerIds';
-import { PodiumCards } from './PodiumCards';
-import { RankedPlayerRow } from './RankedPlayerRow';
-import { formatWeekdayLong } from '@/i18n/format';
-
+import { useWorldRankLookup } from './data/useWorldRankLookup';
+import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
+import { formatWeekdayLong, formatNumberMaxFrac } from '@/i18n/format';
 
 type SortKey = 'ranking' | 'live';
+
+const SEP = ' . ';
 
 function useDebouncedValue<T>(v: T, ms: number): T {
   const [x, setX] = useState(v);
@@ -59,6 +61,59 @@ function formatDayShort(d: string | null | undefined): string | null {
   return formatWeekdayLong(dt);
 }
 
+/** Field band figure — label above figure, centred. */
+function FieldFigure({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string;
+  sub?: string | null;
+}) {
+  return (
+    <div style={{ textAlign: 'center', minWidth: 0 }}>
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: 'rgba(15,23,42,0.45)',
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          marginTop: 3,
+          fontSize: 22,
+          fontWeight: 200,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums lining',
+          lineHeight: 1.1,
+        }}
+      >
+        {value}
+      </div>
+      {sub && (
+        <div
+          style={{
+            marginTop: 2,
+            fontSize: 9,
+            fontWeight: 800,
+            letterSpacing: '0.13em',
+            textTransform: 'uppercase',
+            color: INK_MUTE,
+          }}
+        >
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PlayersTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -73,16 +128,20 @@ export function PlayersTab() {
       : 'pga';
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
-
-
   // ── Sort (honor inbound ?sort=)
   const inboundSort = searchParams.get('sort');
   const [sort, setSortState] = useState<SortKey>(
     inboundSort === 'live' || inboundSort === 'playing-now' ? 'live' : 'ranking',
   );
+  const sortRef = useRef<SortKey>(sort);
+  sortRef.current = sort;
   const setSort = useCallback(
     (next: SortKey) => {
+      const from = sortRef.current;
       setSortState(next);
+      if (from !== next) {
+        analyticsEvents.track('tour_players_sort_changed', { from, to: next, tour: activeTour });
+      }
       setSearchParams(
         (prev) => {
           const p = new URLSearchParams(prev);
@@ -93,7 +152,7 @@ export function PlayersTab() {
         { replace: true },
       );
     },
-    [setSearchParams],
+    [setSearchParams, activeTour],
   );
 
   // ── Search
@@ -109,6 +168,11 @@ export function PlayersTab() {
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
   const { data: liveTournaments } = useLiveTournaments();
+  const loadedIds = useMemo(
+    () => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean),
+    [ranking?.rows],
+  );
+  const { data: worldRanks } = useWorldRankLookup(loadedIds);
 
   // ── Editorial line (live leader → then upcoming day)
   const editorial = useMemo<string | null>(() => {
@@ -127,11 +191,10 @@ export function PlayersTab() {
           )
         : null;
       if (leaderRow && leader?.score != null) {
-        const scoreStr = leader.score === 0 ? 'E' : leader.score > 0 ? `+${leader.score}` : `${leader.score}`;
         return t('players.editorial.leaderAt', {
           tournament: live.name.toUpperCase(),
           leader: leaderRow.name.toUpperCase(),
-          score: scoreStr,
+          score: fmtScore(leader.score),
         });
       }
       return live.name.toUpperCase();
@@ -191,9 +254,61 @@ export function PlayersTab() {
   const isSearching = debouncedSearch.trim().length > 0;
   const synced = !!ranking?.synced;
   const statLabel = ranking?.statLabel ?? null;
-  const podiumRows = useMemo(() => (ranking?.rows ?? []).slice(0, 3), [ranking?.rows]);
+  const loadedCount = ranking?.rows?.length ?? 0;
 
-  const goPlayer = useCallback((id: string) => id && navigate(`/tourhub/player/${id}`), [navigate]);
+  // ── Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
+  const leadMargin = useMemo<number | null>(() => {
+    if (sort !== 'ranking') return null;
+    const rows = ranking?.rows ?? [];
+    if (rows.length < 2) return null;
+    const a = rows[0]?.stat;
+    const b = rows[1]?.stat;
+    if (a == null || b == null) return null;
+    return Math.abs(a - b);
+  }, [sort, ranking?.rows]);
+
+  const showBand = !rankingLoading && !rankingError && (liveCount > 0 || leadMargin != null);
+
+  const goPlayer = useCallback(
+    (r: RankedRow) => {
+      if (!r.playerId) return;
+      analyticsEvents.track('tour_players_row_tapped', {
+        player_id: r.playerId,
+        rank: r.rank,
+        tour: activeTour,
+        is_live: !!(liveMap ?? {})[r.playerId],
+        sort,
+      });
+      navigate(`/tourhub/player/${r.playerId}`);
+    },
+    [navigate, activeTour, liveMap, sort],
+  );
+
+  // ── Analytics: viewed once per mount after the ranking resolves
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    if (rankingLoading || rankingError || !ranking) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_players_viewed', {
+      tour: activeTour,
+      rows: ranking.rows.length,
+      live_count: liveCount,
+      synced: !!ranking.synced,
+    });
+  }, [ranking, rankingLoading, rankingError, activeTour, liveCount]);
+
+  // ── Analytics: searched (debounced value only, never the query text)
+  useEffect(() => {
+    const q = debouncedSearch.trim();
+    if (!q) return;
+    analyticsEvents.track('tour_players_searched', {
+      query_length: q.length,
+      results: filteredRows.length,
+      tour: activeTour,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, activeTour]);
 
   return (
     <div
@@ -311,11 +426,7 @@ export function PlayersTab() {
         </div>
       </div>
 
-
-
-
       <div style={{ padding: '12px 16px 0' }}>
-
         {editorial && (
           <div
             style={{
@@ -334,19 +445,38 @@ export function PlayersTab() {
         )}
       </div>
 
-      {/* PODIUM — synced only, hidden while searching */}
-      {synced && !isSearching && !rankingLoading && !rankingError && podiumRows.length >= 3 && (
-        <PodiumCards rows={podiumRows} statLabel={statLabel} />
+      {/* FIELD BAND — renders nothing at all when neither figure qualifies. */}
+      {showBand && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 40,
+            padding: '4px 16px 14px',
+          }}
+        >
+          {liveCount > 0 && (
+            <FieldFigure label={t('players.field.playingNow')} value={formatNumberMaxFrac(liveCount, 0)} />
+          )}
+          {leadMargin != null && (
+            <FieldFigure
+              label={t('players.field.lead')}
+              value={formatNumberMaxFrac(leadMargin, 0)}
+              sub={statLabel}
+            />
+          )}
+        </div>
       )}
 
-      {/* THE FIELD */}
+      {/* THE FIELD. The kicker is the only amber on this page: there is no
+          viewing member on a tour surface, so nothing else earns brand colour. */}
       <div style={{ padding: '4px 16px 4px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <span
           style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            color: AMBER,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: AMBER_DEEP,
             textTransform: 'uppercase',
           }}
         >
@@ -365,8 +495,8 @@ export function PlayersTab() {
                   padding: '5px 10px',
                   borderRadius: 10,
                   border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: active ? AMBER_TINT_10 : '#FFFFFF',
-                  color: active ? INK : INK_MUTE,
+                  background: active ? INK : '#FFFFFF',
+                  color: active ? '#FFFFFF' : INK_MUTE,
                   fontFamily: 'inherit',
                   fontSize: 10,
                   fontWeight: 800,
@@ -384,19 +514,11 @@ export function PlayersTab() {
       </div>
 
       {rankingLoading ? (
-        <>
-          {/* Podium skeleton - three cards, centre elevated, mirrors PodiumCards */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, padding: '12px 16px 12px' }}>
-            <Skeleton className="flex-1 rounded-xl" style={{ height: 140 }} />
-            <Skeleton className="flex-1 rounded-xl" style={{ height: 164 }} />
-            <Skeleton className="flex-1 rounded-xl" style={{ height: 140 }} />
-          </div>
-          <div style={{ padding: '0 16px' }}>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
-            ))}
-          </div>
-        </>
+        <div style={{ padding: '0 16px' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="w-full mb-1" style={{ height: 58, borderRadius: 6 }} />
+          ))}
+        </div>
       ) : rankingError ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
           <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
@@ -413,29 +535,85 @@ export function PlayersTab() {
             {t('players.error.retry', { defaultValue: 'Retry' })}
           </button>
         </div>
+      ) : orderedRows.length === 0 && isSearching ? (
+        <div
+          style={{
+            padding: '40px 24px',
+            textAlign: 'center',
+            fontSize: 12,
+            fontWeight: 500,
+            color: INK_MUTE,
+            letterSpacing: '0.01em',
+          }}
+        >
+          {t('players.search.noneInField', { count: loadedCount })}
+        </div>
       ) : orderedRows.length === 0 ? (
         <TourHubEmptyState variant="players" />
       ) : (
         <div style={{ background: '#FFFFFF' }}>
+          <RankedPlayerHeader
+            rankLabel={t('players.header.rank')}
+            playerLabel={t('players.header.player')}
+            statLabel={synced ? statLabel : null}
+          />
           {orderedRows.map((r) => {
             const live = (liveMap ?? {})[r.playerId];
             const isLive = !!live;
-            let sub: string | null = null;
-            let subLive = false;
+            let sub: React.ReactNode = null;
+
             if (isLive && live) {
               const posStr =
-                live.position != null
-                  ? `${live.positionTied ? 'T' : ''}${live.position}`
-                  : '';
-              sub = posStr ? `${posStr} \u00B7 ${live.tournamentName}` : live.tournamentName;
-              subLive = true;
-            } else if (synced && (r.wins || r.top10s)) {
-              const parts: string[] = [];
-              if (r.wins) parts.push(t('players.sub.wins', { count: r.wins }));
-              if (r.top10s) parts.push(t('players.sub.top10s', { count: r.top10s }));
-              sub = parts.join(' \u00B7 ');
+                live.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
+              const segments: React.ReactNode[] = [];
+              if (posStr) segments.push(<span key="pos">{posStr}</span>);
+              if (live.score != null) {
+                segments.push(
+                  <span key="score" style={{ color: getScoreColor(live.score, 'light') }}>
+                    {fmtScore(live.score)}
+                  </span>,
+                );
+              }
+              if (live.tournamentName) segments.push(<span key="tn">{live.tournamentName}</span>);
+              sub = segments.length ? (
+                <span style={{ color: INK_MUTE }}>
+                  {segments.map((node, i) => (
+                    <span key={i}>
+                      {i > 0 ? SEP : ''}
+                      {node}
+                    </span>
+                  ))}
+                </span>
+              ) : null;
+            } else {
+              const wr = (worldRanks ?? {})[r.playerId];
+              const segments: React.ReactNode[] = [];
+              if (wr) {
+                segments.push(
+                  <span key="wr" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    {t('players.sub.worldRank', { rank: wr.rank })}
+                    <MovementFigure movement={wr.movement} nullPlaceholder="none" />
+                  </span>,
+                );
+              }
+              if (synced && r.wins) {
+                segments.push(<span key="w">{t('players.sub.wins', { count: r.wins })}</span>);
+              }
+              if (synced && r.top10s) {
+                segments.push(<span key="t10">{t('players.sub.top10s', { count: r.top10s })}</span>);
+              }
+              sub = segments.length ? (
+                <span style={{ color: INK_MUTE, display: 'inline-flex', alignItems: 'center' }}>
+                  {segments.map((node, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      {i > 0 ? SEP : ''}
+                      {node}
+                    </span>
+                  ))}
+                </span>
+              ) : null;
             }
-            const goldRank = synced && r.rank === 1 && !podiumRows.length;
+
             return (
               <RankedPlayerRow
                 key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
@@ -449,22 +627,19 @@ export function PlayersTab() {
                   tourCode: r.tourCode,
                 }}
                 stat={synced ? r.stat : undefined}
-                statLabel={synced ? statLabel : undefined}
                 live={isLive}
                 sub={sub}
-                subLive={subLive}
-                goldRank={goldRank}
-                onClick={() => goPlayer(r.playerId)}
+                onClick={() => goPlayer(r)}
               />
             );
           })}
         </div>
       )}
 
-      {/* Footer caption */}
+      {/* Sample-size caption — always visible, always true. */}
       <div
         style={{
-          padding: '16px 16px 88px',
+          padding: '16px 16px 0',
           fontSize: 10.5,
           fontWeight: 500,
           color: INK_MUTE,
@@ -472,8 +647,9 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {synced ? t('players.footer.synced') : t('players.footer.unsynced')}
+        {t('players.footer.sample', { count: loadedCount })}
       </div>
+      <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
     </div>
   );
 }
