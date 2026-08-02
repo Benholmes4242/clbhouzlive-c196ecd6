@@ -178,7 +178,8 @@ const Nine: React.FC<{
   rows: CardScorecardHole[];
   label: string;
   withField: boolean;
-}> = ({ rows, label, withField }) => {
+  scoreLabel: string;
+}> = ({ rows, label, withField, scoreLabel }) => {
   const { t } = useTranslation(['courses']);
   const par = rows.reduce((s, h) => s + (h.par ?? 0), 0);
   const strokes = rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0);
@@ -194,10 +195,11 @@ const Nine: React.FC<{
       <CardRow label={t('courses:scorecard.hole')} cells={rows.map((h) => h.holeNo)} total={label} muted />
       <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={par || '\u2014'} muted />
       <CardRow
-        label={t('courses:scorecard.you')}
+        label={scoreLabel}
         cells={rows.map((h) => <ScoreCell key={h.holeNo} strokes={h.strokes} par={h.par} />)}
         total={strokes || '\u2014'}
       />
+
       {withField && (
         <CardRow
           label={t('courses:scorecard.field')}
