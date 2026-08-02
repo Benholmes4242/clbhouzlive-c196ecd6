@@ -312,40 +312,51 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
   const renderCutSentence = () => {
     if (cutState.kind === 'none') return null;
     const isProjected = cutState.kind === 'projected';
-    const label = isProjected ? t('board.cut.projected') : t('board.cut.actual');
+    const label = isProjected ? t('tour.projectedCut') : t('tour.cut');
     const cl = cutState.cutline;
     const numTxt =
       cl == null ? '' : cl === 0 ? 'E' : cl > 0 ? `+${cl}` : String(cl);
-    const extraTxt =
-      cutState.extraCount > 0 ? ` (+${cutState.extraCount})` : '';
+    // Players INSIDE the number: everyone above the insertion point when
+    // projected, every non-demoted row once the cut is actual.
+    const advanceCount = isProjected ? insertionIndex : active.length;
     return (
       <div
         key="__cut__"
         style={{
-          background: BAND,
+          background: 'rgba(15,23,42,0.03)',
           padding: '10px 16px',
+          // The ONE horizontal rule left on the board: it separates two
+          // GROUPS, not two peers.
           borderTop: `1px solid ${HAIRLINE}`,
-
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
           fontFamily: F,
-          fontSize: 9.5,
-          fontWeight: 700,
-          color: SECONDARY,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
         }}
       >
-        {label}
-        {numTxt ? (
-          <>
-            {' '}
-            <span style={{ fontWeight: 800, color: INK }}>
-              {numTxt}
-              {extraTxt}
-            </span>
-          </>
-        ) : null}
+        <span style={{ ...LABEL, color: A.INK, flexShrink: 0 }}>{label}</span>
+        <span aria-hidden style={{ flex: 1, height: 1, background: HAIRLINE }} />
+        {numTxt && (
+          <span
+            style={{
+              fontSize: 12.5,
+              fontWeight: 800,
+              color: houseColor(cl),
+              fontVariantNumeric: 'tabular-nums',
+              flexShrink: 0,
+            }}
+          >
+            {numTxt}
+          </span>
+        )}
+        {advanceCount > 0 && (
+          <span style={{ ...LABEL, flexShrink: 0 }}>
+            {t('tour.nAdvance', { count: advanceCount, n: String(advanceCount) })}
+          </span>
+        )}
       </div>
     );
+
   };
 
   const renderRow = (e: BoardEntry, opts?: { demoted?: boolean }) => {
