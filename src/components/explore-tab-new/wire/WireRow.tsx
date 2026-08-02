@@ -22,6 +22,10 @@ import {
  * crown, an ace, an eagle and a birdie haul are one thing: somebody did
  * something notable somewhere.
  *
+ * Nothing here is tagged: aces and albatrosses moved to "Rarest of all"
+ * (BRIEF_DISCOVER_REBUILD §2.1), and tagging both remaining feat types would
+ * tag nothing. A tag returns only if a records-rail kind proves materially rarer.
+ *
  * Three lines, one fact each: who, what, where. The course gets its own line
  * because it is what the event is about and a club name cut halfway through is
  * worse than a taller row.
@@ -55,12 +59,6 @@ export function WireRow({ event: e, onPress }: Props) {
 
   const unit = e.figureSubKey
     ? t(e.figureSubKey, { defaultValue: UNIT_DEFAULTS[e.figureSubKey] ?? '' })
-    : '';
-
-  const tagLabel = e.tagKey
-    ? e.tagKey === 'ace'
-      ? t('discover.wire.tag.ace', 'Hole in one')
-      : t('discover.wire.tag.albatross', 'Albatross')
     : '';
 
   const actorLabel = e.isOwn ? t('discover.wire.you', 'You') : e.actorName;
@@ -136,27 +134,6 @@ export function WireRow({ event: e, onPress }: Props) {
       </span>
 
       <span style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none' }}>
-        {/* Tags are solid ink, never amber: rarity is carried by weight so
-            amber stays reserved for the viewing member. */}
-        {tagLabel && (
-          <span
-            style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.10em',
-              textTransform: 'uppercase',
-              borderRadius: 999,
-              padding: '3px 8px',
-              whiteSpace: 'nowrap',
-              flex: 'none',
-              background: A.INK,
-              color: '#FFFFFF',
-            }}
-          >
-            {tagLabel}
-          </span>
-        )}
-
         {/* Centred, not right-aligned: the unit belongs directly beneath its
             own number, so "71" sits centred above "GROSS". */}
         {e.figure != null && (
