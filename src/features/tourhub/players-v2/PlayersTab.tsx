@@ -645,17 +645,25 @@ export function PlayersTab() {
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}
-            statLabel={synced ? statLabel : null}
+            statLabel={activeStatLabel ?? (synced ? statLabel : null)}
           />
-          {orderedRows.map((r) => {
+          {orderedRows.map((r, idx) => {
             const live = (liveMap ?? {})[r.playerId];
             const isLive = !!live;
             let sub: React.ReactNode = null;
+
+            // Under a stat lens the numeral is the position in the active sort
+            // and the tour ranking moves into the sub-line.
+            const tourRankSeg =
+              activeStat && synced && statLabel ? (
+                <span key="tr">{t('players.sub.tourRank', { label: statLabel, rank: r.rank })}</span>
+              ) : null;
 
             if (isLive && live) {
               const posStr =
                 live.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
               const segments: React.ReactNode[] = [];
+              if (tourRankSeg) segments.push(tourRankSeg);
               if (posStr) segments.push(<span key="pos">{posStr}</span>);
               if (live.score != null) {
                 segments.push(
@@ -678,17 +686,16 @@ export function PlayersTab() {
             } else {
               const wr = (worldRanks ?? {})[r.playerId];
               const segments: React.ReactNode[] = [];
+              if (tourRankSeg) segments.push(tourRankSeg);
               if (wr) {
                 segments.push(
                   <span key="wr">
-                    {t('players.sub.worldRank', { rank: wr.rank })}
-                    {wr.movement != null && wr.movement !== 0 && (
-                      <span
-                        style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: 4 }}
-                      >
-                        <MovementFigure movement={wr.movement} nullPlaceholder="none" />
-                      </span>
-                    )}
+                    {t('players.sub.worldRank', { rank: wr.rank })}{' '}
+                    <MovementFigure
+                      movement={wr.movement}
+                      nullPlaceholder="none"
+                      variant="inline"
+                    />
                   </span>,
                 );
               }
@@ -710,11 +717,12 @@ export function PlayersTab() {
               ) : null;
             }
 
+            const lensValue = activeStat ? statValue(r, activeStat) : null;
 
             return (
               <RankedPlayerRow
                 key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
-                rank={r.rank}
+                rank={activeStat ? idx + 1 : r.rank}
                 player={{
                   playerId: r.playerId,
                   name: r.name,
@@ -723,9 +731,17 @@ export function PlayersTab() {
                   photoUrl: r.photoUrl,
                   tourCode: r.tourCode,
                 }}
-                stat={synced ? r.stat : undefined}
+                stat={activeStat ? undefined : synced ? r.stat : undefined}
+                statFormatted={
+                  activeStat
+                    ? lensValue != null
+                      ? formatLensValue(activeStat, lensValue)
+                      : ''
+                    : undefined
+                }
                 live={isLive}
                 sub={sub}
+                interactive={!!r.playerId}
                 onClick={() => goPlayer(r)}
               />
             );
@@ -744,8 +760,11 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {t('players.footer.sample', { count: loadedCount })}
+        {activeStatLabel
+          ? t('players.footer.sampleSorted', { count: loadedCount, stat: activeStatLabel })
+          : t('players.footer.sample', { count: loadedCount })}
       </div>
+
       <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
     </div>
   );
