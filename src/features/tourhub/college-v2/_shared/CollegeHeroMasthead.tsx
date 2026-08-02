@@ -11,18 +11,36 @@
  * No runtime pixel extraction, no CORS dependency, no async color state.
  */
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  AMBER,
   CHARCOAL,
   FONT,
   GOLD,
-  STATUS_LIVE,
+  STATUS_LIVE_ON_DARK,
   WHITE_ALPHA_10,
-  WHITE_ALPHA_18,
   WHITE_ALPHA_55,
-  WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
+import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
+
+/* Figure-row typography. Labels use WHITE_ALPHA_55 - the light-surface A.DIM
+   token does not read on this dark gradient. */
+const LABEL_STYLE: CSSProperties = {
+  fontSize: 9,
+  fontWeight: 800,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: WHITE_ALPHA_55,
+};
+
+const FIGURE_STYLE: CSSProperties = {
+  fontSize: 22,
+  fontWeight: 800,
+  letterSpacing: '-0.02em',
+  color: '#FFFFFF',
+  marginTop: 4,
+  lineHeight: 1.05,
+};
 
 const CHARCOAL_R = 0x14;
 const CHARCOAL_G = 0x16;
@@ -72,7 +90,11 @@ interface Props {
   pointsTotal: number;
   alumniCount: number;
   playingNow: number;
-  /** Positive = climbed; negative = fell; null/0 = hide chip. */
+  /**
+   * Kept for API compatibility with the profile page. No longer rendered:
+   * the hub hero describes the No.1 college (whose rank cannot move without
+   * the whole board changing) and the movement is stated on its row below.
+   */
   rankChange?: number | null;
   /** Right-hand action slot (Follow / Compare buttons). */
   actions?: ReactNode;
@@ -86,21 +108,19 @@ export function CollegeHeroMasthead({
   pointsTotal,
   alumniCount,
   playingNow,
-  rankChange = null,
   actions,
 }: Props) {
+  const { t } = useTranslation('tourhub');
   const isRankOne = rank === 1;
+
+  const showEarnings = !!pointsTotal && pointsTotal > 0;
+  const showAlumni = alumniCount > 0;
+  const showPlaying = playingNow > 0;
 
   const heroBackground = brandHex
     ? `linear-gradient(180deg, ${darkenTowardCharcoal(brandHex, 0.4)} 0%, ${CHARCOAL} 100%)`
     : `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`;
 
-  const trend =
-    rankChange == null || rankChange === 0
-      ? null
-      : rankChange > 0
-      ? { label: `\u25B2${rankChange}`, color: '#4ADE80' }
-      : { label: `\u25BC${Math.abs(rankChange)}`, color: '#F87171' };
 
   return (
     <div
