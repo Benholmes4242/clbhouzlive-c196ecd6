@@ -39,7 +39,15 @@ export interface RankedRow {
   stat: number | null;
   wins: number | null;
   top10s: number | null;
+  /** Stat-lens fields. PGA only; null on every other tour by design. */
+  scoringAvg: number | null;
+  drivingDistance: number | null;
+  drivingAccuracy: number | null;
+  gir: number | null;
+  puttingAverage: number | null;
+  sgPutting: number | null;
 }
+
 
 export interface RankingResult {
   synced: boolean;
