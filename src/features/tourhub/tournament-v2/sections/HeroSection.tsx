@@ -282,7 +282,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     };
   })();
 
-  // Countdown tiles for upcoming.
+  // Countdown for upcoming (feeds the figure row).
   const countdown = (() => {
     if (state !== 'upcoming' || !startDate) return null;
     const totalMs = startDate.getTime() - now.getTime();
@@ -293,6 +293,89 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     const m = totalMin % 60;
     return { d, h, m };
   })();
+
+  /**
+   * THE THREE FIGURES - the same row in every state, so the hero reads as one
+   * component with a state input rather than three bespoke bands.
+   *   live      -> leader to par / thru / round
+   *   upcoming  -> days / hrs / min (or days + purse when the clock is gone)
+   *   completed -> winning score / margin / purse
+   */
+  const figures: Array<{ value: string; label: string; tone?: string }> = (() => {
+    if (state === 'live' && leader) {
+      const out: Array<{ value: string; label: string; tone?: string }> = [
+        {
+          value: leader.score == null ? 'E' : fmtScore(leader.score),
+          label: t('board.columns.tot'),
+          tone: getScoreColor(leader.score, 'dark'),
+        },
+      ];
+      if (leader.thru != null) {
+        out.push({
+          value: leader.thru >= 18 ? 'F' : String(leader.thru),
+          label: t('board.columns.thru'),
+        });
+      }
+      out.push({
+        value: `R${meta.current_round ?? 1}`,
+        label: t('board.columns.round', { defaultValue: 'ROUND' }),
+      });
+      return out;
+    }
+
+    if (state === 'upcoming') {
+      const out: Array<{ value: string; label: string; tone?: string }> = [];
+      if (countdown) {
+        if (countdown.d > 0) {
+          out.push({
+            value: String(countdown.d),
+            label: t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' }),
+          });
+        }
+        out.push({
+          value: String(countdown.h),
+          label: t('overview.cinematic.countdownHoursLabel', { defaultValue: 'HRS' }),
+        });
+        out.push({
+          value: String(countdown.m),
+          label: t('overview.cinematic.countdownMinutesLabel', { defaultValue: 'MIN' }),
+        });
+      } else if (daysUntil != null) {
+        out.push({
+          value: String(daysUntil),
+          label: t('overview.comingUp.daysLabel', { defaultValue: 'DAYS' }),
+        });
+      }
+      if (out.length < 3 && meta.purse != null) {
+        out.push({ value: formatPurse(meta.purse), label: t('tournament.hero.purseLabel') });
+      }
+      return out.slice(0, 3);
+    }
+
+    if (state === 'completed' && champion) {
+      const out: Array<{ value: string; label: string; tone?: string }> = [
+        {
+          value: champion.score == null ? 'E' : fmtScore(champion.score),
+          label: t('tournament.hero.holesLabel', { defaultValue: '72 HOLES' }),
+          tone: GOLD,
+        },
+      ];
+      if (margin != null) {
+        out.push({
+          value: margin === 0 ? 'E' : `+${margin}`,
+          label: t('tournament.hero.marginLabel', { defaultValue: 'MARGIN' }),
+        });
+      }
+      if (meta.purse != null) {
+        out.push({ value: formatPurse(meta.purse), label: t('tournament.hero.purseLabel') });
+      }
+      return out.slice(0, 3);
+    }
+
+    return [];
+  })();
+
+
 
   return (
     <div
