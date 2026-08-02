@@ -92,7 +92,15 @@ async function resolvePgaSeasonId(): Promise<string | null> {
   return null;
 }
 
+/** Numeric coercion that keeps null null: a 0 default would sort as real. */
+function num(v: number | string | null | undefined): number | null {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 // Minimal structural shapes for row casts.
+
 interface PgaStatRow {
   player_id: string;
   fedex_points: number | string | null;
