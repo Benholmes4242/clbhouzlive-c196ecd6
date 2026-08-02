@@ -124,6 +124,7 @@ export interface LeaderCategoryDef {
   shortKey: string;      // t() -> eyebrow ("EARNINGS")
   unitKey: string;       // t() -> right-column subtitle in the sheet header
   rows: LeaderRow[];     // top 50
+  poolSize: number;      // players in the category pool BEFORE the top-50 slice
 }
 
 export interface LeaderCategoriesResult {
