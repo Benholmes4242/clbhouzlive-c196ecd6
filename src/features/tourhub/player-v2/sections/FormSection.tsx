@@ -1,14 +1,25 @@
 /**
- * FormSection — last 6 results as chips.
+ * FormSection - last 6 results as chips.
  *
- * Wins render with a gold gradient chip + 800 weight. MC/WD/DQ mute.
+ * A horizontal rail of discrete results, so chips are the correct treatment
+ * here - do not convert to rows. Wins are marked with an amber border and an
+ * AMBER_DEEP label, never a fill or a gradient. MC/WD/DQ mute to INK_FAINT
+ * because a missed cut is genuinely absent of a result.
  * Section self-hides when < 2 rendered chips.
  */
 
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { AMBER, GOLD, GOLD_DEEP, HAIRLINE_INK_8, INK, INK_FAINT, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+import {
+  AMBER,
+  AMBER_DEEP,
+  HAIRLINE_INK_8,
+  INK,
+  INK_FAINT,
+  SLATE_50,
+  SURFACE,
+} from '../../_shared/tokens';
 
 interface FormSectionProps {
   results: PlayerTournamentResult[];
@@ -30,19 +41,13 @@ export function FormSection({ results }: FormSectionProps) {
   if (last6.length < 2) return null;
 
   return (
-    <section
-      style={{
-        background: SLATE_50,
-        borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '16px 0 14px',
-      }}
-    >
+    <section style={{ background: SLATE_50, padding: '16px 0 14px' }}>
       <p
         style={{
           margin: '0 16px 12px',
           fontSize: 10,
           fontWeight: 700,
-          color: INK_FAINT,
+          color: AMBER_DEEP,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
         }}
@@ -72,20 +77,18 @@ export function FormSection({ results }: FormSectionProps) {
                 minWidth: 56,
                 padding: '9px 12px',
                 borderRadius: 10,
-                border: isWin ? `1px solid ${GOLD_DEEP}` : `0.5px solid ${HAIRLINE_INK_8}`,
-                background: isWin
-                  ? `linear-gradient(135deg, ${GOLD} 0%, ${AMBER} 100%)`
-                  : SURFACE,
+                border: isWin ? `1px solid ${AMBER}` : `0.5px solid ${HAIRLINE_INK_8}`,
+                background: isWin ? 'transparent' : SURFACE,
                 textAlign: 'center' as const,
               }}
             >
               <div
                 style={{
-                  fontSize: 13,
-                  fontWeight: isWin ? 800 : 700,
-                  color: isWin ? '#0A0E14' : isMissed ? INK_FAINT : INK,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.005em',
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: isWin ? AMBER_DEEP : isMissed ? INK_FAINT : INK,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  letterSpacing: '-0.02em',
                   lineHeight: 1,
                 }}
               >
