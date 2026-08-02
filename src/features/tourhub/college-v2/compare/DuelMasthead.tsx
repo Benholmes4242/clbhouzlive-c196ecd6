@@ -22,6 +22,7 @@ import {
   AMBER,
   CHARCOAL,
   FONT,
+  HERO_MIN_H,
   GOLD,
   STATUS_LIVE_ON_DARK,
   WHITE_ALPHA_30,

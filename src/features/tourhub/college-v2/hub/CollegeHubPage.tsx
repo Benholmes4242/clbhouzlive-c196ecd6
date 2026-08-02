@@ -26,6 +26,7 @@ import {
   FONT,
   HAIRLINE_INK_10,
   INK,
+  HERO_MIN_H,
   INK_FAINT,
   INK_MUTE,
   SLATE_50,
