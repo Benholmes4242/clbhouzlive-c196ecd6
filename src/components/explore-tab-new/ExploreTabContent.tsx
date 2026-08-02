@@ -180,7 +180,6 @@ export default function ExploreTabContent({
       <div
         style={{
           padding: '0 14px',
-          paddingBottom: SPACE.pageBottom,
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
