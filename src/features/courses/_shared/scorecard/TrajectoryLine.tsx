@@ -69,8 +69,8 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
       fieldOpen = false;
     }
 
-    if (d <= -1) beads.push({ i, cum: cumYou, tone: TOPAR_UNDER_LIGHT, big: d <= -2 });
-    else if (d >= 2) beads.push({ i, cum: cumYou, tone: TOPAR_OVER_LIGHT, big: false });
+    const bead = beadForScore(h.strokes, h.par, 'light');
+    if (bead) beads.push({ i, cum: cumYou, tone: bead.tone, r: bead.radius });
   });
 
   const hasField = field.length >= 2;
