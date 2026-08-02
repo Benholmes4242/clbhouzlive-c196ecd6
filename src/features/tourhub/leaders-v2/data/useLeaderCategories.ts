@@ -1,9 +1,9 @@
 /**
- * useLeaderCategories — "The Boards" data source of truth (per-tour).
+ * useLeaderCategories - "The Boards" data source of truth (per-tour).
  *
  * Per-tour category reality (fields ARE real; nothing is faked):
  *
- *   pga (sr_player_statistics) — 11 categories:
+ *   pga (sr_player_statistics) - 11 categories:
  *     earnings                  (desc)  USD
  *     scoring_average           (asc)   AVG
  *     wins                      (desc)  WINS
@@ -20,13 +20,13 @@
  *     points  (desc)  PTS  (per-tour brand label: Race to Dubai / CME Points / LIV Points / Season Points)
  *     wins    (desc)  WINS (only when wins column has any nonzero)
  *
- *   all tours (sr_world_rankings) — PGA-only per editorial policy:
+ *   all tours (sr_world_rankings) - PGA-only per editorial policy:
  *     world_rank (asc rank -> desc points, latest ranking_date)  OWGR PTS
  *
- * ONE fetch per data source per tour — categories share the pool. The
+ * ONE fetch per data source per tour - categories share the pool. The
  * FullListSheet reads the same top-50 slice; the board slices to 3.
  *
- * i18n — LEADER_STAT_LABELS is the canonical registry of category KEY ->
+ * i18n - LEADER_STAT_LABELS is the canonical registry of category KEY ->
  * { labelKey, shortKey, unitKey } consumed by StatBoard, FullListSheet, and
  * (Wave 3e.iv Turn C.3) player-v2/StatsSheet. One source of truth per stat.
  */
@@ -35,6 +35,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
 import { formatCurrencyUsd, formatNumber, formatNumberMaxFrac } from '@/i18n/format';
+import { movementFrom } from '../../_shared/movement';
 
 export interface LeaderRow {
   playerId: string;
@@ -46,6 +47,35 @@ export interface LeaderRow {
   tourCode: string | null;
   value: number;
   valueFormatted: string;
+  /** prior_rank - rank. Populated for world_rank only; null everywhere else. */
+  movement: number | null;
+  /** Gap to the leader, formatted with the category's OWN formatter, always as
+   *  a positive quantity. null on the leader row and on exact ties. */
+  behindFormatted: string | null;
+}
+
+/**
+ * Stamps `behindFormatted` on a leader-first row list. The direction flips with
+ * the sort so the gap is always positive: higher-is-better reads
+ * leader - value, lower-is-better reads value - leader.
+ */
+function applyBehind(
+  rows: LeaderRow[],
+  dir: 'asc' | 'desc',
+  format: (v: number) => string,
+): LeaderRow[] {
+  if (rows.length < 2) return rows;
+  const leaderValue = rows[0].value;
+  const zero = format(0);
+  for (let i = 1; i < rows.length; i++) {
+    const gap = dir === 'desc' ? leaderValue - rows[i].value : rows[i].value - leaderValue;
+    if (!(gap > 0)) continue;
+    const s = format(gap);
+    // An exact tie formats identically to zero -> render nothing, not "0 behind".
+    if (s === zero) continue;
+    rows[i].behindFormatted = dir === 'asc' && !/^[+$]/.test(s) ? `+${s}` : s;
+  }
+  return rows;
 }
 
 // Canonical category-label registry. Keys are the stable category identifiers
@@ -71,7 +101,7 @@ export const LEADER_STAT_LABELS: Record<string, LeaderStatLabelSet> = {
   strokes_gained_putting:      { labelKey: 'leaders.stat.strokes_gained_putting.label',      shortKey: 'leaders.stat.strokes_gained_putting.short',      unitKey: 'leaders.stat.strokes_gained_putting.unit' },
   world_rank:                  { labelKey: 'leaders.stat.world_rank.label',                  shortKey: 'leaders.stat.world_rank.short',                  unitKey: 'leaders.stat.world_rank.unit' },
   points:                      { labelKey: 'leaders.stat.points.label',                      shortKey: 'leaders.stat.points.short',                      unitKey: 'leaders.stat.points.unit' },
-  // Wave 3e.iv Turn C.3 extensions — consumed by player-v2/StatsSheet.
+  // Wave 3e.iv Turn C.3 extensions - consumed by player-v2/StatsSheet.
   events_played:               { labelKey: 'leaders.stat.events_played.label',               shortKey: 'leaders.stat.events_played.short',               unitKey: 'leaders.stat.events_played.unit' },
   top_25:                      { labelKey: 'leaders.stat.top_25.label',                      shortKey: 'leaders.stat.top_25.short',                      unitKey: 'leaders.stat.top_25.unit' },
   cuts_made:                   { labelKey: 'leaders.stat.cuts_made.label',                   shortKey: 'leaders.stat.cuts_made.short',                   unitKey: 'leaders.stat.cuts_made.unit' },
@@ -95,6 +125,7 @@ export interface LeaderCategoryDef {
   shortKey: string;      // t() -> eyebrow ("EARNINGS")
   unitKey: string;       // t() -> right-column subtitle in the sheet header
   rows: LeaderRow[];     // top 50
+  poolSize: number;      // players in the category pool BEFORE the top-50 slice
 }
 
 export interface LeaderCategoriesResult {
@@ -104,7 +135,7 @@ export interface LeaderCategoriesResult {
 }
 
 
-// ── formatting helpers ────────────────────────────────────────────────
+// -- formatting helpers
 function fmtMoneyCompact(v: number): string {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
   if (v >= 1_000) return `$${Math.round(v / 1000)}K`;
@@ -157,7 +188,7 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 }
 
 // PGA category definitions (accessor + sort + format). Labels are resolved via
-// LEADER_STAT_LABELS[key] at render — no display strings live here.
+// LEADER_STAT_LABELS[key] at render - no display strings live here.
 type PgaStatRow = {
   player_id: string | null;
   earnings: number | null;
@@ -225,10 +256,10 @@ async function fetchPlayers(ids: string[]): Promise<Map<string, PlayerRec>> {
 }
 
 async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
-  // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
+  // World ranking (OWGR) is PGA-centric / male-tour - restricted to PGA only.
   const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
-    .select('player_id, rank, points, ranking_date')
+    .select('player_id, rank, prior_rank, points, ranking_date')
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
     .limit(600);
@@ -241,8 +272,8 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
 
   const pmap = await fetchPlayers(dedup.map((r) => r.player_id));
 
-  const rows: LeaderRow[] = dedup
-    .filter((r) => pmap.has(r.player_id))
+  const eligible = dedup.filter((r) => pmap.has(r.player_id));
+  const rows: LeaderRow[] = eligible
     .slice(0, 50)
     .map((r, i) => {
       const p = pmap.get(r.player_id)!;
@@ -257,13 +288,17 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
         tourCode: p.tour_codes?.[0] ?? 'pga',
         value: pts,
         valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${i + 1}`,
+        // Shared arithmetic - do not re-derive movement locally.
+        movement: movementFrom(r.rank, r.prior_rank ?? null),
+        behindFormatted: null,
       };
     });
 
   return {
     key: 'world_rank',
     ...LEADER_STAT_LABELS.world_rank,
-    rows,
+    rows: applyBehind(rows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+    poolSize: eligible.length,
   };
 }
 
@@ -308,13 +343,16 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           tourCode: p.tour_codes?.[0] ?? 'pga',
           value: r.value,
           valueFormatted: cat.format(r.value),
+          movement: null,
+          behindFormatted: null,
         } as LeaderRow;
       });
       if (top.length < 3) return null;
       return {
         key: cat.key,
         ...LEADER_STAT_LABELS[cat.key],
-        rows: top,
+        rows: applyBehind(top, cat.dir, cat.format),
+        poolSize: rows.length,
       } as LeaderCategoryDef;
     })
     .filter((c): c is LeaderCategoryDef => !!c);
@@ -374,12 +412,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         tourCode: p?.tour_codes?.[0] ?? tour,
         value: 0,
         valueFormatted: '',
+        movement: null,
+        behindFormatted: null,
       };
     };
 
     // Points
-    const pointsRows = pool
-      .filter((r) => r.points != null && Number(r.points) > 0)
+    const pointsPool = pool.filter((r) => r.points != null && Number(r.points) > 0);
+    const pointsRows = pointsPool
+      .slice()
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
       .map((r, i) => {
@@ -397,13 +438,15 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         labelKey: brandLabelKey ?? pointsBase.labelKey,
         shortKey: pointsBase.shortKey,
         unitKey: pointsBase.unitKey,
-        rows: pointsRows,
+        rows: applyBehind(pointsRows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+        poolSize: pointsPool.length,
       });
     }
 
     // Wins
-    const winsRows = pool
-      .filter((r) => r.wins != null && Number(r.wins) > 0)
+    const winsPool = pool.filter((r) => r.wins != null && Number(r.wins) > 0);
+    const winsRows = winsPool
+      .slice()
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
       .map((r, i) => {
@@ -414,11 +457,16 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         return base;
       });
     if (winsRows.length >= 3) {
-      categories.push({ key: 'wins', ...LEADER_STAT_LABELS.wins, rows: winsRows });
+      categories.push({
+        key: 'wins',
+        ...LEADER_STAT_LABELS.wins,
+        rows: applyBehind(winsRows, 'desc', fmtInt),
+        poolSize: winsPool.length,
+      });
     }
   }
 
-  // World ranking is PGA-only per editorial policy — not appended to other tours.
+  // World ranking is PGA-only per editorial policy - not appended to other tours.
 
   return { synced: categories.length > 0, categories, year };
 }
@@ -430,7 +478,7 @@ export function useLeaderCategories(tour: TourId) {
     gcTime: 30 * 60_000,
     queryFn: async () => {
       if (tour === 'pga') return fetchPgaCategories();
-      // champ is not offered on the leaders page — hook coerces to pga just in case.
+      // champ is not offered on the leaders page - hook coerces to pga just in case.
       if (tour === 'champ') return fetchPgaCategories();
       return fetchSeasonRankingsCategories(tour);
     },

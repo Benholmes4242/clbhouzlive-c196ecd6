@@ -1,29 +1,37 @@
 /**
- * AlmanacBoards — Tour Leaders full-bleed banded boards (approved mock:
- * leaders-almanac). Replaces the white StatBoard card chrome with the
- * Discover Almanac language: full-width 0.5px hairlines, 3.5% alt-row
- * banding, 14px side padding. Four anatomies dispatched by metric shape:
+ * AlmanacBoards - Tour Leaders boards.
  *
- *   WorldBoard     — rank/points marquee (champion band + top 4)
- *   MoneyBoard     — currency/higher-is-better power bars (top 3)
- *   ScoringBoard   — lower-is-better averages with computed "+X behind" (top 3)
- *   WinnersCircle  — horizontal chip rail for wins/counts (all >0)
+ * Two anatomies, dispatched by metric SHAPE (never by name):
  *
- * Data hooks unchanged; `onOpen` still opens the shared FullListSheet.
- * Live-dot rendering + player nav preserved.
+ *   StatBoardRows - the one row grammar for every ranked-by-a-number board:
+ *                   rank (+ movement on world_rank only), 26px avatar, name,
+ *                   value, and the gap to the leader beneath the value.
+ *   WinnersCircle - horizontal chip rail for wins / top_10. This is the one
+ *                   exception and it is deliberate: those metrics are
+ *                   tie-heavy (many players share 1 win), so a ranked
+ *                   vertical list would be a column of identical numbers.
+ *                   A rail of chips reads as a set, which is what it is.
+ *                   Do not "unify" it into StatBoardRows.
+ *
+ * AMBER ON THIS PAGE MEANS THE ACTION, AND NOTHING ELSE. It appears twice per
+ * section: the kicker and the "Full list" Action. First place is carried by
+ * being first plus figure weight - it does not get a colour, a gradient, a
+ * larger avatar or a ring.
+ *
+ * No alternating row fill and no rule between rows: the column grid is
+ * load-bearing, so no cell may size to its content.
  */
 
-import { memo, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
+import { MovementFigure } from '../../_shared/movement';
 import {
-  AMBER,
-  AMBER_BORDER,
+  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,
@@ -32,29 +40,38 @@ import {
 import type { LeaderCategoryDef, LeaderRow } from '../data/useLeaderCategories';
 import type { LivePlayerMap } from '../../players-v2/data/useLivePlayerIds';
 
-// ── Almanac tokens (page-local, matched to Discover Almanac) ──────────
+// -- Page-local tokens -------------------------------------------------
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const BAND_ALT = 'rgba(15,23,42,0.035)';
-const CHAMP_BAND = 'linear-gradient(100deg, rgba(255,255,255,0.6), #fff6e8)';
 const PAD_X = 14;
 const LIVE_GREEN = '#10B981';
+
+const KICKER: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: AMBER_DEEP,
+  lineHeight: 1,
+};
+
+const LABEL: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  lineHeight: 1,
+};
 
 interface BoardBaseProps {
   category: LeaderCategoryDef;
   liveMap: LivePlayerMap;
   onOpen: () => void;
+  /** Shared tap handler: tracks then navigates. Owned by LeadersTab. */
+  onPlayerTap: (playerId: string, rank: number) => void;
 }
 
-// ── Section header (overline + title + Full list link) ────────────────
-function SectionHead({
-  overline,
-  title,
-  onOpen,
-}: {
-  overline: string;
-  title: string;
-  onOpen: () => void;
-}) {
+// -- Section header: kicker left, sample size right, one line ----------
+function SectionHead({ overline, poolSize }: { overline: string; poolSize: number }) {
   const { t } = useTranslation('tourhub');
   return (
     <div
@@ -66,49 +83,35 @@ function SectionHead({
         gap: 12,
       }}
     >
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: INK_MUTE,
-            lineHeight: 1,
-          }}
-        >
-          {overline}
+      <div style={{ ...KICKER, minWidth: 0, flex: 1 }}>{overline}</div>
+      {poolSize > 0 && (
+        <div style={{ ...LABEL, color: INK_FAINT, flexShrink: 0 }}>
+          {t('leaders.fromN', { count: poolSize })}
         </div>
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 17,
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            color: INK,
-            lineHeight: 1.15,
-          }}
-        >
-          {title}
-        </div>
-      </div>
+      )}
+    </div>
+  );
+}
+
+// -- The quiet Action, below the rows ----------------------------------
+function FullListAction({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div style={{ padding: `8px ${PAD_X}px 0` }}>
       <button
         type="button"
         onClick={onOpen}
         style={{
-          flexShrink: 0,
+          ...LABEL,
           background: 'none',
           border: 'none',
           padding: 0,
           cursor: 'pointer',
-          color: AMBER,
-          fontSize: 12,
-          fontWeight: 600,
+          color: AMBER_DEEP,
           fontFamily: FONT,
-          whiteSpace: 'nowrap',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 2,
+          gap: 3,
         }}
       >
         {t('leaders.fullList')}
@@ -118,7 +121,7 @@ function SectionHead({
   );
 }
 
-// ── Shared row atoms ──────────────────────────────────────────────────
+// -- Shared row atoms --------------------------------------------------
 function PlayerCell({
   row,
   size,
@@ -126,7 +129,6 @@ function PlayerCell({
   nameWeight,
   liveMap,
   onTap,
-  ringColor,
 }: {
   row: LeaderRow;
   size: number;
@@ -134,7 +136,6 @@ function PlayerCell({
   nameWeight: number;
   liveMap: LivePlayerMap;
   onTap: (pid: string) => void;
-  ringColor?: string;
 }) {
   const live = liveMap[row.playerId];
   const candidates = resolvePlayerAvatarCandidates({
@@ -167,7 +168,7 @@ function PlayerCell({
           alt={row.name}
           userId={row.playerId}
           hairlineRing
-          ringColor={ringColor ?? LIGHT_HAIRLINE}
+          ringColor={LIGHT_HAIRLINE}
         />
         {live && (
           <span
@@ -212,98 +213,38 @@ function PlayerCell({
   );
 }
 
-function bandedStyle(index: number, extra?: CSSProperties): CSSProperties {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: `9px ${PAD_X}px`,
-    background: index % 2 === 1 ? BAND_ALT : 'transparent',
-    borderTop: index === 0 ? `0.5px solid ${HAIRLINE}` : undefined,
-    borderBottom: `0.5px solid ${HAIRLINE}`,
-    ...extra,
-  };
-}
-
-// ══ WorldBoard ═════════════════════════════════════════════════════════
-// Rank/points marquee. Champion band + banded ranks 2–4.
-export interface WorldBoardProps extends BoardBaseProps {
-  overline: string;
-  title: string;
-  championSubline: string;
-}
-function WorldBoardInner({
+// == StatBoardRows =====================================================
+// One row grammar for every ranked-by-a-number board. Top 3; the Full list
+// Action is the route to more.
+function StatBoardRowsInner({
   category,
   liveMap,
   onOpen,
+  onPlayerTap,
   overline,
-  title,
-  championSubline,
-}: WorldBoardProps) {
-  const navigate = useNavigate();
-  const top = category.rows.slice(0, 4);
+  showMovement,
+}: BoardBaseProps & { overline: string; showMovement?: boolean }) {
+  const { t } = useTranslation('tourhub');
+  const top = category.rows.slice(0, 3);
   if (!top.length) return null;
-  const [champ, ...rest] = top;
-  const tap = (pid: string) => pid && navigate(`/tourhub/player/${pid}`);
 
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionHead overline={overline} title={title} onOpen={onOpen} />
-
-      {/* Champion band */}
-      <div
-        style={{
-          background: CHAMP_BAND,
-          borderTop: `0.5px solid ${HAIRLINE}`,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
-          padding: `12px ${PAD_X}px`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <PlayerCell
-          row={champ}
-          size={38}
-          nameSize={14.5}
-          nameWeight={700}
-          liveMap={liveMap}
-          onTap={tap}
-          ringColor={AMBER_BORDER}
-        />
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontSize: 17,
-              fontWeight: 800,
-              color: AMBER,
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {champ.valueFormatted}
-          </div>
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              color: INK_MUTE,
-              textTransform: 'uppercase',
-            }}
-          >
-            {championSubline}
-          </div>
-        </div>
-      </div>
-
-      {/* Ranks 2–4 */}
-      {rest.map((r, i) => (
-        <div key={r.playerId || `w-${i}`} style={bandedStyle(i)}>
+      <SectionHead overline={overline} poolSize={category.poolSize} />
+      {top.map((r, i) => (
+        <div
+          key={r.playerId || `s-${i}`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: `11px ${PAD_X}px`,
+          }}
+        >
           <div
             style={{
               width: 18,
+              flex: '0 0 18px',
               fontSize: 12,
               fontWeight: 500,
               color: INK_MUTE,
@@ -313,214 +254,68 @@ function WorldBoardInner({
           >
             {r.rank}
           </div>
+          {showMovement && (
+            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, lineHeight: 1 }}>
+              <MovementFigure movement={r.movement} nullPlaceholder="none" variant="inline" />
+            </div>
+          )}
           <PlayerCell
             row={r}
             size={26}
             nameSize={13}
             nameWeight={600}
             liveMap={liveMap}
-            onTap={tap}
+            onTap={(pid) => onPlayerTap(pid, r.rank)}
           />
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {r.valueFormatted}
+          <div style={{ width: 96, flex: '0 0 96px', textAlign: 'right' }}>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 800,
+                color: INK,
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
+              {r.valueFormatted}
+            </div>
+            {/* Leader row renders nothing here: rank 1 already says it. */}
+            {r.behindFormatted && (
+              <div
+                style={{
+                  ...LABEL,
+                  marginTop: 3,
+                  color: INK_FAINT,
+                  whiteSpace: 'nowrap',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {t('leaders.behind', { gap: r.behindFormatted })}
+              </div>
+            )}
           </div>
         </div>
       ))}
+      <FullListAction onOpen={onOpen} />
     </section>
   );
 }
-export const WorldBoard = memo(WorldBoardInner);
+export const StatBoardRows = memo(StatBoardRowsInner);
 
-// ══ MoneyBoard ═════════════════════════════════════════════════════════
-// Currency / higher-is-better. Top 3 rows with 3px amber power bars.
-function MoneyBoardInner({ category, liveMap, onOpen }: BoardBaseProps) {
-  const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
-  const top = category.rows.slice(0, 3);
-  if (!top.length) return null;
-  const max = Math.max(...top.map((r) => r.value || 0));
-  const tap = (pid: string) => pid && navigate(`/tourhub/player/${pid}`);
-
-  return (
-    <section style={{ fontFamily: FONT }}>
-      <SectionHead
-        overline={t(category.shortKey)}
-        title={t(`leaders.almanac.titles.${category.key}`, { defaultValue: t(category.labelKey) })}
-        onOpen={onOpen}
-      />
-      {top.map((r, i) => {
-        const isLeader = i === 0;
-        const pct = max > 0 ? Math.max(0.08, r.value / max) : 0.08;
-        return (
-          <div
-            key={r.playerId || `m-${i}`}
-            style={bandedStyle(i, { flexDirection: 'column', alignItems: 'stretch', gap: 6 })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div
-                style={{
-                  width: 18,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: isLeader ? AMBER : INK_MUTE,
-                  fontVariantNumeric: 'tabular-nums',
-                  textAlign: 'right',
-                }}
-              >
-                {r.rank}
-              </div>
-              <PlayerCell
-                row={r}
-                size={26}
-                nameSize={13}
-                nameWeight={600}
-                liveMap={liveMap}
-                onTap={tap}
-              />
-              <div
-                style={{
-                  fontSize: 13.5,
-                  fontWeight: 800,
-                  color: isLeader ? AMBER : INK,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {r.valueFormatted}
-              </div>
-            </div>
-            {/* Power bar — inset to text edge (18 rank + 26 avatar + 10+10 gap) */}
-            <div
-              style={{
-                marginLeft: 18 + 10 + 26 + 10,
-                height: 3,
-                background: 'rgba(15,23,42,0.06)',
-                borderRadius: 2,
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${pct * 100}%`,
-                  height: '100%',
-                  background: AMBER,
-                  borderRadius: 2,
-                }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </section>
-  );
-}
-export const MoneyBoard = memo(MoneyBoardInner);
-
-// ══ ScoringBoard ═══════════════════════════════════════════════════════
-// Lower-is-better averages. Value-forward with computed deltas. No bars.
-function ScoringBoardInner({ category, liveMap, onOpen }: BoardBaseProps) {
-  const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
-  const top = category.rows.slice(0, 3);
-  if (!top.length) return null;
-  const leaderValue = top[0].value;
-  const tap = (pid: string) => pid && navigate(`/tourhub/player/${pid}`);
-
-  return (
-    <section style={{ fontFamily: FONT }}>
-      <SectionHead
-        overline={t(category.shortKey)}
-        title={t(`leaders.almanac.titles.${category.key}`, { defaultValue: t(category.labelKey) })}
-        onOpen={onOpen}
-      />
-      {top.map((r, i) => {
-        const isLeader = i === 0;
-        const delta = (r.value - leaderValue).toFixed(2);
-        return (
-          <div key={r.playerId || `s-${i}`} style={bandedStyle(i)}>
-            <div
-              style={{
-                width: 18,
-                fontSize: 12,
-                fontWeight: 500,
-                color: isLeader ? AMBER : INK_MUTE,
-                fontVariantNumeric: 'tabular-nums',
-                textAlign: 'right',
-              }}
-            >
-              {r.rank}
-            </div>
-            <PlayerCell
-              row={r}
-              size={26}
-              nameSize={13}
-              nameWeight={600}
-              liveMap={liveMap}
-              onTap={tap}
-            />
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color: INK,
-                  fontVariantNumeric: 'tabular-nums',
-                  lineHeight: 1,
-                }}
-              >
-                {r.valueFormatted}
-              </div>
-              <div
-                style={{
-                  marginTop: 3,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  color: isLeader ? AMBER : INK_FAINT,
-                  textTransform: 'uppercase',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {isLeader
-                  ? t('leaders.almanac.scoring.leader')
-                  : t('leaders.almanac.scoring.behind', { delta })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </section>
-  );
-}
-export const ScoringBoard = memo(ScoringBoardInner);
-
-// ══ WinnersCircle ══════════════════════════════════════════════════════
-// Horizontal chip rail. All rows with value >= 1. Leader amber-bordered.
+// == WinnersCircle =====================================================
 function surname(name: string): string {
   const parts = name.trim().split(/\s+/);
   return parts.length > 1 ? parts[parts.length - 1] : name;
 }
 
-function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
+function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
   const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
   const chips = category.rows.filter((r) => (r.value ?? 0) >= 1);
   if (!chips.length) return null;
-  const tap = (pid: string) => pid && navigate(`/tourhub/player/${pid}`);
 
   return (
     <section style={{ fontFamily: FONT }}>
-      <SectionHead
-        overline={t(category.shortKey)}
-        title={t(`leaders.almanac.titles.${category.key}`, { defaultValue: t(category.labelKey) })}
-        onOpen={onOpen}
-      />
+      <SectionHead overline={t(category.shortKey)} poolSize={category.poolSize} />
       <div
         style={{
           display: 'flex',
@@ -542,7 +337,7 @@ function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
             <button
               key={r.playerId || `wc-${i}`}
               type="button"
-              onClick={() => tap(r.playerId)}
+              onClick={() => onPlayerTap(r.playerId, r.rank)}
               style={{
                 flexShrink: 0,
                 display: 'inline-flex',
@@ -551,7 +346,7 @@ function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
                 padding: '5px 10px 5px 5px',
                 background: '#FFFFFF',
                 borderRadius: 999,
-                border: `0.5px solid ${isLeader ? AMBER_BORDER : HAIRLINE}`,
+                border: `0.5px solid ${HAIRLINE}`,
                 fontFamily: FONT,
                 cursor: 'pointer',
               }}
@@ -562,7 +357,7 @@ function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
                 alt={r.name}
                 userId={r.playerId}
                 hairlineRing
-                ringColor={isLeader ? AMBER_BORDER : LIGHT_HAIRLINE}
+                ringColor={LIGHT_HAIRLINE}
               />
               <span
                 style={{
@@ -581,7 +376,7 @@ function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
                   height: 20,
                   padding: '0 6px',
                   borderRadius: 999,
-                  background: isLeader ? AMBER : 'rgba(15,23,42,0.06)',
+                  background: isLeader ? INK : 'rgba(15,23,42,0.06)',
                   color: isLeader ? '#FFFFFF' : INK,
                   fontSize: 11,
                   fontWeight: 800,
@@ -597,27 +392,28 @@ function WinnersCircleInner({ category, onOpen }: BoardBaseProps) {
           );
         })}
       </div>
+      <FullListAction onOpen={onOpen} />
     </section>
   );
 }
 export const WinnersCircle = memo(WinnersCircleInner);
 
-// ── Anatomy router ────────────────────────────────────────────────────
+// -- Anatomy router ----------------------------------------------------
 // Maps category key -> anatomy by metric SHAPE, not name.
-export type Anatomy = 'world' | 'money' | 'scoring' | 'winners';
+export type Anatomy = 'stat' | 'winners';
 
 export const ANATOMY_BY_KEY: Record<string, Anatomy> = {
-  world_rank: 'world',
-  points: 'world',
-  earnings: 'money',
-  drive_avg: 'money',
-  drive_acc: 'money',
-  gir_pct: 'money',
-  sand_saves_pct: 'money',
-  strokes_gained_tee_green: 'money',
-  strokes_gained_putting: 'money',
-  scoring_avg: 'scoring',
-  putt_avg: 'scoring',
+  world_rank: 'stat',
+  points: 'stat',
+  earnings: 'stat',
+  drive_avg: 'stat',
+  drive_acc: 'stat',
+  gir_pct: 'stat',
+  sand_saves_pct: 'stat',
+  strokes_gained_tee_green: 'stat',
+  strokes_gained_putting: 'stat',
+  scoring_avg: 'stat',
+  putt_avg: 'stat',
   wins: 'winners',
   top_10: 'winners',
 };

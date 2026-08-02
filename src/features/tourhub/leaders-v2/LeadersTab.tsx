@@ -1,17 +1,18 @@
 /**
- * leaders-v2/LeadersTab — "The Boards" — category cards + deep sheets.
+ * leaders-v2/LeadersTab - "The Boards" - category cards + deep sheets.
  * Overview grammar; no framer-motion; no shell-row dependency.
  *
  * Wiring:
  *   - Tour: TourSelectionContext (selectTour); ?tour= honored once on mount.
  *   - ?category= auto-opens the FullListSheet for that key (Overview deep-links).
  *   - Data: useLeaderCategories(tour) + useLivePlayerIds().
- *   - Sheet nav: closes first, then navigates — no stuck overlay.
+ *   - Sheet nav: closes first, then navigates - no stuck overlay.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
@@ -28,9 +29,7 @@ import {
 
 import { useLeaderCategories } from './data/useLeaderCategories';
 import {
-  WorldBoard,
-  MoneyBoard,
-  ScoringBoard,
+  StatBoardRows,
   WinnersCircle,
   ANATOMY_BY_KEY,
   type Anatomy,
@@ -51,6 +50,7 @@ const CHIP_LABEL_KEY: Record<TourId, string> = {
 
 export function LeadersTab() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
 
   // Per-section tour lens (local state, NO All Tours, PGA default).
@@ -92,14 +92,43 @@ export function LeadersTab() {
 
   const openCategory = useCallback(
     (key: string) => {
+      analyticsEvents.track('tour_leaders_full_list_opened', { tour: activeTour, category: key });
       setOpenKey(key);
       const p = new URLSearchParams(searchParams);
       p.set('tab', 'leaderboards');
       p.set('category', key);
       setSearchParams(p, { replace: true });
     },
-    [searchParams, setSearchParams],
+    [searchParams, setSearchParams, activeTour],
   );
+
+  // Shared board tap handler: track, then navigate.
+  const onPlayerTap = useCallback(
+    (category: string, playerId: string, rank: number) => {
+      if (!playerId) return;
+      analyticsEvents.track('tour_leaders_player_tapped', {
+        tour: activeTour,
+        category,
+        player_id: playerId,
+        rank,
+      });
+      navigate(`/tourhub/player/${playerId}`);
+    },
+    [navigate, activeTour],
+  );
+
+  // Analytics: viewed once per mount, after the categories resolve.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    if (isLoading || isError || !categories.length) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_leaders_viewed', {
+      tour: activeTour,
+      category_count: categories.length,
+      pool_size: categories.reduce((n, c) => n + (c.poolSize ?? 0), 0),
+    });
+  }, [categories, isLoading, isError, activeTour]);
 
   const closeCategory = useCallback(() => {
     setOpenKey(null);
@@ -129,8 +158,8 @@ export function LeadersTab() {
       }}
     >
 
-      {/* Tour lens — sticky glass wrapper; chips from SectionTourLens
-          (no All Tours; PGA default). CHAMP taps are ignored — no board
+      {/* Tour lens - sticky glass wrapper; chips from SectionTourLens
+          (no All Tours; PGA default). CHAMP taps are ignored - no board
           coverage for that tour. */}
       <div
         style={{
@@ -185,46 +214,39 @@ export function LeadersTab() {
         <TourHubEmptyState variant="leaderboard" />
       ) : (
         <div style={{ padding: '16px 0 88px', display: 'flex', flexDirection: 'column', gap: 22 }}>
-          {categories.map((cat, idx) => {
-            const mapped: Anatomy = ANATOMY_BY_KEY[cat.key] ?? 'money';
-            // First board of every tour = marquee (WorldBoard treatment).
-            const anatomy: Anatomy = idx === 0 ? 'world' : mapped;
+          {categories.map((cat) => {
+            // No marquee: every board uses the anatomy its key maps to. The
+            // first board is first because it is the most important stat.
+            const anatomy: Anatomy = ANATOMY_BY_KEY[cat.key] ?? 'stat';
             const onOpen = () => openCategory(cat.key);
             const key = cat.key;
 
-            if (anatomy === 'world') {
-              const isWorldRank = cat.key === 'world_rank';
-              // Marquee overline/title: world_rank uses its own copy; other
-              // marquees (LPGA/EUR/LIV points) use the brand label from the
-              // category itself + a generic marquee title.
-              const overline = isWorldRank
-                ? t('leaders.almanac.world.overline')
-                : t(cat.labelKey).toUpperCase();
-              const title = isWorldRank
-                ? t('leaders.almanac.world.title')
-                : t('leaders.almanac.pointsMarquee.title');
-              const championSubline = isWorldRank
-                ? t('leaders.almanac.world.no1')
-                : t('leaders.almanac.marquee.no1');
+            if (anatomy === 'winners') {
               return (
-                <WorldBoard
+                <WinnersCircle
                   key={key}
                   category={cat}
                   liveMap={liveMap ?? {}}
                   onOpen={onOpen}
-                  overline={overline}
-                  title={title}
-                  championSubline={championSubline}
+                  onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
                 />
               );
             }
-            if (anatomy === 'money') {
-              return <MoneyBoard key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
-            }
-            if (anatomy === 'scoring') {
-              return <ScoringBoard key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
-            }
-            return <WinnersCircle key={key} category={cat} liveMap={liveMap ?? {}} onOpen={onOpen} />;
+            const overline =
+              cat.key === 'world_rank'
+                ? t('leaders.almanac.world.overline')
+                : t(cat.shortKey);
+            return (
+              <StatBoardRows
+                key={key}
+                category={cat}
+                liveMap={liveMap ?? {}}
+                onOpen={onOpen}
+                onPlayerTap={(pid, rank) => onPlayerTap(cat.key, pid, rank)}
+                overline={overline}
+                showMovement={cat.key === 'world_rank'}
+              />
+            );
           })}
           <div
             style={{
