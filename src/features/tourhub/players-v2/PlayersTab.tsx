@@ -590,9 +590,15 @@ export function PlayersTab() {
               const segments: React.ReactNode[] = [];
               if (wr) {
                 segments.push(
-                  <span key="wr" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span key="wr">
                     {t('players.sub.worldRank', { rank: wr.rank })}
-                    <MovementFigure movement={wr.movement} nullPlaceholder="none" />
+                    {wr.movement != null && wr.movement !== 0 && (
+                      <span
+                        style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: 4 }}
+                      >
+                        <MovementFigure movement={wr.movement} nullPlaceholder="none" />
+                      </span>
+                    )}
                   </span>,
                 );
               }
@@ -603,9 +609,9 @@ export function PlayersTab() {
                 segments.push(<span key="t10">{t('players.sub.top10s', { count: r.top10s })}</span>);
               }
               sub = segments.length ? (
-                <span style={{ color: INK_MUTE, display: 'inline-flex', alignItems: 'center' }}>
+                <span style={{ color: INK_MUTE }}>
                   {segments.map((node, i) => (
-                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span key={i}>
                       {i > 0 ? SEP : ''}
                       {node}
                     </span>
@@ -613,6 +619,7 @@ export function PlayersTab() {
                 </span>
               ) : null;
             }
+
 
             return (
               <RankedPlayerRow
