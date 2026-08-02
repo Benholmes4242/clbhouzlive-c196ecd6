@@ -1,36 +1,39 @@
 /**
- * ComparePage — "The Duel".
+ * ComparePage - "The Duel".
  *
  * /tourhub/college-golf/compare?c1=<slug>&c2=<slug>
  *
  * Route-param contract (ported verbatim from the old CollegeComparePage):
- *   - Both params present   → render the duel.
- *   - c1 present, c2 missing → redirect to /tourhub/college-golf/<c1>.
- *   - Both missing           → renders empty duel (both columns "—") with
+ *   - Both params present   -> render the duel.
+ *   - c1 present, c2 missing -> redirect to /tourhub/college-golf/<c1>.
+ *   - Both missing           -> renders empty duel (both columns "-") with
  *                              Change buttons wired to the PickerSheet.
- *   - Unknown/invalid slug   → column renders as "—" (no standings match);
+ *   - Unknown/invalid slug   -> column renders as "-" (no standings match);
  *                              tug bars show both-zero neutrals; Classes
  *                              hides for that side. This mirrors the old
  *                              page's silent-empty behaviour.
  *
  * Reuse:
- *   - useFranchiseStandings   → ONE source for both sides' rank/points/
+ *   - useFranchiseStandings   -> ONE source for both sides' rank/points/
  *                               alumni/wins/top10 (matches the hub exactly).
- *   - useLiveAlumni + useLivePlayerIds → live counts + row live dots.
- *   - useCollegeRoster        → both classes' top alumni (already sorted
+ *   - useLiveAlumni + useLivePlayerIds -> live counts + row live dots.
+ *   - useCollegeRoster        -> both classes' top alumni (already sorted
  *                               by earnings; we slice 5).
  *
  * No framer.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 import { formatNumber } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
+  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -47,7 +50,7 @@ import { useCollegeRoster } from '@/features/tourhub/college-v2/profile/data/use
 import { useThisWeekAlumni, type WeekAlumnusRow } from '@/features/tourhub/college-v2/profile/data/useThisWeekAlumni';
 import { useLivePlayerIds, type LivePlayerMap } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import { DuelMasthead } from './DuelMasthead';
-import { TugStat } from './TugStat';
+import { AverageStatRow, CountStatRow } from './TugStat';
 import { PickerSheet } from './PickerSheet';
 import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,9 +58,47 @@ import { Skeleton } from '@/components/ui/skeleton';
 const CLASS_CAP = 5;
 const OFF_INK = 'rgba(15,23,42,0.38)';
 const fmtInt = (n: number) => formatNumber(n);
-const fmtScoringAvg = (n: number) => (n > 0 ? n.toFixed(2) : '0.00');
-const fmtDrive = (n: number) => (n > 0 ? `${n.toFixed(1)} yds` : '0.0 yds');
-const fmtSg = (n: number) => (n === 0 ? '0.00' : (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2)));
+const fmtScoringAvg = (n: number) => n.toFixed(2);
+const fmtDrive = (n: number) => `${n.toFixed(1)} yds`;
+const fmtSg = (n: number) => (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
+
+const KICKER_STYLE = {
+  padding: '18px 16px 8px',
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase' as const,
+  color: AMBER_DEEP,
+};
+
+function SkeletonKicker() {
+  return (
+    <div style={{ padding: '18px 16px 8px' }}>
+      <Skeleton style={{ height: 10, width: 90, borderRadius: 3 }} />
+    </div>
+  );
+}
+
+function SkeletonRow({ withBar = false }: { withBar?: boolean }) {
+  return (
+    <div style={{ padding: '14px 16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+        <Skeleton style={{ height: 16, width: 60, borderRadius: 3 }} />
+        <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
+        <Skeleton style={{ height: 16, width: 60, borderRadius: 3 }} />
+      </div>
+      {withBar ? (
+        <Skeleton style={{ height: 4, borderRadius: 2 }} />
+      ) : (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Skeleton style={{ height: 9, width: 66, borderRadius: 3 }} />
+          <Skeleton style={{ height: 9, width: 66, borderRadius: 3 }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export function ComparePage() {
   const [searchParams] = useSearchParams();
@@ -65,7 +106,7 @@ export function ComparePage() {
   const c1 = searchParams.get('c1') || '';
   const c2 = searchParams.get('c2') || '';
 
-  // Old contract: c1 present with no c2 → redirect to profile.
+  // Old contract: c1 present with no c2 -> redirect to profile.
   useEffect(() => {
     if (c1 && !c2) navigate(collegeProfileRoute(c1), { replace: true });
   }, [c1, c2, navigate]);
@@ -77,8 +118,10 @@ export function ComparePage() {
   const { data: liveMap = {} } = useLivePlayerIds();
   const { data: leftWeek = [] } = useThisWeekAlumni(c1 || undefined);
   const { data: rightWeek = [] } = useThisWeekAlumni(c2 || undefined);
-  const { data: leftAgg } = useCollegeAggregateStats(c1 || undefined);
-  const { data: rightAgg } = useCollegeAggregateStats(c2 || undefined);
+  const { data: leftAgg, isLoading: leftAggLoading } = useCollegeAggregateStats(c1 || undefined);
+  const { data: rightAgg, isLoading: rightAggLoading } = useCollegeAggregateStats(c2 || undefined);
+  const { t } = useTranslation('tourhub');
+
 
   const leftWeekByPlayer = useMemo(() => {
     const m = new Map<string, WeekAlumnusRow>();
@@ -106,7 +149,63 @@ export function ComparePage() {
   const leftCode = left?.shortName || left?.collegeName?.slice(0, 4).toUpperCase() || 'LEFT';
   const rightCode = right?.shortName || right?.collegeName?.slice(0, 4).toUpperCase() || 'RIGHT';
 
-  // c1 && !c2 → we're about to redirect; render nothing.
+
+  const leftName = left?.shortName || left?.collegeName || '';
+  const rightName = right?.shortName || right?.collegeName || '';
+  const year = data?.year ?? new Date().getFullYear();
+
+  const statsLoading = isLoading && !left && !right;
+  const aggLoading = leftAggLoading || rightAggLoading;
+  const averageRows =
+    (leftAgg?.scoringAvg || rightAgg?.scoringAvg ? 1 : 0) +
+    (leftAgg?.drivingDistance || rightAgg?.drivingDistance ? 1 : 0) +
+    (leftAgg?.sgTotal || rightAgg?.sgTotal ? 1 : 0);
+
+  // Analytics: viewed once per mount, after both sides and aggregates resolve.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    if (!left || !right || aggLoading) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_college_compare_viewed', {
+      left_slug: c1,
+      right_slug: c2,
+      left_rank: left.rank ?? null,
+      right_rank: right.rank ?? null,
+      average_rows: averageRows,
+    });
+  }, [left, right, aggLoading, c1, c2, averageRows]);
+
+  // Analytics: a side swapped to a new college.
+  const prevSlugs = useRef<{ c1: string; c2: string }>({ c1, c2 });
+  useEffect(() => {
+    const prev = prevSlugs.current;
+    if (prev.c1 !== c1) {
+      analyticsEvents.track('tour_college_compare_swapped', {
+        side: 'left',
+        from_slug: prev.c1,
+        to_slug: c1,
+      });
+    }
+    if (prev.c2 !== c2) {
+      analyticsEvents.track('tour_college_compare_swapped', {
+        side: 'right',
+        from_slug: prev.c2,
+        to_slug: c2,
+      });
+    }
+    prevSlugs.current = { c1, c2 };
+  }, [c1, c2]);
+
+  const openPicker = (target: 'c1' | 'c2') => {
+    setPickerTarget(target);
+    analyticsEvents.track('tour_college_compare_changed', {
+      side: target === 'c1' ? 'left' : 'right',
+    });
+  };
+
+
+  // c1 && !c2 -> we're about to redirect; render nothing.
   if (c1 && !c2) return null;
 
   if (isError) {
@@ -144,7 +243,7 @@ export function ComparePage() {
           paddingBottom: 88,
         }}
       >
-        {/* Masthead — always renders (skeleton state below if loading) */}
+        {/* Masthead - always renders (skeleton state below if loading) */}
         {isLoading && !left && !right ? (
           <div
             style={{
@@ -171,92 +270,113 @@ export function ComparePage() {
             right={right}
             liveLeft={liveLeft}
             liveRight={liveRight}
-            onChangeLeft={() => setPickerTarget('c1')}
-            onChangeRight={() => setPickerTarget('c2')}
+            onChangeLeft={() => openPicker('c1')}
+            onChangeRight={() => openPicker('c2')}
           />
         )}
 
-        {/* Stats */}
+        {/* Stats - THE SEASON (counts, tug bars) */}
         <section style={{ background: SURFACE, borderTop: `0.5px solid ${HAIRLINE_INK_10}` }}>
-          {isLoading && !left && !right ? (
-            <div>
+          {statsLoading ? (
+            <>
+              <SkeletonKicker />
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} style={{ padding: '12px 16px 12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
-                    <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
-                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
-                  </div>
-                  <Skeleton style={{ height: 4, borderRadius: 2 }} />
-                </div>
+                <SkeletonRow key={i} withBar />
               ))}
-            </div>
+              <SkeletonKicker />
+              {[0, 1, 2].map((i) => (
+                <SkeletonRow key={`a${i}`} />
+              ))}
+            </>
           ) : (
             <>
-              <TugStat
-                label="Franchise Points"
-                leftValue={left?.earningsTotal ?? 0}
-                rightValue={right?.earningsTotal ?? 0}
-                format={formatCurrency}
+              <div style={KICKER_STYLE}>{t('college.compare.theSeason')}</div>
+              <CountStatRow
+                label={t('college.compare.earnings')}
+                leftValue={left ? left.earningsTotal : null}
+                rightValue={right ? right.earningsTotal : null}
+                format={formatEarnings}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Alumni on Tour"
-                leftValue={left?.alumniCount ?? 0}
-                rightValue={right?.alumniCount ?? 0}
+              <CountStatRow
+                label={t('college.compare.alumniOnTour')}
+                leftValue={left ? left.alumniCount : null}
+                rightValue={right ? right.alumniCount : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Wins"
-                leftValue={left?.winsTotal ?? 0}
-                rightValue={right?.winsTotal ?? 0}
+              <CountStatRow
+                label={t('college.compare.wins')}
+                leftValue={left ? left.winsTotal : null}
+                rightValue={right ? right.winsTotal : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Top 10s"
-                leftValue={left?.top10Total ?? 0}
-                rightValue={right?.top10Total ?? 0}
+              <CountStatRow
+                label={t('college.compare.top10s')}
+                leftValue={left ? left.top10Total : null}
+                rightValue={right ? right.top10Total : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="Scoring Avg"
-                    leftValue={leftAgg?.scoringAvg?.value ?? 0}
-                    rightValue={rightAgg?.scoringAvg?.value ?? 0}
-                    format={fmtScoringAvg}
-                    lowerWins
-                  />
-                </>
-              )}
-              {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="Driving Distance"
-                    leftValue={leftAgg?.drivingDistance?.value ?? 0}
-                    rightValue={rightAgg?.drivingDistance?.value ?? 0}
-                    format={fmtDrive}
-                  />
-                </>
-              )}
-              {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="SG: Total"
-                    leftValue={leftAgg?.sgTotal?.value ?? 0}
-                    rightValue={rightAgg?.sgTotal?.value ?? 0}
-                    format={fmtSg}
-                  />
-                </>
-              )}
             </>
           )}
         </section>
+
+        {/* Stats - THE NUMBERS (averages, coverage, no bars) */}
+        {!statsLoading && averageRows > 0 && (
+          <section style={{ background: SURFACE, marginTop: 10 }}>
+            <div style={KICKER_STYLE}>{t('college.compare.theNumbers')}</div>
+            {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
+              <AverageStatRow
+                label={t('college.compare.scoringAvg')}
+                left={leftAgg?.scoringAvg ?? null}
+                right={rightAgg?.scoringAvg ?? null}
+                format={fmtScoringAvg}
+                lowerWins
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
+              <AverageStatRow
+                label={t('college.compare.drivingDistance')}
+                left={leftAgg?.drivingDistance ?? null}
+                right={rightAgg?.drivingDistance ?? null}
+                format={fmtDrive}
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
+              <AverageStatRow
+                label={t('college.compare.sgTotal')}
+                left={leftAgg?.sgTotal ?? null}
+                right={rightAgg?.sgTotal ?? null}
+                format={fmtSg}
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            <div
+              style={{
+                padding: '10px 16px 16px',
+                fontSize: 10.5,
+                fontWeight: 500,
+                color: INK_FAINT,
+                textAlign: 'center',
+                letterSpacing: '0.01em',
+              }}
+            >
+              {t('college.compare.footer', { year })}
+            </div>
+          </section>
+        )}
+
 
         {/* Classes */}
         <section style={{ background: SURFACE, marginTop: 12 }}>

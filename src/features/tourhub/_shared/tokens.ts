@@ -205,3 +205,8 @@ export const CHARCOAL = '#15171F';                           // canonical charco
 // ============================================================================
 export const FONT =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
+// ============================================================================
+// BAR (proportional tug/track fills on light surfaces)
+// ============================================================================
+export const BAR_NEUTRAL = '#AEB4BC';                        // losing / non-winning half of a head-to-head tug bar

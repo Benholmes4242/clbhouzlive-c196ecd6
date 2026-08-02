@@ -1,96 +1,161 @@
 /**
- * TugStat — one head-to-head stat row.
+ * Head-to-head stat rows for the College compare page.
  *
- * Layout:  [leftValue]   STAT LABEL   [rightValue]
- *          [------- tug bar ------ 2px gap ------]
+ * TWO components, one shared outcome function:
+ *   CountStatRow    - counts and sums (earnings, alumni, wins, top 10s).
+ *                     A tug bar is honest here: 3 wins vs 1 fills 3/4.
+ *   AverageStatRow  - means (scoring avg, driving distance, SG: total).
+ *                     NO bar: there is nothing to take a proportion of when
+ *                     the quantity is a mean, and a 49.98/50.02 split implies
+ *                     "level" on a gap that matters. Coverage is shown instead.
  *
- * Bar geometry: 4px high, radius 2, split at l/(l+r). Winning half uses an
- * amber gradient oriented toward the center; losing half is neutral.
- * Both-zero → both halves faint ink tint + values ink.
+ * AMBER MEANS THE WINNER OF THE ROW, and that is CORRECT here. This surface has
+ * no viewing member and no live round, so amber is free and its meaning is
+ * bounded and local: "the better of the two". Do NOT "correct" it to ink.
+ * Gold stays reserved for the aces / albatross register app-wide.
  *
- * `lowerWins` inverts the winner logic (Scoring Average: lower is better).
- * Zero is treated as "no data" and never wins under lowerWins.
+ * TIES ARE DECIDED ON THE DISPLAYED VALUE. The formatter is the definition of
+ * what the reader sees; if both sides format identically the row is Tied and
+ * neither side is amber. No epsilon float comparison.
  *
- * Amber (#F7931E) is used here because gold is reserved for the aces /
- * albatross register app-wide; head-to-head dominance is amber's job.
+ * MISSING is null/undefined, NOT <= 0. SG: Total is legitimately negative, and
+ * 0 wins is a fact, not a gap. You cannot beat an absent opponent.
  */
 
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
+  AMBER,
+  BAR_NEUTRAL,
   FONT,
   INK,
-  INK_MUTE,
+  INK_FAINT,
 } from '@/features/tourhub/_shared/tokens';
+import type { CollegeAggregate } from './data/useCollegeAggregateStats';
 
-interface Props {
-  label: string;
-  leftValue: number;
-  rightValue: number;
-  /** how to render the numeric value */
-  format: (n: number) => string;
-  /** When true, the smaller (non-zero) value wins. Default false. */
-  lowerWins?: boolean;
+const AMBER_WIN_VALUE = AMBER;
+
+export interface RowOutcome {
+  leftWinning: boolean;
+  rightWinning: boolean;
+  tied: boolean;
+  /** true when at least one side is missing -> no winner, no caption */
+  incomplete: boolean;
 }
 
-const AMBER_GRAD_START = '#D97706';
-const AMBER_GRAD_END = '#F7931E';
-const AMBER_WIN_VALUE = '#F7931E';
-const LOSING = '#AEB4BC';
-const BOTH_ZERO = 'rgba(15,23,42,0.05)';
+/** Single source of truth for who wins a head-to-head row. */
+export function resolveOutcome(
+  leftValue: number | null,
+  rightValue: number | null,
+  format: (n: number) => string,
+  lowerWins = false,
+): RowOutcome {
+  const base = { leftWinning: false, rightWinning: false, tied: false, incomplete: false };
+  if (leftValue == null || rightValue == null) return { ...base, incomplete: true };
 
-function TugStatInner({ label, leftValue, rightValue, format, lowerWins = false }: Props) {
-  const bothZero = leftValue <= 0 && rightValue <= 0;
+  if (format(leftValue) === format(rightValue)) return { ...base, tied: true };
 
-  let leftWinning = false;
-  let rightWinning = false;
-  if (!bothZero) {
-    if (lowerWins) {
-      // Only positive values compete under lowerWins; zero = "no data".
-      const l = leftValue > 0 ? leftValue : Infinity;
-      const r = rightValue > 0 ? rightValue : Infinity;
-      leftWinning = l < r;
-      rightWinning = r < l;
-    } else {
-      leftWinning = leftValue > rightValue;
-      rightWinning = rightValue > leftValue;
-    }
+  if (lowerWins) {
+    return { ...base, leftWinning: leftValue < rightValue, rightWinning: rightValue < leftValue };
   }
+  return { ...base, leftWinning: leftValue > rightValue, rightWinning: rightValue > leftValue };
+}
 
-  // Tug bar proportions.
+function stripSign(s: string): string {
+  return s.replace(/^\+/, '').replace(/^-/, '');
+}
+
+function valueStyle(color: string, align: 'left' | 'right') {
+  return {
+    fontSize: 16,
+    fontWeight: 800,
+    color,
+    letterSpacing: '-0.02em',
+    fontVariantNumeric: 'tabular-nums' as const,
+    textAlign: align,
+  };
+}
+
+const LABEL_STYLE = {
+  fontSize: 10,
+  fontWeight: 800,
+  color: INK_FAINT,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase' as const,
+  textAlign: 'center' as const,
+  whiteSpace: 'nowrap' as const,
+};
+
+function useMarginCaption(
+  outcome: RowOutcome,
+  leftValue: number | null,
+  rightValue: number | null,
+  format: (n: number) => string,
+  leftName: string,
+  rightName: string,
+): string | null {
+  const { t } = useTranslation('tourhub');
+  if (outcome.incomplete) return null;
+  if (outcome.tied) return t('college.compare.tied');
+  if (leftValue == null || rightValue == null) return null;
+  // For plain numeric formats (70.80) the margin is taken from the DISPLAYED
+  // values so the caption can never disagree with the two numbers above it.
+  // Formats that scale or add units ($24.6M, 309.6 yds) keep the raw diff.
+  const PLAIN = /^[+-]?\d+(\.\d+)?$/;
+  const plain = PLAIN.test(format(leftValue).trim()) && PLAIN.test(format(rightValue).trim());
+  const val = (n: number) => (plain ? Number.parseFloat(format(n)) : n);
+  const margin = stripSign(format(Math.abs(val(leftValue) - val(rightValue))));
+
+
+  const name = outcome.leftWinning ? leftName : rightName;
+  if (!name) return null;
+  return t('college.compare.marginBy', { name, margin });
+}
+
+interface SharedProps {
+  label: string;
+  leftValue: number | null;
+  rightValue: number | null;
+  format: (n: number) => string;
+  lowerWins?: boolean;
+  leftName: string;
+  rightName: string;
+}
+
+// ---------------------------------------------------------------------------
+// CountStatRow - tug bar retained.
+// ---------------------------------------------------------------------------
+
+function CountStatRowInner({
+  label,
+  leftValue,
+  rightValue,
+  format,
+  lowerWins = false,
+  leftName,
+  rightName,
+}: SharedProps) {
+  const outcome = resolveOutcome(leftValue, rightValue, format, lowerWins);
+  const caption = useMarginCaption(outcome, leftValue, rightValue, format, leftName, rightName);
+
+  const l = leftValue ?? 0;
+  const r = rightValue ?? 0;
   let leftFrac = 0.5;
-  if (!bothZero) {
+  if (!outcome.incomplete) {
     if (lowerWins) {
-      // Invert magnitudes so the smaller value shows the longer bar.
-      const l = leftValue > 0 ? 1 / leftValue : 0;
-      const r = rightValue > 0 ? 1 / rightValue : 0;
-      const t = l + r;
-      leftFrac = t > 0 ? l / t : 0.5;
+      const li = l !== 0 ? 1 / Math.abs(l) : 0;
+      const ri = r !== 0 ? 1 / Math.abs(r) : 0;
+      const t = li + ri;
+      leftFrac = t > 0 ? li / t : 0.5;
     } else {
-      const t = leftValue + rightValue;
-      leftFrac = t > 0 ? leftValue / t : 0.5;
+      const t = Math.abs(l) + Math.abs(r);
+      leftFrac = t > 0 ? Math.abs(l) / t : 0.5;
     }
   }
   const rightFrac = 1 - leftFrac;
 
-  const leftBg = bothZero
-    ? BOTH_ZERO
-    : leftWinning
-    ? `linear-gradient(90deg, ${AMBER_GRAD_START} 0%, ${AMBER_GRAD_END} 100%)`
-    : LOSING;
-  const rightBg = bothZero
-    ? BOTH_ZERO
-    : rightWinning
-    ? `linear-gradient(270deg, ${AMBER_GRAD_START} 0%, ${AMBER_GRAD_END} 100%)`
-    : LOSING;
-
-  const leftColor = bothZero ? INK : leftWinning ? AMBER_WIN_VALUE : INK;
-  const rightColor = bothZero ? INK : rightWinning ? AMBER_WIN_VALUE : INK;
-
-  const hasLeft = leftValue > 0 || (!lowerWins && leftValue !== 0);
-  const hasRight = rightValue > 0 || (!lowerWins && rightValue !== 0);
-
   return (
-    <div style={{ padding: '12px 16px 12px', fontFamily: FONT }}>
+    <div style={{ padding: '14px 16px', fontFamily: FONT }}>
       <div
         style={{
           display: 'grid',
@@ -100,46 +165,16 @@ function TugStatInner({ label, leftValue, rightValue, format, lowerWins = false 
           marginBottom: 8,
         }}
       >
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 200,
-            color: leftColor,
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
-            textAlign: 'left',
-          }}
-        >
-          {format(leftValue)}
+        <div style={valueStyle(outcome.leftWinning ? AMBER_WIN_VALUE : INK, 'left')}>
+          {leftValue == null ? '' : format(leftValue)}
         </div>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            color: INK_MUTE,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            textAlign: 'center',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {label}
-        </div>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 200,
-            color: rightColor,
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
-            textAlign: 'right',
-          }}
-        >
-          {format(rightValue)}
+        <div style={LABEL_STYLE}>{label}</div>
+        <div style={valueStyle(outcome.rightWinning ? AMBER_WIN_VALUE : INK, 'right')}>
+          {rightValue == null ? '' : format(rightValue)}
         </div>
       </div>
 
-      {/* Tug bar */}
+      {/* Tug bar - flat fills, no gradients. */}
       <div style={{ display: 'flex', alignItems: 'center', height: 4, gap: 2 }}>
         <div
           aria-hidden
@@ -147,8 +182,8 @@ function TugStatInner({ label, leftValue, rightValue, format, lowerWins = false 
             width: `calc(${leftFrac * 100}% - 1px)`,
             height: 4,
             borderRadius: 2,
-            background: leftBg,
-            minWidth: bothZero ? 0 : hasLeft ? 4 : 0,
+            background: outcome.leftWinning ? AMBER : BAR_NEUTRAL,
+            minWidth: leftValue == null ? 0 : 4,
           }}
         />
         <div
@@ -157,14 +192,109 @@ function TugStatInner({ label, leftValue, rightValue, format, lowerWins = false 
             width: `calc(${rightFrac * 100}% - 1px)`,
             height: 4,
             borderRadius: 2,
-            background: rightBg,
-            minWidth: bothZero ? 0 : hasRight ? 4 : 0,
+            background: outcome.rightWinning ? AMBER : BAR_NEUTRAL,
+            minWidth: rightValue == null ? 0 : 4,
           }}
         />
       </div>
+
+      {caption && (
+        <div style={{ ...LABEL_STYLE, marginTop: 8, whiteSpace: 'normal' }}>{caption}</div>
+      )}
     </div>
   );
 }
 
-export const TugStat = memo(TugStatInner);
-export default TugStat;
+export const CountStatRow = memo(CountStatRowInner);
+
+// ---------------------------------------------------------------------------
+// AverageStatRow - no bar, coverage instead.
+// ---------------------------------------------------------------------------
+
+interface AverageProps {
+  label: string;
+  left: CollegeAggregate | null;
+  right: CollegeAggregate | null;
+  format: (n: number) => string;
+  lowerWins?: boolean;
+  leftName: string;
+  rightName: string;
+}
+
+function Coverage({
+  aggregate,
+  align,
+}: {
+  aggregate: CollegeAggregate | null;
+  align: 'left' | 'right';
+}) {
+  const { t } = useTranslation('tourhub');
+  if (!aggregate?.coverage) return null;
+  return (
+    <div
+      style={{
+        marginTop: 3,
+        fontSize: 9,
+        fontWeight: 800,
+        color: INK_FAINT,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        fontVariantNumeric: 'tabular-nums',
+        textAlign: align,
+      }}
+    >
+      {t('college.compare.coverage', {
+        with: aggregate.coverage.with,
+        total: aggregate.coverage.total,
+      })}
+    </div>
+  );
+}
+
+function AverageStatRowInner({
+  label,
+  left,
+  right,
+  format,
+  lowerWins = false,
+  leftName,
+  rightName,
+}: AverageProps) {
+  const leftValue = left ? left.value : null;
+  const rightValue = right ? right.value : null;
+  const outcome = resolveOutcome(leftValue, rightValue, format, lowerWins);
+  const caption = useMarginCaption(outcome, leftValue, rightValue, format, leftName, rightName);
+
+  return (
+    <div style={{ padding: '14px 16px', fontFamily: FONT }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          alignItems: 'flex-start',
+          gap: 10,
+        }}
+      >
+        <div>
+          <div style={valueStyle(outcome.leftWinning ? AMBER_WIN_VALUE : INK, 'left')}>
+            {leftValue == null ? '' : format(leftValue)}
+          </div>
+          <Coverage aggregate={left} align="left" />
+        </div>
+        <div style={{ ...LABEL_STYLE, paddingTop: 5 }}>{label}</div>
+        <div>
+          <div style={valueStyle(outcome.rightWinning ? AMBER_WIN_VALUE : INK, 'right')}>
+            {rightValue == null ? '' : format(rightValue)}
+          </div>
+          <Coverage aggregate={right} align="right" />
+        </div>
+      </div>
+
+      {caption && (
+        <div style={{ ...LABEL_STYLE, marginTop: 8, whiteSpace: 'normal' }}>{caption}</div>
+      )}
+    </div>
+  );
+}
+
+export const AverageStatRow = memo(AverageStatRowInner);
