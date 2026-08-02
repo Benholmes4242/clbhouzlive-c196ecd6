@@ -144,7 +144,9 @@ export function usePlayersRanking(tour: PlayersTourId) {
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
-          .select('player_id, fedex_points, fedex_rank, wins, top_10s, events_played')
+          .select(
+            'player_id, fedex_points, fedex_rank, wins, top_10s, events_played, scoring_average, driving_distance, driving_accuracy, greens_in_reg, putting_average, strokes_gained_putting',
+          )
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
@@ -171,8 +173,15 @@ export function usePlayersRanking(tour: PlayersTourId) {
             stat: s.fedex_points != null ? Number(s.fedex_points) : null,
             wins: s.wins ?? null,
             top10s: s.top_10s ?? null,
+            scoringAvg: num(s.scoring_average),
+            drivingDistance: num(s.driving_distance),
+            drivingAccuracy: num(s.driving_accuracy),
+            gir: num(s.greens_in_reg),
+            puttingAverage: num(s.putting_average),
+            sgPutting: num(s.strokes_gained_putting),
           };
         });
+
         rows = [...rows].sort((a, b) => a.rank - b.rank);
         return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
