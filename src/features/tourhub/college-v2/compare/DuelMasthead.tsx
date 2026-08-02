@@ -16,15 +16,15 @@
  */
 
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { YearbookStanding } from '@/features/tourhub/college-v2/hub/data/useFranchiseStandings';
 import {
   AMBER,
   CHARCOAL,
   FONT,
   GOLD,
-  STATUS_LIVE,
-  WHITE_ALPHA_18,
-  WHITE_ALPHA_55,
+  STATUS_LIVE_ON_DARK,
+  WHITE_ALPHA_30,
   WHITE_ALPHA_65,
 } from '@/features/tourhub/_shared/tokens';
 
@@ -48,6 +48,7 @@ function Column({
   live: number;
   onChange: () => void;
 }) {
+  const { t } = useTranslation('tourhub');
   const isTop = standing?.rank === 1;
   const name = standing?.shortName || standing?.collegeName || 'Pick a school';
 
@@ -127,17 +128,17 @@ function Column({
         style={{
           fontSize: 12,
           fontWeight: 700,
-          color: live > 0 ? STATUS_LIVE : WHITE_ALPHA_65,
+          color: WHITE_ALPHA_65,
           letterSpacing: '0.02em',
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
         }}
       >
-        {standing?.rank ? `No.${standing.rank}` : 'Unranked'}
+        {standing?.rank ? `No.${standing.rank}` : t('college.compare.unranked')}
         {live > 0 && (
           <>
-            <span style={{ color: WHITE_ALPHA_55, margin: '0 5px' }}>{'\u00B7'}</span>
-            <span>{live} live</span>
+            <span style={{ color: WHITE_ALPHA_30, margin: '0 5px' }}>{'\u00B7'}</span>
+            <span style={{ color: STATUS_LIVE_ON_DARK }}>{live} live</span>
           </>
         )}
       </div>
@@ -149,26 +150,27 @@ function Column({
         style={{
           marginTop: 2,
           fontFamily: FONT,
-          height: 22,
-          padding: '0 10px',
+          height: 30,
+          padding: '0 14px',
           borderRadius: 999,
           background: 'transparent',
-          border: `0.75px solid ${WHITE_ALPHA_18}`,
+          border: '0.75px solid rgba(255,255,255,0.28)',
           color: '#FFFFFF',
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 800,
-          letterSpacing: '0.08em',
+          letterSpacing: '0.13em',
           textTransform: 'uppercase',
           cursor: 'pointer',
         }}
       >
-        Change
+        {t('college.compare.change')}
       </button>
     </div>
   );
 }
 
 function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onChangeRight }: Props) {
+  const { t } = useTranslation('tourhub');
   return (
     <div
       style={{
@@ -196,7 +198,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
           marginBottom: 16,
         }}
       >
-        Head to Head
+        {t('college.compare.headToHead')}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
