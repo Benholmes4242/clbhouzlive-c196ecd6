@@ -1,30 +1,29 @@
 /**
- * SeasonCards — "This Season" grid of four stat cards.
+ * SeasonCards - "This Season" stat group.
+ *
+ * Four stats about ONE player, so this is a stat group and not a card rail:
+ * centred label-above-figure cells, no surface, no border, no radius.
  *
  * When useSinglePlayerStatistics has a row: TOP 10s / WINS / SCORING /
- * EARNINGS + 'All stats >' opens the StatsSheet. When the row is
- * missing (euro/LPGA sync gaps): derive EVENTS / BEST FINISH /
- * MADE CUTS from the leaderboard rows and drop the sheet action.
- * Per-field null discipline: cards with no derivable value are
- * omitted rather than shown as dashes.
+ * EARNINGS + the quiet 'All stats' action opens the StatsSheet. When the row
+ * is missing (euro/LPGA sync gaps): derive EVENTS / BEST FINISH / MADE CUTS
+ * from the leaderboard rows and drop the sheet action.
+ * Per-field null discipline: cards with no derivable value are omitted rather
+ * than shown as dashes.
+ *
+ * Money goes through the single shared formatter (_shared/formatEarnings) so a
+ * player's earnings and his college's earnings read identically.
  */
 
 import { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { PlayerTournamentResult } from '../../hooks/usePlayerResults';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { StatsSheet } from '../StatsSheet';
-import { formatCurrencyUsd } from '@/i18n/format';
-import {
-  HAIRLINE_INK_8,
-  INK,
-  INK_FAINT,
-  INK_TINT_07,
-  SLATE_50,
-  SURFACE,
-} from '../../_shared/tokens';
+import { formatEarnings } from '../../_shared/formatEarnings';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { AMBER_DEEP, INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 
 interface SeasonCardsProps {
   playerStats: TourPlayerStatistics | null;
@@ -38,12 +37,6 @@ interface Card {
   value: string;
 }
 
-function fmtCompactMoney(n: number): string {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return formatCurrencyUsd(n);
-}
-
 function fromStats(s: TourPlayerStatistics, t: TFunction): Card[] {
   const cards: Card[] = [];
   if (typeof s.top_10s === 'number' && s.top_10s >= 0)
@@ -53,7 +46,7 @@ function fromStats(s: TourPlayerStatistics, t: TFunction): Card[] {
   if (typeof s.scoring_average === 'number' && s.scoring_average > 0)
     cards.push({ key: 'scoring', label: t('player.season.card.scoring'), value: s.scoring_average.toFixed(1) });
   if (typeof s.earnings === 'number' && s.earnings > 0)
-    cards.push({ key: 'earnings', label: t('player.season.card.earnings'), value: fmtCompactMoney(s.earnings) });
+    cards.push({ key: 'earnings', label: t('player.season.card.earnings'), value: formatEarnings(s.earnings) });
   return cards;
 }
 
@@ -90,15 +83,14 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
 
   if (cards.length === 0) return null;
 
+  const openSheet = () => {
+    setSheetOpen(true);
+    void analyticsEvents.track('tour_player_stats_opened', { player_id: player.id });
+  };
+
   return (
-    <section
-      style={{
-        background: SLATE_50,
-        padding: '16px 0 14px',
-        borderTop: `0.5px solid ${INK_TINT_07}`,
-      }}
-    >
-      {/* Eyebrow row */}
+    <section style={{ background: SLATE_50, padding: '16px 0 14px' }}>
+      {/* Kicker row */}
       <div
         style={{
           padding: '0 16px 12px',
@@ -111,9 +103,9 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
           style={{
             margin: 0,
             fontSize: 10,
-            fontWeight: 800,
-            color: INK_FAINT,
-            letterSpacing: '0.14em',
+            fontWeight: 700,
+            color: AMBER_DEEP,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
         >
@@ -122,66 +114,65 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
         {hasStats && (
           <button
             type="button"
-            onClick={() => setSheetOpen(true)}
+            onClick={openSheet}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 2,
-              fontSize: 11,
+              gap: 4,
+              fontSize: 9,
               fontWeight: 800,
-              color: INK,
+              letterSpacing: '0.13em',
+              textTransform: 'uppercase',
+              color: AMBER_DEEP,
               background: 'transparent',
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              letterSpacing: '-0.005em',
             }}
             className="active:opacity-60 transition-opacity"
           >
             {t('player.season.allStats')}
-            <ChevronRight size={14} strokeWidth={2.4} />
+            <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
+              {'\u203a'}
+            </span>
           </button>
         )}
       </div>
 
-      {/* Card grid */}
-      <div style={{ padding: '0 16px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(cards.length, 4)}, 1fr)`, gap: 8 }}>
+      {/* Stat group */}
+      <div
+        style={{
+          padding: '0 16px',
+          display: 'grid',
+          gridTemplateColumns: `repeat(${Math.min(cards.length, 4)}, 1fr)`,
+          gap: 8,
+        }}
+      >
         {cards.map((c) => (
-          <div
-            key={c.key}
-            style={{
-              background: SURFACE,
-              borderRadius: 12,
-              padding: '12px 10px 12px',
-              border: `0.5px solid ${HAIRLINE_INK_8}`,
-              minWidth: 0,
-            }}
-          >
+          <div key={c.key} style={{ minWidth: 0, textAlign: 'center' as const }}>
             <div
               style={{
-                fontSize: 19,
-                fontWeight: 200,
-                letterSpacing: '-0.02em',
-                color: INK,
-                lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {c.value}
-            </div>
-            <div
-              style={{
-                marginTop: 8,
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: 800,
                 color: INK_FAINT,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.13em',
+                textTransform: 'uppercase',
               }}
             >
               {c.label}
+            </div>
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 21,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: INK,
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {c.value}
             </div>
           </div>
         ))}
