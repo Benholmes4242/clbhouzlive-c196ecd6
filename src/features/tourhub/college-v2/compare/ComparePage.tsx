@@ -118,8 +118,10 @@ export function ComparePage() {
   const { data: liveMap = {} } = useLivePlayerIds();
   const { data: leftWeek = [] } = useThisWeekAlumni(c1 || undefined);
   const { data: rightWeek = [] } = useThisWeekAlumni(c2 || undefined);
-  const { data: leftAgg } = useCollegeAggregateStats(c1 || undefined);
-  const { data: rightAgg } = useCollegeAggregateStats(c2 || undefined);
+  const { data: leftAgg, isLoading: leftAggLoading } = useCollegeAggregateStats(c1 || undefined);
+  const { data: rightAgg, isLoading: rightAggLoading } = useCollegeAggregateStats(c2 || undefined);
+  const { t } = useTranslation('tourhub');
+
 
   const leftWeekByPlayer = useMemo(() => {
     const m = new Map<string, WeekAlumnusRow>();
