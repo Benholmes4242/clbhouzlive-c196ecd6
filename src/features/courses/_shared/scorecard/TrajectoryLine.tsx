@@ -131,7 +131,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
             key={b.i}
             cx={x(b.i)}
             cy={y(b.cum)}
-            r={b.big ? 5 : 3.6}
+            r={b.r}
             fill={b.tone}
             stroke="#FFFFFF"
             strokeWidth={1.5}
