@@ -56,15 +56,12 @@ export function CourseSection({ tournamentId }: Props) {
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
-  const topMaxAbs = Math.max(0.01, Math.abs(hardest.avg_to_par), Math.abs(easiest.avg_to_par));
 
   return (
     <>
       <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
-      <div style={{ display: 'flex', gap: 12, padding: '0 16px 4px' }}>
-        <FeatureMini tone="hard" h={hardest} maxAbs={topMaxAbs} />
-        <FeatureMini tone="easy" h={easiest} maxAbs={topMaxAbs} />
-      </div>
+      <FeaturePair hardest={hardest} easiest={easiest} />
+
       <HolesSheet
         open={open}
         onClose={() => setOpen(false)}
