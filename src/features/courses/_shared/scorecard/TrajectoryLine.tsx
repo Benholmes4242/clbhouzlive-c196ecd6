@@ -1,6 +1,6 @@
 import React from 'react';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { beadForScore } from '@/features/courses/_shared/beadForScore';
 
 /**
  * Cumulative to-par across the round.
@@ -51,7 +51,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
   let cumField = 0;
   const you: number[] = [];
   const field: number[] = [];
-  const beads: { i: number; cum: number; tone: string; big: boolean }[] = [];
+  const beads: { i: number; cum: number; tone: string; r: number }[] = [];
 
   // The field series stops at the first hole with no field average — a live
   // tournament round gates holes the field has not finished, and interpolating
@@ -69,8 +69,8 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
       fieldOpen = false;
     }
 
-    if (d <= -1) beads.push({ i, cum: cumYou, tone: TOPAR_UNDER_LIGHT, big: d <= -2 });
-    else if (d >= 2) beads.push({ i, cum: cumYou, tone: TOPAR_OVER_LIGHT, big: false });
+    const bead = beadForScore(h.strokes, h.par, 'light');
+    if (bead) beads.push({ i, cum: cumYou, tone: bead.tone, r: bead.radius });
   });
 
   const hasField = field.length >= 2;
@@ -131,7 +131,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
             key={b.i}
             cx={x(b.i)}
             cy={y(b.cum)}
-            r={b.big ? 5 : 3.6}
+            r={b.r}
             fill={b.tone}
             stroke="#FFFFFF"
             strokeWidth={1.5}

@@ -20,12 +20,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Crown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
-import {
-  SC_FILL_GOLD,
-  SC_FILL_BIRDIE,
-  SC_FILL_BOGEY,
-  SC_FILL_DOUBLE,
-} from '@/features/courses/components/holes/_constants';
+import { beadForScore } from '@/features/courses/_shared/beadForScore';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 
@@ -144,19 +139,15 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
 };
 
 const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
+  // Beads come from the shared beadForScore helper — one rule across the sheet
+  // trajectory and this one (CORRECTION_ONE_SCORING_MARK §5).
   const pts = useMemo(() => {
     let cum = 0;
-    const out: { cum: number; kind: 'eagle' | 'birdie' | 'bogey' | 'double' | null }[] = [];
+    const out: { cum: number; bead: { tone: string; radius: number } | null }[] = [];
     for (const h of holes) {
       if (h.gross == null || h.par == null) continue;
-      const d = h.gross - h.par;
-      cum += d;
-      let kind: 'eagle' | 'birdie' | 'bogey' | 'double' | null = null;
-      if (d <= -2) kind = 'eagle';
-      else if (d === -1) kind = 'birdie';
-      else if (d === 1) kind = 'bogey';
-      else if (d >= 2) kind = 'double';
-      out.push({ cum, kind });
+      cum += h.gross - h.par;
+      out.push({ cum, bead: beadForScore(h.gross, h.par, 'dark') });
     }
     return out;
   }, [holes]);
@@ -173,15 +164,6 @@ const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
   const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 10);
   const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)},${y(p.cum).toFixed(1)}`).join(' ');
   const final = pts[pts.length - 1].cum;
-
-  const fillFor = (kind: NonNullable<(typeof pts)[number]['kind']>) =>
-    kind === 'eagle'
-      ? SC_FILL_GOLD
-      : kind === 'birdie'
-        ? SC_FILL_BIRDIE
-        : kind === 'bogey'
-          ? SC_FILL_BOGEY
-          : SC_FILL_DOUBLE;
 
   return (
     <div
@@ -229,7 +211,17 @@ const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
           strokeLinecap="round"
         />
         {pts.map((p, i) =>
-          p.kind ? <circle key={i} cx={x(i)} cy={y(p.cum)} r="3.2" fill={fillFor(p.kind)} /> : null,
+          p.bead ? (
+            <circle
+              key={i}
+              cx={x(i)}
+              cy={y(p.cum)}
+              r={p.bead.radius}
+              fill={p.bead.tone}
+              stroke="#0B0D10"
+              strokeWidth={1.5}
+            />
+          ) : null,
         )}
       </svg>
     </div>
