@@ -283,14 +283,15 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Type scale mirrors CoursesPageHero: 10/800 eyebrow, 18.5 title. */}
           <div
             style={{
               fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: GOLD,
-              marginBottom: 10,
+              marginBottom: 8,
               lineHeight: 1,
             }}
           >
@@ -298,10 +299,10 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: 18.5,
               fontWeight: 800,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.15,
               color: '#FFFFFF',
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -341,14 +342,15 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             </div>
           ) : null}
 
-          {/* Story line - absent story renders nothing at all */}
+          {/* Story line - absent story renders nothing at all.
+              Sized as the Courses hero fact line (12.5). */}
           {storyLine ? (
             <div
               style={{
                 marginTop: 10,
-                fontSize: 13.5,
+                fontSize: 12.5,
                 lineHeight: 1.45,
-                maxWidth: 330,
+                maxWidth: 340,
                 color: 'rgba(255,255,255,0.9)',
               }}
             >
@@ -366,7 +368,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             }}
           >
             <SquircleAvatar
-              size={24}
+              size={20}
               src={story.holder_avatar}
               alt={holder}
               fallback={initials(holder)}
@@ -375,7 +377,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             />
             <span
               style={{
-                fontSize: 12,
+                fontSize: 11.5,
                 fontWeight: 600,
                 color: '#FFFFFF',
                 whiteSpace: 'nowrap',
@@ -389,7 +391,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             {story.happened_at ? (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.60)',
                   whiteSpace: 'nowrap',
@@ -402,7 +404,8 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           </div>
 
           {showCta ? (
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 12 }}>
+              {/* Same pill as the Courses hero CTA: 12/800, 9x15. */}
               <button
                 type="button"
                 onClick={handleCta}
@@ -410,8 +413,9 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                 style={{
                   background: '#FFFFFF',
                   color: '#15171F',
-                  fontSize: 13.5,
-                  fontWeight: 700,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '-0.005em',
                   padding: '9px 15px',
                   borderRadius: 999,
                   border: 'none',
@@ -438,10 +442,11 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             className="tabular-nums"
             style={{
-              fontSize: 56,
+              // 39 is the Courses hero rank figure.
+              fontSize: 39,
               fontWeight: 800,
-              letterSpacing: '-0.035em',
-              lineHeight: 0.9,
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
               color: bigColor,
             }}
           >
