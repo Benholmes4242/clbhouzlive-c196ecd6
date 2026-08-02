@@ -1,33 +1,30 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
   A,
+  Action,
   FIGS,
   LABEL,
   Panel,
   SANS,
   TITLE,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { groupWireEvents, type WireEvent, type WireGroupId } from '../hooks/useDiscoverWire';
+import { formatMonthLongGB, formatMonthYearLongGB, formatNumber } from '@/i18n/format';
+import { groupWireByMonth, type WireEvent } from '../hooks/useDiscoverWire';
 import { WireRow } from './WireRow';
 
 /**
- * TheWire — day-grouped panels, paginated in place.
+ * TheWire — calendar-month panels over a 90-day horizon
+ * (BRIEF_DISCOVER_REBUILD §1).
  *
- * Ten events per page behind an IntersectionObserver sentinel, guarded on
- * `isPaging`, reset to page 1 on any scope change (or the list appends one
- * region's events under another region's headers). The sentinel unmounts when
- * the source is exhausted and a quiet end marker takes its place.
+ * Paging lives INSIDE each panel: four events, then an inline "Show n more"
+ * that expands that month only and never collapses again. At roughly a dozen
+ * events a month, infinite scroll was machinery for a problem that does not
+ * exist — and it is what let eighty rows land in one panel.
  */
 
-const PAGE_SIZE = 10;
-
-const GROUP_DEFAULTS: Record<WireGroupId, { key: string; en: string }> = {
-  today: { key: 'discover.groupToday', en: 'Today' },
-  thisWeek: { key: 'discover.groupThisWeek', en: 'This week' },
-  earlier: { key: 'discover.groupEarlier', en: 'Earlier' },
-};
+const INITIAL_PER_MONTH = 4;
 
 /** Flat row placeholder. An empty state is a claim about the data; while a
  *  query is in flight the surface shows a skeleton instead. */
@@ -53,52 +50,33 @@ function WireSkeleton() {
 interface Props {
   events: WireEvent[];
   isLoading: boolean;
-  /** Any change resets pagination. */
+  /** Any change resets expansion. */
   scopeKey: string;
-  /** Rendered after the first day group. */
+  /** Rendered after the first month group. */
   newsSlot?: React.ReactNode;
   onRowPress: (event: WireEvent) => void;
-  onLoadedChange?: (count: number) => void;
+  onMonthExpand?: (month: string, revealed: number) => void;
 }
 
-export function TheWire({ events, isLoading, scopeKey, newsSlot, onRowPress, onLoadedChange }: Props) {
+export function TheWire({ events, isLoading, scopeKey, newsSlot, onRowPress, onMonthExpand }: Props) {
   const { t } = useTranslation('courses');
-  const [page, setPage] = useState(1);
-  const isPaging = useRef(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // Scope change resets to page 1.
-  useEffect(() => {
-    setPage(1);
-  }, [scopeKey]);
+  // A month name alone for the current year; the year only when it is history.
+  const labelFor = useCallback((year: number, monthIndex: number) => {
+    const d = new Date(year, monthIndex, 1);
+    return year === new Date().getFullYear() ? formatMonthLongGB(d) : formatMonthYearLongGB(d);
+  }, []);
 
-  const visible = useMemo(() => events.slice(0, page * PAGE_SIZE), [events, page]);
-  const exhausted = visible.length >= events.length;
+  const groups = useMemo(() => groupWireByMonth(events, labelFor), [events, labelFor]);
 
-  useEffect(() => {
-    onLoadedChange?.(visible.length);
-  }, [visible.length, onLoadedChange]);
-
-  useEffect(() => {
-    if (exhausted || isLoading) return;
-    const el = sentinelRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting || isPaging.current) return;
-        isPaging.current = true;
-        setPage((p) => p + 1);
-        window.setTimeout(() => {
-          isPaging.current = false;
-        }, 120);
-      },
-      { rootMargin: '320px 0px' },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [exhausted, isLoading, visible.length]);
-
-  const groups = useMemo(() => groupWireEvents(visible), [visible]);
+  const handleExpand = useCallback(
+    (id: string, revealed: number) => {
+      setExpanded((prev) => ({ ...prev, [id]: true }));
+      onMonthExpand?.(id, revealed);
+    },
+    [onMonthExpand],
+  );
 
   if (isLoading) return <WireSkeleton />;
 
@@ -122,41 +100,51 @@ export function TheWire({ events, isLoading, scopeKey, newsSlot, onRowPress, onL
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS, ...FIGS }}>
-      {groups.map((g, gi) => (
-        <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Panel>
-            <header
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'baseline',
-                gap: 12,
-                marginBottom: 2,
-              }}
-            >
-              <span style={TITLE}>{t(GROUP_DEFAULTS[g.id].key, GROUP_DEFAULTS[g.id].en)}</span>
-              <span style={LABEL}>
-                {t('discover.eventCount', {
-                  defaultValue: '{{count}} events',
-                  count: g.events.length,
-                })}
-              </span>
-            </header>
-            {g.events.map((e) => (
-              <WireRow key={e.id} event={e} onPress={() => onRowPress(e)} />
-            ))}
-          </Panel>
-          {gi === 0 && newsSlot}
-        </div>
-      ))}
-
-      {exhausted ? (
-        <div style={{ textAlign: 'center', padding: '6px 0 2px' }}>
-          <span style={LABEL}>{t('discover.endOfWire', 'You are up to date')}</span>
-        </div>
-      ) : (
-        <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
-      )}
+      {groups.map((g, gi) => {
+        const key = `${scopeKey}:${g.id}`;
+        const isOpen = !!expanded[key];
+        const visible = isOpen ? g.events : g.events.slice(0, INITIAL_PER_MONTH);
+        const hidden = g.events.length - visible.length;
+        return (
+          <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Panel>
+              <header
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  gap: 12,
+                  marginBottom: 2,
+                }}
+              >
+                <span style={TITLE}>{g.label}</span>
+                <span style={LABEL}>
+                  {t('discover.nFeats', {
+                    defaultValue: '{{value}} feats',
+                    count: g.events.length,
+                    value: formatNumber(g.events.length),
+                  })}
+                </span>
+              </header>
+              {visible.map((e) => (
+                <WireRow key={e.id} event={e} onPress={() => onRowPress(e)} />
+              ))}
+              {hidden > 0 && (
+                <Action
+                  label={t('discover.showNMore', {
+                    defaultValue: 'Show {{value}} more',
+                    count: hidden,
+                    value: formatNumber(hidden),
+                  })}
+                  onClick={() => handleExpand(key, hidden)}
+                  style={{ marginTop: 6 }}
+                />
+              )}
+            </Panel>
+            {gi === 0 && newsSlot}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -31,7 +31,7 @@ export type WireKind = 'crown' | 'ace' | 'albatross' | 'eagle' | 'birdie_haul';
 export interface WireEvent {
   id: string;
   kind: WireKind;
-  /** ISO date or timestamp. Sorting and day-grouping key. */
+  /** ISO date or timestamp. Sorting and month-grouping key. */
   at: string;
   actorName: string;
   actorAvatar: string | null;
@@ -40,7 +40,11 @@ export interface WireEvent {
   courseId: string | null;
   courseName: string | null;
   courseImage: string | null;
-  /** Only the genuinely rare is tagged: hole in one and albatross. */
+  /**
+   * Rarity tag. Aces and albatrosses have left the wire for "Rarest of all"
+   * (BRIEF_DISCOVER_REBUILD §2.1), so nothing in the month groups is tagged
+   * unless a records-rail kind is ever found to be materially rarer.
+   */
   tagKey?: 'ace' | 'albatross';
   actionKey: string;
   actionParams?: Record<string, string | number>;
@@ -51,7 +55,12 @@ export interface WireEvent {
   figureTone?: string;
   /** 3 = ace/albatross, 2 = record/crown, 1 = eagle/birdie haul. News dedupe. */
   rarity: 1 | 2 | 3;
+  /** Legendary rows only — hole context for the "Rarest of all" panel. */
+  holeNo?: number | null;
+  holePar?: number | null;
+  holeYards?: number | null;
 }
+
 
 export const ACTION_DEFAULTS: Record<string, string> = {
   'discover.wire.action.crown': 'Took {{category}}',
@@ -220,8 +229,12 @@ function legendaryEvent(row: FeatRow, index: number, userId?: string): WireEvent
       ...(yards != null ? { yards: formatNumber(yards) } : {}),
     },
     rarity: 3,
+    holeNo: hole,
+    holePar: row.hole_par ?? null,
+    holeYards: yards,
   };
 }
+
 
 function eagleEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
   const at = whenOf(row);
@@ -252,8 +265,22 @@ function birdieHaulEvent(row: FeatRow, index: number, userId?: string): WireEven
 }
 
 export interface DiscoverWireResult {
+  /** Inside the 90-day horizon, newest first. Legendary events excluded. */
   events: WireEvent[];
+  /** All-time aces and albatrosses — rarity first, then newest. Not windowed. */
+  legendary: WireEvent[];
   isLoading: boolean;
+}
+
+const DAY_MS = 86_400_000;
+
+/** The one horizon on the page (BRIEF_DISCOVER_REBUILD §0.1). */
+export const WIRE_HORIZON_DAYS = 90;
+
+export function withinHorizon(iso: string | null | undefined): boolean {
+  const t = Date.parse(String(iso ?? ''));
+  if (Number.isNaN(t)) return false;
+  return t >= Date.now() - WIRE_HORIZON_DAYS * DAY_MS;
 }
 
 /**
@@ -268,21 +295,20 @@ export function useDiscoverWire(
 ): DiscoverWireResult {
   const live = { refetchOnWindowFocus: true };
   const records = useRegionFeats(region, 'records', 'latest', live);
-  const legendary = useRegionFeats(region, 'legendary', 'latest', live);
+  const legendaryRail = useRegionFeats(region, 'legendary', 'latest', live);
   const eagles = useRegionFeats(region, 'eagles', 'latest', live);
   const hauls = useRegionFeats(region, 'birdie_hauls', 'latest', live);
 
   const isLoading =
-    records.isLoading || legendary.isLoading || eagles.isLoading || hauls.isLoading;
+    records.isLoading || legendaryRail.isLoading || eagles.isLoading || hauls.isLoading;
 
+  // The records rail is NOT windowed server-side (191 rows against 190 all
+  // time), so the horizon is applied here or the month groups grow without
+  // bound as the platform does.
   const events = useMemo(() => {
     const out: WireEvent[] = [];
     (records.data ?? []).forEach((row, i) => {
       const e = crownEvent(row, i, userId, categoryLabel(row.category));
-      if (e) out.push(e);
-    });
-    (legendary.data ?? []).forEach((row, i) => {
-      const e = legendaryEvent(row, i, userId);
       if (e) out.push(e);
     });
     (eagles.data ?? []).forEach((row, i) => {
@@ -293,38 +319,62 @@ export function useDiscoverWire(
       const e = birdieHaulEvent(row, i, userId);
       if (e) out.push(e);
     });
-    out.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
-    return out;
-  }, [records.data, legendary.data, eagles.data, hauls.data, userId, categoryLabel]);
+    return out
+      .filter((e) => withinHorizon(e.at))
+      .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  }, [records.data, eagles.data, hauls.data, userId, categoryLabel]);
 
-  return { events, isLoading };
+  // Deliberately not windowed: history is the point of the panel.
+  const legendary = useMemo(() => {
+    const out: WireEvent[] = [];
+    (legendaryRail.data ?? []).forEach((row, i) => {
+      const e = legendaryEvent(row, i, userId);
+      if (e) out.push(e);
+    });
+    const rank = (e: WireEvent) => (e.kind === 'ace' ? 0 : 1);
+    return out.sort((a, b) => rank(a) - rank(b) || Date.parse(b.at) - Date.parse(a.at));
+  }, [legendaryRail.data, userId]);
+
+  return { events, legendary, isLoading };
 }
 
-export type WireGroupId = 'today' | 'thisWeek' | 'earlier';
-
-export interface WireGroup {
-  id: WireGroupId;
+export interface WireMonthGroup {
+  /** Stable "2026-07" key. Also the analytics `month` value. */
+  id: string;
+  /** Localised month name; the year only when it is not the current year. */
+  label: string;
   events: WireEvent[];
 }
 
-const DAY_MS = 86_400_000;
-
-/** Day grouping. A group with no events is not returned. */
-export function groupWireEvents(events: WireEvent[]): WireGroup[] {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const todayMs = startOfToday.getTime();
-  const buckets: Record<WireGroupId, WireEvent[]> = { today: [], thisWeek: [], earlier: [] };
+/**
+ * Calendar-month grouping, newest first. A month with no events is simply
+ * absent — at roughly a dozen events a month, day groups promised a daily
+ * rhythm the platform does not have.
+ */
+export function groupWireByMonth(
+  events: WireEvent[],
+  labelFor: (year: number, monthIndex: number) => string,
+): WireMonthGroup[] {
+  const buckets = new Map<string, { year: number; month: number; events: WireEvent[] }>();
   for (const e of events) {
     const t = Date.parse(e.at);
-    if (Number.isNaN(t)) buckets.earlier.push(e);
-    else if (t >= todayMs) buckets.today.push(e);
-    else if (t >= todayMs - 6 * DAY_MS) buckets.thisWeek.push(e);
-    else buckets.earlier.push(e);
+    if (Number.isNaN(t)) continue;
+    const d = new Date(t);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const id = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const bucket = buckets.get(id) ?? { year, month, events: [] };
+    bucket.events.push(e);
+    buckets.set(id, bucket);
   }
-  return (['today', 'thisWeek', 'earlier'] as WireGroupId[])
-    .filter((id) => buckets[id].length > 0)
-    .map((id) => ({ id, events: buckets[id] }));
+  return [...buckets.entries()]
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .map(([id, b]) => ({
+      id,
+      label: labelFor(b.year, b.month),
+      events: b.events.sort((x, y) => Date.parse(y.at) - Date.parse(x.at)),
+    }));
 }
 
 export const WIRE_TONE = { over: A.RED, under: A.GREEN } as const;
+

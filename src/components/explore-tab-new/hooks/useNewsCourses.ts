@@ -16,6 +16,10 @@ import type { WireEvent } from './useDiscoverWire';
 
 const DAY_MS = 86_400_000;
 const MAX_CARDS = 8;
+/** Matches the wire's horizon (BRIEF_DISCOVER_REBUILD §3). */
+const HORIZON_DAYS = 90;
+/** Two cards in a horizontal scroller looks broken. */
+export const MIN_NEWS_COURSES = 3;
 
 export interface NewsCourse {
   courseId: string;
@@ -24,6 +28,8 @@ export interface NewsCourse {
   image: string | null;
   /** The event that earned the course its place. */
   why: WireEvent;
+  /** Events at this course inside the horizon. Drives the "why" line. */
+  eventCount: number;
   rating: number | null;
   ratingCount: number;
 }
@@ -36,14 +42,16 @@ interface CourseFacts {
   ratingCount: number;
 }
 
-/** One event per course, most notable first. */
-function pickCourses(events: WireEvent[]): WireEvent[] {
-  const cutoff = Date.now() - 7 * DAY_MS;
+/** One event per course, most notable first, plus its in-window count. */
+function pickCourses(events: WireEvent[]): { best: WireEvent[]; counts: Map<string, number> } {
+  const cutoff = Date.now() - HORIZON_DAYS * DAY_MS;
   const best = new Map<string, WireEvent>();
+  const counts = new Map<string, number>();
   for (const e of events) {
     if (!e.courseId) continue;
     const t = Date.parse(e.at);
     if (Number.isNaN(t) || t < cutoff) continue;
+    counts.set(e.courseId, (counts.get(e.courseId) ?? 0) + 1);
     const current = best.get(e.courseId);
     if (
       !current ||
@@ -53,13 +61,16 @@ function pickCourses(events: WireEvent[]): WireEvent[] {
       best.set(e.courseId, e);
     }
   }
-  return [...best.values()]
-    .sort((a, b) => b.rarity - a.rarity || Date.parse(b.at) - Date.parse(a.at))
-    .slice(0, MAX_CARDS);
+  return {
+    best: [...best.values()]
+      .sort((a, b) => b.rarity - a.rarity || Date.parse(b.at) - Date.parse(a.at))
+      .slice(0, MAX_CARDS),
+    counts,
+  };
 }
 
 export function useNewsCourses(events: WireEvent[]) {
-  const picked = useMemo(() => pickCourses(events), [events]);
+  const { best: picked, counts } = useMemo(() => pickCourses(events), [events]);
   const ids = useMemo(() => picked.map((e) => e.courseId!).sort(), [picked]);
 
   const factsQuery = useQuery<Record<string, CourseFacts>>({
@@ -115,16 +126,17 @@ export function useNewsCourses(events: WireEvent[]) {
         place: f.place,
         image: f.image ?? e.courseImage,
         why: e,
+        eventCount: counts.get(e.courseId!) ?? 1,
         rating: f.rating,
         ratingCount: f.ratingCount,
       });
     }
     return out;
-  }, [picked, factsQuery.data]);
+  }, [picked, factsQuery.data, counts]);
 
   return {
     courses,
     isLoading: ids.length > 0 && factsQuery.isLoading,
-    hasCandidates: ids.length > 0,
+    hasCandidates: ids.length >= MIN_NEWS_COURSES,
   };
 }

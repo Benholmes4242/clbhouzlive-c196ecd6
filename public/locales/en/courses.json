@@ -1065,15 +1065,9 @@
       "ordinal_ordinal_other": "{{count}}th"
     },
     "kicker": "The amateur circuit",
-    "headline": "What just happened",
-    "subWorldwide": "Records, crowns and rare cards from official WHS rounds worldwide.",
-    "subScoped": "Records, crowns and rare cards from official WHS rounds in {{scope}}.",
-    "groupToday": "Today",
-    "groupThisWeek": "This week",
-    "groupEarlier": "Earlier",
+    "headline": "What's been happening",
     "eventCount_one": "{{count}} event",
     "eventCount_other": "{{count}} events",
-    "endOfWire": "You are up to date",
     "newsTitle": "Courses in the news",
     "browseAllCourses": "Browse all courses",
     "ratingCount_one": "{{value}} rating",
@@ -1109,7 +1103,20 @@
         "albatrosses": "albatrosses",
         "rounds": "rounds"
       }
-    }
+    },
+    "sub": "Eagles and birdie hauls from official WHS rounds, newest first.",
+    "showNMore_one": "Show {{value}} more",
+    "showNMore_other": "Show {{value}} more",
+    "nFeats_one": "{{value}} feat",
+    "nFeats_other": "{{value}} feats",
+    "nFeatsQuarter_one": "{{value}} feat this quarter",
+    "nFeatsQuarter_other": "{{value}} feats this quarter",
+    "rarestTitle": "Rarest of all",
+    "rarestIntro": "Every hole in one and albatross logged on clbhouz, from official WHS rounds.",
+    "nAllTime_one": "{{value}} all time",
+    "nAllTime_other": "{{value}} all time",
+    "rarestHole": "{{hole}}, par {{par}}",
+    "rarestHoleYards": "{{hole}}, par {{par}}, {{yards}} yds"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

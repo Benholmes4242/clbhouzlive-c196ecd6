@@ -7,10 +7,10 @@ import {
   SANS,
   TITLE,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { formatNumber } from '@/i18n/format';
+import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
 import { CourseCommunityRating } from '@/components/courses/CourseCommunityRating';
-import { ACTION_DEFAULTS, wireWhen } from '../hooks/useDiscoverWire';
-import type { NewsCourse } from '../hooks/useNewsCourses';
+import { ACTION_DEFAULTS } from '../hooks/useDiscoverWire';
+import { MIN_NEWS_COURSES, type NewsCourse } from '../hooks/useNewsCourses';
 
 /**
  * CoursesInTheNews — the photography returns here, and only here. Courses earn
@@ -53,7 +53,9 @@ function RailSkeleton() {
 export function CoursesInTheNews({ courses, isLoading, onCardPress, onBrowseAll }: Props) {
   const { t } = useTranslation('courses');
 
-  if (!isLoading && courses.length === 0) return null;
+  // Fewer than three distinct courses and the rail does not render: two cards
+  // in a horizontal scroller looks broken (BRIEF_DISCOVER_REBUILD §3.2).
+  if (!isLoading && courses.length < MIN_NEWS_COURSES) return null;
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
@@ -97,10 +99,24 @@ export function CoursesInTheNews({ courses, isLoading, onCardPress, onBrowseAll 
           style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}
         >
           {courses.map((c) => {
-            const why = t(c.why.actionKey, {
-              defaultValue: ACTION_DEFAULTS[c.why.actionKey] ?? '',
-              ...(c.why.actionParams ?? {}),
-            });
+            // Over a quarter the "why" line has to earn its place: one event
+            // names itself and its date, several become a count.
+            const why =
+              c.eventCount > 1
+                ? t('discover.nFeatsQuarter', {
+                    defaultValue: '{{value}} feats this quarter',
+                    count: c.eventCount,
+                    value: formatNumber(c.eventCount),
+                  })
+                : [
+                    t(c.why.actionKey, {
+                      defaultValue: ACTION_DEFAULTS[c.why.actionKey] ?? '',
+                      ...(c.why.actionParams ?? {}),
+                    }),
+                    formatDayMonthShortGB(c.why.at),
+                  ]
+                    .filter(Boolean)
+                    .join(', ');
             return (
               <article
                 key={c.courseId}
@@ -176,7 +192,7 @@ export function CoursesInTheNews({ courses, isLoading, onCardPress, onBrowseAll 
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {why} {'\u00B7'} {wireWhen(c.why.at)}
+                      {why}
                     </span>
                   )}
 
