@@ -580,6 +580,12 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           )}
           </div>
         </div>
+
+        {/* Clears the floating bottom nav; 0px where it hides. */}
+        <div
+          aria-hidden="true"
+          style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+        />
       </div>
 
       <Top100ListProgressSheet
