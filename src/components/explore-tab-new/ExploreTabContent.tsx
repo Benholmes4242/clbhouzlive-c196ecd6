@@ -208,6 +208,13 @@ export default function ExploreTabContent({
         <RarestOfAll events={legendary} onRowPress={handleRarestRow} />
 
         <YourCircle userId={userId} onRowPress={handleCircleRow} />
+
+        {/* Clears the floating bottom nav. Collapses to 16px on routes where
+            the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
+        <div
+          aria-hidden="true"
+          style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+        />
       </div>
 
       <RoundDetailSheet
