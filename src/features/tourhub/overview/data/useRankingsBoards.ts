@@ -8,6 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { movementFrom } from '../../_shared/movement';
 
 export type RankingsBoard = 'owgr' | 'r2d' | 'rolex';
 
@@ -22,10 +23,6 @@ export interface RankingsRow {
   movement: number | null; // positive = climbed, negative = fell
 }
 
-function movementFrom(rank: number, prior: number | null): number | null {
-  if (prior == null) return null;
-  return prior - rank;
-}
 
 async function fetchOwgr(): Promise<RankingsRow[]> {
   const { data, error } = await supabase

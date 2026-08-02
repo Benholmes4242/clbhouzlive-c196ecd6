@@ -1,5 +1,5 @@
 /**
- * usePlayersRanking — the Players ledger source of truth.
+ * usePlayersRanking - the Players ledger source of truth.
  *
  * Per-tour reality (measured against sr_player_statistics + tour_season_rankings):
  *   pga   -> sr_player_statistics (fedex_points DESC), stat label "FEDEX PTS"      [synced]
@@ -7,7 +7,13 @@
  *   lpga  -> tour_season_rankings (position ASC),      stat label "CME PTS"        [synced]
  *   pgad  -> tour_season_rankings (position ASC),      stat label "POINTS"         [synced]
  *   liv   -> tour_season_rankings (position ASC),      stat label "LIV PTS"        [synced]
- *   champ -> sr_world_rankings order via useElitePlayers pool                     [degrade]
+ *
+ * The Champions tour is NOT on this page (PlayersTab excludes it from the lens
+ * and rejects ?tour=champ), so the hook's parameter type excludes it. Whether
+ * Champions belongs here is a product question, not a wiring bug.
+ *
+ * DB tour_code values, for reference: pga -> 'pga', euro -> 'EURO',
+ * lpga -> 'LPGA', pgad -> 'PGAD', liv -> 'LIV'.
  *
  * Season is resolved deterministically by (tour_name, year) with a
  * generous limit and a probe: if the current year has no rows, walk
@@ -19,12 +25,13 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
 
+/** Tours this page can render. Champions is excluded by design. */
+export type PlayersTourId = Exclude<TourId, 'champ'>;
+
 export interface RankedRow {
   playerId: string;
   rank: number;
   name: string;
-  firstName: string;
-  lastName: string;
   country: string | null;
   countryCode: string | null;
   photoUrl: string | null;
@@ -32,7 +39,6 @@ export interface RankedRow {
   stat: number | null;
   wins: number | null;
   top10s: number | null;
-  tournamentsPlayed: number | null;
 }
 
 export interface RankingResult {
@@ -41,23 +47,13 @@ export interface RankingResult {
   rows: RankedRow[];
 }
 
-/** Maps tour → i18n key under `players.statLabel.*`. `champ` has no stat label. */
-const STAT_LABEL_KEY: Record<TourId, string | null> = {
+/** Maps tour -> i18n key under `players.statLabel.*`. */
+const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
   pga: 'players.statLabel.pga',
   euro: 'players.statLabel.euro',
   lpga: 'players.statLabel.lpga',
   pgad: 'players.statLabel.pgad',
   liv: 'players.statLabel.liv',
-  champ: null,
-};
-
-const DB_TOUR_NAME: Record<TourId, string[]> = {
-  pga: ['pga'],
-  euro: ['EURO'],
-  lpga: ['LPGA'],
-  pgad: ['PGAD'],
-  liv: ['LIV'],
-  champ: ['CHAMP'],
 };
 
 function currentSeasonYear(): number {
@@ -96,13 +92,10 @@ interface PgaStatRow {
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
-  earnings: number | string | null;
 }
 interface PlayerRow {
   id: string;
   full_name: string | null;
-  first_name: string | null;
-  last_name: string | null;
   country: string | null;
   country_code: string | null;
   photo_url: string | null;
@@ -115,17 +108,17 @@ interface TourSeasonRankingRow {
   position: number | null;
   points: number | string | null;
   wins: number | null;
-  tournaments_played: number | null;
   country: string | null;
   tour_code: string | null;
 }
 
-export function usePlayersRanking(tour: TourId) {
+const PLAYER_SELECT = 'id, full_name, country, country_code, photo_url, tour_codes';
+const SEASON_RANKING_SELECT =
+  'player_id, manual_player_id, player_name, position, points, wins, country, tour_code';
+
+export function usePlayersRanking(tour: PlayersTourId) {
   const { t, i18n } = useTranslation('tourhub');
-  const statLabelFor = (id: TourId): string | null => {
-    const key = STAT_LABEL_KEY[id];
-    return key ? t(key) : null;
-  };
+  const statLabelFor = (id: PlayersTourId): string => t(STAT_LABEL_KEY[id]);
   return useQuery<RankingResult>({
     queryKey: ['players-v2', 'ranking', tour, currentSeasonYear(), i18n.language],
     staleTime: 5 * 60_000,
@@ -136,7 +129,7 @@ export function usePlayersRanking(tour: TourId) {
         if (!seasonId) return { synced: false, statLabel: null, rows: [] };
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
-          .select('player_id, fedex_points, fedex_rank, wins, top_10s, events_played, earnings')
+          .select('player_id, fedex_points, fedex_rank, wins, top_10s, events_played')
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
@@ -146,7 +139,7 @@ export function usePlayersRanking(tour: TourId) {
         const playerIds = [...new Set(statsRows.map((s) => s.player_id))];
         const { data: players, error: playersErr } = await supabase
           .from('sr_players')
-          .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
+          .select(PLAYER_SELECT)
           .in('id', playerIds);
         if (playersErr) throw playersErr;
         const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
@@ -156,8 +149,6 @@ export function usePlayersRanking(tour: TourId) {
             playerId: s.player_id,
             rank: s.fedex_rank ?? i + 1,
             name: p?.full_name ?? 'Unknown',
-            firstName: p?.first_name ?? '',
-            lastName: p?.last_name ?? '',
             country: p?.country ?? null,
             countryCode: p?.country_code ?? null,
             photoUrl: p?.photo_url ?? null,
@@ -165,121 +156,68 @@ export function usePlayersRanking(tour: TourId) {
             stat: s.fedex_points != null ? Number(s.fedex_points) : null,
             wins: s.wins ?? null,
             top10s: s.top_10s ?? null,
-            tournamentsPlayed: s.events_played ?? null,
           };
         });
         rows = [...rows].sort((a, b) => a.rank - b.rank);
         return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
 
-      if (tour === 'euro' || tour === 'lpga' || tour === 'pgad' || tour === 'liv') {
-        const year = currentSeasonYear();
-        const primary = await supabase
+      const year = currentSeasonYear();
+      const primary = await supabase
+        .from('tour_season_rankings' as never)
+        .select(SEASON_RANKING_SELECT)
+        .eq('tour_code', tour)
+        .eq('season_year', year)
+        .order('position', { ascending: true })
+        .limit(400);
+      if (primary.error) throw primary.error;
+      let rankings = (primary.data ?? []) as unknown as TourSeasonRankingRow[];
+      if (!rankings.length) {
+        const alt = await supabase
           .from('tour_season_rankings' as never)
-          .select('player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code')
+          .select(SEASON_RANKING_SELECT)
           .eq('tour_code', tour)
-          .eq('season_year', year)
+          .eq('season_year', year - 1)
           .order('position', { ascending: true })
           .limit(400);
-        if (primary.error) throw primary.error;
-        let rankings = (primary.data ?? []) as unknown as TourSeasonRankingRow[];
-        if (!rankings.length) {
-          const alt = await supabase
-            .from('tour_season_rankings' as never)
-            .select('player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code')
-            .eq('tour_code', tour)
-            .eq('season_year', year - 1)
-            .order('position', { ascending: true })
-            .limit(400);
-          if (alt.error) throw alt.error;
-          rankings = (alt.data ?? []) as unknown as TourSeasonRankingRow[];
-        }
-        if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
-        const playerIds = [
-          ...new Set(
-            rankings
-              .map((r) => (r.player_id ?? r.manual_player_id) as string | null)
-              .filter((v): v is string => !!v),
-          ),
-        ];
-        let players: PlayerRow[] = [];
-        if (playerIds.length) {
-          const { data: pdata, error: playersErr } = await supabase
-            .from('sr_players')
-            .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
-            .in('id', playerIds);
-          if (playersErr) throw playersErr;
-          players = (pdata ?? []) as unknown as PlayerRow[];
-        }
-        const pmap = new Map(players.map((p) => [p.id, p]));
-        const rows: RankedRow[] = rankings.map((r) => {
-          const pid = (r.player_id ?? r.manual_player_id ?? '') as string;
-          const p = pid ? pmap.get(pid) : undefined;
-          const parts = (r.player_name ?? '').split(/\s+/);
-          return {
-            playerId: pid,
-            rank: r.position ?? 0,
-            name: p?.full_name ?? r.player_name ?? 'Unknown',
-            firstName: p?.first_name ?? parts[0] ?? '',
-            lastName: p?.last_name ?? parts.slice(1).join(' ') ?? '',
-            country: p?.country ?? r.country ?? null,
-            countryCode: p?.country_code ?? null,
-            photoUrl: p?.photo_url ?? null,
-            tourCode: p?.tour_codes?.[0] ?? tour,
-            stat: r.points != null ? Number(r.points) : null,
-            wins: r.wins ?? null,
-            top10s: null,
-            tournamentsPlayed: r.tournaments_played ?? null,
-          };
-        });
-        return { synced: true, statLabel: statLabelFor(tour), rows };
+        if (alt.error) throw alt.error;
+        rankings = (alt.data ?? []) as unknown as TourSeasonRankingRow[];
       }
-
-      // champ (degrade) — world-ranking order from sr_world_rankings.
-      const { data: rankings, error: rankErr } = await supabase
-        .from('sr_world_rankings')
-        .select('player_id, rank, ranking_date')
-        .order('ranking_date', { ascending: false })
-        .order('rank', { ascending: true })
-        .limit(500);
-      if (rankErr) throw rankErr;
-      if (!rankings?.length) return { synced: false, statLabel: null, rows: [] };
-      const latestDate = rankings[0].ranking_date;
-      const latest = rankings.filter((r) => r.ranking_date === latestDate);
-      const seen = new Set<string>();
-      const dedup = latest.filter((r) => (seen.has(r.player_id) ? false : (seen.add(r.player_id), true)));
-      const { data: players, error: playersErr } = await supabase
-        .from('sr_players')
-        .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
-        .in('id', dedup.map((r) => r.player_id));
-      if (playersErr) throw playersErr;
-      const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
-      const rows: RankedRow[] = [...dedup
-        .map((r) => {
-          const p = pmap.get(r.player_id);
-          if (!p?.tour_codes?.includes('CHAMP')) return null;
-          return {
-            playerId: r.player_id,
-            rank: r.rank,
-            name: p.full_name ?? 'Unknown',
-            firstName: p.first_name ?? '',
-            lastName: p.last_name ?? '',
-            country: p.country ?? null,
-            countryCode: p.country_code ?? null,
-            photoUrl: p.photo_url ?? null,
-            tourCode: 'champ',
-            stat: null,
-            wins: null,
-            top10s: null,
-            tournamentsPlayed: null,
-          } as RankedRow;
-        })
-        .filter((r): r is RankedRow => !!r)]
-        .sort((a, b) => a.rank - b.rank);
-      return { synced: false, statLabel: null, rows };
+      if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
+      const playerIds = [
+        ...new Set(
+          rankings
+            .map((r) => (r.player_id ?? r.manual_player_id) as string | null)
+            .filter((v): v is string => !!v),
+        ),
+      ];
+      let players: PlayerRow[] = [];
+      if (playerIds.length) {
+        const { data: pdata, error: playersErr } = await supabase
+          .from('sr_players')
+          .select(PLAYER_SELECT)
+          .in('id', playerIds);
+        if (playersErr) throw playersErr;
+        players = (pdata ?? []) as unknown as PlayerRow[];
+      }
+      const pmap = new Map(players.map((p) => [p.id, p]));
+      const rows: RankedRow[] = rankings.map((r) => {
+        const pid = (r.player_id ?? r.manual_player_id ?? '') as string;
+        const p = pid ? pmap.get(pid) : undefined;
+        return {
+          playerId: pid,
+          rank: r.position ?? 0,
+          name: p?.full_name ?? r.player_name ?? 'Unknown',
+          country: p?.country ?? r.country ?? null,
+          countryCode: p?.country_code ?? null,
+          photoUrl: p?.photo_url ?? null,
+          tourCode: p?.tour_codes?.[0] ?? tour,
+          stat: r.points != null ? Number(r.points) : null,
+          wins: r.wins ?? null,
+          top10s: null,
+        };
+      });
+      return { synced: true, statLabel: statLabelFor(tour), rows };
     },
   });
 }
-
-// Silence unused-import warnings for DB_TOUR_NAME (kept as documentation).
-void DB_TOUR_NAME;

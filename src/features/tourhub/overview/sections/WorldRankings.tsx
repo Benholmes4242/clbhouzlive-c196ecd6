@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
+import { MovementFigure } from '../../_shared/movement';
+
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import type { TourId } from '../../hooks/useOverviewData';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -143,13 +145,8 @@ export function WorldRankings({ tour }: { tour: TourId }) {
               ) : (
                 <div style={{ minWidth: 56 }} />
               )}
-              {r.movement != null && r.movement !== 0 ? (
-                <div style={{ minWidth: 34, textAlign: 'right', fontSize: 11, fontWeight: 800, color: r.movement > 0 ? V4.up : V4.down, fontVariantNumeric: 'tabular-nums' }}>
-                  {r.movement > 0 ? '▲' : '▼'} {Math.abs(r.movement)}
-                </div>
-              ) : (
-                <div style={{ minWidth: 34, textAlign: 'right', fontSize: 11, color: V4.inkFaint }}>—</div>
-              )}
+              <MovementFigure movement={r.movement} />
+
             </div>
           );
         })}
