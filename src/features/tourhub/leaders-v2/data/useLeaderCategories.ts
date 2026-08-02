@@ -39,7 +39,13 @@ import { movementFrom } from '../../_shared/movement';
 
 export interface LeaderRow {
   playerId: string;
+  /** Numeric competition rank. Ties share the lower rank. Never a string:
+   *  used as a React key fallback and as an analytics prop. */
   rank: number;
+  /** What is displayed: "3", "T3", "T12". */
+  rankLabel: string;
+  /** True when at least one other row in the list shares this rank. */
+  tied: boolean;
   name: string;
   country: string | null;
   countryCode: string | null;
@@ -52,6 +58,35 @@ export interface LeaderRow {
   /** Gap to the leader, formatted with the category's OWN formatter, always as
    *  a positive quantity. null on the leader row and on exact ties. */
   behindFormatted: string | null;
+}
+
+/**
+ * Standard competition ranking ("1224"): equal values share the lower rank and
+ * the next distinct value skips. Input MUST already be sorted in display order.
+ *
+ * Equality is decided on the DISPLAYED figure, not the raw one: 74.34 and 74.28
+ * both render "74.3%", so they are a tie as far as the member can see.
+ */
+function applyCompetitionRanks<T extends { value: number; rank: number; rankLabel: string; tied: boolean }>(
+  rows: T[],
+  format: (v: number) => string,
+): T[] {
+  let prevKey: string | null = null;
+  let prevRank = 0;
+  const counts = new Map<number, number>();
+  rows.forEach((r, i) => {
+    const key = format(r.value);
+    const rank = prevKey !== null && key === prevKey ? prevRank : i + 1;
+    r.rank = rank;
+    prevKey = key;
+    prevRank = rank;
+    counts.set(rank, (counts.get(rank) ?? 0) + 1);
+  });
+  for (const r of rows) {
+    r.tied = (counts.get(r.rank) ?? 0) > 1;
+    r.rankLabel = r.tied ? `T${r.rank}` : String(r.rank);
+  }
+  return rows;
 }
 
 /**
@@ -77,6 +112,7 @@ function applyBehind(
   }
   return rows;
 }
+
 
 // Canonical category-label registry. Keys are the stable category identifiers
 // (never displayed, never compared against translated labels). Values point at
