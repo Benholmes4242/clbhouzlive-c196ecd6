@@ -794,12 +794,14 @@
       "wins_other": "{{count}} WINS",
       "top10s": "{{count}} TOP-10",
       "worldRank": "WORLD {{rank}}",
-      "fedexRank": "{{label}} {{rank}}"
+      "fedexRank": "{{label}} {{rank}}",
+      "tourRank": "{{label}} {{rank}}"
     },
     "footer": {
       "synced": "Season ranking · live dot = on the course right now",
       "unsynced": "Ranked by world ranking — season statistics arrive with the sync",
-      "sample": "Top {{count}} by season ranking . live dot = on the course now"
+      "sample": "Top {{count}} by season ranking . live dot = on the course now",
+      "sampleSorted": "Top {{count}} by season ranking, sorted by {{stat}} . live dot = on the course now"
     },
     "error": {
       "title": "Couldn't load the ranking",
@@ -820,6 +822,13 @@
     "header": {
       "rank": "#",
       "player": "PLAYER"
+    },
+    "stat": {
+      "scoring": "SCORING",
+      "driving": "DRIVING",
+      "accuracy": "ACCURACY",
+      "gir": "GIR",
+      "sgPutt": "SG PUTT"
     }
   },
   "player": {
