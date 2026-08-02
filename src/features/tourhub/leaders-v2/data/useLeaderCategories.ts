@@ -373,11 +373,13 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
         rows.push({ pid: s.player_id, value: Number(v) });
       }
       rows.sort((a, b) => (cat.dir === 'asc' ? a.value - b.value : b.value - a.value));
-      const top = rows.slice(0, 50).map((r, i) => {
+      const top: LeaderRow[] = rows.slice(0, 50).map((r) => {
         const p = pmap.get(r.pid)!;
         return {
           playerId: r.pid,
-          rank: i + 1,
+          rank: 0,
+          rankLabel: '',
+          tied: false,
           name: p.full_name,
           country: p.country ?? null,
           countryCode: p.country_code ?? null,
@@ -387,8 +389,9 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           valueFormatted: cat.format(r.value),
           movement: null,
           behindFormatted: null,
-        } as LeaderRow;
+        };
       });
+      applyCompetitionRanks(top, cat.format);
       if (top.length < 3) return null;
       return {
         key: cat.key,
@@ -396,6 +399,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
         rows: applyBehind(top, cat.dir, cat.format),
         poolSize: rows.length,
       } as LeaderCategoryDef;
+
     })
     .filter((c): c is LeaderCategoryDef => !!c);
 
