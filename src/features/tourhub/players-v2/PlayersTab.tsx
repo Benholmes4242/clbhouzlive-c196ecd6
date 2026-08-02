@@ -19,6 +19,7 @@ import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { SectionTourLens } from '../overview/sections/SectionTourLens';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 import {
   AMBER_DEEP,
@@ -41,15 +42,6 @@ import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
 type SortKey = 'ranking' | 'live';
 
 const SEP = ' . ';
-
-function useDebouncedValue<T>(v: T, ms: number): T {
-  const [x, setX] = useState(v);
-  useEffect(() => {
-    const t = setTimeout(() => setX(v), ms);
-    return () => clearTimeout(t);
-  }, [v, ms]);
-  return x;
-}
 
 export function PlayersTab() {
   const { t } = useTranslation('tourhub');
