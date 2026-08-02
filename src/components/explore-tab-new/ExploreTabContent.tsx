@@ -9,6 +9,7 @@ import { useNewsCourses, type NewsCourse } from './hooks/useNewsCourses';
 import { REGION_TABS } from './AlmanacSections';
 import { ScopePills } from './wire/ScopePills';
 import { TheWire } from './wire/TheWire';
+import { RarestOfAll } from './wire/RarestOfAll';
 import { CoursesInTheNews } from './wire/CoursesInTheNews';
 import { YourCircle } from './wire/YourCircle';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
@@ -21,7 +22,7 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 import { SPACE } from '@/lib/spacing';
 
 /**
- * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_THE_WIRE).
+ * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_REBUILD).
  *
  * Three sections and one control, down from thirteen sections and four
  * controls. Discover is the only surface that answers "what just happened":
@@ -29,9 +30,10 @@ import { SPACE } from '@/lib/spacing';
  * course", Handicap "how am I playing", Clubhouse "what are people saying".
  *
  *   sticky   region scope pills - ONE control for the whole page
- *   headline kicker + "What just happened"
- *   THE WIRE day-grouped panels, paginated in place
- *   NEWS     horizontal course rail, after the first day group
+ *   headline kicker + "What's been happening"
+ *   THE WIRE calendar-month panels over 90 days, paged inside each panel
+ *   NEWS     horizontal course rail, after the FIRST month group
+ *   RAREST   every ace and albatross, all time, never windowed
  *   CIRCLE   friends' latest rounds, 5 rows + sheet
  */
 
@@ -66,7 +68,7 @@ export default function ExploreTabContent({
     return () => io.disconnect();
   }, []);
 
-  const { events, isLoading: wireLoading } = useDiscoverWire(
+  const { events, legendary, isLoading: wireLoading } = useDiscoverWire(
     activeRegion,
     userId,
     crownCategoryLabel,
@@ -130,29 +132,27 @@ export default function ExploreTabContent({
     [opener],
   );
 
-  // discover_wire_scroll_depth — once per mount, on pagehide or unmount.
-  const loadedRef = useRef(0);
-  const reportedRef = useRef(false);
-  const scopeRef = useRef(activeRegion);
-  scopeRef.current = activeRegion;
-  const handleLoadedChange = useCallback((count: number) => {
-    loadedRef.current = count;
-  }, []);
-  useEffect(() => {
-    const report = () => {
-      if (reportedRef.current || loadedRef.current === 0) return;
-      reportedRef.current = true;
-      analyticsEvents.track('discover_wire_scroll_depth', {
-        scope: scopeRef.current ?? 'worldwide',
-        events_loaded: loadedRef.current,
+  // Month expansion answers whether the per-panel cap is set right; there is
+  // no infinite scroll left to measure a depth against.
+  const handleMonthExpand = useCallback(
+    (month: string, revealed: number) => {
+      analyticsEvents.track('discover_month_expanded', { month, revealed });
+    },
+    [],
+  );
+
+  // Does the all-time panel earn its place? If nobody taps five feats it
+  // becomes a one-line summary rather than a panel.
+  const handleRarestRow = useCallback(
+    (e: WireEvent) => {
+      analyticsEvents.track('discover_rarest_tapped', {
+        kind: e.kind,
+        year: new Date(e.at).getFullYear(),
       });
-    };
-    window.addEventListener('pagehide', report);
-    return () => {
-      window.removeEventListener('pagehide', report);
-      report();
-    };
-  }, []);
+      if (e.courseId) navigate(`/courses/${e.courseId}`);
+    },
+    [navigate],
+  );
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
@@ -173,19 +173,13 @@ export default function ExploreTabContent({
             letterSpacing: '-0.02em',
           }}
         >
-          {t('discover.headline', 'What just happened')}
+          {t('discover.headline', "What's been happening")}
         </h1>
         <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.45, color: A.MUTE }}>
-          {activeRegion == null
-            ? t(
-                'discover.subWorldwide',
-                'Records, crowns and rare cards from official WHS rounds worldwide.',
-              )
-            : t('discover.subScoped', {
-                defaultValue:
-                  'Records, crowns and rare cards from official WHS rounds in {{scope}}.',
-                scope: scopeLabel,
-              })}
+          {t(
+            'discover.sub',
+            'Eagles and birdie hauls from official WHS rounds, newest first.',
+          )}
         </p>
       </div>
 
@@ -203,7 +197,7 @@ export default function ExploreTabContent({
           isLoading={wireLoading}
           scopeKey={activeRegion ?? 'worldwide'}
           onRowPress={handleWireRow}
-          onLoadedChange={handleLoadedChange}
+          onMonthExpand={handleMonthExpand}
           newsSlot={
             hasNewsCandidates ? (
               <div style={{ padding: '6px 0 2px' }}>
@@ -217,6 +211,8 @@ export default function ExploreTabContent({
             ) : null
           }
         />
+
+        <RarestOfAll events={legendary} onRowPress={handleRarestRow} />
 
         <YourCircle userId={userId} onRowPress={handleCircleRow} />
       </div>
