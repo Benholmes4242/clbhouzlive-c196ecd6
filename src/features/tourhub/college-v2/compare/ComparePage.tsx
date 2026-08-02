@@ -176,87 +176,108 @@ export function ComparePage() {
           />
         )}
 
-        {/* Stats */}
+        {/* Stats - THE SEASON (counts, tug bars) */}
         <section style={{ background: SURFACE, borderTop: `0.5px solid ${HAIRLINE_INK_10}` }}>
-          {isLoading && !left && !right ? (
-            <div>
+          {statsLoading ? (
+            <>
+              <SkeletonKicker />
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} style={{ padding: '12px 16px 12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
-                    <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
-                    <Skeleton style={{ height: 14, width: 60, borderRadius: 3 }} />
-                  </div>
-                  <Skeleton style={{ height: 4, borderRadius: 2 }} />
-                </div>
+                <SkeletonRow key={i} withBar />
               ))}
-            </div>
+              <SkeletonKicker />
+              {[0, 1, 2].map((i) => (
+                <SkeletonRow key={`a${i}`} />
+              ))}
+            </>
           ) : (
             <>
-              <TugStat
-                label="Franchise Points"
-                leftValue={left?.earningsTotal ?? 0}
-                rightValue={right?.earningsTotal ?? 0}
-                format={formatCurrency}
+              <div style={KICKER_STYLE}>{t('college.compare.theSeason')}</div>
+              <CountStatRow
+                label={t('college.compare.earnings')}
+                leftValue={left ? left.earningsTotal : null}
+                rightValue={right ? right.earningsTotal : null}
+                format={formatEarnings}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Alumni on Tour"
-                leftValue={left?.alumniCount ?? 0}
-                rightValue={right?.alumniCount ?? 0}
+              <CountStatRow
+                label={t('college.compare.alumniOnTour')}
+                leftValue={left ? left.alumniCount : null}
+                rightValue={right ? right.alumniCount : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Wins"
-                leftValue={left?.winsTotal ?? 0}
-                rightValue={right?.winsTotal ?? 0}
+              <CountStatRow
+                label={t('college.compare.wins')}
+                leftValue={left ? left.winsTotal : null}
+                rightValue={right ? right.winsTotal : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-              <TugStat
-                label="Top 10s"
-                leftValue={left?.top10Total ?? 0}
-                rightValue={right?.top10Total ?? 0}
+              <CountStatRow
+                label={t('college.compare.top10s')}
+                leftValue={left ? left.top10Total : null}
+                rightValue={right ? right.top10Total : null}
                 format={fmtInt}
+                leftName={leftName}
+                rightName={rightName}
               />
-              {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="Scoring Avg"
-                    leftValue={leftAgg?.scoringAvg?.value ?? 0}
-                    rightValue={rightAgg?.scoringAvg?.value ?? 0}
-                    format={fmtScoringAvg}
-                    lowerWins
-                  />
-                </>
-              )}
-              {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="Driving Distance"
-                    leftValue={leftAgg?.drivingDistance?.value ?? 0}
-                    rightValue={rightAgg?.drivingDistance?.value ?? 0}
-                    format={fmtDrive}
-                  />
-                </>
-              )}
-              {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
-                <>
-                  <div style={{ height: 0.5, background: HAIRLINE_INK_10, margin: '0 16px' }} />
-                  <TugStat
-                    label="SG: Total"
-                    leftValue={leftAgg?.sgTotal?.value ?? 0}
-                    rightValue={rightAgg?.sgTotal?.value ?? 0}
-                    format={fmtSg}
-                  />
-                </>
-              )}
             </>
           )}
         </section>
+
+        {/* Stats - THE NUMBERS (averages, coverage, no bars) */}
+        {!statsLoading && averageRows > 0 && (
+          <section style={{ background: SURFACE, marginTop: 10 }}>
+            <div style={KICKER_STYLE}>{t('college.compare.theNumbers')}</div>
+            {(leftAgg?.scoringAvg || rightAgg?.scoringAvg) && (
+              <AverageStatRow
+                label={t('college.compare.scoringAvg')}
+                left={leftAgg?.scoringAvg ?? null}
+                right={rightAgg?.scoringAvg ?? null}
+                format={fmtScoringAvg}
+                lowerWins
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            {(leftAgg?.drivingDistance || rightAgg?.drivingDistance) && (
+              <AverageStatRow
+                label={t('college.compare.drivingDistance')}
+                left={leftAgg?.drivingDistance ?? null}
+                right={rightAgg?.drivingDistance ?? null}
+                format={fmtDrive}
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            {(leftAgg?.sgTotal || rightAgg?.sgTotal) && (
+              <AverageStatRow
+                label={t('college.compare.sgTotal')}
+                left={leftAgg?.sgTotal ?? null}
+                right={rightAgg?.sgTotal ?? null}
+                format={fmtSg}
+                leftName={leftName}
+                rightName={rightName}
+              />
+            )}
+            <div
+              style={{
+                padding: '10px 16px 16px',
+                fontSize: 10.5,
+                fontWeight: 500,
+                color: INK_FAINT,
+                textAlign: 'center',
+                letterSpacing: '0.01em',
+              }}
+            >
+              {t('college.compare.footer', { year })}
+            </div>
+          </section>
+        )}
+
 
         {/* Classes */}
         <section style={{ background: SURFACE, marginTop: 12 }}>
