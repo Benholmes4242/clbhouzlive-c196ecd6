@@ -35,6 +35,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourId } from '../../hooks/useOverviewData';
 import { formatCurrencyUsd, formatNumber, formatNumberMaxFrac } from '@/i18n/format';
+import { movementFrom } from '../../_shared/movement';
 
 export interface LeaderRow {
   playerId: string;
