@@ -111,10 +111,20 @@ export function sortBirdieHauls(rows: FeatRow[], mode: RecordsMode): FeatRow[] {
   return out;
 }
 
+export interface RegionFeatsOptions {
+  /**
+   * Discover's wire is a news surface: returning to it after five minutes
+   * should show what has happened since. A deliberate exception to the
+   * app-wide `refetchOnWindowFocus: false` in App.tsx, set per query.
+   */
+  refetchOnWindowFocus?: boolean;
+}
+
 export function useRegionFeats(
   region: string | null,
   tier: FeatTier,
   mode: RecordsMode = 'latest',
+  options: RegionFeatsOptions = {},
 ) {
   const cacheRegion = slugToCacheRegion(region);
   const isAllTime = mode === 'alltime';
@@ -131,6 +141,7 @@ export function useRegionFeats(
   return useQuery<FeatRow[]>({
     queryKey: ['discover-rail-cache', tier, cacheRegion, mode, railKey],
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: options.refetchOnWindowFocus ?? false,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discover_rail_cache')
