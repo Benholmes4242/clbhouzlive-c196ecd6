@@ -44,6 +44,8 @@ export interface TournamentLeaderWinner extends TournamentFinisher {
   topFinishers: TournamentFinisher[];
   /** All fetched rows for this tournament (for tie overflow counting) */
   allFetched: TournamentFinisher[];
+  /** How many rows share the leader's position (1 = outright). */
+  tiedCount: number;
 }
 
 function formatScore(score: number | null): string {
@@ -59,9 +61,17 @@ function formatDisplayName(firstName: string | null, lastName: string | null): s
   return `${firstName.charAt(0)}. ${lastName}`;
 }
 
-export function useTournamentLeadersWinners(tournamentIds: string[]) {
+export function useTournamentLeadersWinners(
+  tournamentIds: string[],
+  topN: number = 10,
+) {
   return useQuery({
-    queryKey: ['tourhub', 'tournament-leaders-winners-v3', tournamentIds.sort().join(',')],
+    queryKey: [
+      'tourhub',
+      'tournament-leaders-winners-v3',
+      topN,
+      tournamentIds.sort().join(','),
+    ],
     queryFn: async (): Promise<Record<string, TournamentLeaderWinner>> => {
       if (tournamentIds.length === 0) return {};
 
@@ -91,7 +101,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           )
         `)
         .in('tournament_id', tournamentIds)
-        .lte('position', 10)
+        .lte('position', topN)
         .order('tournament_id', { ascending: true })
         .order('position', { ascending: true });
 
@@ -169,6 +179,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           ...leader,
           topFinishers: sorted.slice(0, 3),
           allFetched: sorted,
+          tiedCount: sorted.filter((f) => f.position === leader.position).length,
         };
       }
 
