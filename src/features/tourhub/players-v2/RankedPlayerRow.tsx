@@ -32,6 +32,8 @@ export interface RankedPlayerRowProps {
   /** Composed by the parent; may carry mixed colour. */
   sub?: ReactNode;
   onClick?: () => void;
+  /** False for rows with no linked player: renders inert, looks identical. */
+  interactive?: boolean;
 }
 
 function formatStat(n: number): string {
@@ -47,6 +49,7 @@ function RankedPlayerRowInner({
   live,
   sub,
   onClick,
+  interactive = true,
 }: RankedPlayerRowProps) {
   const candidates = resolvePlayerAvatarCandidates({
     name: player.name,
@@ -54,24 +57,22 @@ function RankedPlayerRowInner({
     tourSlug: player.tourCode ?? 'pga',
   });
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        width: '100%',
-        padding: '13px 16px',
-        background: 'transparent',
-        border: 'none',
-        textAlign: 'left',
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-        fontVariantNumeric: 'tabular-nums lining',
-      }}
-    >
+  const shellStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    width: '100%',
+    padding: '13px 16px',
+    background: 'transparent',
+    border: 'none',
+    textAlign: 'left',
+    fontFamily: 'inherit',
+    fontVariantNumeric: 'tabular-nums lining',
+  };
+
+  const body = (
+    <>
+
       {/* Rank */}
       <div
         style={{
