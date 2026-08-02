@@ -1,11 +1,14 @@
 /**
  * Shared SectionShell — dispatch section header + optional right link.
- * Spec: eyebrow 10.5/800/0.14em amber, right link 11/700 muted.
+ * Spec (analytical): eyebrow is the KICKER token in AMBER_DEEP,
+ * right link 11/700 muted.
  */
 
 import type { ReactNode } from 'react';
 import { V4 } from '../tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SPACE } from '@/lib/spacing';
+
 
 export function SectionShell({
   eyebrow,
