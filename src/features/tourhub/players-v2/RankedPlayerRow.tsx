@@ -1,20 +1,17 @@
 /**
  * RankedPlayerRow — the one shared field row for THE FIELD ledger.
  * Dumb, tab-agnostic; the Leaders rebuild will consume this too.
+ *
+ * Separation is whitespace: no row hairline. The grid is load-bearing, so the
+ * rank and stat cells are fixed width and figures align down the page.
  */
 
-import { memo } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { memo, type ReactNode } from 'react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { formatNumberMaxFrac } from '@/i18n/format';
-import {
-  GOLD_DEEP,
-  HAIRLINE_INK_10,
-  INK,
-  INK_MUTE,
-} from '../_shared/tokens';
+import { HAIRLINE_INK_10, INK, STATUS_LIVE } from '../_shared/tokens';
 
 export interface RankedPlayer {
   playerId: string;
@@ -31,15 +28,11 @@ export interface RankedPlayerRowProps {
   stat?: number | null;
   /** Pre-formatted string override for `stat` (e.g. "$30.1M", "72.3%"). */
   statFormatted?: string;
-  statLabel?: string | null;
   live?: boolean;
-  sub?: string | null;
-  subLive?: boolean;
-  goldRank?: boolean;
+  /** Composed by the parent; may carry mixed colour. */
+  sub?: ReactNode;
   onClick?: () => void;
 }
-
-const LIVE_GREEN = '#10B981';
 
 function formatStat(n: number): string {
   if (Math.abs(n) >= 1000) return formatNumberMaxFrac(n, 0);
@@ -51,11 +44,8 @@ function RankedPlayerRowInner({
   player,
   stat,
   statFormatted,
-  statLabel,
   live,
   sub,
-  subLive,
-  goldRank,
   onClick,
 }: RankedPlayerRowProps) {
   const candidates = resolvePlayerAvatarCandidates({
@@ -73,22 +63,23 @@ function RankedPlayerRowInner({
         alignItems: 'center',
         gap: 12,
         width: '100%',
-        padding: '12px 16px',
+        padding: '13px 16px',
         background: 'transparent',
         border: 'none',
-        borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: 'inherit',
+        fontVariantNumeric: 'tabular-nums lining',
       }}
     >
       {/* Rank */}
       <div
         style={{
           width: 28,
+          flex: '0 0 28px',
           fontSize: 15,
           fontWeight: 200,
-          color: goldRank ? GOLD_DEEP : INK,
+          color: INK,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'right',
         }}
@@ -115,7 +106,7 @@ function RankedPlayerRowInner({
               width: 8,
               height: 8,
               borderRadius: '50%',
-              background: LIVE_GREEN,
+              background: STATUS_LIVE,
               boxShadow: '0 0 0 1.5px #FFFFFF',
             }}
           />
@@ -143,11 +134,12 @@ function RankedPlayerRowInner({
         {sub && (
           <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
               fontSize: 9,
-              fontWeight: subLive ? 700 : 500,
-              letterSpacing: '0.08em',
+              fontWeight: 800,
+              letterSpacing: '0.13em',
               textTransform: 'uppercase',
-              color: subLive ? LIVE_GREEN : INK_MUTE,
               marginTop: 2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -160,40 +152,59 @@ function RankedPlayerRowInner({
       </div>
 
       {/* Stat column */}
-      {(statFormatted != null || stat != null) && (
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 200,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {statFormatted ?? (stat != null ? formatStat(stat) : '')}
-          </div>
-          {statLabel && (
-            <div
-              style={{
-                fontSize: 6.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: INK_MUTE,
-                marginTop: 3,
-              }}
-            >
-              {statLabel}
-            </div>
-          )}
-        </div>
-      )}
-
-      <ChevronRight size={14} color={INK_MUTE} style={{ flexShrink: 0 }} />
+      <div
+        style={{
+          width: 72,
+          flex: '0 0 72px',
+          textAlign: 'right',
+          fontSize: 14,
+          fontWeight: 200,
+          color: INK,
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {statFormatted ?? (stat != null ? formatStat(stat) : '')}
+      </div>
     </button>
   );
 }
 
 export const RankedPlayerRow = memo(RankedPlayerRowInner);
 export default RankedPlayerRow;
+
+/** Column-header grid twin of the row above. Kept here so the two cannot drift. */
+export function RankedPlayerHeader({
+  rankLabel,
+  playerLabel,
+  statLabel,
+}: {
+  rankLabel: string;
+  playerLabel: string;
+  statLabel: string | null;
+}) {
+  const cell: React.CSSProperties = {
+    fontSize: 9,
+    fontWeight: 800,
+    letterSpacing: '0.13em',
+    textTransform: 'uppercase',
+    color: 'rgba(15,23,42,0.45)',
+  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '10px 16px 6px',
+        borderBottom: `0.5px solid ${HAIRLINE_INK_10}`,
+      }}
+    >
+      <div style={{ ...cell, width: 28, flex: '0 0 28px', textAlign: 'right' }}>{rankLabel}</div>
+      <div style={{ ...cell, flex: 1, minWidth: 0 }}>{playerLabel}</div>
+      {statLabel && (
+        <div style={{ ...cell, width: 72, flex: '0 0 72px', textAlign: 'right' }}>{statLabel}</div>
+      )}
+    </div>
+  );
+}
