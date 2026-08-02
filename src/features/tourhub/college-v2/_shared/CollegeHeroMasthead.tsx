@@ -165,13 +165,13 @@ export function CollegeHeroMasthead({
         )}
       </div>
 
-      {/* Name + meta (centred) */}
+      {/* Name + figures (centred) */}
       <div style={{ width: '100%', minWidth: 0 }}>
         <div
           style={{
-            fontSize: 9.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: WHITE_ALPHA_55,
             marginBottom: 4,
@@ -194,57 +194,53 @@ export function CollegeHeroMasthead({
         >
           {displayName}
         </h1>
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 11,
-            fontWeight: 600,
-            color: WHITE_ALPHA_65,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            columnGap: 6,
-            rowGap: 4,
-            flexWrap: 'wrap',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          <span style={{ color: isRankOne ? GOLD : AMBER, fontWeight: 800 }}>
-            {formatPoints(pointsTotal)}
-          </span>
-          <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-          <span>{alumniCount} alumni on tour</span>
-          {trend && (
-            <>
-              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  padding: '2px 6px',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: `0.5px solid ${WHITE_ALPHA_18}`,
-                  color: trend.color,
-                  fontWeight: 800,
-                  fontSize: 10,
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {trend.label}
-              </span>
-            </>
-          )}
-          {playingNow > 0 && (
-            <>
-              <span style={{ color: WHITE_ALPHA_55 }}>{'\u00B7'}</span>
-              <span style={{ color: STATUS_LIVE, fontWeight: 700 }}>
-                {playingNow} playing now
-              </span>
-            </>
-          )}
-        </div>
+
+        {/* Three-figure row. Each cell self-hides; the row hides when empty. */}
+        {(showEarnings || showAlumni || showPlaying) && (
+          <div
+            style={{
+              marginTop: 16,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              gap: 28,
+              fontVariantNumeric: 'tabular-nums lining',
+            }}
+          >
+            {showEarnings && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.earnings')}</div>
+                <div style={FIGURE_STYLE}>{formatEarnings(pointsTotal)}</div>
+              </div>
+            )}
+            {showAlumni && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.alumni')}</div>
+                <div style={FIGURE_STYLE}>{alumniCount}</div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: WHITE_ALPHA_55,
+                    marginTop: 2,
+                  }}
+                >
+                  {t('college.hero.alumniSub')}
+                </div>
+              </div>
+            )}
+            {showPlaying && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={LABEL_STYLE}>{t('college.hero.playingNow')}</div>
+                <div style={{ ...FIGURE_STYLE, color: STATUS_LIVE_ON_DARK }}>
+                  {playingNow}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
 
       {actions && (
         <div
