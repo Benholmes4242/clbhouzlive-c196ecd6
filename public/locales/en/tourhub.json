@@ -32,7 +32,9 @@
     "noEventsThisWeek": "No events this week",
     "openMenuAria": "Open menu",
     "switchTourAria": "Switch tour",
-    "switchTourCurrentAria": "Switch tour — current {{label}}"
+    "switchTourCurrentAria": "Switch tour — current {{label}}",
+    "allTours": "All tours",
+    "allToursSub": "Every tour, soonest first"
   },
   "nav": {
     "group": {
@@ -255,7 +257,11 @@
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
-      "backToLine2": "featured"
+      "backToLine2": "featured",
+      "lowRound": "Low round",
+      "moversToday": "Movers today",
+      "nShare_one": "{{count}} player",
+      "nShare_other": "{{count}} players"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -420,6 +426,12 @@
     "hybridHero": {
       "majorChampionship": "MAJOR CHAMPIONSHIP",
       "teamFallback": "Team"
+    },
+    "venueRecord": {
+      "kicker": "The record book",
+      "clubhouseRating": "Clubhouse",
+      "reviews": "Reviews",
+      "top100": "Top 100"
     }
   },
   "empty": {
