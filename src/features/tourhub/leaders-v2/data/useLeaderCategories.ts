@@ -39,7 +39,13 @@ import { movementFrom } from '../../_shared/movement';
 
 export interface LeaderRow {
   playerId: string;
+  /** Numeric competition rank. Ties share the lower rank. Never a string:
+   *  used as a React key fallback and as an analytics prop. */
   rank: number;
+  /** What is displayed: "3", "T3", "T12". */
+  rankLabel: string;
+  /** True when at least one other row in the list shares this rank. */
+  tied: boolean;
   name: string;
   country: string | null;
   countryCode: string | null;
@@ -52,6 +58,35 @@ export interface LeaderRow {
   /** Gap to the leader, formatted with the category's OWN formatter, always as
    *  a positive quantity. null on the leader row and on exact ties. */
   behindFormatted: string | null;
+}
+
+/**
+ * Standard competition ranking ("1224"): equal values share the lower rank and
+ * the next distinct value skips. Input MUST already be sorted in display order.
+ *
+ * Equality is decided on the DISPLAYED figure, not the raw one: 74.34 and 74.28
+ * both render "74.3%", so they are a tie as far as the member can see.
+ */
+function applyCompetitionRanks<T extends { value: number; rank: number; rankLabel: string; tied: boolean }>(
+  rows: T[],
+  format: (v: number) => string,
+): T[] {
+  let prevKey: string | null = null;
+  let prevRank = 0;
+  const counts = new Map<number, number>();
+  rows.forEach((r, i) => {
+    const key = format(r.value);
+    const rank = prevKey !== null && key === prevKey ? prevRank : i + 1;
+    r.rank = rank;
+    prevKey = key;
+    prevRank = rank;
+    counts.set(rank, (counts.get(rank) ?? 0) + 1);
+  });
+  for (const r of rows) {
+    r.tied = (counts.get(r.rank) ?? 0) > 1;
+    r.rankLabel = r.tied ? `T${r.rank}` : String(r.rank);
+  }
+  return rows;
 }
 
 /**
@@ -77,6 +112,7 @@ function applyBehind(
   }
   return rows;
 }
+
 
 // Canonical category-label registry. Keys are the stable category identifiers
 // (never displayed, never compared against translated labels). Values point at
@@ -259,7 +295,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
   // World ranking (OWGR) is PGA-centric / male-tour - restricted to PGA only.
   const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
-    .select('player_id, rank, prior_rank, points, ranking_date')
+    .select('player_id, rank, prior_rank, tied, points, ranking_date')
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
     .limit(600);
@@ -275,24 +311,30 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
   const eligible = dedup.filter((r) => pmap.has(r.player_id));
   const rows: LeaderRow[] = eligible
     .slice(0, 50)
-    .map((r, i) => {
+    .map((r) => {
       const p = pmap.get(r.player_id)!;
       const pts = r.points != null ? Number(r.points) : 0;
+      // The provider owns OWGR rank and its ties. We do not re-derive either:
+      // our list position is not a world rank.
+      const tied = r.tied ?? false;
       return {
         playerId: r.player_id,
-        rank: i + 1,
+        rank: r.rank,
+        rankLabel: tied ? `T${r.rank}` : String(r.rank),
+        tied,
         name: p.full_name,
         country: p.country ?? null,
         countryCode: p.country_code ?? null,
         photoUrl: p.photo_url ?? null,
         tourCode: p.tour_codes?.[0] ?? 'pga',
         value: pts,
-        valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${i + 1}`,
+        valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${r.rank}`,
         // Shared arithmetic - do not re-derive movement locally.
         movement: movementFrom(r.rank, r.prior_rank ?? null),
         behindFormatted: null,
       };
     });
+
 
   return {
     key: 'world_rank',
@@ -331,11 +373,13 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
         rows.push({ pid: s.player_id, value: Number(v) });
       }
       rows.sort((a, b) => (cat.dir === 'asc' ? a.value - b.value : b.value - a.value));
-      const top = rows.slice(0, 50).map((r, i) => {
+      const top: LeaderRow[] = rows.slice(0, 50).map((r) => {
         const p = pmap.get(r.pid)!;
         return {
           playerId: r.pid,
-          rank: i + 1,
+          rank: 0,
+          rankLabel: '',
+          tied: false,
           name: p.full_name,
           country: p.country ?? null,
           countryCode: p.country_code ?? null,
@@ -345,8 +389,9 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           valueFormatted: cat.format(r.value),
           movement: null,
           behindFormatted: null,
-        } as LeaderRow;
+        };
       });
+      applyCompetitionRanks(top, cat.format);
       if (top.length < 3) return null;
       return {
         key: cat.key,
@@ -354,6 +399,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
         rows: applyBehind(top, cat.dir, cat.format),
         poolSize: rows.length,
       } as LeaderCategoryDef;
+
     })
     .filter((c): c is LeaderCategoryDef => !!c);
 
@@ -405,6 +451,8 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       return {
         playerId: pid,
         rank: 0,
+        rankLabel: '',
+        tied: false,
         name: p?.full_name ?? r.player_name ?? 'Unknown',
         country: p?.country ?? r.country ?? null,
         countryCode: p?.country_code ?? null,
@@ -418,18 +466,19 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
     };
 
     // Points
+    const fmtPoints = (v: number) => formatNumberMaxFrac(v, 2);
     const pointsPool = pool.filter((r) => r.points != null && Number(r.points) > 0);
     const pointsRows = pointsPool
       .slice()
       .sort((a, b) => Number(b.points) - Number(a.points))
       .slice(0, 50)
-      .map((r, i) => {
+      .map((r) => {
         const base = resolve(r);
-        base.rank = i + 1;
         base.value = Number(r.points);
-        base.valueFormatted = formatNumberMaxFrac(base.value, 2);
+        base.valueFormatted = fmtPoints(base.value);
         return base;
       });
+    applyCompetitionRanks(pointsRows, fmtPoints);
     if (pointsRows.length >= 3) {
       const pointsBase = LEADER_STAT_LABELS.points;
       const brandLabelKey = POINTS_LABEL_KEY_BY_TOUR[tour];
@@ -438,7 +487,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         labelKey: brandLabelKey ?? pointsBase.labelKey,
         shortKey: pointsBase.shortKey,
         unitKey: pointsBase.unitKey,
-        rows: applyBehind(pointsRows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+        rows: applyBehind(pointsRows, 'desc', fmtPoints),
         poolSize: pointsPool.length,
       });
     }
@@ -449,13 +498,13 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
       .slice()
       .sort((a, b) => Number(b.wins) - Number(a.wins))
       .slice(0, 50)
-      .map((r, i) => {
+      .map((r) => {
         const base = resolve(r);
-        base.rank = i + 1;
         base.value = Number(r.wins);
         base.valueFormatted = fmtInt(base.value);
         return base;
       });
+    applyCompetitionRanks(winsRows, fmtInt);
     if (winsRows.length >= 3) {
       categories.push({
         key: 'wins',
@@ -464,6 +513,7 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
         poolSize: winsPool.length,
       });
     }
+
   }
 
   // World ranking is PGA-only per editorial policy - not appended to other tours.

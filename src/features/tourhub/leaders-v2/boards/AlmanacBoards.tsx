@@ -36,6 +36,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
+  SLATE_50,
 } from '../../_shared/tokens';
 import type { LeaderCategoryDef, LeaderRow } from '../data/useLeaderCategories';
 import type { LivePlayerMap } from '../../players-v2/data/useLivePlayerIds';
@@ -180,7 +181,7 @@ function PlayerCell({
               height: Math.max(6, Math.round(size * 0.22)),
               borderRadius: '50%',
               background: LIVE_GREEN,
-              boxShadow: '0 0 0 1.5px #FFFFFF',
+              boxShadow: `0 0 0 1.5px ${SLATE_50}`,
             }}
           />
         )}
@@ -243,8 +244,8 @@ function StatBoardRowsInner({
         >
           <div
             style={{
-              width: 18,
-              flex: '0 0 18px',
+              width: 24,
+              flex: '0 0 24px',
               fontSize: 12,
               fontWeight: 500,
               color: INK_MUTE,
@@ -252,7 +253,7 @@ function StatBoardRowsInner({
               textAlign: 'right',
             }}
           >
-            {r.rank}
+            {r.rankLabel}
           </div>
           {showMovement && (
             <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, lineHeight: 1 }}>
