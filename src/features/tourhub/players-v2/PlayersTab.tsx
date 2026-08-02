@@ -329,6 +329,9 @@ export function PlayersTab() {
   const synced = !!ranking?.synced;
   const statLabel = ranking?.statLabel ?? null;
   const loadedCount = ranking?.rows?.length ?? 0;
+  const activeStat: StatKey | null = isStatKey(sort) ? sort : null;
+  const activeStatLabel = activeStat ? t(STAT_LENS[activeStat].labelKey) : null;
+
 
   // -- Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
   const leadMargin = useMemo<number | null>(() => {
