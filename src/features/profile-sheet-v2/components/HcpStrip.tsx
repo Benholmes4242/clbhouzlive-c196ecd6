@@ -1,27 +1,25 @@
 /**
- * ProfileSheetV2 · HcpStrip
+ * ProfileSheetV2 · HcpStrip — "Your game" stat panel.
  *
- * Slim tappable handicap strip. Two states:
- *   - Connected: HCP eyebrow + index + trend arrow + rounds-90d + chevron
- *   - Disconnected: HCP eyebrow + "Connect official WHS handicap" + chevron
- * Hidden for business actors. Both states tap to /handicap.
+ * Three figures from data already fetched (no new query):
+ *   HANDICAP  current index + 90d delta
+ *   ROUNDS    rounds in the last 90 days
+ *   COURSES   distinct courses in the member's official record
  *
- * rounds-90d is computed locally by scanning useAllScores by play_date,
- * mirroring src/hooks/useProfileSheetStats.ts (which dies with the old
- * sheet).
+ * The courses count is derived client-side from useAllScores by counting
+ * distinct course_id. Those are WHS-side course ids, not golf_courses ids —
+ * that is deliberate and honest: it is the number of courses in the member's
+ * own official record, and bridging through whs_to_golf_course_map would add
+ * a dependency for an identical number.
+ *
+ * Hidden entirely for business actors and for members with no WHS connection.
+ * Taps through to /handicap.
  */
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
-
-const AMBER = '#F7931E';
-const INK = '#0F172A';
-const MUTED = '#94A3B8';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const GREEN = '#16a34a';
-const RED = '#dc2626';
-const DOT = '\u00B7';
-const CHEVRON = '\u203A';
+import { A, Panel, StatRow, KICKER, Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   actorType: 'personal' | 'business';
@@ -30,22 +28,22 @@ interface Props {
 }
 
 export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
+  const { t } = useTranslation('common');
   const isBusiness = actorType === 'business';
 
   const { data: connection, isLoading: connectionLoading } = useWhsConnection(isBusiness ? undefined : actorId);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
-  const { data: history90 } = useHandicapHistory(connection?.id, 90);
-  const { data: scores } = useAllScores(connection?.id);
+  const { data: history90, isLoading: historyLoading } = useHandicapHistory(connection?.id, 90);
+  const { data: scores, isLoading: scoresLoading } = useAllScores(connection?.id);
 
   // 90-day delta: replicate HeroHandicapCardDark exactly —
   //   history90[last].handicap_index - history90[0].handicap_index
-  // (see src/components/profile/handicap/whs/sections/HeroHandicapCardDark.tsx)
   const delta90 = useMemo<number | null>(() => {
     if (!history90 || history90.length < 2) return null;
     return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
   }, [history90]);
 
-  const rounds90d = useMemo(() => {
+  const rounds90d = useMemo<number | null>(() => {
     if (!scores) return null;
     const cutoff = Date.now() - 90 * 86_400_000;
     return scores.filter(
@@ -53,142 +51,125 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     ).length;
   }, [scores]);
 
+  const coursesPlayed = useMemo<number | null>(() => {
+    if (!scores) return null;
+    const ids = new Set<string>();
+    for (const s of scores as any[]) {
+      if (s?.course_id) ids.add(String(s.course_id));
+    }
+    return ids.size;
+  }, [scores]);
+
   if (isBusiness) return null;
 
-  const stripBase: React.CSSProperties = {
-    margin: '12px 20px 0',
-    padding: '11px 15px',
-    background: '#fff',
-    border: `1px solid ${HAIRLINE}`,
-    borderRadius: 14,
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-    cursor: 'pointer',
-  };
+  const wrap: React.CSSProperties = { margin: '12px 20px 0' };
 
-  const eyebrow = (
-    <span
-      style={{
-        fontWeight: 700,
-        fontSize: 10,
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-        color: AMBER,
-      }}
-    >
-      HCP
-    </span>
-  );
+  // A skeleton while any of the four queries is in flight — never a partial
+  // stat row and never a zero.
+  const pending =
+    connectionLoading ||
+    (!!connection && (trendLoading || historyLoading || scoresLoading));
 
-  const chevron = (
-    <span style={{ color: MUTED, fontSize: 15, marginLeft: 'auto' }}>{CHEVRON}</span>
-  );
-
-  // Loading state: shimmer strip in the exact stripBase geometry so there is
-  // zero layout shift when the real state lands. Never show the connect CTA
-  // or an index until the connection query has resolved.
-  if (connectionLoading) {
+  if (pending) {
     return (
-      <div style={stripBase} aria-hidden>
-        {eyebrow}
-        <div
-          className="clb-shimmer-light rounded-sm"
-          style={{ width: 60, height: 22, background: 'rgba(15,23,42,0.06)' }}
-        />
-        {chevron}
+      <div style={wrap} aria-hidden>
+        <Panel>
+          <div
+            className="clb-shimmer-light"
+            style={{ height: 64, borderRadius: 8, background: A.TRACK }}
+          />
+        </Panel>
       </div>
     );
   }
 
-  // Disconnected state
-  if (!connection) {
-    return (
-      <div
-        onClick={() => onNavigate('/handicap')}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onNavigate('/handicap');
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        style={stripBase}
-      >
-        {eyebrow}
-        <span style={{ fontWeight: 600, fontSize: 13, color: INK }}>
-          Connect official WHS handicap
-        </span>
-        {chevron}
-      </div>
-    );
-  }
+  // No official record at all — the panel is absent, not a row of dashes.
+  if (!connection) return null;
 
-  // current-index from useHandicapTrend (default 30d window) — mirrors the
-  // page: the hero shows the trend row deltas from history90, but the current
-  // index is the authoritative value from the trend hook.
   const current = trend?.current;
-  let trendNode: React.ReactNode = null;
-  // Thresholds match HeroHandicapCardDark TrendRow: improved < -0.05 (green),
-  // drifted > 0.05 (red), else neutral/omitted.
-  const improved = delta90 != null && delta90 < -0.05;
-  const drifted = delta90 != null && delta90 > 0.05;
-  if (improved || drifted) {
-    const sign = delta90! < 0 ? '-' : '+';
-    const formatted = `${sign}${Math.abs(delta90!).toFixed(1)}`;
-    trendNode = (
-      <span style={{ fontWeight: 700, fontSize: 11.5, color: improved ? GREEN : RED, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-        <span style={{ fontSize: 9 }}>{improved ? '\u25BC' : '\u25B2'}</span>
-        {formatted}
-      </span>
-    );
-  }
-
   const indexText = typeof current === 'number'
     ? (current < 0 ? `+${Math.abs(current).toFixed(1)}` : current.toFixed(1))
-    : '\u2014';
+    : null;
+  if (indexText == null) return null;
+
+  // Delta tone. A handicap going UP means playing WORSE, so the tone follows
+  // the MEANING, not the sign: rising -> OVER (red), falling -> UNDER (green).
+  // This is the opposite reasoning to every other figure in the system (where
+  // "+" is red because over par is worse) and arrives at the same colours for
+  // different causes. Do NOT "fix" this to the generic rule — that inverts the
+  // meaning.
+  const rounded = delta90 == null ? null : Math.round(delta90 * 10) / 10;
+  let deltaSub: string;
+  let deltaTone: string;
+  if (rounded == null || rounded === 0) {
+    deltaSub = t('profileSheet.levelNinety');
+    deltaTone = A.DIM;
+  } else if (rounded > 0) {
+    deltaSub = t('profileSheet.deltaNinety', { delta: `+${rounded.toFixed(1)}` });
+    deltaTone = A.OVER;
+  } else {
+    deltaSub = t('profileSheet.deltaNinety', { delta: `\u2212${Math.abs(rounded).toFixed(1)}` });
+    deltaTone = A.UNDER;
+  }
+
+  const go = () => onNavigate('/handicap');
 
   return (
-    <div
-      onClick={() => onNavigate('/handicap')}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onNavigate('/handicap');
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      style={stripBase}
-    >
-      {eyebrow}
-      {trendLoading ? (
-        <div
-          className="clb-shimmer-light rounded-sm"
-          style={{ width: 52, height: 22, background: 'rgba(15,23,42,0.06)' }}
-        />
-      ) : (
-        <span
+    <div style={wrap}>
+      <Panel>
+        <header
           style={{
-            fontWeight: 800,
-            fontSize: 22,
-            color: INK,
-            letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            gap: 12,
+            marginBottom: 16,
           }}
         >
-          {indexText}
-        </span>
-      )}
-      {trendNode}
-      {rounds90d != null && (
-        <span style={{ fontWeight: 500, fontSize: 11, color: MUTED }}>
-          {DOT} {rounds90d} rounds {DOT} 90d
-        </span>
-      )}
-      {chevron}
+          <span style={KICKER}>{t('profileSheet.yourGame')}</span>
+          <Action label={t('profileSheet.handicap')} onClick={go} />
+        </header>
+        <div
+          onClick={go}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              go();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          style={{ cursor: 'pointer' }}
+        >
+          <StatRow
+            size={24}
+            items={[
+              {
+                label: t('profileSheet.handicap'),
+                value: indexText,
+                sub: deltaSub,
+              },
+              ...(rounds90d != null
+                ? [{
+                    label: t('profileSheet.rounds'),
+                    value: rounds90d,
+                    sub: t('profileSheet.ninetyDays'),
+                  }]
+                : []),
+              ...(coursesPlayed != null
+                ? [{
+                    label: t('profileSheet.courses'),
+                    value: coursesPlayed,
+                    sub: t('profileSheet.played'),
+                  }]
+                : []),
+            ]}
+          />
+        </div>
+      </Panel>
+      {/* Sub-label tone lives on the figure's sub row; StatRow renders subs in
+          DIM, so the delta tone is applied by overriding it below. */}
+      <style>{`.ps2-hcp-delta{color:${deltaTone} !important}`}</style>
     </div>
   );
 }
