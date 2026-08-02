@@ -1,8 +1,14 @@
 /**
- * LiveNowStrip — charcoal row shown ONLY when the player is in an
+ * LiveNowStrip - charcoal row shown ONLY when the player is in an
  * inprogress tournament. Reads usePlayerState.liveData (extended in P1
  * to include position + thru so the row can render the sub line
  * without a second query).
+ *
+ * LIVE is a haloed STATUS_LIVE dot + LABEL, matching the leaderboard
+ * masthead / side menu / schedule / tournament hero. No capsule, no border.
+ * Scores go through the canonical fmtScore + getScoreColor helpers.
+ * The strip's own border/radius stays: it is a discrete live object on canvas,
+ * not a row in a list.
  */
 
 import { ChevronRight } from 'lucide-react';
@@ -10,13 +16,21 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PlayerLiveData } from '../../hooks/usePlayerState';
 import { tournamentRoute } from '../../routes';
-import { CHARCOAL, LIVE_DOT, TOPAR_UNDER_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { fmtScore } from '../../utils/fmtScore';
+import { getScoreColor } from '../../_shared/scoreColor';
+import { CHARCOAL, STATUS_LIVE_ON_DARK, WHITE_ALPHA_55 } from '../../_shared/tokens';
 
 interface LiveNowStripProps {
-
   liveData: PlayerLiveData;
   playerName: string;
 }
+
+const LABEL_ON_DARK = {
+  fontSize: 9,
+  fontWeight: 800 as const,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase' as const,
+};
 
 function posLabel(pos: number | null, tied: boolean | null): string | null {
   if (pos === null) return null;
@@ -37,15 +51,9 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
       ? t('player.live.finished')
       : t('player.live.thru', { holes: liveData.thru });
 
-  const subParts = [pos, thruLabel].filter(Boolean).join(' · ');
-  const scoreDisplay =
-    liveData.score === null
-      ? '—'
-      : liveData.score === 0
-      ? 'E'
-      : liveData.score > 0
-      ? `+${liveData.score}`
-      : String(liveData.score);
+  const subParts = [pos, thruLabel].filter(Boolean).join(' \u00b7 ');
+  const scoreDisplay = liveData.score === null ? '' : fmtScore(liveData.score);
+  const scoreColor = getScoreColor(liveData.score, 'dark');
 
   return (
     <div style={{ padding: '12px 16px 8px' }}>
@@ -62,39 +70,20 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           textDecoration: 'none',
           color: '#FFFFFF',
         }}
-
         className="active:opacity-80 transition-opacity"
       >
-        {/* LIVE pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '4px 8px',
-            borderRadius: 999,
-            background: 'rgba(34,197,94,0.14)',
-            border: `1px solid rgba(34,197,94,0.36)`,
-            flexShrink: 0,
-          }}
-        >
+        {/* LIVE dot + label */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <span
             style={{
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               borderRadius: '50%',
-              background: LIVE_DOT,
-              boxShadow: `0 0 8px ${LIVE_DOT}`,
+              background: STATUS_LIVE_ON_DARK,
+              boxShadow: `0 0 8px ${STATUS_LIVE_ON_DARK}`,
             }}
           />
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: LIVE_DOT,
-              letterSpacing: '0.14em',
-            }}
-          >
+          <span style={{ ...LABEL_ON_DARK, color: STATUS_LIVE_ON_DARK }}>
             {t('player.live.badge')}
           </span>
         </div>
@@ -122,11 +111,10 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           {subParts && (
             <div
               style={{
-                marginTop: 2,
-                fontSize: 10.5,
-                fontWeight: 700,
+                marginTop: 3,
+                ...LABEL_ON_DARK,
                 color: WHITE_ALPHA_55,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
               {subParts}
@@ -135,18 +123,20 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
         </div>
 
         {/* Total */}
-        <div
-          style={{
-            fontSize: 20,
-            fontWeight: 200,
-            letterSpacing: '-0.02em',
-            color: TOPAR_UNDER_DARK,
-            fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
-          }}
-        >
-          {scoreDisplay}
-        </div>
+        {scoreDisplay && (
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: scoreColor,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+              flexShrink: 0,
+            }}
+          >
+            {scoreDisplay}
+          </div>
+        )}
 
         <ChevronRight size={18} color={WHITE_ALPHA_55} style={{ flexShrink: 0 }} />
       </Link>
