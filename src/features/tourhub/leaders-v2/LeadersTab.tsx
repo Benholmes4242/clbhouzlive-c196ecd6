@@ -28,9 +28,7 @@ import {
 
 import { useLeaderCategories } from './data/useLeaderCategories';
 import {
-  WorldBoard,
-  MoneyBoard,
-  ScoringBoard,
+  StatBoardRows,
   WinnersCircle,
   ANATOMY_BY_KEY,
   type Anatomy,
