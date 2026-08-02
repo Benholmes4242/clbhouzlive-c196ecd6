@@ -11,10 +11,37 @@ import { V4 } from '../tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { SPACE } from '@/lib/spacing';
+import { useMyCourseBest } from '../../hooks/useMyCourseBest';
+import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+
+/** Stat cell for the Course of the Week panel. Amber is reserved for the member. */
+function CotwStat({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  tone?: string;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 0 }}>
+      <span style={{ fontSize: 20, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
+        {value}
+      </span>
+      <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
+      {sub ? <span style={{ ...LABEL, fontSize: 8, color: A.MUTE }}>{sub}</span> : null}
+    </div>
+  );
+}
 
 export function CourseOfTheWeekSection() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useCourseOfTheWeek();
+  // No row (never played / signed out) => two-cell stat row, no error surface.
+  const { data: myBest } = useMyCourseBest(data?.course_id);
 
   // Loading: skeleton mirrors card geometry, no reservation beyond it.
   if (isLoading && !data) {
@@ -211,24 +238,29 @@ export function CourseOfTheWeekSection() {
 
               {/* Body */}
               <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* Rating + review count row */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                  <span
-                    style={{
-                      fontSize: 26,
-                      fontWeight: 200,
-                      color: V4.ink,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1,
-                      fontVariantNumeric: 'tabular-nums',
-                      fontFeatureSettings: '"kern" 1, "liga" 1',
-                    }}
-                  >
-                    {Number(avg_rating ?? 0).toFixed(1)}
-                  </span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: V4.inkFaint, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    · {review_count.toLocaleString()} reviews
-                  </span>
+                {/* Stat row — three cells when the member has played here,
+                    two when signed out / never played (grid rebalances). */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${myBest?.best_gross != null ? 3 : 2}, 1fr)`,
+                    alignItems: 'start',
+                  }}
+                >
+                  <CotwStat label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
+                  <CotwStat label="Reviews" value={review_count.toLocaleString()} />
+                  {myBest?.best_gross != null ? (
+                    <CotwStat
+                      label="Your best"
+                      value={String(myBest.best_gross)}
+                      tone={A.AMBER}
+                      sub={
+                        myBest.rounds_here && myBest.rounds_here > 0
+                          ? `${myBest.rounds_here} ${myBest.rounds_here === 1 ? 'round' : 'rounds'}`
+                          : undefined
+                      }
+                    />
+                  ) : null}
                 </div>
 
                 {/* Quote block (only when present) */}

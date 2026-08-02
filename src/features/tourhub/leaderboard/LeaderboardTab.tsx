@@ -24,6 +24,7 @@ import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, t
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
+import { resolveCutDisplay } from '../_shared/cutDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -285,12 +286,20 @@ export function LeaderboardTab() {
     }).length;
   })();
 
-  let cutState: CutState = { kind: 'none', cutline: null, extraCount: 0 };
-  if (cutHasHappened && cutline != null) {
-    cutState = { kind: 'actual', cutline, extraCount };
-  } else if (isLive && projectedCutline != null) {
-    cutState = { kind: 'projected', cutline: projectedCutline, extraCount: 0 };
-  }
+  // Shared guard: projected_cutline is never shown once current_round > cut_round.
+  const cutDisplay = resolveCutDisplay({
+    status: metaStatus,
+    currentRound,
+    cutRound,
+    cutline,
+    projectedCutline,
+  });
+  const cutState: CutState =
+    cutDisplay.kind === 'actual'
+      ? { kind: 'actual', cutline: cutDisplay.cutline as number, extraCount }
+      : cutDisplay.kind === 'projected'
+        ? { kind: 'projected', cutline: cutDisplay.cutline as number, extraCount: 0 }
+        : { kind: 'none', cutline: null, extraCount: 0 };
 
   const venueLine = [
     meta?.venue_name ?? selected.venue_name,

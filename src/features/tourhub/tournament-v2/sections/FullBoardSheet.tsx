@@ -15,6 +15,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
+import { resolveCutDisplay } from '../../_shared/cutDisplay';
 import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50, HAIRLINE_INK_8, AMBER } from '../../_shared/tokens';
 
 interface Props {
@@ -36,20 +37,20 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
 
 
   const cutState: CutState = useMemo(() => {
-    const status = (meta?.status ?? '').toLowerCase();
-    const currentRound = meta?.current_round ?? null;
-    const cutRound = meta?.cut_round ?? null;
-    const cutline = meta?.cutline ?? null;
-    const projected = meta?.projected_cutline ?? null;
-    const cutHappened =
-      (cutRound != null && currentRound != null && currentRound > cutRound) ||
-      status === 'closed' || status === 'completed' || status === 'complete';
     const extra = entries.filter((e) => {
       const u = (e.status || '').toUpperCase();
       return u === 'CUT' || u === 'MC' || u === 'MDF';
     }).length;
-    if (cutHappened && cutline != null) return { kind: 'actual', cutline, extraCount: extra };
-    if (status === 'inprogress' && projected != null) return { kind: 'projected', cutline: projected, extraCount: 0 };
+    // Shared guard: a stale projected_cutline is never shown after the cut lands.
+    const cut = resolveCutDisplay({
+      status: meta?.status ?? null,
+      currentRound: meta?.current_round ?? null,
+      cutRound: meta?.cut_round ?? null,
+      cutline: meta?.cutline ?? null,
+      projectedCutline: meta?.projected_cutline ?? null,
+    });
+    if (cut.kind === 'actual') return { kind: 'actual', cutline: cut.cutline as number, extraCount: extra };
+    if (cut.kind === 'projected') return { kind: 'projected', cutline: cut.cutline as number, extraCount: 0 };
     return { kind: 'none', cutline: null, extraCount: 0 };
   }, [meta, entries]);
 
