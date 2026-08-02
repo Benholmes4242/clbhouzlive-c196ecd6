@@ -190,8 +190,14 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
 
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
-      <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} eyebrowColor={V4.amber} rightMeta={rightMeta}>
+      <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} rightMeta={rightMeta}>
+        <LiveStatBand
+          entries={(leaderboardQuery.data ?? []) as any[]}
+          round={round}
+          tournamentId={tournamentId ?? ''}
+        />
         <div
+
           ref={railRef}
           style={{
             display: 'flex',
