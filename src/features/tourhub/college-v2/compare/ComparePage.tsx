@@ -147,7 +147,61 @@ export function ComparePage() {
   const rightClass = rightRoster.slice(0, CLASS_CAP);
 
   const leftCode = left?.shortName || left?.collegeName?.slice(0, 4).toUpperCase() || 'LEFT';
-  const rightCode = right?.shortName || right?.collegeName?.slice(0, 4).toUpperCase() || 'RIGHT';
+
+  const leftName = left?.shortName || left?.collegeName || '';
+  const rightName = right?.shortName || right?.collegeName || '';
+  const year = data?.year ?? new Date().getFullYear();
+
+  const statsLoading = isLoading && !left && !right;
+  const aggLoading = leftAggLoading || rightAggLoading;
+  const averageRows =
+    (leftAgg?.scoringAvg || rightAgg?.scoringAvg ? 1 : 0) +
+    (leftAgg?.drivingDistance || rightAgg?.drivingDistance ? 1 : 0) +
+    (leftAgg?.sgTotal || rightAgg?.sgTotal ? 1 : 0);
+
+  // Analytics: viewed once per mount, after both sides and aggregates resolve.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    if (!left || !right || aggLoading) return;
+    viewedRef.current = true;
+    analyticsEvents.track('tour_college_compare_viewed', {
+      left_slug: c1,
+      right_slug: c2,
+      left_rank: left.rank ?? null,
+      right_rank: right.rank ?? null,
+      average_rows: averageRows,
+    });
+  }, [left, right, aggLoading, c1, c2, averageRows]);
+
+  // Analytics: a side swapped to a new college.
+  const prevSlugs = useRef<{ c1: string; c2: string }>({ c1, c2 });
+  useEffect(() => {
+    const prev = prevSlugs.current;
+    if (prev.c1 !== c1) {
+      analyticsEvents.track('tour_college_compare_swapped', {
+        side: 'left',
+        from_slug: prev.c1,
+        to_slug: c1,
+      });
+    }
+    if (prev.c2 !== c2) {
+      analyticsEvents.track('tour_college_compare_swapped', {
+        side: 'right',
+        from_slug: prev.c2,
+        to_slug: c2,
+      });
+    }
+    prevSlugs.current = { c1, c2 };
+  }, [c1, c2]);
+
+  const openPicker = (target: 'c1' | 'c2') => {
+    setPickerTarget(target);
+    analyticsEvents.track('tour_college_compare_changed', {
+      side: target === 'c1' ? 'left' : 'right',
+    });
+  };
+
 
   // c1 && !c2 → we're about to redirect; render nothing.
   if (c1 && !c2) return null;
