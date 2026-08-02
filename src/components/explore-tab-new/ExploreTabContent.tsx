@@ -1,259 +1,224 @@
-import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegion } from './hooks/useExploreRegion';
-
-// WireTicker is now attached directly under the Discover hero by
-// CoursesContent (`<AmateurCircuitHero fallback={…} /> + <WireTicker />`),
-// so this surface no longer owns the ticker.
-
-
-import { AlmanacLens, REGION_TABS } from './AlmanacSections';
-import {
-  useRegionFeats,
-  type FeatRow,
-  type RecordsMode,
-} from './hooks/useRegionFeats';
-import { TierSeeAllSheet } from './TierSeeAllSheet';
-
-import { scrollPageToTop } from '@/lib/getScrollParent';
-
-
-import { TheRecordBook } from './TheRecordBook';
-import { FriendsRoundsSection } from './FriendsRoundsSection';
-
-import { AcesAlbatrossesPodium } from './AcesAlbatrossesPodium';
-import { EaglesLedger } from './EaglesLedger';
-import { BirdieHaulsLedger } from './BirdieHaulsLedger';
-import { ToughestIndex } from './ToughestIndex';
-import { HardestHolesRail } from './HardestHolesRail';
-import { SectionHead } from './SectionHead';
-import { DiscoverBand } from './DiscoverBand';
-import {
-  isHideableScope,
-  useHiddenRailTracker,
-  useReportRailEmpty,
-  type OnRailEmpty,
-} from './railEmptiness';
+import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
+import { useNewsCourses, type NewsCourse } from './hooks/useNewsCourses';
+import { REGION_TABS } from './AlmanacSections';
+import { ScopePills } from './wire/ScopePills';
+import { TheWire } from './wire/TheWire';
+import { CoursesInTheNews } from './wire/CoursesInTheNews';
+import { YourCircle } from './wire/YourCircle';
+import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
+import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-import { AlmanacEmptyCard } from './AlmanacEmptyCard';
-
-import ExploreGrid from './ExploreGrid';
-import WeekInGolfRail from './WeekInGolfRail';
-
-import { SeasonRaceCard } from './SeasonRaceCard';
-import { YourStandingStrip } from './YourStandingStrip';
-import { AttackDefendBand } from './AttackDefendBand';
-
-
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
-import { SPACE } from '@/lib/spacing';
+import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { regionScopePhrase } from './regionScope';
-import { EmptyScopeCard } from './EmptyScopeCard';
+import { SPACE } from '@/lib/spacing';
+
+/**
+ * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_THE_WIRE).
+ *
+ * Three sections and one control, down from thirteen sections and four
+ * controls. Discover is the only surface that answers "what just happened":
+ * Courses answers "where might I play", course detail "tell me about this
+ * course", Handicap "how am I playing", Clubhouse "what are people saying".
+ *
+ *   sticky   region scope pills - ONE control for the whole page
+ *   headline kicker + "What just happened"
+ *   THE WIRE day-grouped panels, paginated in place
+ *   NEWS     horizontal course rail, after the first day group
+ *   CIRCLE   friends' latest rounds, 5 rows + sheet
+ */
 
 interface ExploreTabContentProps {
   embedded?: boolean;
   shellTabs?: React.ReactNode;
 }
 
-export default function ExploreTabContent({ embedded: _embedded = false, shellTabs }: ExploreTabContentProps) {
-  const { user, loading: authLoading } = useSupabaseSession();
+export default function ExploreTabContent({
+  embedded: _embedded = false,
+  shellTabs,
+}: ExploreTabContentProps) {
+  const { t } = useTranslation('courses');
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   const userId = user?.id;
-  const gridRef = useRef<HTMLDivElement | null>(null);
-  const [scope, setScope] = useState<RecordsMode>('latest');
-  // Sticky lens bar: mirrors CoursesContent so the notch veil paints the
-  // strip above the bar the moment it pins (no gap, no colour seam).
+
+  const { region: activeRegion, setRegion } = useExploreRegion();
+
+  // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
+  // moment the pills pin (no gap, no colour seam).
   const lensSentinelRef = useRef<HTMLDivElement | null>(null);
   const [tabsStuck, setTabsStuck] = useState(false);
-
   useEffect(() => {
     setTabsStuck(window.scrollY > 200);
     const el = lensSentinelRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setTabsStuck(!entry.isIntersecting),
-      { threshold: 0 },
-    );
+    const io = new IntersectionObserver(([entry]) => setTabsStuck(!entry.isIntersecting), {
+      threshold: 0,
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
-  const { region: activeRegion, setRegion } = useExploreRegion();
-
-  const {
-    posts,
-    isLoading,
-    isError,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    refetch,
-  } = useExploreFeed({ userId, region: activeRegion });
-
-  const coursePosts = useMemo(
-    () => posts.filter((post) => !!(post.courseName || post.review?.courseName)),
-    [posts],
+  const { events, isLoading: wireLoading } = useDiscoverWire(
+    activeRegion,
+    userId,
+    crownCategoryLabel,
   );
+  const {
+    courses: newsCourses,
+    isLoading: newsLoading,
+    hasCandidates: hasNewsCandidates,
+  } = useNewsCourses(events);
 
-  const feedRegionLabel = useMemo(
+  const scopeLabel = useMemo(
     () => REGION_TABS.find((tab) => tab.slug === activeRegion)?.label ?? 'Worldwide',
     [activeRegion],
   );
 
   const handleRegionChange = useCallback(
     (slug: string | null) => {
+      if (slug === activeRegion) return;
+      analyticsEvents.track('discover_scope_changed', {
+        from: activeRegion ?? 'worldwide',
+        to: slug ?? 'worldwide',
+      });
       setRegion(slug);
       scrollPageToTop('smooth');
     },
-    [setRegion],
+    [activeRegion, setRegion],
   );
 
-  const regionUpper = feedRegionLabel.toUpperCase();
+  // Wire rows and news cards ROUTE: a course page is a different surface with
+  // its own job. "View all" on the circle is a sheet - bounded set, same rows,
+  // coming straight back.
+  const handleWireRow = useCallback(
+    (e: WireEvent) => {
+      analyticsEvents.track('discover_wire_row_tapped', {
+        kind: e.kind,
+        course_id: e.courseId ?? null,
+        is_own: e.isOwn,
+      });
+      if (e.courseId) navigate(`/courses/${e.courseId}`);
+    },
+    [navigate],
+  );
+
+  const handleNewsCard = useCallback(
+    (c: NewsCourse) => {
+      analyticsEvents.track('discover_news_card_tapped', {
+        course_id: c.courseId,
+        why: c.why.kind,
+      });
+      navigate(`/courses/${c.courseId}`);
+    },
+    [navigate],
+  );
 
   const opener = useScorecardOpener();
-  const handleFeatRowTap = useCallback(
-    (row: FeatRow) => {
-      if (row.score_id) opener.openByScore(row.score_id, null, row.user_id);
-      else if (row.user_id) opener.openProfile(row.user_id);
+  const handleCircleRow = useCallback(
+    (scoreId: string | null, uid: string) => {
+      if (scoreId) opener.openByScore(scoreId, null, uid);
+      else opener.openProfile(uid);
     },
     [opener],
   );
-  const handleLeaderTap = useCallback(
-    (uid: string) => opener.openProfile(uid),
-    [opener],
-  );
 
-  // Scope-driven rails report their own emptiness; the page shows ONE
-  // consolidated note when two or more have gone missing.
-  const { reporter, hiddenCount } = useHiddenRailTracker();
-  const showConsolidatedEmpty = isHideableScope(activeRegion) && hiddenCount >= 2;
+  // discover_wire_scroll_depth — once per mount, on pagehide or unmount.
+  const loadedRef = useRef(0);
+  const reportedRef = useRef(false);
+  const scopeRef = useRef(activeRegion);
+  scopeRef.current = activeRegion;
+  const handleLoadedChange = useCallback((count: number) => {
+    loadedRef.current = count;
+  }, []);
+  useEffect(() => {
+    const report = () => {
+      if (reportedRef.current || loadedRef.current === 0) return;
+      reportedRef.current = true;
+      analyticsEvents.track('discover_wire_scroll_depth', {
+        scope: scopeRef.current ?? 'worldwide',
+        events_loaded: loadedRef.current,
+      });
+    };
+    window.addEventListener('pagehide', report);
+    return () => {
+      window.removeEventListener('pagehide', report);
+      report();
+    };
+  }, []);
 
   return (
-    <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      <div>
+    <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
+      <div>{shellTabs}</div>
 
+      <GlassHeaderPlate visible={tabsStuck} />
+      <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
+      <ScopePills region={activeRegion} onChange={handleRegionChange} />
 
-        {shellTabs}
-        {/* Your standing — merged identity + standing band (crowns / rank+progress / hcp) */}
-        <YourStandingStrip userId={userId} />
-      </div>
-
-      <div>
-        <GlassHeaderPlate visible={tabsStuck} />
-        <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
-        <AlmanacLens
-          region={activeRegion}
-          onRegionChange={handleRegionChange}
-          scope={scope}
-          onScopeChange={setScope}
-        />
-
-        <AlmanacEmptyCard region={activeRegion} />
-
-        <FriendsRoundsSection userId={userId} opener={opener} />
-
-        {/* Attack / Defend band — absorbs "Your next conquests" */}
-        <AttackDefendBand userId={userId} region={activeRegion} />
-
-        {/* The record book owns its own containment card so a hidden rail
-            takes the band with it. */}
-        <TheRecordBook
-          region={activeRegion}
-          opener={opener}
-          mode={scope}
-          userId={userId}
-          inCard
-          onEmpty={reporter('records')}
-        />
-
-
-
-
-        {/* This week in golf — honours rail */}
-        <WeekInGolfRail region={activeRegion} onEmpty={reporter('week')} />
-
-
-        {/* Season race */}
-        <SeasonRaceCard userId={userId} />
-
-        {/* Merged Moments: Honours / Eagles / Birdies */}
-        <MomentsSection
-          region={activeRegion}
-          regionUpper={regionUpper}
-          mode={scope}
-          onRowTap={handleFeatRowTap}
-          onLeaderTap={handleLeaderTap}
-          onEmpty={reporter('moments')}
-        />
-
-        {/* Toughest courses index */}
-        <ToughestIndex region={activeRegion} />
-
-        {/* Hardest holes rail — siblings to the sternest tests: courses then holes */}
-        <HardestHolesRail region={activeRegion} />
-
-        {/* ONE consolidated note for everything the scope has yet to fill. */}
-        {showConsolidatedEmpty ? (
-          <DiscoverBand>
-            <div style={{ padding: '16px 14px' }}>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 0.6,
-                  textTransform: 'uppercase',
-                  color: 'rgba(15,23,42,0.45)',
-                  marginBottom: 4,
-                }}
-              >
-                Early days
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 650, color: '#0F172A', lineHeight: 1.3 }}>
-                {feedRegionLabel} is still filling up — records, honours and hauls
-                will appear here as rounds land.
-              </div>
-            </div>
-          </DiscoverBand>
-        ) : null}
-
-
-
-        {/* Feed block */}
-        <div
+      <div style={{ padding: '18px 16px 12px' }}>
+        <div style={KICKER}>{t('discover.kicker', 'The amateur circuit')}</div>
+        <h1
           style={{
-            marginTop: SPACE.sectionSection,
-            borderTop: '1px solid rgba(15,23,42,0.06)',
-            paddingTop: SPACE.sectionSection,
-            paddingBottom: SPACE.pageBottom,
+            margin: '7px 0 0',
+            fontSize: 26,
+            fontWeight: 800,
+            color: A.INK,
+            letterSpacing: '-0.02em',
           }}
         >
-          <SectionHead
-            overline="The feed"
-            title="On the course"
-            paddingX={30}
-          />
+          {t('discover.headline', 'What just happened')}
+        </h1>
+        <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.45, color: A.MUTE }}>
+          {activeRegion == null
+            ? t(
+                'discover.subWorldwide',
+                'Records, crowns and rare cards from official WHS rounds worldwide.',
+              )
+            : t('discover.subScoped', {
+                defaultValue:
+                  'Records, crowns and rare cards from official WHS rounds in {{scope}}.',
+                scope: scopeLabel,
+              })}
+        </p>
+      </div>
 
+      <div
+        style={{
+          padding: '0 14px',
+          paddingBottom: SPACE.pageBottom,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}
+      >
+        <TheWire
+          events={events}
+          isLoading={wireLoading}
+          scopeKey={activeRegion ?? 'worldwide'}
+          onRowPress={handleWireRow}
+          onLoadedChange={handleLoadedChange}
+          newsSlot={
+            hasNewsCandidates ? (
+              <div style={{ padding: '6px 0 2px' }}>
+                <CoursesInTheNews
+                  courses={newsCourses}
+                  isLoading={newsLoading}
+                  onCardPress={handleNewsCard}
+                  onBrowseAll={() => navigate('/courses')}
+                />
+              </div>
+            ) : null
+          }
+        />
 
-          <ExploreGrid
-            posts={posts}
-            coursePosts={coursePosts}
-            isLoading={isLoading || (authLoading && coursePosts.length === 0)}
-            isError={isError}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={fetchNextPage}
-            refetch={refetch}
-            gridRef={gridRef}
-            activeRegion={activeRegion}
-            onRegionChange={handleRegionChange}
-          />
-        </div>
+        <YourCircle userId={userId} onRowPress={handleCircleRow} />
       </div>
 
       <RoundDetailSheet
@@ -264,290 +229,5 @@ export default function ExploreTabContent({ embedded: _embedded = false, shellTa
         profileUserId={opener.target?.profileUserId ?? null}
       />
     </div>
-  );
-}
-
-function LegendarySection({
-  region,
-  regionUpper,
-  mode,
-  onRowTap,
-  onLeaderTap,
-  hideHeader = false,
-  sheetOpen: sheetOpenProp,
-  onSheetOpenChange,
-  onEmpty,
-}: {
-  region: string | null;
-  regionUpper: string;
-  mode: RecordsMode;
-  onRowTap: (row: FeatRow) => void;
-  onLeaderTap: (uid: string) => void;
-  hideHeader?: boolean;
-  sheetOpen?: boolean;
-  onSheetOpenChange?: (open: boolean) => void;
-  onEmpty?: OnRailEmpty;
-}) {
-  const { data } = useRegionFeats(region, 'legendary');
-  const rows = useMemo(() => data ?? [], [data]);
-  const [localSheetOpen, setLocalSheetOpen] = useState(false);
-  const controlled = onSheetOpenChange !== undefined;
-  const sheetOpen = controlled ? !!sheetOpenProp : localSheetOpen;
-  const setSheetOpen = controlled ? onSheetOpenChange : setLocalSheetOpen;
-  const sectionMarginTop = hideHeader ? 0 : 32;
-  const [sheetMetric, setSheetMetric] = useState<'aces' | 'albatrosses'>('aces');
-
-  const openSheet = (metric: 'aces' | 'albatrosses') => {
-    setSheetMetric(metric);
-    setSheetOpen(true);
-  };
-
-  const overline = mode === 'alltime' ? 'All-time honours' : 'Latest honours';
-
-  // Scoped-empty: render the unconquered empty-state.
-  if ((data ?? []).length > 0 && rows.length === 0 && region != null) {
-    return (
-      <section style={{ marginTop: sectionMarginTop }}>
-        {hideHeader ? null : (
-          <SectionHead overline={overline} title="Moments of the game" paddingX={14} />
-        )}
-        <EmptyScopeCard
-          title={`No moments ${regionScopePhrase(region)} yet.`}
-          subline="This region is unconquered — be the first."
-        />
-      </section>
-    );
-  }
-
-  // Suppress region-only used prop lint
-  void regionUpper;
-
-  return (
-    <section style={{ marginTop: sectionMarginTop }}>
-      {hideHeader ? null : (
-        <SectionHead
-          overline={overline}
-          title="Moments of the game"
-          meta="View all"
-          onMeta={() => openSheet(sheetMetric)}
-          paddingX={14}
-        />
-      )}
-
-      {mode === 'alltime' && (
-        <div
-          role="tablist"
-          aria-label="Metric"
-          style={{
-            margin: `${hideHeader ? 4 : 0}px 14px 8px`,
-            display: 'inline-flex',
-            gap: 2,
-            padding: 2,
-            background: '#FFFFFF',
-            border: '1px solid rgba(15,23,42,0.08)',
-            borderRadius: 999,
-          }}
-        >
-          {([
-            { v: 'aces', label: 'Aces' },
-            { v: 'albatrosses', label: 'Albatrosses' },
-          ] as const).map((o) => {
-            const active = sheetMetric === o.v;
-            return (
-              <button
-                key={o.v}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSheetMetric(o.v)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 999,
-                  background: active ? '#15171F' : 'transparent',
-                  color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                  border: 'none',
-                  fontFamily: 'inherit',
-                  fontSize: 10,
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  transition: 'all .15s',
-                }}
-              >
-                {o.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      <AcesAlbatrossesPodium
-        region={region}
-        mode={mode}
-        metric={sheetMetric}
-        onRowTap={onLeaderTap}
-        onLatestRowTap={onRowTap}
-        onEmpty={onEmpty}
-      />
-      <TierSeeAllSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        tier="legendary"
-        region={region}
-        rows={rows}
-        onRowTap={onRowTap}
-        initialMode={mode}
-        initialMetric={sheetMetric}
-      />
-    </section>
-  );
-}
-
-type MomentsTab = 'honours' | 'eagles' | 'birdies';
-
-/**
- * Merged "Moments of the game" — Honours / Eagles / Birdies behind one header.
- * Both page toggles (mode = Recent/All-time, region) are threaded into every
- * tab body; the selected tab is component-local and never resets on toggle.
- */
-function MomentsSection({
-  region,
-  regionUpper,
-  mode,
-  onRowTap,
-  onLeaderTap,
-  onEmpty,
-}: {
-  region: string | null;
-  regionUpper: string;
-  mode: RecordsMode;
-  onRowTap: (row: FeatRow) => void;
-  onLeaderTap: (uid: string) => void;
-  onEmpty?: OnRailEmpty;
-}) {
-  const { t } = useTranslation('courses');
-  const [tab, setTab] = useState<MomentsTab>('honours');
-  const [sheetOpen, setSheetOpen] = useState(false);
-
-  // All three bodies stay mounted (inactive ones visually hidden) so each can
-  // report its own emptiness — the merged band only disappears when the whole
-  // set is empty for the scope.
-  const { reporter, hiddenCount } = useHiddenRailTracker();
-  const allEmpty = hiddenCount >= 3;
-  useReportRailEmpty(onEmpty, allEmpty);
-
-  const tabs: { id: MomentsTab; label: string }[] = [
-    { id: 'honours', label: t('discover.moments.tabs.honours', 'Honours') },
-    { id: 'eagles', label: t('discover.moments.tabs.eagles', 'Eagles') },
-    { id: 'birdies', label: t('discover.moments.tabs.birdies', 'Birdies') },
-  ];
-
-  const handleTab = (id: MomentsTab) => {
-    if (id === tab) return;
-    setTab(id);
-    analyticsEvents.track('discover_feats_tab', { tier: id, mode });
-  };
-
-  return (
-    <DiscoverBand hidden={allEmpty}>
-
-      <SectionHead
-        overline={
-          mode === 'alltime'
-            ? t('discover.moments.overlineAllTime', 'All-time honours')
-            : t('discover.moments.overlineLatest', 'Latest honours')
-        }
-        title={t('discover.moments.title', 'Moments of the game')}
-        meta={t('discover.moments.viewAll', 'View all')}
-        onMeta={() => setSheetOpen(true)}
-        paddingX={14}
-        paddingTop={12}
-        paddingBottom={10}
-      />
-
-      <div
-        role="tablist"
-        aria-label={t('discover.moments.title', 'Moments of the game')}
-        style={{
-          margin: '0 14px 4px',
-          display: 'inline-flex',
-          gap: 2,
-          padding: 2,
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.08)',
-          borderRadius: 999,
-        }}
-      >
-        {tabs.map((o) => {
-          const active = tab === o.id;
-          return (
-            <button
-              key={o.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => handleTab(o.id)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 999,
-                background: active ? '#15171F' : 'transparent',
-                color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
-                border: 'none',
-                fontFamily: 'inherit',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0.2,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                transition: 'all .15s',
-              }}
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={{ paddingBottom: 4 }}>
-        <div style={tab === 'honours' ? undefined : { display: 'none' }}>
-          <LegendarySection
-            region={region}
-            regionUpper={regionUpper}
-            mode={mode}
-            onRowTap={onRowTap}
-            onLeaderTap={onLeaderTap}
-            hideHeader
-            sheetOpen={tab === 'honours' && sheetOpen}
-            onSheetOpenChange={setSheetOpen}
-            onEmpty={reporter('honours')}
-          />
-        </div>
-        <div style={tab === 'eagles' ? undefined : { display: 'none' }}>
-          <EaglesLedger
-            region={region}
-            regionUpper={regionUpper}
-            mode={mode}
-            onRowTap={onRowTap}
-            onLeaderTap={onLeaderTap}
-            hideHeader
-            sheetOpen={tab === 'eagles' && sheetOpen}
-            onSheetOpenChange={setSheetOpen}
-            onEmpty={reporter('eagles')}
-          />
-        </div>
-        <div style={tab === 'birdies' ? undefined : { display: 'none' }}>
-          <BirdieHaulsLedger
-            region={region}
-            regionUpper={regionUpper}
-            mode={mode}
-            onRowTap={onRowTap}
-            hideHeader
-            sheetOpen={tab === 'birdies' && sheetOpen}
-            onSheetOpenChange={setSheetOpen}
-            onEmpty={reporter('birdies')}
-          />
-        </div>
-      </div>
-    </DiscoverBand>
   );
 }

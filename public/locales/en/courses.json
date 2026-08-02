@@ -1020,6 +1020,52 @@
       "ordinal_ordinal_two": "{{count}}nd",
       "ordinal_ordinal_few": "{{count}}rd",
       "ordinal_ordinal_other": "{{count}}th"
+    },
+    "kicker": "The amateur circuit",
+    "headline": "What just happened",
+    "subWorldwide": "Records, crowns and rare cards from official WHS rounds worldwide.",
+    "subScoped": "Records, crowns and rare cards from official WHS rounds in {{scope}}.",
+    "groupToday": "Today",
+    "groupThisWeek": "This week",
+    "groupEarlier": "Earlier",
+    "eventCount_one": "{{count}} event",
+    "eventCount_other": "{{count}} events",
+    "endOfWire": "You are up to date",
+    "newsTitle": "Courses in the news",
+    "browseAllCourses": "Browse all courses",
+    "ratingCount_one": "{{value}} rating",
+    "ratingCount_other": "{{value}} ratings",
+    "yourCircle": "Your circle",
+    "viewAll": "View all",
+    "wire": {
+      "emptyTitle": "Nothing on the wire yet",
+      "emptyBody": "Records, crowns and rare cards appear here as official WHS rounds land.",
+      "you": "You",
+      "tag": {
+        "ace": "Hole in one",
+        "albatross": "Albatross"
+      },
+      "action": {
+        "crown": "Took {{category}}",
+        "crownRecord": "New course record",
+        "ace": "Aced the {{hole}}",
+        "aceYards": "Aced the {{hole}}, {{yards}} yds",
+        "albatross": "Albatross on the {{hole}}",
+        "albatrossYards": "Albatross on the {{hole}}, {{yards}} yds",
+        "eagle": "Eagled the {{hole}}",
+        "eagleUnknownHole": "Made an eagle",
+        "birdieHaul": "Made {{count}} birdies"
+      },
+      "unit": {
+        "gross": "gross",
+        "diff": "diff",
+        "points": "points",
+        "birdies": "birdies",
+        "eagles": "eagles",
+        "aces": "aces",
+        "albatrosses": "albatrosses",
+        "rounds": "rounds"
+      }
     }
   },
   "statBrowse": {

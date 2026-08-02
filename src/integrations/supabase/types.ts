@@ -19754,6 +19754,16 @@ export type Database = {
           user_wins: number
         }[]
       }
+      get_round_course_context: {
+        Args: { p_whs_score_id: string }
+        Returns: {
+          best_here: number
+          course_id: string
+          rank_here: number
+          rounds_here: number
+          your_avg_to_par: number
+        }[]
+      }
       get_round_crowns: {
         Args: { p_score_ids: string[] }
         Returns: {
@@ -20377,6 +20387,19 @@ export type Database = {
       get_tournament_hole_analysis: {
         Args: { p_round?: number; p_tournament_id: string }
         Returns: Json
+      }
+      get_tournament_hole_averages: {
+        Args: {
+          p_min_players?: number
+          p_round_number: number
+          p_tournament_id: string
+        }
+        Returns: {
+          field_avg: number
+          hole_number: number
+          par: number
+          players: number
+        }[]
       }
       get_trending_courses: {
         Args: { p_days_back?: number; p_limit?: number; p_region_slug?: string }
