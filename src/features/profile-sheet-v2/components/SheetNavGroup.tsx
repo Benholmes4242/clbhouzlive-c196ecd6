@@ -13,10 +13,8 @@
 
 import React from 'react';
 
-const INK = '#0F172A';
-const MUTED = '#94A3B8';
-const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+
 const CHEVRON = '\u203A';
 
 type AnalyticsState = 'ready' | 'building' | 'disconnected';
@@ -51,10 +49,9 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        padding: '14px 16px',
+        padding: '13px 0',
         background: 'transparent',
         border: 0,
-        borderBottom: isLast ? 0 : `0.5px solid ${HAIRLINE}`,
         cursor: 'pointer',
         transition: 'transform 120ms ease',
         opacity: disabled ? 0.55 : 1,
@@ -62,14 +59,17 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
       }}
     >
       <div style={{ minWidth: 0, flex: 1, paddingRight: 12 }}>
-        <div style={{ fontWeight: 600, fontSize: 13.5, color: INK }}>{label}</div>
+        <div style={{ fontWeight: 700, fontSize: 14.5, color: A.INK }}>{label}</div>
         {subLabel && (
-          <div style={{ fontWeight: 500, fontSize: 11.5, color: MUTED, marginTop: 2 }}>
+          <div style={{ fontWeight: 500, fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>
             {subLabel}
           </div>
         )}
       </div>
-      {trailing ?? <span style={{ color: MUTED, fontSize: 16 }}>{CHEVRON}</span>}
+      {/* A tag OR a chevron — never both. */}
+      {trailing ?? (
+        <span style={{ color: A.AMBER_DEEP, fontSize: 16, fontWeight: 800 }}>{CHEVRON}</span>
+      )}
     </button>
   );
 }
@@ -102,10 +102,10 @@ export default function SheetNavGroup({
     <div
       style={{
         margin: '12px 20px 0',
-        background: '#fff',
-        border: `1px solid ${HAIRLINE}`,
+        background: A.PANEL,
+        border: `1px solid ${A.BORDER}`,
         borderRadius: 16,
-        overflow: 'hidden',
+        padding: '4px 16px',
       }}
     >
       <Row
@@ -120,20 +120,7 @@ export default function SheetNavGroup({
           disabled={analyticsDisabled}
           trailing={
             analyticsState === 'ready' ? (
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: 9,
-                  letterSpacing: '0.12em',
-                  color: AMBER,
-                  padding: '3px 7px',
-                  border: `1px solid ${AMBER}`,
-                  borderRadius: 999,
-                  textTransform: 'uppercase',
-                }}
-              >
-                NEW
-              </span>
+              <span style={{ ...LABEL, fontSize: 8.5, color: A.AMBER_DEEP }}>New</span>
             ) : undefined
           }
         />
@@ -160,16 +147,7 @@ export default function SheetNavGroup({
           onClick={() => onNavigate('/admin/command-center')}
           isLast
           trailing={
-            <span
-              style={{
-                fontWeight: 700,
-                fontSize: 9,
-                letterSpacing: '0.1em',
-                color: AMBER,
-              }}
-            >
-              ADMIN
-            </span>
+            <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE }}>Admin</span>
           }
         />
       )}

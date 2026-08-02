@@ -208,5 +208,15 @@
     "openAppleMaps": "Open in Apple Maps",
     "openGoogleMaps": "Open in Google Maps",
     "close": "Close"
+  },
+  "profileSheet": {
+    "yourGame": "Your game",
+    "handicap": "Handicap",
+    "rounds": "Rounds",
+    "courses": "Courses",
+    "ninetyDays": "90 days",
+    "played": "played",
+    "levelNinety": "Level 90d",
+    "deltaNinety": "{{delta}} 90d"
   }
 }

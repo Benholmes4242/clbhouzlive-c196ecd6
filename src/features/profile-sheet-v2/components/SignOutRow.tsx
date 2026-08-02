@@ -1,16 +1,16 @@
 /**
  * ProfileSheetV2 · SignOutRow
  *
- * Two-tap confirm: muted "Sign out" -> crimson pill "Tap again to
- * confirm" -> onNavigate('/logout'). The opener owns the actual logout
+ * Two-tap confirm: quiet "Sign out" -> quiet "Tap again to confirm"
+ * -> onNavigate('/logout'). No red: signing out is routine and reversible,
+ * and red is reserved for over par / genuinely destructive actions. The opener owns the actual logout
  * side effect (PostingAsMenu.handleAccountHubNavigate maps '/logout' to
  * useLogout().logout). Confirm state auto-reverts after 4s untouched.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 
-const MUTED = '#94A3B8';
-const CRIMSON = '#dc2626';
+import { A, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   onNavigate: (route: string) => void;
@@ -49,12 +49,11 @@ export default function SignOutRow({ onNavigate }: Props) {
           type="button"
           onClick={handleClick}
           style={{
-            fontWeight: 700,
-            fontSize: 13,
-            color: CRIMSON,
-            background: 'rgba(220,38,38,0.08)',
-            border: '1px solid rgba(220,38,38,0.25)',
-            borderRadius: 999,
+            ...LABEL,
+            fontFamily: SANS,
+            color: A.MUTE,
+            background: 'transparent',
+            border: 0,
             padding: '8px 20px',
             cursor: 'pointer',
           }}
@@ -66,9 +65,9 @@ export default function SignOutRow({ onNavigate }: Props) {
           type="button"
           onClick={handleClick}
           style={{
-            fontWeight: 600,
-            fontSize: 13,
-            color: MUTED,
+            ...LABEL,
+            fontFamily: SANS,
+            color: A.MUTE,
             background: 'transparent',
             border: 0,
             padding: '8px 12px',

@@ -17,9 +17,7 @@ import { Sparkles, Mail, Bell } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
-const INK = '#0F172A';
-const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   actorType: 'personal' | 'business';
@@ -43,9 +41,9 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
       style={{
         position: 'relative',
         flex: 1,
-        background: '#fff',
-        border: `1px solid ${HAIRLINE}`,
-        borderRadius: 14,
+        background: A.PANEL,
+        border: `1px solid ${A.BORDER}`,
+        borderRadius: 16,
         padding: '12px 0',
         display: 'flex',
         flexDirection: 'column',
@@ -57,7 +55,7 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
       }}
     >
       {icon}
-      <span style={{ fontWeight: 600, fontSize: 11.5, color: INK }}>{label}</span>
+      <span style={{ fontWeight: 600, fontSize: 11.5, color: A.INK }}>{label}</span>
       {badge != null && badge > 0 && (
         <span
           aria-label={`${badge} unread`}
@@ -69,12 +67,14 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
             height: 18,
             padding: '0 5px',
             borderRadius: 999,
-            background: AMBER,
-            color: '#fff',
+            // A waiting count is a count of things for THIS member — the one
+            // surviving amber fill on this sheet, and it is correct.
+            background: A.AMBER,
+            color: A.PANEL,
             fontWeight: 700,
             fontSize: 10,
             fontVariantNumeric: 'tabular-nums',
-            border: '2px solid #fff',
+            border: `2px solid ${A.PANEL}`,
             boxSizing: 'content-box',
             display: 'flex',
             alignItems: 'center',
@@ -103,18 +103,18 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
     <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
       <Tile
         label="Echo"
-        icon={<Sparkles size={17} color={INK} />}
+        icon={<Sparkles size={17} color={A.INK} />}
         onClick={() => onNavigate('/echo')}
       />
       <Tile
         label="Messages"
-        icon={<Mail size={17} color={INK} />}
+        icon={<Mail size={17} color={A.INK} />}
         badge={messagesBadge}
         onClick={() => onNavigate('/messages')}
       />
       <Tile
         label="Alerts"
-        icon={<Bell size={17} color={INK} />}
+        icon={<Bell size={17} color={A.INK} />}
         badge={alertsBadge}
         onClick={() => onNavigate('/notificationmessages')}
       />
