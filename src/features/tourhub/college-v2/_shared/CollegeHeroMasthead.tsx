@@ -61,12 +61,8 @@ function darkenTowardCharcoal(hex: string, amount = 0.4): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatPoints(n: number): string {
-  if (!n) return '$0';
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
-}
+/* Money formatting lives in _shared/formatEarnings.ts - one implementation. */
+
 
 interface Props {
   displayName: string;
