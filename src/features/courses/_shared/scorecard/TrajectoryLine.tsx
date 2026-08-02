@@ -1,6 +1,6 @@
 import React from 'react';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { beadForScore } from '@/features/courses/_shared/beadForScore';
 
 /**
  * Cumulative to-par across the round.
