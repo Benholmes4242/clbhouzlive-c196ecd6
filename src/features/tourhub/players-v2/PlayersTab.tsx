@@ -41,9 +41,58 @@ import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
 import { formatWeekdayLong, formatNumberMaxFrac } from '@/i18n/format';
 
-type SortKey = 'ranking' | 'live';
+type StatKey = 'scoring' | 'driving' | 'accuracy' | 'gir' | 'sgPutt';
+type SortKey = 'ranking' | 'live' | StatKey;
 
 const SEP = ' . ';
+
+/**
+ * The stat lens. Direction is per stat and getting it wrong is silent, so it
+ * lives here beside the field it orders rather than inside the comparator.
+ */
+const STAT_LENS: Record<
+  StatKey,
+  {
+    field: 'scoringAvg' | 'drivingDistance' | 'drivingAccuracy' | 'gir' | 'sgPutting';
+    dir: 'asc' | 'desc';
+    labelKey: string;
+  }
+> = {
+  scoring: { field: 'scoringAvg', dir: 'asc', labelKey: 'players.stat.scoring' },
+  driving: { field: 'drivingDistance', dir: 'desc', labelKey: 'players.stat.driving' },
+  accuracy: { field: 'drivingAccuracy', dir: 'desc', labelKey: 'players.stat.accuracy' },
+  gir: { field: 'gir', dir: 'desc', labelKey: 'players.stat.gir' },
+  sgPutt: { field: 'sgPutting', dir: 'desc', labelKey: 'players.stat.sgPutt' },
+};
+
+const STAT_ORDER: StatKey[] = ['scoring', 'driving', 'accuracy', 'gir', 'sgPutt'];
+
+function isStatKey(k: SortKey): k is StatKey {
+  return k !== 'ranking' && k !== 'live';
+}
+
+function statValue(r: RankedRow, k: StatKey): number | null {
+  return r[STAT_LENS[k].field] ?? null;
+}
+
+/** Nothing in the stat column is coloured; SG is the only signed figure. */
+function formatLensValue(k: StatKey, v: number): string {
+  switch (k) {
+    case 'scoring':
+      return formatNumberMaxFrac(v, 2);
+    case 'driving':
+      return formatNumberMaxFrac(v, 1);
+    case 'accuracy':
+    case 'gir':
+      return `${formatNumberMaxFrac(v, 1)}%`;
+    case 'sgPutt': {
+      // Round first, then decide the sign, so -0.0004 never renders "-0.000".
+      const r = Math.round(v * 1000) / 1000;
+      return `${r > 0 ? '+' : ''}${formatNumberMaxFrac(r, 3)}`;
+    }
+  }
+}
+
 
 function useDebouncedValue<T>(v: T, ms: number): T {
   const [x, setX] = useState(v);
@@ -155,6 +204,17 @@ export function PlayersTab() {
     [setSearchParams, activeTour],
   );
 
+  // Switching tour while a stat pill is active must reset the sort: the stat
+  // fields are null on every non-PGA row, so the key would order invisibly.
+  const changeTour = useCallback(
+    (next: PlayersTourId) => {
+      setActiveTour(next);
+      if (isStatKey(sortRef.current)) setSort('ranking');
+    },
+    [setSort],
+  );
+
+
   // -- Search
   const [search, setSearch] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -223,19 +283,32 @@ export function PlayersTab() {
     [filteredRows, liveMap],
   );
 
-  // -- Sort options: hide "Playing now" when nobody is live
-  const sortOptions = useMemo<SortKey[]>(
-    () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
-    [liveCount],
-  );
+  // -- Sort options: "Playing now" only when somebody is live; the stat lens
+  // only on PGA, where the stat columns actually exist.
+  const sortOptions = useMemo<SortKey[]>(() => {
+    const base: SortKey[] = liveCount > 0 ? ['ranking', 'live'] : ['ranking'];
+    return activeTour === 'pga' ? [...base, ...STAT_ORDER] : base;
+  }, [liveCount, activeTour]);
 
   // -- Safety: if live filter becomes empty, revert to ranking
   useEffect(() => {
     if (liveCount === 0 && sort === 'live') setSort('ranking');
   }, [liveCount, sort, setSort]);
 
-  // -- Ordering when "Playing now" active
+  // -- Ordering: "Playing now", or the active stat lens (nulls to the bottom).
   const orderedRows = useMemo<RankedRow[]>(() => {
+    if (isStatKey(sort)) {
+      const dir = STAT_LENS[sort].dir;
+      const valued: RankedRow[] = [];
+      const nulls: RankedRow[] = [];
+      filteredRows.forEach((r) => (statValue(r, sort) == null ? nulls : valued).push(r));
+      valued.sort((a, b) => {
+        const va = statValue(a, sort) as number;
+        const vb = statValue(b, sort) as number;
+        return dir === 'asc' ? va - vb : vb - va;
+      });
+      return [...valued, ...nulls];
+    }
     if (sort !== 'live') return filteredRows;
     const live: RankedRow[] = [];
     const rest: RankedRow[] = [];
@@ -250,6 +323,7 @@ export function PlayersTab() {
     });
     return [...live, ...rest];
   }, [sort, filteredRows, liveMap]);
+
 
   const isSearching = debouncedSearch.trim().length > 0;
   const synced = !!ranking?.synced;
