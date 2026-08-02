@@ -258,7 +258,7 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
   // World ranking (OWGR) is PGA-centric / male-tour — restricted to PGA only.
   const { data, error: rankErr } = await supabase
     .from('sr_world_rankings')
-    .select('player_id, rank, points, ranking_date')
+    .select('player_id, rank, prior_rank, points, ranking_date')
     .order('ranking_date', { ascending: false })
     .order('rank', { ascending: true })
     .limit(600);
@@ -271,8 +271,8 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
 
   const pmap = await fetchPlayers(dedup.map((r) => r.player_id));
 
-  const rows: LeaderRow[] = dedup
-    .filter((r) => pmap.has(r.player_id))
+  const eligible = dedup.filter((r) => pmap.has(r.player_id));
+  const rows: LeaderRow[] = eligible
     .slice(0, 50)
     .map((r, i) => {
       const p = pmap.get(r.player_id)!;
@@ -287,13 +287,17 @@ async function fetchWorldRankingCat(): Promise<LeaderCategoryDef | null> {
         tourCode: p.tour_codes?.[0] ?? 'pga',
         value: pts,
         valueFormatted: pts > 0 ? formatNumberMaxFrac(pts, 2) : `#${i + 1}`,
+        // Shared arithmetic — do not re-derive movement locally.
+        movement: movementFrom(r.rank, r.prior_rank ?? null),
+        behindFormatted: null,
       };
     });
 
   return {
     key: 'world_rank',
     ...LEADER_STAT_LABELS.world_rank,
-    rows,
+    rows: applyBehind(rows, 'desc', (v) => formatNumberMaxFrac(v, 2)),
+    poolSize: eligible.length,
   };
 }
 
