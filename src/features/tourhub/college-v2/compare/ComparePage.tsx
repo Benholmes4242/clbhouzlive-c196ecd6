@@ -23,14 +23,17 @@
  * No framer.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 import { formatNumber } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
+  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -47,7 +50,7 @@ import { useCollegeRoster } from '@/features/tourhub/college-v2/profile/data/use
 import { useThisWeekAlumni, type WeekAlumnusRow } from '@/features/tourhub/college-v2/profile/data/useThisWeekAlumni';
 import { useLivePlayerIds, type LivePlayerMap } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import { DuelMasthead } from './DuelMasthead';
-import { TugStat } from './TugStat';
+import { AverageStatRow, CountStatRow } from './TugStat';
 import { PickerSheet } from './PickerSheet';
 import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,9 +58,47 @@ import { Skeleton } from '@/components/ui/skeleton';
 const CLASS_CAP = 5;
 const OFF_INK = 'rgba(15,23,42,0.38)';
 const fmtInt = (n: number) => formatNumber(n);
-const fmtScoringAvg = (n: number) => (n > 0 ? n.toFixed(2) : '0.00');
-const fmtDrive = (n: number) => (n > 0 ? `${n.toFixed(1)} yds` : '0.0 yds');
-const fmtSg = (n: number) => (n === 0 ? '0.00' : (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2)));
+const fmtScoringAvg = (n: number) => n.toFixed(2);
+const fmtDrive = (n: number) => `${n.toFixed(1)} yds`;
+const fmtSg = (n: number) => (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
+
+const KICKER_STYLE = {
+  padding: '18px 16px 8px',
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase' as const,
+  color: AMBER_DEEP,
+};
+
+function SkeletonKicker() {
+  return (
+    <div style={{ padding: '18px 16px 8px' }}>
+      <Skeleton style={{ height: 10, width: 90, borderRadius: 3 }} />
+    </div>
+  );
+}
+
+function SkeletonRow({ withBar = false }: { withBar?: boolean }) {
+  return (
+    <div style={{ padding: '14px 16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+        <Skeleton style={{ height: 16, width: 60, borderRadius: 3 }} />
+        <Skeleton style={{ height: 10, width: 70, borderRadius: 3 }} />
+        <Skeleton style={{ height: 16, width: 60, borderRadius: 3 }} />
+      </div>
+      {withBar ? (
+        <Skeleton style={{ height: 4, borderRadius: 2 }} />
+      ) : (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Skeleton style={{ height: 9, width: 66, borderRadius: 3 }} />
+          <Skeleton style={{ height: 9, width: 66, borderRadius: 3 }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export function ComparePage() {
   const [searchParams] = useSearchParams();
