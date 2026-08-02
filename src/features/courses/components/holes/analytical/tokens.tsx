@@ -24,6 +24,9 @@ export const A = {
   AMBER_DEEP: '#C2620A',
   RED: '#C8372B',
   GREEN: '#0F8F4A',
+  /** Semantic aliases: OVER reads worse, UNDER reads better. */
+  OVER: '#C8372B',
+  UNDER: '#0F8F4A',
   TRACK: '#E9EDF1',
 } as const;
 
