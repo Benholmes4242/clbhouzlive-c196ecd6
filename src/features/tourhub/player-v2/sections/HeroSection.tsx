@@ -1,10 +1,12 @@
 /**
- * HeroSection — dark cinematic identity band.
+ * HeroSection - dark cinematic identity band.
  *
- * ~210px tall (+ safe-area). Gradient #262B33 → #15171F. The identity IS
- * the image — no course photo. 74px avatar squircle w/ white-alpha ring,
- * eyebrow "{TOUR} · {flag} {COUNTRY}", name 23/800, meta row surfaces
- * only what actually exists on the DB row (world_rank, fedex_rank).
+ * Height is HERO_MIN_H from _shared/tokens - the canonical tour hero height,
+ * sourced from the course detail hero. FIXED in all cases; it does not vary
+ * on whether a photo is present. The identity IS the image - no course photo.
+ * 74px avatar squircle w/ white-alpha ring, LABEL eyebrow
+ * "{TOUR} . {flag} {COUNTRY}", name 26/800, then a two-figure rank row
+ * (WORLD / FEDEX) that surfaces only what actually exists on the DB row.
  */
 
 import { useTranslation } from 'react-i18next';
@@ -15,21 +17,49 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { titleCaseCountry } from '../../utils/countryFlags';
 import { TOUR_LABEL, mapTourSlug } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { HERO_MIN_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
 import { heroTintGradient } from '../../_shared/heroGradient';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 
 interface HeroSectionProps {
-
   player: TourPlayer;
   playerStats: TourPlayerStatistics | null;
 }
+
+// LABEL token on dark: 9 / 800 / 0.13em / uppercase.
+const LABEL_ON_DARK = {
+  fontSize: 9,
+  fontWeight: 800 as const,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase' as const,
+};
 
 function tourLabel(codes: string[] | null, t: TFunction): string {
   const first = codes?.[0] as keyof typeof TOUR_LABEL | undefined;
   return first
     ? t('player.hero.tourSuffix', { tour: TOUR_LABEL[first] ?? first.toUpperCase() })
     : t('player.hero.fallback');
+}
+
+function RankFigure({ label, value }: { label: string; value: number }) {
+  return (
+    <div style={{ minWidth: 0 }}>
+      <div style={{ ...LABEL_ON_DARK, color: 'rgba(255,255,255,0.42)' }}>{label}</div>
+      <div
+        style={{
+          marginTop: 4,
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          lineHeight: 1,
+          color: '#FFFFFF',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  );
 }
 
 export function HeroSection({ player, playerStats }: HeroSectionProps) {
@@ -46,6 +76,8 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
   const fedexRank =
     playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? playerStats.fedex_rank : null;
   const isPga = player.tour_codes?.includes('pga') ?? false;
+  const showFedex = isPga && !!fedexRank;
+  const showRankRow = !!worldRank || showFedex;
 
   const tourId = mapTourSlug(player.tour_codes?.[0] ?? 'pga');
   const tourColor = TOUR_CONFIG[tourId]?.color ?? null;
@@ -55,16 +87,13 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
     <div
       style={{
         background: heroBg,
-        // Canonical hero height — matches course-detail / tournament hero.
-        minHeight:
-          'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+        minHeight: HERO_MIN_H,
         paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
         paddingBottom: 16,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
       }}
-
     >
       <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
         <SquircleAvatar
@@ -83,11 +112,8 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              fontSize: 9.5,
-              fontWeight: 800,
-              letterSpacing: '0.10em',
-              color: WHITE_ALPHA_55,
-              textTransform: 'uppercase',
+              ...LABEL_ON_DARK,
+              color: 'rgba(255,255,255,0.45)',
               marginBottom: 6,
               minHeight: 14,
               flexWrap: 'wrap',
@@ -96,7 +122,9 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
             <span>{tourLabel(player.tour_codes, t)}</span>
             {country && (
               <>
-                <span aria-hidden style={{ opacity: 0.6 }}>·</span>
+                <span aria-hidden style={{ opacity: 0.6 }}>
+                  {'\u00b7'}
+                </span>
                 <CountryFlag country={player.country_code || player.country} size="sm" />
                 <span>{country}</span>
               </>
@@ -107,7 +135,7 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
           <h1
             style={{
               margin: 0,
-              fontSize: 23,
+              fontSize: 26,
               fontWeight: 800,
               letterSpacing: '-0.01em',
               lineHeight: 1.1,
@@ -119,30 +147,24 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
           >
             {player.full_name}
           </h1>
-
-          {/* Meta */}
-          {(worldRank || (isPga && fedexRank)) && (
-            <div
-              style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              marginTop: 12,
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: WHITE_ALPHA_65,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-            >
-              {worldRank && <span>{t('player.hero.worldNo', { rank: worldRank })}</span>}
-              {worldRank && isPga && fedexRank && (
-                <span aria-hidden style={{ opacity: 0.5 }}>·</span>
-              )}
-              {isPga && fedexRank && <span>{t('player.hero.fedexNo', { rank: fedexRank })}</span>}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Two-figure rank row. Group boundary rule is permitted here. */}
+      {showRankRow && (
+        <div
+          style={{
+            margin: '14px 16px 0',
+            paddingTop: 12,
+            borderTop: '1px solid rgba(255,255,255,0.10)',
+            display: 'flex',
+            gap: 32,
+          }}
+        >
+          {worldRank && <RankFigure label={t('player.hero.worldLabel')} value={worldRank} />}
+          {showFedex && <RankFigure label={t('player.hero.fedexLabel')} value={fedexRank!} />}
+        </div>
+      )}
     </div>
   );
 }
