@@ -166,6 +166,7 @@ export const StatRow: React.FC<{
               ...LABEL,
               fontSize: 8,
               marginTop: 3,
+              ...(it.subTone ? { color: it.subTone } : null),
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
