@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +6,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { useNewsCourses, type NewsCourse } from './hooks/useNewsCourses';
-import { REGION_TABS } from './AlmanacSections';
 import { ScopePills } from './wire/ScopePills';
 import { TheWire } from './wire/TheWire';
 import { RarestOfAll } from './wire/RarestOfAll';
@@ -78,11 +77,6 @@ export default function ExploreTabContent({
     isLoading: newsLoading,
     hasCandidates: hasNewsCandidates,
   } = useNewsCourses(events);
-
-  const scopeLabel = useMemo(
-    () => REGION_TABS.find((tab) => tab.slug === activeRegion)?.label ?? 'Worldwide',
-    [activeRegion],
-  );
 
   const handleRegionChange = useCallback(
     (slug: string | null) => {
