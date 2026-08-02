@@ -405,14 +405,6 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* THIS WEEK - renders nothing at all without a live event on this tour. */}
-      {showThisWeek && thisWeek && (
-        <div style={{ padding: '12px 16px 4px' }}>
-          <Panel kicker={thisWeek.name.toUpperCase()}>
-            <StatRow items={thisWeekItems} />
-          </Panel>
-        </div>
-      )}
 
       {/* THE FIELD. The kicker is the only amber on this page: there is no
           viewing member on a tour surface, so nothing else earns brand colour.
