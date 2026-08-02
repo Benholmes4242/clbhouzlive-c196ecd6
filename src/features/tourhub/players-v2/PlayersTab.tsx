@@ -109,7 +109,7 @@ export function PlayersTab() {
   // -- Data
   const { data: ranking, isLoading: rankingLoading, isError: rankingError, refetch: refetchRanking } = usePlayersRanking(activeTour);
   const { data: liveMap } = useLivePlayerIds();
-  const { data: liveTournaments } = useLiveTournaments();
+  
   const loadedIds = useMemo(
     () => (ranking?.rows ?? []).map((r) => r.playerId).filter(Boolean),
     [ranking?.rows],
