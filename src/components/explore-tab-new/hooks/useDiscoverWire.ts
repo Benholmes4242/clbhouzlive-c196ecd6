@@ -31,7 +31,7 @@ export type WireKind = 'crown' | 'ace' | 'albatross' | 'eagle' | 'birdie_haul';
 export interface WireEvent {
   id: string;
   kind: WireKind;
-  /** ISO date or timestamp. Sorting and day-grouping key. */
+  /** ISO date or timestamp. Sorting and month-grouping key. */
   at: string;
   actorName: string;
   actorAvatar: string | null;
@@ -40,7 +40,11 @@ export interface WireEvent {
   courseId: string | null;
   courseName: string | null;
   courseImage: string | null;
-  /** Only the genuinely rare is tagged: hole in one and albatross. */
+  /**
+   * Rarity tag. Aces and albatrosses have left the wire for "Rarest of all"
+   * (BRIEF_DISCOVER_REBUILD §2.1), so nothing in the month groups is tagged
+   * unless a records-rail kind is ever found to be materially rarer.
+   */
   tagKey?: 'ace' | 'albatross';
   actionKey: string;
   actionParams?: Record<string, string | number>;
@@ -51,7 +55,12 @@ export interface WireEvent {
   figureTone?: string;
   /** 3 = ace/albatross, 2 = record/crown, 1 = eagle/birdie haul. News dedupe. */
   rarity: 1 | 2 | 3;
+  /** Legendary rows only — hole context for the "Rarest of all" panel. */
+  holeNo?: number | null;
+  holePar?: number | null;
+  holeYards?: number | null;
 }
+
 
 export const ACTION_DEFAULTS: Record<string, string> = {
   'discover.wire.action.crown': 'Took {{category}}',
