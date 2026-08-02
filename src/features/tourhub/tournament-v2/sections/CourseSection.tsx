@@ -133,12 +133,24 @@ function HolesSheet({
   }, [t, roundsPresent]);
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" surfaceColor={SLATE_50} style={{ height: '75dvh', maxHeight: '75dvh' }}>
-      <div style={{ background: SLATE_50, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '4px 16px 8px' }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      variant="light"
+      surfaceColor={A.PANEL}
+      ariaLabelledBy="tournament-holes-sheet-title"
+      style={{ height: '75dvh', maxHeight: '75dvh' }}
+    >
+      <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '0 16px 8px' }}>
+          <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
+          <h2
+            id="tournament-holes-sheet-title"
+            style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+          >
             {t('tournament.course.allHolesTitle', { ns: 'tourhub' })}
-          </div>
+          </h2>
+
           {/* Amber credibility pill */}
           <div
             style={{
