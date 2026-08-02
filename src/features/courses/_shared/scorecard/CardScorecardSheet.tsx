@@ -5,6 +5,7 @@ import { RefreshCw, Table } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
@@ -107,51 +108,11 @@ function toParColor(n: number | null): string {
 const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
 
 /**
- * Result marks — shape AND colour together. Shape survives a colourblind
- * reader and a screenshot; colour makes it scannable. Par is unmarked on
- * purpose: marking every hole marks nothing.
+ * Result marks come from the shared ScoreMark renderer — one grammar across the
+ * sheet, the feed card and the Holes legend. Par is unmarked on purpose:
+ * marking every hole marks nothing.
  */
-const ScoreCell: React.FC<{ strokes: number | null; par: number | null }> = ({ strokes, par }) => {
-  if (strokes == null || strokes <= 0) {
-    return <span style={{ ...NUM, fontSize: 13, color: A.DIM }}>{'\u2014'}</span>;
-  }
-  const d = par == null ? 0 : strokes - par;
-  const under = d <= -1;
-  const over = d >= 1;
-  // Over par carries no colour of its own — the SHAPE carries it, exactly as a
-  // paper card works. Only under par is coloured.
-  const tone = under ? TOPAR_UNDER_LIGHT : TOPAR_OVER_LIGHT;
-  const dbl = d <= -2 || d >= 2;
 
-  return (
-    <span
-      style={{
-        width: '100%', maxWidth: 26, aspectRatio: '1 / 1', display: 'inline-flex',
-        alignItems: 'center', justifyContent: 'center', position: 'relative',
-      }}
-    >
-      {(under || over) && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 0, border: `1.5px solid ${tone}`,
-            borderRadius: under ? '50%' : 3,
-          }}
-        />
-      )}
-      {dbl && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 3, border: `1.5px solid ${tone}`,
-            borderRadius: under ? '50%' : 2,
-          }}
-        />
-      )}
-      <span style={{ ...NUM, fontSize: 13.5, color: tone, position: 'relative' }}>{strokes}</span>
-    </span>
-  );
-};
 
 const CardRow: React.FC<{
   label: string;
@@ -197,7 +158,10 @@ const Nine: React.FC<{
       <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={par || '\u2014'} muted />
       <CardRow
         label={scoreLabel}
-        cells={rows.map((h) => <ScoreCell key={h.holeNo} strokes={h.strokes} par={h.par} />)}
+        cells={rows.map((h) => (
+          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="light" />
+        ))}
+
         total={strokes || '\u2014'}
       />
 
@@ -224,23 +188,25 @@ const Nine: React.FC<{
 
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
-  const keys: { d: number; label: string }[] = [
-    { d: -1, label: t('courses:scorecard.legendBirdie') },
-    { d: -2, label: t('courses:scorecard.legendEagle') },
-    { d: 1, label: t('courses:scorecard.legendBogey') },
-    { d: 2, label: t('courses:scorecard.legendDouble') },
+  const keys: { strokes: number; label: string }[] = [
+    { strokes: 3, label: t('courses:scorecard.legendBirdie') },
+    { strokes: 2, label: t('courses:scorecard.legendEagle') },
+    { strokes: 1, label: t('courses:scorecard.legendAce') },
+    { strokes: 5, label: t('courses:scorecard.legendBogey') },
+    { strokes: 6, label: t('courses:scorecard.legendDouble') },
   ];
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
       {keys.map((k) => (
-        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <ScoreCell strokes={4 + k.d} par={4} />
+        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+          <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
           <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
         </span>
       ))}
     </div>
   );
 };
+
 
 /* ------------------------------------------------------ round breakdown */
 

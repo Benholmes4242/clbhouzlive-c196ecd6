@@ -1,65 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  FONT,
-  INK,
-  SC_ACCENT,
-  SC_FILL_GOLD,
-  SC_FILL_BIRDIE,
-  SC_FILL_BOGEY,
-  SC_FILL_DOUBLE,
-  SC_PAR,
-} from './_constants';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { FONT, INK, SC_ACCENT } from './_constants';
 
-// World Feed scoring key: swatches mirror the ScoreMark chip shapes exactly.
-// Gold disc = ace / albatross / eagle. Red disc = birdie. Small gray dot = par.
-// Blue square = bogey. Navy square = double-plus.
-type KeyShape = 'circle' | 'square' | 'dot';
-type KeyId = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'doublePlus';
-interface KeyItem { id: KeyId; labelKey: string; color: string; shape: KeyShape; ink?: string; }
+// Scoring key: swatches are rendered BY ScoreMark itself, never hand-drawn,
+// so the key can never drift from the card.
+// Birdie · Eagle · Ace · Bogey · Double+
+interface KeyItem { id: string; labelKey: string; strokes: number; par: number; }
 
 const KEY: KeyItem[] = [
-  { id: 'ace',        labelKey: 'courses:holes.scoringKey.ace',        color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { id: 'albatross',  labelKey: 'courses:holes.scoringKey.albatross',  color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { id: 'eagle',      labelKey: 'courses:holes.scoringKey.eagle',      color: SC_FILL_GOLD,   shape: 'circle', ink: INK },
-  { id: 'birdie',     labelKey: 'courses:holes.scoringKey.birdie',     color: SC_FILL_BIRDIE, shape: 'circle' },
-  { id: 'par',        labelKey: 'courses:holes.par',                   color: SC_PAR,         shape: 'dot' },
-  { id: 'bogey',      labelKey: 'courses:holes.scoringKey.bogey',      color: SC_FILL_BOGEY,  shape: 'square' },
-  { id: 'doublePlus', labelKey: 'courses:holes.scoringKey.doublePlus', color: SC_FILL_DOUBLE, shape: 'square' },
+  { id: 'birdie',     labelKey: 'courses:holes.scoringKey.birdie',     strokes: 3, par: 4 },
+  { id: 'eagle',      labelKey: 'courses:holes.scoringKey.eagle',      strokes: 2, par: 4 },
+  { id: 'ace',        labelKey: 'courses:holes.scoringKey.ace',        strokes: 1, par: 4 },
+  { id: 'bogey',      labelKey: 'courses:holes.scoringKey.bogey',      strokes: 5, par: 4 },
+  { id: 'doublePlus', labelKey: 'courses:holes.scoringKey.doublePlus', strokes: 6, par: 4 },
 ];
-
-const Swatch: React.FC<{ item: KeyItem }> = ({ item }) => {
-  if (item.shape === 'dot') {
-    return (
-      <span
-        aria-hidden
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: item.color,
-          display: 'inline-block',
-          flexShrink: 0,
-          marginLeft: 3,
-          marginRight: 3,
-        }}
-      />
-    );
-  }
-  return (
-    <span
-      aria-hidden
-      style={{
-        width: 12,
-        height: 12,
-        borderRadius: item.shape === 'square' ? 3 : '50%',
-        background: item.color,
-        display: 'inline-block',
-        flexShrink: 0,
-      }}
-    />
-  );
-};
 
 export const HolesScoringKey: React.FC = () => {
   const { t } = useTranslation(['courses']);
@@ -92,8 +47,8 @@ export const HolesScoringKey: React.FC = () => {
         }}
       >
         {KEY.map((it) => (
-          <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <Swatch item={it} />
+          <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: 7, lineHeight: 1 }}>
+            <ScoreMark strokes={it.strokes} par={it.par} size={22} surface="light" />
             <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{t(it.labelKey)}</span>
           </div>
         ))}
@@ -103,4 +58,3 @@ export const HolesScoringKey: React.FC = () => {
 };
 
 export default HolesScoringKey;
-
