@@ -829,6 +829,12 @@
       "accuracy": "ACCURACY",
       "gir": "GIR",
       "sgPutt": "SG PUTT"
+    },
+    "thisWeek": {
+      "inField": "IN THE FIELD",
+      "top10In": "TOP 10 IN",
+      "leader": "LEADER",
+      "tied": "{{count}} tied"
     }
   },
   "player": {

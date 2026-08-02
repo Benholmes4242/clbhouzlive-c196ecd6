@@ -1,14 +1,15 @@
 /**
- * players-v2/PlayersTab - "The Field" - one shared ledger row, a two-figure
- * field band, a column header, and an honest sample-size caption.
+ * players-v2/PlayersTab - "The Field" - a this-week panel, one shared ledger
+ * row, a column header, and an honest sample-size caption.
  *
  * Wiring:
  *   - Tour: LOCAL lens (per-section by design; NOT TourSelectionContext).
  *     ?tour= honored once on mount; ?sort= honored for old inbound links.
  *   - Data: usePlayersRanking(tour) + useLivePlayerIds() + useLiveTournaments()
  *     + useWorldRankLookup(loaded ids).
- *   - Editorial line: derived from the live/next tournament for the tour;
- *     self-hides when nothing to say.
+ *   - This-week panel: derived CLIENT-SIDE from the loaded field crossed with
+ *     the live leaderboard map. Renders ONLY when the active tour has an
+ *     inprogress tournament; otherwise nothing at all.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,6 +32,7 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
+import { Panel, StatRow, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
@@ -39,60 +41,11 @@ import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/us
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
-import { formatWeekdayLong, formatNumberMaxFrac } from '@/i18n/format';
+import { formatNumberMaxFrac } from '@/i18n/format';
 
-type StatKey = 'scoring' | 'driving' | 'accuracy' | 'gir' | 'sgPutt';
-type SortKey = 'ranking' | 'live' | StatKey;
+type SortKey = 'ranking' | 'live';
 
 const SEP = ' . ';
-
-/**
- * The stat lens. Direction is per stat and getting it wrong is silent, so it
- * lives here beside the field it orders rather than inside the comparator.
- */
-const STAT_LENS: Record<
-  StatKey,
-  {
-    field: 'scoringAvg' | 'drivingDistance' | 'drivingAccuracy' | 'gir' | 'sgPutting';
-    dir: 'asc' | 'desc';
-    labelKey: string;
-  }
-> = {
-  scoring: { field: 'scoringAvg', dir: 'asc', labelKey: 'players.stat.scoring' },
-  driving: { field: 'drivingDistance', dir: 'desc', labelKey: 'players.stat.driving' },
-  accuracy: { field: 'drivingAccuracy', dir: 'desc', labelKey: 'players.stat.accuracy' },
-  gir: { field: 'gir', dir: 'desc', labelKey: 'players.stat.gir' },
-  sgPutt: { field: 'sgPutting', dir: 'desc', labelKey: 'players.stat.sgPutt' },
-};
-
-const STAT_ORDER: StatKey[] = ['scoring', 'driving', 'accuracy', 'gir', 'sgPutt'];
-
-function isStatKey(k: SortKey): k is StatKey {
-  return k !== 'ranking' && k !== 'live';
-}
-
-function statValue(r: RankedRow, k: StatKey): number | null {
-  return r[STAT_LENS[k].field] ?? null;
-}
-
-/** Nothing in the stat column is coloured; SG is the only signed figure. */
-function formatLensValue(k: StatKey, v: number): string {
-  switch (k) {
-    case 'scoring':
-      return formatNumberMaxFrac(v, 2);
-    case 'driving':
-      return formatNumberMaxFrac(v, 1);
-    case 'accuracy':
-    case 'gir':
-      return `${formatNumberMaxFrac(v, 1)}%`;
-    case 'sgPutt': {
-      // Round first, then decide the sign, so -0.0004 never renders "-0.000".
-      const r = Math.round(v * 1000) / 1000;
-      return `${r > 0 ? '+' : ''}${formatNumberMaxFrac(r, 3)}`;
-    }
-  }
-}
-
 
 function useDebouncedValue<T>(v: T, ms: number): T {
   const [x, setX] = useState(v);
@@ -101,66 +54,6 @@ function useDebouncedValue<T>(v: T, ms: number): T {
     return () => clearTimeout(t);
   }, [v, ms]);
   return x;
-}
-
-function formatDayShort(d: string | null | undefined): string | null {
-  if (!d) return null;
-  const dt = new Date(d);
-  if (Number.isNaN(dt.getTime())) return null;
-  return formatWeekdayLong(dt);
-}
-
-/** Field band figure - label above figure, centred. */
-function FieldFigure({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string | null;
-}) {
-  return (
-    <div style={{ textAlign: 'center', minWidth: 0 }}>
-      <div
-        style={{
-          fontSize: 9,
-          fontWeight: 800,
-          letterSpacing: '0.13em',
-          textTransform: 'uppercase',
-          color: 'rgba(15,23,42,0.45)',
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          marginTop: 3,
-          fontSize: 22,
-          fontWeight: 200,
-          color: INK,
-          fontVariantNumeric: 'tabular-nums lining',
-          lineHeight: 1.1,
-        }}
-      >
-        {value}
-      </div>
-      {sub && (
-        <div
-          style={{
-            marginTop: 2,
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.13em',
-            textTransform: 'uppercase',
-            color: INK_MUTE,
-          }}
-        >
-          {sub}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export function PlayersTab() {
@@ -204,15 +97,9 @@ export function PlayersTab() {
     [setSearchParams, activeTour],
   );
 
-  // Switching tour while a stat pill is active must reset the sort: the stat
-  // fields are null on every non-PGA row, so the key would order invisibly.
-  const changeTour = useCallback(
-    (next: PlayersTourId) => {
-      setActiveTour(next);
-      if (isStatKey(sortRef.current)) setSort('ranking');
-    },
-    [setSort],
-  );
+  const changeTour = useCallback((next: PlayersTourId) => {
+    setActiveTour(next);
+  }, []);
 
 
   // -- Search
@@ -234,41 +121,6 @@ export function PlayersTab() {
   );
   const { data: worldRanks } = useWorldRankLookup(loadedIds);
 
-  // -- Editorial line (live leader -> then upcoming day)
-  const editorial = useMemo<string | null>(() => {
-    const tours = (liveTournaments ?? []).filter((t) => t.tourSlug === activeTour);
-    if (!tours.length) return null;
-    const live = tours.find((t) => t.status === 'inprogress');
-    if (live) {
-      // Find leader among liveMap rows belonging to this tournament.
-      const leaders = Object.values(liveMap ?? {})
-        .filter((info) => info.tournamentId === live.id && info.position === 1)
-        .slice(0, 1);
-      const leader = leaders[0];
-      const leaderRow = leader
-        ? (ranking?.rows ?? []).find(
-            (r) => (liveMap ?? {})[r.playerId]?.tournamentId === live.id && (liveMap ?? {})[r.playerId]?.position === 1,
-          )
-        : null;
-      if (leaderRow && leader?.score != null) {
-        return t('players.editorial.leaderAt', {
-          tournament: live.name.toUpperCase(),
-          leader: leaderRow.name.toUpperCase(),
-          score: fmtScore(leader.score),
-        });
-      }
-      return live.name.toUpperCase();
-    }
-    const soon = tours[0];
-    const day = formatDayShort(soon.start_date);
-    return day
-      ? t('players.editorial.startsOn', {
-          tournament: soon.name.toUpperCase(),
-          day: day.toUpperCase(),
-        })
-      : null;
-  }, [liveTournaments, activeTour, liveMap, ranking?.rows, t]);
-
   // -- Rows: filter by search
   const filteredRows = useMemo<RankedRow[]>(() => {
     const rows = ranking?.rows ?? [];
@@ -283,32 +135,19 @@ export function PlayersTab() {
     [filteredRows, liveMap],
   );
 
-  // -- Sort options: "Playing now" only when somebody is live; the stat lens
-  // only on PGA, where the stat columns actually exist.
-  const sortOptions = useMemo<SortKey[]>(() => {
-    const base: SortKey[] = liveCount > 0 ? ['ranking', 'live'] : ['ranking'];
-    return activeTour === 'pga' ? [...base, ...STAT_ORDER] : base;
-  }, [liveCount, activeTour]);
+  // -- Sort options: "Playing now" only when somebody is live.
+  const sortOptions = useMemo<SortKey[]>(
+    () => (liveCount > 0 ? ['ranking', 'live'] : ['ranking']),
+    [liveCount],
+  );
 
   // -- Safety: if live filter becomes empty, revert to ranking
   useEffect(() => {
     if (liveCount === 0 && sort === 'live') setSort('ranking');
   }, [liveCount, sort, setSort]);
 
-  // -- Ordering: "Playing now", or the active stat lens (nulls to the bottom).
+  // -- Ordering: "Playing now" floats live players to the top.
   const orderedRows = useMemo<RankedRow[]>(() => {
-    if (isStatKey(sort)) {
-      const dir = STAT_LENS[sort].dir;
-      const valued: RankedRow[] = [];
-      const nulls: RankedRow[] = [];
-      filteredRows.forEach((r) => (statValue(r, sort) == null ? nulls : valued).push(r));
-      valued.sort((a, b) => {
-        const va = statValue(a, sort) as number;
-        const vb = statValue(b, sort) as number;
-        return dir === 'asc' ? va - vb : vb - va;
-      });
-      return [...valued, ...nulls];
-    }
     if (sort !== 'live') return filteredRows;
     const live: RankedRow[] = [];
     const rest: RankedRow[] = [];
@@ -329,22 +168,85 @@ export function PlayersTab() {
   const synced = !!ranking?.synced;
   const statLabel = ranking?.statLabel ?? null;
   const loadedCount = ranking?.rows?.length ?? 0;
-  const activeStat: StatKey | null = isStatKey(sort) ? sort : null;
-  const activeStatLabel = activeStat ? t(STAT_LENS[activeStat].labelKey) : null;
 
 
-  // -- Field band: LEAD = points margin of rank 1 over rank 2 (RANKING only)
-  const leadMargin = useMemo<number | null>(() => {
-    if (sort !== 'ranking') return null;
+  // -- THIS WEEK. Only the ACTIVE TOUR's inprogress event, and every figure
+  // derived client-side from data already loaded. No new query.
+  const liveEvent = useMemo(() => {
+    const tours = (liveTournaments ?? []).filter((x) => x.tourSlug === activeTour);
+    return tours.find((x) => x.status === 'inprogress') ?? null;
+  }, [liveTournaments, activeTour]);
+
+  // Tournament-scoped, deliberately SEPARATE from `liveCount` (which counts
+  // any live event and drives the PLAYING NOW pill).
+  const thisWeek = useMemo(() => {
+    if (!liveEvent) return null;
     const rows = ranking?.rows ?? [];
-    if (rows.length < 2) return null;
-    const a = rows[0]?.stat;
-    const b = rows[1]?.stat;
-    if (a == null || b == null) return null;
-    return Math.abs(a - b);
-  }, [sort, ranking?.rows]);
+    const map = liveMap ?? {};
+    if (!rows.length || !Object.keys(map).length) return null;
+    const inEvent = (r: RankedRow) =>
+      !!r.playerId && map[r.playerId]?.tournamentId === liveEvent.id;
+    const inField = rows.filter(inEvent).length;
+    const top10In = rows.filter((r) => r.rank <= 10 && inEvent(r)).length;
+    const leaderRows = rows.filter((r) => inEvent(r) && map[r.playerId]?.position === 1);
+    const leaderScore = leaderRows.length ? map[leaderRows[0].playerId]?.score ?? null : null;
+    return {
+      tournamentId: liveEvent.id,
+      name: liveEvent.name,
+      inField,
+      total: rows.length,
+      top10In,
+      showTop10: rows.length >= 10,
+      leaderScore,
+      leaderName: leaderRows.length === 1 ? leaderRows[0].name : null,
+      leaderTied: leaderRows.length,
+    };
+  }, [liveEvent, ranking?.rows, liveMap]);
 
-  const showBand = !rankingLoading && !rankingError && (liveCount > 0 || leadMargin != null);
+  const thisWeekItems = useMemo<StatItem[]>(() => {
+    if (!thisWeek || rankingLoading || rankingError) return [];
+    const items: StatItem[] = [
+      {
+        label: t('players.thisWeek.inField'),
+        value: `${formatNumberMaxFrac(thisWeek.inField, 0)}/${formatNumberMaxFrac(thisWeek.total, 0)}`,
+      },
+    ];
+    if (thisWeek.showTop10) {
+      items.push({
+        label: t('players.thisWeek.top10In'),
+        value: `${formatNumberMaxFrac(thisWeek.top10In, 0)}/10`,
+      });
+    }
+    if (thisWeek.leaderScore != null) {
+      items.push({
+        label: t('players.thisWeek.leader'),
+        value: fmtScore(thisWeek.leaderScore),
+        tone: getScoreColor(thisWeek.leaderScore, 'light'),
+        sub:
+          thisWeek.leaderTied > 1
+            ? t('players.thisWeek.tied', { count: thisWeek.leaderTied })
+            : thisWeek.leaderName ?? undefined,
+        subVariant: 'caption',
+      });
+    }
+    return items;
+  }, [thisWeek, rankingLoading, rankingError, t]);
+
+  const showThisWeek = thisWeekItems.length > 0;
+
+  // -- Analytics: the panel earns its space or it does not.
+  const thisWeekTrackedRef = useRef(false);
+  useEffect(() => {
+    if (thisWeekTrackedRef.current || !showThisWeek || !thisWeek) return;
+    thisWeekTrackedRef.current = true;
+    analyticsEvents.track('tour_players_this_week_shown', {
+      tour: activeTour,
+      tournament_id: thisWeek.tournamentId,
+      in_field: thisWeek.inField,
+      field_total: thisWeek.total,
+      top10_in: thisWeek.top10In,
+    });
+  }, [showThisWeek, thisWeek, activeTour]);
 
   const goPlayer = useCallback(
     (r: RankedRow) => {
@@ -503,45 +405,12 @@ export function PlayersTab() {
         </div>
       </div>
 
-      <div style={{ padding: '12px 16px 0' }}>
-        {editorial && (
-          <div
-            style={{
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: INK_MUTE,
-              letterSpacing: '0.02em',
-              marginBottom: 12,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {editorial}
-          </div>
-        )}
-      </div>
-
-      {/* FIELD BAND - renders nothing at all when neither figure qualifies. */}
-      {showBand && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 40,
-            padding: '4px 16px 14px',
-          }}
-        >
-          {liveCount > 0 && (
-            <FieldFigure label={t('players.field.playingNow')} value={formatNumberMaxFrac(liveCount, 0)} />
-          )}
-          {leadMargin != null && (
-            <FieldFigure
-              label={t('players.field.lead')}
-              value={formatNumberMaxFrac(leadMargin, 0)}
-              sub={statLabel}
-            />
-          )}
+      {/* THIS WEEK - renders nothing at all without a live event on this tour. */}
+      {showThisWeek && thisWeek && (
+        <div style={{ padding: '12px 16px 4px' }}>
+          <Panel kicker={thisWeek.name.toUpperCase()}>
+            <StatRow items={thisWeekItems} />
+          </Panel>
         </div>
       )}
 
@@ -549,86 +418,57 @@ export function PlayersTab() {
           viewing member on a tour surface, so nothing else earns brand colour.
           With the stat lens present the pills need a full scrollable row of
           their own; with two pills they stay inline beside the kicker. */}
-      {(() => {
-        const lensRow = activeTour === 'pga';
-        const pills = (
-          <div
-            className={lensRow ? 'overflow-x-auto scrollbar-hide' : undefined}
-            style={{
-              display: 'flex',
-              gap: 4,
-              ...(lensRow
-                ? { padding: '0 16px 2px', WebkitOverflowScrolling: 'touch' as const }
-                : {}),
-            }}
-          >
-            {sortOptions.map((k) => {
-              const active = k === sort;
-              const label =
-                k === 'ranking'
-                  ? t('players.sort.ranking')
-                  : k === 'live'
-                    ? t('players.sort.playingNow')
-                    : t(STAT_LENS[k].labelKey);
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setSort(k)}
-                  style={{
-                    padding: '5px 10px',
-                    borderRadius: 10,
-                    border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                    background: active ? INK : '#FFFFFF',
-                    color: active ? '#FFFFFF' : INK_MUTE,
-                    fontFamily: 'inherit',
-                    fontSize: 10,
-                    fontWeight: 800,
-                    letterSpacing: '0.10em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    lineHeight: 1,
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        );
-
-        return (
-          <>
-            <div
-              style={{
-                padding: lensRow ? '4px 16px 6px' : '4px 16px 4px',
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'space-between',
-              }}
-            >
-              <span
+      <div
+        style={{
+          padding: '12px 16px 4px',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: AMBER_DEEP,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('players.field.eyebrow')}
+        </span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {sortOptions.map((k) => {
+            const active = k === sort;
+            return (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setSort(k)}
                 style={{
+                  padding: '5px 10px',
+                  borderRadius: 10,
+                  border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
+                  background: active ? INK : '#FFFFFF',
+                  color: active ? '#FFFFFF' : INK_MUTE,
+                  fontFamily: 'inherit',
                   fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  color: AMBER_DEEP,
+                  fontWeight: 800,
+                  letterSpacing: '0.10em',
                   textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
-                {t('players.field.eyebrow')}
-              </span>
-              {!lensRow && pills}
-            </div>
-            {lensRow && pills}
-          </>
-        );
-      })()}
-
-
+                {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {rankingLoading ? (
         <div style={{ padding: '0 16px' }}>
@@ -672,25 +512,17 @@ export function PlayersTab() {
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}
-            statLabel={activeStatLabel ?? (synced ? statLabel : null)}
+            statLabel={synced ? statLabel : null}
           />
-          {orderedRows.map((r, idx) => {
+          {orderedRows.map((r) => {
             const live = (liveMap ?? {})[r.playerId];
             const isLive = !!live;
             let sub: React.ReactNode = null;
-
-            // Under a stat lens the numeral is the position in the active sort
-            // and the tour ranking moves into the sub-line.
-            const tourRankSeg =
-              activeStat && synced && statLabel ? (
-                <span key="tr">{t('players.sub.tourRank', { label: statLabel, rank: r.rank })}</span>
-              ) : null;
 
             if (isLive && live) {
               const posStr =
                 live.position != null ? `${live.positionTied ? 'T' : ''}${live.position}` : '';
               const segments: React.ReactNode[] = [];
-              if (tourRankSeg) segments.push(tourRankSeg);
               if (posStr) segments.push(<span key="pos">{posStr}</span>);
               if (live.score != null) {
                 segments.push(
@@ -713,7 +545,6 @@ export function PlayersTab() {
             } else {
               const wr = (worldRanks ?? {})[r.playerId];
               const segments: React.ReactNode[] = [];
-              if (tourRankSeg) segments.push(tourRankSeg);
               if (wr) {
                 segments.push(
                   <span key="wr">
@@ -744,12 +575,10 @@ export function PlayersTab() {
               ) : null;
             }
 
-            const lensValue = activeStat ? statValue(r, activeStat) : null;
-
             return (
               <RankedPlayerRow
                 key={`${r.playerId || 'none'}-${r.rank}-${r.name}`}
-                rank={activeStat ? idx + 1 : r.rank}
+                rank={r.rank}
                 player={{
                   playerId: r.playerId,
                   name: r.name,
@@ -758,14 +587,7 @@ export function PlayersTab() {
                   photoUrl: r.photoUrl,
                   tourCode: r.tourCode,
                 }}
-                stat={activeStat ? undefined : synced ? r.stat : undefined}
-                statFormatted={
-                  activeStat
-                    ? lensValue != null
-                      ? formatLensValue(activeStat, lensValue)
-                      : ''
-                    : undefined
-                }
+                stat={synced ? r.stat : undefined}
                 live={isLive}
                 sub={sub}
                 interactive={!!r.playerId}
@@ -787,9 +609,7 @@ export function PlayersTab() {
           textAlign: 'center',
         }}
       >
-        {activeStatLabel
-          ? t('players.footer.sampleSorted', { count: loadedCount, stat: activeStatLabel })
-          : t('players.footer.sample', { count: loadedCount })}
+        {t('players.footer.sample', { count: loadedCount })}
       </div>
 
       <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
