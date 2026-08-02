@@ -47,20 +47,23 @@ export function MovementFigure({
         fontVariantNumeric: 'tabular-nums',
       };
 
+  const Tag = (inline ? 'span' : 'div') as 'span' | 'div';
+
   if (movement != null && movement !== 0) {
     return (
-      <div style={{ ...base, color: movement > 0 ? V4.up : V4.down }}>
+      <Tag style={{ ...base, color: movement > 0 ? V4.up : V4.down }}>
         {movement > 0 ? '\u25B2' : '\u25BC'} {Math.abs(movement)}
-      </div>
+      </Tag>
     );
   }
   if (nullPlaceholder === 'none') return null;
   return (
-    <div style={{ ...base, color: V4.inkFaint, fontWeight: inline ? 'inherit' : undefined }}>
+    <Tag style={{ ...base, color: V4.inkFaint, fontWeight: inline ? 'inherit' : undefined }}>
       {'\u2014'}
-    </div>
+    </Tag>
   );
 }
+
 
 
 export default MovementFigure;
