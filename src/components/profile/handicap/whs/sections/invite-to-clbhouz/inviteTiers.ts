@@ -18,9 +18,6 @@ export const INVITE_TIERS: InviteTier[] = [
   { floor: 10, goal: 15, title: 'Circle builder',          sub: "You're rounding up the whole club now" },
 ];
 
-/** Milestone markers shown as a dot ladder under the bar. */
-export const INVITE_MILESTONES = [3, 5, 10, 15];
-
 /** Returns the current tier, or null when all tiers are complete. */
 export function tierForSent(sent: number): InviteTier | null {
   for (const t of INVITE_TIERS) {
