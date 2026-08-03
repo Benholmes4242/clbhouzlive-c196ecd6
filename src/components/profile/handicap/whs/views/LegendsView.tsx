@@ -2,8 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import RivalriesSection from '../sections/rivalries/RivalriesSection';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
-import StreaksCard from '../../gam/streaks/StreaksCard';
-import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import CourseLegendsSection from '../sections/course-legends/CourseLegendsSection';
 import type { CourseSelection } from '../sections/course-legends/types';
 
@@ -39,17 +37,14 @@ export const LegendsView: React.FC<Props> = ({
         viewMode={readOnly ? 'friend' : 'owner'}
         ownerFirstName={ownerFirstName}
       />
-      {/* 2. Streaks — owner only */}
-      {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
-      {/* 3. Rivalries */}
+      {/* 2. Rivalries */}
       <RivalriesSection userId={userId} />
-      {/* 4. Course Legends */}
+      {/* 3. Course Legends */}
       <CourseLegendsSection
         userId={userId}
         friendName={readOnly ? ownerFirstName ?? null : null}
         onSelectCourse={handleSelectCourse}
       />
-      {!readOnly && <StreaksSheetMount />}
     </div>
   );
 };

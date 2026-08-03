@@ -1,7 +1,6 @@
 import React from 'react';
 import RecentRoundsCard from '../sections/trends/RecentRoundsCard';
 import PersonalBests from '../sections/records/PersonalBests';
-import AchievementsCard from '../sections/records/AchievementsCard';
 
 interface Props {
   connectionId: string;
@@ -39,13 +38,6 @@ export const RecordsView: React.FC<Props> = ({
       {/* 2. Recent Rounds (existing archive list also covers monthly history) */}
       <RecentRoundsCard
         connectionId={connectionId}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
-
-      {/* 3. Achievements */}
-      <AchievementsCard
-        userId={userId}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
       />
