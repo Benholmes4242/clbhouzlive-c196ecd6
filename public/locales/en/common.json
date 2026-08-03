@@ -98,7 +98,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -115,8 +115,8 @@
   "connectGhost": {
     "eyebrow": "THIS COULD BE YOURS",
     "cta": "Connect your handicap",
-    "footnote": "TAKES 30 SECONDS · WE NEVER POST ON YOUR BEHALF",
-    "slimCta": "Connect →",
+    "footnote": "TAKES 30 SECONDS \u00b7 WE NEVER POST ON YOUR BEHALF",
+    "slimCta": "Connect \u2192",
     "dismissA11y": "Dismiss",
     "holes": {
       "headline": "See exactly where your shots go here",
@@ -142,7 +142,7 @@
   "verifiedAccounts": {
     "title": "Verified accounts",
     "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
-    "cta": "Contact support →",
+    "cta": "Contact support \u2192",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",
     "settingsRowSubtitle": "How verification works"
@@ -345,7 +345,9 @@
       "trophyRoom": "Trophy room",
       "streak": "Streak",
       "openAllStreaks": "Open all streaks",
-      "justUnlocked": "Just unlocked"
+      "justUnlocked": "Just unlocked",
+      "titles": "TITLES",
+      "chase": "{{n}} {{unit}} from #1 at {{course}}"
     },
     "circle": {
       "standing": {
@@ -378,6 +380,43 @@
     },
     "hero": {
       "chartSample": "{{count}} points, 90 days"
+    },
+    "compare": {
+      "kicker": "COMPARE",
+      "title": "How you compare",
+      "prompt": "Search anyone, or pick someone who played recently",
+      "youAnd": "You and {{name}}",
+      "searchPlaceholder": "Find a player",
+      "recent": "PLAYED MOST RECENTLY",
+      "results": "RESULTS",
+      "noMatch": "No player matches that name.",
+      "sharedRounds_one": "{{count}} shared round",
+      "sharedRounds_other": "{{count}} shared rounds",
+      "neverPlayed": "Never played together",
+      "headToHead": "HEAD TO HEAD",
+      "noShared": "No shared rounds",
+      "youLeadBy": "You lead by {{n}}",
+      "theyLeadBy": "{{name}} leads by {{n}}",
+      "levelAt": "Level at {{n}}",
+      "inSharedRounds": "IN SHARED ROUNDS",
+      "thisSeason": "THIS SEASON",
+      "sharedFooter": "From {{count}} rounds played the same course on the same day",
+      "neverFooter": "You have never played the same course on the same day",
+      "seasonOnly": "Season figures only. Play a round together and a head-to-head record starts building automatically.",
+      "back": "Compare someone else",
+      "entryLine": "See how your game stacks up against anyone you play with.",
+      "close": "Close",
+      "open": "Open compare",
+      "stat": {
+        "stablefordWins": "Stableford wins",
+        "avgStableford": "Average stableford",
+        "avgGross": "Average gross",
+        "bestGross": "Best gross",
+        "bestMargin": "Best margin",
+        "index": "Handicap index",
+        "scoringAverage": "Scoring average",
+        "rounds": "Rounds"
+      }
     }
   }
 }
