@@ -84,10 +84,14 @@ function normalizeTiersArray(raw: unknown): number[] {
   return [];
 }
 
-function materialName(t: number) {
-  const l = MATERIAL_PALETTES[Math.min(5, Math.max(1, t)) as 1 | 2 | 3 | 4 | 5].label;
-  return l.charAt(0) + l.slice(1).toLowerCase();
+/**
+ * Threshold names are the threshold. The metal ladder (bronze -> obsidian)
+ * was an asserted rarity vocabulary and is gone; a tier is now a distance.
+ */
+function thresholdName(threshold: number) {
+  return String(threshold);
 }
+
 
 export function normalizeBadge(b: UserBadge): TrophyItem {
   const thresholds = normalizeTiersArray(b.counter_tiers);
