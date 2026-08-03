@@ -803,48 +803,9 @@ const ProfilePageV2Content: React.FC = () => {
 
       </div>
 
-      {/* HCP pill — lifted OUT of hero wrapper to escape its z-index:1 stacking context.
-          Rendered as a PageRoot-level sibling at z-30 so it sits above the Identity Stack
-          (z-10) which would otherwise absorb taps in the overlap band. Same top math. */}
-      {resolvedHcp.value != null && (
-        <div className="absolute right-5 z-30 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
-          {resolvedHcp.source === 'whs' ? (
-            <button
-              type="button"
-              aria-label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isSelf) {
-                  navigate('/handicap');
-                } else if (profileUserId) {
-                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
-                }
-              }}
-              className="pl-4 pr-2.5 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-              style={{
-                background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <span>HCP {formatHandicap(resolvedHcp.value)}</span>
-              <ChevronRight size={14} strokeWidth={2.4} style={{ color: '#64748B' }} />
-            </button>
-          ) : (
-            <div
-              className="pl-4 pr-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center gap-1.5"
-              style={{
-                background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
-                border: 'none',
-                cursor: 'default',
-              }}
-              aria-label={`Handicap ${formatHandicap(resolvedHcp.value)}, self-reported`}
-            >
-              <span>HCP {formatHandicap(resolvedHcp.value)}</span>
-            </div>
-          )}
+      {/* Hero HCP pill removed — the handicap is stated ONCE, as the INDEX
+          figure in the primary figure row below, which also owns the tap
+          through to /handicap (or the snapshot sheet for other members). */}
         </div>
       )}
 
