@@ -17829,6 +17829,14 @@ export type Database = {
         }[]
       }
       friend_content_nightly: { Args: never; Returns: Json }
+      gam_badge_population_share: {
+        Args: never
+        Returns: {
+          badge_id: string
+          denominator: number
+          holders: number
+        }[]
+      }
       gam_lock_for_eval: { Args: { p_whs_score_id: string }; Returns: boolean }
       gam_mark_badge_seen: { Args: { p_badge_id: string }; Returns: undefined }
       gam_requeue_scores: { Args: { p_score_ids: string[] }; Returns: number }
@@ -17840,6 +17848,15 @@ export type Database = {
           milestones_deleted: number
           rounds_queued: number
           streaks_deleted: number
+        }[]
+      }
+      gam_top100_threshold_distribution: {
+        Args: { p_thresholds?: number[] }
+        Returns: {
+          denominator: number
+          list_slug: string
+          members_at_or_above: number
+          threshold: number
         }[]
       }
       gam_user_courses: {

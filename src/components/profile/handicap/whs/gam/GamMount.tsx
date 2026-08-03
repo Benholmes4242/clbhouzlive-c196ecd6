@@ -1,12 +1,11 @@
 /**
  * Central mount for gam_* full-screen sheets driven by the event bus.
- * The Trophy Room sheet replaces the old GamAchievementsSheet AND
- * the standalone LegendStatusSheet — both card sections (achievements
- * + legends) now live under one roof.
+ * CareerRecordSheet replaces TrophyRoomSheet: same event bus, same entry
+ * points, a record rather than a trophy cabinet.
  */
 import React from 'react';
 import NotificationsSheet from './NotificationsSheet';
-import { TrophyRoomSheet } from './trophy-room/TrophyRoomSheet';
+import { CareerRecordSheet } from './trophy-room/career/CareerRecordSheet';
 
 interface Props {
   ownerUserId: string;
@@ -18,7 +17,8 @@ interface Props {
 const GamMount: React.FC<Props> = ({ ownerUserId, viewerUserId, ownerFirstName, readOnly }) => {
   return (
     <>
-      <TrophyRoomSheet userId={ownerUserId} viewerUserId={viewerUserId} ownerFirstName={ownerFirstName ?? null} />
+      <CareerRecordSheet userId={ownerUserId} viewerUserId={viewerUserId} ownerFirstName={ownerFirstName ?? null} />
+
       {!readOnly && <NotificationsSheet userId={ownerUserId} />}
     </>
   );

@@ -1,7 +1,7 @@
 import type { UserBadge, BadgeRarity, BadgeCategory, LegendCategory } from '@/lib/gam/types';
 import type { TopLegendRow } from '@/hooks/gam/useUserTopLegends';
 import { legendCategoryLabel, formatLegendValue } from '@/lib/gam/visuals';
-import { MATERIAL_PALETTES } from './rarityPalette';
+
 
 export interface TrophyTier {
   tier: number;
@@ -84,10 +84,14 @@ function normalizeTiersArray(raw: unknown): number[] {
   return [];
 }
 
-function materialName(t: number) {
-  const l = MATERIAL_PALETTES[Math.min(5, Math.max(1, t)) as 1 | 2 | 3 | 4 | 5].label;
-  return l.charAt(0) + l.slice(1).toLowerCase();
+/**
+ * Threshold names are the threshold. The metal ladder (bronze -> obsidian)
+ * was an asserted rarity vocabulary and is gone; a tier is now a distance.
+ */
+function thresholdName(threshold: number) {
+  return String(threshold);
 }
+
 
 export function normalizeBadge(b: UserBadge): TrophyItem {
   const thresholds = normalizeTiersArray(b.counter_tiers);
@@ -107,7 +111,7 @@ export function normalizeBadge(b: UserBadge): TrophyItem {
     ? thresholds.map((t, idx) => ({
         tier: idx + 1,
         threshold: t,
-        name: materialName(idx + 1),
+        name: thresholdName(t),
         earned: idx < reached,
         earnedAt: idx < reached && idx === reached - 1 ? b.earned_at : null,
       }))
