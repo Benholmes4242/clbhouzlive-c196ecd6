@@ -13,22 +13,41 @@ import { DIST_SEG_COLORS } from '../HoleDataSheet';
 import { A, LABEL, NUM, SANS, StatRow, toParParts } from './tokens';
 
 export const HOLE_GRID = '26px 32px 32px 1fr 52px 48px';
+/** Tournament variant: no stroke index (always null) and no viewing member. */
+export const HOLE_GRID_TOURNAMENT = '26px 32px 1fr 56px';
+
+/** Preview row count shared by the course panel and the tournament section. */
+export const PREVIEW_COUNT = 4;
+
+export type HoleRowVariant = 'course' | 'tournament';
 
 function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
 
-export const HoleColumnHeader: React.FC = () => {
+export const HoleColumnHeader: React.FC<{ variant?: HoleRowVariant }> = ({ variant = 'course' }) => {
   const { t } = useTranslation(['courses']);
+  const tournament = variant === 'tournament';
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: HOLE_GRID, gap: 10, paddingBottom: 8 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: tournament ? HOLE_GRID_TOURNAMENT : HOLE_GRID,
+        gap: 10,
+        paddingBottom: 8,
+      }}
+    >
       <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colHole')}</span>
       <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colPar')}</span>
-      <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colSi')}</span>
+      {!tournament && (
+        <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.holes.colSi')}</span>
+      )}
       <span style={LABEL}>{t('courses:courseDetail.holes.colDist')}</span>
       <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colField')}</span>
-      <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colYou')}</span>
+      {!tournament && (
+        <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.holes.colYou')}</span>
+      )}
     </div>
   );
 };
@@ -36,13 +55,17 @@ export const HoleColumnHeader: React.FC = () => {
 export const HoleRow: React.FC<{
 
   row: CourseHole;
-  mine: MyHolePerformanceRow | null;
+  mine?: MyHolePerformanceRow | null;
   open: boolean;
   onToggle: () => void;
-}> = ({ row, mine, open, onToggle }) => {
-  const { t } = useTranslation(['courses']);
+  variant?: HoleRowVariant;
+}> = ({ row, mine = null, open, onToggle, variant = 'course' }) => {
+  const tournament = variant === 'tournament';
+
+  const { t } = useTranslation(['courses', 'tourhub']);
   const field = toParParts(row.avg_to_par);
   const you = toParParts(mine?.avg_to_par);
+
 
   const segs: { pctValue: number; bg: string; label: string }[] = [
     {
@@ -64,7 +87,7 @@ export const HoleRow: React.FC<{
         aria-expanded={open}
         style={{
           display: 'grid',
-          gridTemplateColumns: HOLE_GRID,
+          gridTemplateColumns: tournament ? HOLE_GRID_TOURNAMENT : HOLE_GRID,
           alignItems: 'center',
           gap: 10,
           padding: '9px 0',
@@ -89,18 +112,20 @@ export const HoleRow: React.FC<{
         >
           {row.par}
         </span>
-        <span
-          style={{
-            fontFamily: SANS,
-            fontVariantNumeric: 'tabular-nums lining',
-            fontSize: 12,
-            fontWeight: 600,
-            color: A.MUTE,
-            textAlign: 'center',
-          }}
-        >
-          {row.stroke_index ?? ''}
-        </span>
+        {!tournament && (
+          <span
+            style={{
+              fontFamily: SANS,
+              fontVariantNumeric: 'tabular-nums lining',
+              fontSize: 12,
+              fontWeight: 600,
+              color: A.MUTE,
+              textAlign: 'center',
+            }}
+          >
+            {row.stroke_index ?? ''}
+          </span>
+        )}
         <span style={{ height: 5, borderRadius: 3, overflow: 'hidden', display: 'flex', background: A.TRACK }}>
           {segs.map((s) => (
             <i key={s.label} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
@@ -110,7 +135,10 @@ export const HoleRow: React.FC<{
         <span style={{ ...NUM, fontSize: 13, color: field?.tone ?? A.INK, textAlign: 'right' }}>
           {field?.text ?? ''}
         </span>
-        <span style={{ ...NUM, fontSize: 13, color: A.AMBER, textAlign: 'right' }}>{you?.text ?? ''}</span>
+        {!tournament && (
+          <span style={{ ...NUM, fontSize: 13, color: A.AMBER, textAlign: 'right' }}>{you?.text ?? ''}</span>
+        )}
+
       </button>
 
       {open && (
@@ -140,7 +168,12 @@ export const HoleRow: React.FC<{
                 ? [{ label: t('courses:courseDetail.holes.yards'), value: row.yards }]
                 : []),
               ...(field ? [{ label: t('courses:courseDetail.plays.fieldAvg'), value: field.text, tone: field.tone }] : []),
-              ...(you ? [{ label: t('courses:courseDetail.plays.yourAvg'), value: you.text, tone: A.AMBER }] : []),
+              ...(tournament
+                ? [{ label: t('tourhub:tournament.course.colPlayers'), value: row.rounds }]
+                : you
+                ? [{ label: t('courses:courseDetail.plays.yourAvg'), value: you.text, tone: A.AMBER }]
+                : []),
+
             ]}
           />
         </div>

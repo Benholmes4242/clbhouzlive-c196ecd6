@@ -20,9 +20,9 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, KICKER, LABEL, NUM, Panel, StatRow, TITLE, toParParts } from './tokens';
-import { HoleColumnHeader, HoleRow } from './HoleRows';
+import { HoleColumnHeader, HoleRow, PREVIEW_COUNT } from './HoleRows';
 
-const PREVIEW_COUNT = 4;
+
 
 interface Props {
   courseId: string | undefined;
