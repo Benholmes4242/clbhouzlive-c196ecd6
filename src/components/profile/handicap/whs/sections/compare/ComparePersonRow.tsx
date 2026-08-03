@@ -1,57 +1,50 @@
 /**
  * ComparePersonRow - one selectable player in the compare sheet's list state.
  *
- * Avatar, name, two LABEL lines (when + last course, then the shared-round
- * standing), their index as a FIGURE, then a chevron.
+ * Takes a MINIMAL shape, not a leaderboard entry, so the recent-players list
+ * and the search results render through the same row.
  *
- * The shared-round count is fetched by the ROW, not the list, so only mounted
- * rows cost a query and the list stays cheap.
+ * Avatar, name, a LABEL context line, the shared-round standing, their index
+ * as a FIGURE, then a chevron. The shared-round count is fetched by the ROW,
+ * not the list, so only mounted rows cost a query.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { useSharedRounds } from '@/lib/whs/hooks';
-import { formatRelativeAgo } from '@/i18n/format';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
-import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+
+export interface ComparePerson {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  /** Handicap index, when known. */
+  index: number | null;
+  /** "2 days ago . Sunningdale", or null for search results. */
+  contextLine: string | null;
+}
 
 interface Props {
   viewerUserId: string;
-  entry: FriendLeaderboardEntry;
-  onSelect: (targetUserId: string, sharedRounds: number) => void;
+  person: ComparePerson;
+  onSelect: (person: ComparePerson, sharedRounds: number) => void;
 }
 
 export const ComparePersonRow: React.FC<Props> = ({
   viewerUserId,
-  entry,
+  person,
   onSelect,
 }) => {
   const { t } = useTranslation('common');
-  const targetUserId = entry.friend_user_id;
-  const { data: shared } = useSharedRounds(viewerUserId, targetUserId);
+  const { data: shared } = useSharedRounds(viewerUserId, person.userId);
   const sharedCount = shared?.shared_rounds_count ?? 0;
-
-  const avatarSrc = pickAvatarSrc(
-    entry.friend_thumbnail_url,
-    entry.friend_profile_photo_url,
-  );
-  const fbBg = getAvatarFallbackColor(
-    targetUserId ?? entry.friend_row_id ?? entry.friend_name,
-  );
-
-  const when = entry.last_round_played_at
-    ? formatRelativeAgo(entry.last_round_played_at, { yesterday: true })
-    : '';
-  const course = entry.last_round_course_name ?? '';
-  const contextLine = [when, course].filter(Boolean).join(' . ');
+  const fbBg = getAvatarFallbackColor(person.userId);
 
   return (
     <button
       type="button"
-      disabled={!targetUserId}
-      onClick={() => targetUserId && onSelect(targetUserId, sharedCount)}
+      onClick={() => onSelect(person, sharedCount)}
       style={{
         width: '100%',
         display: 'flex',
@@ -62,9 +55,8 @@ export const ComparePersonRow: React.FC<Props> = ({
         border: 'none',
         borderTop: `1px solid ${CHART.BORDER}`,
         textAlign: 'left',
-        cursor: targetUserId ? 'pointer' : 'default',
+        cursor: 'pointer',
         fontFamily: CHART_FONT,
-        opacity: targetUserId ? 1 : 0.5,
       }}
     >
       <div
@@ -74,7 +66,7 @@ export const ComparePersonRow: React.FC<Props> = ({
           height: 33,
           borderRadius: '34%',
           overflow: 'hidden',
-          background: avatarSrc ? CHART.PANEL_2 : fbBg,
+          background: person.avatarUrl ? CHART.PANEL_2 : fbBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -84,14 +76,15 @@ export const ComparePersonRow: React.FC<Props> = ({
           fontWeight: 800,
         }}
       >
-        {avatarSrc ? (
+        {person.avatarUrl ? (
           <img
-            src={avatarSrc}
+            src={person.avatarUrl}
             alt=""
+            loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
+          <span>{getInitialsFromName(person.name) || '?'}</span>
         )}
         {/* Canonical traced hairline ring - dark surface token. */}
         <div
@@ -100,7 +93,7 @@ export const ComparePersonRow: React.FC<Props> = ({
             position: 'absolute',
             inset: 0,
             borderRadius: '34%',
-            border: '1px solid rgba(255,255,255,0.22)',
+            border: `1px solid ${CHART.FAINT}`,
             pointerEvents: 'none',
           }}
         />
@@ -118,9 +111,9 @@ export const ComparePersonRow: React.FC<Props> = ({
             textOverflow: 'ellipsis',
           }}
         >
-          {entry.friend_name}
+          {person.name}
         </div>
-        {contextLine && (
+        {person.contextLine && (
           <div
             style={{
               ...LABEL_STYLE,
@@ -130,7 +123,7 @@ export const ComparePersonRow: React.FC<Props> = ({
               textOverflow: 'ellipsis',
             }}
           >
-            {contextLine}
+            {person.contextLine}
           </div>
         )}
         <div style={{ ...LABEL_STYLE, marginTop: 3, color: CHART.MUTE }}>
@@ -150,9 +143,7 @@ export const ComparePersonRow: React.FC<Props> = ({
           flexShrink: 0,
         }}
       >
-        {entry.friend_handicap_index != null
-          ? entry.friend_handicap_index.toFixed(1)
-          : '-'}
+        {person.index != null ? person.index.toFixed(1) : '-'}
       </span>
       <ChevronRight
         size={15}
