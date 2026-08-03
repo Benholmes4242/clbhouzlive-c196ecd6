@@ -11,7 +11,6 @@ import {
   fetchFriendsActivity,
   fetchFriendCourseBests,
   fetchSentInvites,
-  fetchCourseForm,
   fetchRoundDetail,
   fetchFriendRoundDetail,
   fetchFriendWindowRankings,
@@ -44,8 +43,6 @@ export const whsKeys = {
   friendCourseBests: (ownerUserId: string) =>
     ['whs-friend-course-bests', ownerUserId] as const,
   sentInvites: () => ['whs-sent-invites'] as const,
-  courseForm: (connectionId: string, currentHandicap: number) =>
-    ['whs-course-form', connectionId, currentHandicap] as const,
   roundDetail: (scoreId: string) =>
     ['whs-round-detail', scoreId] as const,
   friendFeaturedRound: (userId: string) => ['whs-friend-featured-round', userId] as const,
@@ -172,19 +169,6 @@ export function useSentInvites() {
     queryKey: whsKeys.sentInvites(),
     queryFn: fetchSentInvites,
     staleTime: 30_000,
-  });
-}
-
-export function useCourseForm(
-  connectionId: string | undefined,
-  currentHandicap: number | null | undefined,
-) {
-  return useQuery({
-    queryKey: whsKeys.courseForm(connectionId ?? '', currentHandicap ?? NaN),
-    // minRounds=1 — return ALL courses; callers apply their own filtering.
-    queryFn: () => fetchCourseForm(connectionId as string, currentHandicap as number, 1),
-    enabled: !!connectionId && currentHandicap !== undefined && currentHandicap !== null,
-    staleTime: 60_000,
   });
 }
 
