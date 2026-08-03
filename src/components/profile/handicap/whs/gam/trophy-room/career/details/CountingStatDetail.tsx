@@ -26,6 +26,7 @@ interface Props {
 
 export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('handicap');
   const [roundId, setRoundId] = useState<string | null>(null);
   const metric = roundMetricForCounter(item.counterMetric);
   const value = item.currentValue ?? 0;
