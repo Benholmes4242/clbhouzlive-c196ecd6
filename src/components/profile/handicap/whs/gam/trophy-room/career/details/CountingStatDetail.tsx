@@ -98,16 +98,24 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
             >
               {tier.threshold}
             </span>
+            {/* These rows are on the LABEL treatment, so the sentence-case
+                locale value is uppercased in CSS rather than in the string. */}
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.06em',
+                textTransform: 'uppercase',
                 color: tier.earned ? REC.AMBER : REC.DIM,
                 ...REC.TABULAR,
               }}
             >
-              {tier.earned ? 'PASSED' : `${Math.max(0, tier.threshold - value)} TO GO`}
+              {tier.earned
+                ? t('career.achieved')
+                : t('career.toGoTo', {
+                    n: Math.max(0, tier.threshold - value),
+                    target: tier.threshold,
+                  })}
             </span>
           </div>
         ))}
