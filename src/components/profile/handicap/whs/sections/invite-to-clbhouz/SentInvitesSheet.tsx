@@ -41,7 +41,7 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
           fontWeight: 800,
         }}
       >
-        🎉 Joined
+        Joined
       </span>
     );
   }
