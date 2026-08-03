@@ -9,7 +9,7 @@ import FriendsView from './views/FriendsView';
 import LegendsView from './views/LegendsView';
 
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
-import { isHandicapSubtab, type HandicapSubtab } from './types';
+import { resolveHandicapSubtab, type HandicapSubtab } from './types';
 
 interface Props {
   connection: WhsConnection;
@@ -36,11 +36,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
     connection.last_sync_status === 'auth_failed' && isOldEnoughForReauth
   );
 
-  // ── URL-state for the active subtab ─────────────────────────────────────
+  // ── URL-state for the active subtab (legacy values aliased) ─────────────
   const rawSubtab = searchParams.get('subtab');
-  const activeSubtab: HandicapSubtab = isHandicapSubtab(rawSubtab)
-    ? rawSubtab
-    : DEFAULT_SUBTAB;
+  const activeSubtab: HandicapSubtab = resolveHandicapSubtab(rawSubtab).subtab;
+
 
   // ── Trend (used by hero + passed to views as currentHandicap) ───────────
   const { data: trend } = useHandicapTrend(connection.id);
@@ -64,35 +63,36 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             ownerFirstName={ownerFirstName}
           />
         )}
-        {activeSubtab === 'trends' && (
-          <TrendsView
-            connectionId={connection.id}
-            userId={userId}
-            currentHandicap={currentHandicap}
-            readOnly={readOnly}
-            ownerFirstName={ownerFirstName}
-          />
+        {activeSubtab === 'form' && (
+          <>
+            <TrendsView
+              connectionId={connection.id}
+              userId={userId}
+              currentHandicap={currentHandicap}
+              readOnly={readOnly}
+              ownerFirstName={ownerFirstName}
+            />
+            <RecordsView
+              connectionId={connection.id}
+              userId={userId}
+              currentHandicap={currentHandicap}
+              readOnly={readOnly}
+              ownerFirstName={ownerFirstName}
+            />
+          </>
         )}
-        {activeSubtab === 'records' && (
-          <RecordsView
-            connectionId={connection.id}
-            userId={userId}
-            currentHandicap={currentHandicap}
-            readOnly={readOnly}
-            ownerFirstName={ownerFirstName}
-          />
+        {activeSubtab === 'circle' && (
+          <>
+            <FriendsView
+              userId={userId}
+              currentHandicap={currentHandicap}
+              connectionId={connection.id}
+              readOnly={readOnly}
+            />
+            <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
+          </>
         )}
-        {activeSubtab === 'friends' && (
-          <FriendsView
-            userId={userId}
-            currentHandicap={currentHandicap}
-            connectionId={connection.id}
-            readOnly={readOnly}
-          />
-        )}
-        {activeSubtab === 'legends' && (
-          <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
-        )}
+
       </div>
 
       {!readOnly && (

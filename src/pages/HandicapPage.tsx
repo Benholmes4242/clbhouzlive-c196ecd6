@@ -35,7 +35,9 @@ import { firstName } from '@/pages/rivalry-page/_shared/helpers';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+import { resolveHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+import { useTranslation } from 'react-i18next';
+
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -190,6 +192,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   viewerUserId,
 }) => {
   const greeting = useMemo(() => getGreeting(), []);
+  const { t } = useTranslation('common');
 
   const subheadOwn = useMemo(() => {
     const dateStr = formatWeekdayDayMonthShortGB(new Date());
@@ -198,16 +201,18 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       : `${greeting} · ${dateStr}`;
   }, [greeting, displayName]);
 
-  const tabs = useMemo(() => {
-    const all = [
-      { id: 'today', label: 'Today' },
-      { id: 'trends', label: 'Form' },
-      { id: 'records', label: 'Rounds' },
-      { id: 'friends', label: 'Friends' },
-      { id: 'legends', label: 'Compete' },
-    ];
-    return readOnly ? all.filter(t => t.id !== 'friends') : all;
-  }, [readOnly]);
+  // Three tabs. Circle remains available in friend view; its owner-only
+  // sections (invite, personal leaderboard affordances) are suppressed by
+  // `readOnly` inside the sections themselves.
+  const tabs = useMemo(
+    () => [
+      { id: 'today', label: t('handicap.tab.today', 'Today') },
+      { id: 'form', label: t('handicap.tab.form', 'Form') },
+      { id: 'circle', label: t('handicap.tab.circle', 'Circle') },
+    ],
+    [t]
+  );
+
 
   return (
     <>
@@ -233,15 +238,9 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       {(readOnly || hasConnection) && (
         <div
           style={{
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
             fontFamily: FONT_GEIST,
             background: 'var(--hcp-bg-0)',
           }}
-          className="hcp-tab-row"
         >
           <div
             role="tablist"
@@ -249,7 +248,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               display: 'flex',
               justifyContent: 'space-evenly',
               padding: '0 16px',
-              minWidth: 'min-content',
             }}
           >
             {tabs.map(tab => {
@@ -262,16 +260,16 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                   aria-selected={active}
                   style={{
                     flex: '0 0 auto',
-                    height: 44,
+                    height: 48,
                     padding: '0 4px',
                     borderRadius: 0,
                     border: 'none',
                     background: 'transparent',
-                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                    color: active ? '#FFFFFF' : 'rgba(255,255,255,0.40)',
                     fontFamily: 'inherit',
-                    fontSize: 14,
-                    fontWeight: active ? 700 : 600,
-                    letterSpacing: '-0.005em',
+                    fontSize: 17,
+                    fontWeight: active ? 800 : 600,
+                    letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -280,20 +278,13 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                     transition: 'color 0.15s',
                   }}
                 >
-                  <span
-                    style={{
-                      display: 'inline-block',
-                    }}
-                  >
-                    {tab.label}
-                  </span>
+                  <span style={{ display: 'inline-block' }}>{tab.label}</span>
                 </button>
               );
             })}
-
           </div>
-          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
+
       )}
     </>
   );
@@ -363,16 +354,25 @@ const HandicapPage: React.FC = () => {
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
   const rawSubtab = searchParams.get('subtab');
-  // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
-  const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
-  const candidate: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
-  const activeTab: HandicapSubtab = isFriendView && candidate === 'friends' ? 'today' : candidate;
+  // Legacy five-tab deep links (overview / trends / records / friends /
+  // legends) are aliased to the three live tabs before validation, then the
+  // URL is REPLACED so the address bar shows the new value.
+  const { subtab: activeTab, migrated } = resolveHandicapSubtab(rawSubtab);
+
+  useEffect(() => {
+    if (!migrated) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('subtab', activeTab);
+    setSearchParams(next, { replace: true });
+  }, [migrated, activeTab, searchParams, setSearchParams]);
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);
     params.set('subtab', next);
     setSearchParams(params, { replace: true });
-  }, [searchParams, setSearchParams]);
+    analyticsEvents.track?.('handicap_tab_changed', { from: activeTab, to: next });
+  }, [searchParams, setSearchParams, activeTab]);
+
 
   // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
   // Defer the emit until after GamMount has mounted and subscribed. The
