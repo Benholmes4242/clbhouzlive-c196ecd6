@@ -92,6 +92,17 @@ export function AllTeeTimesSheet({
     if (open) setSearch('');
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    analyticsEvents.track('tour_tournament_tee_times_opened', {
+      tournament_id: tournamentId ?? null,
+      round: Number(initial),
+    });
+    // Fire once per open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+
   const roundNum = Number(round);
   const isDrawn = drawnSet.has(roundNum);
 
