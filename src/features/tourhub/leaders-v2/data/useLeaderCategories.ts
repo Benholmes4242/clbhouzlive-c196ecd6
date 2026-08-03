@@ -164,10 +164,19 @@ export interface LeaderCategoryDef {
   poolSize: number;      // players in the category pool BEFORE the top-50 slice
 }
 
+/**
+ * ADDITIVE (player-v2/StatsSheet): category key -> player_id -> rank.
+ * Built over the FULL ranked pool, not the top-50 slice. Empty on every
+ * non-PGA tour, where tour_season_rankings carries no stat columns.
+ */
+export type LeaderRankMaps = Record<string, Record<string, { rank: number; tied: boolean }>>;
+
 export interface LeaderCategoriesResult {
   synced: boolean;
   categories: LeaderCategoryDef[];
   year: number;
+  /** Additive. Empty object off the PGA Tour. */
+  rankMaps?: LeaderRankMaps;
 }
 
 
