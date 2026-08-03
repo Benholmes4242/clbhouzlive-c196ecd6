@@ -29,6 +29,7 @@ import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { ProfileGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { A, SANS, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -49,52 +50,28 @@ interface TrendRowProps {
 function TrendRow({ label, delta, caption, borderTop }: TrendRowProps) {
   const improved = delta != null && delta < -0.05;
   const drifted = delta != null && delta > 0.05;
-  const color = improved ? '#16A34A' : drifted ? '#DC2626' : 'var(--hcp-t-40)';
-  const arrow = improved ? '\u2193 ' : drifted ? '\u2191 ' : '';
+  const color = improved ? A.UNDER : drifted ? A.OVER : A.MUTE;
   const fmt =
     delta == null
-      ? 'N/A'
+      ? null
       : `${delta > 0 ? '+' : delta < 0 ? '-' : ''}${Math.abs(delta).toFixed(1)}`;
   return (
-    <div
-      style={{
-        padding: '10px 0 10px 16px',
-        borderTop: borderTop ? '1px solid var(--hcp-line-2)' : 'none',
-      }}
-    >
+    <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
+      <div style={{ ...LABEL, marginBottom: 5 }}>{label}</div>
       <div
         style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: 'var(--hcp-t-40)',
-          marginBottom: 4,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color,
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
+          fontFamily: SANS,
+          fontSize: 26,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
           lineHeight: 1,
+          color,
+          ...FIGS,
         }}
       >
-        {arrow}
         {fmt}
       </div>
-      <div
-        style={{
-          fontSize: 10,
-          color: 'var(--hcp-t-40)',
-          fontWeight: 600,
-          marginTop: 4,
-        }}
-      >
+      <div style={{ fontFamily: SANS, fontSize: 10.5, color: A.DIM, fontWeight: 600, marginTop: 5 }}>
         {caption}
       </div>
     </div>
@@ -195,7 +172,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
           color: 'var(--hcp-t-60)',
         }}
       >
-        HANDICAP INDEX
+        HANDICAP TREND
       </span>
     </div>
   );
@@ -230,8 +207,11 @@ const ProfileHandicapCard: React.FC<Props> = ({
     </div>
   );
 
-  // Simple, non-interactive variant for manual-handicap users.
-  if (isManual) {
+  // Manual-handicap users have no trend data, and the index itself is stated
+  // once in the profile shell figure row. Nothing left to render here.
+  if (isManual) return null;
+
+  if (false) {
     return (
       <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
         <div
@@ -277,30 +257,10 @@ const ProfileHandicapCard: React.FC<Props> = ({
       >
         {eyebrow}
 
-        {/* Index grid: CURRENT INDEX | 90d / 12mo */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-          <div
-            style={{
-              borderRight: '1px solid var(--hcp-line-2)',
-              paddingRight: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            {currentIndexLabel}
-            {currentIndexValue}
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
-            <TrendRow
-              label="12 Months"
-              delta={trend12.delta}
-              caption="over 12 months"
-              borderTop
-            />
-          </div>
+        {/* Trend figures only — the current index is owned by the shell row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
+          <TrendRow label="12 Months" delta={trend12.delta} caption="over 12 months" />
         </div>
       </div>
 
