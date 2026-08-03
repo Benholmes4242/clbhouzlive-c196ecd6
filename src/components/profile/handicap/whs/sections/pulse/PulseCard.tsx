@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUp, ArrowDown, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
-import { Sparkline, directionTone, toneColor, DEAD_BAND } from '../../charts';
+import { Sparkline, directionTone, toneColor } from '../../charts';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
