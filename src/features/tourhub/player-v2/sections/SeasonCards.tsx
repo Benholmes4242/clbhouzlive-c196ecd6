@@ -23,6 +23,7 @@ import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubDat
 import { StatsSheet } from '../StatsSheet';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { mapTourSlug } from '../../_shared/tourOrder';
 import { AMBER_DEEP, INK, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 
 interface SeasonCardsProps {
@@ -184,6 +185,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
           onClose={() => setSheetOpen(false)}
           playerStats={playerStats!}
           playerName={player.full_name}
+          tour={mapTourSlug(player.tour_codes?.[0] ?? 'pga')}
         />
       )}
     </section>

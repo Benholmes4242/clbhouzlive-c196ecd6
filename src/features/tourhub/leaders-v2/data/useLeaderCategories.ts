@@ -164,10 +164,19 @@ export interface LeaderCategoryDef {
   poolSize: number;      // players in the category pool BEFORE the top-50 slice
 }
 
+/**
+ * ADDITIVE (player-v2/StatsSheet): category key -> player_id -> rank.
+ * Built over the FULL ranked pool, not the top-50 slice. Empty on every
+ * non-PGA tour, where tour_season_rankings carries no stat columns.
+ */
+export type LeaderRankMaps = Record<string, Record<string, { rank: number; tied: boolean }>>;
+
 export interface LeaderCategoriesResult {
   synced: boolean;
   categories: LeaderCategoryDef[];
   year: number;
+  /** Additive. Empty object off the PGA Tour. */
+  rankMaps?: LeaderRankMaps;
 }
 
 
@@ -196,7 +205,9 @@ function fmtSG(v: number): string {
   return (v >= 0 ? '+' : '') + v.toFixed(2);
 }
 
-function currentSeasonYear(): number {
+/** Season year used by every board. Exported so player-v2/StatsSheet can label
+ *  its sub-line from the same source rather than re-deriving it. */
+export function currentSeasonYear(): number {
   const now = new Date();
   return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
 }
@@ -363,23 +374,34 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   const playerIds = [...new Set(pool.map((s) => s.player_id).filter((v): v is string => !!v))];
   const pmap = await fetchPlayers(playerIds);
 
+  const rankMaps: LeaderRankMaps = {};
+
   const categories: LeaderCategoryDef[] = PGA_CATS
     .map((cat) => {
-      const rows: Array<{ pid: string; value: number }> = [];
+      const rows: Array<{ pid: string; value: number; rank: number; rankLabel: string; tied: boolean }> = [];
       for (const s of pool) {
         const v = cat.accessor(s);
         if (v == null || v === 0) continue;
         if (!s.player_id || !pmap.has(s.player_id)) continue;
-        rows.push({ pid: s.player_id, value: Number(v) });
+        rows.push({ pid: s.player_id, value: Number(v), rank: 0, rankLabel: '', tied: false });
       }
       rows.sort((a, b) => (cat.dir === 'asc' ? a.value - b.value : b.value - a.value));
+      // Rank the FULL sorted pool BEFORE the top-50 slice: a player outside the
+      // top 50 still needs a rank (player-v2/StatsSheet looks it up). The
+      // top-50 rows then carry ranks correct by construction.
+      applyCompetitionRanks(rows, cat.format);
+      const map: Record<string, { rank: number; tied: boolean }> = {};
+      for (const r of rows) {
+        if (map[r.pid] === undefined) map[r.pid] = { rank: r.rank, tied: r.tied };
+      }
+      rankMaps[cat.key] = map;
       const top: LeaderRow[] = rows.slice(0, 50).map((r) => {
         const p = pmap.get(r.pid)!;
         return {
           playerId: r.pid,
-          rank: 0,
-          rankLabel: '',
-          tied: false,
+          rank: r.rank,
+          rankLabel: r.rankLabel,
+          tied: r.tied,
           name: p.full_name,
           country: p.country ?? null,
           countryCode: p.country_code ?? null,
@@ -391,7 +413,6 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
           behindFormatted: null,
         };
       });
-      applyCompetitionRanks(top, cat.format);
       if (top.length < 3) return null;
       return {
         key: cat.key,
@@ -406,7 +427,7 @@ async function fetchPgaCategories(): Promise<LeaderCategoriesResult> {
   const world = await fetchWorldRankingCat();
   if (world) categories.unshift(world);
 
-  return { synced: true, categories, year: currentSeasonYear() };
+  return { synced: true, categories, year: currentSeasonYear(), rankMaps };
 }
 
 async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCategoriesResult> {
@@ -521,8 +542,10 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   return { synced: categories.length > 0, categories, year };
 }
 
-export function useLeaderCategories(tour: TourId) {
+export function useLeaderCategories(tour: TourId, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   return useQuery<LeaderCategoriesResult>({
+    enabled,
     queryKey: ['leaders-v2', 'categories', tour, currentSeasonYear()],
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
