@@ -23,7 +23,7 @@ interface Props {
   segments: RingSegment[];
   centre: React.ReactNode;
   sub: string;
-  delta?: { text: string; tone: 'up' | 'down' | 'neutral' };
+  delta?: { text: string; tone: ChartTone };
   size?: number;
   stroke?: number;
 }
@@ -52,8 +52,7 @@ export const DistributionRing: React.FC<Props> = ({
     return arc;
   });
 
-  const deltaColor =
-    delta?.tone === 'up' ? CHART.UP : delta?.tone === 'down' ? CHART.DOWN : CHART.MUTE;
+  const deltaColor = delta ? toneColor(delta.tone) : CHART.MUTE;
 
   return (
     <div
