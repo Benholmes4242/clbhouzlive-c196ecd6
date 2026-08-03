@@ -11,6 +11,7 @@
  * the friend, not decoration.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { displayName } from '@/lib/whs/utils/initials';
 import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
@@ -53,14 +54,15 @@ const Cell: React.FC<{ label: string; width: number; children: React.ReactNode }
 );
 
 export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) => {
+  const { t } = useTranslation('common');
   const isSynced = variant === 'clbhouz-synced';
   const gross = activity.last_round_adjusted_gross;
   const stableford = activity.last_round_stableford;
   const diff = activity.last_round_differential;
-  const course = activity.last_round_course_name ?? 'Unknown course';
+  const course = activity.last_round_course_name ?? t('handicap.circle.round.unknownCourse');
   const played = fmtAbsoluteDate(activity.last_round_played_at);
 
-  const meta = [played, course, activity.is_counter ? 'Counts' : null]
+  const meta = [played, course, activity.is_counter ? t('handicap.circle.round.counts') : null]
     .filter(Boolean)
     .join(' \u00B7 ');
 
@@ -101,7 +103,7 @@ export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) 
           </span>
           {variant === 'eg-only' && (
             <span style={{ ...LABEL_STYLE, color: CHART.MUTE, flexShrink: 0 }}>
-              England Golf
+              {t('handicap.circle.round.englandGolf')}
             </span>
           )}
         </div>
@@ -118,16 +120,16 @@ export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) 
         </div>
       </div>
 
-      <Cell label="Gross" width={COL_GROSS}>
+      <Cell label={t('handicap.circle.round.gross')} width={COL_GROSS}>
         {gross ?? '\u2014'}
       </Cell>
 
       {isSynced ? (
         <>
-          <Cell label="Stbl" width={COL_STBL}>
+          <Cell label={t('handicap.circle.round.stbl')} width={COL_STBL}>
             {stableford ?? '\u2014'}
           </Cell>
-          <Cell label="Diff" width={COL_DIFF}>
+          <Cell label={t('handicap.circle.round.diff')} width={COL_DIFF}>
             {diff != null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : '\u2014'}
           </Cell>
           {activity.last_round_score_id && (
@@ -150,7 +152,9 @@ export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) 
             flexShrink: 0,
           }}
         >
-          {variant === 'clbhouz-not-synced' ? 'Ask to sync' : 'Invite'}
+          {variant === 'clbhouz-not-synced'
+            ? t('handicap.circle.round.askToSync')
+            : t('handicap.circle.round.invite')}
           <ChevronRight size={13} strokeWidth={2.6} />
         </span>
       )}
