@@ -11,7 +11,7 @@ import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_A
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DistributionRing, CHART, directionTone, type RingSegment } from '../../charts';
+import { DistributionRing, CHART, pointsTone, type RingSegment } from '../../charts';
 
 interface Props {
   scores: WhsScore[];
@@ -423,9 +423,9 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
             showDelta && delta !== null
               ? {
                   text: `${delta > 0 ? '+' : '\u2212'}${Math.abs(delta).toFixed(1)} VS PRIOR`,
-                  // MORE points is BETTER, so an improving average must read
-                  // as 'down' (green). Args are swapped for that reason.
-                  tone: directionTone(avg, avg - delta),
+                  // MORE points is BETTER: pointsTone reads before-then-after
+                  // and owns the polarity, so no argument swapping here.
+                  tone: pointsTone(avg - delta, avg),
                 }
               : undefined
           }
@@ -824,8 +824,8 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
             showDelta && delta !== null
               ? {
                   text: `${delta > 0 ? '+' : '\u2212'}${Math.abs(delta)} VS PRIOR`,
-                  // MORE birdies is BETTER, so swap the args as above.
-                  tone: directionTone(birdiesOrBetter, birdiesOrBetter - delta),
+                  // MORE birdies is BETTER -- pointsTone, before then after.
+                  tone: pointsTone(birdiesOrBetter - delta, birdiesOrBetter),
                 }
               : undefined
           }
