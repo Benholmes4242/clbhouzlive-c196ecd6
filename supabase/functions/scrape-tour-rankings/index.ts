@@ -14,10 +14,12 @@ import { corsFor } from '../_shared/cors.ts';
  * Sign convention, verified against the live payload (3 Aug 2026):
  * a POSITIVE RankMoved means the player MOVED UP (e.g. MAZZOLI, CurrentRank 39,
  * RankMoved 88 -> prior rank 127; the opposite reading gives an impossible -49).
- * The only renderer of this column (useRankingsBoards -> `movement: -change`)
- * treats a POSITIVE stored value as places LOST, so RankMoved is negated on
- * write to make the on-screen arrow match the tour's own board.
+ * RankMoved is stored VERBATIM. position_change is a shared column across
+ * tours, so the feed's own convention is the stored one and the client does
+ * the interpreting: priorRank = position + change, movement = change, both
+ * positive-means-up.
  */
+
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -150,7 +152,7 @@ Deno.serve(async (req) => {
       `[scrape-tour-rankings] mainGroup=${mainGroup} playersInPayload=${feedPlayers.length} lastEvent=${payload.LastEventName ?? "n/a"}`
     );
 
-    // ---- Match to sr_players by name (existing behaviour) ---------------
+    // ---- Pass 1: match within euro-tagged sr_players --------------------
     const { data: existingPlayers } = await supabase
       .from("sr_players")
       .select("id, full_name, last_name, first_name")
@@ -160,6 +162,8 @@ Deno.serve(async (req) => {
     // ---- Map ------------------------------------------------------------
     const now = new Date().toISOString();
     const rows: MappedRow[] = [];
+    // Feed first/last kept per row so pass 2 can match on discrete fields.
+    const feedNames: Array<{ first: string; last: string }> = [];
     let skippedNoMainGroup = 0;
     let skippedNullRank = 0;
 
@@ -174,18 +178,19 @@ Deno.serve(async (req) => {
         skippedNullRank++;
         continue;
       }
-      const name = `${(p.FirstName ?? "").trim()} ${(p.LastName ?? "").trim()}`
-        .replace(/\s+/g, " ")
-        .trim();
+      const first = (p.FirstName ?? "").trim();
+      const last = (p.LastName ?? "").trim();
+      const name = `${first} ${last}`.replace(/\s+/g, " ").trim();
       const moved = Number.isFinite(Number(entry.RankMoved)) ? Number(entry.RankMoved) : 0;
+      feedNames.push({ first, last });
       rows.push({
         player_name: name,
         player_id: name ? matchPlayer(name, playerMap) : null,
         tour_code: config.tourCode,
         season_year: season,
         position: Math.trunc(entry.CurrentRank),
-        // Negated: see the sign note in the file header.
-        position_change: String(-moved),
+        // Verbatim: see the sign note in the file header.
+        position_change: String(moved),
         points: entry.CurrentPoints == null ? null : Number(entry.CurrentPoints),
         tournaments_played: entry.EventsPlayed == null ? null : Math.trunc(entry.EventsPlayed),
         country: p.CountryCode ?? null,
@@ -194,6 +199,64 @@ Deno.serve(async (req) => {
         updated_at: now,
       });
     }
+
+    const matchedPass1 = rows.filter((r) => r.player_id).length;
+
+    // ---- Pass 2: unmatched only, exact first AND last across ALL players -
+    // Non-members (Rahm, Justin Thomas, Aberg, Min Woo Lee, Adam Scott) score
+    // Race to Dubai points in co-sanctioned events and majors but are tagged
+    // pga/LIV, so pass 1 excludes them from the pool by construction.
+    // A name that matches more than one row is never accepted.
+    let matchedPass2 = 0;
+    const ambiguous: Array<{ name: string; candidates: number }> = [];
+    const needsPass2 = rows.some((r) => !r.player_id);
+    if (needsPass2) {
+      const allPlayers: Array<{ id: string; first_name: string | null; last_name: string | null }> = [];
+      const PAGE = 1000;
+      for (let from = 0; ; from += PAGE) {
+        const { data: page, error: allErr } = await supabase
+          .from("sr_players")
+          .select("id, first_name, last_name")
+          .range(from, from + PAGE - 1);
+        if (allErr) {
+          console.error(`[scrape-tour-rankings] pass 2 pool fetch failed: ${allErr.message}`);
+          break;
+        }
+        allPlayers.push(...((page ?? []) as typeof allPlayers));
+        if (!page || page.length < PAGE) break;
+      }
+
+      const pairIndex = new Map<string, string[]>();
+      for (const p of allPlayers) {
+        if (!p.first_name || !p.last_name) continue;
+        const key = `${normalizeName(p.first_name)}|${normalizeName(p.last_name)}`;
+        const list = pairIndex.get(key);
+        if (list) list.push(p.id);
+        else pairIndex.set(key, [p.id]);
+      }
+
+      rows.forEach((r, i) => {
+        if (r.player_id) return;
+        const { first, last } = feedNames[i];
+        if (!first || !last) return;
+        const hits = pairIndex.get(`${normalizeName(first)}|${normalizeName(last)}`);
+        if (!hits || hits.length === 0) return;
+        if (hits.length > 1) {
+          ambiguous.push({ name: r.player_name, candidates: hits.length });
+          console.warn(
+            `[scrape-tour-rankings] pass 2 ambiguous: "${r.player_name}" matched ${hits.length} sr_players rows - left null`
+          );
+          return;
+        }
+        r.player_id = hits[0];
+        matchedPass2++;
+      });
+
+      console.log(
+        `[scrape-tour-rankings] pass2 pool=${allPlayers.length} matched=${matchedPass2} ambiguous=${ambiguous.length}`
+      );
+    }
+
 
     console.log(
       `[scrape-tour-rankings] mapped=${rows.length} skippedSwingOnly=${skippedNoMainGroup} skippedNullRank=${skippedNullRank}`
@@ -267,6 +330,10 @@ Deno.serve(async (req) => {
         deleted: priorCount ?? 0,
         inserted,
         matched,
+        matchedPass1,
+        matchedPass2,
+        ambiguous,
+
         unmatched: rows.length - matched,
         unmatchedNames: rows.filter((r) => !r.player_id).slice(0, 20).map((r) => r.player_name),
       }),

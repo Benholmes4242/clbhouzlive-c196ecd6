@@ -103,7 +103,9 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[
       country: joined?.country ?? r.country ?? null,
       photoUrl: joined?.photo_url ?? null,
       points: r.points ?? null,
-      movement: change != null && !Number.isNaN(change) ? -change : null,
+      // position_change stores the feed's own convention: positive = climbed.
+      movement: change != null && !Number.isNaN(change) ? change : null,
+
     };
   });
 }
