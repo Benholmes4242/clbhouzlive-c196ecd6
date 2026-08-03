@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
 import { WantToPlaySection } from './courses/WantToPlaySection';
@@ -7,6 +7,8 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -32,6 +34,19 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   displayName,
 }) => {
   const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
+
+  // PAGE-LEVEL scoring source. The RPC resolves auth.uid() server-side, so it
+  // is own-profile only - rows never re-subscribe per card.
+  const { data: analyticsCourses } = useUserAnalyticsCourses({ enabled: isOwnProfile });
+  const scoringByCourseId = useMemo(() => {
+    const m = new Map<string, UserAnalyticsCourse>();
+    for (const row of analyticsCourses ?? []) {
+      if (row?.course_id) m.set(row.course_id, row);
+    }
+    return m;
+  }, [analyticsCourses]);
+
+  const { data: top100Progress } = useTop100ProgressForUser(userId);
 
   // Fetch average rating for the summary card
   const { data: avgRating } = useQuery({
@@ -81,6 +96,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         coursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
         avgRating={avgRating || null}
+        top100Played={top100Progress?.total_played_top100 ?? null}
         isOwnProfile={isOwnProfile}
         displayName={displayName}
       />
@@ -96,6 +112,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           userId={userId}
           isOwnProfile={isOwnProfile}
           displayName={displayName}
+          scoringByCourseId={scoringByCourseId}
         />
       </div>
     </div>

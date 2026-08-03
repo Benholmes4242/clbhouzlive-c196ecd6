@@ -76,6 +76,10 @@ import {
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import ProfileHandicapCard from '@/components/handicap/ProfileHandicapCard';
+import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
+import { formatNumber } from '@/i18n/format';
+import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
@@ -327,6 +331,15 @@ const ProfilePageV2Content: React.FC = () => {
     profileUserId ? { type: 'personal', id: profileUserId } : undefined,
   );
   const followersCount = socialCounts?.followers ?? 0;
+
+  // Shell figures. Courses come from the same summary hook the Courses tab
+  // uses; rounds come from the own-profile analytics RPC (auth.uid()).
+  const { totalCoursesPlayed: shellCoursesPlayed } = useUserCourseSummary(profileUserId ?? undefined);
+  const { data: shellAnalyticsCourses } = useUserAnalyticsCourses({ enabled: !!isSelf });
+  const shellRoundsCount = React.useMemo(() => {
+    if (!shellAnalyticsCourses) return null;
+    return shellAnalyticsCourses.reduce((sum, r) => sum + (r.rounds_count ?? 0), 0) || null;
+  }, [shellAnalyticsCourses]);
   const followingCount = socialCounts?.following ?? 0;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
   
@@ -790,50 +803,9 @@ const ProfilePageV2Content: React.FC = () => {
 
       </div>
 
-      {/* HCP pill — lifted OUT of hero wrapper to escape its z-index:1 stacking context.
-          Rendered as a PageRoot-level sibling at z-30 so it sits above the Identity Stack
-          (z-10) which would otherwise absorb taps in the overlap band. Same top math. */}
-      {resolvedHcp.value != null && (
-        <div className="absolute right-5 z-30 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
-          {resolvedHcp.source === 'whs' ? (
-            <button
-              type="button"
-              aria-label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isSelf) {
-                  navigate('/handicap');
-                } else if (profileUserId) {
-                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
-                }
-              }}
-              className="pl-4 pr-2.5 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-              style={{
-                background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <span>HCP {formatHandicap(resolvedHcp.value)}</span>
-              <ChevronRight size={14} strokeWidth={2.4} style={{ color: '#64748B' }} />
-            </button>
-          ) : (
-            <div
-              className="pl-4 pr-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center justify-center gap-1.5"
-              style={{
-                background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
-                border: 'none',
-                cursor: 'default',
-              }}
-              aria-label={`Handicap ${formatHandicap(resolvedHcp.value)}, self-reported`}
-            >
-              <span>HCP {formatHandicap(resolvedHcp.value)}</span>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Hero HCP pill removed — the handicap is stated ONCE, as the INDEX
+          figure in the primary figure row below, which also owns the tap
+          through to /handicap (or the snapshot sheet for other members). */}
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
       <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
@@ -852,11 +824,20 @@ const ProfilePageV2Content: React.FC = () => {
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={() => navigate(editRoute)}
-              className="flex-1 h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+              className="flex-1 h-11 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              style={{
+                background: 'transparent',
+                border: `1px solid ${A.BORDER}`,
+                color: A.INK,
+                fontFamily: SANS,
+                fontSize: 11.5,
+                fontWeight: 800,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+              }}
             >
               <Pencil className="w-4 h-4" />
-              Edit Profile
+              Edit profile
             </button>
             {/* Fix 3: Expanded self overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
@@ -865,7 +846,7 @@ const ProfilePageV2Content: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <button 
                   className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  style={{ background: 'transparent', border: `1px solid ${A.BORDER}` }}
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
@@ -1073,103 +1054,99 @@ const ProfilePageV2Content: React.FC = () => {
         )}
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends */}
+      {/* Primary figure row — the record, stated once. INDEX taps through to
+          the handicap surface (the hero pill is gone; one owner only). */}
+      {isPersonal && (
+        <div className="mt-4 px-4 relative z-10 pointer-events-auto">
+          <Panel>
+            <StatRow
+              size={26}
+              items={[
+                ...(resolvedHcp.value != null
+                  ? [{ label: 'INDEX', value: formatHandicap(resolvedHcp.value) }]
+                  : []),
+                ...(isSelf && shellRoundsCount != null
+                  ? [{ label: 'ROUNDS', value: formatNumber(shellRoundsCount) }]
+                  : []),
+                { label: 'COURSES', value: formatNumber(shellCoursesPlayed) },
+              ]}
+            />
+            {resolvedHcp.value != null && (
+              <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
+                <Action
+                  label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
+                  onClick={() => {
+                    if (isSelf) navigate('/handicap');
+                    else if (profileUserId)
+                      openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
+                  }}
+                />
+              </div>
+            )}
+          </Panel>
+        </div>
+      )}
+
+      {/* Social navigation — one quiet line, not four figures competing with the record */}
       <div className="mt-3 px-4 relative z-10 pointer-events-auto">
-        <motion.div 
-          className="flex items-center justify-evenly"
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: {},
-            show: { transition: { staggerChildren: 0.06 } }
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 6,
+            fontFamily: SANS,
+            fontSize: 12.5,
+            color: A.MUTE,
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
-          {/* Posts */}
-          <motion.button
-            onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex flex-col items-center text-center min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
-            variants={{
-              hidden: { opacity: 0, y: 4 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-            }}
-          >
-            <AnimatedNumber 
-              value={postsCount} 
-              isLoading={postsCountLoading}
-              minCh={2}
-              className="text-base font-semibold text-foreground"
-            />
-            <span className="text-xs text-muted-foreground">Posts</span>
-          </motion.button>
-          
-          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
-
-          {/* Reviews */}
-          <motion.button
-            onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex flex-col items-center text-center min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
-            variants={{
-              hidden: { opacity: 0, y: 4 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-            }}
-          >
-            <AnimatedNumber 
-              value={reviewsCount} 
-              isLoading={reviewsCountLoading}
-              minCh={2}
-              className="text-base font-semibold text-foreground"
-            />
-            <span className="text-xs text-muted-foreground">Reviews</span>
-          </motion.button>
-          
-          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
-          
-          {/* Followers */}
-          <motion.button
-            onClick={() => {
-              setActiveMiniNav('followers');
-              navigate(`/profile/${username}/followers`);
-            }}
-            className="pb-3 flex flex-col items-center text-center min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
-            variants={{
-              hidden: { opacity: 0, y: 4 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-            }}
-          >
-            <AnimatedNumber 
-              value={followersCount} 
-              isLoading={socialCountsLoading} 
-              minCh={2}
-              className="text-base font-semibold text-foreground"
-            />
-            <span className="text-xs text-muted-foreground">Followers</span>
-          </motion.button>
-          
-          {isPersonal && <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />}
-          
-          {/* Friends */}
-          {isPersonal && (
-            <motion.button
-              onClick={() => {
-                setActiveMiniNav('friends');
-                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
-              }}
-              className="pb-3 flex flex-col items-center text-center min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
-              variants={{
-                hidden: { opacity: 0, y: 4 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
-              }}
-            >
-              <AnimatedNumber 
-                value={friendsCount} 
-                isLoading={socialCountsLoading} 
-                minCh={2}
-                className="text-base font-semibold text-foreground"
-              />
-              <span className="text-xs text-muted-foreground">Friends</span>
-            </motion.button>
-          )}
-        </motion.div>
+          {[
+            { key: 'posts', label: `${formatNumber(postsCount)} posts`, onTap: () => setActiveMiniNav('posts') },
+            { key: 'reviews', label: `${formatNumber(reviewsCount)} reviews`, onTap: () => setActiveMiniNav('posts') },
+            {
+              key: 'followers',
+              label: `${formatNumber(followersCount)} followers`,
+              onTap: () => {
+                setActiveMiniNav('followers');
+                navigate(`/profile/${username}/followers`);
+              },
+            },
+            ...(isPersonal
+              ? [
+                  {
+                    key: 'friends',
+                    label: `${formatNumber(friendsCount)} friends`,
+                    onTap: () => {
+                      setActiveMiniNav('friends');
+                      navigate(`/profile/${username}/followers?tab=following&filter=friends`);
+                    },
+                  },
+                ]
+              : []),
+          ].map((item, i, arr) => (
+            <React.Fragment key={item.key}>
+              <button
+                type="button"
+                onClick={item.onTap}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  minHeight: 32,
+                  cursor: 'pointer',
+                  fontFamily: SANS,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: A.INK,
+                }}
+              >
+                {item.label}
+              </button>
+              {i < arr.length - 1 && <span aria-hidden style={{ color: A.DIM }}>·</span>}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
 
       {/* White content sheet */}

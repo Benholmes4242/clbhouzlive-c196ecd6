@@ -22,11 +22,19 @@ import {
   type RatedCourseData,
 } from './my-ratings/myRatingsTiers';
 import { formatNumber } from '@/i18n/format';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 interface AllCoursesListProps {
   userId: string;
   isOwnProfile: boolean;
   displayName?: string;
+  /**
+   * Own-profile scoring, keyed by course id. Sourced ONCE at page level from
+   * useUserAnalyticsCourses (auth.uid() server-side) - never per row.
+   */
+  scoringByCourseId?: Map<string, UserAnalyticsCourse>;
 }
 
 const PAGE_SIZE = 20;
@@ -64,6 +72,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   userId,
   isOwnProfile,
   displayName,
+  scoringByCourseId,
 }) => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -77,6 +86,23 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { courses: playedUnrated, count: reviewCount } = usePlayedUnratedCourses(userId);
+
+  const scoringFor = useCallback(
+    (courseId: string): UserAnalyticsCourse | null =>
+      (isOwnProfile ? scoringByCourseId?.get(courseId) : null) ?? null,
+    [isOwnProfile, scoringByCourseId],
+  );
+
+  const handleRowExpand = useCallback(
+    (course: RatedCourseData, hasScoring: boolean) => {
+      analyticsEvents.track('profile_course_row_expanded', {
+        course_id: course.id,
+        has_scoring: hasScoring,
+        own_profile: isOwnProfile,
+      });
+    },
+    [isOwnProfile],
+  );
 
   const handleCourseClick = useCallback(
     (courseId: string) => {
@@ -381,6 +407,28 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           <BreakdownsPrompt
             variant={promptMode}
             missingCount={promptMode === 'review' ? reviewCount : missingBreakdownsCourses.length}
+            courses={
+              promptMode === 'review'
+                ? playedUnrated.map((c) => ({
+                    id: c.course_id,
+                    name: c.name,
+                    country: null,
+                    sub_country: c.region,
+                    thumbnail_image: c.thumbnail_image,
+                    is_top100: false,
+                    global_rank: null,
+                    last_played_at: c.last_played,
+                    rating_value: 0,
+                    rating_id: null,
+                    design_score: null,
+                    condition_score: null,
+                    clubhouse_score: null,
+                    facilities_score: null,
+                    review: null,
+                    review_date: null,
+                  }))
+                : missingBreakdownsCourses
+            }
             onTap={promptMode === 'review' ? handleReviewPromptTap : handleBreakdownsPromptTap}
           />
         </div>
@@ -460,6 +508,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     rank={rank}
                     onCourseClick={handleCourseClick}
                     onFullReview={handleFullReview}
+                    scoring={scoringFor(course.id)}
+                    onExpand={handleRowExpand}
                   />,
                 );
               });
@@ -481,6 +531,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                         rank={rank}
                         onCourseClick={handleCourseClick}
                         onFullReview={handleFullReview}
+                        scoring={scoringFor(course.id)}
+                        onExpand={handleRowExpand}
                       />
                     );
                   }
@@ -501,6 +553,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             );
           })()}
         </div>
+      )}
+
+      {/* Scoring provenance - stated once, at the foot of the list */}
+      {isOwnProfile && (scoringByCourseId?.size ?? 0) > 0 && (
+        <p style={{ ...LABEL, color: A.DIM, textAlign: 'center', padding: '14px 24px 0' }}>
+          SCORING FROM YOUR IMPORTED ROUNDS
+        </p>
       )}
 
       {/* Load More */}

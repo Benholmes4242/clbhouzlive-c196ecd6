@@ -34,6 +34,9 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
 import { PendingPostCard } from './PendingPostCard';
+import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
+import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
@@ -106,6 +109,22 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       }
     });
   }, [posts, activeFilter]);
+
+  // ── Batched enrichment (parity with Clubhouse.tsx) ──
+  // ONE course-context call and TWO round calls for the whole visible page.
+  // Never per card: the cards read from these maps.
+  const feedCourseIds = useMemo(
+    () => filteredPosts.map((p) => resolvePostCourseId(p)).filter((id): id is string => !!id),
+    [filteredPosts],
+  );
+  const courseContextMap = usePostCourseContext(feedCourseIds);
+
+  const feedPostIds = useMemo(() => filteredPosts.map((p) => p.id), [filteredPosts]);
+  const postScoreIdMap = usePostScoreIds(feedPostIds);
+  const feedScoreIds = useMemo(() => Array.from(postScoreIdMap.values()), [postScoreIdMap]);
+  const postRoundMap = usePostRounds(feedScoreIds);
+
+  const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
   // ── Active post derivation (shared store, same as Clubhouse) ──
   const activeIndex = useClubhouseStore(s => s.activeIndex);
@@ -322,6 +341,13 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           getCommentCount={(post) => getCommentCount(post)}
           onFollow={handleFollow}
           currentUserId={user?.id}
+          courseContextMap={courseContextMap}
+          resolveCourseId={resolvePostCourseId}
+          postScoreIdMap={postScoreIdMap}
+          postRoundMap={postRoundMap}
+          onRoundTap={(post, round) =>
+            setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
+          }
         />
       )}
 
@@ -332,6 +358,16 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         >
           <Skeleton className="w-full rounded-none" style={{ aspectRatio: '16 / 10' }} />
         </div>
+      )}
+
+      {/* Attached-round drill-in (parity with Clubhouse) */}
+      {roundSheet && (
+        <RoundDetailSheet
+          open
+          onClose={() => setRoundSheet(null)}
+          scoreId={roundSheet.scoreId}
+          profileUserId={roundSheet.userId}
+        />
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}

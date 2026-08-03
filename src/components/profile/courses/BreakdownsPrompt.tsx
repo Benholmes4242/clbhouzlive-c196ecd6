@@ -1,105 +1,132 @@
 import React from 'react';
-import { Plus, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
+import { type RatedCourseData } from './my-ratings/myRatingsTiers';
+import { A, SANS, LABEL, Panel, Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface BreakdownsPromptProps {
   missingCount: number;
-  onTap: () => void;
+  courses: RatedCourseData[];
+  onTap: (from: 'preview' | 'action') => void;
   variant?: 'breakdowns' | 'review';
 }
 
+const TILE_W = 96;
+const TILE_H = 68;
+
 /**
- * Page-level prompt at the top of AllCoursesList. Mirrors the amber
- * "Played here?" hero tile from Course Details About tab
- * (CourseStatusToggle) — soft amber gradient surface, 1.5px amber
- * hairline, 46px squircle icon, amber pill CTA.
+ * Page-level "still to rate" prompt at the top of AllCoursesList.
+ * Recognition is the prompt: it shows the first three courses rather than a
+ * bare count. Analytical panel - no gradient, no glyph tile, no filled pill.
  */
 const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
   missingCount,
+  courses,
   onTap,
   variant = 'breakdowns',
 }) => {
+  const { t } = useTranslation('courses');
   if (missingCount === 0) return null;
 
-  const isReview = variant === 'review';
-  const noun = missingCount === 1 ? 'course' : 'courses';
+  const preview = courses.slice(0, 3);
+  const remainder = missingCount - preview.length;
 
-  const title = isReview
-    ? `${missingCount} ${noun} to review`
-    : `Add breakdowns to ${missingCount} ${noun}`;
-
-  const sub = isReview
-    ? 'Your ratings help golfers worldwide'
-    : 'Sharpen your scores by category';
-
-  const cta = isReview ? 'Review' : 'Add';
+  const kicker = t('toRate.kicker', { defaultValue: 'STILL TO RATE' });
+  const count = t('toRate.count', {
+    count: missingCount,
+    defaultValue: '{{count}} courses',
+  });
 
   return (
-    <button
-      type="button"
-      onClick={onTap}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        padding: 16,
-        borderRadius: 18,
-        cursor: 'pointer',
-        textAlign: 'left',
-        background: 'linear-gradient(135deg, rgba(247,147,30,0.07), rgba(247,147,30,0.02))',
-        border: '1.5px solid rgba(247,147,30,0.15)',
-        fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, sans-serif',
-      }}
-    >
+    <Panel kicker={variant === 'review' ? kicker : kicker} aside={count} style={{ fontFamily: SANS }}>
       <div
         style={{
-          width: 46,
-          height: 46,
-          borderRadius: 13,
-          flexShrink: 0,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+          gap: 10,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          paddingBottom: 2,
         }}
       >
-        {isReview ? (
-          <Star size={22} color="#fff" fill="#fff" strokeWidth={0} />
-        ) : (
-          <Plus size={22} color="#fff" strokeWidth={2.5} />
+        {preview.map((c) => {
+          const played = c.last_played_at ? formatDayMonthYearShortGB(new Date(c.last_played_at)) : null;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onTap('preview')}
+              style={{
+                flex: `0 0 ${TILE_W}px`,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                textAlign: 'left',
+                cursor: 'pointer',
+                fontFamily: SANS,
+              }}
+            >
+              <div
+                style={{
+                  width: TILE_W,
+                  height: TILE_H,
+                  borderRadius: 10,
+                  background: c.thumbnail_image ? `url(${c.thumbnail_image})` : A.TRACK,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+              <div
+                style={{
+                  marginTop: 6,
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: A.INK,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: TILE_W,
+                }}
+              >
+                {c.name}
+              </div>
+              {played && (
+                <div style={{ ...LABEL, marginTop: 2, letterSpacing: '0.10em' }}>
+                  {t('toRate.playedAgo', { ago: played, defaultValue: '{{ago}}' })}
+                </div>
+              )}
+            </button>
+          );
+        })}
+
+        {remainder > 0 && (
+          <button
+            type="button"
+            onClick={() => onTap('preview')}
+            style={{
+              flex: `0 0 ${TILE_W}px`,
+              height: TILE_H,
+              borderRadius: 10,
+              border: `1px dashed ${A.DIM}`,
+              background: 'transparent',
+              cursor: 'pointer',
+              fontFamily: SANS,
+              ...LABEL,
+              color: A.MUTE,
+            }}
+          >
+            {t('toRate.more', { count: remainder, defaultValue: '+{{count}} more' })}
+          </button>
         )}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 15,
-            fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {title}
-        </div>
-        <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>
-          {sub}
-        </div>
+
+      <div style={{ marginTop: 12 }}>
+        <Action
+          align="left"
+          label={t('toRate.action', { defaultValue: 'Rate them' })}
+          onClick={() => onTap('action')}
+        />
       </div>
-      <span
-        style={{
-          flexShrink: 0,
-          padding: '9px 18px',
-          borderRadius: 999,
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#fff',
-          border: 'none',
-          background: '#F7931E',
-          boxShadow: '0 4px 14px rgba(247,147,30,0.3)',
-        }}
-      >
-        {cta}
-      </span>
-    </button>
+    </Panel>
   );
 };
 
