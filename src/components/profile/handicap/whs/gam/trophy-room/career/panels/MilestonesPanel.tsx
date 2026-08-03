@@ -89,6 +89,7 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
           </RowButton>
         );
       })}
+      </Collapsible>
     </Panel>
   );
 };
