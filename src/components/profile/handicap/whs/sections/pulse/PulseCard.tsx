@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUp, ArrowDown, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
+import { Sparkline, directionTone, toneColor } from '../../charts';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -27,33 +28,6 @@ function colorFromUserId(id: string): string {
   return palette[Math.abs(hash) % palette.length];
 }
 
-const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, color }) => {
-  const h = 18;
-  if (series.length < 2) {
-    return <div style={{ height: h }} />;
-  }
-  const w = 110;
-  const PAD = 3;
-  const min = Math.min(...series);
-  const max = Math.max(...series);
-  const range = Math.max(0.1, max - min);
-  const PADX = 3;
-  const points = series.map((v, i) => [
-    PADX + (i / (series.length - 1)) * (w - PADX * 2),
-    h - PAD - ((v - min) / range) * (h - PAD * 2),
-  ]);
-  const path = points
-    .map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`)
-    .join(' ');
-  const lastPoint = points[points.length - 1];
-  return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      <path d={path} fill="none" stroke={color} strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={lastPoint[0]} cy={lastPoint[1]} r={2} fill={color} />
-    </svg>
-  );
-};
-
 const ZONE_LABEL: React.CSSProperties = {
   fontSize: 8,
   fontWeight: 800,
@@ -64,26 +38,19 @@ const ZONE_LABEL: React.CSSProperties = {
 
 export const PulseCard: React.FC<Props> = ({ friend }) => {
   const navigate = useNavigate();
-  const isUp = (friend.delta90 ?? 0) >= 0.3;
-  const isDown = (friend.delta90 ?? 0) <= -0.3;
-  const isFlat = friend.delta90 != null && !isUp && !isDown;
-  const deltaColor = isUp
-    ? '#EF4444'
-    : isDown
-      ? '#34D399'
-      : 'rgba(242,244,247,0.38)';
-  // Colour describes the visible line. When delta90 is null (thin
-  // history) fall back to the series' own direction so a rising line
-  // is never neutral grey.
+  // Direction is decided in exactly one place on this surface.
   const s = friend.hcp_series;
-  const seriesMove = s.length >= 2 ? s[s.length - 1] - s[0] : 0;
-  const lineUp = friend.delta90 != null ? isUp : seriesMove >= 0.3;
-  const lineDown = friend.delta90 != null ? isDown : seriesMove <= -0.3;
-  const lineColor = lineDown
-    ? '#34D399'
-    : lineUp
-      ? '#EF4444'
-      : 'rgba(242,244,247,0.55)';
+  const deltaTone =
+    friend.delta90 != null
+      ? directionTone(0, friend.delta90)
+      : s.length >= 2
+        ? directionTone(s[0], s[s.length - 1])
+        : 'neutral';
+  const isUp = deltaTone === 'up';
+  const isDown = deltaTone === 'down';
+  const isFlat = friend.delta90 != null && deltaTone === 'neutral';
+  const deltaColor = toneColor(deltaTone);
+  const lineTone = s.length >= 2 ? directionTone(s[0], s[s.length - 1]) : deltaTone;
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();
@@ -194,8 +161,8 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
             </span>
           )}
         </div>
-        <div style={{ marginTop: 5 }}>
-          <HcpSparkline series={friend.hcp_series} color={lineColor} />
+        <div style={{ marginTop: 5, height: 18 }}>
+          <Sparkline values={friend.hcp_series} tone={lineTone} w={110} h={18} />
         </div>
       </div>
 

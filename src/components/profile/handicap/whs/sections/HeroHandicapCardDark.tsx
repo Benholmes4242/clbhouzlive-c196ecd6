@@ -4,6 +4,8 @@ import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import type { WhsConnection } from '@/lib/whs/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { IndexChart, type IndexPoint } from '../charts';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 interface Props {
   connection: WhsConnection;
@@ -95,6 +97,12 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const isLoading = trendLoading || history90Loading;
 
+  // 90-day index series. IndexChart owns the inversion via directionTone().
+  const chartPoints = useMemo<IndexPoint[]>(() => {
+    if (!history90) return [];
+    return history90.map((p) => ({ t: p.observed_at, v: p.handicap_index }));
+  }, [history90]);
+
   return (
     <section style={{ padding: '16px 16px 16px', fontFamily: FONT }}>
       <div
@@ -159,6 +167,25 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
           <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
           <TrendRow label="12 Months" delta={delta12} borderTop caption="over 12 months" />
         </div>
+
+        {/* The shape, not just the number. Renders nothing under 2 points. */}
+        {chartPoints.length >= 2 && (
+          <div
+            style={{
+              gridColumn: '1 / -1',
+              marginTop: 16,
+              paddingTop: 16,
+              borderTop: '1px solid var(--hcp-line-2)',
+            }}
+          >
+            <IndexChart
+              points={chartPoints}
+              height={92}
+              hideFooter
+              formatLabel={(t) => formatDayMonthShortGB(t)}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

@@ -3,13 +3,15 @@ import { AlertTriangle } from 'lucide-react';
 import type { WhsConnection } from '@/lib/whs/types';
 import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import TodayGreeting from '../sections/TodayGreeting';
-import TrophyRoomEntryRow from '../sections/TrophyRoomEntryRow';
+import AchievementsPanel from '../sections/AchievementsPanel';
 import LastRoundCard from '../sections/LastRoundCard';
 
 import Pattern14Card from '../sections/Pattern14Card';
 
 
-import RecentUnlocksStrip from '../gam/RecentUnlocksStrip';
+import NextRoundWatch from '../sections/NextRoundWatch';
+import StreaksCard from '../../gam/streaks/StreaksCard';
+import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 import { PulseSection } from '../sections/PulseSection';
 
@@ -66,17 +68,22 @@ export const TodayView: React.FC<Props> = ({
       >
         {!readOnly && <TodayGreeting connectionId={connectionId} userId={userId} />}
         <HeroHandicapCardDark connection={connection} />
-        <TrophyRoomEntryRow userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
       </div>
 
+      {/* 2. Achievements — one entry point: figures, action, recent unlocks */}
+      <AchievementsPanel userId={userId} viewMode={viewMode} ownerFirstName={ownerFirstName} />
 
-      {/* 2. Find a player + Pulse — owner only */}
+      {/* 3. Streaks — owner only */}
+      {!readOnly && <StreaksCard userId={userId} readOnly={readOnly} />}
+
+      {/* 4. Next round — verdict, band, explanation */}
+      <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
+
+
+      {/* 5. Find a player + Pulse — owner only */}
       {!readOnly && <PulseSection userId={userId} />}
 
-      {/* 3. Recent Unlocks */}
-      <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
-
-      {/* 4. Last Round */}
+      {/* 6. Last Round */}
       <LastRoundCard
         connectionId={connectionId}
         userId={userId}
@@ -84,9 +91,10 @@ export const TodayView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 5. Last 14 Rounds */}
+      {/* 7. Last 14 Rounds */}
       <Pattern14Card connectionId={connectionId} />
 
+      {!readOnly && <StreaksSheetMount />}
       <LaunchSheetMount userId={userId} />
     </div>
   );
