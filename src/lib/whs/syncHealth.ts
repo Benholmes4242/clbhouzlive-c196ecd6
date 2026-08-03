@@ -55,8 +55,9 @@ const truncateDetail = (raw: string | null | undefined): string | null => {
 export function getSyncHealth(
   connection: Pick<
     WhsConnection,
-    'last_sync_status' | 'last_synced_at' | 'consecutive_failures'
+    'last_sync_status' | 'last_synced_at' | 'consecutive_failures' | 'last_sync_error'
   >,
+
   now: number = Date.now(),
 ): SyncHealth {
   const lastSyncedAt = connection.last_synced_at
