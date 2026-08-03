@@ -35,7 +35,9 @@ import { firstName } from '@/pages/rivalry-page/_shared/helpers';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { isHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+import { resolveHandicapSubtab, type HandicapSubtab } from '@/components/profile/handicap/whs/types';
+import { useTranslation } from 'react-i18next';
+
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
