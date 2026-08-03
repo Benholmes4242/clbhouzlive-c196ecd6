@@ -522,7 +522,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         </span>
         <span
           style={{
-            fontSize: 8,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.06em',
             color: isCounter ? 'var(--hcp-good-deep)' : T.inkFaded,

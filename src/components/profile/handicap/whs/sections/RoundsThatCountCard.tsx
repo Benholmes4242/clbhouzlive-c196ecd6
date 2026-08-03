@@ -316,7 +316,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             >
               <span
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.14em',
                   color: DIM,
@@ -407,7 +407,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               >
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 9,
                     fontWeight: 800,
                     letterSpacing: '0.1em',
                     color: statusColor,
@@ -470,7 +470,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     textAnchor="end"
                     fill={FAINT}
                     style={{
-                      fontSize: 8,
+                      fontSize: 9,
                       fontWeight: 700,
                       ...NUM,
                     }}
@@ -546,7 +546,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 y={H - 3}
                 fill={FAINT}
                 style={{
-                  fontSize: 7.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                 }}
@@ -559,7 +559,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 textAnchor="end"
                 fill={FAINT}
                 style={{
-                  fontSize: 7.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                 }}
@@ -591,7 +591,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 />
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 9,
                     fontWeight: 800,
                     letterSpacing: '0.1em',
                     color: FAINT,
@@ -614,7 +614,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   />
                   <span
                     style={{
-                      fontSize: 8.5,
+                      fontSize: 9,
                       fontWeight: 800,
                       letterSpacing: '0.1em',
                       color: FAINT,
@@ -641,7 +641,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             >
               <span
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                   color: DIM,
@@ -659,7 +659,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 {n < 20 ? (
                   <span
                     style={{
-                      fontSize: 8.5,
+                      fontSize: 9,
                       fontWeight: 800,
                       letterSpacing: '0.1em',
                       color: FAINT,
@@ -689,7 +689,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         </span>
                         <span
                           style={{
-                            fontSize: 8.5,
+                            fontSize: 9,
                             fontWeight: 800,
                             letterSpacing: '0.1em',
                             color: GOOD,
@@ -719,7 +719,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         </span>
                         <span
                           style={{
-                            fontSize: 8.5,
+                            fontSize: 9,
                             fontWeight: 800,
                             letterSpacing: '0.1em',
                             color: WARN,
@@ -731,7 +731,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     ) : (
                       <span
                         style={{
-                          fontSize: 8.5,
+                          fontSize: 9,
                           fontWeight: 800,
                           letterSpacing: '0.1em',
                           color: FAINT,

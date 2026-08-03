@@ -76,7 +76,7 @@ const ChaseCard: React.FC<{ row: LegendPulseRow; onClick: () => void }> = ({ row
       {/* Text column */}
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{
-          fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em', color: AMBER,
+          fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: AMBER,
         }}>
           CHASE
         </div>
@@ -120,7 +120,7 @@ export const LegendPulseTicker: React.FC<Props> = ({
         eyebrow={`THE CHASE · ${rows.length} LIVE`}
         right={
           <span style={{
-            fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em',
+            fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
             color: 'var(--hcp-t-40)', textTransform: 'uppercase',
             fontFamily: GAM.FONT_GEIST,
           }}>
