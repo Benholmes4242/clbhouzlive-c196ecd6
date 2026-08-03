@@ -610,7 +610,11 @@
       "roundShort": "R{{round}}",
       "roundScopeAria": "Round",
       "roundEmpty": "Draw released after Round {{prev}}",
-      "noGroups": "No tee times available for this round."
+      "noGroups": "No tee times available for this round.",
+      "sub": "{{groups}} groups . {{players}} players . round {{round}}",
+      "searchPlaceholder": "Find a player",
+      "noMatch": "No player in this round's draw matches that name."
+
     },
     "teeTimesBand": {
       "title": "Tee times",

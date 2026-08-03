@@ -1,22 +1,27 @@
-import { Skeleton } from '@/components/ui/skeleton';
 /**
- * AllTeeTimesSheet — owns its round state. Renders the canonical Lens
+ * AllTeeTimesSheet - owns its round state. Renders the canonical Lens
  * segment (R1/R2/R3/R4), fetches per-round groups via useTeeTimesAll,
- * and gracefully handles undrawn rounds (segment disabled at 35% opacity;
- * "Draw released after Round {n−1}" if tapped anyway).
+ * and gracefully handles undrawn rounds (segment disabled; "Draw released
+ * after Round {n-1}" if tapped anyway).
  *
  * Rounds are marked available when the tournament's current_round has
  * reached them (live/completed) or, for upcoming events, only Round 1.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
+import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
-import { FONT, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { FONT, INK, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
+import { A, KICKER, LABEL, CAPTION } from '@/features/courses/components/holes/analytical/tokens';
 
 type RoundKey = '1' | '2' | '3' | '4';
 
@@ -37,6 +42,8 @@ interface Props {
    * maxAvailableRound, so a gap (R1, R2, R4 drawn) is handled correctly.
    */
   drawnRounds?: readonly number[];
+  /** Leaderboard rows already on the page; used for position + score. */
+  entries?: BoardEntry[];
 }
 
 export function AllTeeTimesSheet({
@@ -47,8 +54,10 @@ export function AllTeeTimesSheet({
   defaultRound = 1,
   maxAvailableRound,
   drawnRounds,
+  entries,
 }: Props) {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const maxDrawn = Math.min(4, Math.max(1, maxAvailableRound ?? defaultRound));
 
   // Availability comes from the data when we have it; otherwise fall back to
@@ -71,17 +80,70 @@ export function AllTeeTimesSheet({
   }, [defaultRound, drawnSet]);
 
   const [round, setRound] = useState<RoundKey>(initial);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 200);
 
   // Reset to the current round each time the sheet opens.
   useEffect(() => {
     if (open) setRound(initial);
   }, [open, initial]);
 
+  useEffect(() => {
+    if (open) setSearch('');
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    analyticsEvents.track('tour_tournament_tee_times_opened', {
+      tournament_id: tournamentId ?? null,
+      round: Number(initial),
+    });
+    // Fire once per open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+
   const roundNum = Number(round);
   const isDrawn = drawnSet.has(roundNum);
 
   const teeQuery = useTeeTimesAll(tournamentId, roundNum, { enabled: open && isDrawn });
   const groups = teeQuery.data ?? [];
+
+  const filteredGroups = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
+    if (!q) return groups;
+    return groups.filter((g) => g.players.some((p) => p.name.toLowerCase().includes(q)));
+  }, [groups, debouncedSearch]);
+
+  const isSearching = debouncedSearch.trim().length > 0;
+
+  useEffect(() => {
+    if (!open) return;
+    const q = debouncedSearch.trim();
+    if (q.length === 0) return;
+    analyticsEvents.track('tour_tournament_tee_times_searched', {
+      tournament_id: tournamentId ?? null,
+      round: roundNum,
+      query_length: q.length,
+      results: filteredGroups.length,
+    });
+    // Debounced value only - not per keystroke, and never the query text.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, open, roundNum]);
+
+  const handlePlayerTap = useCallback(
+    (playerId: string, hasScore: boolean) => {
+      analyticsEvents.track('tour_tournament_tee_player_tapped', {
+        tournament_id: tournamentId ?? null,
+        round: roundNum,
+        player_id: playerId,
+        has_score: hasScore,
+      });
+      onClose();
+      setTimeout(() => navigate(`/tourhub/player/${playerId}`), 60);
+    },
+    [navigate, onClose, tournamentId, roundNum],
+  );
 
   const options: ReadonlyArray<ScopeSegmentOption<RoundKey>> = useMemo(
     () =>
@@ -92,6 +154,8 @@ export function AllTeeTimesSheet({
       })),
     [t, drawnSet],
   );
+
+  const playerCount = groups.reduce((s, g) => s + g.players.length, 0);
 
   return (
     <BottomSheet
@@ -113,6 +177,16 @@ export function AllTeeTimesSheet({
               {tournamentName}
             </h2>
           )}
+          {groups.length > 0 && (
+            <div style={{ ...LABEL, marginTop: 5 }}>
+              {t('tournament.allTeeTimes.sub', {
+                groups: groups.length,
+                players: playerCount,
+                round: roundNum,
+                defaultValue: `${groups.length} groups . ${playerCount} players . round ${roundNum}`,
+              })}
+            </div>
+          )}
           <div style={{ marginTop: 10 }}>
             <ScopeSegment
               value={round}
@@ -121,6 +195,37 @@ export function AllTeeTimesSheet({
               ariaLabel={t('tournament.allTeeTimes.roundScopeAria', { defaultValue: 'Round' })}
             />
           </div>
+          {isDrawn && groups.length > 0 && (
+            <div
+              style={{
+                marginTop: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 7,
+                background: '#F8FAFC',
+                border: `0.5px solid ${INK_FAINT}33`,
+                borderRadius: 18,
+                padding: '7px 12px',
+              }}
+            >
+              <Search size={13} color={INK_FAINT} />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('tournament.allTeeTimes.searchPlaceholder', { defaultValue: 'Find a player' })}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 13,
+                  fontFamily: FONT,
+                  color: INK,
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
@@ -134,19 +239,25 @@ export function AllTeeTimesSheet({
               </div>
             </div>
           ) : teeQuery.isLoading ? (
-            <div style={{ padding: '8px 16px' }}>
+            <div style={{ padding: '8px 0' }}>
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 0',
-                    borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+                    display: 'grid',
+                    gridTemplateColumns: '56px 1fr 62px',
+                    padding: '13px 16px',
                   }}
                 >
-                  <Skeleton style={{ width: 40, height: 12, borderRadius: 4 }} />
-                  <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
-                  <Skeleton style={{ width: 36, height: 12, borderRadius: 4 }} />
+                  <div>
+                    <Skeleton style={{ width: 40, height: 13, borderRadius: 4 }} />
+                    <Skeleton style={{ width: 30, height: 8, borderRadius: 4, marginTop: 5 }} />
+                  </div>
+                  <div style={{ gridColumn: '2 / 4', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <Skeleton style={{ width: '62%', height: 12, borderRadius: 4 }} />
+                    <Skeleton style={{ width: '54%', height: 12, borderRadius: 4 }} />
+                    <Skeleton style={{ width: '58%', height: 12, borderRadius: 4 }} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -158,8 +269,16 @@ export function AllTeeTimesSheet({
                 })}
               </div>
             </div>
+          ) : filteredGroups.length === 0 && isSearching ? (
+            <div style={{ padding: '24px 16px' }}>
+              <div style={{ ...CAPTION, textAlign: 'center', lineHeight: 1.5 }}>
+                {t('tournament.allTeeTimes.noMatch', {
+                  defaultValue: "No player in this round's draw matches that name.",
+                })}
+              </div>
+            </div>
           ) : (
-            <TeeTimesFirstGroups groups={groups} limit={9999} surface="transparent" />
+            <TeeTimesFirstGroups groups={filteredGroups} entries={entries} onPlayerTap={handlePlayerTap} />
           )}
         </div>
       </div>
