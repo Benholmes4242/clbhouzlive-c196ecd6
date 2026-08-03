@@ -17632,6 +17632,10 @@ export type Database = {
       compute_player_ratings: { Args: never; Returns: undefined }
       contains_banned_term: { Args: { _text: string }; Returns: boolean }
       count_orphan_posts: { Args: never; Returns: number }
+      count_shared_rounds_batch: {
+        Args: { p_target_ids: string[]; p_user_id: string }
+        Returns: Json
+      }
       create_business_account: {
         Args: {
           p_category?: string
