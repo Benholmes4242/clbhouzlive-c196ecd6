@@ -789,7 +789,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
                       <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
                         <span style={{ ...LABEL, fontSize: 8, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                          {t('courses:scorecard.parNCaps', { n: cardTotalPar })}
+                          {t('courses:scorecard.parN', { n: cardTotalPar })}
                         </span>
                         <span style={{ gridColumn: 'span 9' }} />
                         <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
