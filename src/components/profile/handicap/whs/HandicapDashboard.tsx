@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
+import { getSyncHealth } from '@/lib/whs/syncHealth';
+
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
 import CircleView from './views/CircleView';
