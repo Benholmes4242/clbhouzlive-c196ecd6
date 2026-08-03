@@ -313,6 +313,20 @@
     "form": {
       "nRoundsSample_one": "{{count}} ROUND",
       "nRoundsSample_other": "{{count}} ROUNDS"
+    },
+    "nextRound": {
+      "eyebrow": "Next round",
+      "sample": "Last 20 rounds",
+      "stateUp": "At risk",
+      "stateDown": "Drifting down",
+      "stateFlat": "Holding",
+      "whyUpCounterDropping": "A counting round is rolling off, so the index settles at {{settle}} unless you beat {{cut}}.",
+      "whyUp": "Anything worse than {{cut}} leaves the index at {{settle}}.",
+      "whyDown": "The window is improving on its own: the index reaches {{settle}} even without a counter.",
+      "whyFlat": "The window is stable: the index stays near {{settle}} whatever the next round does.",
+      "explainInside": "Your last 5 average is {{avg}}, inside the cut zone.",
+      "explainOutside": "Your last 5 average is {{avg}}, {{gap}} outside the cut zone.",
+      "explainFallback": "Best 8 of the last 20 differentials set the index. Beat the cut target and one of them is replaced."
     }
   }
 }
