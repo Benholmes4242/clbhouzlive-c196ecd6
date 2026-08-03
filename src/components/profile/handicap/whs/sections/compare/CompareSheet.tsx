@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { X, ArrowLeft, Search } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { useFriendLeaderboard, useSharedRounds, useWhsConnection } from '@/lib/whs/hooks';
+import { useFriendLeaderboard, useSharedRounds, useSharedRoundCounts, useWhsConnection } from '@/lib/whs/hooks';
 import { useEntityPickerSearch } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
@@ -115,6 +115,21 @@ export const CompareSheet: React.FC<Props> = ({
           contextLine: null,
         })),
     [people, viewerUserId],
+  );
+
+  /**
+   * ONE batched RPC for whichever list is on screen - six recent rows or the
+   * search results - instead of a query per row. Cached per id-set, so
+   * toggling back to the recent list or re-typing a query costs nothing.
+   */
+  const visibleIds = React.useMemo(
+    () => (searching ? searchResults : recent).map((p) => p.userId),
+    [searching, searchResults, recent],
+  );
+  const { data: sharedCounts } = useSharedRoundCounts(
+    viewerUserId,
+    visibleIds,
+    open && !target,
   );
 
   // Deep link / friend-view pre-selection. Resolved against the leaderboard
@@ -400,8 +415,8 @@ export const CompareSheet: React.FC<Props> = ({
             {(searching ? searchResults : recent).map((p) => (
               <ComparePersonRow
                 key={p.userId}
-                viewerUserId={viewerUserId}
                 person={p}
+                sharedCount={sharedCounts?.[p.userId] ?? 0}
                 onSelect={handleSelect}
               />
             ))}

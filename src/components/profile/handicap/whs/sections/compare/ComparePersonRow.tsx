@@ -5,14 +5,14 @@
  * and the search results render through the same row.
  *
  * Avatar, name, a LABEL context line, the shared-round standing, their index
- * as a FIGURE, then a chevron. The shared-round count is fetched by the ROW,
- * not the list, so only mounted rows cost a query.
+ * as a FIGURE, then a chevron. The shared-round count is BATCHED by the list
+ * (one RPC for every visible id) and passed in - the row itself queries
+ * nothing.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
-import { useSharedRounds } from '@/lib/whs/hooks';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 
 export interface ComparePerson {
@@ -26,19 +26,18 @@ export interface ComparePerson {
 }
 
 interface Props {
-  viewerUserId: string;
   person: ComparePerson;
+  /** Shared-round count from the list's batched lookup. */
+  sharedCount: number;
   onSelect: (person: ComparePerson, sharedRounds: number) => void;
 }
 
 export const ComparePersonRow: React.FC<Props> = ({
-  viewerUserId,
   person,
+  sharedCount,
   onSelect,
 }) => {
   const { t } = useTranslation('common');
-  const { data: shared } = useSharedRounds(viewerUserId, person.userId);
-  const sharedCount = shared?.shared_rounds_count ?? 0;
   const fbBg = getAvatarFallbackColor(person.userId);
 
   return (
