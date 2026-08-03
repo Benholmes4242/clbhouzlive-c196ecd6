@@ -541,29 +541,42 @@ function EGFriendRow({
       </div>
 
       <div style={{ flexShrink: 0, textAlign: 'right' }}>
-        <Action
-          label={already ? t('invite.reshare') : t('invite.invite')}
-          onClick={busy ? () => {} : onInvite}
-          align="left"
+        {/* The shared quiet Action's shape, inline so it can carry the
+            per-friend aria-label. Never a filled or outlined pill. */}
+        <button
+          type="button"
+          onClick={onInvite}
+          disabled={busy}
+          aria-label={t('invite.inviteAria', { name: firstName(friend.friend_name) })}
           style={{
+            minHeight: 32,
+            border: 'none',
+            background: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 6,
+            padding: 0,
             marginLeft: 'auto',
+            fontFamily: SANS,
             cursor: busy ? 'default' : 'pointer',
             opacity: busy ? 0.5 : 1,
           }}
-        />
+        >
+          <span style={{ ...LABEL, color: A.AMBER_DEEP }}>
+            {already ? t('invite.reshare') : t('invite.invite')}
+          </span>
+          <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+            {'\u203A'}
+          </span>
+        </button>
         {already && (
           <div style={{ ...LABEL, marginTop: 2 }}>
             {t('invite.invitedAgo', { ago: fmtRelative(already.created_at, { compact: true }) })}
           </div>
         )}
       </div>
-      <button
-        type="button"
-        onClick={onInvite}
-        disabled={busy}
-        aria-label={t('invite.inviteAria', { name: firstName(friend.friend_name) })}
-        style={{ display: 'none' }}
-      />
+
     </div>
   );
 }
