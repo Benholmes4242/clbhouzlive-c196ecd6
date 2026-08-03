@@ -47,6 +47,25 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     return diffs.reduce((a, b) => a + b, 0) / diffs.length;
   }, [allScores]);
 
+  // Fire once per mount when the band is actually rendered. Never awaited.
+  const firedRef = useRef(false);
+  const shownPayload = useMemo(() => {
+    if (!projection || !projection.hasData || currentHandicap == null) return null;
+    const { cutTarget, settleAtRaw } = projection;
+    if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
+    return {
+      cut: Number(cutTarget.toFixed(1)),
+      rise: Number((settleAtRaw - currentHandicap).toFixed(1)),
+      counting: Math.min(8, allScores?.length ?? 0),
+    };
+  }, [projection, currentHandicap, allScores]);
+
+  useEffect(() => {
+    if (!shownPayload || firedRef.current) return;
+    firedRef.current = true;
+    analyticsEvents.track?.('handicap_next_round_shown', shownPayload);
+  }, [shownPayload]);
+
   if (isLoading || !projection || !projection.hasData || currentHandicap == null) return null;
 
   const { cutTarget, settleAt, settleAtRaw, counterDropping } = projection;
