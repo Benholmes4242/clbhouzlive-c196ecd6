@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -10,24 +8,15 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
-import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
+import ManageScreen from '@/components/profile/handicap/whs/connect/ManageScreen';
+import { CANVAS } from '@/components/profile/handicap/whs/connect/designTokens';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
-import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const GREEN = '#059669';
-const GREEN_BG = 'rgba(5,150,105,0.08)';
-const AMBER_SOFT_BG = 'rgba(180,83,9,0.08)';
-const AMBER_SOFT_FG = '#B45309';
-const DANGER = '#DC2626';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export default function HandicapManagePage() {
   const { user } = useSupabaseSession();
