@@ -178,6 +178,20 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               borderTop: '1px solid var(--hcp-line-2)',
             }}
           >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: 6,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
+              }}
+            >
+              {t('common:handicap.hero.chartSample', { count: chartPoints.length })}
+            </div>
             <IndexChart
               points={chartPoints}
               height={92}
