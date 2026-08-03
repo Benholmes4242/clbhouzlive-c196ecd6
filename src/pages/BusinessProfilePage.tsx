@@ -534,7 +534,7 @@ const BusinessProfilePage: React.FC = () => {
 
 
 
-        {/* H3: header rendered globally by ChromeIsland (business 3-seg → back '/clubhouse'). */}
+        {/* H3: header rendered globally by ChromeIsland (business 3-seg back to '/clubhouse'). */}
 
         {/* Avatar (squircle) - owner: tap to upload; visitor: tap to lightbox */}
         {/* Canon exception: 2px bg-background die-cut ring over the cover photo - */}
