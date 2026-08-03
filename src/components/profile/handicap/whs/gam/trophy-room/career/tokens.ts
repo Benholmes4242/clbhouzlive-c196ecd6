@@ -17,6 +17,13 @@ export const REC = {
   PANEL_2: CHART.PANEL_2,
   BORDER: CHART.BORDER,
   TRACK: CHART.TRACK,
+  /**
+   * Bar track. Lifted off CHART.TRACK on purpose: against the panel a faint
+   * track makes a 0% bar read as a hairline and a 100% bar as a solid band,
+   * so the same component looked like two different objects. At 0.16 an empty
+   * bar still reads as a bar.
+   */
+  BAR_TRACK: 'rgba(255,255,255,0.16)',
   INK: CHART.INK,
   MUTE: CHART.MUTE,
   DIM: CHART.DIM,

@@ -83,16 +83,19 @@ export const Panel: React.FC<{
   </section>
 );
 
-export const Bar: React.FC<{ pct: number; height?: number; color?: string }> = ({
-  pct,
-  height = 4,
-  color,
-}) => (
+/**
+ * ONE height everywhere. The height prop is gone on purpose: a call site that
+ * wants a different one is a signal the treatment is wrong, not that the prop
+ * is useful.
+ */
+const BAR_HEIGHT = 4;
+
+export const Bar: React.FC<{ pct: number; color?: string }> = ({ pct, color }) => (
   <div
     style={{
-      height,
-      borderRadius: height / 2,
-      background: REC.TRACK,
+      height: BAR_HEIGHT,
+      borderRadius: BAR_HEIGHT / 2,
+      background: REC.BAR_TRACK,
       overflow: 'hidden',
     }}
   >
