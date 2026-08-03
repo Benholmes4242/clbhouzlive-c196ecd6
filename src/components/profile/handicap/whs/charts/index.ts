@@ -1,7 +1,7 @@
 /**
  * Handicap chart primitives. No section on this surface draws its own SVG.
  */
-export { CHART, CHART_FONT, LABEL_STYLE, DEAD_BAND, directionTone, toneColor } from './tokens';
+export { CHART, CHART_FONT, LABEL_STYLE, DEAD_BAND, indexTone, pointsTone, toneColor } from './tokens';
 export type { ChartTone } from './tokens';
 
 export { IndexChart } from './IndexChart';
