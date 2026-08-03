@@ -10,6 +10,7 @@
  * The bar is AMBER on TRACK. It is the one place amber earns a fill here.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 import { tierForSent } from './inviteTiers';
 
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export const InviteProgressPanel: React.FC<Props> = ({ sentCount, onClick }) => {
+  const { t } = useTranslation('common');
   const tier = tierForSent(sentCount);
 
   // Past the fixed ladder the mark rolls in fives.
@@ -62,8 +64,12 @@ export const InviteProgressPanel: React.FC<Props> = ({ sentCount, onClick }) => 
           gap: 12,
         }}
       >
-        <span style={{ ...LABEL_STYLE, color: CHART.MUTE }}>Invites sent</span>
-        {tappable && <span style={{ ...LABEL_STYLE, color: CHART.AMBER }}>Sent invites</span>}
+        <span style={{ ...LABEL_STYLE, color: CHART.MUTE }}>{t('handicap.circle.invite.invitesSent')}</span>
+        {tappable && (
+          <span style={{ ...LABEL_STYLE, color: CHART.AMBER }}>
+            {t('handicap.circle.invite.sentInvites')}
+          </span>
+        )}
       </div>
 
       <div style={{ marginTop: 14 }}>
@@ -80,9 +86,11 @@ export const InviteProgressPanel: React.FC<Props> = ({ sentCount, onClick }) => 
           {sentCount}
         </div>
         <div style={{ ...LABEL_STYLE, marginTop: 6, color: CHART.MUTE }}>
-          {sentCount === 1 ? '1 invited' : `${sentCount} invited`}
+          {t('handicap.circle.invite.invitedCount', { count: sentCount })}
         </div>
-        <div style={{ ...LABEL_STYLE, marginTop: 3 }}>Next at {goal}</div>
+        <div style={{ ...LABEL_STYLE, marginTop: 3 }}>
+          {t('handicap.circle.invite.nextAt', { count: goal })}
+        </div>
       </div>
 
       {/* Progress: amber on track. */}
