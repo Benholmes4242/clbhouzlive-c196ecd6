@@ -109,8 +109,11 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
   const handleSeeRivalry = () => {
     if (!targetUserId) return;
     onClose();
-    navigate(`/handicap/rivalry/${targetUserId}`);
+    // The rivalry page is gone; the compare sheet answers the same question
+    // and opens pre-selected on this player.
+    navigate(`/handicap?subtab=circle&compare=${encodeURIComponent(targetUserId)}`);
   };
+
   const handleSeeHandicap = () => {
     if (!targetUserId) return;
     onClose();

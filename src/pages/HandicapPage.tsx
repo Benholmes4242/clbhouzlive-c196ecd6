@@ -30,8 +30,13 @@ import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboa
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
-import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
-import { firstName } from '@/pages/rivalry-page/_shared/helpers';
+import { CompareOwnerCTA } from '@/components/profile/handicap/whs/sections/header/CompareOwnerCTA';
+import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
+import { firstName as canonicalFirstName } from '@/lib/whs/utils/initials';
+
+/** Local wrapper: the canonical helper returns '' for empty input. */
+const firstName = (n: string | null | undefined): string =>
+  canonicalFirstName((n ?? '').trim()) || 'Player';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -229,9 +234,9 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       ) : null}
 
       {readOnly && ownerUserId && viewerUserId && (
-        <RivalryCTA
-          rivalUserId={ownerUserId}
-          rivalFirstName={firstName(displayName)}
+        <CompareOwnerCTA
+          ownerUserId={ownerUserId}
+          ownerFirstName={firstName(displayName)}
         />
       )}
 
@@ -517,6 +522,7 @@ const HandicapPage: React.FC = () => {
       >
         <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={false} />
+        <CompareMount viewerUserId={user.id} />
       </ManagePageShell>
     );
   }
@@ -543,6 +549,7 @@ const HandicapPage: React.FC = () => {
         )}
       </main>
       <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
+      <CompareMount viewerUserId={user.id} />
     </PageRoot>
   );
 };

@@ -1,31 +1,32 @@
 /**
  * CircleView - the merged Circle tab.
  *
- * Absorbs the old Friends and Compete tabs. Composition, in order:
- *   1. ONE leaderboard (FriendsLeaderboardSection - the richer of the two)
+ * Composition, in order:
+ *   1. ONE leaderboard (FriendsLeaderboardSection)
  *   2. Friends' rounds
- *   3. Rivalries
- *   4. Course legends
- *   5. Invite
+ *   3. Compare entry - one panel opening the compare sheet
+ *   4. Invite
  *
- * There is exactly ONE leaderboard here. YourCircleSection used to draw a
- * second one from the same hook and the two disagreed on the surface
- * ("8th of 28" against "#7 of 25"); it is deleted, not hidden.
+ * The Rivalries section and the Course Champions section are GONE, not hidden.
+ * Rivalries required the member to manage a fixed set of slots to get one
+ * comparison; the compare sheet gives the same comparison against anyone they
+ * can search, with no slots to manage. Course Champions aggregated per-course
+ * boards that the course detail page already shows better - its two figures
+ * that were NOT visible elsewhere (titles held, the nearest chase) moved to the
+ * Achievements panel on Today.
  *
- * FRIEND VIEW (decision A4) - explicit, do not re-derive from "owner-only":
- *   SHOWN:      rivalries, course legends
- *   SUPPRESSED: the leaderboard, friends' rounds, invite
- * That is exactly what the old FriendsView hid and the old LegendsView showed,
- * so nothing a member had is lost. StreaksCard now lives on Today.
+ * FRIEND VIEW - explicit, do not re-derive from "owner-only":
+ *   SHOWN:      nothing on this tab besides the compare entry, which is
+ *               pre-selected on the owner by the header control instead.
+ *   SUPPRESSED: the leaderboard, friends' rounds, invite.
+ * In friend view the tab therefore carries the compare entry only, which is a
+ * real destination rather than an empty tab.
  */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
-import RivalriesSection from '../sections/rivalries/RivalriesSection';
-import CourseLegendsSection from '../sections/course-legends/CourseLegendsSection';
+import CompareEntryPanel from '../sections/compare/CompareEntryPanel';
 import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
-import type { CourseSelection } from '../sections/course-legends/types';
 
 interface Props {
   userId: string;
@@ -39,12 +40,6 @@ export const CircleView: React.FC<Props> = ({
   readOnly = false,
   ownerFirstName = null,
 }) => {
-  const navigate = useNavigate();
-
-  const handleSelectCourse = (selection: CourseSelection) => {
-    navigate(`/courses/${selection.courseId}?tab=legends`);
-  };
-
   return (
     <div
       role="tabpanel"
@@ -65,17 +60,10 @@ export const CircleView: React.FC<Props> = ({
       {/* 2. Friends' rounds - owner only */}
       {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
 
-      {/* 3. Rivalries - shown in friend view */}
-      <RivalriesSection userId={userId} />
+      {/* 3. Compare - shown in friend view */}
+      <CompareEntryPanel />
 
-      {/* 4. Course legends - shown in friend view */}
-      <CourseLegendsSection
-        userId={userId}
-        friendName={readOnly ? ownerFirstName ?? null : null}
-        onSelectCourse={handleSelectCourse}
-      />
-
-      {/* 5. Invite - owner only */}
+      {/* 4. Invite - owner only */}
       {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
     </div>
   );

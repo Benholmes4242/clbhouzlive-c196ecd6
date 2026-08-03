@@ -1,0 +1,158 @@
+/**
+ * ComparePersonRow - one selectable player in the compare sheet's list state.
+ *
+ * Takes a MINIMAL shape, not a leaderboard entry, so the recent-players list
+ * and the search results render through the same row.
+ *
+ * Avatar, name, a LABEL context line, the shared-round standing, their index
+ * as a FIGURE, then a chevron. The shared-round count is fetched by the ROW,
+ * not the list, so only mounted rows cost a query.
+ */
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { useSharedRounds } from '@/lib/whs/hooks';
+import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
+
+export interface ComparePerson {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  /** Handicap index, when known. */
+  index: number | null;
+  /** "2 days ago . Sunningdale", or null for search results. */
+  contextLine: string | null;
+}
+
+interface Props {
+  viewerUserId: string;
+  person: ComparePerson;
+  onSelect: (person: ComparePerson, sharedRounds: number) => void;
+}
+
+export const ComparePersonRow: React.FC<Props> = ({
+  viewerUserId,
+  person,
+  onSelect,
+}) => {
+  const { t } = useTranslation('common');
+  const { data: shared } = useSharedRounds(viewerUserId, person.userId);
+  const sharedCount = shared?.shared_rounds_count ?? 0;
+  const fbBg = getAvatarFallbackColor(person.userId);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(person, sharedCount)}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '11px 16px',
+        background: 'none',
+        border: 'none',
+        borderTop: `1px solid ${CHART.BORDER}`,
+        textAlign: 'left',
+        cursor: 'pointer',
+        fontFamily: CHART_FONT,
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          width: 33,
+          height: 33,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          background: person.avatarUrl ? CHART.PANEL_2 : fbBg,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: CHART.INK,
+          flexShrink: 0,
+          fontSize: 12,
+          fontWeight: 800,
+        }}
+      >
+        {person.avatarUrl ? (
+          <img
+            src={person.avatarUrl}
+            alt=""
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <span>{getInitialsFromName(person.name) || '?'}</span>
+        )}
+        {/* Canonical traced hairline ring - dark surface token. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            border: `1px solid ${CHART.FAINT}`,
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: CHART.INK,
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {person.name}
+        </div>
+        {person.contextLine && (
+          <div
+            style={{
+              ...LABEL_STYLE,
+              marginTop: 4,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {person.contextLine}
+          </div>
+        )}
+        <div style={{ ...LABEL_STYLE, marginTop: 3, color: CHART.MUTE }}>
+          {sharedCount > 0
+            ? t('handicap.compare.sharedRounds', { count: sharedCount })
+            : t('handicap.compare.neverPlayed')}
+        </div>
+      </div>
+
+      <span
+        style={{
+          fontSize: 15,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          color: CHART.INK,
+          fontVariantNumeric: 'tabular-nums lining-nums',
+          flexShrink: 0,
+        }}
+      >
+        {person.index != null ? person.index.toFixed(1) : '-'}
+      </span>
+      <ChevronRight
+        size={15}
+        strokeWidth={2.2}
+        color={CHART.DIM}
+        style={{ flexShrink: 0 }}
+      />
+    </button>
+  );
+};
+
+export default ComparePersonRow;

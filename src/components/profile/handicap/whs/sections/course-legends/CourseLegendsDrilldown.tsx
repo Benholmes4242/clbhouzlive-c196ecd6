@@ -27,7 +27,7 @@ import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
-import { WindowToggle } from './CourseLegendsSection';
+import { WindowToggle } from './_shared/WindowToggle';
 
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
