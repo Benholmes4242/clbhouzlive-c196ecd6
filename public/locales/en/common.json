@@ -1,5 +1,35 @@
 {
+  "invite": {
+    "kicker": "INVITE FRIENDS",
+    "title": "Golf's better with your circle",
+    "sub": "{{count}} England Golf friends . {{invited}} invited",
+    "shareLink": "Share your clbhouz link",
+    "searchPlaceholder": "Find a friend",
+    "noMatch": "No England Golf friend matches that name.",
+    "groupPending": "NOT YET INVITED",
+    "groupInvited": "INVITED",
+    "invite": "Invite",
+    "reshare": "Re-share",
+    "invitedAgo": "Invited {{ago}}",
+    "inviteAria": "Invite {{name}}",
+    "emptyFriends": "No England Golf friends to invite right now.",
+    "loading": "Loading",
+    "unconnected": {
+      "title": "Bring your fourball",
+      "body": "Send your personal link. They download the app and you are connected from day one.",
+      "copy": "Copy link",
+      "share": "Share invite",
+      "preparing": "Preparing link"
+    },
+    "toast": {
+      "linkCopied": "Link copied",
+      "copyFailed": "Couldn't copy link",
+      "createFailed": "Couldn't create invite link",
+      "missingId": "Cannot invite this friend"
+    }
+  },
   "action": {
+
     "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",

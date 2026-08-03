@@ -1,10 +1,26 @@
-import React, { useCallback, useMemo, useState } from 'react';
+/**
+ * InviteFriendsSheet
+ *
+ * Two states, and after BRIEF_INVITE_FRIENDS_SHEET they are siblings: kicker,
+ * title, a line of context, and exactly ONE filled control, which is INK.
+ *
+ *   - CONNECTED: the member's England Golf friends who are not yet on
+ *     clbhouz, grouped by invite state (not-yet-invited first), searchable.
+ *   - UNCONNECTED: a generic invite link to share.
+ *
+ * Amber appears only in section kickers and the quiet row Actions.
+ */
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from '@/lib/toast';
-import { UserPlus, Copy, Share2, Send } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useWhsConnection, useFriendLeaderboard, useSentInvites, whsKeys } from '@/lib/whs/hooks';
 import type { FriendLeaderboardEntry, WhsInviteStatus } from '@/lib/whs/types';
 import { callCreateInvite } from '@/lib/whs/api';
@@ -14,21 +30,22 @@ import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallbac
 import { displayName } from '@/lib/whs/utils/initials';
 import { fmtHcp } from '@/lib/whs/format';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
+import {
+  A,
+  CAPTION,
+  KICKER,
+  LABEL,
+  SANS,
+  Action,
+} from '@/features/courses/components/holes/analytical/tokens';
+
+const DOT = '\u00B7';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   source: string;
 }
-
-const FONT = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const INK = '#0F172A';
-const INK_MUTE = '#94A3B8';
-const INK_SOFT = '#475569';
-const AMBER = '#F7931E';
-const AMBER_BG = '#FFF7EC';
-const SURFACE = '#F8FAFC';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
 
 interface GenericInviteResp {
   ok: boolean;
@@ -57,68 +74,76 @@ async function createGenericInvite(source: string): Promise<GenericInviteResp | 
 }
 
 export function InviteFriendsSheet({ open, onClose, source }: Props) {
+  const { t } = useTranslation('common');
   const { user } = useSupabaseSession();
   const userId = user?.id;
   const { data: whs, isLoading: whsLoading } = useWhsConnection(userId);
   const connected = !!whs;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light" ariaLabelledBy="invite-friends-title">
-      <div
-        style={{
-          padding: '4px 16px 24px',
-          fontFamily: FONT,
-          background: SURFACE,
-          maxHeight: '75dvh',
-          overflowY: 'auto',
-        }}
-      >
-        {/* Header */}
-        <div style={{ padding: '4px 4px 14px' }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 500,
-              color: AMBER,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-            }}
-          >
-            invite friends
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      variant="light"
+      ariaLabelledBy="invite-friends-title"
+      // Stacks OVER the profile sheet, which sits at 9998/9999.
+      zIndexBase={10000}
+      maxHeight="75dvh"
+      style={{
+        height: '75dvh',
+        maxHeight: '75dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      {whsLoading ? (
+        <div style={{ fontFamily: SANS, padding: '4px 20px 24px' }}>
+          <InviteHeader />
+          <div style={{ ...CAPTION, padding: '24px 0', textAlign: 'center' }}>
+            {t('invite.loading')}
           </div>
-          <h2
-            id="invite-friends-title"
-            style={{
-              margin: '4px 0 0',
-              fontSize: 13,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '-0.005em',
-            }}
-          >
-            Golf's better with your circle
-          </h2>
         </div>
-
-        {whsLoading ? (
-          <div style={{ padding: 32, textAlign: 'center', color: INK_MUTE, fontSize: 12 }}>
-            loading…
-          </div>
-        ) : connected && userId ? (
-          <ConnectedState source={source} ownerUserId={userId} />
-        ) : (
-          <UnconnectedState source={source} />
-        )}
-      </div>
+      ) : connected && userId ? (
+        <ConnectedState source={source} ownerUserId={userId} />
+      ) : (
+        <UnconnectedState source={source} />
+      )}
     </BottomSheet>
   );
 }
 
-/* ────────────────── State A: WHS connected ────────────────── */
+/** Kicker + title. Shared by both states so they stay siblings. */
+function InviteHeader({ sub }: { sub?: string | null }) {
+  const { t } = useTranslation('common');
+  return (
+    <>
+      <div style={KICKER}>{t('invite.kicker')}</div>
+      <h2
+        id="invite-friends-title"
+        style={{
+          margin: '4px 0 0',
+          fontSize: 17,
+          fontWeight: 800,
+          color: A.INK,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {t('invite.title')}
+      </h2>
+      {sub ? <div style={{ ...LABEL, marginTop: 5 }}>{sub}</div> : null}
+    </>
+  );
+}
+
+/* ---------------- State A: WHS connected ---------------- */
 
 function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: string }) {
+  const { t } = useTranslation('common');
   const { data: friends } = useFriendLeaderboard(ownerUserId);
   const { data: sent } = useSentInvites();
+  const [q, setQ] = useState('');
+  const debouncedQ = useDebouncedValue(q, 200);
 
   const invitable = useMemo(
     () =>
@@ -141,52 +166,188 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
     return map;
   }, [sent]);
 
-  return (
-    <>
-      <InviteAnyoneRow source={source} />
+  const alreadyFor = useCallback(
+    (f: FriendLeaderboardEntry) =>
+      f.friend_passport_id != null ? sentByPassportId.get(String(f.friend_passport_id)) : undefined,
+    [sentByPassportId],
+  );
 
-      <div
-        style={{
-          padding: '18px 4px 10px',
-          fontSize: 10.5,
-          fontWeight: 500,
-          color: INK_MUTE,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-        }}
-      >
-        your england golf friends
+  // Filter on the DISPLAY name, not the raw feed name.
+  const filtered = useMemo(() => {
+    const needle = debouncedQ.trim().toLowerCase();
+    if (!needle) return invitable;
+    return invitable.filter((f) => displayName(f.friend_name).toLowerCase().includes(needle));
+  }, [invitable, debouncedQ]);
+
+  // Grouping is applied AFTER the existing within-group sort, which is
+  // preserved by filtering in order.
+  const pending = useMemo(() => filtered.filter((f) => !alreadyFor(f)), [filtered, alreadyFor]);
+  const invited = useMemo(() => filtered.filter((f) => !!alreadyFor(f)), [filtered, alreadyFor]);
+
+  const invitedTotal = useMemo(
+    () => invitable.filter((f) => !!alreadyFor(f)).length,
+    [invitable, alreadyFor],
+  );
+
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    viewedRef.current = true;
+    analyticsEvents.track('invite_sheet_viewed', {
+      source,
+      connected: true,
+      friends: invitable.length,
+      invited: invitedTotal,
+    });
+  }, [source, invitable.length, invitedTotal]);
+
+  useEffect(() => {
+    const query = debouncedQ.trim();
+    if (query.length === 0) return;
+    analyticsEvents.track('invite_searched', {
+      query_length: query.length,
+      results: filtered.length,
+    });
+    // Debounced value only, and never the query text.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQ]);
+
+  const hasList = invitable.length > 0;
+  const isSearching = debouncedQ.trim().length > 0;
+
+  return (
+    <div style={{ fontFamily: SANS, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      {/* Pinned header */}
+      <div style={{ padding: '4px 20px 12px', flexShrink: 0 }}>
+        <InviteHeader
+          sub={
+            hasList
+              ? t('invite.sub', { count: invitable.length, invited: invitedTotal })
+              : null
+          }
+        />
+        <div style={{ marginTop: 12 }}>
+          <ShareLinkButton source={source} />
+        </div>
+        {hasList && (
+          <div
+            style={{
+              marginTop: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              background: '#FFFFFF',
+              border: `0.5px solid ${A.BORDER}`,
+              borderRadius: 18,
+              padding: '8px 13px',
+            }}
+          >
+            <Search size={13} color={A.DIM} />
+            <input
+              type="text"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t('invite.searchPlaceholder')}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 14,
+                fontFamily: SANS,
+                color: A.INK,
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+              }}
+            />
+          </div>
+        )}
       </div>
 
-      {invitable.length === 0 ? (
-        <div
-          style={{
-            padding: 20,
-            textAlign: 'center',
-            color: INK_MUTE,
-            fontSize: 12,
-            background: '#FFFFFF',
-            border: `0.5px solid ${HAIRLINE}`,
-            borderRadius: 14,
-          }}
-        >
-          No England Golf friends to invite right now.
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {invitable.map((f) => {
-            const already = f.friend_passport_id != null
-              ? sentByPassportId.get(String(f.friend_passport_id))
-              : undefined;
-            return <EGFriendRow key={String(f.friend_passport_id)} friend={f} already={already} />;
-          })}
-        </div>
-      )}
+      {/* Scroller. overscrollBehavior: contain stops scroll chaining into the
+          profile sheet behind. */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          padding: '0 0 12px',
+        }}
+      >
+        {!hasList ? (
+          <div style={{ ...CAPTION, padding: '20px 24px', textAlign: 'center' }}>
+            {t('invite.emptyFriends')}
+          </div>
+        ) : pending.length === 0 && invited.length === 0 ? (
+          <div style={{ ...CAPTION, padding: '20px 24px', textAlign: 'center' }}>
+            {isSearching ? t('invite.noMatch') : t('invite.emptyFriends')}
+          </div>
+        ) : (
+          <>
+            <FriendGroup
+              label={t('invite.groupPending')}
+              rows={pending}
+              alreadyFor={alreadyFor}
+              source={source}
+            />
+            <FriendGroup
+              label={t('invite.groupInvited')}
+              rows={invited}
+              alreadyFor={alreadyFor}
+              source={source}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** A group renders nothing at all, header included, when it has no members. */
+function FriendGroup({
+  label,
+  rows,
+  alreadyFor,
+  source,
+}: {
+  label: string;
+  rows: FriendLeaderboardEntry[];
+  alreadyFor: (f: FriendLeaderboardEntry) => { created_at: string } | undefined;
+  source: string;
+}) {
+  if (rows.length === 0) return null;
+  return (
+    <>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+          padding: '14px 20px 8px',
+        }}
+      >
+        <span style={KICKER}>{label}</span>
+        <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>{rows.length}</span>
+      </div>
+      <div style={{ background: '#FFFFFF', borderTop: `0.5px solid ${A.BORDER}` }}>
+        {rows.map((f) => (
+          <EGFriendRow
+            key={String(f.friend_passport_id)}
+            friend={f}
+            already={alreadyFor(f)}
+            source={source}
+          />
+        ))}
+      </div>
     </>
   );
 }
 
-function InviteAnyoneRow({ source }: { source: string }) {
+/** The single filled control on the connected state, and it is INK. */
+function ShareLinkButton({ source }: { source: string }) {
+  const { t } = useTranslation('common');
   const [busy, setBusy] = useState(false);
   const handleClick = useCallback(async () => {
     if (busy) return;
@@ -194,9 +355,10 @@ function InviteAnyoneRow({ source }: { source: string }) {
     try {
       const res = await createGenericInvite(source);
       if (!res?.ok || !res.share_url) {
-        toast.error("Couldn't create invite link");
+        toast.error(t('invite.toast.createFailed'));
         return;
       }
+      analyticsEvents.track('invite_sent', { source, kind: 'generic', is_reshare: false });
       await shareInvite({
         share_url: res.share_url,
         share_message: res.share_message ?? res.share_url,
@@ -205,7 +367,7 @@ function InviteAnyoneRow({ source }: { source: string }) {
     } finally {
       setBusy(false);
     }
-  }, [busy, source]);
+  }, [busy, source, t]);
 
   return (
     <button
@@ -213,36 +375,18 @@ function InviteAnyoneRow({ source }: { source: string }) {
       onClick={handleClick}
       style={{
         width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        background: AMBER_BG,
-        border: `0.5px solid ${AMBER}`,
-        borderRadius: 14,
-        padding: '12px 14px',
-        textAlign: 'left',
-        cursor: 'pointer',
-        fontFamily: FONT,
+        height: 44,
+        background: A.INK,
+        color: '#FFFFFF',
+        border: 'none',
+        borderRadius: 12,
+        fontSize: 13.5,
+        fontWeight: 800,
+        fontFamily: SANS,
+        cursor: busy ? 'default' : 'pointer',
       }}
     >
-      <div
-        style={{
-          width: 38,
-          height: 38,
-          borderRadius: 13,
-          background: AMBER,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <Share2 size={17} color="#fff" strokeWidth={2.2} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>Invite anyone</div>
-        <div style={{ fontSize: 11, color: INK_SOFT, marginTop: 1 }}>Share your clbhouz link</div>
-      </div>
+      {t('invite.shareLink')}
     </button>
   );
 }
@@ -250,32 +394,38 @@ function InviteAnyoneRow({ source }: { source: string }) {
 function EGFriendRow({
   friend,
   already,
+  source,
 }: {
   friend: FriendLeaderboardEntry;
   already?: { created_at: string };
+  source: string;
 }) {
+  const { t } = useTranslation('common');
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const avatarSrc = pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url);
 
+  // Compute the display name ONCE and derive the initials from it. The feed
+  // supplies surname-first, so passing the raw name to getInitialsFromName
+  // produced "GM" for "Matthew Grice".
+  const shown = displayName(friend.friend_name);
+
   const club = friend.last_round_course_name ?? null;
   const hcp = friend.friend_handicap_index;
+  // An invited friend keeps their golf: the meta line always shows club and
+  // handicap. The invite state sits beneath the action instead.
   const sub =
     club && hcp != null
-      ? `${club} · ${fmtHcp(hcp)}`
+      ? `${club} ${DOT} ${fmtHcp(hcp)}`
       : club
       ? club
       : hcp != null
       ? fmtHcp(hcp)
       : '';
 
-  const alreadySub = already
-    ? `Invited ${fmtRelative(already.created_at, { compact: true })}`
-    : null;
-
   const onInvite = useCallback(async () => {
     if (friend.friend_passport_id == null) {
-      toast.error('Cannot invite this friend (missing ID)');
+      toast.error(t('invite.toast.missingId'));
       return;
     }
     if (busy) return;
@@ -283,9 +433,14 @@ function EGFriendRow({
     try {
       const res = await callCreateInvite(friend.friend_passport_id, 'copy_link');
       if (!res.ok || !res.share_url) {
-        toast.error(res.message ?? "Couldn't create invite");
+        toast.error(res.message ?? t('invite.toast.createFailed'));
         return;
       }
+      analyticsEvents.track('invite_sent', {
+        source,
+        kind: 'friend',
+        is_reshare: !!already,
+      });
       queryClient.invalidateQueries({ queryKey: whsKeys.sentInvites() });
       await shareInvite({
         share_url: res.share_url,
@@ -295,7 +450,7 @@ function EGFriendRow({
     } finally {
       setBusy(false);
     }
-  }, [busy, friend, queryClient]);
+  }, [busy, friend, queryClient, t, source, already]);
 
   return (
     <div
@@ -303,14 +458,11 @@ function EGFriendRow({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        background: '#FFFFFF',
-        border: `0.5px solid ${HAIRLINE}`,
-        borderRadius: 14,
-        padding: '10px 12px',
+        padding: '12px 20px',
       }}
     >
       {avatarSrc ? (
-        <div style={{ position: 'relative', width: 34, height: 34, flexShrink: 0 }}>
+        <div style={{ position: 'relative', width: 34, height: 34, flex: '0 0 34px' }}>
           <div
             style={{
               width: 34,
@@ -342,6 +494,7 @@ function EGFriendRow({
           style={{
             width: 34,
             height: 34,
+            flex: '0 0 34px',
             borderRadius: '34%',
             background: getAvatarFallbackColor(
               friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name,
@@ -352,71 +505,90 @@ function EGFriendRow({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexShrink: 0,
           }}
         >
-          {getInitialsFromName(friend.friend_name) || '?'}
+          {getInitialsFromName(shown) || '?'}
         </div>
       )}
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 500,
-            color: INK,
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: A.INK,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
         >
-          {displayName(friend.friend_name)}
+          {shown}
         </div>
-        <div
-          style={{
-            fontSize: 11,
-            color: INK_MUTE,
-            marginTop: 1,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {alreadySub ?? sub}
-        </div>
+        {sub ? (
+          <div
+            style={{
+              ...LABEL,
+              color: A.MUTE,
+              marginTop: 4,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {sub}
+          </div>
+        ) : null}
       </div>
 
-      <button
-        type="button"
-        onClick={onInvite}
-        disabled={busy}
-        aria-label={`Invite ${firstName(friend.friend_name)}`}
-        style={{
-          flexShrink: 0,
-          padding: '7px 14px',
-          borderRadius: 999,
-          fontSize: 11.5,
-          fontWeight: 700,
-          fontFamily: FONT,
-          cursor: busy ? 'default' : 'pointer',
-          background: already ? 'transparent' : AMBER,
-          color: already ? AMBER : '#fff',
-          border: already ? `1px solid ${AMBER}` : 'none',
-        }}
-      >
-        {already ? 'Re-share' : 'Invite'}
-      </button>
+      <div style={{ flexShrink: 0, textAlign: 'right' }}>
+        {/* The shared quiet Action's shape, inline so it can carry the
+            per-friend aria-label. Never a filled or outlined pill. */}
+        <button
+          type="button"
+          onClick={onInvite}
+          disabled={busy}
+          aria-label={t('invite.inviteAria', { name: firstName(friend.friend_name) })}
+          style={{
+            minHeight: 32,
+            border: 'none',
+            background: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 6,
+            padding: 0,
+            marginLeft: 'auto',
+            fontFamily: SANS,
+            cursor: busy ? 'default' : 'pointer',
+            opacity: busy ? 0.5 : 1,
+          }}
+        >
+          <span style={{ ...LABEL, color: A.AMBER_DEEP }}>
+            {already ? t('invite.reshare') : t('invite.invite')}
+          </span>
+          <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+            {'\u203A'}
+          </span>
+        </button>
+        {already && (
+          <div style={{ ...LABEL, marginTop: 2 }}>
+            {t('invite.invitedAgo', { ago: fmtRelative(already.created_at, { compact: true }) })}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
 
-/* ────────────────── State B: no WHS ────────────────── */
+/* ---------------- State B: no WHS ---------------- */
 
 function UnconnectedState({ source }: { source: string }) {
+  const { t } = useTranslation('common');
   const [link, setLink] = useState<{ url: string; message: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
     setLoading(true);
     createGenericInvite(source).then((res) => {
@@ -431,134 +603,126 @@ function UnconnectedState({ source }: { source: string }) {
     };
   }, [source]);
 
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (loading || viewedRef.current) return;
+    viewedRef.current = true;
+    analyticsEvents.track('invite_sheet_viewed', {
+      source,
+      connected: false,
+      friends: 0,
+      invited: 0,
+    });
+  }, [loading, source]);
+
   const onCopy = useCallback(async () => {
     // Re-create + copy so send is logged each time.
     const res = await createGenericInvite(source);
     const url = res?.share_url ?? link?.url;
     if (!url) {
-      toast.error("Couldn't create link");
+      toast.error(t('invite.toast.createFailed'));
       return;
     }
     try {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
+      analyticsEvents.track('invite_sent', { source, kind: 'generic', is_reshare: false });
+      toast.success(t('invite.toast.linkCopied'));
     } catch {
-      toast.error("Couldn't copy link");
+      toast.error(t('invite.toast.copyFailed'));
     }
-  }, [source, link]);
+  }, [source, link, t]);
 
   const onShare = useCallback(async () => {
     const res = await createGenericInvite(source);
     const url = res?.share_url ?? link?.url;
     const message = res?.share_message ?? link?.message ?? url ?? '';
     if (!url) {
-      toast.error("Couldn't create link");
+      toast.error(t('invite.toast.createFailed'));
       return;
     }
+    analyticsEvents.track('invite_sent', { source, kind: 'generic', is_reshare: false });
     await shareInvite({ share_url: url, share_message: message, invitee_name: 'a friend' });
-  }, [source, link]);
+  }, [source, link, t]);
 
   return (
-    <div style={{ padding: '8px 4px 4px', textAlign: 'center' }}>
-      <div
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 19,
-          background: AMBER_BG,
-          border: `0.5px solid ${AMBER}`,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 14px',
-        }}
-      >
-        <UserPlus size={24} color={AMBER} strokeWidth={2} />
-      </div>
-      <div
-        style={{
-          fontSize: 14,
-          fontWeight: 500,
-          color: INK,
-          marginBottom: 6,
-        }}
-      >
-        Bring your fourball
-      </div>
-      <div
-        style={{
-          fontSize: 12,
-          color: INK_SOFT,
-          maxWidth: 300,
-          margin: '0 auto 18px',
-          lineHeight: 1.45,
-        }}
-      >
-        Send your personal link — they download the app and you're connected from day one.
-      </div>
-
-      {/* Link row */}
-      <button
-        type="button"
-        onClick={onCopy}
-        disabled={loading || !link}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          background: SURFACE,
-          border: `0.5px solid ${HAIRLINE}`,
-          borderRadius: 999,
-          padding: '9px 14px',
-          cursor: loading ? 'default' : 'pointer',
-          marginBottom: 10,
-        }}
-      >
-        <span
+    <div style={{ fontFamily: SANS, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div style={{ padding: '4px 20px 12px', flexShrink: 0 }}>
+        <div style={KICKER}>{t('invite.kicker')}</div>
+        <h2
+          id="invite-friends-title"
           style={{
-            flex: 1,
-            minWidth: 0,
-            textAlign: 'left',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-            fontSize: 11,
-            color: INK_SOFT,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            margin: '4px 0 0',
+            fontSize: 15,
+            fontWeight: 800,
+            color: A.INK,
+            letterSpacing: '-0.01em',
           }}
         >
-          {loading ? 'preparing link…' : link?.url ?? '—'}
-        </span>
-        <Copy size={14} color={AMBER} />
-      </button>
+          {t('invite.unconnected.title')}
+        </h2>
+        <div style={{ ...CAPTION, marginTop: 6 }}>{t('invite.unconnected.body')}</div>
+      </div>
 
-      {/* Share CTA */}
-      <button
-        type="button"
-        onClick={onShare}
-        disabled={loading || !link}
+      <div
         style={{
-          width: '100%',
-          background: AMBER,
-          color: '#fff',
-          border: 'none',
-          borderRadius: 999,
-          padding: '13px 16px',
-          fontSize: 13.5,
-          fontWeight: 700,
-          fontFamily: FONT,
-          cursor: loading ? 'default' : 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-          boxShadow: '0 4px 14px rgba(247,147,30,0.28)',
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          padding: '0 20px 16px',
         }}
       >
-        <Send size={15} strokeWidth={2.2} />
-        Share invite
-      </button>
+        {loading ? (
+          <div style={{ ...CAPTION, padding: '8px 0 14px' }}>
+            {t('invite.unconnected.preparing')}
+          </div>
+        ) : link?.url ? (
+          // Absent values render nothing: with no link there is no row at all.
+          <div style={{ padding: '4px 0 14px' }}>
+            <div
+              style={{
+                fontFamily: SANS,
+                fontVariantNumeric: 'tabular-nums lining',
+                fontSize: 12.5,
+                color: A.MUTE,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {link.url}
+            </div>
+            <Action
+              label={t('invite.unconnected.copy')}
+              onClick={onCopy}
+              align="left"
+              style={{ marginTop: 4 }}
+            />
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={onShare}
+          disabled={loading || !link}
+          style={{
+            width: '100%',
+            height: 44,
+            background: A.INK,
+            color: '#FFFFFF',
+            border: 'none',
+            borderRadius: 12,
+            fontSize: 13.5,
+            fontWeight: 800,
+            fontFamily: SANS,
+            cursor: loading ? 'default' : 'pointer',
+            opacity: loading || !link ? 0.5 : 1,
+          }}
+        >
+          {t('invite.unconnected.share')}
+        </button>
+      </div>
     </div>
   );
 }
