@@ -1200,16 +1200,25 @@ export async function fetchSharedRoundCounts(
   targetIds: string[],
 ): Promise<Record<string, number>> {
   if (!userId || targetIds.length === 0) return {};
-  const { data, error } = await supabase.rpc('count_shared_rounds_batch' as any, {
-    p_user_id: userId,
+  // The viewer is resolved server-side from auth.uid(); userId is kept only for
+  // the cache key. Falls back to the legacy p_user_id signature so the client
+  // works either side of the function replacement.
+  let { data, error } = await supabase.rpc('count_shared_rounds_batch' as any, {
     p_target_ids: targetIds,
   });
+  if (error && (error.code === 'PGRST202' || /function.*does not exist/i.test(error.message ?? ''))) {
+    ({ data, error } = await supabase.rpc('count_shared_rounds_batch' as any, {
+      p_user_id: userId,
+      p_target_ids: targetIds,
+    }));
+  }
   if (error) throw error;
   const raw = (data ?? {}) as Record<string, number>;
   const out: Record<string, number> = {};
   for (const id of targetIds) out[id] = Number(raw[id] ?? 0);
   return out;
 }
+
 
 
 // ─── Trophy aggregates RPC (Sprint 3) ─────────────────────────────────────
