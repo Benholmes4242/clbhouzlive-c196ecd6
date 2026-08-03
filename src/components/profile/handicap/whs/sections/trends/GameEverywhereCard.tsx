@@ -39,14 +39,17 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
 
   const showS1 = rings.length >= 2;
 
-  // Rank rings by avg_over: highest = RED, lowest = GREEN, middle = AMBER
+  // Rank rings by avg_over: worst = up (red), best = down (green), middle = amber.
   const ranked = [...rings].sort((a, b) => a.data.avg_over - b.data.avg_over);
-  const colorFor = (row: RingRow): string => {
-    if (ranked.length <= 1) return AMBER;
-    if (row === ranked[ranked.length - 1]) return RED;
-    if (row === ranked[0]) return GREEN;
-    return AMBER;
+  const toneFor = (row: RingRow): ChartTone => {
+    if (ranked.length <= 1) return 'amber';
+    if (row === ranked[ranked.length - 1]) return 'up';
+    if (row === ranked[0]) return 'down';
+    return 'amber';
   };
+
+  /** ONE ceiling for the group - per-ring maxima would render all three full. */
+  const ringMax = sharedMax(rings.map((r) => r.data.avg_over), 0.7);
 
   // Stratum 1 sentence
   const worst = ranked[ranked.length - 1];
@@ -55,45 +58,6 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
   const share =
     worst && totalHoles > 0 ? Math.round((worst.data.holes_played / totalHoles) * 100) : 0;
 
-  // Stratum 2
-  const thirds = [...(d.thirds ?? [])].sort((a, b) => a.third - b.third);
-  const showS2 = thirds.length === 3;
-  const vals = thirds.map((x) => x.avg_over_six);
-  const maxV = Math.max(...vals, 0.0001);
-  const minV = Math.min(...vals);
-  const spread = maxV - minV;
-  const worstIdx = vals.indexOf(maxV);
-  const bestIdx = vals.indexOf(minV);
-  const evenSpread = spread < 1.5;
-
-  const thirdLabel = (i: number): string =>
-    i === 0
-      ? t('holes.gameEverywhere.third1')
-      : i === 1
-      ? t('holes.gameEverywhere.third2')
-      : t('holes.gameEverywhere.third3');
-
-  let s2Sentence = '';
-  if (showS2) {
-    if (evenSpread) {
-      s2Sentence = t('holes.gameEverywhere.s2SentenceEven');
-    } else if (worstIdx === 0) {
-      s2Sentence = t('holes.gameEverywhere.s2SentenceEarly', {
-        best: thirdLabel(bestIdx),
-        spread: spread.toFixed(1),
-      });
-    } else if (worstIdx === 1) {
-      s2Sentence = t('holes.gameEverywhere.s2SentenceMiddle', {
-        best: thirdLabel(bestIdx),
-        spread: spread.toFixed(1),
-      });
-    } else {
-      s2Sentence = t('holes.gameEverywhere.s2SentenceLate', {
-        best: thirdLabel(bestIdx),
-        spread: spread.toFixed(1),
-      });
-    }
-  }
 
   return (
     <>
