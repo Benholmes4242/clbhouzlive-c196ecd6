@@ -42,17 +42,15 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   const [range, setRange] = useState<Range>('3M');
   // Scope changes are tracked, never awaited.
   const scopeRange = (next: Range) => {
-    setRange((prev) => {
-      if (prev !== next) {
-        analyticsEvents.track?.('handicap_chart_scoped', {
-          chart: 'index_history',
-          from: prev,
-          to: next,
-        });
-      }
-      return next;
+    if (next === range) return;
+    analyticsEvents.track?.('handicap_chart_scoped', {
+      chart: 'index_history',
+      from: range,
+      to: next,
     });
+    setRange(next);
   };
+
   const daysBack = range === '1M' ? 30 : range === '3M' ? 90 : 365;
   const { data: history, isLoading } = useHandicapHistory(connectionId, daysBack);
 
