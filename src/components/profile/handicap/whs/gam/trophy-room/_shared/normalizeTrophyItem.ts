@@ -111,7 +111,7 @@ export function normalizeBadge(b: UserBadge): TrophyItem {
     ? thresholds.map((t, idx) => ({
         tier: idx + 1,
         threshold: t,
-        name: materialName(idx + 1),
+        name: thresholdName(t),
         earned: idx < reached,
         earnedAt: idx < reached && idx === reached - 1 ? b.earned_at : null,
       }))
