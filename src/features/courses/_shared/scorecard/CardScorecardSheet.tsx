@@ -578,7 +578,33 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   const out = holes.filter((h) => h.holeNo <= 9);
   const back = holes.filter((h) => h.holeNo > 9);
+
+  /**
+   * TOTALS ARE DERIVED FROM THE NINES SHOWN ABOVE, NOT COMPUTED SEPARATELY.
+   * The row displays OUT n / IN n either side of the gross, so a reader adds
+   * them. cardGross and cardTotalPar therefore come from the same nineSummary
+   * calls that produced those two figures. to-par is NOT recomputed here: it
+   * stays totals.toPar, the single hole-by-hole derivation.
+   */
+  const outSummary = nineSummary(out);
+  const backSummary = back.length > 0 ? nineSummary(back) : null;
+  const cardGross = outSummary.strokes + (backSummary?.strokes ?? 0);
+  const cardTotalPar = outSummary.par + (backSummary?.par ?? 0);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
+  if (import.meta.env.DEV) {
+    // The visible sum must agree with the hero/stat gross. A mismatch means the
+    // nines and the round totals were filtered differently — loud, not silent.
+    if (totals.played && cardGross !== totals.gross) {
+      console.warn('[CardScorecardSheet] gross mismatch', { cardGross, gross: totals.gross });
+    }
+    // Par can legitimately differ mid-round: cardTotalPar counts every hole on
+    // the card, totalPar only the holes played (which is what to-par is measured
+    // against). Flag it so a full-round disagreement is not mistaken for that.
+    if (totals.played && cardTotalPar !== totalPar && played.length === holes.length) {
+      console.warn('[CardScorecardSheet] par mismatch', { cardTotalPar, totalPar });
+    }
+  }
+
 
   /**
    * The FIELD row is a tour-card row only — see the note on <Nine>. On the
