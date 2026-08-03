@@ -392,9 +392,28 @@ function normalizeName(name: string): string {
     .trim();
 }
 
+/**
+ * Characters that survive NFD (single codepoints with no canonical
+ * decomposition) and would otherwise be deleted by the non-ASCII filter
+ * rather than transliterated. Pre-pass MUST run before normalize("NFD").
+ */
+const STROKE_MAP: Record<string, string> = {
+  "Ø": "O", "ø": "o",   // Danish/Norwegian — Højgaard, Nørgaard, Olesen
+  "Æ": "AE", "æ": "ae", // Danish/Norwegian
+  "Ł": "L", "ł": "l",   // Polish
+  "Đ": "D", "đ": "d",   // Croatian
+  "Ð": "D", "ð": "d",   // Icelandic
+  "Þ": "TH", "þ": "th", // Icelandic
+  "ß": "ss",            // German
+};
+
 function stripAccents(s: string): string {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return s
+    .replace(/[ØøÆæŁłĐđÐðÞþß]/g, (c) => STROKE_MAP[c] ?? c)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
+
 
 /** Match a feed name ("Patrick REED") to an sr_players id, or null. */
 function matchPlayer(name: string, map: Map<string, string>): string | null {
