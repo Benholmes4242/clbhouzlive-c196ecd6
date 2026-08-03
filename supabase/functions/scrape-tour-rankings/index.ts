@@ -14,10 +14,12 @@ import { corsFor } from '../_shared/cors.ts';
  * Sign convention, verified against the live payload (3 Aug 2026):
  * a POSITIVE RankMoved means the player MOVED UP (e.g. MAZZOLI, CurrentRank 39,
  * RankMoved 88 -> prior rank 127; the opposite reading gives an impossible -49).
- * The only renderer of this column (useRankingsBoards -> `movement: -change`)
- * treats a POSITIVE stored value as places LOST, so RankMoved is negated on
- * write to make the on-screen arrow match the tour's own board.
+ * RankMoved is stored VERBATIM. position_change is a shared column across
+ * tours, so the feed's own convention is the stored one and the client does
+ * the interpreting: priorRank = position + change, movement = change, both
+ * positive-means-up.
  */
+
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
