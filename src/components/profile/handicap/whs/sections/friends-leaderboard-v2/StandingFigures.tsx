@@ -14,6 +14,7 @@
  * Renders NOTHING without a self row.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 import { firstName } from '@/lib/whs/utils/initials';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -70,14 +71,16 @@ export const StandingFigures: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
+  const { t } = useTranslation('common');
+
   if (!selfRow || rank == null) return null;
 
   const isFriend = viewMode === 'friend';
   const rankLabel = isFriend
     ? ownerFirstName
-      ? `${ownerFirstName}'s rank`
-      : 'Their rank'
-    : 'Your rank';
+      ? t('handicap.circle.standing.rankOwned', { name: ownerFirstName })
+      : t('handicap.circle.standing.rankOwnedUnknown')
+    : t('handicap.circle.standing.rank');
 
   const gap =
     rowAbove &&
@@ -95,17 +98,25 @@ export const StandingFigures: React.FC<Props> = ({
         fontFamily: CHART_FONT,
       }}
     >
-      <Figure label={rankLabel} value={`#${rank}`} sub={`of ${totalActive}`} />
+      <Figure
+        label={rankLabel}
+        value={`#${rank}`}
+        sub={t('handicap.circle.standing.ofTotal', { count: totalActive })}
+      />
       {percentileTop != null && (
         <Figure
-          label="Percentile"
+          label={t('handicap.circle.standing.percentile')}
           value={`${percentileTop}%`}
-          sub={isFriend ? 'of their circle' : 'of your circle'}
+          sub={
+            isFriend
+              ? t('handicap.circle.standing.ofCircleFriend')
+              : t('handicap.circle.standing.ofCircleOwner')
+          }
         />
       )}
       {gap != null && rowAbove && (
         <Figure
-          label="To catch"
+          label={t('handicap.circle.standing.toCatch')}
           value={gap.toFixed(1)}
           sub={firstName(rowAbove.friend_name)}
         />

@@ -9,11 +9,13 @@
  * already say the history is empty.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas } from './computeRoundDeltas';
 import RoundsArchiveSheet from './RoundsArchiveSheet';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
+import { analyticsEvents } from '@/lib/analytics/events';
 
 interface Props {
   connectionId: string;
@@ -35,6 +37,7 @@ export const RoundsArchivePanel: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
+  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
   const { data: allRounds } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
@@ -53,9 +56,9 @@ export const RoundsArchivePanel: React.FC<Props> = ({
   ).length;
 
   const figures = [
-    { label: 'Rounds', value: rounds.length },
-    { label: 'Counters', value: counters },
-    { label: '90 days', value: last90 },
+    { label: t('handicap.form.archive.rounds'), value: rounds.length },
+    { label: t('handicap.form.archive.counters'), value: counters },
+    { label: t('handicap.form.archive.last90Days'), value: last90 },
   ];
 
   return (
@@ -80,13 +83,21 @@ export const RoundsArchivePanel: React.FC<Props> = ({
           >
             <span style={{ ...LABEL_STYLE, color: CHART.MUTE }}>
               {viewMode === 'friend'
-                ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} posted history`
-                : 'Posted history'}
+                ? ownerFirstName
+                  ? t('handicap.form.archive.postedHistoryOwned', { name: ownerFirstName })
+                  : t('handicap.form.archive.postedHistoryOwnedUnknown')
+                : t('handicap.form.archive.postedHistory')}
             </span>
             <button
               type="button"
-              onClick={() => setOpen(true)}
-              aria-label="Open the full posted history"
+              onClick={() => {
+                // Fire-and-forget: never awaited in a render or handler path.
+                analyticsEvents.track?.('handicap_history_sheet_opened', {
+                  rounds: rounds.length,
+                });
+                setOpen(true);
+              }}
+              aria-label={t('handicap.form.archive.openFull')}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -99,7 +110,7 @@ export const RoundsArchivePanel: React.FC<Props> = ({
                 color: CHART.AMBER,
               }}
             >
-              All rounds
+              {t('handicap.form.archive.allRounds')}
               <ChevronRight size={13} strokeWidth={2.6} />
             </button>
           </div>

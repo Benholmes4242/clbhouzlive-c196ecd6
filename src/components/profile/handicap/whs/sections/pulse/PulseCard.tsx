@@ -29,7 +29,7 @@ function colorFromUserId(id: string): string {
 }
 
 const ZONE_LABEL: React.CSSProperties = {
-  fontSize: 8,
+  fontSize: 9,
   fontWeight: 800,
   letterSpacing: '0.14em',
   color: 'var(--hcp-t-40)',
@@ -214,7 +214,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
               borderRadius: 999,
               border: '1px solid rgba(247,147,30,0.35)',
               color: 'var(--hcp-amber-bold, #F7931E)',
-              fontSize: 8.5,
+              fontSize: 9,
               fontWeight: 800,
               letterSpacing: '0.10em',
               background: 'transparent',

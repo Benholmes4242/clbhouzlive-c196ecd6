@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useHandicapTrend } from '@/lib/whs/hooks';
+import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/lib/analytics/events';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
@@ -42,6 +43,22 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   // ── Trend (used by hero + passed to views as currentHandicap) ───────────
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
+
+  // ── handicap_viewed: one emit per (tab, read_only) view. Fire-and-forget. ─
+  const { data: counters } = useCounters(connection.id);
+  const roundsCounting = counters?.length ?? null;
+  const viewedKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    const key = `${activeSubtab}:${readOnly ? 1 : 0}`;
+    if (viewedKeyRef.current === key) return;
+    viewedKeyRef.current = key;
+    analyticsEvents.track?.('handicap_viewed', {
+      tab: activeSubtab,
+      read_only: readOnly,
+      index: currentHandicap,
+      rounds_counting: roundsCounting,
+    });
+  }, [activeSubtab, readOnly, currentHandicap, roundsCounting]);
 
   const showReauthBanner = !readOnly && reauthRequired;
 

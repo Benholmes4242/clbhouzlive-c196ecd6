@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHandicapHistory } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/lib/analytics/events';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +40,17 @@ const fmtDateShort = (iso: string) => {
 
 const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   const [range, setRange] = useState<Range>('3M');
+  // Scope changes are tracked, never awaited.
+  const scopeRange = (next: Range) => {
+    if (next === range) return;
+    analyticsEvents.track?.('handicap_chart_scoped', {
+      chart: 'index_history',
+      from: range,
+      to: next,
+    });
+    setRange(next);
+  };
+
   const daysBack = range === '1M' ? 30 : range === '3M' ? 90 : 365;
   const { data: history, isLoading } = useHandicapHistory(connectionId, daysBack);
 
@@ -68,7 +80,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
+        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={scopeRange} />} />
         <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
@@ -87,7 +99,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   if (n < 2) {
     return (
       <section style={{ marginTop: 32 }}>
-        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
+        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={scopeRange} />} />
         <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
@@ -156,7 +168,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="INDEX HISTORY"
-        right={<RangePills value={range} onChange={setRange} />}
+        right={<RangePills value={range} onChange={scopeRange} />}
       />
       <div style={{ padding: '0 16px' }}>
         <div style={{
@@ -172,7 +184,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             alignItems: 'baseline', padding: '0 4px',
           }}>
             <span style={{
-              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', color: DIM,
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: DIM,
             }}>
               {periodLabel}
             </span>
@@ -202,7 +214,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             </span>
             {isSelectedMin && (
               <span style={{
-                fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: GOOD,
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: GOOD,
               }}>
                 LOWEST OF THE PERIOD
               </span>
@@ -245,7 +257,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
                 <text
                   x={W - 2} y={y(t) + 3}
                   textAnchor="end" fill={FAINT}
-                  style={{ fontSize: 8, fontWeight: 700, ...NUM }}
+                  style={{ fontSize: 9, fontWeight: 700, ...NUM }}
                 >
                   {t.toFixed(1)}
                 </text>
@@ -284,13 +296,13 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             {/* h. Extent labels */}
             <text
               x={PADX} y={H - 6} fill={FAINT}
-              style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '0.12em' }}
+              style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em' }}
             >
               {fmtDateShort(first.observed_at)}
             </text>
             <text
               x={W - PADR} y={H - 6} textAnchor="end" fill={FAINT}
-              style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '0.12em' }}
+              style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em' }}
             >
               {fmtDateShort(last.observed_at)}
             </text>
@@ -309,7 +321,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
                 boxSizing: 'border-box',
               }} />
               <span style={{
-                fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: FAINT,
+                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: FAINT,
               }}>
                 LOWEST{' '}
                 <span style={{ color: GOOD, ...NUM }}>{dataMin.toFixed(1)}</span>
@@ -318,7 +330,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               </span>
             </span>
             <span style={{
-              fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: FAINT, ...NUM,
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: FAINT, ...NUM,
             }}>
               {n} SNAPSHOTS
             </span>

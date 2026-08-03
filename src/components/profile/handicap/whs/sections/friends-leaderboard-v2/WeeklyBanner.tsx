@@ -29,24 +29,10 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
           fontFamily: FONT,
         }}
       >
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            background: 'rgba(247,147,30,0.10)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>🔥</span>
-        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 8.5,
+              fontSize: 9,
               fontWeight: 800,
               letterSpacing: '0.12em',
               color: 'var(--hcp-t-60)',

@@ -194,37 +194,6 @@ export interface Achievement {
   };
 }
 
-export interface CourseForm {
-  course_id: string;
-  course_name: string;
-  /** Region label from `golf_courses.region`. Used in the Course Form row to show
-   *  course location below the name (e.g. "Sandwich, Kent"). Null when the course
-   *  wasn't resolved to a `golf_courses` row or has no region populated. */
-  course_region: string | null;
-  rounds_played: number;
-  avg_differential: number;
-  expected_differential: number;
-  delta: number;
-  /**
-   * Lowest (best) handicap differential at this course across all
-   * synced rounds. For single-course players this drives the "Best"
-   * pill in the expanded card view.
-   */
-  best_differential: number;
-  /**
-   * Highest (worst) handicap differential at this course across all
-   * synced rounds. For single-course players this drives the "Worst"
-   * pill in the expanded card view.
-   */
-  worst_differential: number;
-  /**
-   * Course image URL from `whs_course_aliases.thumbnail_url` (looked
-   * up by name via the same parallel pattern as `fetchAllScores` and
-   * `fetchFriendsActivity`). Null if no thumbnail is available.
-   */
-  course_thumbnail_image: string | null;
-}
-
 // ─── Hole-level detail ──────────────────────────────────────────────────
 // ─── Phase 2: Friend course bests (PR rosette) ──────────────────────────
 export interface WhsFriendCourseBest {

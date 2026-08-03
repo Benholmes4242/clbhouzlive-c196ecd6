@@ -378,7 +378,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
       >
         <span
           style={{
-            fontSize: 8.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.14em',
             color: T.inkMute,
@@ -389,7 +389,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
         </span>
         <span
           style={{
-            fontSize: 8.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.14em',
             color: T.ink40,
@@ -467,7 +467,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               </div>
               <div
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   color: T.ink40,
                   letterSpacing: '0.12em',
@@ -478,7 +478,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               </div>
               <div
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
@@ -779,7 +779,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       >
         <span
           style={{
-            fontSize: 8.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.14em',
             color: T.inkMute,
@@ -790,7 +790,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         </span>
         <span
           style={{
-            fontSize: 8.5,
+            fontSize: 9,
             fontWeight: 800,
             letterSpacing: '0.14em',
             color: T.ink40,
@@ -872,7 +872,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               </div>
               <div
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   color: labelColor,
                   letterSpacing: '0.12em',
@@ -883,7 +883,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               </div>
               <div
                 style={{
-                  fontSize: 8.5,
+                  fontSize: 9,
                   fontWeight: 800,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',

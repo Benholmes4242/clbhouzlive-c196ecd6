@@ -15,6 +15,7 @@
  *   figures row plus the Action. There is no empty state.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
@@ -45,6 +46,7 @@ export const AchievementsPanel: React.FC<Props> = ({
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
+  const { t } = useTranslation('common');
   const { data: achievements } = useUserAchievements(userId);
   const { data: unlocks } = useRecentUnlocks(userId);
   const { data: streaks } = useUserStreaks(userId);
@@ -67,9 +69,9 @@ export const AchievementsPanel: React.FC<Props> = ({
   const isFriend = viewMode === 'friend';
   const kicker = isFriend
     ? ownerFirstName
-      ? `${ownerFirstName}'s trophies`
-      : 'Their trophies'
-    : 'Trophies';
+      ? t('handicap.trophies.labelOwned', { name: ownerFirstName })
+      : t('handicap.trophies.labelOwnedUnknown')
+    : t('handicap.trophies.label');
 
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
@@ -95,7 +97,7 @@ export const AchievementsPanel: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => openGamAchievements()}
-            aria-label="Open the trophy room"
+            aria-label={t('handicap.trophies.open')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -108,7 +110,7 @@ export const AchievementsPanel: React.FC<Props> = ({
               color: CHART.AMBER,
             }}
           >
-            Trophy room
+            {t('handicap.achievements.trophyRoom')}
             <ChevronRight size={13} strokeWidth={2.6} />
           </button>
         </div>
@@ -117,13 +119,13 @@ export const AchievementsPanel: React.FC<Props> = ({
         <div style={{ display: 'flex', gap: 32, marginTop: 14 }}>
           <div>
             <div style={figureStyle}>{trophies}</div>
-            <div style={{ ...LABEL_STYLE, marginTop: 6 }}>Trophies</div>
+            <div style={{ ...LABEL_STYLE, marginTop: 6 }}>{t('handicap.trophies.label')}</div>
           </div>
           {bestStreak != null && (
             <button
               type="button"
               onClick={() => !isFriend && openAllStreaks()}
-              aria-label={isFriend ? undefined : 'Open all streaks'}
+              aria-label={isFriend ? undefined : t('handicap.achievements.openAllStreaks')}
               disabled={isFriend}
               style={{
                 background: 'none',
@@ -134,7 +136,7 @@ export const AchievementsPanel: React.FC<Props> = ({
               }}
             >
               <div style={figureStyle}>{bestStreak}</div>
-              <div style={{ ...LABEL_STYLE, marginTop: 6 }}>Streak</div>
+              <div style={{ ...LABEL_STYLE, marginTop: 6 }}>{t('handicap.achievements.streak')}</div>
             </button>
           )}
         </div>
@@ -159,7 +161,7 @@ export const AchievementsPanel: React.FC<Props> = ({
                 <div style={{ minWidth: 0 }}>
                   {i === 0 && (
                     <div style={{ ...LABEL_STYLE, color: CHART.AMBER, marginBottom: 4 }}>
-                      Just unlocked
+                      {t('handicap.achievements.justUnlocked')}
                     </div>
                   )}
                   <div

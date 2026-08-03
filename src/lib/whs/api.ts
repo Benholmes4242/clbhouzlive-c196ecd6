@@ -10,7 +10,6 @@ import type {
   WhsInviteStatus,
   CreateInviteResponse,
   HandicapPoint,
-  CourseForm,
   WhsRoundDetail,
   WhsScoreWithIndex,
   WhsLastRound,
@@ -671,65 +670,6 @@ export async function callCreateInvite(
   }
 }
 
-export async function fetchCourseForm(
-  connectionId: string,
-  currentHandicap: number,
-  minRounds: number = 3,
-): Promise<CourseForm[]> {
-  const { data, error } = await supabase
-    .from('whs_scores' as any)
-    .select('handicap_differential, course:whs_courses(id, name)')
-    .eq('connection_id', connectionId)
-    .not('handicap_differential', 'is', null);
-  if (error) throw error;
-
-  const grouped = new Map<string, { name: string; diffs: number[] }>();
-  for (const row of ((data as any[]) ?? [])) {
-    const courseId = row.course?.id;
-    const courseName = row.course?.name;
-    const diff = Number(row.handicap_differential);
-    if (!courseId || !courseName || isNaN(diff)) continue;
-    const existing = grouped.get(courseId) ?? { name: courseName, diffs: [] };
-    existing.diffs.push(diff);
-    grouped.set(courseId, existing);
-  }
-
-  // First pass: build the base CourseForm rows including best/worst diffs.
-  const baseRows: Omit<CourseForm, 'course_thumbnail_image' | 'course_region'>[] = [];
-  for (const [course_id, info] of grouped) {
-    if (info.diffs.length < minRounds) continue;
-    const avg = info.diffs.reduce((a, b) => a + b, 0) / info.diffs.length;
-    const best = Math.min(...info.diffs);
-    const worst = Math.max(...info.diffs);
-    baseRows.push({
-      course_id,
-      course_name: info.name,
-      rounds_played: info.diffs.length,
-      avg_differential: avg,
-      expected_differential: currentHandicap,
-      delta: avg - currentHandicap,
-      best_differential: best,
-      worst_differential: worst,
-    });
-  }
-
-  // Second pass: enrich with course thumbnail + region in a single matcher hit.
-  const uniqueNames = Array.from(new Set(baseRows.map((r) => r.course_name)));
-  const metaByName: Record<string, { thumbnail_image: string | null; region: string | null } | null> = {};
-  await Promise.all(
-    uniqueNames.map(async (name) => {
-      metaByName[name.toLowerCase()] = await lookupCourseMetaV2(name);
-    }),
-  );
-
-  const result: CourseForm[] = baseRows.map((r) => ({
-    ...r,
-    course_thumbnail_image: metaByName[r.course_name.toLowerCase()]?.thumbnail_image ?? null,
-    course_region: metaByName[r.course_name.toLowerCase()]?.region ?? null,
-  }));
-  return result.sort((a, b) => a.delta - b.delta);
-}
-
 // ─── Round detail (any score by id) ───────────────────────────────────
 export async function fetchRoundDetail(
   scoreId: string,
@@ -908,13 +848,6 @@ async function lookupCourseThumbnail(
 ): Promise<string | null> {
   const { lookupCourseThumbnailV2 } = await import('./courseNameMatcher');
   return lookupCourseThumbnailV2(whsName, countryCode);
-}
-
-async function lookupCourseMetaV2(
-  whsName: string,
-): Promise<{ thumbnail_image: string | null; region: string | null } | null> {
-  const { lookupCourseMetaV2: impl } = await import('./courseNameMatcher');
-  return impl(whsName);
 }
 
 // ─── Phase 0 (Friends Tab Redesign): Featured round + rivalries fetchers ──

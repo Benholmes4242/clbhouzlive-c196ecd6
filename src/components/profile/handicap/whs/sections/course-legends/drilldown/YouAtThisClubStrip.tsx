@@ -138,7 +138,6 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
 
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
         <Cell
-          icon="👑"
           value={String(crownCount)}
           label="crowns"
           emphasize={crownCount > 0}
@@ -147,7 +146,6 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
           <>
             <Divider />
             <Cell
-              icon="🎯"
               value={nearestMiss.split(' from')[0]}
               label="from a crown"
               emphasize
@@ -157,7 +155,6 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         ) : null}
         <Divider />
         <Cell
-          icon="📈"
           value={String(changes)}
           label="changes 30d"
           emphasize={changes > 0}
@@ -202,13 +199,11 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
   }
 
   function Cell({
-    icon,
     value,
     label,
     emphasize,
     wide,
   }: {
-    icon?: string;
     value: string;
     label: string;
     emphasize?: boolean;
@@ -230,9 +225,6 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0, maxWidth: '100%' }}>
-          {icon ? (
-            <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>{icon}</span>
-          ) : null}
           <span
             className="tabular-nums"
             style={{

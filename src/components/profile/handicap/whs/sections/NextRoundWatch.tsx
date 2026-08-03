@@ -12,7 +12,9 @@
  * Direction is never decided here: it goes through indexTone(), so the
  * handicap inversion (index up = red) stays owned by the chart tokens.
  */
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { analyticsEvents } from '@/lib/analytics/events';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
@@ -27,6 +29,7 @@ interface Props {
 }
 
 const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
+  const { t } = useTranslation(['common']);
   const { data: allScores, isLoading } = useAllScores(connectionId);
 
   const projection = useMemo(() => {
@@ -44,6 +47,25 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     return diffs.reduce((a, b) => a + b, 0) / diffs.length;
   }, [allScores]);
 
+  // Fire once per mount when the band is actually rendered. Never awaited.
+  const firedRef = useRef(false);
+  const shownPayload = useMemo(() => {
+    if (!projection || !projection.hasData || currentHandicap == null) return null;
+    const { cutTarget, settleAtRaw } = projection;
+    if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
+    return {
+      cut: Number(cutTarget.toFixed(1)),
+      rise: Number((settleAtRaw - currentHandicap).toFixed(1)),
+      counting: Math.min(8, allScores?.length ?? 0),
+    };
+  }, [projection, currentHandicap, allScores]);
+
+  useEffect(() => {
+    if (!shownPayload || firedRef.current) return;
+    firedRef.current = true;
+    analyticsEvents.track?.('handicap_next_round_shown', shownPayload);
+  }, [shownPayload]);
+
   if (isLoading || !projection || !projection.hasData || currentHandicap == null) return null;
 
   const { cutTarget, settleAt, settleAtRaw, counterDropping } = projection;
@@ -54,16 +76,23 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const color = toneColor(tone);
 
   const stateLabel =
-    tone === 'up' ? 'At risk' : tone === 'down' ? 'Drifting down' : 'Holding';
+    tone === 'up'
+      ? t('common:handicap.nextRound.stateUp')
+      : tone === 'down'
+        ? t('common:handicap.nextRound.stateDown')
+        : t('common:handicap.nextRound.stateFlat');
+
+  const settle = settleAt.toFixed(1);
+  const cut = cutTarget.toFixed(1);
 
   const why =
     tone === 'up'
       ? counterDropping
-        ? `A counting round is rolling off, so the index settles at ${settleAt.toFixed(1)} unless you beat ${cutTarget.toFixed(1)}.`
-        : `Anything worse than ${cutTarget.toFixed(1)} leaves the index at ${settleAt.toFixed(1)}.`
+        ? t('common:handicap.nextRound.whyUpCounterDropping', { settle, cut })
+        : t('common:handicap.nextRound.whyUp', { settle, cut })
       : tone === 'down'
-        ? `The window is improving on its own: the index reaches ${settleAt.toFixed(1)} even without a counter.`
-        : `The window is stable: the index stays near ${settleAt.toFixed(1)} whatever the next round does.`;
+        ? t('common:handicap.nextRound.whyDown', { settle })
+        : t('common:handicap.nextRound.whyFlat', { settle });
 
   // The band scale is centred on the cut target. A red zone only exists when
   // the index actually rises without a counter.
@@ -74,15 +103,18 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const explanation =
     last5Avg != null
       ? last5Avg <= cutTarget
-        ? `Your last 5 average is ${last5Avg.toFixed(1)}, inside the cut zone.`
-        : `Your last 5 average is ${last5Avg.toFixed(1)}, ${(last5Avg - cutTarget).toFixed(1)} outside the cut zone.`
-      : 'Best 8 of the last 20 differentials set the index. Beat the cut target and one of them is replaced.';
+        ? t('common:handicap.nextRound.explainInside', { avg: last5Avg.toFixed(1) })
+        : t('common:handicap.nextRound.explainOutside', {
+            avg: last5Avg.toFixed(1),
+            gap: (last5Avg - cutTarget).toFixed(1),
+          })
+      : t('common:handicap.nextRound.explainFallback');
 
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
       <DarkSectionHeader
-        eyebrow="Next round"
-        right={<span style={{ ...LABEL_STYLE }}>Last 20 rounds</span>}
+        eyebrow={t('common:handicap.nextRound.eyebrow')}
+        right={<span style={{ ...LABEL_STYLE }}>{t('common:handicap.nextRound.sample')}</span>}
       />
 
       <div

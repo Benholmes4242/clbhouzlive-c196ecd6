@@ -225,7 +225,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                   {autoPicked.length > 0 && (
                     <Section
                       title="AUTO-PICKED"
-                      subtitle="Tap ✕ to stop suggesting someone."
+                      subtitle="Tap remove to stop suggesting someone."
                     >
                       {autoPicked.map((r) => (
                         <AutoPickedRow

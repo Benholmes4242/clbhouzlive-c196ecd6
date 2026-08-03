@@ -1,3 +1,13 @@
+/**
+ * predictHandicap — DELIBERATELY UNIMPORTED. DO NOT SWEEP.
+ *
+ * This module carries the trend signal (last 5 rounds vs the 8 counters —
+ * "am I currently playing better than my index says?"). The C3 amendment
+ * landed a different, window-mechanics verdict in NextRoundWatch, so this
+ * fact currently appears nowhere in the app. It is scheduled to surface on
+ * FORM inside the "Rounds that count" panel. Zero importers is expected and
+ * accepted until then; leave the file in place.
+ */
 import type { WhsScore } from '@/lib/whs/types';
 
 export type FormVerdict = 'in_form' | 'building' | 'steady' | 'slipping' | 'cold' | 'unknown';

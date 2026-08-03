@@ -197,7 +197,7 @@ export const RivalFightCard: React.FC<Props> = ({
                 );
               })}
             </div>
-            <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>HEAD TO HEAD</span>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>HEAD TO HEAD</span>
           </div>
 
           {/* THEM */}

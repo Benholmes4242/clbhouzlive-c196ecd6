@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
@@ -82,6 +83,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
 }
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
+  const { t } = useTranslation(['common']);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history90, isLoading: history90Loading } = useHandicapHistory(connection.id, 90);
   const trend12 = useHandicapTrend12mo(connection.id);
@@ -178,11 +180,25 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               borderTop: '1px solid var(--hcp-line-2)',
             }}
           >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: 6,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
+              }}
+            >
+              {t('common:handicap.hero.chartSample', { count: chartPoints.length })}
+            </div>
             <IndexChart
               points={chartPoints}
               height={92}
               hideFooter
-              formatLabel={(t) => formatDayMonthShortGB(t)}
+              formatLabel={(iso) => formatDayMonthShortGB(iso)}
             />
           </div>
         )}

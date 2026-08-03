@@ -312,7 +312,72 @@
     },
     "form": {
       "nRoundsSample_one": "{{count}} ROUND",
-      "nRoundsSample_other": "{{count}} ROUNDS"
+      "nRoundsSample_other": "{{count}} ROUNDS",
+      "archive": {
+        "postedHistoryOwned": "{{name}}'s posted history",
+        "postedHistoryOwnedUnknown": "Their posted history",
+        "postedHistory": "Posted history",
+        "yourPostedHistory": "Your posted history",
+        "openFull": "Open the full posted history",
+        "allRounds": "All rounds",
+        "rounds": "Rounds",
+        "counters": "Counters",
+        "last90Days": "90 days",
+        "roundsLabel": "ROUNDS",
+        "close": "Close"
+      }
+    },
+    "nextRound": {
+      "eyebrow": "Next round",
+      "sample": "Last 20 rounds",
+      "stateUp": "At risk",
+      "stateDown": "Drifting down",
+      "stateFlat": "Holding",
+      "whyUpCounterDropping": "A counting round is rolling off, so the index settles at {{settle}} unless you beat {{cut}}.",
+      "whyUp": "Anything worse than {{cut}} leaves the index at {{settle}}.",
+      "whyDown": "The window is improving on its own: the index reaches {{settle}} even without a counter.",
+      "whyFlat": "The window is stable: the index stays near {{settle}} whatever the next round does.",
+      "explainInside": "Your last 5 average is {{avg}}, inside the cut zone.",
+      "explainOutside": "Your last 5 average is {{avg}}, {{gap}} outside the cut zone.",
+      "explainFallback": "Best 8 of the last 20 differentials set the index. Beat the cut target and one of them is replaced."
+    },
+    "achievements": {
+      "trophyRoom": "Trophy room",
+      "streak": "Streak",
+      "openAllStreaks": "Open all streaks",
+      "justUnlocked": "Just unlocked"
+    },
+    "circle": {
+      "standing": {
+        "rankOwned": "{{name}}'s rank",
+        "rankOwnedUnknown": "Their rank",
+        "rank": "Your rank",
+        "ofTotal": "of {{count}}",
+        "percentile": "Percentile",
+        "ofCircleFriend": "of their circle",
+        "ofCircleOwner": "of your circle",
+        "toCatch": "To catch"
+      },
+      "round": {
+        "unknownCourse": "Unknown course",
+        "counts": "Counts",
+        "englandGolf": "England Golf",
+        "gross": "Gross",
+        "stbl": "Stbl",
+        "diff": "Diff",
+        "askToSync": "Ask to sync",
+        "invite": "Invite"
+      },
+      "invite": {
+        "invitesSent": "Invites sent",
+        "sentInvites": "Sent invites",
+        "invitedCount_one": "{{count}} invited",
+        "invitedCount_other": "{{count}} invited",
+        "nextAt": "Next at {{count}}"
+      }
+    },
+    "hero": {
+      "chartSample": "{{count}} points, 90 days"
     }
   }
 }
