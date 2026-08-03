@@ -200,8 +200,11 @@ const StreakRowView: React.FC<{
             }}
           >
             {atBest
-              ? t('streaks.atYourBest')
+              ? settingItNow
+                ? t('streaks.settingItNow')
+                : t('streaks.atYourBest')
               : t('streaks.fromYourBest', { n: best - current, best })}
+
           </div>
         </div>
       )}
