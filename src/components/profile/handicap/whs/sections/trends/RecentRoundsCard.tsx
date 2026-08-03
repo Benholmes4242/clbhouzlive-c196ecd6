@@ -13,7 +13,14 @@ interface Props {
   connectionId: string;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
+  /**
+   * 'section' keeps the section header and top margin (legacy in-page use).
+   * 'sheet' suppresses BOTH so the list can be hosted inside
+   * RoundsArchiveSheet - the chips and month groups are untouched either way.
+   */
+  variant?: 'section' | 'sheet';
 }
+
 
 const T = {
   ink: 'var(--hcp-t-100)',
@@ -107,7 +114,7 @@ const fmtMonth = (iso: string): string => {
 
 type FilterKey = 'all' | 'counters' | string;
 
-export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null }) => {
+export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
@@ -168,20 +175,25 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
     setDisplayedCount(INITIAL_COUNT);
   };
 
+  const inSheet = variant === 'sheet';
+
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
+    <section style={{ marginTop: inSheet ? 0 : 32, fontFamily: FONT }}>
       <style>{`
         .rr-last-row > button[data-feedrow="true"] { border-bottom: none; }
       `}</style>
-      <DarkSectionHeader
-        eyebrow="RECENT ROUNDS"
-        title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
-        sub={
-          viewMode === 'friend'
-            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
-            : 'Your full posted history.'
-        }
-      />
+      {!inSheet && (
+        <DarkSectionHeader
+          eyebrow="RECENT ROUNDS"
+          title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
+          sub={
+            viewMode === 'friend'
+              ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
+              : 'Your full posted history.'
+          }
+        />
+      )}
+
 
 
       <div style={{ padding: '0 16px' }}>

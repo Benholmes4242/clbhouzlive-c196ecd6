@@ -207,7 +207,9 @@
       "s2SentenceEven": "You score evenly across the round, wherever you play - no weak stretch. To go lower, warm up properly before the first tee and keep eating and drinking every few holes so it stays that way.",
       "s2SentenceEarly": "You start slowly: holes {{best}} are {{spread}} shots better than holes 1-6. Hit a few balls and roll some putts before you tee off - your opening holes are doing your warm-up for you.",
       "s2SentenceMiddle": "Your middle six cost {{spread}} shots more than holes {{best}}. That's usually where focus drifts - pick a target on every shot through the turn.",
-      "s2SentenceLate": "You fade late: the closing six cost {{spread}} shots more than holes {{best}}. Take on water and something to eat around the 12th, before the drop-off starts."
+      "s2SentenceLate": "You fade late: the closing six cost {{spread}} shots more than holes {{best}}. Take on water and something to eat around the 12th, before the drop-off starts.",
+      "nRoundsSample_one": "{{count}} ROUND",
+      "nRoundsSample_other": "{{count}} ROUNDS"
     },
     "yourCourses": {
       "eyebrow": "Course by course",
@@ -1022,7 +1024,6 @@
     "buildingBody": "Play a counting round and this fills up.",
     "searching": "Searching...",
     "noResults": "No courses found.",
-
     "avgHere": "{{avg}} here",
     "avgHereOnAverage": "{{avg}} here on average",
     "pillEaglesLong": "eagles+",

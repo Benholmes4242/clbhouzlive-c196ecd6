@@ -11,6 +11,7 @@ import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_A
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DistributionRing, CHART, directionTone, type RingSegment } from '../../charts';
 
 interface Props {
   scores: WhsScore[];
@@ -402,14 +403,32 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
 
       {/* Ring */}
       <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
-        <PointsRing
-          bands={bands}
-          total={dist.total}
-          avg={avg}
-          scopeShort={scopeShort}
-          delta={showDelta ? delta : null}
-          goodColor={POINTS_GOOD}
-          badColor={POINTS_BAD}
+        <DistributionRing
+          segments={bands.map((b): RingSegment => ({ l: b.key, v: b.count, c: b.color }))}
+          centre={
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 800,
+                color: CHART.INK,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {avg.toFixed(1)}
+            </span>
+          }
+          sub={`PTS AVG \u00B7 ${scopeShort}`}
+          delta={
+            showDelta && delta !== null
+              ? {
+                  text: `${delta > 0 ? '+' : '\u2212'}${Math.abs(delta).toFixed(1)} VS PRIOR`,
+                  // MORE points is BETTER, so an improving average must read
+                  // as 'down' (green). Args are swapped for that reason.
+                  tone: directionTone(avg, avg - delta),
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -481,148 +500,6 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
         </div>
       )}
     </>
-  );
-};
-
-// ─── Points ring ────────────────────────────────────────────────────────
-interface PointsRingProps {
-  bands: { key: string; count: number; color: string }[];
-  total: number;
-  avg: number;
-  scopeShort: string;
-  delta: number | null;
-  goodColor: string;
-  badColor: string;
-}
-
-const PointsRing: React.FC<PointsRingProps> = ({
-  bands,
-  total,
-  avg,
-  scopeShort,
-  delta,
-  goodColor,
-  badColor,
-}) => {
-  const nonZero = bands.filter((b) => b.count > 0);
-  const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
-  const seams: { angleRad: number }[] = [];
-  const singleColor = nonZero.length === 1 && total > 0 ? nonZero[0].color : null;
-
-  if (total > 0 && nonZero.length > 1) {
-    let cursor = 0;
-    bands.forEach((b) => {
-      if (b.count === 0) return;
-      const span = (b.count / total) * Math.PI * 2;
-      const arcLen = span * RING_R;
-      const startDeg = (cursor * 180) / Math.PI - 90;
-      arcs.push({
-        color: b.color,
-        dasharray: `${arcLen} ${RING_CIRC}`,
-        startDeg,
-      });
-      seams.push({ angleRad: cursor - Math.PI / 2 });
-      cursor += span;
-    });
-  }
-
-  return (
-    <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`} role="img" aria-label="Points distribution ring">
-      <circle
-        cx={RING_CX}
-        cy={RING_CY}
-        r={RING_R}
-        fill="none"
-        stroke="rgba(255,255,255,0.05)"
-        strokeWidth={RING_SW}
-      />
-      {singleColor && (
-        <circle
-          cx={RING_CX}
-          cy={RING_CY}
-          r={RING_R}
-          fill="none"
-          stroke={singleColor}
-          strokeWidth={RING_SW}
-        />
-      )}
-      {arcs.map((a, i) => (
-        <circle
-          key={i}
-          cx={RING_CX}
-          cy={RING_CY}
-          r={RING_R}
-          fill="none"
-          stroke={a.color}
-          strokeWidth={RING_SW}
-          strokeLinecap="butt"
-          strokeDasharray={a.dasharray}
-          transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
-        />
-      ))}
-      {seams.map((s, i) => {
-        const rIn = RING_R - RING_SW / 2 - 1.5;
-        const rOut = RING_R + RING_SW / 2 + 1.5;
-        const cos = Math.cos(s.angleRad);
-        const sin = Math.sin(s.angleRad);
-        return (
-          <line
-            key={`seam-${i}`}
-            x1={RING_CX + cos * rIn}
-            y1={RING_CY + sin * rIn}
-            x2={RING_CX + cos * rOut}
-            y2={RING_CY + sin * rOut}
-            stroke="#1B1E27"
-            strokeWidth={2.5}
-          />
-        );
-      })}
-      <text
-        x={RING_CX}
-        y={RING_CY - 10}
-        textAnchor="middle"
-        style={{
-          fontFamily: FONT,
-          fontSize: 30,
-          fontWeight: 800,
-          fill: 'var(--hcp-t-100)',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {avg.toFixed(1)}
-      </text>
-      <text
-        x={RING_CX}
-        y={RING_CY + 8}
-        textAnchor="middle"
-        style={{
-          fontFamily: FONT,
-          fontSize: 7.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          fill: 'var(--hcp-t-40)',
-        }}
-      >
-        PTS AVG · {scopeShort}
-      </text>
-      {delta !== null && delta !== 0 && (
-        <text
-          x={RING_CX}
-          y={RING_CY + 26}
-          textAnchor="middle"
-          style={{
-            fontFamily: FONT,
-            fontSize: 10,
-            fontWeight: 800,
-            fill: delta > 0 ? goodColor : badColor,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {delta > 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}
-          <tspan style={{ fontSize: 7, fill: 'var(--hcp-t-40)' }}> VS PRIOR</tspan>
-        </text>
-      )}
-    </svg>
   );
 };
 
@@ -927,12 +804,31 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 
       {/* Ring */}
       <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
-        <ScoreStatsRing
-          bands={bands}
-          totalHoles={totalHoles}
-          birdiePlusCount={birdiesOrBetter}
-          birdiePlusRate={pctBirdiesOrBetter}
-          delta={showDelta ? delta : null}
+        <DistributionRing
+          segments={bands.map((b): RingSegment => ({ l: b.key, v: b.count, c: b.color }))}
+          centre={
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 800,
+                color: SC_BIRDIE_DARK,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {birdiesOrBetter}
+            </span>
+          }
+          sub={`BIRDIE+ \u00B7 ${pctBirdiesOrBetter.toFixed(1)}%`}
+          delta={
+            showDelta && delta !== null
+              ? {
+                  text: `${delta > 0 ? '+' : '\u2212'}${Math.abs(delta)} VS PRIOR`,
+                  // MORE birdies is BETTER, so swap the args as above.
+                  tone: directionTone(birdiesOrBetter, birdiesOrBetter - delta),
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -1016,160 +912,14 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   );
 };
 
-// ─── Score stats ring ───────────────────────────────────────────────────
-const RING_SIZE = 176;
-const RING_R = 72;
-const RING_SW = 8;
+// Ring geometry now lives in the shared DistributionRing primitive.
 
-const RING_CX = RING_SIZE / 2;
-const RING_CY = RING_SIZE / 2;
-const RING_CIRC = 2 * Math.PI * RING_R;
 
 interface Band {
   key: string;
   count: number;
   color: string;
 }
-
-interface ScoreStatsRingProps {
-  bands: Band[];
-  totalHoles: number;
-  birdiePlusCount: number;
-  birdiePlusRate: number;
-  delta: number | null;
-}
-
-const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
-  bands,
-  totalHoles,
-  birdiePlusCount,
-  birdiePlusRate,
-  delta,
-}) => {
-  const nonZero = bands.filter((b) => b.count > 0);
-  const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
-  const seams: { angleRad: number }[] = [];
-  const singleColor = nonZero.length === 1 && totalHoles > 0 ? nonZero[0].color : null;
-
-  if (totalHoles > 0 && nonZero.length > 1) {
-    let cursor = 0;
-    bands.forEach((b) => {
-      if (b.count === 0) return;
-      const span = (b.count / totalHoles) * Math.PI * 2;
-      const arcLen = span * RING_R;
-      const startDeg = (cursor * 180) / Math.PI - 90;
-      arcs.push({
-        color: b.color,
-        dasharray: `${arcLen} ${RING_CIRC}`,
-        startDeg,
-      });
-      seams.push({ angleRad: cursor - Math.PI / 2 });
-      cursor += span;
-    });
-  }
-
-  return (
-    <svg width={RING_SIZE} height={RING_SIZE} role="img" aria-label="Score distribution ring">
-      {/* Track */}
-      <circle
-        cx={RING_CX}
-        cy={RING_CY}
-        r={RING_R}
-        fill="none"
-        stroke="rgba(255,255,255,0.05)"
-        strokeWidth={RING_SW}
-      />
-      {singleColor && (
-        <circle
-          cx={RING_CX}
-          cy={RING_CY}
-          r={RING_R}
-          fill="none"
-          stroke={singleColor}
-          strokeWidth={RING_SW}
-        />
-      )}
-      {arcs.map((a, i) => (
-        <circle
-          key={i}
-          cx={RING_CX}
-          cy={RING_CY}
-          r={RING_R}
-          fill="none"
-          stroke={a.color}
-          strokeWidth={RING_SW}
-          strokeLinecap="butt"
-          strokeDasharray={a.dasharray}
-          transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
-        />
-      ))}
-      {seams.map((s, i) => {
-        const rIn = RING_R - RING_SW / 2 - 1.5;
-        const rOut = RING_R + RING_SW / 2 + 1.5;
-        const cos = Math.cos(s.angleRad);
-        const sin = Math.sin(s.angleRad);
-        return (
-          <line
-            key={`seam-${i}`}
-            x1={RING_CX + cos * rIn}
-            y1={RING_CY + sin * rIn}
-            x2={RING_CX + cos * rOut}
-            y2={RING_CY + sin * rOut}
-            stroke="#1B1E27"
-            strokeWidth={2.5}
-          />
-        );
-      })}
-
-      {/* Center stack */}
-      <text
-        x={RING_CX}
-        y={RING_CY - 10}
-        textAnchor="middle"
-        style={{
-          fontFamily: FONT,
-          fontSize: 30,
-          fontWeight: 800,
-          fill: SC_BIRDIE_DARK,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {birdiePlusCount}
-      </text>
-      <text
-        x={RING_CX}
-        y={RING_CY + 8}
-        textAnchor="middle"
-        style={{
-          fontFamily: FONT,
-          fontSize: 7.5,
-          fontWeight: 800,
-          letterSpacing: '0.12em',
-          fill: T.ink40,
-        }}
-      >
-        BIRDIE+ · {birdiePlusRate.toFixed(1)}%
-      </text>
-      {delta !== null && delta !== 0 && (
-        <text
-          x={RING_CX}
-          y={RING_CY + 26}
-          textAnchor="middle"
-          style={{
-            fontFamily: FONT,
-            fontSize: 10,
-            fontWeight: 800,
-            fill: delta > 0 ? 'var(--hcp-good, #55BD8B)' : 'var(--hcp-bad)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {delta > 0 ? '↑' : '↓'} {Math.abs(delta)}
-          <tspan style={{ fontSize: 7, fill: T.ink40 }}> VS PRIOR</tspan>
-        </text>
-      )}
-    </svg>
-  );
-};
 
 // ─── Milestone ladder ───────────────────────────────────────────────────
 interface MilestoneLadderProps {
