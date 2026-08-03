@@ -644,14 +644,28 @@ export async function fetchFriendsActivity(
   return items.slice(0, limit);
 }
 
+/**
+ * Invites THIS MEMBER SENT.
+ *
+ * The `inviter_user_id` filter is NOT redundant with RLS. `whs_invites`
+ * carries two select policies - sent-by-me (`inviter_user_id = auth.uid()`)
+ * AND redeemed-by-me (`redeemed_by_user_id = auth.uid()`) - so the view
+ * legitimately returns invites somebody else sent that this member redeemed.
+ * This feed promises "sent", so the caller narrows it. Do not remove.
+ */
 export async function fetchSentInvites(): Promise<WhsInviteStatus[]> {
+  const userResp = await supabase.auth.getUser();
+  const userId = userResp.data.user?.id;
+  if (!userId) return [];
   const { data, error } = await supabase
     .from('whs_invite_status' as any)
     .select('*')
+    .eq('inviter_user_id', userId)
     .order('sent_at', { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as WhsInviteStatus[];
 }
+
 
 export async function callCreateInvite(
   invitee_passport_id: number,
