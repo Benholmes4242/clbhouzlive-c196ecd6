@@ -28,7 +28,7 @@ export const DiscoverSubsection: React.FC<Props> = ({
       : undefined;
 
   return (
-    <CollapsibleSubsection title="Discover this week" subtitle={countLabel} icon="🔍">
+    <CollapsibleSubsection title="Discover this week" subtitle={countLabel}>
       <div style={{ padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {isLoading && <Skeleton height={220} radius={14} />}
         {!isLoading && courses.length === 0 && (
