@@ -136,6 +136,21 @@ const CardRow: React.FC<{
   </div>
 );
 
+/**
+ * ONE SOURCE FOR THE NINE FIGURES. The totals row now SHOWS its working
+ * (OUT 36 / IN 39 / 75), so the gross beside the two nines must be the sum of
+ * exactly the figures rendered above it. Both <Nine> and the totals row read
+ * their par/strokes through this helper so the two can never be derived from
+ * different filters and disagree on screen.
+ */
+function nineSummary(rows: CardScorecardHole[]): { par: number; strokes: number } {
+  return {
+    par: rows.reduce((s, h) => s + (h.par ?? 0), 0),
+    strokes: rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0),
+  };
+}
+
+
 const Nine: React.FC<{
   rows: CardScorecardHole[];
   label: string;
