@@ -8,8 +8,9 @@ export interface ImportedCounts {
 }
 
 /**
- * connect-whs does not report the import figures reliably, so the DONE screen
- * derives all three client-side from the tables it just wrote.
+ * Counts come from whs_imported_counts(p_connection_id) - one row, computed
+ * server-side. The function is SECURITY INVOKER on purpose, so RLS on
+ * whs_scores / whs_friends still scopes a member to their own connection.
  * A null result means "not readable yet" - the caller must render the
  * still-importing state, NEVER a zero.
  */
@@ -20,22 +21,23 @@ export function useImportedCounts(connectionId: string | null | undefined) {
     refetchInterval: (q) => (q.state.data ? false : 2500),
     queryFn: async () => {
       if (!connectionId) return null;
-      const [scores, friends] = await Promise.all([
-        supabase
-          .from('whs_scores' as any)
-          .select('course_id')
-          .eq('connection_id', connectionId)
-          .limit(2000),
-        supabase
-          .from('whs_friends' as any)
-          .select('id', { count: 'exact', head: true })
-          .eq('connection_id', connectionId),
-      ]);
-      const rows = (scores.data as unknown as Array<{ course_id: string | null }>) ?? [];
-      const rounds = rows.length;
+      const { data, error } = await supabase.rpc('whs_imported_counts' as any, {
+        p_connection_id: connectionId,
+      });
+      if (error) throw error;
+      const row = (Array.isArray(data) ? data[0] : data) as
+        | { rounds: number | string; courses: number | string; friends: number | string }
+        | null
+        | undefined;
+      if (!row) return null;
+      // bigints arrive as strings over PostgREST - coerce before rendering.
+      const rounds = Number(row.rounds ?? 0);
       if (rounds === 0) return null;
-      const courses = new Set(rows.map((r) => r.course_id).filter(Boolean)).size;
-      return { rounds, courses, friends: friends.count ?? 0 };
+      return {
+        rounds,
+        courses: Number(row.courses ?? 0),
+        friends: Number(row.friends ?? 0),
+      };
     },
   });
 }
