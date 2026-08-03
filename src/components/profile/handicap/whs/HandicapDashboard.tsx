@@ -4,7 +4,6 @@ import { useHandicapTrend } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
-import RecordsView from './views/RecordsView';
 import FriendsView from './views/FriendsView';
 import LegendsView from './views/LegendsView';
 
@@ -64,22 +63,13 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
         {activeSubtab === 'form' && (
-          <>
-            <TrendsView
-              connectionId={connection.id}
-              userId={userId}
-              currentHandicap={currentHandicap}
-              readOnly={readOnly}
-              ownerFirstName={ownerFirstName}
-            />
-            <RecordsView
-              connectionId={connection.id}
-              userId={userId}
-              currentHandicap={currentHandicap}
-              readOnly={readOnly}
-              ownerFirstName={ownerFirstName}
-            />
-          </>
+          <TrendsView
+            connectionId={connection.id}
+            userId={userId}
+            currentHandicap={currentHandicap}
+            readOnly={readOnly}
+            ownerFirstName={ownerFirstName}
+          />
         )}
         {activeSubtab === 'circle' && (
           <>
