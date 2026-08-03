@@ -2,7 +2,7 @@
  * Career record primitives. Flat panels, hairline borders, one scroller.
  * No glows, no watermarks, no full-bleed glyphs, no "tap anywhere to close".
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { REC, KICKER, LABEL, CAPTION, FIGURE } from './tokens';
 
 export const Kicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
