@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const RoundShapePanel: React.FC<Props> = ({ readOnly = false }) => {
-  const { t } = useTranslation('courses');
+  const { t } = useTranslation(['courses', 'common']);
   const { data } = useScoringBreakdownAllCourses(!readOnly);
 
   if (!data || data.rounds < MIN_ROUNDS) return null;
@@ -84,7 +84,7 @@ export const RoundShapePanel: React.FC<Props> = ({ readOnly = false }) => {
             {t('holes.gameEverywhere.s2Title')}
           </span>
           <span style={{ ...LABEL_STYLE, whiteSpace: 'nowrap' }}>
-            {t('holes.gameEverywhere.nRoundsSample', { count: data.rounds })}
+            {t('common:handicap.form.nRoundsSample', { count: data.rounds })}
           </span>
         </div>
 
