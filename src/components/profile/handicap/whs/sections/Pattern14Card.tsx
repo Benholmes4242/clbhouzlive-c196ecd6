@@ -9,9 +9,11 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   connectionId: string;
+  /** Profile owner - threaded to RoundDetailSheet so the card can name and own the round. */
+  userId?: string | null;
 }
 
-const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
+const Pattern14Card: React.FC<Props> = ({ connectionId, userId = null }) => {
   const { data: allScores, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [selectedScoreId, setSelectedScoreId] = useState<string | null>(null);
@@ -261,6 +263,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
         onClose={() => setSelectedScoreId(null)}
         scoreId={selectedScoreId ?? ''}
         connectionId={connectionId}
+        profileUserId={userId}
         handicapDelta={selectedRound?.handicapDelta ?? null}
       />
     </>

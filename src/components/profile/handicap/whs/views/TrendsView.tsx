@@ -51,6 +51,7 @@ export const TrendsView: React.FC<Props> = ({
       {/* 1. Rounds That Count */}
       <RoundsThatCountCard
         connectionId={connectionId}
+        userId={userId}
         currentHandicap={currentHandicap}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
@@ -85,6 +86,7 @@ export const TrendsView: React.FC<Props> = ({
       {/* 7. Posted history — figures here, list in the 75dvh sheet */}
       <RoundsArchivePanel
         connectionId={connectionId}
+        userId={userId}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
       />
