@@ -1,19 +1,26 @@
+/**
+ * RecentlyPlayedFeed - friends' rounds, as rows.
+ *
+ * No card per row, no rule between rows, no paged carousel: one house row per
+ * round with fixed figure columns. The rows sit inside a single panel so the
+ * section still reads as one object.
+ *
+ * Renders NOTHING when there are no rounds.
+ */
 import React, { useState } from 'react';
 import { useFriendsActivity } from '@/lib/whs/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import Paged8 from '../_shared/Paged8';
-import FriendRoundCard from './FriendRoundCard';
+import FriendRoundRow, { type FriendRoundVariant } from './FriendRoundRow';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { CHART } from '../../charts';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
 interface Props {
   ownerUserId: string;
 }
-
-const INK_MUTE = 'var(--hcp-t-60)';
 
 const toWhsOnlyEntry = (a: WhsFriendActivityWithImage): FriendLeaderboardEntry => ({
   is_self: false,
@@ -34,6 +41,13 @@ const toWhsOnlyEntry = (a: WhsFriendActivityWithImage): FriendLeaderboardEntry =
   rounds_last_30d: 0,
 });
 
+const variantFor = (a: WhsFriendActivityWithImage): FriendRoundVariant =>
+  a.is_clbhouz_user && a.friend_connection_id
+    ? 'clbhouz-synced'
+    : a.is_clbhouz_user
+      ? 'clbhouz-not-synced'
+      : 'eg-only';
+
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const { data, isLoading } = useFriendsActivity(ownerUserId);
   const [sheetActivity, setSheetActivity] =
@@ -47,13 +61,11 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
       return;
     }
     // State C — Clbhouz user but not synced (no friend_connection_id) → friend sheet
-    // (auto-derives the UnsyncedPitchCard state from the snapshot).
     if (!item.friend_connection_id) {
       openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
       return;
     }
     // State B — Synced friend, but no detailed scorecard for this round
-    // (EG summary-only). Never open the empty RoundDetailSheet.
     if (!item.last_round_score_id) {
       openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
       return;
@@ -62,17 +74,16 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
     setSheetActivity(item);
   };
 
-  // Each item must satisfy { id: string } for Paged8
-  const items = (data ?? []).map((d) => ({
-    ...d,
-    id: d.last_round_score_id ?? `${d.friend_passport_id}-${d.last_round_played_at}`,
-  }));
+  const items = data ?? [];
+
+  // Nothing at all when the fortnight is empty.
+  if (!isLoading && items.length === 0) return null;
 
   return (
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="FRIENDS' ROUNDS"
-        right={!isLoading && items.length > 0 ? 'Last fortnight' : undefined}
+        right={!isLoading ? `LAST FORTNIGHT \u00B7 ${items.length}` : undefined}
       />
 
       {isLoading ? (
@@ -81,33 +92,32 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
             <Skeleton
               key={i}
               variant="dark"
-              style={{
-                height: 280,
-                borderRadius: 16,
-                marginBottom: 12,
-              }}
+              style={{ height: 58, borderRadius: 0, marginBottom: 1 }}
             />
           ))}
         </div>
-      ) : items.length === 0 ? (
-        <p
+      ) : (
+        <div
           style={{
-            padding: '0 16px',
-            fontSize: 13,
-            color: INK_MUTE,
-            lineHeight: 1.5,
+            margin: '0 16px',
+            background: CHART.PANEL,
+            border: `1px solid ${CHART.BORDER}`,
+            borderRadius: 16,
+            overflow: 'hidden',
           }}
         >
-          When your friends post rounds in MyEG, they'll show up here.
-        </p>
-      ) : (
-        <Paged8
-          items={items}
-          ariaLabel="Friends' recent rounds"
-          renderItem={(item) => (
-            <FriendRoundCard activity={item} onClick={() => handleOpen(item)} />
-          )}
-        />
+          {items.map((item) => (
+            <FriendRoundRow
+              key={
+                item.last_round_score_id ??
+                `${item.friend_passport_id}-${item.last_round_played_at}`
+              }
+              activity={item}
+              variant={variantFor(item)}
+              onClick={() => handleOpen(item)}
+            />
+          ))}
+        </div>
       )}
 
       <RoundDetailSheet
