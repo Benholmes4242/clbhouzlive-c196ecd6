@@ -211,26 +211,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
   // once in the profile shell figure row. Nothing left to render here.
   if (isManual) return null;
 
-  if (false) {
-    return (
-      <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
-        <div
-          style={{
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line)',
-            borderRadius: 18,
-            overflow: 'hidden',
-            padding: '16px 16px 14px',
-            fontFamily: FONT,
-          }}
-        >
-          {eyebrow}
-          {currentIndexLabel}
-          {currentIndexValue}
-        </div>
-      </div>
-    );
-  }
 
   // Full interactive variant for WHS-synced users.
   return (
