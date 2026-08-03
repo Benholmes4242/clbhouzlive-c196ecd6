@@ -44,14 +44,35 @@ export function toneColor(tone: ChartTone): string {
 export const DEAD_BAND = 0.05;
 
 /**
- * Direction of travel for an index series (first vs last).
- * Rising -> 'up' (red), falling -> 'down' (green), level -> 'neutral'.
+ * The ONLY comparator. `risingIsWorse` carries the polarity, so no call site
+ * ever swaps its arguments to flip a colour.
  */
-export function directionTone(first: number, last: number): ChartTone {
+function movementTone(first: number, last: number, risingIsWorse: boolean): ChartTone {
   const delta = last - first;
   if (Math.abs(delta) <= DEAD_BAND) return 'neutral';
-  return delta > 0 ? 'up' : 'down';
+  const rising = delta > 0;
+  if (rising) return risingIsWorse ? 'up' : 'down';
+  return risingIsWorse ? 'down' : 'up';
 }
+
+/**
+ * Lower-is-better series: handicap index, differentials, gross.
+ * Rising -> 'up' (red). Falling -> 'down' (green).
+ */
+export function indexTone(first: number, last: number): ChartTone {
+  return movementTone(first, last, true);
+}
+
+/**
+ * Higher-is-better series: stableford points, birdies, greens.
+ * Rising -> 'down' (green). Falling -> 'up' (red).
+ *
+ * Always pass it before-then-after: pointsTone(previous, current).
+ */
+export function pointsTone(first: number, last: number): ChartTone {
+  return movementTone(first, last, false);
+}
+
 
 export const LABEL_STYLE = {
   fontFamily: CHART_FONT,
