@@ -14,9 +14,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
+import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
-import { openNotifications, openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
