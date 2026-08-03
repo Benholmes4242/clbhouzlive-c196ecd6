@@ -257,6 +257,8 @@
     "in": "In",
     "total": "Total",
     "parN": "par {{n}}",
+    "outN": "OUT {{n}}",
+    "inN": "IN {{n}}",
     "round": "Round",
     "howItUnfolded": "How it unfolded",
     "howItBrokeDown": "How the round broke down",

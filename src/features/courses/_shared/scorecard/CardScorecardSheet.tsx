@@ -136,6 +136,21 @@ const CardRow: React.FC<{
   </div>
 );
 
+/**
+ * ONE SOURCE FOR THE NINE FIGURES. The totals row now SHOWS its working
+ * (OUT 36 / IN 39 / 75), so the gross beside the two nines must be the sum of
+ * exactly the figures rendered above it. Both <Nine> and the totals row read
+ * their par/strokes through this helper so the two can never be derived from
+ * different filters and disagree on screen.
+ */
+function nineSummary(rows: CardScorecardHole[]): { par: number; strokes: number } {
+  return {
+    par: rows.reduce((s, h) => s + (h.par ?? 0), 0),
+    strokes: rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0),
+  };
+}
+
+
 const Nine: React.FC<{
   rows: CardScorecardHole[];
   label: string;
@@ -152,8 +167,8 @@ const Nine: React.FC<{
   scoreLabel: string;
 }> = ({ rows, label, withField, scoreLabel }) => {
   const { t } = useTranslation(['courses']);
-  const par = rows.reduce((s, h) => s + (h.par ?? 0), 0);
-  const strokes = rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0);
+  const { par, strokes } = nineSummary(rows);
+
   const fieldRel = withField
     ? rows.reduce(
         (s, h) => s + (h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : 0),
@@ -563,7 +578,33 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
   const out = holes.filter((h) => h.holeNo <= 9);
   const back = holes.filter((h) => h.holeNo > 9);
+
+  /**
+   * TOTALS ARE DERIVED FROM THE NINES SHOWN ABOVE, NOT COMPUTED SEPARATELY.
+   * The row displays OUT n / IN n either side of the gross, so a reader adds
+   * them. cardGross and cardTotalPar therefore come from the same nineSummary
+   * calls that produced those two figures. to-par is NOT recomputed here: it
+   * stays totals.toPar, the single hole-by-hole derivation.
+   */
+  const outSummary = nineSummary(out);
+  const backSummary = back.length > 0 ? nineSummary(back) : null;
+  const cardGross = outSummary.strokes + (backSummary?.strokes ?? 0);
+  const cardTotalPar = outSummary.par + (backSummary?.par ?? 0);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
+  if (import.meta.env.DEV) {
+    // The visible sum must agree with the hero/stat gross. A mismatch means the
+    // nines and the round totals were filtered differently - loud, not silent.
+    if (totals.played && cardGross !== totals.gross) {
+      console.warn('[CardScorecardSheet] gross mismatch', { cardGross, gross: totals.gross });
+    }
+    // Par can legitimately differ mid-round: cardTotalPar counts every hole on
+    // the card, totalPar only the holes played (which is what to-par is measured
+    // against). Flag it so a full-round disagreement is not mistaken for that.
+    if (totals.played && cardTotalPar !== totalPar && played.length === holes.length) {
+      console.warn('[CardScorecardSheet] par mismatch', { cardTotalPar, totalPar });
+    }
+  }
+
 
   /**
    * The FIELD row is a tour-card row only — see the note on <Nine>. On the
@@ -713,28 +754,50 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     )}
 
                     {/*
-                      TOTALS ROW — three separate tokens: the TOTAL label, the
-                      par segment and the to-par figure. The par segment carries
-                      its own left gap so "TOTAL" and "par 71" can never read as
-                      one broken word, and a middle dot keeps par and to-par
-                      apart. Holds on a nine-hole card, where only the Out block
-                      renders above it.
+                      TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
+                      a summary line floating beneath it. Two rows on the same
+                      NINE_GRID: row 1 carries TOTAL, the OUT and IN segments and
+                      the gross in the totals column, directly under the nine
+                      totals above; row 2 carries PAR n as a caps label and the
+                      to-par beneath the gross. Every figure lines up down the
+                      right edge. On a nine-hole card the OUT segment spans the
+                      full nine columns and no IN segment renders.
                     */}
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2 }}>
-                      <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      <span
-                        style={{
-                          gridColumn: 'span 9', ...NUM, fontSize: 11.5, fontWeight: 700, color: A.MUTE,
-                          paddingLeft: 10, display: 'inline-flex', alignItems: 'baseline', gap: 6,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <span>{t('courses:scorecard.parN', { n: totalPar })}</span>
-                        <span aria-hidden="true" style={{ color: A.MUTE }}>{'\u00B7'}</span>
-                        <span style={{ color: toParColor(totals.toPar) }}>{fmtRel(totals.toPar)}</span>
-                      </span>
-                      <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{totals.gross}</span>
+                    <div>
+                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                        <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                        <span
+                          style={{
+                            gridColumn: backSummary ? 'span 4' : 'span 9',
+                            ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                        </span>
+                        {backSummary && (
+                          <span
+                            style={{
+                              gridColumn: 'span 5',
+                              ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {t('courses:scorecard.inN', { n: backSummary.strokes })}
+                          </span>
+                        )}
+                        <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                        <span style={{ ...LABEL, fontSize: 8, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                          {t('courses:scorecard.parN', { n: cardTotalPar })}
+                        </span>
+                        <span style={{ gridColumn: 'span 9' }} />
+                        <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
+                          {fmtRel(totals.toPar)}
+                        </span>
+                      </div>
                     </div>
+
 
 
                     <Legend />
