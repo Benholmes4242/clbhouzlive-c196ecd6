@@ -263,29 +263,37 @@ async function runAtRiskCheck() {
     // Upsert with ignoreDuplicates so re-runs same week collapse. Key includes
     // weekStart to allow a fresh warning the following week.
     const dedupKey = `streak_risk:${s.user_id}:${s.streak_type}:${weekStartISO}`;
-    const { error } = await supabase
+    const payload = {
+      streak_type: s.streak_type,
+      count: s.current_count ?? 0,
+    };
+    const { data: inserted, error } = await supabase
       .from("gam_notification_outbox")
       .upsert(
         {
           user_id: s.user_id,
           notification_type: "streak_at_risk",
           template_id: "streak_at_risk",
-          template_payload: {
-            streak_type: s.streak_type,
-            count: s.current_count ?? 0,
-          },
+          template_payload: payload,
           deduplication_key: dedupKey,
           scheduled_for: new Date().toISOString(),
           urgency: "high",
           status: "pending",
         },
         { onConflict: "deduplication_key", ignoreDuplicates: true },
-      );
+      )
+      .select("id");
     if (error) {
       console.warn("[at-risk] upsert failed", s.user_id, error.message);
       continue;
     }
+    // Mirror to the inbox only when the outbox row actually landed, so a
+    // collapsed re-run does not produce a second notifications row.
+    if (Array.isArray(inserted) && inserted.length > 0) {
+      await writeActivityRow(s.user_id, "streak_at_risk", payload);
+    }
     warned++;
+
   }
 
   const summary = { active: (active ?? []).length, warned, safe, weekStart: weekStartISO };
