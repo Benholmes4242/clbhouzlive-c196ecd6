@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -24,6 +25,7 @@ import {
   clearRivalDismissal,
   type RivalIdentity,
   fetchSharedRounds,
+  fetchSharedRoundCounts,
   fetchTrophyAggregates,
   lookupWhsCourseId,
 } from './api';
@@ -327,6 +329,27 @@ export function useSharedRounds(
     staleTime: 60_000,
   });
 }
+
+/**
+ * Batched shared-round counts for a list of member ids (compare sheet list).
+ * ONE request for the whole visible list, cached per id-set so switching
+ * between the recent list and search results does not refetch a set already
+ * seen, and re-typing an earlier query is served from cache.
+ */
+export function useSharedRoundCounts(
+  userId: string | undefined,
+  targetIds: string[],
+  enabled = true,
+) {
+  const key = useMemo(() => [...targetIds].sort().join(','), [targetIds]);
+  return useQuery({
+    queryKey: ['whs-shared-round-counts', userId ?? '', key],
+    queryFn: () => fetchSharedRoundCounts(userId as string, key ? key.split(',') : []),
+    enabled: enabled && !!userId && targetIds.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 
 // ─── Trophy aggregates (Sprint 3) ───────────────────────────────────────
 export function useTrophyAggregates(

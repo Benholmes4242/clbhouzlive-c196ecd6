@@ -1189,6 +1189,29 @@ export async function fetchSharedRounds(
   };
 }
 
+/**
+ * BATCHED shared-round counts for a list of target members.
+ * One RPC for the whole visible list - the compare sheet renders six default
+ * rows plus up to twelve search results, and a per-row query would cost one
+ * request each. Returns a map of userId -> shared round count.
+ */
+export async function fetchSharedRoundCounts(
+  userId: string,
+  targetIds: string[],
+): Promise<Record<string, number>> {
+  if (!userId || targetIds.length === 0) return {};
+  const { data, error } = await supabase.rpc('count_shared_rounds_batch' as any, {
+    p_user_id: userId,
+    p_target_ids: targetIds,
+  });
+  if (error) throw error;
+  const raw = (data ?? {}) as Record<string, number>;
+  const out: Record<string, number> = {};
+  for (const id of targetIds) out[id] = Number(raw[id] ?? 0);
+  return out;
+}
+
+
 // ─── Trophy aggregates RPC (Sprint 3) ─────────────────────────────────────
 export interface TrophyAggregates {
   hole_stats: {
