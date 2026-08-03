@@ -83,6 +83,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
 }
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
+  const { t } = useTranslation(['common']);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection.id);
   const { data: history90, isLoading: history90Loading } = useHandicapHistory(connection.id, 90);
   const trend12 = useHandicapTrend12mo(connection.id);
