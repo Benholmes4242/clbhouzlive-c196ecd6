@@ -212,6 +212,11 @@ export const GameEverywhereCard: React.FC<Props> = ({ readOnly = false }) => {
       <DarkSectionHeader
         eyebrow={t('holes.gameEverywhere.eyebrow')}
         title={t('holes.gameEverywhere.title')}
+        right={
+          <span style={{ ...LABEL_STYLE }}>
+            {t('common:handicap.form.nRoundsSample', { count: data.rounds })}
+          </span>
+        }
       />
       <DarkCard>
         <GameEverywhereBody d={data} />
