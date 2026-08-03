@@ -20,7 +20,10 @@ interface Props {
 }
 
 export const StreaksPanel: React.FC<Props> = ({ streaks }) => {
-  const rows = streaks.filter((s) => LABEL[s.streak_type]);
+  // Only streaks that exist. A member with none gets no panel at all.
+  const rows = streaks.filter(
+    (s) => LABEL[s.streak_type] && (s.current_count > 0 || s.best_count > 0),
+  );
   if (rows.length === 0) return null;
   return (
     <Panel title="STREAKS">

@@ -32,6 +32,9 @@ export const Top100Panel: React.FC<Props> = ({ data, items }) => {
     (a, b) => ORDER.indexOf(a.badgeId) - ORDER.indexOf(b.badgeId),
   );
   if (sorted.length === 0) return null;
+  // Sparse account: every list at zero is four rows of nothing. The panel
+  // does not render at all rather than showing "0 of 100" four times.
+  if (sorted.every((item) => (item.currentValue ?? 0) === 0)) return null;
 
   return (
     <Panel title="TOP 100 LISTS">

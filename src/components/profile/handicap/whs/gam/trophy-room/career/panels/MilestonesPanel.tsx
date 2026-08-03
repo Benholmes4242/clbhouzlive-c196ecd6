@@ -5,8 +5,9 @@
  * happened yet is part of a record. No lock icons, no greyed cards.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
-import { Panel, RowButton, Dot, MetaLabel } from '../Primitives';
+import { Panel, RowButton, Dot, MetaLabel, Collapsible } from '../Primitives';
 import { monthYear } from '../format';
 import { measuredShare } from '../shareModel';
 import type { Achievement, CareerData } from '../types';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
+  const { t } = useTranslation('handicap');
   if (items.length === 0) return null;
   const reached = items.filter((i) => i.earned);
   const pending = items.filter((i) => !i.earned);
@@ -31,6 +33,10 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
         </MetaLabel>
       }
     >
+      <Collapsible
+        showAllLabel={t('career.showAllItems', { count: ordered.length })}
+        showFewerLabel={t('career.showFewer')}
+      >
       {ordered.map((item, i) => {
         const share = measuredShare(data.shares.get(item.badgeId), data.config.shareMinDenominator);
         return (
@@ -83,6 +89,7 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
           </RowButton>
         );
       })}
+      </Collapsible>
     </Panel>
   );
 };

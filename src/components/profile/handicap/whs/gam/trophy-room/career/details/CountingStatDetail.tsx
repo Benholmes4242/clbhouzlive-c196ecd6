@@ -5,10 +5,11 @@
  */
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
 import { Panel, BackLink, Kicker, Caption, Figure, Bar, MetaLabel, RowButton } from '../Primitives';
 import { measuredShare } from '../shareModel';
-import { dayMonthYear, plural } from '../format';
+import { dayMonthYear, monthYear, plural } from '../format';
 import {
   courseSplitFor,
   bestRoundFor,
@@ -25,6 +26,7 @@ interface Props {
 
 export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('handicap');
   const [roundId, setRoundId] = useState<string | null>(null);
   const metric = roundMetricForCounter(item.counterMetric);
   const value = item.currentValue ?? 0;
@@ -59,6 +61,10 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
         <Figure value={value} size={40} color={value > 0 ? REC.AMBER : REC.DIM} />
         <span style={{ fontSize: 12.5, color: REC.MUTE }}>{item.description}</span>
       </div>
+      {/* Omitted entirely when earned_at is null. No placeholder. */}
+      {monthYear(item.earnedAt) ? (
+        <Caption>{t('career.mostRecent', { when: monthYear(item.earnedAt) })}</Caption>
+      ) : null}
       {share !== null && (
         <Caption>
           <span style={{ color: REC.GOOD, fontWeight: 700 }}>
@@ -92,16 +98,24 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
             >
               {tier.threshold}
             </span>
+            {/* These rows are on the LABEL treatment, so the sentence-case
+                locale value is uppercased in CSS rather than in the string. */}
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.06em',
+                textTransform: 'uppercase',
                 color: tier.earned ? REC.AMBER : REC.DIM,
                 ...REC.TABULAR,
               }}
             >
-              {tier.earned ? 'PASSED' : `${Math.max(0, tier.threshold - value)} TO GO`}
+              {tier.earned
+                ? t('career.achieved')
+                : t('career.toGoTo', {
+                    n: Math.max(0, tier.threshold - value),
+                    target: tier.threshold,
+                  })}
             </span>
           </div>
         ))}
@@ -139,7 +153,7 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
                 <Figure value={row.count} size={15} />
               </div>
               <div style={{ marginTop: 6 }}>
-                <Bar pct={topCount > 0 ? (row.count / topCount) * 100 : 0} height={3} />
+                <Bar pct={topCount > 0 ? (row.count / topCount) * 100 : 0} />
               </div>
             </RowButton>
           ))}
@@ -155,9 +169,15 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
               </span>
               <Figure value={Number(best[metric] ?? 0)} size={17} color={REC.AMBER} />
             </div>
+            {/* Separator is a middle dot in the OUTPUT, written as an ASCII
+                escape in the locale value. Never "--" in rendered prose. */}
             <div style={{ marginTop: 4, fontSize: 11.5, color: REC.MUTE, ...REC.TABULAR }}>
-              {dayMonthYear(best.play_date)}
-              {best.gross_score ? ` -- ${best.gross_score} gross` : ''}
+              {best.gross_score
+                ? t('career.bestRoundLine', {
+                    date: dayMonthYear(best.play_date),
+                    gross: best.gross_score,
+                  })
+                : dayMonthYear(best.play_date)}
             </div>
             <div style={{ marginTop: 8 }}>
               <MetaLabel color={REC.AMBER}>OPEN THE CARD</MetaLabel>

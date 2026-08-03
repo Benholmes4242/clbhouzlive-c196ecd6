@@ -2,7 +2,7 @@
  * Career record primitives. Flat panels, hairline borders, one scroller.
  * No glows, no watermarks, no full-bleed glyphs, no "tap anywhere to close".
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { REC, KICKER, LABEL, CAPTION, FIGURE } from './tokens';
 
 export const Kicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -83,16 +83,19 @@ export const Panel: React.FC<{
   </section>
 );
 
-export const Bar: React.FC<{ pct: number; height?: number; color?: string }> = ({
-  pct,
-  height = 4,
-  color,
-}) => (
+/**
+ * ONE height everywhere. The height prop is gone on purpose: a call site that
+ * wants a different one is a signal the treatment is wrong, not that the prop
+ * is useful.
+ */
+const BAR_HEIGHT = 4;
+
+export const Bar: React.FC<{ pct: number; color?: string }> = ({ pct, color }) => (
   <div
     style={{
-      height,
-      borderRadius: height / 2,
-      background: REC.TRACK,
+      height: BAR_HEIGHT,
+      borderRadius: BAR_HEIGHT / 2,
+      background: REC.BAR_TRACK,
       overflow: 'hidden',
     }}
   >
@@ -193,3 +196,31 @@ export const Dot: React.FC<{ on: boolean }> = ({ on }) => (
     }}
   />
 );
+
+/**
+ * Collapsible list. Built once and used by every panel whose list can grow,
+ * so no panel hand-rolls its own "show more". Over `threshold` rows it shows
+ * `collapsedCount` and a quiet action; the panel aside keeps stating the full
+ * total so collapsing never hides the headline figure.
+ */
+export const Collapsible: React.FC<{
+  children: React.ReactNode;
+  threshold?: number;
+  collapsedCount?: number;
+  showAllLabel: string;
+  showFewerLabel: string;
+}> = ({ children, threshold = 5, collapsedCount = 3, showAllLabel, showFewerLabel }) => {
+  const [open, setOpen] = useState(false);
+  const rows = React.Children.toArray(children);
+  if (rows.length <= threshold) return <>{rows}</>;
+  return (
+    <>
+      {open ? rows : rows.slice(0, collapsedCount)}
+      <div style={{ padding: '11px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
+        <Action onClick={() => setOpen((prev) => !prev)}>
+          {open ? showFewerLabel : showAllLabel}
+        </Action>
+      </div>
+    </>
+  );
+};
