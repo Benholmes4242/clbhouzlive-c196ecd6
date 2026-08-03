@@ -11,8 +11,9 @@ import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
   Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
-  Star, ChevronRight, Navigation, Calendar,
+  Navigation, Calendar,
 } from 'lucide-react';
+
 import { toast } from '@/lib/toast';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -62,6 +63,39 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { useTranslation } from 'react-i18next';
+import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
+import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+/** One centred figure in the reach panel. Optional tap-through preserved. */
+const ReachCell: React.FC<{
+  label: string;
+  value: string;
+  sub?: string;
+  onClick?: () => void;
+}> = ({ label, value, sub, onClick }) => {
+  const Wrapper: React.ElementType = onClick ? 'button' : 'div';
+  return (
+    <Wrapper
+      {...(onClick ? { type: 'button', onClick } : {})}
+      style={{
+        textAlign: 'center',
+        minWidth: 0,
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
+      <div style={LABEL}>{label}</div>
+      <div style={{ ...NUM, fontSize: 22, color: A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>{value}</div>
+      {sub && <div style={{ ...LABEL, fontSize: 9, marginTop: 3 }}>{sub}</div>}
+    </Wrapper>
+  );
+};
+
 
 
 type BusinessTab = 'posts' | 'about' | 'team';
@@ -103,6 +137,7 @@ const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
+  const { t } = useTranslation();
 
   useHideHeader();
   // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
@@ -114,24 +149,30 @@ const BusinessProfilePage: React.FC = () => {
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
 
-  // Home course (club_id only): first course under the business's club
-  const { data: homeCourse } = useQuery({
-    queryKey: ['business-home-course', business?.club_id],
+  // Club courses (club_id only): EVERY course under the business's club.
+  // A 36-hole club has two and a resort may have more; returning one row
+  // silently hid half of the club's golf.
+  const { data: clubCourses } = useQuery({
+    queryKey: ['business-club-courses', business?.club_id],
     enabled: !!business?.club_id,
     staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      if (!business?.club_id) return null;
+    queryFn: async (): Promise<BusinessClubCourse[]> => {
+      if (!business?.club_id) return [];
       const { data, error } = await supabase
         .from('golf_courses')
         .select('id, name, region, country')
         .eq('club_id', business.club_id)
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .maybeSingle();
+        .order('created_at', { ascending: true });
       if (error) throw error;
-      return data;
+      return (data ?? []) as BusinessClubCourse[];
     },
   });
+  const courses = clubCourses ?? [];
+
+  // Reach-row ROUNDS figure. Same query key as the first course panel, so a
+  // single-course club issues ONE request for the stats.
+  const { data: firstCourseStats } = useCourseStatsDetail(courses[0]?.id, courses.length > 0);
+
 
   const { activeActor } = useActiveActor();
   const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
@@ -191,6 +232,48 @@ const BusinessProfilePage: React.FC = () => {
   useEffect(() => {
     if (business?.id) trackBusinessProfileVisit(business.id, user?.id, visitSource);
   }, [business?.id, user?.id, visitSource]);
+
+  // business_profile_viewed - once per mount, ref guarded.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (!business?.id || viewedRef.current) return;
+    viewedRef.current = true;
+    void analyticsEvents.track('business_profile_viewed', {
+      business_id: business.id,
+      is_club: !!business.club_id,
+      is_own: !!membership?.canManage,
+      courses: courses.length,
+      followers: followersCount,
+    });
+  }, [business?.id, business?.club_id, membership?.canManage, courses.length, followersCount]);
+
+  // business_course_panel_shown - once per mount, when the panels resolve.
+  const panelFiguresRef = useRef<Map<string, boolean>>(new Map());
+  const panelReportedRef = useRef(false);
+  const handleFiguresResolved = React.useCallback((courseId: string, hasFigures: boolean) => {
+    panelFiguresRef.current.set(courseId, hasFigures);
+    if (panelReportedRef.current || !business?.id) return;
+    if (panelFiguresRef.current.size < courses.length || courses.length === 0) return;
+    panelReportedRef.current = true;
+    const withStats = Array.from(panelFiguresRef.current.values()).filter(Boolean).length;
+    void analyticsEvents.track('business_course_panel_shown', {
+      business_id: business.id,
+      courses: courses.length,
+      with_stats: withStats,
+    });
+  }, [business?.id, courses.length]);
+
+  const handleCourseOpen = React.useCallback((courseId: string, position: number) => {
+    if (business?.id) {
+      void analyticsEvents.track('business_course_opened', {
+        business_id: business.id,
+        course_id: courseId,
+        position,
+      });
+    }
+    navigate(`/courses/${courseId}`);
+  }, [business?.id, navigate]);
+
 
   // Clamp detection for bio
   useEffect(() => {
@@ -521,8 +604,8 @@ const BusinessProfilePage: React.FC = () => {
         {business.city && (
           <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px) + 12px)' }}>
             <span
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+              className="px-3 py-1.5 rounded-full flex items-center gap-1.5"
+              style={{ background: A.PANEL, border: `0.5px solid ${A.BORDER}`, ...LABEL, color: A.MUTE }}
             >
               <MapPin className="w-3.5 h-3.5" />
               {business.city}
@@ -544,7 +627,7 @@ const BusinessProfilePage: React.FC = () => {
 
 
         {subtitleText && (
-          <p className="mt-1 text-sm text-muted-foreground">{subtitleText}</p>
+          <p className="mt-1" style={{ ...LABEL, color: A.MUTE }}>{subtitleText}</p>
         )}
 
         {/* Bio (expandable) */}
@@ -572,35 +655,89 @@ const BusinessProfilePage: React.FC = () => {
           </div>
         )}
 
-        {/* Proof line: rating chip (club-only) + followers + posts */}
-        <div className="mt-3 flex items-center gap-3 flex-wrap text-[13px]">
-          {business.club_id && reviewStats && reviewStats.totalReviews > 0 && (
-            <span
-              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold"
-              style={{ background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.20)' }}
-            >
-              <Star className="w-3 h-3" fill="#F7931E" strokeWidth={0} />
-              {reviewStats.avgRating.toFixed(1)}
-              <span style={{ color: '#F7931E', opacity: 0.8, fontWeight: 500 }}>({reviewStats.totalReviews})</span>
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
-            className="inline-flex items-center gap-1 active:opacity-70 transition-opacity"
-          >
-            <span className="font-semibold text-foreground tabular-nums">{followersCount}</span>
-            <span className="text-muted-foreground">followers</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('posts')}
-            className="inline-flex items-center gap-1 active:opacity-70 transition-opacity"
-          >
-            <span className="font-semibold text-foreground tabular-nums">{postsCount}</span>
-            <span className="text-muted-foreground">posts</span>
-          </button>
-        </div>
+        {/* Reach: figures for a club, a quiet line for everyone else. The
+            rating lives HERE and nowhere else on the page. */}
+        {(() => {
+          const followersOnClick = () =>
+            navigate(`/business/${business.slug || business.id}/followers`);
+          const postsOnClick = () => setActiveTab('posts');
+
+          const cells: React.ReactNode[] = [];
+          if (business.club_id) {
+            if (reviewStats && reviewStats.totalReviews > 0) {
+              cells.push(
+                <ReachCell
+                  key="rated"
+                  label={t('business.reach.rated')}
+                  value={reviewStats.avgRating.toFixed(1)}
+                  sub={t('business.reach.ratedFrom', { count: reviewStats.totalReviews })}
+                />,
+              );
+            }
+            const rounds = firstCourseStats?.rounds_tracked ?? null;
+            if (rounds != null && rounds > 0) {
+              cells.push(
+                <ReachCell
+                  key="rounds"
+                  label={t('business.reach.rounds')}
+                  value={rounds.toLocaleString()}
+                />,
+              );
+            }
+            cells.push(
+              <ReachCell
+                key="followers"
+                label={t('business.reach.followers')}
+                value={followersCount.toLocaleString()}
+                onClick={followersOnClick}
+              />,
+              <ReachCell
+                key="posts"
+                label={t('business.reach.posts')}
+                value={postsCount.toLocaleString()}
+                onClick={postsOnClick}
+              />,
+            );
+          }
+
+          if (business.club_id && cells.length > 2) {
+            return (
+              <Panel style={{ marginTop: 14 }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
+                  }}
+                >
+                  {cells}
+                </div>
+              </Panel>
+            );
+          }
+
+          return (
+            <div className="mt-3 flex items-center gap-1" style={{ ...LABEL, color: A.MUTE }}>
+              <button
+                type="button"
+                onClick={followersOnClick}
+                style={{ ...LABEL, color: A.MUTE, background: 'transparent', border: 'none', padding: 0 }}
+                className="active:opacity-70 transition-opacity"
+              >
+                {t('business.reach.followersLine', { count: followersCount })}
+              </button>
+              <span aria-hidden="true">.</span>
+              <button
+                type="button"
+                onClick={postsOnClick}
+                style={{ ...LABEL, color: A.MUTE, background: 'transparent', border: 'none', padding: 0 }}
+                className="active:opacity-70 transition-opacity"
+              >
+                {t('business.reach.postsLine', { count: postsCount })}
+              </button>
+            </div>
+          );
+        })()}
+
       </div>
 
       {/* ───── Action rows ───── */}
@@ -660,7 +797,7 @@ const BusinessProfilePage: React.FC = () => {
             disabled={disabled}
             onClick={onClick}
             className={cn('h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]', className)}
-            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icon className="w-3.5 h-3.5" />}
             {label}
@@ -683,7 +820,7 @@ const BusinessProfilePage: React.FC = () => {
                   </button>
                   <button
                     className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
                     onClick={() => navigate('/businesses/manage')}
                   >
                     Manage
@@ -696,7 +833,7 @@ const BusinessProfilePage: React.FC = () => {
                     style={{
                       flex: 1.6,
                       ...(isFollowing
-                        ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+                        ? { background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }
                         : { background: '#0F172A', color: '#ffffff' }),
                     }}
                     onClick={handleFollowToggle}
@@ -705,7 +842,7 @@ const BusinessProfilePage: React.FC = () => {
                   </button>
                   <button
                     className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
                     onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
                     disabled={isStartingDM}
                     aria-label={`Message ${business.name}`}
@@ -730,7 +867,7 @@ const BusinessProfilePage: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <button
                     className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}` }}
                     aria-label="More options"
                   >
                     <MoreHorizontal className="w-5 h-5 text-foreground" />
@@ -792,39 +929,23 @@ const BusinessProfilePage: React.FC = () => {
         );
       })()}
 
-      {/* ───── Home course card (club-only) ───── */}
-      {business.club_id && homeCourse && (
-        <button
-          type="button"
-          onClick={() => navigate(`/courses/${homeCourse.id}`)}
-          className="mt-4 mx-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-left active:scale-[0.99] transition-transform"
-          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
-        >
-          <div className="flex-1 min-w-0">
-            <p className="text-[10.5px] font-bold tracking-[0.08em] uppercase" style={{ color: '#94A3B8' }}>
-              Home course
-            </p>
-            <p className="mt-1 text-[15px] font-semibold text-foreground truncate">
-              {homeCourse.name}
-            </p>
-            <p className="mt-0.5 flex items-center gap-2 text-[12.5px] text-muted-foreground">
-              {reviewStats && reviewStats.totalReviews > 0 && (
-                <span className="inline-flex items-center gap-1 font-semibold text-foreground tabular-nums">
-                  <Star className="w-3 h-3" fill="#F7931E" strokeWidth={0} />
-                  {reviewStats.avgRating.toFixed(1)}
-                  <span className="text-muted-foreground font-normal">({reviewStats.totalReviews})</span>
-                </span>
-              )}
-              {(homeCourse.region || homeCourse.country) && (
-                <span className="truncate">
-                  {[homeCourse.region, homeCourse.country].filter(Boolean).join(', ')}
-                </span>
-              )}
-            </p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
-        </button>
+      {/* ───── Club courses (club-only): one panel per course ───── */}
+      {business.club_id && courses.length > 0 && (
+        <div className="px-4">
+          {courses.map((course, i) => (
+            <BusinessCoursePanel
+              key={course.id}
+              course={course}
+              isFirst={i === 0}
+              plural={courses.length > 1}
+              position={i}
+              onOpen={handleCourseOpen}
+              onFiguresResolved={handleFiguresResolved}
+            />
+          ))}
+        </div>
       )}
+
 
       <div className="h-4" />
 
@@ -834,11 +955,18 @@ const BusinessProfilePage: React.FC = () => {
       <section className="px-4 bg-background">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <FilterChips
-            options={tabs.map((t) => ({ id: t.id, label: t.label }))}
+            options={tabs.map((tab) => ({ id: tab.id, label: tab.label }))}
             value={activeTab}
-            onChange={(id) => setActiveTab(id)}
+            onChange={(id) => {
+              setActiveTab(id);
+              void analyticsEvents.track('business_tab_changed', {
+                business_id: business.id,
+                to: id,
+              });
+            }}
             ariaLabel="Business profile sections"
           />
+
         </div>
       </section>
 
