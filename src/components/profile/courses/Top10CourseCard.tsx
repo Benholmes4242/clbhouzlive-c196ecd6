@@ -3,7 +3,7 @@
  * 
  * Features:
  * - Full-bleed hero image with gradient overlay
- * - Frosted glass rank badge (top left)
+ * - Frosted glass rank chip (top left) — number only, no crown glyph
  * - Frosted glass rating chip (bottom)
  * - Frosted glass reaction strip overlay
  * - 280x360px taller aspect ratio
@@ -12,7 +12,7 @@
  */
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { MapPin, Crown } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -121,7 +121,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             ...rankStyle,
           }}
         >
-          {position === 1 && <Crown size={12} strokeWidth={2.5} fill="#FFB800" style={{ color: '#D97706', flexShrink: 0 }} />}
+          {/* No crown glyph — the rank number is the whole statement. */}
           <span className="text-white font-bold text-[12px]">#{position}</span>
         </div>
 
