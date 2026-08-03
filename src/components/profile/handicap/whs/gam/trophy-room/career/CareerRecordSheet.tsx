@@ -54,10 +54,16 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<CareerView>({ kind: 'room' });
 
+  // A badgeId in the payload must land on that badge's detail, not the room.
+  // Badges are only fetched once `open` is true, so the id is parked here and
+  // resolved by the effect below when the data arrives.
+  const [pendingBadgeId, setPendingBadgeId] = useState<string | null>(null);
+
   useEffect(
     () =>
-      gamAchievementsBus.subscribe(() => {
+      gamAchievementsBus.subscribe((payload) => {
         setView({ kind: 'room' });
+        setPendingBadgeId(payload?.badgeId ?? null);
         setOpen(true);
       }),
     [],
@@ -156,6 +162,20 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
       a.counterMetric === null &&
       a.tiers.length <= 1,
   );
+
+  // Resolve a parked badgeId to the right detail view. Kind is derived from the
+  // same partition the panels use, so a deep link and a tap agree. An unknown
+  // or not-yet-earned id simply leaves the room open.
+  useEffect(() => {
+    if (!pendingBadgeId || badgesLoading) return;
+    const kind =
+      top100.some((a) => a.badgeId === pendingBadgeId) ? 'top100'
+      : counting.some((a) => a.badgeId === pendingBadgeId) ? 'counting'
+      : milestones.some((a) => a.badgeId === pendingBadgeId) ? 'milestone'
+      : null;
+    if (kind) setView({ kind, badgeId: pendingBadgeId });
+    setPendingBadgeId(null);
+  }, [pendingBadgeId, badgesLoading, top100, counting, milestones]);
 
   const isLoading = badgesLoading || legendsLoading;
   const back = () => setView({ kind: 'room' });
