@@ -15,6 +15,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas } from './computeRoundDeltas';
 import RoundsArchiveSheet from './RoundsArchiveSheet';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
+import { analyticsEvents } from '@/lib/analytics/events';
 
 interface Props {
   connectionId: string;
@@ -89,7 +90,13 @@ export const RoundsArchivePanel: React.FC<Props> = ({
             </span>
             <button
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                // Fire-and-forget: never awaited in a render or handler path.
+                analyticsEvents.track?.('handicap_history_sheet_opened', {
+                  rounds: rounds.length,
+                });
+                setOpen(true);
+              }}
               aria-label={t('handicap.form.archive.openFull')}
               style={{
                 display: 'inline-flex',
