@@ -205,7 +205,9 @@ function fmtSG(v: number): string {
   return (v >= 0 ? '+' : '') + v.toFixed(2);
 }
 
-function currentSeasonYear(): number {
+/** Season year used by every board. Exported so player-v2/StatsSheet can label
+ *  its sub-line from the same source rather than re-deriving it. */
+export function currentSeasonYear(): number {
   const now = new Date();
   return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
 }
