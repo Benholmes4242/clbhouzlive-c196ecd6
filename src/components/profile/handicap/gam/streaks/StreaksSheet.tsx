@@ -291,9 +291,9 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       }),
     );
   }
-  if (totalFreezes > 0) {
-    subLineParts.push(t('streaks.freezeTotal', { count: totalFreezes }));
-  }
+  // Freezes are deliberately NOT totalled here: they are seeded only for
+  // round_played, so a header total reads as a pool covering every streak.
+
 
   return (
     <GamSheet open={open} onClose={onClose}>
