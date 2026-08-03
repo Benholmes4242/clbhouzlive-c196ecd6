@@ -1,160 +1,99 @@
 /**
- * JourneySummaryCard — Course Legacy stat card.
- * Eyebrow ABOVE the card; white card surface with centered big number
- * + divided KPI strip (countries / avg rating).
+ * JourneySummaryCard - Course Legacy figure row.
+ * Four figures: PLAYED, COUNTRIES, TOP 100, AVG RATING. No icons, no card
+ * chrome beyond the analytical panel - the figures carry the meaning.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Trophy, Globe, Star } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface JourneySummaryCardProps {
   coursesPlayed: number;
   countriesPlayed: number;
   avgRating: number | null;
+  top100Played?: number | null;
   isOwnProfile: boolean;
   displayName?: string;
   className?: string;
 }
 
-const FONT_SANS =
-  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-const CARD_STYLE: React.CSSProperties = {
-  background: '#FFFFFF',
-  borderRadius: 16,
-  border: '0.5px solid rgba(15,23,42,0.08)',
-  overflow: 'hidden',
-};
-
-// Canonical SectionHeader eyebrow (role="section" → AA amber, 11px, cut-line)
-const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
-  <div className="px-2.5">
-    <SectionHeader role="section" kicker={label.toUpperCase()} />
-  </div>
-);
-
 export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
+  top100Played,
   isOwnProfile,
   displayName,
   className,
 }) => {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useTranslation('courses');
 
-  const eyebrowLabel = isOwnProfile
-    ? 'Your Course Legacy'
-    : `${displayName || 'Their'}'s Course Legacy`;
+  const kicker = isOwnProfile
+    ? t('legacy.kickerOwn', { defaultValue: 'YOUR COURSE LEGACY' })
+    : t('legacy.kickerOther', {
+        name: (displayName || 'Their').toUpperCase(),
+        defaultValue: '{{name}} - COURSE LEGACY',
+      });
 
-  // Empty state — sits inside the same card surface for consistency.
   if (coursesPlayed === 0) {
     return (
-      <div className={cn('', className)}>
-        <Eyebrow label={eyebrowLabel} />
-        <div style={{ ...CARD_STYLE, padding: '28px 20px' }}>
-          <div className="flex flex-col items-center justify-center text-center">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-              style={{
-                background: 'rgba(15,23,42,0.05)',
-                border: '0.5px solid rgba(15,23,42,0.08)',
-              }}
-            >
-              <MapPin className="w-6 h-6 text-muted-foreground" />
-            </div>
-
-            <h3
-              className="mb-1"
-              style={{
-                fontFamily: FONT_SANS,
-                fontSize: 16,
-                fontWeight: 700,
-                color: '#0F172A',
-              }}
-            >
-              {isOwnProfile ? 'Start Building Your Legacy' : 'No Courses Played Yet'}
-            </h3>
-
-            <p
-              className="mb-5 max-w-xs"
-              style={{ fontFamily: FONT_SANS, fontSize: 13, color: '#64748B' }}
-            >
+      <div className={cn('px-4', className)}>
+        <Panel kicker={kicker}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', fontFamily: SANS }}>
+            <MapPin size={20} color={A.DIM} strokeWidth={2} />
+            <div style={{ marginTop: 10, fontSize: 14.5, fontWeight: 800, color: A.INK }}>
               {isOwnProfile
-                ? 'Play and rate courses to track your golf journey'
-                : "This golfer hasn't logged any courses yet."}
-            </p>
-
+                ? t('legacy.emptyTitleOwn', { defaultValue: 'No courses logged yet' })
+                : t('legacy.emptyTitleOther', { defaultValue: 'No courses played yet' })}
+            </div>
+            <div style={{ marginTop: 4, fontSize: 12.5, color: A.MUTE, maxWidth: 260 }}>
+              {isOwnProfile
+                ? t('legacy.emptyBodyOwn', { defaultValue: 'Rate a course and it starts here.' })
+                : t('legacy.emptyBodyOther', { defaultValue: 'Nothing on the record yet.' })}
+            </div>
             {isOwnProfile && (
-              <button
-                onClick={() => navigate('/courses')}
-                className="px-5 py-2.5 rounded-full transition-colors min-h-[44px] active:scale-[0.97]"
-                style={{
-                  background: '#FFFFFF',
-                  border: '0.5px solid rgba(15,23,42,0.12)',
-                  color: '#0F172A',
-                  fontFamily: FONT_SANS,
-                  fontSize: 13,
-                  fontWeight: 700,
-                }}
-              >
-                Find Courses
-              </button>
+              <div style={{ marginTop: 10 }}>
+                <Action
+                  label={t('legacy.findCourses', { defaultValue: 'Find courses' })}
+                  onClick={() => navigate('/courses')}
+                />
+              </div>
             )}
           </div>
-        </div>
+        </Panel>
       </div>
     );
   }
 
-  const showCountries = countriesPlayed > 0;
-  const showAvg = avgRating !== null && avgRating > 0;
-  const cellCount = 1 + (showCountries ? 1 : 0) + (showAvg ? 1 : 0);
-
-  const cells = [
-    { label: 'Played', value: String(coursesPlayed), Icon: Trophy, show: true },
-    { label: countriesPlayed === 1 ? 'Country' : 'Countries', value: String(countriesPlayed), Icon: Globe, show: showCountries },
-    { label: 'Avg Rating', value: showAvg ? (avgRating as number).toFixed(1) : '', Icon: Star, show: showAvg },
-  ].filter(c => c.show);
+  const items = [
+    { label: t('legacy.played', { defaultValue: 'PLAYED' }), value: String(coursesPlayed) },
+    ...(countriesPlayed > 0
+      ? [{ label: t('legacy.countries', { defaultValue: 'COUNTRIES' }), value: String(countriesPlayed) }]
+      : []),
+    ...(top100Played != null && top100Played > 0
+      ? [{ label: t('legacy.top100', { defaultValue: 'TOP 100' }), value: String(top100Played) }]
+      : []),
+    ...(avgRating != null && avgRating > 0
+      ? [{ label: t('legacy.avgRating', { defaultValue: 'AVG RATING' }), value: avgRating.toFixed(1) }]
+      : []),
+  ];
 
   return (
     <motion.div
       initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={cn('', className)}
+      className={cn('px-4', className)}
     >
-      <Eyebrow label={eyebrowLabel} />
-
-      <div style={CARD_STYLE}>
-        {/* Compact horizontal 3-stat strip */}
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cellCount}, 1fr)` }}>
-          {cells.map((c, i, arr) => (
-            <div
-              key={c.label}
-              style={{
-                padding: '14px 8px',
-                textAlign: 'center',
-                borderRight: i < arr.length - 1 ? '0.5px solid rgba(15,23,42,0.06)' : 'none',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 5 }}>
-                <c.Icon size={12} strokeWidth={2.4} color="#F7931E" />
-                <span style={{ fontFamily: FONT_SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#64748B', textTransform: 'uppercase' }}>
-                  {c.label}
-                </span>
-              </div>
-              <div style={{ fontFamily: FONT_SANS, fontSize: 24, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-                {c.value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Panel kicker={kicker}>
+        <StatRow size={22} items={items} />
+      </Panel>
     </motion.div>
   );
 };

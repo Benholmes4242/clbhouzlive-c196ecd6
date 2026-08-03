@@ -1,43 +1,46 @@
 import React, { useState } from 'react';
-import { Flag, ArrowUpRight, ChevronDown } from 'lucide-react';
-import { formatDayMonthLongYearCommaGB } from '@/i18n/format';
+import { Flag, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
+import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { A, SANS, LABEL, NUM, Action, StatRow } from '@/features/courses/components/holes/analytical/tokens';
+import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
- * DossierCard — Direction B scannable row.
- * Collapsed: big rank + 48x48 thumb + name + date + compact rating + chevron.
- * Expanded: 4-bar breakdown + "View course" + "Full review".
- * Tap the row to toggle expand. Navigation only via the explicit CTAs.
+ * DossierCard - scannable rated-course row.
+ * Collapsed: rank + thumb + name + meta line + rating (+ Top 100 rank).
+ * Expanded: 2x2 banded sub-score grid, scoring stat row (own profile only),
+ * then the quiet actions. Tap the row to toggle; navigation via the actions.
+ *
+ * Scoring comes from a PAGE-LEVEL useUserAnalyticsCourses lookup passed in as
+ * `scoring`. The hook resolves auth.uid() server-side, so it is own-profile
+ * only - never render another member's row with the viewer's rounds.
  */
-
-const FONT_SANS =
-  '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
-
-const INK = '#0F172A';
-const INK_TERTIARY = '#94A3B8';
-const INK_QUATERNARY = '#CBD5E1';
-const AMBER = '#F7931E';
-const AMBER_DEEP = '#F7931E';
-const HAIRLINE_SOFT = '#EEF2F6';
 
 export interface DossierCardProps {
   course: RatedCourseData;
   rank: number;
   onCourseClick: (courseId: string) => void;
   onFullReview: (courseId: string, ratingId: string | null) => void;
+  /** Own-profile scoring for this course. Absent = render no scoring at all. */
+  scoring?: UserAnalyticsCourse | null;
+  onExpand?: (course: RatedCourseData, hasScoring: boolean) => void;
 }
 
-const splitRating = (rating: number) => {
-  const int = Math.floor(rating);
-  const dec = Math.round((rating * 10) % 10);
-  return { int, dec };
-};
-
-const formatEditorialDate = (iso: string | null): string => {
+const formatRowDate = (iso: string | null): string => {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return formatDayMonthLongYearCommaGB(d).toUpperCase();
+  return formatDayMonthYearShortGB(d);
+};
+
+/** Round FIRST, then branch, so -0.04 never renders "-0.0". */
+const fmtSigned = (v: number): string => {
+  const r = Math.round(v * 10) / 10;
+  if (r > 0) return `+${r.toFixed(1)}`;
+  if (r < 0) return `-${Math.abs(r).toFixed(1)}`;
+  return '0.0';
 };
 
 const DossierCard: React.FC<DossierCardProps> = ({
@@ -45,15 +48,25 @@ const DossierCard: React.FC<DossierCardProps> = ({
   rank,
   onCourseClick,
   onFullReview,
+  scoring,
+  onExpand,
 }) => {
+  const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
   const dateIso = course.review_date ?? course.last_played_at ?? null;
-  const dateText = formatEditorialDate(dateIso);
-  const { int, dec } = splitRating(course.rating_value);
+  const dateText = formatRowDate(dateIso);
   const reviewText = (course.review ?? '').trim();
   const hasReview = reviewText.length > 0;
 
-  const toggle = () => setExpanded((v) => !v);
+  const rounds = scoring?.rounds_count ?? null;
+  const avgToPar = scoring?.avg_to_par ?? null;
+  const hasScoring = !!rounds && rounds > 0;
+
+  const toggle = () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next) onExpand?.(course, hasScoring);
+  };
 
   const bars: { label: string; score: number | null }[] = [
     { label: 'DESIGN', score: course.design_score },
@@ -61,6 +74,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
     { label: 'CLUBHOUSE', score: course.clubhouse_score },
     { label: 'FACILITIES', score: course.facilities_score },
   ];
+
+  const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
+
+  const metaSegments = [
+    dateText || null,
+    where,
+    hasScoring
+      ? t('row.rounds', { count: rounds as number, defaultValue: '{{count}} rounds' })
+      : null,
+    hasScoring && avgToPar != null
+      ? t('row.avg', { avg: fmtSigned(avgToPar), defaultValue: '{{avg}} avg' })
+      : null,
+  ].filter(Boolean) as string[];
 
   return (
     <article
@@ -75,11 +101,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
         }
       }}
       style={{
-        background: '#FFFFFF',
-        borderBottom: '1px solid #F1F5F9',
+        background: A.PANEL,
         cursor: 'pointer',
-        fontFamily: FONT_SANS,
-        padding: '12px 16px',
+        fontFamily: SANS,
+        padding: '13px 20px',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
@@ -87,36 +112,31 @@ const DossierCard: React.FC<DossierCardProps> = ({
     >
       {/* HEADER (always visible) */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        {/* Rank number */}
+        {/* Rank */}
         <span
           style={{
-            fontFamily: FONT_SANS,
-            color: INK,
-            fontSize: 24,
-            fontWeight: 800,
+            ...NUM,
+            flex: '0 0 22px',
+            color: A.INK,
+            fontSize: 20,
             letterSpacing: '-0.04em',
             lineHeight: 1,
-            width: 30,
             textAlign: 'center',
-            flexShrink: 0,
-            fontVariantNumeric: 'tabular-nums',
           }}
         >
           {rank}
         </span>
 
-        {/* Thumb 48x48 */}
+        {/* Thumb */}
         <div
           style={{
             position: 'relative',
-            width: 48,
-            height: 48,
-            flexShrink: 0,
+            flex: '0 0 42px',
+            width: 42,
+            height: 42,
             borderRadius: 10,
             overflow: 'hidden',
-            background: course.thumbnail_image
-              ? `url(${course.thumbnail_image})`
-              : 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+            background: course.thumbnail_image ? `url(${course.thumbnail_image})` : A.TRACK,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -129,70 +149,51 @@ const DossierCard: React.FC<DossierCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FFFFFF',
-                opacity: 0.4,
+                color: A.DIM,
               }}
             >
-              <Flag size={20} />
+              <Flag size={16} />
             </div>
           )}
         </div>
 
-        {/* Middle */}
+        {/* Identity */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div
             style={{
-              fontFamily: FONT_SANS,
-              color: INK,
-              fontWeight: 700,
-              fontSize: 15.5,
+              color: A.INK,
+              fontWeight: 800,
+              fontSize: 14.5,
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
             }}
           >
             {course.name}
           </div>
-          {dateText && (
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.15em',
-                color: INK_TERTIARY,
-              }}
-            >
-              {dateText}
+          {metaSegments.length > 0 && (
+            <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
+              {metaSegments.join(' \u00B7 ')}
             </div>
           )}
         </div>
 
-        {/* Rating */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
-          }}
-        >
-          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>
-            {int}
-          </span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: INK_TERTIARY, letterSpacing: '-0.02em' }}>
-            .{dec}
-          </span>
+        {/* Rating - one figure, published rank beneath */}
+        <div style={{ flex: '0 0 46px', textAlign: 'right' }}>
+          <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
+            {course.rating_value.toFixed(1)}
+          </div>
+          {course.is_top100 && course.global_rank != null && (
+            <div style={{ ...LABEL, marginTop: 3 }}>{`#${course.global_rank}`}</div>
+          )}
         </div>
 
-        {/* Chevron */}
         <ChevronDown
           size={18}
-          color={INK_TERTIARY}
+          color={A.DIM}
           strokeWidth={2}
           style={{
             flexShrink: 0,
@@ -204,122 +205,61 @@ const DossierCard: React.FC<DossierCardProps> = ({
 
       {/* EXPANDED */}
       {expanded && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingLeft: 0 }}>
-          {/* Breakdown 2×2 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Sub-scores - shared band scale */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              columnGap: 12,
-              rowGap: 8,
+              columnGap: 16,
+              rowGap: 10,
             }}
           >
-            {bars.map(({ label, score }) => {
-              const pct = score != null ? (score / 10) * 100 : 0;
-              return (
-                <div
-                  key={label}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}
-                >
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: '0.15em',
-                      color: '#64748B',
-                    }}
-                  >
-                    {label}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 2,
-                        background: HAIRLINE_SOFT,
-                        borderRadius: 999,
-                        overflow: 'hidden',
-                        position: 'relative',
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          width: `${pct}%`,
-                          background: AMBER,
-                          borderRadius: 999,
-                        }}
-                      />
-                    </div>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: score != null ? INK : INK_QUATERNARY,
-                        fontVariantNumeric: 'tabular-nums',
-                        flexShrink: 0,
-                        minWidth: 18,
-                        textAlign: 'right',
-                      }}
-                    >
-                      {score != null ? score.toFixed(1) : '—'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            {bars.map(({ label, score }) =>
+              score != null ? <SubScoreBar key={label} label={label} score={score} /> : null,
+            )}
           </div>
 
-          {/* CTAs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-              onCourseClick(course.id);
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                color: AMBER_DEEP,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                background: 'transparent',
-                border: 0,
-                padding: 0,
-                cursor: 'pointer',
-              }}
-            >
-              View course
-              <ArrowUpRight size={12} strokeWidth={2.5} />
-            </button>
+          {/* Scoring - own profile with rounds only */}
+          {hasScoring && (
+            <StatRow
+              size={18}
+              items={[
+                {
+                  label: t('row.yourRounds', { defaultValue: 'YOUR ROUNDS' }),
+                  value: String(rounds),
+                },
+                ...(avgToPar != null
+                  ? [
+                      {
+                        label: t('row.avgToPar', { defaultValue: 'AVG TO PAR' }),
+                        value: fmtSigned(avgToPar),
+                        tone:
+                          Math.round(avgToPar * 10) / 10 > 0
+                            ? A.RED
+                            : Math.round(avgToPar * 10) / 10 < 0
+                              ? A.GREEN
+                              : A.INK,
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          )}
+
+          {/* Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <Action
+              align="left"
+              label={t('row.viewCourse', { defaultValue: 'View course' })}
+              onClick={() => onCourseClick(course.id)}
+            />
             {hasReview && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onFullReview(course.id, course.rating_id);
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  color: AMBER_DEEP,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                  background: 'transparent',
-                  border: 0,
-                  padding: 0,
-                  cursor: 'pointer',
-                }}
-              >
-                Full review
-                <ArrowUpRight size={12} strokeWidth={2.5} />
-              </button>
+              <Action
+                align="left"
+                label={t('row.fullReview', { defaultValue: 'Full review' })}
+                onClick={() => onFullReview(course.id, course.rating_id)}
+              />
             )}
           </div>
         </div>

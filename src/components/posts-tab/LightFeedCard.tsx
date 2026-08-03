@@ -33,6 +33,12 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import Pressable from '@/components/ui/Pressable';
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
+import { PostCourseBand } from '@/components/feed/PostCourseBand';
+import { CourseStatsSheet } from '@/components/feed/CourseStatsSheet';
+import { PostRoundCard } from '@/components/feed/PostRoundCard';
+import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
+import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import type { PostRound } from '@/hooks/feed/usePostRounds';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -83,6 +89,12 @@ export interface LightFeedCardProps {
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
   feedIndex?: number;
+  /** Batched course enrichment (resolved once at page level). */
+  courseContext?: PostCourseContext | null;
+  /** Batched round attached to this post (resolved once at page level). */
+  postRound?: PostRound | null;
+  /** Opens the attached round's scorecard. */
+  onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
 interface CaptionBlockProps {
@@ -215,9 +227,13 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   onFollow,
   currentUserId,
   feedIndex,
+  courseContext,
+  postRound,
+  onRoundTap,
 }) => {
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
@@ -425,6 +441,27 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         onReadReview={post.isReview && reviewCourseId ? handleReadReview : undefined}
       />
 
+      {/* Attached round — scorecard block sits ABOVE media (parity with Clubhouse) */}
+      {postRound && (
+        <PostRoundCard
+          round={postRound}
+          postId={post.id}
+          notability={post.roundNotability ?? null}
+          courseName={post.courseName ?? null}
+          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
+          crown={
+            postRound.crown
+              ? {
+                  category: crownCategoryLabel(postRound.crown.category),
+                  previousHolderName: postRound.crown.previousHolderName,
+                  margin: postRound.crown.margin != null ? String(postRound.crown.margin) : null,
+                }
+              : null
+          }
+          onTap={onRoundTap ? () => onRoundTap(post, postRound) : undefined}
+        />
+      )}
+
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
@@ -538,129 +575,69 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         ) : null}
       </div>
 
-      {/* Course eyebrow + location */}
-      {post.courseName && (() => {
+      {/* Course band + footer — same primitive as the Clubhouse card */}
+      {(() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
-        const handleCourseTap = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          onCourse?.(post);
-        };
-        const pill = post.courseRating != null ? (
-          <button
-            type="button"
-            onClick={handleCourseTap}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-              background: 'rgba(15,23,42,0.05)',
-              border: '1px solid rgba(15,23,42,0.08)',
-              padding: '3px 9px 3px 4px', borderRadius: 999,
-              cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
-            }}
-          >
-            <img
-              src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-              alt=""
-              style={{
-                width: 16, height: 16, flexShrink: 0, objectFit: 'contain',
-              }}
-              aria-hidden="true"
-            />
-            <span style={{ fontSize: 11, fontWeight: 800, color: T100, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-              {formatRatingValue(post.courseRating)}
-            </span>
-          </button>
-        ) : null;
-        const nameEl = post.courseId ? (
-          <button
-            type="button"
-            onClick={handleCourseTap}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              textAlign: 'left',
-              fontSize: 13,
-              fontWeight: 700,
-              color: T100,
-              cursor: 'pointer',
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {post.courseName}
-          </button>
-        ) : (
+        const suppressRating = Boolean(post.isReview) && reviewRating != null;
+        const hasCourse = Boolean(post.courseName || courseContext);
+
+        const actionsRow = (
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: T100,
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 14px 12px',
             }}
           >
-            {post.courseName}
+            <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} theme="light" />
+            <FooterButton
+              icon={Heart}
+              label={formatCount(likeCount)}
+              active={liked}
+              onClick={() => onLike(post, effectiveActor)}
+              activeColor={AMBER}
+              haptic={!liked ? 'selection' : 'none'}
+            />
+            <FooterButton
+              icon={MessageCircle}
+              label={formatCount(commentCount)}
+              onClick={() => onComment(post, effectiveActor)}
+            />
+            <FooterButton icon={Share} onClick={() => onShare(post)} />
           </div>
         );
+
+        if (!hasCourse) {
+          return <div style={{ borderTop: `0.5px solid ${LINE}` }}>{actionsRow}</div>;
+        }
+
         return (
-          <div style={{ padding: '10px 14px 10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              {nameEl}
-              {pill}
-            </div>
-            {courseLocation && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: 11,
-                  color: T60,
-                  marginTop: 2,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <MapPin size={10} color={T40} style={{ marginRight: 3, flexShrink: 0 }} />
-                {courseLocation}
-              </div>
+          <>
+            <PostCourseBand
+              courseName={post.courseName}
+              courseLocation={courseLocation || null}
+              courseRating={suppressRating ? null : post.courseRating ?? null}
+              ctx={courseContext ?? null}
+              onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
+              actions={actionsRow}
+              surface="solid"
+            />
+            {post.courseId && statsOpen && (
+              <CourseStatsSheet
+                open={statsOpen}
+                onClose={() => setStatsOpen(false)}
+                courseId={post.courseId}
+                courseName={post.courseName}
+                courseLocation={courseLocation || null}
+                courseRating={post.courseRating ?? null}
+              />
             )}
-          </div>
+          </>
         );
       })()}
-
-      {/* Footer action bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 14px 12px',
-          borderTop: `0.5px solid ${LINE}`,
-        }}
-      >
-        <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} theme="light" />
-        <FooterButton
-          icon={Heart}
-          label={formatCount(likeCount)}
-          active={liked}
-          onClick={() => onLike(post, effectiveActor)}
-          activeColor={AMBER}
-          haptic={!liked ? 'selection' : 'none'}
-        />
-        <FooterButton
-          icon={MessageCircle}
-          label={formatCount(commentCount)}
-          onClick={() => onComment(post, effectiveActor)}
-        />
-        <FooterButton icon={Share} onClick={() => onShare(post)} />
-      </div>
     </article>
   );
 };

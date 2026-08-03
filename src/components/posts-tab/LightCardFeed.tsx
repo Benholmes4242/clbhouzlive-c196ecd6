@@ -17,6 +17,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
+import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
@@ -74,6 +76,13 @@ export interface LightCardFeedProps {
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
+  /** Batched course enrichment, resolved once in PostsTabContent. */
+  courseContextMap?: Map<string, PostCourseContext>;
+  resolveCourseId?: (post: FeedPost) => string | null;
+  /** post.id -> whs score id, and score id -> round (both batched at page level). */
+  postScoreIdMap?: Map<string, string>;
+  postRoundMap?: Map<string, PostRound>;
+  onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
 export const LightCardFeed: React.FC<LightCardFeedProps> = ({
@@ -94,6 +103,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   bottomPadding = 32,
   onFollow,
   currentUserId,
+  courseContextMap,
+  resolveCourseId,
+  postScoreIdMap,
+  postRoundMap,
+  onRoundTap,
 }) => {
   // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
@@ -442,6 +456,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 onFollow={onFollow}
                 currentUserId={currentUserId}
                 feedIndex={index}
+                courseContext={(() => {
+                  const cid = resolveCourseId?.(post) ?? post.courseId ?? null;
+                  return cid ? courseContextMap?.get(cid) ?? null : null;
+                })()}
+                postRound={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? postRoundMap?.get(sid) ?? null : null;
+                })()}
+                onRoundTap={onRoundTap}
               />
             )}
           </LightItemGate>
@@ -467,6 +490,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       onShare,
       onFollow,
       currentUserId,
+      courseContextMap,
+      resolveCourseId,
+      postScoreIdMap,
+      postRoundMap,
+      onRoundTap,
     ],
   );
 
