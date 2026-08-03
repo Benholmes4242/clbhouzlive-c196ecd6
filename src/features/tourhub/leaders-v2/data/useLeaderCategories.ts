@@ -540,8 +540,10 @@ async function fetchSeasonRankingsCategories(tour: TourId): Promise<LeaderCatego
   return { synced: categories.length > 0, categories, year };
 }
 
-export function useLeaderCategories(tour: TourId) {
+export function useLeaderCategories(tour: TourId, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   return useQuery<LeaderCategoriesResult>({
+    enabled,
     queryKey: ['leaders-v2', 'categories', tour, currentSeasonYear()],
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
