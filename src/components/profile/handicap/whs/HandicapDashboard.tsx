@@ -63,35 +63,36 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
             ownerFirstName={ownerFirstName}
           />
         )}
-        {activeSubtab === 'trends' && (
-          <TrendsView
-            connectionId={connection.id}
-            userId={userId}
-            currentHandicap={currentHandicap}
-            readOnly={readOnly}
-            ownerFirstName={ownerFirstName}
-          />
+        {activeSubtab === 'form' && (
+          <>
+            <TrendsView
+              connectionId={connection.id}
+              userId={userId}
+              currentHandicap={currentHandicap}
+              readOnly={readOnly}
+              ownerFirstName={ownerFirstName}
+            />
+            <RecordsView
+              connectionId={connection.id}
+              userId={userId}
+              currentHandicap={currentHandicap}
+              readOnly={readOnly}
+              ownerFirstName={ownerFirstName}
+            />
+          </>
         )}
-        {activeSubtab === 'records' && (
-          <RecordsView
-            connectionId={connection.id}
-            userId={userId}
-            currentHandicap={currentHandicap}
-            readOnly={readOnly}
-            ownerFirstName={ownerFirstName}
-          />
+        {activeSubtab === 'circle' && (
+          <>
+            <FriendsView
+              userId={userId}
+              currentHandicap={currentHandicap}
+              connectionId={connection.id}
+              readOnly={readOnly}
+            />
+            <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
+          </>
         )}
-        {activeSubtab === 'friends' && (
-          <FriendsView
-            userId={userId}
-            currentHandicap={currentHandicap}
-            connectionId={connection.id}
-            readOnly={readOnly}
-          />
-        )}
-        {activeSubtab === 'legends' && (
-          <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
-        )}
+
       </div>
 
       {!readOnly && (
