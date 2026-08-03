@@ -4,6 +4,10 @@ export interface WhsConnection {
   membership_number: string;
   last_synced_at: string | null;
   last_sync_status: string | null;
+  /** Raw error text from the last failed sync, truncated to 500 chars. */
+  last_sync_error: string | null;
+  /** Reset to 0 on every successful sync. */
+  consecutive_failures: number;
   initial_sync_complete: boolean;
   created_at: string;
   /** whs_provider enum value, e.g. 'england_golf'. */
