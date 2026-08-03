@@ -1,164 +1,89 @@
 import React from 'react';
-import { ChevronRight, Check } from 'lucide-react';
-import {
-  INK, DIM, FAINT, HAIR, GREEN, GREEN_BG, FONT,
-} from './approachStages';
+import { INK, MUTE, AMBER_DEEP, LABEL, H1, H1_SUB, BORDER } from './designTokens';
+import { Panel, PanelGap, PrimaryButton, Action, FooterBar, CopyBlock } from './Primitives';
 
 interface Props {
   onPickCountry: () => void;
   onDecline?: () => void;
 }
 
-const FEATURES = [
-  { title: 'Live official index',   sub: 'Moves the moment counting rounds land' },
-  { title: 'Full score history',    sub: 'All your rounds imported on day one' },
-  { title: 'Friends on clbhouz',    sub: 'See who from your club is already here' },
+const ROWS: Array<{ when: string; title: string; sub: string }> = [
+  {
+    when: 'Day one',
+    title: 'Every round England Golf holds for you comes across',
+    sub: 'However far back it goes',
+  },
+  {
+    when: 'Within hours',
+    title: 'Your index moves as counting rounds land',
+    sub: 'You never type a score in',
+  },
+  {
+    when: 'Straight away',
+    title: 'You can see which holes are costing you shots',
+    sub: 'And where rounds tend to slip',
+  },
+  {
+    when: 'Straight away',
+    title: 'Friends from your club who are already here',
+    sub: 'Compare your game to any of them',
+  },
 ];
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
-  return (
-    <div
-      className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
-    >
-      {/* Middle region - centered cluster */}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          gap: 28,
-        }}
-      >
-        {/* Headline */}
-        <div>
-          <h1
+/**
+ * SCREEN 1 - INTRO. Also the decline surface: onDecline hides the connect chip,
+ * which is behaviour the old empty state owned and must survive.
+ */
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => (
+  <>
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
+      <CopyBlock kicker="England Golf">
+        <h1 style={{ ...H1, fontSize: 25, letterSpacing: '-0.025em' }}>
+          Connect once.
+          <br />
+          Then it looks after itself.
+        </h1>
+        <p style={H1_SUB}>
+          Your official index and every round England Golf holds for you, in clbhouz in about a minute.
+        </p>
+      </CopyBlock>
+
+      <Panel kicker="What changes">
+        {ROWS.map((r, i) => (
+          <div
+            key={r.title}
             style={{
-              fontSize: 40,
-              fontWeight: 900,
-              letterSpacing: '-0.035em',
-              lineHeight: 1.05,
-              color: INK,
-              margin: 0,
+              display: 'flex',
+              gap: 12,
+              alignItems: 'baseline',
+              padding: i === 0 ? '0 0 13px' : '13px 0',
+              borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
             }}
           >
-            One connection.<br />
-            Every round, <span style={{ color: GREEN }}>live.</span>
-          </h1>
-          <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.55,
-              color: DIM,
-              margin: '12px 0 0',
-              maxWidth: 320,
-            }}
-          >
-            Link your official WHS index once. From then on it moves the moment your counting rounds land.
-          </p>
-        </div>
-
-        {/* Feature list */}
-        <div>
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.title}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: '16px 0',
-                borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
-              }}
-            >
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 12,
-                  background: GREEN_BG,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Check size={15} color={GREEN} strokeWidth={3} />
+            <div style={{ ...LABEL, color: AMBER_DEEP, width: 78, flexShrink: 0 }}>{r.when}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, lineHeight: 1.35 }}>
+                {r.title}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: INK }}>{f.title}</div>
-                <div style={{ fontSize: 13.5, color: DIM, marginTop: 2 }}>{f.sub}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-
-      {/* Pinned CTA */}
-      <div style={{ padding: '14px 0 8px' }}>
-        <button
-          type="button"
-          onClick={onPickCountry}
-          style={{
-            width: '100%',
-            minHeight: 56,
-            borderRadius: 16,
-            background: INK,
-            color: '#fff',
-            border: 'none',
-            fontFamily: FONT,
-            fontSize: 16.5,
-            fontWeight: 800,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            cursor: 'pointer',
-            boxShadow: '0 8px 22px rgba(15,23,42,0.22)',
-          }}
-        >
-          Tee off {'\u00B7'} Choose country
-          <ChevronRight size={17} strokeWidth={2.4} />
-        </button>
-
-        {onDecline && (
-          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <button
-              type="button"
-              onClick={onDecline}
-              style={{
-                minHeight: 44,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: FONT,
-                fontSize: 13,
-                fontWeight: 600,
-                color: DIM,
-              }}
-            >
-              I don't track a handicap
-            </button>
-            <div
-              style={{
-                fontSize: 11.5,
-                color: FAINT,
-                lineHeight: 1.45,
-                maxWidth: 260,
-                marginTop: 2,
-              }}
-            >
-              Hides the Connect HCP button from your header. Turn it back on anytime in Settings.
+              <div style={{ fontSize: 11.5, color: MUTE, marginTop: 3 }}>{r.sub}</div>
             </div>
           </div>
-        )}
-      </div>
+        ))}
+      </Panel>
+      <PanelGap />
     </div>
-  );
-};
+
+    <FooterBar>
+      <PrimaryButton onClick={onPickCountry}>Start with your country</PrimaryButton>
+      {onDecline ? (
+        <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center' }}>
+          <Action onClick={onDecline} color={MUTE}>
+            I don't hold an official handicap
+          </Action>
+        </div>
+      ) : null}
+    </FooterBar>
+  </>
+);
 
 export default EmptyStateScreen;
