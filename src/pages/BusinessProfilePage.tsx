@@ -1,7 +1,7 @@
 /**
- * BusinessProfilePage — Phase 1 rebuild
+ * BusinessProfilePage - Phase 1 rebuild
  * Immersive header (mirrors personal profile, business-appropriate),
- * 3 tabs: Posts · About · Team (Team is conditional on ≥1 public member).
+ * 3 tabs: Posts . About . Team (Team is conditional on >=1 public member).
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -44,7 +44,7 @@ import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-// FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
+// FloatingPageHeader removed (H3) - chrome now driven by ChromeIsland registry.
 
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -109,7 +109,7 @@ function buildCategoryLocation(category: string | null, country: string | null, 
   if (region) locBits.push(region);
   else if (city) locBits.push(city);
   if (locBits.length) parts.push(locBits.join(', '));
-  return parts.length ? parts.join(' · ') : null;
+  return parts.length ? parts.join(' . ') : null;
 }
 
 // Normalize URL with protocol
@@ -208,7 +208,7 @@ const BusinessProfilePage: React.FC = () => {
   const isOwner = membership?.canManage;
   const isFollowing = cachedFollowing ?? false;
 
-  // Conditional Team tab — only when ≥1 public member exists
+  // Conditional Team tab - only when >=1 public member exists
   const publicTeamCount = useMemo(
     () => (teamMembers ?? []).filter(m => m.is_public === true).length,
     [teamMembers]
@@ -220,7 +220,7 @@ const BusinessProfilePage: React.FC = () => {
     if (activeTab === 'team' && !showTeamTab) setActiveTab('posts');
   }, [activeTab, showTeamTab]);
 
-  // Track profile visit — pass a real source from navigation state / query.
+  // Track profile visit - pass a real source from navigation state / query.
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const visitSource = (() => {
@@ -287,7 +287,7 @@ const BusinessProfilePage: React.FC = () => {
     return () => window.removeEventListener('resize', checkClamped);
   }, [business?.description]);
 
-  // ───── image upload ─────
+  // ----- image upload -----
   const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -319,7 +319,7 @@ const BusinessProfilePage: React.FC = () => {
     }
   };
 
-  // ───── actions ─────
+  // ----- actions -----
   const handleFollowToggle = () => {
     if (!user?.id || !business?.id || !viewerActorId || isOwnBusiness) return;
     toggleFollow.mutate({
@@ -352,12 +352,12 @@ const BusinessProfilePage: React.FC = () => {
     toast.success('Copied to clipboard');
   };
 
-  // ───── early returns ─────
+  // ----- early returns -----
   if (authLoading || isLoading) {
     return <ProfileSkeleton />;
   }
 
-  // Sentinel string from useBusinessProfile — keep in sync.
+  // Sentinel string from useBusinessProfile - keep in sync.
   const isNotFound = error instanceof Error && error.message === 'Business not found';
   if (error || !business) {
     return (
@@ -416,7 +416,7 @@ const BusinessProfilePage: React.FC = () => {
     business.category, business.country, business.region, business.city
   );
 
-  // (Contact/social icons row removed — surfaced via action rows + About tab)
+  // (Contact/social icons row removed - surfaced via action rows + About tab)
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
@@ -446,7 +446,7 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
-      {/* ───── Hero (full-bleed) ───── */}
+      {/* ----- Hero (full-bleed) ----- */}
       <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
         <div
           className="relative w-full overflow-hidden"
@@ -456,7 +456,7 @@ const BusinessProfilePage: React.FC = () => {
             paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
-          {/* Cover image layer — locked to 3:2 of full width so what the user
+          {/* Cover image layer - locked to 3:2 of full width so what the user
               framed in the editor is exactly what shows. Content below may
               extend past the image height over the dark background. */}
           {heroUrl ? (
@@ -503,7 +503,7 @@ const BusinessProfilePage: React.FC = () => {
               pointerEvents: 'none',
             }}
           />
-          {/* Whole-cover tap target — owner only */}
+          {/* Whole-cover tap target - owner only */}
           {isOwner && (
             <button
               type="button"
@@ -536,8 +536,8 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* H3: header rendered globally by ChromeIsland (business 3-seg → back '/clubhouse'). */}
 
-        {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
-        {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}
+        {/* Avatar (squircle) - owner: tap to upload; visitor: tap to lightbox */}
+        {/* Canon exception: 2px bg-background die-cut ring over the cover photo - */}
         {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <div
@@ -578,7 +578,7 @@ const BusinessProfilePage: React.FC = () => {
               </div>
             )}
 
-            {/* Full-rect transparent tap target — matches cover-photo pattern. */}
+            {/* Full-rect transparent tap target - matches cover-photo pattern. */}
             {isOwner && !uploadingLogo && (
               <button
                 type="button"
@@ -614,7 +614,7 @@ const BusinessProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* ───── Identity ───── */}
+      {/* ----- Identity ----- */}
       <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
         <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
           {business.name}
@@ -740,7 +740,7 @@ const BusinessProfilePage: React.FC = () => {
 
       </div>
 
-      {/* ───── Action rows ───── */}
+      {/* ----- Action rows ----- */}
       {(() => {
         // Secondary action defs
         type SecKey = 'website' | 'call' | 'directions' | 'email' | 'book';
@@ -929,7 +929,7 @@ const BusinessProfilePage: React.FC = () => {
         );
       })()}
 
-      {/* ───── Club courses (club-only): one panel per course ───── */}
+      {/* ----- Club courses (club-only): one panel per course ----- */}
       {business.club_id && courses.length > 0 && (
         <div className="px-4">
           {courses.map((course, i) => (
@@ -951,7 +951,7 @@ const BusinessProfilePage: React.FC = () => {
 
 
 
-      {/* ───── Tabs ───── */}
+      {/* ----- Tabs ----- */}
       <section className="px-4 bg-background">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <FilterChips
@@ -970,7 +970,7 @@ const BusinessProfilePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ───── Tab content ───── */}
+      {/* ----- Tab content ----- */}
       <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
         {renderTab()}
       </div>
