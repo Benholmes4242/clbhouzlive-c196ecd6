@@ -167,8 +167,8 @@ const Nine: React.FC<{
   scoreLabel: string;
 }> = ({ rows, label, withField, scoreLabel }) => {
   const { t } = useTranslation(['courses']);
-  const par = rows.reduce((s, h) => s + (h.par ?? 0), 0);
-  const strokes = rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0);
+  const { par, strokes } = nineSummary(rows);
+
   const fieldRel = withField
     ? rows.reduce(
         (s, h) => s + (h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : 0),
