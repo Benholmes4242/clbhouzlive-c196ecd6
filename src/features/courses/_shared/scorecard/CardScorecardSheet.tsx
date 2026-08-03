@@ -593,7 +593,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
   if (import.meta.env.DEV) {
     // The visible sum must agree with the hero/stat gross. A mismatch means the
-    // nines and the round totals were filtered differently — loud, not silent.
+    // nines and the round totals were filtered differently - loud, not silent.
     if (totals.played && cardGross !== totals.gross) {
       console.warn('[CardScorecardSheet] gross mismatch', { cardGross, gross: totals.gross });
     }
@@ -754,7 +754,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     )}
 
                     {/*
-                      TOTALS BLOCK — a member of the HOLE / PAR / YOU family, not
+                      TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
                       a summary line floating beneath it. Two rows on the same
                       NINE_GRID: row 1 carries TOTAL, the OUT and IN segments and
                       the gross in the totals column, directly under the nine
