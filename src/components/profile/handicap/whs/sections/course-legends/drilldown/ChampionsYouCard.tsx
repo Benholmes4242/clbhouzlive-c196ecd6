@@ -8,7 +8,7 @@ import { ScopeSegment } from '@/components/shared/ScopeSegment';
 import { YouAtThisClubStrip } from './YouAtThisClubStrip';
 import { CrownCabinet, type CabinetSlot } from './CrownCabinet';
 import { CourseRivalryLine } from './CourseRivalryLine';
-import type { WindowToggleVariant } from '../CourseLegendsSection';
+import type { WindowToggleVariant } from '../types';
 
 interface Props {
   userId: string | undefined;

@@ -5,3 +5,5 @@ export interface CourseSelection {
   courseCountry: string | null;
   courseType: string | null;
 }
+
+export type WindowToggleVariant = 'dark' | 'light';

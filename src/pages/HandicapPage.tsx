@@ -32,7 +32,11 @@ import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { CompareOwnerCTA } from '@/components/profile/handicap/whs/sections/header/CompareOwnerCTA';
 import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
-import { firstName } from '@/pages/rivalry-page/_shared/helpers';
+import { firstName as canonicalFirstName } from '@/lib/whs/utils/initials';
+
+/** Local wrapper: the canonical helper returns '' for empty input. */
+const firstName = (n: string | null | undefined): string =>
+  canonicalFirstName((n ?? '').trim()) || 'Player';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';

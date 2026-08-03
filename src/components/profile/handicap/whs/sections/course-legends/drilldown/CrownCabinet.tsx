@@ -2,7 +2,7 @@ import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
-import type { WindowToggleVariant } from '../CourseLegendsSection';
+import type { WindowToggleVariant } from '../types';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
 

@@ -341,7 +341,7 @@ function renderPush(r: OutboxRow, badgeMap: Map<string, any>) {
       return {
         title,
         body,
-        data: { route: `/handicap/rivalry/${p.rival_user_id}` },
+        data: { route: `/handicap?compare=${p.rival_user_id}` },
       };
     }
     case "status_at_risk": {
