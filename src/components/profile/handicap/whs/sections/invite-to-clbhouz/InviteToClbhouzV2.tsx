@@ -6,7 +6,7 @@ import {
 } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import InviteCard from './InviteCard';
-import InviteQuestCard from './InviteQuestCard';
+import InviteProgressPanel from './InviteProgressPanel';
 import SentInvitesSheet from './SentInvitesSheet';
 
 interface Props {
@@ -50,7 +50,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="INVITE FRIENDS" />
         <div style={{ padding: '0 16px' }}>
-          <InviteQuestCard sentCount={sentCount} onClick={() => setSheetOpen(true)} />
+          <InviteProgressPanel sentCount={sentCount} onClick={() => setSheetOpen(true)} />
         </div>
         <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
       </section>
@@ -62,7 +62,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       <DarkSectionHeader eyebrow="INVITE FRIENDS" />
 
       <div style={{ padding: '0 16px' }}>
-        <InviteQuestCard sentCount={sentCount} onClick={() => setSheetOpen(true)} />
+        <InviteProgressPanel sentCount={sentCount} onClick={() => setSheetOpen(true)} />
       </div>
 
       {!friendsLoading && invitable.length > 0 && (

@@ -4,8 +4,7 @@ import { useHandicapTrend } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
-import FriendsView from './views/FriendsView';
-import LegendsView from './views/LegendsView';
+import CircleView from './views/CircleView';
 
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
 import { resolveHandicapSubtab, type HandicapSubtab } from './types';
@@ -72,15 +71,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           />
         )}
         {activeSubtab === 'circle' && (
-          <>
-            <FriendsView
-              userId={userId}
-              currentHandicap={currentHandicap}
-              connectionId={connection.id}
-              readOnly={readOnly}
-            />
-            <LegendsView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
-          </>
+          <CircleView userId={userId} readOnly={readOnly} ownerFirstName={ownerFirstName} />
         )}
 
       </div>

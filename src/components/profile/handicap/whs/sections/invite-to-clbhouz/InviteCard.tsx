@@ -1,5 +1,5 @@
 import React from 'react';
-import { Send } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { callCreateInvite } from '@/lib/whs/api';
@@ -127,13 +127,23 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         aria-label={`Invite ${firstName(friend.friend_name)} to clbhouz`}
         style={{
           flexShrink: 0,
-          width: 40, height: 40, borderRadius: 11, border: 'none',
-          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 2,
+          padding: 0,
+          background: 'none',
+          border: 'none',
           cursor: 'pointer',
+          fontFamily: FONT_GEIST,
+          fontSize: 10,
+          fontWeight: 800,
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: '#F7931E',
         }}
       >
-        <Send size={16} color="#1A0F02" strokeWidth={2.2} />
+        Invite
+        <ChevronRight size={13} strokeWidth={2.6} />
       </button>
     </div>
   );
