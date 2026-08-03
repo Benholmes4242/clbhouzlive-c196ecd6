@@ -22798,6 +22798,14 @@ export type Database = {
         Args: { p_connection_id: string }
         Returns: boolean
       }
+      whs_imported_counts: {
+        Args: { p_connection_id: string }
+        Returns: {
+          courses: number
+          friends: number
+          rounds: number
+        }[]
+      }
       whs_score_publicly_visible: {
         Args: { p_score_id: string }
         Returns: boolean
