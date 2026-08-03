@@ -192,6 +192,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   viewerUserId,
 }) => {
   const greeting = useMemo(() => getGreeting(), []);
+  const { t } = useTranslation('common');
 
   const subheadOwn = useMemo(() => {
     const dateStr = formatWeekdayDayMonthShortGB(new Date());
@@ -200,16 +201,18 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       : `${greeting} · ${dateStr}`;
   }, [greeting, displayName]);
 
-  const tabs = useMemo(() => {
-    const all = [
-      { id: 'today', label: 'Today' },
-      { id: 'trends', label: 'Form' },
-      { id: 'records', label: 'Rounds' },
-      { id: 'friends', label: 'Friends' },
-      { id: 'legends', label: 'Compete' },
-    ];
-    return readOnly ? all.filter(t => t.id !== 'friends') : all;
-  }, [readOnly]);
+  // Three tabs. Circle remains available in friend view; its owner-only
+  // sections (invite, personal leaderboard affordances) are suppressed by
+  // `readOnly` inside the sections themselves.
+  const tabs = useMemo(
+    () => [
+      { id: 'today', label: t('handicap.tab.today', 'Today') },
+      { id: 'form', label: t('handicap.tab.form', 'Form') },
+      { id: 'circle', label: t('handicap.tab.circle', 'Circle') },
+    ],
+    [t]
+  );
+
 
   return (
     <>
