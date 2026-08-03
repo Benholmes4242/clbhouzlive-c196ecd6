@@ -29,7 +29,6 @@
     }
   },
   "action": {
-
     "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",
@@ -99,7 +98,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -116,8 +115,8 @@
   "connectGhost": {
     "eyebrow": "THIS COULD BE YOURS",
     "cta": "Connect your handicap",
-    "footnote": "TAKES 30 SECONDS · WE NEVER POST ON YOUR BEHALF",
-    "slimCta": "Connect →",
+    "footnote": "TAKES 30 SECONDS \u00b7 WE NEVER POST ON YOUR BEHALF",
+    "slimCta": "Connect \u2192",
     "dismissA11y": "Dismiss",
     "holes": {
       "headline": "See exactly where your shots go here",
@@ -143,7 +142,7 @@
   "verifiedAccounts": {
     "title": "Verified accounts",
     "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
-    "cta": "Contact support →",
+    "cta": "Contact support \u2192",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",
     "settingsRowSubtitle": "How verification works"
@@ -248,5 +247,51 @@
     "played": "played",
     "levelNinety": "Level 90d",
     "deltaNinety": "{{delta}} 90d"
+  },
+  "business": {
+    "reach": {
+      "rated": "RATED",
+      "ratedFrom": "from {{count}}",
+      "rounds": "ROUNDS",
+      "followers": "FOLLOWERS",
+      "posts": "POSTS",
+      "line": "{{followers}} followers . {{posts}} posts",
+      "followersLine": "{{count}} followers",
+      "postsLine": "{{count}} posts"
+    },
+    "course": {
+      "kicker": "HOME COURSE",
+      "kickerPlural": "COURSES",
+      "fromRounds": "from {{count}} rounds",
+      "playsTo": "PLAYS TO",
+      "harderThan": "harder than {{pct}}%",
+      "easierThan": "easier than {{pct}}%",
+      "middleOfPack": "middle of the pack",
+      "hardest": "HARDEST",
+      "parN": "par {{n}}",
+      "rankOn": "{{list}} RANK",
+      "footLine": "Toughest hole plays {{toPar}} . {{count}} members have played here",
+      "footHardest": "Toughest hole plays {{toPar}}",
+      "footMembers": "{{count}} members have played here",
+      "open": "Open course"
+    },
+    "about": {
+      "contact": "CONTACT",
+      "location": "LOCATION",
+      "follow": "FOLLOW",
+      "directions": "Get directions"
+    },
+    "team": {
+      "kicker": "TEAM",
+      "count_one": "{{count}} person",
+      "count_other": "{{count}} people",
+      "member": "Team member",
+      "role": {
+        "owner": "Owner",
+        "admin": "Manager",
+        "editor": "Editor",
+        "analyst": "Analyst"
+      }
+    }
   }
 }
