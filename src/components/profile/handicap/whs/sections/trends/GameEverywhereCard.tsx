@@ -129,9 +129,18 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 18 }}>
             {rings.map((row) => (
-              <Ring key={row.key} row={row} color={colorFor(row)} t={t} />
+              <div key={row.key} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <MiniRing
+                  value={row.data.avg_over}
+                  max={ringMax}
+                  label={t('holes.gameEverywhere.parNs', { n: row.parN })}
+                  sub={t('holes.gameEverywhere.nHoles', { count: row.data.holes_played })}
+                  tone={toneFor(row)}
+                />
+              </div>
             ))}
           </div>
+
           {worst && best && worst !== best && (
             <div
               style={{
