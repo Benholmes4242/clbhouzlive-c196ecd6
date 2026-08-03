@@ -84,10 +84,7 @@ export const RoundShapePanel: React.FC<Props> = ({ readOnly = false }) => {
             {t('holes.gameEverywhere.s2Title')}
           </span>
           <span style={{ ...LABEL_STYLE, whiteSpace: 'nowrap' }}>
-            {t('holes.gameEverywhere.nRoundsSample', {
-              defaultValue: '{{count}} ROUNDS',
-              count: data.rounds,
-            })}
+            {t('holes.gameEverywhere.nRoundsSample', { count: data.rounds })}
           </span>
         </div>
 
