@@ -375,6 +375,9 @@
         "invitedCount_other": "{{count}} invited",
         "nextAt": "Next at {{count}}"
       }
+    },
+    "hero": {
+      "chartSample": "{{count}} points, 90 days"
     }
   }
 }
