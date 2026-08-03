@@ -915,7 +915,17 @@
         "ballStriking": "Ball Striking",
         "shortGame": "Short Game",
         "strokesGained": "Strokes Gained"
-      }
+      },
+      "sub": "{{year}} . {{tour}} . from {{events}} events",
+      "subNoEvents": "{{year}} . {{tour}}",
+      "rankFootnote": "Ranks are among {{count}} ranked PGA Tour players this season.",
+      "ordinal": {
+        "st": "{{n}}st",
+        "nd": "{{n}}nd",
+        "rd": "{{n}}rd",
+        "th": "{{n}}th"
+      },
+      "ordinalTied": "T{{ordinal}}"
     }
   },
   "tour": {
