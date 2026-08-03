@@ -210,12 +210,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           ))
         ) : (
           (() => {
-            const rowAbove = cohorts.rowAbove;
-            const gap =
-              selfRow && rowAbove && selfRow.friend_handicap_index != null && rowAbove.friend_handicap_index != null
-                ? Number((rowAbove.friend_handicap_index - selfRow.friend_handicap_index).toFixed(1))
-                : null;
-            const catchName = rowAbove ? firstName(rowAbove.friend_name) : null;
+
 
             return cohorts.topFive.map((entry) => {
               const activeIdx = cohorts.active.findIndex((e) => e === entry);
