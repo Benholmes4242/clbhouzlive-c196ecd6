@@ -45,5 +45,69 @@
     "primer1": "Stableford scores each hole on points rather than strokes, rewarding good holes and capping the damage of bad ones. A round of 36 points means you played exactly to your handicap.",
     "primer2": "Your index moves on your best 8 of 20 differentials. Stableford is a different lens on the same rounds, and the distribution shows what the index number alone hides.",
     "primer3": "A high in-the-zone count means you reach your ceiling often. A high solid count means you are consistent. A high off-day count means there is headroom to improve."
+  },
+  "streaks": {
+    "kicker": "STREAKS",
+    "headlineNone": "Nothing running",
+    "headlineOne": "One streak running",
+    "headlineMany": "{{count}} streaks running",
+    "longestEver": "Longest ever \u00b7 {{n}} {{unit}} \u00b7 {{name}}",
+    "sectionRunning": "Running now",
+    "sectionBroken": "Broken",
+    "sectionNotStarted": "Not started",
+    "fromYourBest": "{{n}} from your best of {{best}}",
+    "atYourBest": "At your best",
+    "brokenLine": "Best {{n}} {{unit}} \u00b7 broken {{when}}",
+    "bestLine": "Best {{n}} {{unit}}",
+    "notStartedYet": "Not started yet",
+    "freezeHeld_one": "{{count}} freeze held",
+    "freezeHeld_other": "{{count}} freezes held",
+    "freezeRefill": "Next refill {{when}}",
+    "freezeTotal_one": "{{count}} freeze",
+    "freezeTotal_other": "{{count}} freezes",
+    "closing": "A streak ends the first round it is not extended. Nothing is lost \u2014 your best stays on the record.",
+    "unit": {
+      "rounds_one": "round",
+      "rounds_other": "rounds",
+      "weeks_one": "week",
+      "weeks_other": "weeks"
+    },
+    "type": {
+      "counter": {
+        "label": "Counter rounds in a row",
+        "short": "counter rounds",
+        "explainer": "Consecutive rounds being counted towards your handicap."
+      },
+      "cutting": {
+        "label": "Index cuts in a row",
+        "short": "index cuts",
+        "explainer": "Counter rounds that dropped your handicap index."
+      },
+      "sub_80": {
+        "label": "Rounds under 80",
+        "short": "rounds under 80",
+        "explainer": "Posted scores below 80 in a row."
+      },
+      "no_up": {
+        "label": "No index increases",
+        "short": "index holds",
+        "explainer": "Counter rounds that did not increase your handicap index. Defensive streak \u2014 holding the line."
+      },
+      "sub_par": {
+        "label": "Sub-par rounds",
+        "short": "sub-par rounds",
+        "explainer": "Counter rounds with a score below par. The hardest streak in the system."
+      },
+      "birdie_round": {
+        "label": "Birdie rounds",
+        "short": "birdie rounds",
+        "explainer": "Rounds with at least one birdie."
+      },
+      "round_played": {
+        "label": "Weeks played",
+        "short": "weeks played",
+        "explainer": "Weeks where you played at least one round. Pure activity streak \u2014 your engagement baseline."
+      }
+    }
   }
 }
