@@ -169,9 +169,15 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
               </span>
               <Figure value={Number(best[metric] ?? 0)} size={17} color={REC.AMBER} />
             </div>
+            {/* Separator is a middle dot in the OUTPUT, written as an ASCII
+                escape in the locale value. Never "--" in rendered prose. */}
             <div style={{ marginTop: 4, fontSize: 11.5, color: REC.MUTE, ...REC.TABULAR }}>
-              {dayMonthYear(best.play_date)}
-              {best.gross_score ? ` -- ${best.gross_score} gross` : ''}
+              {best.gross_score
+                ? t('career.bestRoundLine', {
+                    date: dayMonthYear(best.play_date),
+                    gross: best.gross_score,
+                  })
+                : dayMonthYear(best.play_date)}
             </div>
             <div style={{ marginTop: 8 }}>
               <MetaLabel color={REC.AMBER}>OPEN THE CARD</MetaLabel>
