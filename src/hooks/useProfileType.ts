@@ -38,9 +38,12 @@ export const PERSONAL_TABS = [
 ];
 
 /**
- * Business profile tabs - only Posts
+ * Fallback tabs for a non-individual user_type rendered on the PERSONAL
+ * profile page. The business profile page (BusinessProfilePage) owns its own
+ * Posts / About / Team definition and never reads this file, so nothing here
+ * should be mistaken for the shipped business tab set.
  */
-export const BUSINESS_TABS = [
+export const NON_PERSONAL_FALLBACK_TABS = [
   { id: 'activity', label: 'Posts' }
 ];
 
@@ -49,5 +52,6 @@ export const BUSINESS_TABS = [
  */
 export const getProfileTabs = (userType: string | null | undefined) => {
   const { isPersonal } = getProfileType(userType);
-  return isPersonal ? PERSONAL_TABS : BUSINESS_TABS;
+  return isPersonal ? PERSONAL_TABS : NON_PERSONAL_FALLBACK_TABS;
 };
+

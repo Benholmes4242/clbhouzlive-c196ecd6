@@ -1,11 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Phone, Mail, Globe, MapPin, Clock, Check, ArrowUpRight, Flag,
-} from 'lucide-react';
+import { Check, ArrowUpRight, Flag } from 'lucide-react';
 import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
+import { useTranslation } from 'react-i18next';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { A, Panel, Action, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useNearestCourse } from '@/hooks/useNearestCourse';
@@ -24,54 +23,22 @@ interface BusinessProfileInfoProps {
   userId?: string | null;
 }
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
+const VALUE: React.CSSProperties = {
+  fontSize: 13.5,
+  fontWeight: 700,
+  color: A.INK,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
 
-/* ── Kicker section header ── */
-function SectionKicker({ children }: { children: string }) {
-  return (
-    <SectionHeader
-      role="section"
-      kicker={children.toUpperCase()}
-    />
-  );
-}
-
-function SectionDivider() {
-  return <div className="mx-6 h-px" style={{ background: HAIR }} />;
-}
-
-/* ── Facilities chips ── */
-function FacilitiesSection({ amenities }: { amenities: string[] }) {
-  return (
-    <section className="px-4 py-4">
-      <SectionKicker>Facilities</SectionKicker>
-      <div className="flex flex-wrap gap-2">
-        {amenities.map((a) => (
-          <span
-            key={a}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-medium"
-            style={{
-              background: '#ffffff',
-              border: `1px solid ${HAIR}`,
-              color: INK,
-            }}
-          >
-            <Check className="w-3 h-3" style={{ color: INK_45 }} strokeWidth={2.5} />
-            {a}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ── Contact row ── */
+/**
+ * Label-above-value row. No glyph: the label IS the identification, and no
+ * hairline: separation inside a panel is whitespace only.
+ */
 function ContactRow({
-  icon: Icon, value, label, onClick, isLink = false,
+  value, label, onClick, isLink = false,
 }: {
-  icon: React.ElementType;
   value: string;
   label: string;
   onClick?: () => void;
@@ -81,21 +48,19 @@ function ContactRow({
   return (
     <Wrapper
       {...(onClick ? { type: 'button', onClick } : {})}
-      className="flex items-start gap-3 w-full text-left min-h-[52px] py-3 active:opacity-70 transition-opacity"
+      className="w-full text-left active:opacity-70 transition-opacity"
+      style={{ minHeight: 44, display: 'block', padding: 0 }}
     >
-      <Icon className="h-4 w-4 mt-1 shrink-0" style={{ color: INK_45 }} />
-      <div className="min-w-0 flex-1">
-        <p className="text-[14.5px] font-medium truncate" style={{ color: INK }}>
-          {value}
-          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" style={{ color: INK_45 }} />}
-        </p>
-        <p className="text-[11.5px]" style={{ color: INK_45 }}>{label}</p>
-      </div>
+      <p style={LABEL}>{label}</p>
+      <p style={{ ...VALUE, marginTop: 3 }}>
+        {value}
+        {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5" style={{ color: A.DIM }} />}
+      </p>
     </Wrapper>
   );
 }
 
-/* ── Opening hours helpers ── */
+/* Opening hours helpers */
 const DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 const DAY_LABELS: Record<string, string> = {
   Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday',
@@ -124,46 +89,30 @@ function OpeningHoursSection({
 }) {
   const openNow = isOpenNow(hours);
   return (
-    <section className="px-4 py-4">
-      <SectionKicker>Opening hours</SectionKicker>
-      {openNow && (
-        <div
-          className="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full text-[11.5px] font-semibold"
-          style={{ background: 'rgba(5,150,105,0.10)', color: '#059669' }}
-        >
-          <span
-            className="inline-block w-1.5 h-1.5 rounded-full"
-            style={{ background: '#059669' }}
-          />
-          Open now
-        </div>
-      )}
-      <div className="flex flex-col">
+    <Panel
+      kicker="OPENING HOURS"
+      aside={openNow ? 'OPEN NOW' : undefined}
+      style={{ marginTop: 12 }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', rowGap: 8 }}>
         {DAY_KEYS.map((k) => {
           const h = hours[k];
           if (!h) return null;
           return (
-            <div
-              key={k}
-              className="flex items-center justify-between py-2"
-              style={{ borderBottom: `1px solid ${HAIR}` }}
-            >
-              <span className="flex items-center gap-2 text-[13.5px]" style={{ color: INK }}>
-                <Clock className="h-3.5 w-3.5" style={{ color: INK_45 }} />
-                {DAY_LABELS[k]}
-              </span>
-              <span className="text-[13.5px]" style={{ color: h.closed ? INK_45 : INK }}>
-                {h.closed ? 'Closed' : `${h.open} – ${h.close}`}
+            <div key={k} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+              <span style={{ ...LABEL, color: A.MUTE }}>{DAY_LABELS[k]}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: h.closed ? A.DIM : A.INK }}>
+                {h.closed ? 'Closed' : `${h.open} - ${h.close}`}
               </span>
             </div>
           );
         })}
       </div>
-    </section>
+    </Panel>
   );
 }
 
-/* ── Socials ── */
+/* Socials - the brand marks ARE the identification, so they stay. */
 const SOCIAL_CONFIG: {
   key: keyof NonNullable<BusinessProfile['social_links']>;
   Icon: React.ElementType;
@@ -182,9 +131,10 @@ function ensureProtocol(url: string): string {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
-/* ── Main ── */
+/* Main */
 export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const amenities = Array.isArray(business.amenities) ? business.amenities.filter(Boolean) : [];
   const hasAmenities = amenities.length > 0;
 
@@ -246,87 +196,80 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
   const hasSocials = socials.length > 0;
 
   return (
-    <div className="-mx-4 px-0 pb-24 bg-background">
+    <div className="pb-24">
       {hasAmenities && (
-        <>
-          <FacilitiesSection amenities={amenities} />
-          <SectionDivider />
-        </>
+        <Panel kicker="FACILITIES">
+          <div className="flex flex-wrap gap-2">
+            {amenities.map((a) => (
+              <span
+                key={a}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-semibold"
+                style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.INK }}
+              >
+                <Check className="w-3 h-3" style={{ color: A.DIM }} strokeWidth={2.5} />
+                {a}
+              </span>
+            ))}
+          </div>
+        </Panel>
       )}
 
       {hasContact && (
-        <>
-          <section className="px-4 py-4">
-            <SectionKicker>Contact</SectionKicker>
-            <div className="flex flex-col [&>*+*]:border-t" style={{ '--tw-border-opacity': 1 } as React.CSSProperties}>
-              {business.website && (
-                <ContactRow
-                  icon={Globe}
-                  value={business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                  label="Website"
-                  onClick={contactHandlers.website}
-                  isLink
-                />
-              )}
-              {business.phone && (
-                <ContactRow icon={Phone} value={business.phone} label="Phone" onClick={contactHandlers.phone} />
-              )}
-              {business.email && (
-                <ContactRow icon={Mail} value={business.email} label="Email" onClick={contactHandlers.email} isLink />
-              )}
-            </div>
-          </section>
-          <SectionDivider />
-        </>
+        <Panel kicker={t('business.about.contact')} style={{ marginTop: hasAmenities ? 12 : 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: 12 }}>
+            {business.website && (
+              <ContactRow
+                value={business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                label="Website"
+                onClick={contactHandlers.website}
+                isLink
+              />
+            )}
+            {business.phone && (
+              <ContactRow value={business.phone} label="Phone" onClick={contactHandlers.phone} />
+            )}
+            {business.email && (
+              <ContactRow value={business.email} label="Email" onClick={contactHandlers.email} isLink />
+            )}
+          </div>
+        </Panel>
       )}
 
       {showOpeningHours && (
-        <>
-          <OpeningHoursSection hours={oh as Record<string, { open: string; close: string; closed: boolean }>} />
-          <SectionDivider />
-        </>
+        <OpeningHoursSection hours={oh as Record<string, { open: string; close: string; closed: boolean }>} />
       )}
 
       {shortLocation && (
-        <>
-          <section className="px-4 py-4">
-            <SectionKicker>Location</SectionKicker>
-            <div className="flex items-start gap-3">
-              <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: INK_45 }} />
-              <div>
-                <p className="text-[14.5px] font-medium" style={{ color: INK }}>{shortLocation}</p>
-                <button
-                  type="button"
-                  onClick={handleDirections}
-                  className="text-[13px] font-semibold mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                  style={{ color: INK }}
-                >
-                  Get directions
-                  <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: INK_45 }} />
-                </button>
-                {isHospitality && hasCoords && nearestCourse && (
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/courses/${nearestCourse.id}`)}
-                    className="mt-1 min-h-[44px] flex items-center gap-2 active:scale-[0.97] transition-transform"
-                  >
-                    <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: INK_45 }} strokeWidth={2} />
-                    <span className="text-[13px]" style={{ color: INK }}>
-                      <span className="font-semibold">Near {nearestCourse.name}</span>
-                      <span style={{ color: INK_45 }}> · {formatDistanceKm(nearestCourse.distance_km)}</span>
-                    </span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </section>
-          {hasSocials && <SectionDivider />}
-        </>
+        <Panel
+          kicker={t('business.about.location')}
+          style={{ marginTop: hasAmenities || hasContact || showOpeningHours ? 12 : 0 }}
+        >
+          <p style={VALUE}>{shortLocation}</p>
+          <Action
+            label={t('business.about.directions')}
+            align="left"
+            onClick={handleDirections}
+            style={{ marginTop: 10 }}
+          />
+          {isHospitality && hasCoords && nearestCourse && (
+            <button
+              type="button"
+              onClick={() => navigate(`/courses/${nearestCourse.id}`)}
+              className="mt-1 flex items-center gap-2 active:opacity-70 transition-opacity"
+              style={{ minHeight: 40, background: 'transparent', border: 'none', padding: 0 }}
+            >
+              <Flag className="h-3.5 w-3.5 shrink-0" style={{ color: A.DIM }} strokeWidth={2} />
+              <span style={{ fontSize: 13, color: A.INK, fontWeight: 700 }}>
+                {`Near ${nearestCourse.name}`}
+                <span style={{ color: A.DIM, fontWeight: 600 }}>{` . ${formatDistanceKm(nearestCourse.distance_km)}`}</span>
+              </span>
+            </button>
+          )}
+        </Panel>
       )}
 
       {hasSocials && (
-        <section className="px-4 py-4">
-          <SectionKicker>Follow us</SectionKicker>
+        <Panel kicker={t('business.about.follow')} style={{ marginTop: 12 }}>
           <div className="flex items-center gap-2 flex-wrap">
             {socials.map(({ key, Icon, label, buildUrl }) => {
               const url = buildUrl(socialLinks[key]!.trim());
@@ -336,15 +279,20 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
                   type="button"
                   onClick={() => openExternalUrl(url)}
                   aria-label={label}
-                  className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                  style={{ background: '#ffffff', border: `1px solid ${HAIR}`, color: INK }}
+                  className="h-10 w-10 inline-flex items-center justify-center active:opacity-70 transition-opacity"
+                  style={{
+                    background: A.PANEL,
+                    border: `1px solid ${A.BORDER}`,
+                    borderRadius: '34%',
+                    color: A.INK,
+                  }}
                 >
                   <Icon className="w-4 h-4" />
                 </button>
               );
             })}
           </div>
-        </section>
+        </Panel>
       )}
     </div>
   );
