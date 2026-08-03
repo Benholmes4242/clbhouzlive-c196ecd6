@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DarkCard, DarkSectionHeader } from '../_shared/darkAtoms';
+import { MiniRing, sharedMax, type ChartTone } from '../../charts';
 import {
   useScoringBreakdownAllCourses,
   type ParSplit,
@@ -9,11 +10,6 @@ import {
 } from '@/lib/whs/hooks';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-
-// Verdict hues (lifted for contrast on charcoal)
-const GREEN = '#3DD68C';
-const AMBER = '#FFB020';
-const RED = '#FF6B72';
 
 const MIN_HOLES_PAR_TYPE = 50;
 const MIN_ROUNDS = 10;
@@ -30,98 +26,6 @@ interface RingRow {
   data: ParSplit;
 }
 
-const HEX_TO_RGBA = (hex: string, a: number) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
-
-const Ring: React.FC<{ row: RingRow; color: string; t: (k: string, opts?: any) => string }> = ({
-  row,
-  color,
-  t,
-}) => {
-  const size = 92;
-  const stroke = 9;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const pct = Math.min(1, Math.max(0, row.data.avg_over / 1.2));
-  const dash = pct * c;
-  const gap = c - dash;
-
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={HEX_TO_RGBA(color, 0.16)}
-          strokeWidth={stroke}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={stroke}
-          strokeDasharray={`${dash} ${gap}`}
-          strokeLinecap="round"
-        />
-        <text
-          x={size / 2}
-          y={size / 2}
-          textAnchor="middle"
-          dominantBaseline="central"
-          transform={`rotate(90 ${size / 2} ${size / 2})`}
-          style={{
-            fontFamily: FONT,
-            fontSize: 19,
-            fontWeight: 800,
-            fill: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          +{row.data.avg_over.toFixed(2)}
-        </text>
-      </svg>
-      <div
-        style={{
-          marginTop: 10,
-          minHeight: 26,
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          color: 'var(--hcp-t-60)',
-          textTransform: 'uppercase',
-          whiteSpace: 'pre-line',
-          textAlign: 'center',
-          lineHeight: 1.35,
-        }}
-      >
-        {t('holes.gameEverywhere.parNs', { n: row.parN })}
-      </div>
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color,
-          fontVariantNumeric: 'tabular-nums',
-          marginTop: 2,
-        }}
-      >
-        {t('holes.gameEverywhere.nHoles', { count: row.data.holes_played })}
-      </div>
-    </div>
-  );
-};
 
 const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) => {
   const { t } = useTranslation('courses');
