@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
@@ -196,7 +197,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               points={chartPoints}
               height={92}
               hideFooter
-              formatLabel={(t) => formatDayMonthShortGB(t)}
+              formatLabel={(iso) => formatDayMonthShortGB(iso)}
             />
           </div>
         )}
