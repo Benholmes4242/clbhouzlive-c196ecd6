@@ -159,6 +159,16 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   const isLoading = badgesLoading || legendsLoading;
   const back = () => setView({ kind: 'room' });
 
+  /**
+   * SPARSE: the typical member, not the edge case. With no crowns, no Top 100
+   * progress and no streaks those panels self-hide, and the closing footnote
+   * says what appears as they play instead of the measured-share note.
+   */
+  const sparse =
+    crownGroups.length === 0 &&
+    top100.every((a) => (a.currentValue ?? 0) === 0) &&
+    streaks.every((s) => s.current_count === 0 && s.best_count === 0);
+
   const detail = (() => {
     if (view.kind === 'counting' || view.kind === 'milestone') {
       const item = achievements.find((a) => a.badgeId === view.badgeId);
