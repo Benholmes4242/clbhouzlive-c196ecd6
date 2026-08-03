@@ -824,11 +824,20 @@ const ProfilePageV2Content: React.FC = () => {
           <div className="flex items-center gap-3 w-full">
             <button
               onClick={() => navigate(editRoute)}
-              className="flex-1 h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+              className="flex-1 h-11 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              style={{
+                background: 'transparent',
+                border: `1px solid ${A.BORDER}`,
+                color: A.INK,
+                fontFamily: SANS,
+                fontSize: 11.5,
+                fontWeight: 800,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+              }}
             >
               <Pencil className="w-4 h-4" />
-              Edit Profile
+              Edit profile
             </button>
             {/* Fix 3: Expanded self overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
@@ -837,7 +846,7 @@ const ProfilePageV2Content: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <button 
                   className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  style={{ background: 'transparent', border: `1px solid ${A.BORDER}` }}
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
