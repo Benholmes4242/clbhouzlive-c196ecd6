@@ -330,6 +330,10 @@ Deno.serve(async (req) => {
         deleted: priorCount ?? 0,
         inserted,
         matched,
+        matchedPass1,
+        matchedPass2,
+        ambiguous,
+
         unmatched: rows.length - matched,
         unmatchedNames: rows.filter((r) => !r.player_id).slice(0, 20).map((r) => r.player_name),
       }),
