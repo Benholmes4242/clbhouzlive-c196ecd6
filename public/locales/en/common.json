@@ -417,6 +417,10 @@
         "scoringAverage": "Scoring average",
         "rounds": "Rounds"
       }
+    },
+    "legends": {
+      "window90d": "90 days",
+      "windowAllTime": "All time"
     }
   }
 }
