@@ -806,8 +806,6 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Hero HCP pill removed — the handicap is stated ONCE, as the INDEX
           figure in the primary figure row below, which also owns the tap
           through to /handicap (or the snapshot sheet for other members). */}
-        </div>
-      )}
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
       <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
