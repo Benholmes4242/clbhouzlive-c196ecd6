@@ -7,7 +7,9 @@ import RoundsArchivePanel from '../sections/trends/RoundsArchivePanel';
 import PersonalBests from '../sections/records/PersonalBests';
 import YourCoursesRail from '../sections/trends/YourCoursesRail';
 
-import TrendCardsStack from '../sections/trends/TrendCardsStack';
+import StablefordCard from '../sections/trends/StablefordCard';
+import { useAllScores } from '@/lib/whs/hooks';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * FORM - the whole of the old Trends tab plus the whole of the old Rounds tab.
@@ -15,6 +17,8 @@ import TrendCardsStack from '../sections/trends/TrendCardsStack';
  * The round list is no longer a section: RoundsArchivePanel states the figures
  * and RoundsArchiveSheet carries the list at 75dvh.
  */
+
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
   connectionId: string;
@@ -34,6 +38,7 @@ export const TrendsView: React.FC<Props> = ({
   ownerFirstName = null,
 }) => {
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
+  const { data: scores, isLoading: scoresLoading } = useAllScores(connectionId);
 
   return (
     <div
@@ -55,14 +60,13 @@ export const TrendsView: React.FC<Props> = ({
       <IndexHistoryCard connectionId={connectionId} />
 
       {/* 3. Stableford distribution */}
-      <TrendCardsStack
-        connectionId={connectionId}
-        userId={userId}
-        currentHandicap={currentHandicap}
-        splitAt="rest"
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
+      <section style={{ padding: '0 16px', marginTop: 32, fontFamily: FONT }}>
+        {scoresLoading ? (
+          <Skeleton variant="dark" style={{ height: 420, borderRadius: 16, marginBottom: 12 }} />
+        ) : (
+          <StablefordCard scores={scores ?? []} userId={userId} connectionId={connectionId} />
+        )}
+      </section>
 
       {/* 4. Where the shots go — par-type rings, one shared max */}
       <GameEverywhereCard readOnly={readOnly} />
