@@ -13,7 +13,14 @@ interface Props {
   connectionId: string;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
+  /**
+   * 'section' keeps the section header and top margin (legacy in-page use).
+   * 'sheet' suppresses BOTH so the list can be hosted inside
+   * RoundsArchiveSheet - the chips and month groups are untouched either way.
+   */
+  variant?: 'section' | 'sheet';
 }
+
 
 const T = {
   ink: 'var(--hcp-t-100)',
