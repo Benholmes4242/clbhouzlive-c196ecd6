@@ -23,10 +23,11 @@ export const SeasonCutPanel: React.FC<Props> = ({ rounds }) => {
   const cut = seasonCut(rounds, year);
   if (cut.rounds === 0) return null;
 
+  // BEST is omitted rather than placeheld when nothing is scored.
   const cells: Array<{ label: string; value: string | number }> = [
     { label: t('career.seasonRounds'), value: cut.rounds },
     { label: t('career.seasonBirdies'), value: cut.birdies },
-    { label: t('career.seasonBest'), value: cut.best ?? '--' },
+    ...(cut.best !== null ? [{ label: t('career.seasonBest'), value: cut.best }] : []),
   ];
 
   return (

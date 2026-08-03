@@ -139,7 +139,7 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
                 <Figure value={row.count} size={15} />
               </div>
               <div style={{ marginTop: 6 }}>
-                <Bar pct={topCount > 0 ? (row.count / topCount) * 100 : 0} height={3} />
+                <Bar pct={topCount > 0 ? (row.count / topCount) * 100 : 0} />
               </div>
             </RowButton>
           ))}
