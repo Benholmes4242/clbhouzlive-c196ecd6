@@ -196,3 +196,31 @@ export const Dot: React.FC<{ on: boolean }> = ({ on }) => (
     }}
   />
 );
+
+/**
+ * Collapsible list. Built once and used by every panel whose list can grow,
+ * so no panel hand-rolls its own "show more". Over `threshold` rows it shows
+ * `collapsedCount` and a quiet action; the panel aside keeps stating the full
+ * total so collapsing never hides the headline figure.
+ */
+export const Collapsible: React.FC<{
+  children: React.ReactNode;
+  threshold?: number;
+  collapsedCount?: number;
+  showAllLabel: string;
+  showFewerLabel: string;
+}> = ({ children, threshold = 5, collapsedCount = 3, showAllLabel, showFewerLabel }) => {
+  const [open, setOpen] = useState(false);
+  const rows = React.Children.toArray(children);
+  if (rows.length <= threshold) return <>{rows}</>;
+  return (
+    <>
+      {open ? rows : rows.slice(0, collapsedCount)}
+      <div style={{ padding: '11px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
+        <Action onClick={() => setOpen((prev) => !prev)}>
+          {open ? showFewerLabel : showAllLabel}
+        </Action>
+      </div>
+    </>
+  );
+};
