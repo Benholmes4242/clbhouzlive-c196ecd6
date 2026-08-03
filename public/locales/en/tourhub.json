@@ -583,7 +583,19 @@
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " · field scoring"
+      "fieldScoringSuffix": " · field scoring",
+      "holeN": "Hole {{n}}",
+      "fromPlayers": "FROM {{count}} PLAYERS",
+      "seeAllHoles": "See all 18 holes",
+      "sheetTitle": "How the field scores",
+      "sheetSubRound": "From {{count}} players . round {{round}}",
+      "sheetSubAll": "From {{count}} players . all rounds",
+      "colHole": "HOLE",
+      "colPar": "PAR",
+      "colDist": "DISTRIBUTION",
+      "colField": "FIELD",
+      "colPlayers": "PLAYERS",
+      "roundEmptyBody": "No scoring data for this round yet."
     },
     "featuredGroups": {
       "eyebrow": "On the Course",

@@ -1,53 +1,45 @@
 /**
  * CourseSection - "The Course" tournament section.
- * Renders HARDEST / EASIEST cards from get_tournament_hole_analysis, and
- * an "All 18 holes >" sheet that uses SharedHoleCard with countLabel="players".
+ *
+ * One Panel that states its sample, names the hardest and easiest holes with
+ * their to-par figures, and previews the first four holes using the SAME
+ * HoleRow implementation as the course detail page (tournament variant: no
+ * stroke index, no viewing member). "See all 18 holes" opens the 75dvh sheet.
  * Section self-hides when the RPC reports unavailable coverage.
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SectionEyebrow } from './SectionEyebrow';
 import {
   useTournamentHoleAnalysis,
   type TournamentHole,
 } from '../data/useTournamentHoleAnalysis';
-import { FONT, INK_MUTE, INK_FAINT, AMBER } from '../../_shared/tokens';
+import { FONT } from '../../_shared/tokens';
 import {
   A, CAPTION, KICKER, LABEL, NUM, Panel, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { SharedHoleCard } from '@/features/courses/_shared/holes/SharedHoleCard';
-import type { SharedHole } from '@/features/courses/_shared/holes/types';
+import {
+  HoleColumnHeader,
+  HoleRow,
+  PREVIEW_COUNT,
+} from '@/features/courses/components/holes/analytical/HoleRows';
+import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { formatNumber } from '@/i18n/format';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
 interface Props { tournamentId: string }
 
 type RoundKey = 'all' | '1' | '2' | '3' | '4';
 
-function toShared(h: TournamentHole): SharedHole {
-  return {
-    hole_no: h.hole_no,
-    par: h.par,
-    yards: h.yards,
-    stroke_index: h.stroke_index, // null in tournaments -> SI hidden
-    rounds: h.rounds,
-    avg_to_par: h.avg_to_par,
-    avg_gross: h.avg_gross,
-    dist: h.dist,
-  };
-}
-
-const AVG_EPSILON = 0.05;
-
 export function CourseSection({ tournamentId }: Props) {
   const { t } = useTranslation(['tourhub', 'courses']);
-  // Mini cards always represent the full tournament (all rounds combined).
+  // Preview always represents the full tournament (all rounds combined).
   const { data } = useTournamentHoleAnalysis(tournamentId, null);
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const holes = data?.holes ?? [];
   const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
@@ -56,11 +48,56 @@ export function CourseSection({ tournamentId }: Props) {
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
+  const totalPlayers = data.total_players ?? 0;
+
+  const togglePreview = (holeNo: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(holeNo)) next.delete(holeNo);
+      else {
+        next.add(holeNo);
+        void analyticsEvents.track('tour_tournament_hole_expanded', {
+          tournament_id: tournamentId,
+          hole_no: holeNo,
+          round: null,
+          from: 'preview',
+        });
+      }
+      return next;
+    });
+  };
+
+  const openSheet = () => {
+    setOpen(true);
+    void analyticsEvents.track('tour_tournament_holes_opened', { tournament_id: tournamentId });
+  };
 
   return (
-    <>
-      <SectionEyebrow kicker={t('tournament.course.title', { ns: 'tourhub' })} actionLabel={t('tournament.course.allHolesAction', { ns: 'tourhub' })} onAction={() => setOpen(true)} />
-      <FeaturePair hardest={hardest} easiest={easiest} />
+    <div style={{ padding: '0 16px 4px' }}>
+      <Panel
+        kicker={t('tournament.course.title', { ns: 'tourhub' })}
+        aside={t('tournament.course.fromPlayers', {
+          ns: 'tourhub',
+          count: totalPlayers,
+          formattedCount: formatNumber(totalPlayers),
+        })}
+        footer={t('tournament.course.seeAllHoles', { ns: 'tourhub', defaultValue: 'See all 18 holes' })}
+        onOpen={openSheet}
+      >
+        {hardest.hole_no !== easiest.hole_no && (
+          <FeaturePair hardest={hardest} easiest={easiest} />
+        )}
+        <HoleColumnHeader variant="tournament" />
+        {holes.slice(0, PREVIEW_COUNT).map((h) => (
+          <HoleRow
+            key={h.hole_no}
+            row={h as CourseHole}
+            variant="tournament"
+            open={expanded.has(h.hole_no)}
+            onToggle={() => togglePreview(h.hole_no)}
+          />
+        ))}
+      </Panel>
 
       <HolesSheet
         open={open}
@@ -68,7 +105,7 @@ export function CourseSection({ tournamentId }: Props) {
         tournamentId={tournamentId}
         roundsPresent={data.rounds_present ?? []}
       />
-    </>
+    </div>
   );
 }
 
@@ -107,18 +144,21 @@ function HolesSheet({
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
 
-  const toggle = (n: number) =>
+  const toggle = (holeNo: number) =>
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(n)) next.delete(n);
-      else next.add(n);
+      if (next.has(holeNo)) next.delete(holeNo);
+      else {
+        next.add(holeNo);
+        void analyticsEvents.track('tour_tournament_hole_expanded', {
+          tournament_id: tournamentId,
+          hole_no: holeNo,
+          round: roundParam,
+          from: 'sheet',
+        });
+      }
       return next;
     });
-
-  const maxAbs = useMemo(
-    () => Math.max(0.01, ...holes.map((h) => Math.abs(h.avg_to_par))),
-    [holes],
-  );
 
   const roundOptions: ReadonlyArray<ScopeSegmentOption<RoundKey>> = useMemo(() => {
     const present = new Set(roundsPresent);
@@ -132,6 +172,22 @@ function HolesSheet({
     ];
   }, [t, roundsPresent]);
 
+  const subLine =
+    round === 'all'
+      ? t('tournament.course.sheetSubAll', {
+          ns: 'tourhub',
+          count: totalPlayers,
+          formattedCount: formatNumber(totalPlayers),
+          defaultValue: 'From {{count}} players . all rounds',
+        })
+      : t('tournament.course.sheetSubRound', {
+          ns: 'tourhub',
+          count: totalPlayers,
+          formattedCount: formatNumber(totalPlayers),
+          round,
+          defaultValue: 'From {{count}} players . round {{round}}',
+        });
+
   return (
     <BottomSheet
       open={open}
@@ -142,44 +198,20 @@ function HolesSheet({
       style={{ height: '75dvh', maxHeight: '75dvh' }}
     >
       <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '0 16px 8px' }}>
+        <div style={{ padding: '0 16px 10px' }}>
           <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
           <h2
             id="tournament-holes-sheet-title"
-            style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
           >
-            {t('tournament.course.allHolesTitle', { ns: 'tourhub' })}
+            {t('tournament.course.sheetTitle', { ns: 'tourhub', defaultValue: 'How the field scores' })}
           </h2>
-
-          {/* Amber credibility pill */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              marginTop: 8,
-              padding: '7px 12px',
-              borderRadius: 999,
-              background: 'rgba(247,147,30,0.08)',
-              border: '1px solid rgba(247,147,30,0.18)',
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: '#B8720E',
-            }}
-          >
-            <ShieldCheck size={13} strokeWidth={2.2} />
-            <span>
-              <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {t('holes.players', {
-                  ns: 'courses',
-                  count: totalPlayers,
-                  formattedCount: formatNumber(totalPlayers),
-                })}
-              </span>
-              {t('tournament.course.fieldScoringSuffix', { ns: 'tourhub' })}
-            </span>
-
+          <div style={LABEL}>
+            {subLine}
+            {' \u00B7 '}
+            {t('courses:courseDetail.holes.tapHint')}
           </div>
+
           <div style={{ marginTop: 10 }}>
             <ScopeSegment
               value={round}
@@ -190,33 +222,28 @@ function HolesSheet({
           </div>
         </div>
 
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingBottom: 16 }}>
-          {isLoading || !hardest || !easiest ? (
-            <div style={{ padding: '24px 16px', fontSize: 12.5, fontWeight: 600, color: INK_FAINT }}>
-              {t('tournament.course.roundEmpty', { ns: 'tourhub', defaultValue: 'No scoring data for this round yet.' })}
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, padding: '0 16px 28px' }}>
+          {isLoading ? null : !hardest || !easiest ? (
+            <div style={{ ...CAPTION, padding: '24px 16px', textAlign: 'center' }}>
+              {t('tournament.course.roundEmptyBody', {
+                ns: 'tourhub',
+                defaultValue: 'No scoring data for this round yet.',
+              })}
             </div>
           ) : (
             <>
-              {/* HARDEST / EASIEST - one Panel, to-par figures */}
               {hardest.hole_no !== easiest.hole_no && (
                 <FeaturePair hardest={hardest} easiest={easiest} />
               )}
 
+              <HoleColumnHeader variant="tournament" />
               {holes.map((h) => (
-                <SharedHoleCard
+                <HoleRow
                   key={h.hole_no}
-                  hole={toShared(h)}
-                  maxAbs={maxAbs}
-                  countLabel="players"
-                  expanded={expanded.has(h.hole_no)}
+                  row={h as CourseHole}
+                  variant="tournament"
+                  open={expanded.has(h.hole_no)}
                   onToggle={() => toggle(h.hole_no)}
-                  tag={
-                    h.hole_no === hardest.hole_no
-                      ? 'hardest'
-                      : h.hole_no === easiest.hole_no
-                      ? 'easiest'
-                      : null
-                  }
                 />
               ))}
             </>
@@ -229,7 +256,7 @@ function HolesSheet({
 
 
 /**
- * FeaturePair - HARDEST / EASIEST in ONE analytical Panel.
+ * FeaturePair - HARDEST / EASIEST as a bare flex row the parent Panel places.
  *
  * Correctness: the figure is the hole's scoring average RELATIVE TO PAR
  * (canonical toParParts), never the gross average - a par 3 that plays to
@@ -243,13 +270,15 @@ const FeatureHalf: React.FC<{ tone: string; label: string; h: TournamentHole }> 
   return (
     <div style={{ minWidth: 0, flex: 1 }}>
       <div style={{ ...LABEL, color: tone }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
-        <span style={{ ...NUM, fontSize: 28, color: A.INK, lineHeight: 1 }}>{h.hole_no}</span>
-        {parts && (
-          <span style={{ ...NUM, fontSize: 15, color: parts.tone, lineHeight: 1 }}>{parts.text}</span>
-        )}
+      <div style={{ ...NUM, fontSize: 17, color: A.INK, marginTop: 6, lineHeight: 1.1 }}>
+        {t('tournament.course.holeN', { ns: 'tourhub', n: h.hole_no, defaultValue: 'Hole {{n}}' })}
       </div>
-      <div style={{ ...CAPTION, marginTop: 6 }}>
+      {parts && (
+        <div style={{ ...NUM, fontSize: 22, color: parts.tone, marginTop: 4, lineHeight: 1.1 }}>
+          {parts.text}
+        </div>
+      )}
+      <div style={{ ...LABEL, marginTop: 6 }}>
         {t('board.meta.par', { ns: 'tourhub', par: h.par })}
         {h.yards != null
           ? ` \u00B7 ${t('courses:courseDetail.holes.yards')} ${formatNumber(h.yards)}`
@@ -262,15 +291,10 @@ const FeatureHalf: React.FC<{ tone: string; label: string; h: TournamentHole }> 
 const FeaturePair: React.FC<{ hardest: TournamentHole; easiest: TournamentHole }> = ({ hardest, easiest }) => {
   const { t } = useTranslation(['tourhub', 'courses']);
   return (
-    <div style={{ padding: '0 16px 4px' }}>
-      <Panel>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-          <FeatureHalf tone={A.OVER} label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
-          <div style={{ width: 1, alignSelf: 'stretch', background: A.BORDER }} aria-hidden="true" />
-          <FeatureHalf tone={A.UNDER} label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
-        </div>
-      </Panel>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 18 }}>
+      <FeatureHalf tone={A.OVER} label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
+      <div style={{ width: 1, alignSelf: 'stretch', background: A.BORDER }} aria-hidden="true" />
+      <FeatureHalf tone={A.UNDER} label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
     </div>
   );
 };
-
