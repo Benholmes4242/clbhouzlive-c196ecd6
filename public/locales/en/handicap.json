@@ -57,6 +57,7 @@
     "sectionNotStarted": "Not started",
     "fromYourBest": "{{n}} from your best of {{best}}",
     "atYourBest": "At your best",
+    "settingItNow": "Your best ever, still running",
     "brokenLine": "Best {{n}} {{unit}} \u00b7 broken {{when}}",
     "bestLine": "Best {{n}} {{unit}}",
     "notStartedYet": "Not started yet",

@@ -132,7 +132,15 @@ const StreakRowView: React.FC<{
   const best = row?.best_count ?? 0;
   const freeze = row?.freeze_credits ?? 0;
   const atBest = state === 'active' && best > 0 && current >= best;
+  /**
+   * `best_ended_at === null` means the record run has never ended - i.e. the
+   * run on screen IS the best run and is still extending. That is a different
+   * (and better) state than having matched an old record, so only the label
+   * differs: both stay green and both fill the bar.
+   */
+  const settingItNow = atBest && row?.best_ended_at == null;
   const figureColour = state === 'active' ? (atBest ? CHART.DOWN : CHART.AMBER) : CHART.DIM;
+
 
   const unitLabel = (n: number) => t(`streaks.unit.${meta.unit}`, { count: n });
 
@@ -192,8 +200,11 @@ const StreakRowView: React.FC<{
             }}
           >
             {atBest
-              ? t('streaks.atYourBest')
+              ? settingItNow
+                ? t('streaks.settingItNow')
+                : t('streaks.atYourBest')
               : t('streaks.fromYourBest', { n: best - current, best })}
+
           </div>
         </div>
       )}
@@ -259,10 +270,6 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
     return { active: a, lapsed: l, fresh: f };
   }, [byType]);
 
-  const totalFreezes = useMemo(
-    () => (data ?? []).reduce((acc, r) => acc + (r.freeze_credits ?? 0), 0),
-    [data],
-  );
 
   const longest = useMemo(() => {
     let bestRow: StreakRow | null = null;
@@ -291,9 +298,9 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       }),
     );
   }
-  if (totalFreezes > 0) {
-    subLineParts.push(t('streaks.freezeTotal', { count: totalFreezes }));
-  }
+  // Freezes are deliberately NOT totalled here: they are seeded only for
+  // round_played, so a header total reads as a pool covering every streak.
+
 
   return (
     <GamSheet open={open} onClose={onClose}>
