@@ -14,7 +14,7 @@
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';

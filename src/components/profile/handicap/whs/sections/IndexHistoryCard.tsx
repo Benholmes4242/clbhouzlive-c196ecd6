@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHandicapHistory } from '@/lib/whs/hooks';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
