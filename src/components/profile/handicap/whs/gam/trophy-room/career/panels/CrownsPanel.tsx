@@ -6,8 +6,9 @@
  * held against. Field size comes from the legends view, not from an assertion.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
-import { Panel, RowButton, Figure } from '../Primitives';
+import { Panel, RowButton, Figure, Collapsible, MetaLabel } from '../Primitives';
 import { plural } from '../format';
 import type { CareerData, Legend } from '../types';
 
