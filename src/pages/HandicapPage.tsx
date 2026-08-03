@@ -30,7 +30,8 @@ import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboa
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
-import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
+import { CompareOwnerCTA } from '@/components/profile/handicap/whs/sections/header/CompareOwnerCTA';
+import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
 import { firstName } from '@/pages/rivalry-page/_shared/helpers';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
@@ -229,9 +230,9 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       ) : null}
 
       {readOnly && ownerUserId && viewerUserId && (
-        <RivalryCTA
-          rivalUserId={ownerUserId}
-          rivalFirstName={firstName(displayName)}
+        <CompareOwnerCTA
+          ownerUserId={ownerUserId}
+          ownerFirstName={firstName(displayName)}
         />
       )}
 
