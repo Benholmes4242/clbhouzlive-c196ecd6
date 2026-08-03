@@ -238,15 +238,9 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       {(readOnly || hasConnection) && (
         <div
           style={{
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
             fontFamily: FONT_GEIST,
             background: 'var(--hcp-bg-0)',
           }}
-          className="hcp-tab-row"
         >
           <div
             role="tablist"
@@ -254,7 +248,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
               display: 'flex',
               justifyContent: 'space-evenly',
               padding: '0 16px',
-              minWidth: 'min-content',
             }}
           >
             {tabs.map(tab => {
@@ -267,16 +260,16 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                   aria-selected={active}
                   style={{
                     flex: '0 0 auto',
-                    height: 44,
+                    height: 48,
                     padding: '0 4px',
                     borderRadius: 0,
                     border: 'none',
                     background: 'transparent',
-                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                    color: active ? '#FFFFFF' : 'rgba(255,255,255,0.40)',
                     fontFamily: 'inherit',
-                    fontSize: 14,
-                    fontWeight: active ? 700 : 600,
-                    letterSpacing: '-0.005em',
+                    fontSize: 17,
+                    fontWeight: active ? 800 : 600,
+                    letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -285,20 +278,13 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                     transition: 'color 0.15s',
                   }}
                 >
-                  <span
-                    style={{
-                      display: 'inline-block',
-                    }}
-                  >
-                    {tab.label}
-                  </span>
+                  <span style={{ display: 'inline-block' }}>{tab.label}</span>
                 </button>
               );
             })}
-
           </div>
-          <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
+
       )}
     </>
   );
