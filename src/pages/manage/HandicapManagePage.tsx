@@ -10,6 +10,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
+import { getSyncHealth } from '@/lib/whs/syncHealth';
+
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
@@ -154,7 +156,9 @@ const SyncedBody: React.FC<{
   onDelete: () => void;
 }> = ({ connection, onDisconnect, onDelete }) => {
   const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const isAuthFailed = connection.last_sync_status === 'auth_failed';
+  // Single source of truth - see src/lib/whs/syncHealth.ts. Status only, never last_sync_error.
+  const isAuthFailed = getSyncHealth(connection).kind === 'reauth_auth';
+
   const connectedAt = new Date(connection.created_at);
   const bodyName = bodyNameForProvider(connection.provider);
   const iso = isoForProvider(connection.provider);

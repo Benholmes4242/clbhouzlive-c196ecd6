@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useHandicapTrend, useCounters } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsConnection } from '@/lib/whs/types';
+import { getSyncHealth } from '@/lib/whs/syncHealth';
+
 import TodayView from './views/TodayView';
 import TrendsView from './views/TrendsView';
 import CircleView from './views/CircleView';
@@ -27,13 +29,10 @@ const DEFAULT_SUBTAB: HandicapSubtab = 'today';
 
 export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false, ownerFirstName = null }) => {
   const [searchParams] = useSearchParams();
-  const lastSyncedAtForInit = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const isOldEnoughForReauth =
-    !lastSyncedAtForInit ||
-    Date.now() - lastSyncedAtForInit.getTime() > 48 * 3600_000;
-  const [reauthRequired] = useState(
-    connection.last_sync_status === 'auth_failed' && isOldEnoughForReauth
-  );
+  // Single source of truth - see src/lib/whs/syncHealth.ts. Status only.
+  const [syncHealth] = useState(() => getSyncHealth(connection));
+  const reauthRequired = syncHealth.kind === 'reauth_auth';
+
 
   // ── URL-state for the active subtab (legacy values aliased) ─────────────
   const rawSubtab = searchParams.get('subtab');
