@@ -181,7 +181,7 @@ export function useCourseForm(
 ) {
   return useQuery({
     queryKey: whsKeys.courseForm(connectionId ?? '', currentHandicap ?? NaN),
-    // minRounds=1 — return ALL courses; CourseFormCard applies view-specific filtering.
+    // minRounds=1 — return ALL courses; callers apply their own filtering.
     queryFn: () => fetchCourseForm(connectionId as string, currentHandicap as number, 1),
     enabled: !!connectionId && currentHandicap !== undefined && currentHandicap !== null,
     staleTime: 60_000,
