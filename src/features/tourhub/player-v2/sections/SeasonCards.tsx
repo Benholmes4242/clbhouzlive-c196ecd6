@@ -184,6 +184,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
           onClose={() => setSheetOpen(false)}
           playerStats={playerStats!}
           playerName={player.full_name}
+          tour={mapTourSlug(player.tour_codes?.[0] ?? 'pga')}
         />
       )}
     </section>
