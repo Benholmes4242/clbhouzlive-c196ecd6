@@ -363,16 +363,25 @@ const HandicapPage: React.FC = () => {
   const ownerUserId = isFriendView ? friendId! : user?.id ?? null;
 
   const rawSubtab = searchParams.get('subtab');
-  // Graceful redirect: legacy ?subtab=overview bookmarks resolve to 'today'.
-  const normalisedSubtab = rawSubtab === 'overview' ? 'today' : rawSubtab;
-  const candidate: HandicapSubtab = isHandicapSubtab(normalisedSubtab) ? normalisedSubtab : 'today';
-  const activeTab: HandicapSubtab = isFriendView && candidate === 'friends' ? 'today' : candidate;
+  // Legacy five-tab deep links (overview / trends / records / friends /
+  // legends) are aliased to the three live tabs before validation, then the
+  // URL is REPLACED so the address bar shows the new value.
+  const { subtab: activeTab, migrated } = resolveHandicapSubtab(rawSubtab);
+
+  useEffect(() => {
+    if (!migrated) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('subtab', activeTab);
+    setSearchParams(next, { replace: true });
+  }, [migrated, activeTab, searchParams, setSearchParams]);
 
   const handleTabChange = useCallback((next: HandicapSubtab) => {
     const params = new URLSearchParams(searchParams);
     params.set('subtab', next);
     setSearchParams(params, { replace: true });
-  }, [searchParams, setSearchParams]);
+    analyticsEvents.track?.('handicap_tab_changed', { from: activeTab, to: next });
+  }, [searchParams, setSearchParams, activeTab]);
+
 
   // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
   // Defer the emit until after GamMount has mounted and subscribed. The
