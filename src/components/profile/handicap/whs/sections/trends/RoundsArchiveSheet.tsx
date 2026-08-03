@@ -9,6 +9,7 @@
  * Pinned header, one scroller beneath it.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import RecentRoundsCard from './RecentRoundsCard';
@@ -32,6 +33,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
   ownerFirstName = null,
   total = null,
 }) => {
+  const { t } = useTranslation('common');
   return (
     <BottomSheet
       open={open}
@@ -63,7 +65,9 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
       >
         <div style={{ minWidth: 0 }}>
           <div style={{ ...LABEL_STYLE, color: CHART.MUTE }}>
-            {total != null ? `${total} ROUNDS` : 'ROUNDS'}
+            {total != null
+              ? t('handicap.form.nRoundsSample', { count: total })
+              : t('handicap.form.archive.roundsLabel')}
           </div>
           <div
             id="rounds-archive-sheet-title"
@@ -76,14 +80,16 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
             }}
           >
             {viewMode === 'friend'
-              ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} posted history`
-              : 'Your posted history'}
+              ? ownerFirstName
+                ? t('handicap.form.archive.postedHistoryOwned', { name: ownerFirstName })
+                : t('handicap.form.archive.postedHistoryOwnedUnknown')
+              : t('handicap.form.archive.yourPostedHistory')}
           </div>
         </div>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t('handicap.form.archive.close')}
           style={{
             border: 'none',
             background: 'transparent',
