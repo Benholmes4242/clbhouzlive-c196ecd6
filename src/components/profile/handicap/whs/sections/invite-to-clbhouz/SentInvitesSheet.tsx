@@ -1,254 +1,258 @@
-import React, { useEffect } from 'react';
+/**
+ * Sent invites - analytical treatment.
+ *
+ * DARK, portalled surface: literal hex, never var(--hcp-*).
+ *
+ * Rides the house `BottomSheet` (drag handle, scroll lock, portal, dark
+ * variant) rather than a hand-rolled vaul drawer with its own
+ * lock/unlockBodyScroll pair and an X button.
+ */
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Drawer as DrawerPrimitive } from 'vaul';
-import SheetHeader from '@/components/ui/SheetHeader';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsInviteStatus } from '@/lib/whs/types';
-import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { REC, KICKER, LABEL, CAPTION } from '../../gam/trophy-room/career/tokens';
+import { Collapsible } from '../../gam/trophy-room/career/Primitives';
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-const T = {
-  pageBg: '#F8FAFC',
-  ink: 'rgba(255,255,255,0.96)',
-  inkMute: 'rgba(255,255,255,0.55)',
-  hairline: 'rgba(255,255,255,0.10)',
-  green: '#059669',
-  greenTint: 'rgba(5,150,105,0.12)',
-  greyTint: '#20242E',
-};
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const TITLE_ID = 'sent-invites-title';
 
-const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }) => {
-  if (status === 'redeemed') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          padding: '3px 10px',
-          borderRadius: 999,
-          background: T.greenTint,
-          color: T.green,
-          fontSize: 11,
-          fontWeight: 800,
-        }}
-      >
-        Joined
-      </span>
-    );
-  }
-  if (status === 'expired') {
-    return (
-      <span
-        style={{
-          padding: '3px 10px',
-          borderRadius: 999,
-          background: T.greyTint,
-          color: 'rgba(255,255,255,0.55)',
-          fontSize: 11,
-          fontWeight: 800,
-        }}
-      >
-        Expired
-      </span>
-    );
-  }
-  return (
-    <span
+const GroupKicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ ...LABEL, fontFamily: REC.FONT, padding: '16px 16px 8px' }}>{children}</div>
+);
+
+const InviteRow: React.FC<{
+  invite: WhsInviteStatus;
+  last: boolean;
+  statusLabel: string;
+  statusColor: string;
+}> = ({ invite, last, statusLabel, statusColor }) => {
+  const isPending = invite.status === 'pending';
+  const onClick = () => {
+    if (!isPending) return;
+    shareInvite({
+      share_url: `https://clbhouz.co.uk/i/${invite.invite_code}`,
+      share_message: `Join me on clbhouz - connect your England Golf handicap and we can compare rounds. Tap: https://clbhouz.co.uk/i/${invite.invite_code}`,
+      invitee_name: invite.invitee_name,
+    });
+  };
+
+  const inner = (
+    <div
       style={{
-        padding: '3px 10px',
-        borderRadius: 999,
-        background: T.greyTint,
-        color: 'rgba(255,255,255,0.55)',
-        fontSize: 11,
-        fontWeight: 800,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
       }}
     >
-      Sent
-    </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: REC.FONT,
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: REC.INK,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {firstName(invite.invitee_name)}
+        </p>
+        <div
+          style={{
+            ...LABEL,
+            fontFamily: REC.FONT,
+            marginTop: 4,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {[invite.invitee_home_club, formatRelativeAgoLong(invite.sent_at)]
+            .filter(Boolean)
+            .join(' \u00B7 ')}
+        </div>
+      </div>
+      <span style={{ ...LABEL, fontFamily: REC.FONT, color: statusColor, flexShrink: 0 }}>
+        {statusLabel}
+      </span>
+    </div>
+  );
+
+  const style: React.CSSProperties = {
+    width: '100%',
+    textAlign: 'left',
+    padding: '12px 16px',
+    background: 'transparent',
+    border: 'none',
+    borderBottom: last ? 'none' : `1px solid ${REC.BORDER}`,
+  };
+
+  if (!isPending) return <div style={style}>{inner}</div>;
+  return (
+    <button type="button" onClick={onClick} style={{ ...style, cursor: 'pointer' }}>
+      {inner}
+    </button>
   );
 };
 
 export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
+  const { t } = useTranslation('handicap');
   const { data: invites, isLoading } = useSentInvites();
 
-  useEffect(() => {
-    if (!open) return;
-    lockBodyScroll();
-    return () => unlockBodyScroll();
-  }, [open]);
+  const groups = useMemo(() => {
+    const rows = invites ?? [];
+    return {
+      joined: rows.filter((r) => r.status === 'redeemed'),
+      pending: rows.filter((r) => r.status === 'pending'),
+      expired: rows.filter((r) => r.status === 'expired'),
+    };
+  }, [invites]);
 
+  const total = invites?.length ?? 0;
 
+  const statusFor = (invite: WhsInviteStatus) => {
+    if (invite.status === 'redeemed') {
+      return { label: t('invites.status.joined'), color: REC.GOOD };
+    }
+    if (invite.status === 'expired') {
+      return { label: t('invites.status.expired'), color: REC.DIM };
+    }
+    return { label: formatRelativeAgoLong(invite.sent_at), color: REC.MUTE };
+  };
+
+  const renderGroup = (
+    kicker: string,
+    rows: WhsInviteStatus[],
+    collapse?: boolean,
+  ) => {
+    if (rows.length === 0) return null;
+    const items = rows.map((inv, i) => {
+      const s = statusFor(inv);
+      return (
+        <InviteRow
+          key={inv.id}
+          invite={inv}
+          last={i === rows.length - 1}
+          statusLabel={s.label}
+          statusColor={s.color}
+        />
+      );
+    });
+    return (
+      <section>
+        <GroupKicker>{kicker}</GroupKicker>
+        {collapse ? (
+          <Collapsible
+            showAllLabel={t('invites.showAll', { count: rows.length })}
+            showFewerLabel={t('invites.showFewer')}
+          >
+            {items}
+          </Collapsible>
+        ) : (
+          items
+        )}
+      </section>
+    );
+  };
 
   return (
-    <DrawerPrimitive.Root
+    <BottomSheet
       open={open}
-      onOpenChange={(o) => !o && onClose()}
-      shouldScaleBackground={false}
+      onClose={onClose}
+      variant="dark"
+      surfaceColor={REC.PANEL}
+      maxHeight="75dvh"
+      ariaLabelledBy={TITLE_ID}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '75dvh',
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
     >
-      <DrawerPrimitive.Portal>
-        <DrawerPrimitive.Overlay
+      {/* Pinned header. Panel background - never a light-surface token. */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '20px 16px 14px',
+          background: REC.PANEL,
+          borderBottom: `1px solid ${REC.BORDER}`,
+        }}
+      >
+        <div style={{ ...KICKER, fontFamily: REC.FONT }}>{t('invites.kicker')}</div>
+        <h2
+          id={TITLE_ID}
           style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(255,255,255,0.38)',
-            zIndex: 50,
-          }}
-        />
-        <DrawerPrimitive.Content
-          aria-describedby={undefined}
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            maxHeight: '92vh',
-            minHeight: 0,
-            background: T.pageBg,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            zIndex: 51,
-            outline: 'none',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 -10px 40px -10px rgba(0,0,0,0.5)',
+            margin: '6px 0 0',
+            fontFamily: REC.FONT,
+            fontSize: 21,
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            color: REC.INK,
+            ...REC.TABULAR,
           }}
         >
-          {/* Drag handle */}
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: 8,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 36,
-              height: 4,
-              borderRadius: 2,
-              background: 'rgba(255,255,255,0.16)',
-            }}
-          />
-
-          <DrawerPrimitive.Title className="sr-only">Sent invites</DrawerPrimitive.Title>
-          <DrawerPrimitive.Description className="sr-only">
-            Tap a pending invite to share it again.
-          </DrawerPrimitive.Description>
-
-          <SheetHeader
-            eyebrow="INVITES SENT"
-            title="Sent invites"
-            sub="Tap a pending invite to share it again."
-            onClose={onClose}
-            dark
-          />
-
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              paddingBottom: 32,
-            }}
-          >
-            {isLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  variant="dark"
-                  style={{
-                    height: 56,
-                    margin: '0 16px 8px',
-                    borderRadius: 8,
-                  }}
-                />
-              ))
-            ) : !invites || invites.length === 0 ? (
-              <div
-                style={{
-                  padding: '24px 16px',
-                  textAlign: 'center',
-                  fontSize: 13,
-                  color: T.inkMute,
-                }}
-              >
-                Nothing sent yet. Tap "Invite" on a friend above to get started.
-              </div>
-            ) : (
-              invites.map((inv, idx) => {
-                const isPending = inv.status === 'pending';
-                const onClick = () => {
-                  if (!isPending) return;
-                  shareInvite({
-                    share_url: `https://clbhouz.co.uk/i/${inv.invite_code}`,
-                    share_message: `Join me on Clbhouz — connect your England Golf handicap and we can compare rounds. Tap: https://clbhouz.co.uk/i/${inv.invite_code}`,
-                    invitee_name: inv.invitee_name,
-                  });
-                };
-                return (
-                  <button
-                    key={inv.id}
-                    onClick={onClick}
-                    disabled={!isPending}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 12,
-                      borderTop: idx === 0 ? 'none' : `1px solid ${T.hairline}`,
-                      background: '#1B1E27',
-                      border: 'none',
-                      cursor: isPending ? 'pointer' : 'default',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: T.ink,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {firstName(inv.invitee_name)}
-                      </p>
-                      <p
-                        style={{
-                          margin: '1px 0 0',
-                          fontSize: 11,
-                          color: T.inkMute,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {inv.invitee_home_club ?? '—'} ·{' '}
-                        {formatRelativeAgoLong(inv.sent_at)}
-                        {isPending && ' · Tap to share again'}
-                      </p>
-                    </div>
-                    <StatusBadge status={inv.status} />
-                  </button>
-                );
-              })
-            )}
+          {total === 0 ? t('invites.headlineNone') : t('invites.headlineSent', { count: total })}
+        </h2>
+        {total > 0 && (
+          <div style={{ ...LABEL, fontFamily: REC.FONT, marginTop: 8 }}>
+            {t('invites.split', {
+              pending: groups.pending.length,
+              joined: groups.joined.length,
+            })}
           </div>
-        </DrawerPrimitive.Content>
-      </DrawerPrimitive.Portal>
-    </DrawerPrimitive.Root>
+        )}
+      </div>
+
+      {/* One scroller. */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingBottom: 32 }}>
+        {isLoading ? (
+          <div style={{ padding: '16px' }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                variant="dark"
+                style={{ height: 48, marginBottom: 8, borderRadius: 8 }}
+              />
+            ))}
+          </div>
+        ) : total === 0 ? (
+          <div style={{ ...CAPTION, fontFamily: REC.FONT, padding: '18px 16px' }}>
+            {t('invites.empty')}
+          </div>
+        ) : (
+          <>
+            {renderGroup(
+              t('invites.groupJoined', { count: groups.joined.length }),
+              groups.joined,
+            )}
+            {renderGroup(
+              t('invites.groupPending', { count: groups.pending.length }),
+              groups.pending,
+            )}
+            {renderGroup(
+              t('invites.groupExpired', { count: groups.expired.length }),
+              groups.expired,
+              true,
+            )}
+          </>
+        )}
+      </div>
+    </BottomSheet>
   );
 };
 

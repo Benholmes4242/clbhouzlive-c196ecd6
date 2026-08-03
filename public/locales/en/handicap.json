@@ -110,5 +110,22 @@
         "explainer": "Weeks where you played at least one round. Pure activity streak \u2014 your engagement baseline."
       }
     }
+  },
+  "invites": {
+    "kicker": "INVITES",
+    "headlineSent_one": "{{count}} sent",
+    "headlineSent_other": "{{count}} sent",
+    "headlineNone": "No invites yet",
+    "split": "{{pending}} pending \u00b7 {{joined}} joined",
+    "status": {
+      "joined": "Joined",
+      "expired": "Expired"
+    },
+    "groupJoined": "Joined \u00b7 {{count}}",
+    "groupPending": "Pending \u00b7 {{count}}",
+    "groupExpired": "Expired \u00b7 {{count}}",
+    "showAll": "Show all {{count}}",
+    "showFewer": "Show fewer",
+    "empty": "Nothing sent yet. Invite a friend from the panel behind this sheet and it appears here."
   }
 }
