@@ -5,10 +5,11 @@
  */
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
 import { Panel, BackLink, Kicker, Caption, Figure, Bar, MetaLabel, RowButton } from '../Primitives';
 import { measuredShare } from '../shareModel';
-import { dayMonthYear, plural } from '../format';
+import { dayMonthYear, monthYear, plural } from '../format';
 import {
   courseSplitFor,
   bestRoundFor,
