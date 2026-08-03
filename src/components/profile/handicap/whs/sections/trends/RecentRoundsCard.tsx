@@ -114,7 +114,7 @@ const fmtMonth = (iso: string): string => {
 
 type FilterKey = 'all' | 'counters' | string;
 
-export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null }) => {
+export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
