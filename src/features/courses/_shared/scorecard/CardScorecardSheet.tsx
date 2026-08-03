@@ -772,7 +772,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                             ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
-                          {t('courses:scorecard.outN', { n: outSummary.par })}
+                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
                         </span>
                         {backSummary && (
                           <span
@@ -781,7 +781,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                               ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                             }}
                           >
-                            {t('courses:scorecard.inN', { n: backSummary.par })}
+                            {t('courses:scorecard.inN', { n: backSummary.strokes })}
                           </span>
                         )}
                         <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
