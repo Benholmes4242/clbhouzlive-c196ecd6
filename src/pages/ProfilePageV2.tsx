@@ -310,10 +310,10 @@ const ProfilePageV2Content: React.FC = () => {
   useEffect(() => {
     if (activeSection !== 'stats') return;
     if (isSelf) {
-      analyticsEvents.track?.('handicap_legacy_redirect_fired', { source: 'profile_stats_tab' });
+      analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'profile_stats_tab' });
       navigate('/handicap', { replace: true });
     } else if (profile?.id) {
-      analyticsEvents.track?.('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
+      analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
       navigate(`/handicap/${profile.id}`, { replace: true });
     }
   }, [activeSection, isSelf, profile?.id, navigate]);

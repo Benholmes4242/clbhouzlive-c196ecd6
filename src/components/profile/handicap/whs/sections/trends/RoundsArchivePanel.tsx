@@ -92,7 +92,7 @@ export const RoundsArchivePanel: React.FC<Props> = ({
               type="button"
               onClick={() => {
                 // Fire-and-forget: never awaited in a render or handler path.
-                analyticsEvents.track?.('handicap_history_sheet_opened', {
+                analyticsEvents.track('handicap_history_sheet_opened', {
                   rounds: rounds.length,
                 });
                 setOpen(true);

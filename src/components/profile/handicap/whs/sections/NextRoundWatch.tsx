@@ -63,7 +63,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   useEffect(() => {
     if (!shownPayload || firedRef.current) return;
     firedRef.current = true;
-    analyticsEvents.track?.('handicap_next_round_shown', shownPayload);
+    analyticsEvents.track('handicap_next_round_shown', shownPayload);
   }, [shownPayload]);
 
   if (isLoading || !projection || !projection.hasData || currentHandicap == null) return null;

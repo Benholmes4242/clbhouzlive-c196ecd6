@@ -137,7 +137,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
 
   const handleTap = () => {
     if (!isOwnProfile) {
-      analyticsEvents.track?.('friend_handicap_page_viewed', {
+      analyticsEvents.track('friend_handicap_page_viewed', {
         viewer_id: viewerUserId,
         friend_id: userId,
         source: 'profile_hero_ring',
