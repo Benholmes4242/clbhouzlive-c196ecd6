@@ -1,20 +1,85 @@
 import { corsFor } from '../_shared/cors.ts';
 /**
- * scrape-tour-rankings — Scrapes DP World Tour Race to Dubai rankings
- * and upserts into tour_season_rankings table.
+ * scrape-tour-rankings - DP World Tour (Race to Dubai) season rankings ingest.
+ *
+ * Source: the tour's own JSON feed
+ *   GET https://www.europeantour.com/api/sportdata/Rankings/Tour/{tourId}/Season/{year}
+ * No auth. Cache-Control max-age ~89s, so the feed is materially fresher than
+ * the old daily HTML scrape (which stopped working entirely once the rankings
+ * table moved to client-side rendering).
+ *
+ * Writes ASCII only. The previous parser emitted arrow glyphs into
+ * tour_season_rankings.position_change, which broke parseInt on the client.
+ *
+ * Sign convention, verified against the live payload (3 Aug 2026):
+ * a POSITIVE RankMoved means the player MOVED UP (e.g. MAZZOLI, CurrentRank 39,
+ * RankMoved 88 -> prior rank 127; the opposite reading gives an impossible -49).
+ * The only renderer of this column (useRankingsBoards -> `movement: -change`)
+ * treats a POSITIVE stored value as places LOST, so RankMoved is negated on
+ * write to make the on-screen arrow match the tour's own board.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const RANKINGS_URLS: Record<
-  string,
-  { url: string; tourCode: string }
-> = {
-  euro: {
-    url: "https://www.europeantour.com/dpworld-tour/rankings/overview/rankings/",
-    tourCode: "euro",
-  },
+/** Tour ids on the europeantour.com sportdata feed. 1 = DP World Tour. */
+const TOUR_FEED: Record<string, { feedTourId: number; tourCode: string }> = {
+  euro: { feedTourId: 1, tourCode: "euro" },
 };
+
+/**
+ * Minimum mapped rows required before anything is written. The live Race to
+ * Dubai list carries ~230 players; 50 is a floor a genuine early-season list
+ * would still clear while catching any structural change to the payload.
+ */
+const MIN_MAPPED_ROWS = 50;
+
+interface FeedRankingGroup {
+  Group: number;
+  CurrentRank: number | null;
+  RankMoved?: number | null;
+  CurrentPoints?: number | null;
+  EventsPlayed?: number | null;
+  EventWins?: number | null;
+}
+
+interface FeedPlayer {
+  PlayerId?: number;
+  FirstName?: string | null;
+  LastName?: string | null;
+  CountryCode?: string | null;
+  RankingGroups?: FeedRankingGroup[];
+}
+
+interface FeedPayload {
+  LastUpdated?: string;
+  LastEventId?: number;
+  LastEventName?: string;
+  Groups?: Array<{ Group: number; Name?: string; MainGroup?: boolean }>;
+  Players?: FeedPlayer[];
+}
+
+interface MappedRow {
+  player_name: string;
+  player_id: string | null;
+  tour_code: string;
+  season_year: number;
+  position: number;
+  position_change: string;
+  points: number | null;
+  tournaments_played: number | null;
+  country: string | null;
+  wins: number | null;
+  scraped_at: string;
+  updated_at: string;
+}
+
+function fail(message: string, corsHeaders: Record<string, string>, extra?: Record<string, unknown>) {
+  console.error(`[scrape-tour-rankings] ABORT: ${message}`, extra ?? "");
+  return new Response(JSON.stringify({ error: message, ...(extra ?? {}) }), {
+    status: 500,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 Deno.serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
@@ -30,123 +95,180 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const tour: string = body.tour || "euro";
-    const year: number = body.year || 2026;
+    const season: number = Number(body.year) || new Date().getUTCFullYear();
+    // Test hook: lets the failed-fetch path be exercised without touching data.
+    const urlOverride: string | undefined = body.url_override;
 
-    const config = RANKINGS_URLS[tour];
+    const config = TOUR_FEED[tour];
     if (!config) {
-      return new Response(
-        JSON.stringify({ error: `Unknown tour: ${tour}` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: `Unknown tour: ${tour}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Step 1: Fetch the rankings page
-    console.log(`[scrape-tour-rankings] Fetching ${config.url}`);
-    const response = await fetch(config.url, {
+    const url =
+      urlOverride ??
+      `https://www.europeantour.com/api/sportdata/Rankings/Tour/${config.feedTourId}/Season/${season}`;
+
+    // ---- Guard 1: HTTP status -------------------------------------------
+    console.log(`[scrape-tour-rankings] Fetching ${url}`);
+    const response = await fetch(url, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml",
+        // NOT a spoofed browser UA: Akamai returns 403 to a Chrome UA arriving
+        // from a datacenter IP. A plain, honest agent string is served 200.
+        "User-Agent": "clbhouz-rankings-sync/1.0 (+https://clbhouz.com)",
+        Accept: "application/json",
       },
     });
-
+    const raw = await response.text();
+    console.log(`[scrape-tour-rankings] status=${response.status} bytes=${raw.length}`);
     if (!response.ok) {
-      return new Response(
-        JSON.stringify({ error: `Failed to fetch rankings: HTTP ${response.status}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return fail(`Failed to fetch rankings feed: HTTP ${response.status}`, corsHeaders, {
+        bytes: raw.length,
+      });
     }
 
-    const html = await response.text();
-    console.log(`[scrape-tour-rankings] HTML length: ${html.length}`);
-
-    // Step 2: Parse the HTML
-    const players = parseEuropeanTourRankings(html);
-    console.log(`[scrape-tour-rankings] Parsed ${players.length} players`);
-
-    if (players.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: "No players parsed — HTML structure may have changed",
-          htmlLength: html.length,
-        }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // ---- Guard 2: valid JSON --------------------------------------------
+    let payload: FeedPayload;
+    try {
+      payload = JSON.parse(raw) as FeedPayload;
+    } catch {
+      return fail("Rankings feed did not return valid JSON", corsHeaders, { bytes: raw.length });
     }
 
-    // Step 3: Match to sr_players by name
+    // ---- Guard 3: main group present ------------------------------------
+    const mainGroup = payload.Groups?.find((g) => g.MainGroup === true)?.Group;
+    if (mainGroup == null) {
+      return fail("No group in the payload carries MainGroup: true", corsHeaders, {
+        groups: (payload.Groups ?? []).map((g) => g.Group),
+      });
+    }
+
+    const feedPlayers = payload.Players ?? [];
+    console.log(
+      `[scrape-tour-rankings] mainGroup=${mainGroup} playersInPayload=${feedPlayers.length} lastEvent=${payload.LastEventName ?? "n/a"}`
+    );
+
+    // ---- Match to sr_players by name (existing behaviour) ---------------
     const { data: existingPlayers } = await supabase
       .from("sr_players")
       .select("id, full_name, last_name, first_name")
       .or("tour_codes.cs.{euro},tour_codes.cs.{EURO}");
-
     const playerMap = buildPlayerNameMap(existingPlayers || []);
-    console.log(`[scrape-tour-rankings] Player map size: ${playerMap.size}`);
 
-    // Step 4: Upsert rankings
-    const rows = players.map((p) => {
-      const playerId = matchPlayer(p.name, playerMap);
-      return {
-        player_name: p.name,
-        player_id: playerId,
-        tour_code: config.tourCode,
-        season_year: year,
-        position: p.position,
-        position_change: p.positionChange || null,
-        points: p.points ? parseFloat(p.points.replace(/,/g, "")) : null,
-        tournaments_played: p.tournamentsPlayed
-          ? parseInt(p.tournamentsPlayed)
-          : null,
-        country: p.country || null,
-        wins: 0,
-        scraped_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-    });
+    // ---- Map ------------------------------------------------------------
+    const now = new Date().toISOString();
+    const rows: MappedRow[] = [];
+    let skippedNoMainGroup = 0;
+    let skippedNullRank = 0;
 
-    let upserted = 0;
-    const errors: string[] = [];
-    for (let i = 0; i < rows.length; i += 50) {
-      const batch = rows.slice(i, i + 50);
-      const { error } = await supabase
-        .from("tour_season_rankings")
-        .upsert(batch, { onConflict: "tour_code,season_year,player_name" });
-      if (error) {
-        console.error("[scrape-tour-rankings] Upsert error:", error);
-        errors.push(error.message);
-      } else {
-        upserted += batch.length;
+    for (const p of feedPlayers) {
+      const entry = (p.RankingGroups ?? []).find((g) => g.Group === mainGroup);
+      // Swing-only players carry no main-group entry: not on the Race to Dubai.
+      if (!entry) {
+        skippedNoMainGroup++;
+        continue;
       }
+      if (entry.CurrentRank == null) {
+        skippedNullRank++;
+        continue;
+      }
+      const name = `${(p.FirstName ?? "").trim()} ${(p.LastName ?? "").trim()}`
+        .replace(/\s+/g, " ")
+        .trim();
+      const moved = Number.isFinite(Number(entry.RankMoved)) ? Number(entry.RankMoved) : 0;
+      rows.push({
+        player_name: name,
+        player_id: name ? matchPlayer(name, playerMap) : null,
+        tour_code: config.tourCode,
+        season_year: season,
+        position: Math.trunc(entry.CurrentRank),
+        // Negated: see the sign note in the file header.
+        position_change: String(-moved),
+        points: entry.CurrentPoints == null ? null : Number(entry.CurrentPoints),
+        tournaments_played: entry.EventsPlayed == null ? null : Math.trunc(entry.EventsPlayed),
+        country: p.CountryCode ?? null,
+        wins: entry.EventWins == null ? null : Math.trunc(entry.EventWins),
+        scraped_at: now,
+        updated_at: now,
+      });
     }
 
-    // Log unmatched players
-    const unmatched = rows.filter((r) => !r.player_id);
-    if (unmatched.length > 0) {
-      console.log(
-        `[scrape-tour-rankings] Unmatched players (${unmatched.length}):`,
-        unmatched.slice(0, 20).map((r) => r.player_name)
+    console.log(
+      `[scrape-tour-rankings] mapped=${rows.length} skippedSwingOnly=${skippedNoMainGroup} skippedNullRank=${skippedNullRank}`
+    );
+
+    // ---- Guard 4: floor on mapped rows ----------------------------------
+    if (rows.length < MIN_MAPPED_ROWS) {
+      return fail(
+        `Only ${rows.length} rows mapped, below the floor of ${MIN_MAPPED_ROWS} - refusing to write`,
+        corsHeaders,
+        { playersInPayload: feedPlayers.length, mainGroup }
       );
     }
 
-    // Populate wins from tournament results
-    const { error: winsError } = await supabase.rpc('populate_tour_ranking_wins');
-    if (winsError) {
-      console.error('[scrape-tour-rankings] Failed to populate wins:', winsError.message);
-    } else {
-      console.log('[scrape-tour-rankings] Wins populated successfully');
+    // ---- Guard 5: every row complete ------------------------------------
+    const incomplete = rows.filter(
+      (r) => !r.player_name || !Number.isFinite(r.position) || r.position <= 0
+    );
+    if (incomplete.length > 0) {
+      return fail(
+        `${incomplete.length} mapped rows are missing a position or a player name - refusing to write a partial list`,
+        corsHeaders,
+        { mapped: rows.length }
+      );
     }
+
+    // ---- Replace: delete only after a validated fetch --------------------
+    const { count: priorCount } = await supabase
+      .from("tour_season_rankings")
+      .select("id", { count: "exact", head: true })
+      .eq("tour_code", config.tourCode)
+      .eq("season_year", season);
+
+    const { error: delErr } = await supabase
+      .from("tour_season_rankings")
+      .delete()
+      .eq("tour_code", config.tourCode)
+      .eq("season_year", season);
+    if (delErr) {
+      return fail(`Failed to clear existing rows: ${delErr.message}`, corsHeaders);
+    }
+
+    let inserted = 0;
+    for (let i = 0; i < rows.length; i += 100) {
+      const batch = rows.slice(i, i + 100);
+      const { error } = await supabase.from("tour_season_rankings").insert(batch);
+      if (error) {
+        return fail(`Insert failed at offset ${i}: ${error.message}`, corsHeaders, { inserted });
+      }
+      inserted += batch.length;
+    }
+
+    const matched = rows.filter((r) => r.player_id).length;
+    console.log(
+      `[scrape-tour-rankings] deleted=${priorCount ?? 0} inserted=${inserted} matched=${matched} unmatched=${rows.length - matched}`
+    );
 
     return new Response(
       JSON.stringify({
         success: true,
         tour,
-        year,
-        parsed: players.length,
-        upserted,
-        matched: rows.filter((r) => r.player_id).length,
-        unmatched: unmatched.length,
-        unmatchedNames: unmatched.slice(0, 20).map((r) => r.player_name),
-        errors: errors.length > 0 ? errors : undefined,
+        season,
+        lastUpdated: payload.LastUpdated ?? null,
+        lastEventName: payload.LastEventName ?? null,
+        bytes: raw.length,
+        mainGroup,
+        playersInPayload: feedPlayers.length,
+        mapped: rows.length,
+        skippedSwingOnly: skippedNoMainGroup,
+        skippedNullRank,
+        deleted: priorCount ?? 0,
+        inserted,
+        matched,
+        unmatched: rows.length - matched,
+        unmatchedNames: rows.filter((r) => !r.player_id).slice(0, 20).map((r) => r.player_name),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
@@ -160,125 +282,10 @@ Deno.serve(async (req) => {
 });
 
 /**
- * Parse the European Tour rankings HTML page.
- * Each player row is a <tr class="rankings__row"> with cells for:
- *   position, position change, country flag, player name, sponsor, tournaments played, points
- */
-function parseEuropeanTourRankings(
-  html: string
-): Array<{
-  position: number;
-  positionChange: string;
-  name: string;
-  country: string;
-  tournamentsPlayed: string;
-  points: string;
-}> {
-  const players: Array<{
-    position: number;
-    positionChange: string;
-    name: string;
-    country: string;
-    tournamentsPlayed: string;
-    points: string;
-  }> = [];
-
-  // Split by rankings__row to find each player row
-  const rowSplits = html.split(/class="rankings__row"/);
-  
-  // Skip first split (before first row)
-  for (let i = 1; i < rowSplits.length; i++) {
-    const rowHtml = rowSplits[i];
-    
-    // Find the end of this row (next </tr>)
-    const rowEnd = rowHtml.indexOf("</tr>");
-    const row = rowEnd > 0 ? rowHtml.substring(0, rowEnd) : rowHtml;
-
-    // Position: inside table__cell--pos
-    const posMatch = row.match(
-      /table__cell--pos[^>]*>[\s\S]*?<div[^>]*class="table__cell-inner"[^>]*>([\d]+)<\/div>/
-    );
-    if (!posMatch) continue;
-    const position = parseInt(posMatch[1]);
-    if (isNaN(position) || position <= 0) continue;
-
-    // Position change: value-change class
-    let positionChange = "-";
-    const changeMatch = row.match(
-      /value-change value-change--(up|down)"[^>]*>([\d]+)<\/div>/
-    );
-    if (changeMatch) {
-      positionChange =
-        changeMatch[1] === "up" ? `▲${changeMatch[2]}` : `▼${changeMatch[2]}`;
-    }
-
-    // Country from flag alt text
-    const countryMatch = row.match(/alt="Flag for ([^"]+)"/);
-    const country = countryMatch ? countryMatch[1] : "";
-
-    // Player name: <strong>LASTNAME, </strong>Firstname
-    const nameMatch = row.match(
-      /leaderboard__name[^>]*><strong>([^<]+)<\/strong>([^<]*)<\/span>/
-    );
-    if (!nameMatch) continue;
-    const lastName = nameMatch[1].trim();
-    const firstName = nameMatch[2].trim();
-    const name = `${lastName}${firstName}`;
-
-    // Find all table__cell-inner divs to get tournaments played and points
-    // These are the last numeric cells in the row
-    // Strategy: find all <div class="table__cell-inner"> content values
-    const cellInnerMatches = [
-      ...row.matchAll(/<div class="table__cell-inner"[^>]*>([^<]*)<\/div>/g),
-    ];
-    
-    // Typically: [position, changeVal, ..., tournamentsPlayed, points]
-    // But points might be in table__cell--points
-    let tournamentsPlayed = "";
-    let points = "";
-
-    // Try to find points specifically from the points cell
-    const pointsMatch = row.match(
-      /table__cell--points[\s\S]*?<div[^>]*class="table__cell-inner"[^>]*>([\d,\.]+)<\/div>/
-    );
-    if (pointsMatch) {
-      points = pointsMatch[1].trim();
-    }
-
-    // Tournaments played — look for a cell-inner with a small number (1-50)
-    // that appears after the country cell
-    if (cellInnerMatches.length >= 3) {
-      // The last few cell-inner values should be: [pos, change?, ..., tournamentsPlayed, points]
-      const values = cellInnerMatches.map((m) => m[1].trim()).filter(Boolean);
-      // Find tournaments played — it's typically the second-to-last numeric value
-      for (let j = values.length - 1; j >= 0; j--) {
-        const val = values[j];
-        const num = parseInt(val);
-        if (!isNaN(num) && num >= 1 && num <= 50 && val === String(num)) {
-          tournamentsPlayed = val;
-          break;
-        }
-      }
-    }
-
-    if (name && position > 0) {
-      players.push({
-        position,
-        positionChange,
-        name,
-        country,
-        tournamentsPlayed,
-        points,
-      });
-    }
-  }
-
-  return players;
-}
-
-/**
  * Build a name lookup map from sr_players for matching.
- * Supports multiple formats: "LASTNAME, Firstname", "Firstname Lastname", etc.
+ * Keys cover "Firstname Lastname", "LASTNAME, Firstname" and accent-stripped
+ * variants; the feed now supplies discrete first/last names so the
+ * "Firstname Lastname" key is the one that carries the traffic.
  */
 function buildPlayerNameMap(
   players: Array<{
@@ -289,68 +296,48 @@ function buildPlayerNameMap(
   }>
 ): Map<string, string> {
   const map = new Map<string, string>();
+  const put = (key: string, id: string) => {
+    const k = normalizeName(key);
+    if (k && !map.has(k)) map.set(k, id);
+  };
   for (const p of players) {
-    // Normalized formats
-    if (p.last_name && p.first_name) {
-      // "REED, Patrick" → key
-      map.set(
-        `${p.last_name.toUpperCase()}, ${p.first_name}`,
-        p.id
-      );
-      // "REED, PATRICK" → key (all caps)
-      map.set(
-        `${p.last_name.toUpperCase()}, ${p.first_name.toUpperCase()}`,
-        p.id
-      );
-      // Strip accents version
-      const stripped = stripAccents(
-        `${p.last_name.toUpperCase()}, ${p.first_name}`
-      );
-      map.set(stripped, p.id);
+    if (p.first_name && p.last_name) {
+      put(`${p.first_name} ${p.last_name}`, p.id);
+      put(`${p.last_name}, ${p.first_name}`, p.id);
     }
     if (p.full_name) {
-      map.set(p.full_name.toUpperCase(), p.id);
-      map.set(stripAccents(p.full_name.toUpperCase()), p.id);
+      put(p.full_name, p.id);
+      const parts = p.full_name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        put(`${parts.slice(1).join(" ")}, ${parts[0]}`, p.id);
+      }
     }
   }
   return map;
 }
 
-/**
- * Attempt to match a scraped name to an sr_players record.
- * Scraped names come as "REED, Patrick" format.
- */
-function matchPlayer(
-  scrapedName: string,
-  playerMap: Map<string, string>
-): string | null {
-  // Direct match
-  let id = playerMap.get(scrapedName);
-  if (id) return id;
-
-  // Upper case match
-  id = playerMap.get(scrapedName.toUpperCase());
-  if (id) return id;
-
-  // Strip accents match
-  id = playerMap.get(stripAccents(scrapedName));
-  if (id) return id;
-  id = playerMap.get(stripAccents(scrapedName.toUpperCase()));
-  if (id) return id;
-
-  // Try "Firstname Lastname" from "LASTNAME, Firstname"
-  const parts = scrapedName.match(/^([^,]+),\s*(.+)$/);
-  if (parts) {
-    const reversed = `${parts[2]} ${parts[1]}`;
-    id = playerMap.get(reversed.toUpperCase());
-    if (id) return id;
-    id = playerMap.get(stripAccents(reversed.toUpperCase()));
-    if (id) return id;
-  }
-
-  return null;
+/** Case-, accent- and punctuation-insensitive key. */
+function normalizeName(name: string): string {
+  return stripAccents(name)
+    .toUpperCase()
+    .replace(/[^A-Z, ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function stripAccents(str: string): string {
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function stripAccents(s: string): string {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+/** Match a feed name ("Patrick REED") to an sr_players id, or null. */
+function matchPlayer(name: string, map: Map<string, string>): string | null {
+  const direct = map.get(normalizeName(name));
+  if (direct) return direct;
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const swapped = `${parts.slice(1).join(" ")}, ${parts[0]}`;
+    const hit = map.get(normalizeName(swapped));
+    if (hit) return hit;
+  }
+  return null;
 }
