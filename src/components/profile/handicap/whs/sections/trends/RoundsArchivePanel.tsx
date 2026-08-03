@@ -15,7 +15,7 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas } from './computeRoundDeltas';
 import RoundsArchiveSheet from './RoundsArchiveSheet';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
-import { analyticsEvents } from '@/lib/analytics/events';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   connectionId: string;
