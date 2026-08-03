@@ -130,17 +130,96 @@ function nextMonthFirst(): Date {
 }
 
 async function enqueue(userId: string, type: string, payload: any) {
-  await supabase.from("gam_notification_outbox").insert({
-    user_id: userId,
-    notification_type: type,
-    template_id: type,
-    template_payload: payload,
-    deduplication_key: `${type}:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`,
-    scheduled_for: new Date().toISOString(),
-    urgency: type === "streak_freeze_applied" ? "medium" : "low",
-    status: "pending",
-  });
+  // Upsert with ignoreDuplicates: the outbox dedup trigger already skips
+  // repeats inside 24h, and a returned row is the exact "this event is new"
+  // signal used to gate the Activity mirror below. One outbox row therefore
+  // produces at most one notifications row, including across a retry.
+  const { data: inserted, error } = await supabase
+    .from("gam_notification_outbox")
+    .upsert(
+      {
+        user_id: userId,
+        notification_type: type,
+        template_id: type,
+        template_payload: payload,
+        deduplication_key: `${type}:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`,
+        scheduled_for: new Date().toISOString(),
+        urgency: type === "streak_freeze_applied" ? "medium" : "low",
+        status: "pending",
+      },
+      { onConflict: "deduplication_key", ignoreDuplicates: true },
+    )
+    .select("id");
+  if (error) {
+    console.warn("[enqueue]", type, error.message);
+    return;
+  }
+  if (Array.isArray(inserted) && inserted.length > 0) {
+    await writeActivityRow(userId, type, payload);
+  }
 }
+
+// ---------------------------------------------------------------------------
+// Activity ledger mirror.
+//
+// gam_notification_outbox is a pure DELIVERY QUEUE, and the dispatcher applies
+// push-only suppressions (quiet hours, type cap, dedup bundling, no-device) on
+// the way out. The inbox must be COMPLETE, so the notifications row is written
+// here at enqueue time - independent of any push decision. This is the same
+// mirror gam-evaluator performs; copy MUST stay identical to activityCopy() in
+// supabase/functions/gam-evaluator/index.ts, and the types below MUST stay in
+// v_game_types (public.get_activity_feed) and GAME_NOTIF_TYPES
+// (src/features/activity-v2/components/ledgerKinds.tsx).
+// ---------------------------------------------------------------------------
+function activityCopy(
+  type: string,
+  p: any,
+): { title: string; message: string } | null {
+  switch (type) {
+    case "streak_freeze_applied":
+      return {
+        title: "Streak saved",
+        message: `A freeze kept your ${p?.streak_type ?? "playing"} streak alive.`,
+      };
+    case "streak_broken":
+      return {
+        title: "Streak broken",
+        message: `Your ${p?.streak_type ?? "playing"} streak ended at ${p?.count ?? 0}.`,
+      };
+    case "streak_at_risk":
+      return {
+        title: "Streak at risk",
+        message: `Your ${p?.streak_type ?? "playing"} streak is about to break.`,
+      };
+    default:
+      return null;
+  }
+}
+
+async function writeActivityRow(userId: string, type: string, payload: any) {
+  const copy = activityCopy(type, payload);
+  if (!copy) return;
+  try {
+    // entity_type stays NULL: the feed's liveness CASE only resolves post /
+    // comment / course_rating, and a wrong entity_type is silently filtered out.
+    const { error } = await supabase.from("notifications").insert({
+      user_id: userId,
+      recipient_actor_type: "personal",
+      recipient_actor_id: userId,
+      type,
+      title: copy.title,
+      message: copy.message,
+      data: payload ?? {},
+      entity_type: null,
+      entity_id: null,
+      actor_id: null,
+    });
+    if (error) console.warn("[writeActivityRow]", type, error.message);
+  } catch (e) {
+    console.warn("[writeActivityRow]", type, (e as Error).message);
+  }
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // At-risk check — Friday warning pass over the CURRENT (in-flight) ISO week.
