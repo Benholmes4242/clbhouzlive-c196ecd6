@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useHandicapHistory } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/lib/analytics/events';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +40,19 @@ const fmtDateShort = (iso: string) => {
 
 const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   const [range, setRange] = useState<Range>('3M');
+  // Scope changes are tracked, never awaited.
+  const scopeRange = (next: Range) => {
+    setRange((prev) => {
+      if (prev !== next) {
+        analyticsEvents.track?.('handicap_chart_scoped', {
+          chart: 'index_history',
+          from: prev,
+          to: next,
+        });
+      }
+      return next;
+    });
+  };
   const daysBack = range === '1M' ? 30 : range === '3M' ? 90 : 365;
   const { data: history, isLoading } = useHandicapHistory(connectionId, daysBack);
 
@@ -68,7 +82,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
+        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={scopeRange} />} />
         <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
@@ -87,7 +101,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   if (n < 2) {
     return (
       <section style={{ marginTop: 32 }}>
-        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={setRange} />} />
+        <DarkSectionHeader eyebrow="INDEX HISTORY" right={<RangePills value={range} onChange={scopeRange} />} />
         <div style={{ padding: '0 16px' }}>
           <div style={{
             background: 'var(--hcp-bg-1)', border: `1px solid ${LINE}`,
@@ -156,7 +170,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
         eyebrow="INDEX HISTORY"
-        right={<RangePills value={range} onChange={setRange} />}
+        right={<RangePills value={range} onChange={scopeRange} />}
       />
       <div style={{ padding: '0 16px' }}>
         <div style={{
