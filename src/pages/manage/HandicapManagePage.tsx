@@ -154,7 +154,9 @@ const SyncedBody: React.FC<{
   onDelete: () => void;
 }> = ({ connection, onDisconnect, onDelete }) => {
   const lastSyncedAt = connection.last_synced_at ? new Date(connection.last_synced_at) : null;
-  const isAuthFailed = connection.last_sync_status === 'auth_failed';
+  // Single source of truth - see src/lib/whs/syncHealth.ts. Status only, never last_sync_error.
+  const isAuthFailed = getSyncHealth(connection).kind === 'reauth_auth';
+
   const connectedAt = new Date(connection.created_at);
   const bodyName = bodyNameForProvider(connection.provider);
   const iso = isoForProvider(connection.provider);
