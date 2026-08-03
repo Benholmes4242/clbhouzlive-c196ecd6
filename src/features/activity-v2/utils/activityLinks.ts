@@ -75,8 +75,13 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     type === 'status_at_risk' || type === 'status_reclaimed' ||
     type === 'badge_earned'
   ) {
-    return '/achievements';
+    // The career record sheet lives on /handicap and is opened by the
+    // ?gam=trophies deep link. badge= preserves the retired NotificationsSheet
+    // behaviour: a badge row opens the record ON THAT BADGE.
+    const badgeId = type === 'badge_earned' ? data.badge_id : null;
+    return `/handicap?gam=trophies${badgeId ? `&badge=${encodeURIComponent(badgeId)}` : ''}`;
   }
+
 
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {
