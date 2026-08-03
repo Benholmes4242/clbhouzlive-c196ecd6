@@ -299,6 +299,16 @@
       "today": "Today",
       "form": "Form",
       "circle": "Circle"
+    },
+    "trophies": {
+      "label": "Trophies",
+      "labelOwned": "{{name}}'s trophies",
+      "labelOwnedUnknown": "Their trophies",
+      "open": "Open the trophy room",
+      "emptyFriend": "{{name}} hasn't earned trophies yet",
+      "emptyFriendUnknown": "They haven't earned trophies yet",
+      "emptyOwner": "You haven't earned trophies yet",
+      "newThisWeek": "{{count}} new this week"
     }
   }
 }
