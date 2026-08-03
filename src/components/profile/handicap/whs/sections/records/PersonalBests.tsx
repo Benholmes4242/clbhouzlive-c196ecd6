@@ -5,7 +5,6 @@ import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { WhsScore } from '@/lib/whs/types';
-import { TrendingDown, Flag, Target, Award, CalendarDays, type LucideIcon } from 'lucide-react';
 import { formatDay2MonthYearShortGB, formatMonthYearLongGB } from '@/i18n/format';
 
 interface Props {
@@ -22,13 +21,6 @@ const D_T100 = 'var(--hcp-t-100)';
 const D_T60 = 'var(--hcp-t-60)';
 
 
-const RECORD_ICON: Record<string, LucideIcon> = {
-  'Best Diff': TrendingDown,
-  'Best Gross': Flag,
-  'Best Stableford Score': Target,
-  'Best vs HCP': Award,
-  'Most Rounds in a Month': CalendarDays,
-};
 
 interface Tile {
   eyebrow: string;
@@ -232,7 +224,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         >
           {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => {
             const tile = t as Tile;
-            const Icon = !isLoading ? RECORD_ICON[tile.eyebrow] : null;
             const isEmpty = !isLoading && tile.value === '—';
             // Last card spans full width when there's an odd count (5 → last is full-width)
             const isOddLast = isLoading
@@ -255,8 +246,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
               >
                 {isLoading ? (
                   <>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Skeleton variant="dark" style={{ width: 30, height: 30, borderRadius: 9 }} />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <Skeleton variant="dark" style={{ width: 44, height: 26, borderRadius: 4 }} />
                     </div>
                     <Skeleton variant="dark" style={{ height: 13, width: '70%', borderRadius: 2, marginTop: 12 }} />
@@ -264,20 +254,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                   </>
                 ) : (
                   <>
-                    {/* top row: icon chip + value */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div
-                        style={{
-                          width: 30, height: 30, borderRadius: 9,
-                          background: 'var(--hcp-bg-2)',
-                          border: '1px solid var(--hcp-line)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
-                          boxSizing: 'border-box',
-                        }}
-                      >
-                        {Icon && <Icon size={15} color="var(--hcp-t-60)" strokeWidth={2.2} />}
-                      </div>
+                    {/* the figure. No icon tile - the figure is the record. */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                       <span
                         style={{
                           fontSize: 30,
