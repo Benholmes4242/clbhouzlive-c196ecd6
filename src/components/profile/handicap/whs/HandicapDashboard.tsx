@@ -36,11 +36,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
     connection.last_sync_status === 'auth_failed' && isOldEnoughForReauth
   );
 
-  // ── URL-state for the active subtab ─────────────────────────────────────
+  // ── URL-state for the active subtab (legacy values aliased) ─────────────
   const rawSubtab = searchParams.get('subtab');
-  const activeSubtab: HandicapSubtab = isHandicapSubtab(rawSubtab)
-    ? rawSubtab
-    : DEFAULT_SUBTAB;
+  const activeSubtab: HandicapSubtab = resolveHandicapSubtab(rawSubtab).subtab;
+
 
   // ── Trend (used by hero + passed to views as currentHandicap) ───────────
   const { data: trend } = useHandicapTrend(connection.id);
