@@ -115,8 +115,9 @@ Deno.serve(async (req) => {
     console.log(`[scrape-tour-rankings] Fetching ${url}`);
     const response = await fetch(url, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        // NOT a spoofed browser UA: Akamai returns 403 to a Chrome UA arriving
+        // from a datacenter IP. A plain, honest agent string is served 200.
+        "User-Agent": "clbhouz-rankings-sync/1.0 (+https://clbhouz.com)",
         Accept: "application/json",
       },
     });
