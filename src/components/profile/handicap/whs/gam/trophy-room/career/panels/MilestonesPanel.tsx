@@ -18,6 +18,7 @@ interface Props {
 }
 
 export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
+  const { t } = useTranslation('handicap');
   if (items.length === 0) return null;
   const reached = items.filter((i) => i.earned);
   const pending = items.filter((i) => !i.earned);
@@ -32,6 +33,10 @@ export const MilestonesPanel: React.FC<Props> = ({ data, items }) => {
         </MetaLabel>
       }
     >
+      <Collapsible
+        showAllLabel={t('career.showAllItems', { count: ordered.length })}
+        showFewerLabel={t('career.showFewer')}
+      >
       {ordered.map((item, i) => {
         const share = measuredShare(data.shares.get(item.badgeId), data.config.shareMinDenominator);
         return (
