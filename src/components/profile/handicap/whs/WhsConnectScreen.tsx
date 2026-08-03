@@ -7,15 +7,15 @@ import type { WhsCountry } from '@/lib/whs/whsCountries';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 import EmptyStateScreen from './connect/EmptyStateScreen';
-import CountryPickerSheet from './connect/CountryPickerSheet';
+import CountryScreen from './connect/CountryScreen';
 import EnglandGolfForm from './connect/EnglandGolfForm';
 import ComingSoonScreen from './connect/ComingSoonScreen';
 import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
-import ApproachTracker from './connect/ApproachTracker';
-import type { ApproachStage } from './connect/approachStages';
-import { HAIR } from './connect/approachStages';
+import { HeaderBar } from './connect/Primitives';
+import { CANVAS, FONT } from './connect/designTokens';
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: 'Please sign in to clbhouz first, then try again.',
@@ -34,6 +34,8 @@ interface Props {
   layout?: 'page' | 'embedded';
 }
 
+type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done';
+
 export const WhsConnectScreen: React.FC<Props> = ({
   onConnected,
   onDecline,
@@ -43,25 +45,25 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const location = useLocation();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const { data: connection } = useWhsConnection(user?.id);
+  const [step, setStep] = useState<'intro' | 'country' | 'chosen'>('intro');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
 
   useEffect(() => {
     const preselect = (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
-    if (preselect) setCountryId(preselect);
+    if (preselect) {
+      setCountryId(preselect);
+      setStep('chosen');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePick = (c: WhsCountry) => {
     setCountryId(c.id);
-    setPickerOpen(false);
+    setStep('chosen');
     setError(null);
-  };
-
-  const handleChangeCountry = () => {
-    setPickerOpen(true);
   };
 
   const handleSubmit = async (membershipNumber: string, password: string) => {
@@ -96,77 +98,70 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
   };
 
-  // Derive stage from render branches.
-  const stage: ApproachStage = successData
+  const stage: Stage = successData
     ? 'done'
     : submitting
     ? 'sync'
-    : !country
+    : step === 'intro'
     ? 'intro'
+    : step === 'country' || !country
+    ? 'country'
     : !country.supported
     ? 'comingSoon'
     : 'form';
 
+  const HEADERS: Record<Stage, { title: string; back?: () => void }> = {
+    intro: { title: 'Connect your handicap' },
+    country: { title: 'Where do you play?', back: () => setStep('intro') },
+    form: { title: 'England Golf', back: () => setStep('country') },
+    comingSoon: { title: country?.name ?? 'Coming soon', back: () => setStep('country') },
+    sync: { title: 'Connecting' },
+    done: { title: 'Connected' },
+  };
+
   const activeScreen = (() => {
-    if (successData) {
-      const firstName = (successData.name ?? '').split(' ')[0] || 'golfer';
-      return (
-        <WelcomeAboardScreen
-          firstName={firstName}
-          handicapIndex={successData.handicap_index ?? null}
-          homeClub={successData.home_club ?? null}
-          scoresImported={successData.scores_imported ?? 0}
-          friendsImported={successData.friends_imported ?? 0}
-          onContinue={async () => {
-            await onConnected();
-            setSuccessData(null);
-          }}
-        />
-      );
+    switch (stage) {
+      case 'done':
+        return (
+          <WelcomeAboardScreen
+            firstName={(successData?.name ?? '').split(' ')[0] || 'golfer'}
+            handicapIndex={successData?.handicap_index ?? null}
+            homeClub={successData?.home_club ?? null}
+            connectionId={connection?.id ?? null}
+            onContinue={async () => {
+              await onConnected();
+              setSuccessData(null);
+            }}
+          />
+        );
+      case 'sync':
+        return <SyncingScreen />;
+      case 'intro':
+        return (
+          <EmptyStateScreen onPickCountry={() => setStep('country')} onDecline={onDecline} />
+        );
+      case 'country':
+        return <CountryScreen onSelect={handlePick} />;
+      case 'comingSoon':
+        return (
+          <ComingSoonScreen country={country!} onChangeCountry={() => setStep('country')} />
+        );
+      case 'form':
+      default:
+        return <EnglandGolfForm onSubmit={handleSubmit} error={error} submitting={false} />;
     }
-    if (submitting) return <SyncingScreen />;
-    if (!country) {
-      return (
-        <EmptyStateScreen
-          onPickCountry={() => setPickerOpen(true)}
-          onDecline={onDecline}
-        />
-      );
-    }
-    if (!country.supported) {
-      return (
-        <ComingSoonScreen
-          country={country}
-          onChangeCountry={handleChangeCountry}
-        />
-      );
-    }
-    return (
-      <EnglandGolfForm
-        onSubmit={handleSubmit}
-        error={error}
-        submitting={false}
-        onChangeCountry={handleChangeCountry}
-      />
-    );
   })();
 
   const wrapperClass =
     layout === 'page' ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col';
 
+  const header = HEADERS[stage];
+
   return (
-    <>
-      <div className={wrapperClass}>
-        <ApproachTracker stage={stage} />
-        <div style={{ height: 1, background: HAIR, margin: '16px 0 0' }} />
-        {activeScreen}
-      </div>
-      <CountryPickerSheet
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        onSelect={handlePick}
-      />
-    </>
+    <div className={wrapperClass} style={{ fontFamily: FONT, background: CANVAS }}>
+      <HeaderBar title={header.title} onBack={header.back} />
+      {activeScreen}
+    </div>
   );
 };
 

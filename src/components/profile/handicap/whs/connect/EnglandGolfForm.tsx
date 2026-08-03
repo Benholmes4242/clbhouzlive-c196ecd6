@@ -1,229 +1,93 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, ShieldCheck, AlertCircle, ArrowRight } from 'lucide-react';
-import { MiniFlag } from './MiniFlag';
-import {
-  INK, DIM, FAINT, HAIR, GREEN, GREEN_BG, DANGER, FONT,
-} from './approachStages';
+import { INK, MUTE, BORDER, BAD, FONT, LABEL, H1, H1_SUB, CAPTION } from './designTokens';
+import { Panel, PrimaryButton, FooterBar, CopyBlock } from './Primitives';
 
 interface Props {
   onSubmit: (membershipNumber: string, password: string) => void;
   error: string | null;
   submitting: boolean;
-  onChangeCountry: () => void;
+  /** Kept for API compatibility - the header back chevron owns this now. */
+  onChangeCountry?: () => void;
 }
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  background: '#fff',
-  border: `1px solid ${HAIR}`,
-  borderRadius: 14,
-  padding: '16px 16px',
-  fontSize: 17,
+  boxSizing: 'border-box',
+  padding: '12px 14px',
+  border: `1px solid ${BORDER}`,
+  borderRadius: 10,
+  fontSize: 15,
   color: INK,
   fontFamily: FONT,
   outline: 'none',
+  background: '#FFF',
+  fontVariantNumeric: 'tabular-nums lining',
 };
 
-const labelStyle: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 700,
-  color: DIM,
-  marginBottom: 6,
-  display: 'block',
-};
-
-const helperStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: FAINT,
-  marginTop: 6,
-};
-
-export const EnglandGolfForm: React.FC<Props> = ({
-  onSubmit,
-  error,
-  submitting,
-  onChangeCountry,
-}) => {
+/** SCREEN 3 - FORM. */
+export const EnglandGolfForm: React.FC<Props> = ({ onSubmit, error, submitting }) => {
   const [membershipNumber, setMembershipNumber] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
-  const isValid = membershipNumber.trim().length >= 8 && password.length > 0;
-  const buttonDisabled = !isValid || submitting;
+  const isValid = membershipNumber.trim().length > 0 && password.length > 0;
+  const disabled = !isValid || submitting;
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (!isValid || submitting) return;
+        if (disabled) return;
         onSubmit(membershipNumber.trim(), password);
       }}
       className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
+      style={{ fontFamily: FONT }}
     >
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ transform: 'scale(1.15)', transformOrigin: 'left center' }}>
-            <MiniFlag iso="GB-ENG" />
-          </div>
-          <div style={{ flex: 1, minWidth: 0, fontSize: 25, fontWeight: 900, color: INK, letterSpacing: '-0.03em' }}>
-            England Golf
-          </div>
-          <button
-            type="button"
-            onClick={onChangeCountry}
-            disabled={submitting}
-            style={{
-              background: '#fff',
-              border: `1px solid ${HAIR}`,
-              borderRadius: 10,
-              padding: '7px 12px',
-              fontFamily: FONT,
-              fontSize: 12.5,
-              fontWeight: 700,
-              color: DIM,
-              cursor: submitting ? 'default' : 'pointer',
-              opacity: submitting ? 0.5 : 1,
-            }}
-          >
-            Change
-          </button>
-        </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
+        <CopyBlock kicker="Step 2 of 2">
+          <h1 style={{ ...H1, fontSize: 21 }}>Sign in to MyEG</h1>
+          <p style={H1_SUB}>The same details you use for the England Golf app.</p>
+        </CopyBlock>
 
-        {/* Fields */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 28 }}>
-          <div>
-            <label htmlFor="whs-membership" style={labelStyle}>Membership number</label>
-            <input
-              id="whs-membership"
-              type="text"
-              inputMode="numeric"
-              autoComplete="off"
-              placeholder="e.g. 1013567548"
-              value={membershipNumber}
-              onChange={(e) => setMembershipNumber(e.target.value.replace(/[^0-9]/g, ''))}
-              disabled={submitting}
-              style={{ ...inputStyle, fontVariantNumeric: 'tabular-nums', opacity: submitting ? 0.5 : 1 }}
-            />
-            <div style={helperStyle}>On your member card or in MyEG</div>
+        <Panel>
+          <div style={{ ...LABEL, marginBottom: 7 }}>Membership number</div>
+          <input
+            value={membershipNumber}
+            onChange={(e) => setMembershipNumber(e.target.value)}
+            inputMode="numeric"
+            autoComplete="username"
+            aria-label="Membership number"
+            style={inputStyle}
+          />
+          <div style={{ fontSize: 11.5, color: MUTE, marginTop: 7 }}>
+            Ten digits, on your member card
           </div>
 
-          <div>
-            <label htmlFor="whs-password" style={labelStyle}>Password</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                id="whs-password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                placeholder="Your MyEG password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={submitting}
-                style={{ ...inputStyle, paddingRight: 44, opacity: submitting ? 0.5 : 1 }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                tabIndex={-1}
-                style={{
-                  position: 'absolute',
-                  right: 6,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 34,
-                  height: 34,
-                  borderRadius: 8,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: DIM,
-                }}
-              >
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-            <div style={helperStyle}>Same one you use for the MyEG app</div>
-          </div>
-        </div>
+          <div style={{ ...LABEL, margin: '18px 0 7px' }}>MyEG password</div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            aria-label="MyEG password"
+            style={inputStyle}
+          />
 
-        {error && (
-          <div
-            role="alert"
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 10,
-              background: 'rgba(239,68,68,0.06)',
-              border: '1px solid rgba(239,68,68,0.20)',
-              padding: '12px 14px',
-              borderRadius: 12,
-              fontSize: 13,
-              color: DANGER,
-              lineHeight: 1.45,
-              marginTop: 16,
-            }}
-          >
-            <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
-            <span style={{ fontWeight: 500 }}>{error}</span>
+          <div style={{ ...CAPTION, marginTop: 14 }}>
+            Your password is encrypted in a secure vault and decrypted only when a sync runs. It
+            never leaves our servers, and you can disconnect or delete it at any time.
           </div>
-        )}
 
-        {/* Trust panel */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 10,
-            alignItems: 'flex-start',
-            background: GREEN_BG,
-            border: '1px solid rgba(5,150,105,0.24)',
-            padding: '12px 14px',
-            borderRadius: 14,
-            marginTop: error ? 16 : 28,
-          }}
-        >
-          <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
-          <div style={{ fontSize: 12.5, color: '#334155', lineHeight: 1.5 }}>
-            <span style={{ fontWeight: 700, color: INK }}>Your password is safe.</span>{' '}
-            Stored encrypted and used only to sync your handicap from England Golf. You can disconnect or delete it anytime.
-          </div>
-        </div>
-
-        <div style={{ flex: 1 }} />
+          {error ? (
+            <div style={{ fontSize: 12.5, color: BAD, marginTop: 14, lineHeight: 1.5 }}>{error}</div>
+          ) : null}
+        </Panel>
       </div>
 
-
-      <div style={{ padding: '14px 0 8px' }}>
-        <button
-          type="submit"
-          disabled={buttonDisabled}
-          style={{
-            width: '100%',
-            minHeight: 56,
-            borderRadius: 16,
-            background: buttonDisabled ? 'rgba(15,23,42,0.08)' : INK,
-            color: buttonDisabled ? FAINT : '#fff',
-            border: 'none',
-            fontFamily: FONT,
-            fontSize: 16.5,
-            fontWeight: 800,
-            cursor: buttonDisabled ? 'not-allowed' : 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            boxShadow: buttonDisabled ? 'none' : '0 8px 22px rgba(15,23,42,0.22)',
-          }}
-        >
-          Connect official WHS handicap
-          {!buttonDisabled && <ArrowRight size={18} strokeWidth={2.4} />}
-        </button>
-      </div>
+      <FooterBar>
+        <PrimaryButton type="submit" disabled={disabled}>
+          Connect to England Golf
+        </PrimaryButton>
+      </FooterBar>
     </form>
   );
 };

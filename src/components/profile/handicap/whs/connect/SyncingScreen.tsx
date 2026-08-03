@@ -1,169 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { INK, DIM, FAINT, HAIR, GREEN, GREEN_BG, FONT } from './approachStages';
+import React from 'react';
+import { INK, BORDER, MUTE, H1, H1_SUB, CAPTION } from './designTokens';
+import { Panel, Indeterminate, CopyBlock } from './Primitives';
 
+/**
+ * SCREEN 4 - SYNCING.
+ * connect-whs is a single synchronous call, so there is no running count to
+ * report. The four rows are a STATEMENT of what the server is doing, not a
+ * tracker: no changing dots, no "2 of 4", no percentage.
+ */
 const STEPS = [
-  'Verifying with England Golf',
-  'Saving your handicap',
-  'Importing your scores',
-  'Finding your friends',
+  'Signing in to England Golf',
+  'Saving your index',
+  'Reading your scoring record',
+  'Finding friends at your club',
 ] as const;
 
-const PERCENTS = [15, 45, 75, 96] as const;
+export const SyncingScreen: React.FC = () => (
+  <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
+    <CopyBlock kicker="England Golf">
+      <h1 style={{ ...H1, fontSize: 21 }}>Pulling your record</h1>
+      <p style={H1_SUB}>
+        Under a minute for most accounts. You can close this - it finishes on our side either way.
+      </p>
+    </CopyBlock>
 
-export const SyncingScreen: React.FC = () => {
-  const reduced = usePrefersReducedMotion();
-  const [activeStep, setActiveStep] = useState(0);
+    <Indeterminate />
 
-  useEffect(() => {
-    if (reduced) {
-      setActiveStep(STEPS.length - 1);
-      return;
-    }
-    const timer = window.setInterval(() => {
-      setActiveStep((s) => Math.min(s + 1, STEPS.length - 1));
-    }, 1300);
-    return () => window.clearInterval(timer);
-  }, [reduced]);
-
-  const percent = PERCENTS[activeStep];
-  const r = 66;
-  const c = 2 * Math.PI * r;
-  const offset = c * (1 - percent / 100);
-
-  return (
-    <div
-      className="flex flex-col flex-1 min-h-0"
-      style={{ fontFamily: FONT, padding: '20px 0 8px' }}
-    >
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 28, alignItems: 'center' }}>
-        {/* Status headline */}
-        <div style={{ textAlign: 'center', width: '100%' }}>
-          <div
-            key={activeStep}
-            style={{
-              fontSize: 26,
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
-              color: INK,
-              animation: reduced ? 'none' : 'wcFadeUp 450ms ease',
-            }}
-          >
-            {STEPS[activeStep]}
-            <span style={{ color: GREEN }}>{'\u2026'}</span>
-          </div>
-          <div style={{ fontSize: 14, color: FAINT, marginTop: 6 }}>
-            The ball's rolling. A few seconds.
-          </div>
+    <Panel kicker="What's happening" aside="in order">
+      {STEPS.map((label, i) => (
+        <div
+          key={label}
+          style={{
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: INK,
+            padding: i === 0 ? '0 0 12px' : '12px 0',
+            borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
+          }}
+        >
+          {label}
         </div>
+      ))}
+    </Panel>
 
-        {/* Progress ring */}
-        <div style={{ position: 'relative', width: 168, height: 168 }}>
-          <svg width="168" height="168" viewBox="0 0 168 168">
-            <circle cx="84" cy="84" r={r} fill="rgba(5,150,105,0.07)" />
-            <circle
-              cx="84"
-              cy="84"
-              r={r}
-              fill="none"
-              stroke={GREEN}
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={c}
-              strokeDashoffset={offset}
-              transform="rotate(-90 84 84)"
-              style={{ transition: reduced ? 'none' : 'stroke-dashoffset 900ms cubic-bezier(.22,1,.36,1)' }}
-            />
-          </svg>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 30,
-              fontWeight: 900,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {percent}%
-          </div>
-        </div>
-
-        {/* Step list */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {STEPS.map((label, i) => {
-            const isDone = i < activeStep;
-            const isActive = i === activeStep;
-            return (
-              <div
-                key={label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 16px',
-                  background: isActive ? '#fff' : 'transparent',
-                  border: isActive ? `1px solid ${HAIR}` : '1px solid transparent',
-                  borderRadius: 14,
-                  transition: 'all 350ms ease',
-                }}
-              >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '50%',
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: isDone ? GREEN : isActive ? '#fff' : 'transparent',
-                    border: isDone
-                      ? `1.5px solid ${GREEN}`
-                      : isActive
-                      ? `1.5px solid ${GREEN}`
-                      : `1.5px solid ${HAIR}`,
-                    color: '#fff',
-                    transition: 'all 350ms ease',
-                  }}
-                >
-                  {isDone && <Check size={13} strokeWidth={3} />}
-                  {isActive && (
-                    <div
-                      style={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: '50%',
-                        background: GREEN,
-                        animation: reduced ? 'none' : 'wcDotPulse 1.4s ease-in-out infinite',
-                      }}
-                    />
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontSize: 16,
-                    fontWeight: isActive ? 800 : 600,
-                    color: isActive ? INK : isDone ? INK : FAINT,
-                    transition: 'color 350ms ease',
-                  }}
-                >
-                  {label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* No CTA on sync */}
-      <div />
+    <div style={{ ...CAPTION, marginTop: 18, textAlign: 'center', color: MUTE }}>
+      Long records take a little longer. Nothing is lost if you leave.
     </div>
-  );
-};
+  </div>
+);
 
 export default SyncingScreen;
