@@ -855,7 +855,9 @@
       "tourSuffix": "{{tour}} TOUR",
       "fallback": "PLAYER",
       "worldNo": "World No. {{rank}}",
-      "fedexNo": "FedEx No. {{rank}}"
+      "fedexNo": "FedEx No. {{rank}}",
+      "worldLabel": "World",
+      "fedexLabel": "FedEx"
     },
     "live": {
       "badge": "LIVE",
