@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCheck } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -173,7 +173,14 @@ export const ActivityPageV2: React.FC = () => {
   const recipientActorId = activeActor?.id ?? user?.id ?? '';
 
 
-  const [chip, setChip] = useState<ChipKey>('all');
+  // ?filter=crowns deep link: the retired gam NotificationsSheet's entry
+  // points land here, so the initial chip honours the query param once.
+  const [searchParams] = useSearchParams();
+  const initialChip: ChipKey = (() => {
+    const f = searchParams.get('filter');
+    return CHIPS.some((c) => c.key === f) ? (f as ChipKey) : 'all';
+  })();
+  const [chip, setChip] = useState<ChipKey>(initialChip);
   const filter = chipToFilter(chip);
   const feed = useActivityFeedV2(filter);
 

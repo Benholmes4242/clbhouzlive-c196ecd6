@@ -19,7 +19,7 @@
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
  *  achievement / achievement_unlocked      -> /achievements
  *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
- *  level_* / streak_* / status_* / badge_earned -> /achievements
+ *  level_* / streak_* / status_* / badge_earned -> /handicap?gam=trophies (&badge=)
  *  business_verification_*                 -> /business/:id/verification
  *  course_claim_*                          -> /courses/:course_id (claim surface)
  *  business_member_added                   -> /business/:id
@@ -75,8 +75,13 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     type === 'status_at_risk' || type === 'status_reclaimed' ||
     type === 'badge_earned'
   ) {
-    return '/achievements';
+    // The career record sheet lives on /handicap and is opened by the
+    // ?gam=trophies deep link. badge= preserves the retired NotificationsSheet
+    // behaviour: a badge row opens the record ON THAT BADGE.
+    const badgeId = type === 'badge_earned' ? data.badge_id : null;
+    return `/handicap?gam=trophies${badgeId ? `&badge=${encodeURIComponent(badgeId)}` : ''}`;
   }
+
 
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {

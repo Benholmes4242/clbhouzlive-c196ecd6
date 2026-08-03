@@ -14,9 +14,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
-import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
+import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
-import { openNotifications, openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -389,11 +389,15 @@ const HandicapPage: React.FC = () => {
     if (searchParams.get('gam') !== 'trophies') return;
     if (!ownerUserId) return;
     const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
+    // ?badge=<id> preserves the retired NotificationsSheet behaviour: a badge
+    // row in the Activity ledger opens the career record ON THAT BADGE.
+    const badgeId = searchParams.get('badge') || undefined;
     const id = setTimeout(() => {
-      openGamAchievements(section ? { section } : undefined);
+      openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
       next.delete('section');
+      next.delete('badge');
       setSearchParams(next, { replace: true });
     }, 0);
     return () => clearTimeout(id);
