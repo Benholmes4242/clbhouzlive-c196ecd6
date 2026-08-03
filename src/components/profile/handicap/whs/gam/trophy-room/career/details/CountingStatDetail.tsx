@@ -61,6 +61,10 @@ export const CountingStatDetail: React.FC<Props> = ({ data, item, onBack }) => {
         <Figure value={value} size={40} color={value > 0 ? REC.AMBER : REC.DIM} />
         <span style={{ fontSize: 12.5, color: REC.MUTE }}>{item.description}</span>
       </div>
+      {/* Omitted entirely when earned_at is null. No placeholder. */}
+      {monthYear(item.earnedAt) ? (
+        <Caption>{t('career.mostRecent', { when: monthYear(item.earnedAt) })}</Caption>
+      ) : null}
       {share !== null && (
         <Caption>
           <span style={{ color: REC.GOOD, fontWeight: 700 }}>
