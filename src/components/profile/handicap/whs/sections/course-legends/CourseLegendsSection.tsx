@@ -113,7 +113,7 @@ const SectionHero: React.FC<{
     >
       {/* Row 1: eyebrow */}
       <div style={{
-        fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em',
+        fontSize: 10, fontWeight: 800, letterSpacing: '0.13em',
         color: 'var(--hcp-t-60)', textTransform: 'uppercase',
       }}>
         COURSE CHAMPIONS

@@ -97,7 +97,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
 
   const isLoading = trendLoading || history90Loading;
 
-  // 90-day index series. IndexChart owns the inversion via directionTone().
+  // 90-day index series. IndexChart owns the inversion via indexTone().
   const chartPoints = useMemo<IndexPoint[]>(() => {
     if (!history90) return [];
     return history90.map((p) => ({ t: p.observed_at, v: p.handicap_index }));

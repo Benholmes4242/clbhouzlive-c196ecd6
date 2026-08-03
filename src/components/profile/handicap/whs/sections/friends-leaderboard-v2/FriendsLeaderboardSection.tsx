@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import LeaderboardRow from './LeaderboardRow';
-import HeroPositionCard from './HeroPositionCard';
+import StandingFigures from './StandingFigures';
 import FullLeaderboardSheet from './FullLeaderboardSheet';
 import WeeklyBanner from './WeeklyBanner';
 import {
@@ -13,7 +13,6 @@ import {
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 import { Skeleton } from '@/components/ui/skeleton';
-import { firstName } from '@/lib/whs/utils/initials';
 
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -42,7 +41,6 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
-  const [heroExpanded, setHeroExpanded] = useState(false);
   const [fullLeaderboardOpen, setFullLeaderboardOpen] = useState(false);
 
   const cohorts = buildLeaderboardCohorts(data);
@@ -169,22 +167,17 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         {isLoading ? (
           <Skeleton variant="dark" style={{ height: 120, width: '100%', borderRadius: 0 }} />
         ) : (
-          <HeroPositionCard
+          /* Three figures: YOUR RANK / PERCENTILE / TO CATCH. The rank and
+             its denominator come from the SAME cohort the rows below are
+             numbered against - acceptance test 3. */
+          <StandingFigures
             selfRow={selfRow}
             rowAbove={cohorts.rowAbove}
-            selfRank={cohorts.selfActiveRank}
+            rank={cohorts.selfActiveRank}
             totalActive={cohorts.totalActive}
             percentileTop={circlePercentile}
-            selfDelta={
-              selfRow?.friend_row_id
-                ? deltasData?.byFriendRowId.get(selfRow.friend_row_id)
-                : undefined
-            }
-            expanded={heroExpanded}
-            onToggleExpand={() => setHeroExpanded((v) => !v)}
             viewMode={viewMode}
             ownerFirstName={ownerFirstName}
-            embedded
           />
         )}
 
@@ -216,12 +209,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           ))
         ) : (
           (() => {
-            const rowAbove = cohorts.rowAbove;
-            const gap =
-              selfRow && rowAbove && selfRow.friend_handicap_index != null && rowAbove.friend_handicap_index != null
-                ? Number((rowAbove.friend_handicap_index - selfRow.friend_handicap_index).toFixed(1))
-                : null;
-            const catchName = rowAbove ? firstName(rowAbove.friend_name) : null;
+
 
             return cohorts.topFive.map((entry) => {
               const activeIdx = cohorts.active.findIndex((e) => e === entry);
@@ -230,25 +218,17 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                 ? deltasData?.byFriendRowId.get(entry.friend_row_id)
                 : undefined;
 
-              const showCatchHairline = entry.is_self && gap != null && catchName;
-
+              /* The member's row is a GROUP BOUNDARY: an amber rule above it.
+                 This is the one permitted internal line on this surface. The
+                 gap to the player above is already stated as the TO CATCH
+                 figure, so it is not repeated here. */
               return (
                 <React.Fragment key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}>
-                  {showCatchHairline && (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '7px 14px',
-                    }}>
-                      <div style={{ flex: 1, height: 1, background: 'rgba(52,211,153,0.35)' }} />
-                      <span style={{
-                        fontFamily: FONT, fontSize: 8.5, fontWeight: 800,
-                        letterSpacing: '0.12em', color: 'var(--hcp-good, #34D399)',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}>
-                        {Math.abs(gap!).toFixed(1)} TO CATCH {catchName!.toUpperCase()}
-                      </span>
-                      <div style={{ flex: 1, height: 1, background: 'rgba(52,211,153,0.35)' }} />
-                    </div>
+                  {entry.is_self && (
+                    <div
+                      aria-hidden
+                      style={{ height: 1, background: 'rgba(247,147,30,0.45)', margin: '6px 0 0' }}
+                    />
                   )}
                   <LeaderboardRow
                     entry={entry}

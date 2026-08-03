@@ -44,7 +44,7 @@ export const YourCoursesSubsection: React.FC<Props> = ({
     (titlesHeld > 0 ? ` · ${titlesHeld} title${titlesHeld === 1 ? '' : 's'} held` : '');
 
   return (
-    <CollapsibleSubsection title="Your courses" subtitle={countLabel} icon="⛳">
+    <CollapsibleSubsection title="Your courses" subtitle={countLabel}>
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {isLoading && <Skeleton height={220} radius={14} />}
         {!isLoading && courses.length === 0 && (

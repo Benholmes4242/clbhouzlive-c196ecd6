@@ -4,11 +4,10 @@ import { ChevronDown } from 'lucide-react';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
+  /** Rendered as a KICKER - uppercase, tracked, muted. */
   title: string;
-  /** Small grey line under the title, e.g. "5 played · 7 titles held". */
+  /** The count, rendered as a right-aligned LABEL aside. */
   subtitle?: string;
-  /** Optional leading glyph/emoji. */
-  icon?: React.ReactNode;
   /** Start expanded? Default false (collapsed). */
   defaultOpen?: boolean;
   children: React.ReactNode;
@@ -17,7 +16,6 @@ interface Props {
 export const CollapsibleSubsection: React.FC<Props> = ({
   title,
   subtitle,
-  icon,
   defaultOpen = false,
   children,
 }) => {
@@ -44,33 +42,34 @@ export const CollapsibleSubsection: React.FC<Props> = ({
           fontFamily: FONT,
         }}
       >
-        {icon != null && (
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.13em',
+            textTransform: 'uppercase',
+            color: 'var(--hcp-t-60)',
+          }}
+        >
+          {title}
+        </span>
+        {subtitle && (
           <span
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 10,
-              background: 'var(--hcp-bg-2)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               flexShrink: 0,
-              fontSize: 16,
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.13em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-40)',
+              whiteSpace: 'nowrap',
             }}
           >
-            {icon}
+            {subtitle}
           </span>
         )}
-        <span style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '0.01em' }}>
-            {title}
-          </span>
-          {subtitle && (
-            <span style={{ display: 'block', fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 1 }}>
-              {subtitle}
-            </span>
-          )}
-        </span>
         <ChevronDown
           size={18}
           strokeWidth={2.2}

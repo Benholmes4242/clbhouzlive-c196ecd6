@@ -8,7 +8,7 @@
  * Renders NOTHING with fewer than 2 points. A chart is a claim about data.
  */
 import React, { useId } from 'react';
-import { CHART, CHART_FONT, LABEL_STYLE, directionTone, toneColor } from './tokens';
+import { CHART, CHART_FONT, LABEL_STYLE, indexTone, toneColor } from './tokens';
 
 export interface IndexPoint {
   t: string;
@@ -49,7 +49,7 @@ export const IndexChart: React.FC<Props> = ({
   const x = (i: number) => PAD_X + (i / (points.length - 1)) * innerW;
   const y = (v: number) => PAD_Y + (1 - (v - min) / span) * innerH;
 
-  const tone = directionTone(values[0], values[values.length - 1]);
+  const tone = indexTone(values[0], values[values.length - 1]);
   const color = toneColor(tone);
 
   const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(2)},${y(p.v).toFixed(2)}`).join(' ');

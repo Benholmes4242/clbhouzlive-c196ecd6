@@ -309,6 +309,10 @@
       "emptyFriendUnknown": "They haven't earned trophies yet",
       "emptyOwner": "You haven't earned trophies yet",
       "newThisWeek": "{{count}} new this week"
+    },
+    "form": {
+      "nRoundsSample_one": "{{count}} ROUND",
+      "nRoundsSample_other": "{{count}} ROUNDS"
     }
   }
 }

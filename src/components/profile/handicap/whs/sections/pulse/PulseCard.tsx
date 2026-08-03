@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUp, ArrowDown, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
-import { Sparkline, directionTone, toneColor } from '../../charts';
+import { Sparkline, indexTone, toneColor } from '../../charts';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -42,15 +42,15 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
   const s = friend.hcp_series;
   const deltaTone =
     friend.delta90 != null
-      ? directionTone(0, friend.delta90)
+      ? indexTone(0, friend.delta90)
       : s.length >= 2
-        ? directionTone(s[0], s[s.length - 1])
+        ? indexTone(s[0], s[s.length - 1])
         : 'neutral';
   const isUp = deltaTone === 'up';
   const isDown = deltaTone === 'down';
   const isFlat = friend.delta90 != null && deltaTone === 'neutral';
   const deltaColor = toneColor(deltaTone);
-  const lineTone = s.length >= 2 ? directionTone(s[0], s[s.length - 1]) : deltaTone;
+  const lineTone = s.length >= 2 ? indexTone(s[0], s[s.length - 1]) : deltaTone;
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();

@@ -9,14 +9,14 @@
  * Renders NOTHING when fewer than 20 rounds exist or the projection is not
  * usable. No empty container, no placeholder band.
  *
- * Direction is never decided here: it goes through directionTone(), so the
+ * Direction is never decided here: it goes through indexTone(), so the
  * handicap inversion (index up = red) stays owned by the chart tokens.
  */
 import React, { useMemo } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
-import { NextRoundBand, CHART, CHART_FONT, LABEL_STYLE, directionTone, toneColor } from '../charts';
+import { NextRoundBand, CHART, CHART_FONT, LABEL_STYLE, indexTone, toneColor } from '../charts';
 
 const MIN_ROUNDS = 20;
 const SCALE_PAD = 6;
@@ -50,7 +50,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
 
   // Direction of travel of the INDEX if the next round does not count.
-  const tone = directionTone(currentHandicap, settleAtRaw);
+  const tone = indexTone(currentHandicap, settleAtRaw);
   const color = toneColor(tone);
 
   const stateLabel =

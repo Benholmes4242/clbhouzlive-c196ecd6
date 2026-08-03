@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Star, Crown } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
@@ -8,9 +8,7 @@ import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
-import { computeStreak } from './_shared/streakUtils';
 import {
-  pickHeadline,
   computeCrowns,
   emptyCrowns,
   type RivalCrowns,
@@ -50,25 +48,22 @@ export const RivalFightCard: React.FC<Props> = ({
       losses: 0,
       ties: 0,
     };
-  const results = rivalry.shared_round_results ?? [];
-  const streakInfo = useMemo(() => computeStreak(results, dimension), [results, dimension]);
-  const signedStreak =
-    streakInfo == null ? 0 : streakInfo.who === 'you' ? streakInfo.count : -streakInfo.count;
-
   const safeCrowns: RivalCrowns = crowns ?? emptyCrowns(key ?? '');
   const crownInfos = useMemo(() => computeCrowns(safeCrowns), [safeCrowns]);
 
-  const headline = useMemo(
-    () => pickHeadline({
-      crowns: safeCrowns,
-      wins: record.wins,
-      losses: record.losses,
-      streak: signedStreak,
-    }),
-    [safeCrowns, record.wins, record.losses, signedStreak],
-  );
-
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
+
+  // Three states, LABEL token. `youLabel` is the owner's first name in friend
+  // view, so the verb has to agree with it.
+  const margin = Math.abs(record.wins - record.losses);
+  const rivalFirst = firstName(rivalry.rival_name ?? 'Them').toUpperCase();
+  const youSubject = youLabel === 'YOU' ? 'YOU LEAD' : `${youLabel} LEADS`;
+  const marginLine =
+    record.wins > record.losses
+      ? `${youSubject} BY ${margin}`
+      : record.losses > record.wins
+        ? `${rivalFirst} LEADS BY ${margin}`
+        : `LEVEL AT ${record.wins}`;
 
   // Hero photo fallback chain — venue isn't on the hydrated type yet, so we
   // fall back through the available portrait sources.
@@ -147,9 +142,12 @@ export const RivalFightCard: React.FC<Props> = ({
           )}
         </div>
 
-        {/* KING-OF-X headline, centred */}
+        {/* MARGIN line. States the fact the card does not state anywhere else,
+            and survives both directions without changing voice. The card
+            already carries HEAD TO HEAD beneath the figures, so this is not a
+            second statement of who leads - it is BY HOW MUCH. */}
         <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: accentColor }}>
-          {headline.title}
+          {marginLine}
         </div>
 
         {/* you | big score | them */}
@@ -242,7 +240,6 @@ export const RivalFightCard: React.FC<Props> = ({
               {/* label + dominance bar */}
               <div style={{ flex: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', color: 'var(--hcp-t-60)' }}>
-                  {youLeads ? <Crown size={10} color={AMBER} fill={AMBER} strokeWidth={1.5} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 3 }} /> : null}
                   {c.key === 'gross' ? 'GROSS SCORE' : c.label}
                 </div>
                 <div style={{ position: 'relative', height: 3, background: 'var(--hcp-bg-2)', borderRadius: 2, marginTop: 5, overflow: 'hidden' }}>
