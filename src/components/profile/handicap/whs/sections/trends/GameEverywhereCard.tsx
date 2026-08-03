@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DarkCard, DarkSectionHeader } from '../_shared/darkAtoms';
-import { MiniRing, sharedMax, type ChartTone } from '../../charts';
+import { MiniRing, sharedMax, LABEL_STYLE, type ChartTone } from '../../charts';
 import {
   useScoringBreakdownAllCourses,
   type ParSplit,
@@ -28,7 +28,7 @@ interface RingRow {
 
 
 const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) => {
-  const { t } = useTranslation('courses');
+  const { t } = useTranslation(['courses', 'common']);
 
   const rings: RingRow[] = ([
     { key: 'par3', parN: 3, data: d.par3 },
@@ -169,7 +169,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
 };
 
 export const GameEverywhereCard: React.FC<Props> = ({ readOnly = false }) => {
-  const { t } = useTranslation('courses');
+  const { t } = useTranslation(['courses', 'common']);
   const enabled = !readOnly;
   const { data, isLoading, isError } = useScoringBreakdownAllCourses(enabled);
 
