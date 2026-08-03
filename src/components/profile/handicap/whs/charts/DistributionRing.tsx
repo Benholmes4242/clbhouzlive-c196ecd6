@@ -8,7 +8,7 @@
  * Renders NOTHING when there are no segments or every value is zero.
  */
 import React from 'react';
-import { CHART, CHART_FONT, LABEL_STYLE } from './tokens';
+import { CHART, CHART_FONT, LABEL_STYLE, toneColor, type ChartTone } from './tokens';
 
 export interface RingSegment {
   /** Label */
