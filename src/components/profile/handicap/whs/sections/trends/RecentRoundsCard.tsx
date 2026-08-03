@@ -175,20 +175,25 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
     setDisplayedCount(INITIAL_COUNT);
   };
 
+  const inSheet = variant === 'sheet';
+
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
+    <section style={{ marginTop: inSheet ? 0 : 32, fontFamily: FONT }}>
       <style>{`
         .rr-last-row > button[data-feedrow="true"] { border-bottom: none; }
       `}</style>
-      <DarkSectionHeader
-        eyebrow="RECENT ROUNDS"
-        title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
-        sub={
-          viewMode === 'friend'
-            ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
-            : 'Your full posted history.'
-        }
-      />
+      {!inSheet && (
+        <DarkSectionHeader
+          eyebrow="RECENT ROUNDS"
+          title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
+          sub={
+            viewMode === 'friend'
+              ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
+              : 'Your full posted history.'
+          }
+        />
+      )}
+
 
 
       <div style={{ padding: '0 16px' }}>
