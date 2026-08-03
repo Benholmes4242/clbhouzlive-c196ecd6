@@ -259,10 +259,6 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
     return { active: a, lapsed: l, fresh: f };
   }, [byType]);
 
-  const totalFreezes = useMemo(
-    () => (data ?? []).reduce((acc, r) => acc + (r.freeze_credits ?? 0), 0),
-    [data],
-  );
 
   const longest = useMemo(() => {
     let bestRow: StreakRow | null = null;
