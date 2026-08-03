@@ -32,6 +32,7 @@ import { REC } from './tokens';
 import { Caption } from './Primitives';
 import { CareerHeader } from './CareerHeader';
 import { CountingStatsPanel } from './panels/CountingStatsPanel';
+import { SeasonCutPanel } from './panels/SeasonCutPanel';
 import { Top100Panel } from './panels/Top100Panel';
 import { CrownsPanel, groupCrowns } from './panels/CrownsPanel';
 import { StreaksPanel } from './panels/StreaksPanel';
@@ -237,7 +238,8 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
               </Caption>
             ) : (
               <>
-                <CountingStatsPanel data={data} items={counting} />
+                <SeasonCutPanel rounds={rounds} />
+                <CountingStatsPanel data={data} items={counting} sparse={sparse} />
                 <Top100Panel data={data} items={top100} />
                 <CrownsPanel data={data} groups={crownGroups} />
                 <StreaksPanel streaks={streaks} />
