@@ -8,9 +8,7 @@ import { fmtHcp } from '@/lib/whs/format';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 import { rivalKey } from '@/lib/whs/utils/rivalryTiering';
-import { computeStreak } from './_shared/streakUtils';
 import {
-  pickHeadline,
   computeCrowns,
   emptyCrowns,
   type RivalCrowns,
@@ -50,23 +48,8 @@ export const RivalFightCard: React.FC<Props> = ({
       losses: 0,
       ties: 0,
     };
-  const results = rivalry.shared_round_results ?? [];
-  const streakInfo = useMemo(() => computeStreak(results, dimension), [results, dimension]);
-  const signedStreak =
-    streakInfo == null ? 0 : streakInfo.who === 'you' ? streakInfo.count : -streakInfo.count;
-
   const safeCrowns: RivalCrowns = crowns ?? emptyCrowns(key ?? '');
   const crownInfos = useMemo(() => computeCrowns(safeCrowns), [safeCrowns]);
-
-  const headline = useMemo(
-    () => pickHeadline({
-      crowns: safeCrowns,
-      wins: record.wins,
-      losses: record.losses,
-      streak: signedStreak,
-    }),
-    [safeCrowns, record.wins, record.losses, signedStreak],
-  );
 
   const rivalDisplayName = reformatFriendName(rivalry.rival_name ?? 'Unknown');
 
