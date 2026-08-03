@@ -912,14 +912,8 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   );
 };
 
-// ─── Score stats ring ───────────────────────────────────────────────────
-const RING_SIZE = 176;
-const RING_R = 72;
-const RING_SW = 8;
+// Ring geometry now lives in the shared DistributionRing primitive.
 
-const RING_CX = RING_SIZE / 2;
-const RING_CY = RING_SIZE / 2;
-const RING_CIRC = 2 * Math.PI * RING_R;
 
 interface Band {
   key: string;
