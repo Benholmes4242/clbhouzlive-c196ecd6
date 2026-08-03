@@ -5,8 +5,9 @@
  * happened yet is part of a record. No lock icons, no greyed cards.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { REC } from '../tokens';
-import { Panel, RowButton, Dot, MetaLabel } from '../Primitives';
+import { Panel, RowButton, Dot, MetaLabel, Collapsible } from '../Primitives';
 import { monthYear } from '../format';
 import { measuredShare } from '../shareModel';
 import type { Achievement, CareerData } from '../types';
