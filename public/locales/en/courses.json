@@ -287,11 +287,17 @@
     "voiceYour": "your",
     "voiceYourCap": "Your",
     "avgHereOther": "{{whose}} avg",
+    "avgHereNeutral": "Avg here",
     "vsAvgLevel": "Right on {{whose}} average here.",
     "vsAvgBetter": "{{n}} shots better than {{whose}} average here.",
     "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
+    "vsAvgLevelNeutral": "Right on the average here.",
+    "vsAvgBetterNeutral": "{{n}} shots better than the average here.",
+    "vsAvgWorseNeutral": "{{n}} shots worse than the average here.",
     "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
+    "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
     "beatFieldVoice": "{{who}} beat the field average on {{beat}} of {{scored}} holes scored so far."
+
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

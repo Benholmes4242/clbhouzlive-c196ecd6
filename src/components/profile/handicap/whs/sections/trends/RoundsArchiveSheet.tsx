@@ -19,6 +19,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   connectionId: string;
+  /** Profile owner - threaded through to the round detail scorecard. */
+  userId?: string | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
   /** Rounds count for the header aside. */
@@ -29,6 +31,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
   open,
   onClose,
   connectionId,
+  userId = null,
   viewMode = 'owner',
   ownerFirstName = null,
   total = null,
@@ -117,6 +120,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
       >
         <RecentRoundsCard
           connectionId={connectionId}
+          userId={userId}
           viewMode={viewMode}
           ownerFirstName={ownerFirstName}
           variant="sheet"

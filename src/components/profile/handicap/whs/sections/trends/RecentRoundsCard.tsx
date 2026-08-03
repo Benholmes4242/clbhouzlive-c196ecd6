@@ -11,6 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
   connectionId: string;
+  /** Profile owner - threaded to RoundDetailSheet so the card can name and own the round. */
+  userId?: string | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
   /**
@@ -114,7 +116,7 @@ const fmtMonth = (iso: string): string => {
 
 type FilterKey = 'all' | 'counters' | string;
 
-export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
+export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
@@ -275,6 +277,8 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
         scoreId={openScoreId}
         open={!!openScoreId}
         onClose={() => setOpenScoreId(null)}
+        connectionId={connectionId}
+        profileUserId={userId}
         handicapDelta={openDelta}
       />
     </section>

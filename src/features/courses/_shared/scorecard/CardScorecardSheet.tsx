@@ -139,6 +139,15 @@ const CardRow: React.FC<{
 const Nine: React.FC<{
   rows: CardScorecardHole[];
   label: string;
+  /**
+   * FIELD ROW — MEMBER CARD DOES NOT SHOW IT. The field comparison is already
+   * stated in prose directly above the card ("beat the field average on 14 of
+   * 18 holes scored so far"), and a third row of small signed figures under two
+   * rows that already carry the story is noise. Per-hole field figures remain
+   * available behind "See all 18 holes". The TOUR card keeps the row: there the
+   * field is the tournament field for that round and is the primary reference
+   * point, not a secondary one, so callers gate this on surface.
+   */
   withField: boolean;
   scoreLabel: string;
 }> = ({ rows, label, withField, scoreLabel }) => {
@@ -161,13 +170,12 @@ const Nine: React.FC<{
         cells={rows.map((h) => (
           <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="light" />
         ))}
-
         total={strokes || '\u2014'}
       />
 
       {withField && (
         <CardRow
-          label={t('courses:scorecard.field')}
+          label={t('courses:scorecard.fieldAvg')}
           cells={rows.map((h) => {
             const d = h.fieldAvg != null && h.par != null ? h.fieldAvg - h.par : null;
             if (d == null) return '';
@@ -185,6 +193,10 @@ const Nine: React.FC<{
     </div>
   );
 };
+
+
+
+
 
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
@@ -378,12 +390,25 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * cannot be resolved we fall to the third person.
    */
   const isOwner = !isTour && !!playerUserId && !!user?.id && playerUserId === user.id;
-  const firstName = (playerName || '').trim().split(/\s+/)[0] || playerName || '';
+  const firstName = (playerName || '').trim().split(/\s+/)[0] ?? '';
+  /**
+   * NO NAME IS A STATE, NOT AN EMPTY STRING. An empty or whitespace-only
+   * playerName must NEVER be poured into a possessive or a subject slot: the
+   * result renders as a bare apostrophe ("'s average here") or as a leading
+   * space followed by a lowercase verb (" beat the field average"). This sheet
+   * has more than one caller and will acquire more, so it defends itself here
+   * rather than trusting every caller to pass a name. With no name and no
+   * ownership we use the IMPERSONAL forms, which read correctly with no subject.
+   */
+  const hasName = firstName.trim().length > 0;
   // A first name already ending in s takes a bare apostrophe: "James' average".
   const namePossessive = /s$/i.test(firstName) ? `${firstName}\u2019` : `${firstName}\u2019s`;
+  /** Impersonal voice: no owner and no name to speak of. */
+  const impersonal = !isOwner && !hasName;
   const subject = isOwner ? t('courses:scorecard.voiceYou') : firstName;
   const whose = isOwner ? t('courses:scorecard.voiceYour') : namePossessive;
   const whoseCap = isOwner ? t('courses:scorecard.voiceYourCap') : namePossessive;
+
   const [showCard, setShowCard] = useState(false);
   useEffect(() => { if (!open) setShowCard(false); }, [open]);
 
@@ -453,7 +478,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         items.push({
           label: isOwner
             ? t('courses:scorecard.yourAvgHere')
-            : t('courses:scorecard.avgHereOther', { whose: whoseCap }),
+            : impersonal
+              // No name: a neutral label, never a bare possessive.
+              ? t('courses:scorecard.avgHereNeutral')
+              : t('courses:scorecard.avgHereOther', { whose: whoseCap }),
           value: parts.text,
           // The member's own scoring average is a PLAYER SCORE, so it takes the
           // to-par rule. The label already says "Your"; amber is not needed to
@@ -467,7 +495,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       }
     }
     return items;
-  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, isOwner, whoseCap, t]);
+  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, isOwner, impersonal, whoseCap, t]);
 
   const captions = useMemo(() => {
     const out: string[] = [];
@@ -478,28 +506,50 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       if (avg != null && roundsHere > 1 && totals.played) {
         const diff = totals.toPar - avg;
         const d = Math.abs(Math.round(diff * 10) / 10);
-        if (d < 0.5) out.push(t('courses:scorecard.vsAvgLevel', { whose }));
-        else if (diff < 0) out.push(t('courses:scorecard.vsAvgBetter', { n: d.toFixed(1), whose }));
-        else out.push(t('courses:scorecard.vsAvgWorse', { n: d.toFixed(1), whose }));
+        // Impersonal variants carry no subject at all, so a missing name can
+        // never produce a line that opens with an apostrophe.
+        if (d < 0.5) {
+          out.push(impersonal
+            ? t('courses:scorecard.vsAvgLevelNeutral')
+            : t('courses:scorecard.vsAvgLevel', { whose }));
+        } else if (diff < 0) {
+          out.push(impersonal
+            ? t('courses:scorecard.vsAvgBetterNeutral', { n: d.toFixed(1) })
+            : t('courses:scorecard.vsAvgBetter', { n: d.toFixed(1), whose }));
+        } else {
+          out.push(impersonal
+            ? t('courses:scorecard.vsAvgWorseNeutral', { n: d.toFixed(1) })
+            : t('courses:scorecard.vsAvgWorse', { n: d.toFixed(1), whose }));
+        }
       }
       if (courseContext.rankHere != null && roundsHere > 0) {
-        out.push(t('courses:scorecard.rankHereVoice', {
-          whose: whoseCap,
-          ordinal: formatOrdinal(courseContext.rankHere),
-          count: roundsHere,
-        }));
+        out.push(impersonal
+          ? t('courses:scorecard.rankHereNeutral', {
+              ordinal: formatOrdinal(courseContext.rankHere),
+              count: roundsHere,
+            })
+          : t('courses:scorecard.rankHereVoice', {
+              whose: whoseCap,
+              ordinal: formatOrdinal(courseContext.rankHere),
+              count: roundsHere,
+            }));
       }
     }
     return out;
-  }, [isTour, courseContext, totals, whose, whoseCap, t]);
+  }, [isTour, courseContext, totals, whose, whoseCap, impersonal, t]);
 
+  /**
+   * With no subject to name, use the subject-less form (capital B, no leading
+   * space) rather than interpolating an empty string into "{{who}} beat ...".
+   */
   const fieldCaption = withField && beatFieldOn != null
-    ? t(isTour ? 'courses:scorecard.beatFieldOnTour' : 'courses:scorecard.beatFieldVoice', {
+    ? t((isTour || impersonal) ? 'courses:scorecard.beatFieldOnTour' : 'courses:scorecard.beatFieldVoice', {
         who: subject,
         beat: beatFieldOn,
         scored: fieldHoles.length,
       })
     : null;
+
 
   const split = useMemo(() => {
     const d = (h: CardScorecardHole) => (h.strokes as number) - (h.par as number);
@@ -515,9 +565,17 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const back = holes.filter((h) => h.holeNo > 9);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
 
+  /**
+   * The FIELD row is a tour-card row only — see the note on <Nine>. On the
+   * member card the prose above states the field comparison and the per-hole
+   * figures live in the holes sheet.
+   */
+  const showFieldRow = withField && isTour;
+
   // The card column header has no room for a name and the legend above already
   // names the player, so a third-person card marks the column with an em dash.
   const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '\u2014';
+
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
   const showIdentity = !!playerName;
@@ -610,10 +668,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
                   {withField && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{isOwner ? t('courses:scorecard.you') : firstName}</span>
-                      <span style={LABEL}>{t('courses:scorecard.field')}</span>
+                      {(isOwner || hasName) && (
+                        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{isOwner ? t('courses:scorecard.you') : firstName}</span>
+                      )}
+                      <span style={LABEL}>{t('courses:scorecard.fieldAvg')}</span>
                     </span>
                   )}
+
                 </div>
 
                 <TrajectoryLine holes={holes} />
@@ -646,19 +707,35 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 
                 {showCard && (
                   <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <Nine rows={out} label={t('courses:scorecard.out')} withField={withField} scoreLabel={cardScoreLabel} />
+                    <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
                     {back.length > 0 && (
-                      <Nine rows={back} label={t('courses:scorecard.in')} withField={withField} scoreLabel={cardScoreLabel} />
+                      <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
                     )}
 
+                    {/*
+                      TOTALS ROW — three separate tokens: the TOTAL label, the
+                      par segment and the to-par figure. The par segment carries
+                      its own left gap so "TOTAL" and "par 71" can never read as
+                      one broken word, and a middle dot keeps par and to-par
+                      apart. Holds on a nine-hole card, where only the Out block
+                      renders above it.
+                    */}
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2 }}>
                       <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      <span style={{ gridColumn: 'span 9', ...NUM, fontSize: 11.5, fontWeight: 700, color: A.MUTE }}>
-                        {t('courses:scorecard.parN', { n: totalPar })}
-                        <span style={{ color: toParColor(totals.toPar), marginLeft: 8 }}>{fmtRel(totals.toPar)}</span>
+                      <span
+                        style={{
+                          gridColumn: 'span 9', ...NUM, fontSize: 11.5, fontWeight: 700, color: A.MUTE,
+                          paddingLeft: 10, display: 'inline-flex', alignItems: 'baseline', gap: 6,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <span>{t('courses:scorecard.parN', { n: totalPar })}</span>
+                        <span aria-hidden="true" style={{ color: A.MUTE }}>{'\u00B7'}</span>
+                        <span style={{ color: toParColor(totals.toPar) }}>{fmtRel(totals.toPar)}</span>
                       </span>
                       <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{totals.gross}</span>
                     </div>
+
 
                     <Legend />
                   </div>

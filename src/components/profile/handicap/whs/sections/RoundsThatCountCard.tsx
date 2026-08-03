@@ -11,6 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface Props {
   connectionId: string;
   currentHandicap: number | null;
+  /**
+   * Profile owner. Threaded to RoundDetailSheet as profileUserId: without it
+   * the scorecard cannot resolve the player name or ownership and falls back
+   * to third-person copy with an empty subject.
+   */
+  userId?: string | null;
   /** 'owner' (default) shows first-person copy; 'friend' uses possessive + ownerFirstName. */
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
@@ -81,6 +87,7 @@ const CardSkeleton: React.FC = () => (
 export const RoundsThatCountCard: React.FC<Props> = ({
   connectionId,
   currentHandicap,
+  userId = null,
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
@@ -753,6 +760,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
         onClose={() => setSheetScoreId(null)}
         scoreId={sheetScoreId}
         connectionId={connectionId}
+        profileUserId={userId}
         handicapDelta={null}
       />
     </>

@@ -19,6 +19,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Props {
   connectionId: string;
+  /** Profile owner - threaded through to the round detail scorecard. */
+  userId?: string | null;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
 }
@@ -34,6 +36,7 @@ const figureStyle: React.CSSProperties = {
 
 export const RoundsArchivePanel: React.FC<Props> = ({
   connectionId,
+  userId = null,
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
@@ -130,6 +133,7 @@ export const RoundsArchivePanel: React.FC<Props> = ({
         open={open}
         onClose={() => setOpen(false)}
         connectionId={connectionId}
+        userId={userId}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}
         total={rounds.length}

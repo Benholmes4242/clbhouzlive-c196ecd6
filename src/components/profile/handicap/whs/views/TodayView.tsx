@@ -92,7 +92,7 @@ export const TodayView: React.FC<Props> = ({
       />
 
       {/* 7. Last 14 Rounds */}
-      <Pattern14Card connectionId={connectionId} />
+      <Pattern14Card connectionId={connectionId} userId={userId} />
 
       {!readOnly && <StreaksSheetMount />}
       <LaunchSheetMount userId={userId} />
