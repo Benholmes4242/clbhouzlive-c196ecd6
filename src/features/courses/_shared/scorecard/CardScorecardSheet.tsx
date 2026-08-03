@@ -754,28 +754,50 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     )}
 
                     {/*
-                      TOTALS ROW — three separate tokens: the TOTAL label, the
-                      par segment and the to-par figure. The par segment carries
-                      its own left gap so "TOTAL" and "par 71" can never read as
-                      one broken word, and a middle dot keeps par and to-par
-                      apart. Holds on a nine-hole card, where only the Out block
-                      renders above it.
+                      TOTALS BLOCK — a member of the HOLE / PAR / YOU family, not
+                      a summary line floating beneath it. Two rows on the same
+                      NINE_GRID: row 1 carries TOTAL, the OUT and IN segments and
+                      the gross in the totals column, directly under the nine
+                      totals above; row 2 carries PAR n as a caps label and the
+                      to-par beneath the gross. Every figure lines up down the
+                      right edge. On a nine-hole card the OUT segment spans the
+                      full nine columns and no IN segment renders.
                     */}
-                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2 }}>
-                      <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      <span
-                        style={{
-                          gridColumn: 'span 9', ...NUM, fontSize: 11.5, fontWeight: 700, color: A.MUTE,
-                          paddingLeft: 10, display: 'inline-flex', alignItems: 'baseline', gap: 6,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <span>{t('courses:scorecard.parN', { n: totalPar })}</span>
-                        <span aria-hidden="true" style={{ color: A.MUTE }}>{'\u00B7'}</span>
-                        <span style={{ color: toParColor(totals.toPar) }}>{fmtRel(totals.toPar)}</span>
-                      </span>
-                      <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{totals.gross}</span>
+                    <div>
+                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                        <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                        <span
+                          style={{
+                            gridColumn: backSummary ? 'span 4' : 'span 9',
+                            ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('courses:scorecard.outN', { n: outSummary.par })}
+                        </span>
+                        {backSummary && (
+                          <span
+                            style={{
+                              gridColumn: 'span 5',
+                              ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {t('courses:scorecard.inN', { n: backSummary.par })}
+                          </span>
+                        )}
+                        <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                        <span style={{ ...LABEL, fontSize: 8, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                          {t('courses:scorecard.parNCaps', { n: cardTotalPar })}
+                        </span>
+                        <span style={{ gridColumn: 'span 9' }} />
+                        <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
+                          {fmtRel(totals.toPar)}
+                        </span>
+                      </div>
                     </div>
+
 
 
                     <Legend />
