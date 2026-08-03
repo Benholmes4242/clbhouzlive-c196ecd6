@@ -19,7 +19,7 @@
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
  *  achievement / achievement_unlocked      -> /achievements
  *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
- *  level_* / streak_* / status_* / badge_earned -> /achievements
+ *  level_* / streak_* / status_* / badge_earned -> /handicap?gam=trophies (&badge=)
  *  business_verification_*                 -> /business/:id/verification
  *  course_claim_*                          -> /courses/:course_id (claim surface)
  *  business_member_added                   -> /business/:id
