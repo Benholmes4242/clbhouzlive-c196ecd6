@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -24,6 +25,7 @@ import {
   clearRivalDismissal,
   type RivalIdentity,
   fetchSharedRounds,
+  fetchSharedRoundCounts,
   fetchTrophyAggregates,
   lookupWhsCourseId,
 } from './api';
@@ -339,7 +341,7 @@ export function useSharedRoundCounts(
   targetIds: string[],
   enabled = true,
 ) {
-  const key = React.useMemo(() => [...targetIds].sort().join(','), [targetIds]);
+  const key = useMemo(() => [...targetIds].sort().join(','), [targetIds]);
   return useQuery({
     queryKey: ['whs-shared-round-counts', userId ?? '', key],
     queryFn: () => fetchSharedRoundCounts(userId as string, key ? key.split(',') : []),
