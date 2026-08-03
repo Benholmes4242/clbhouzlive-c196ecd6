@@ -291,6 +291,8 @@ export function TournamentPage() {
         defaultRound={currentRound}
         maxAvailableRound={pulse.state === 'upcoming' ? 1 : (highestDrawnRound ?? meta?.current_round ?? currentRound)}
         drawnRounds={pulse.state === 'upcoming' && drawnRounds.length === 0 ? [1] : drawnRounds}
+        entries={leaderboardRows}
+
       />
       <FullBoardSheet
         open={fullBoardOpen}
