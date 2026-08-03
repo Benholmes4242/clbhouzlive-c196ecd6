@@ -43,7 +43,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
   // Scope changes are tracked, never awaited.
   const scopeRange = (next: Range) => {
     if (next === range) return;
-    analyticsEvents.track?.('handicap_chart_scoped', {
+    analyticsEvents.track('handicap_chart_scoped', {
       chart: 'index_history',
       from: range,
       to: next,

@@ -91,7 +91,7 @@ const FriendTitleRow: React.FC<{
   const initial = (displayName?.charAt(0) ?? '?').toUpperCase();
 
   const handleTap = () => {
-    analyticsEvents.track?.('friend_handicap_profile_tap', {
+    analyticsEvents.track('friend_handicap_profile_tap', {
       viewer_id: viewerUserId,
       friend_id: friendId,
     });
@@ -370,7 +370,7 @@ const HandicapPage: React.FC = () => {
     const params = new URLSearchParams(searchParams);
     params.set('subtab', next);
     setSearchParams(params, { replace: true });
-    analyticsEvents.track?.('handicap_tab_changed', { from: activeTab, to: next });
+    analyticsEvents.track('handicap_tab_changed', { from: activeTab, to: next });
   }, [searchParams, setSearchParams, activeTab]);
 
 
@@ -432,13 +432,13 @@ const HandicapPage: React.FC = () => {
   useEffect(() => {
     if (!ownerUserId) return;
     if (isFriendView) {
-      analyticsEvents.track?.('friend_handicap_page_viewed', {
+      analyticsEvents.track('friend_handicap_page_viewed', {
         viewer_id: user?.id,
         friend_id: ownerUserId,
         source: 'route',
       });
     } else {
-      analyticsEvents.track?.('handicap_page_viewed', {
+      analyticsEvents.track('handicap_page_viewed', {
         source: 'route',
         mode: 'own',
       });

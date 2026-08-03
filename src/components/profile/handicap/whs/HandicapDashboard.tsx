@@ -52,7 +52,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
     const key = `${activeSubtab}:${readOnly ? 1 : 0}`;
     if (viewedKeyRef.current === key) return;
     viewedKeyRef.current = key;
-    analyticsEvents.track?.('handicap_viewed', {
+    analyticsEvents.track('handicap_viewed', {
       tab: activeSubtab,
       read_only: readOnly,
       index: currentHandicap,
