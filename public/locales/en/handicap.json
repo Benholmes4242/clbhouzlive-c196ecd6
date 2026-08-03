@@ -1,0 +1,20 @@
+{
+  "career": {
+    "achieved": "Achieved",
+    "everyThreshold": "Every threshold achieved",
+    "toGoTo": "{{n}} to go to {{target}}",
+    "partsSoFar": "{{parts}} so far",
+    "partsAll": "{{parts}}",
+    "mostRecent": "Most recent {{when}}",
+    "showAll": "Show all {{count}} courses",
+    "showAllItems": "Show all {{count}}",
+    "showFewer": "Show fewer",
+    "seasonKicker": "SEASON {{year}}",
+    "seasonAside": "so far",
+    "seasonRounds": "ROUNDS",
+    "seasonBirdies": "BIRDIES",
+    "seasonBest": "BEST",
+    "sparseFootnote": "Post a few more rounds and crowns, Top 100 progress and longer streaks appear here.",
+    "bestRoundLine": "{{date}} \u00b7 {{gross}} gross"
+  }
+}

@@ -34,7 +34,16 @@ if (!i18n.isInitialized) {
         en: { auth: authEn as Record<string, unknown> },
       },
       defaultNS: 'common',
-      ns: ['common', 'auth', 'composer', 'messaging', 'achievements', 'courses', 'tourhub'],
+      ns: [
+        'common',
+        'auth',
+        'composer',
+        'messaging',
+        'achievements',
+        'courses',
+        'tourhub',
+        'handicap',
+      ],
       load: 'languageOnly',
       // React already escapes.
       interpolation: { escapeValue: false },
