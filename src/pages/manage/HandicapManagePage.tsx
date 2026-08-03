@@ -10,6 +10,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
+import { getSyncHealth } from '@/lib/whs/syncHealth';
+
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
