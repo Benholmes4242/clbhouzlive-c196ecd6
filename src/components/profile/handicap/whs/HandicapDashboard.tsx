@@ -9,7 +9,7 @@ import FriendsView from './views/FriendsView';
 import LegendsView from './views/LegendsView';
 
 import WhsConnectionCaption from './sections/WhsConnectionCaption';
-import { isHandicapSubtab, type HandicapSubtab } from './types';
+import { resolveHandicapSubtab, type HandicapSubtab } from './types';
 
 interface Props {
   connection: WhsConnection;
