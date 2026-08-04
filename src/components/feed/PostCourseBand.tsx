@@ -31,9 +31,8 @@ const RED = '#EF4444';
 const GREEN = '#5EE9A6';
 const AMBER = '#F7931E';
 const LINE = 'rgba(255,255,255,0.10)';
-const SURFACE = 'rgba(255,255,255,0.035)';
 /** Solid feed card surface, used to keep the actions row off the photo backdrop. */
-const OPAQUE_SURFACE = '#15171F';
+const OPAQUE_SURFACE = '#10151C';
 
 const MONO =
   'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
@@ -336,7 +335,7 @@ export const PostCourseBand: React.FC<Props> = ({
   return (
     <div
       style={{
-        background: glass ? 'transparent' : SURFACE,
+        background: 'transparent',
         borderTop: `1px solid ${LINE}`,
       }}
     >

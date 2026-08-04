@@ -39,7 +39,7 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 
-const CANVAS = '#15171F';
+const CANVAS = '#05070A';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -731,8 +731,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
               />
             )}
           </FeedItemGate>
-          {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
-          <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
+          {/* Inter-slab gap — the dark canvas showing through, never a painted strip */}
+          <div aria-hidden style={{ height: 8, background: 'transparent' }} />
         </div>
       );
     },
