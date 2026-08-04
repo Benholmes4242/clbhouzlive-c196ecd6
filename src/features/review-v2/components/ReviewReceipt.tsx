@@ -133,7 +133,7 @@ export function ReviewReceipt({
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '0.14em',
-              color: RV2.amberDeep,
+              color: RV2.eyebrow,
               marginBottom: 12,
             }}
           >

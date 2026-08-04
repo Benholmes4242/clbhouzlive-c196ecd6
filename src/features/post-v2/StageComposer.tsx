@@ -52,7 +52,7 @@ import { CT } from '@/features/_shared/composerTokens';
 const EYEBROW: React.CSSProperties = {
   fontSize: 10.5,
   fontWeight: 700,
-  color: CT.amberDeep,
+  color: CT.eyebrow,
   textTransform: 'uppercase',
   letterSpacing: '0.14em',
 };
