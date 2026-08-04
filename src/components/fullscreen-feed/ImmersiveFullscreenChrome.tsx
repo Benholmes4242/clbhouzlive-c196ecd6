@@ -574,31 +574,37 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
       </div>
 
-      {/* Bottom-RIGHT — vertical action rail (no avatar) */}
-      {!readOnly && (
-        <div
-          style={{
-            position: 'fixed',
-            right: 'max(12px, env(safe-area-inset-right, 0px))',
-            bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
-            zIndex: Z.echo,
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            gap: 20, pointerEvents: 'none',
-            fontFamily: 'Geist, system-ui, sans-serif',
-          }}
+      {/* Bottom-RIGHT — vertical action rail (no avatar).
+          ONE wrapper, always mounted: mute is never suppressed (read-only /
+          gallery opens still need audio control on videos). Only the
+          engagement buttons below it are gated on !readOnly, so normal-mode
+          layout is pixel-identical to before. */}
+      <div
+        style={{
+          position: 'fixed',
+          right: 'max(12px, env(safe-area-inset-right, 0px))',
+          bottom: 'calc(max(env(safe-area-inset-bottom, 0px), 24px) + 26px)',
+          zIndex: Z.echo,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          gap: 20, pointerEvents: 'none',
+          fontFamily: 'Geist, system-ui, sans-serif',
+        }}
+      >
+        <RailButton
+          onClick={handleMuteTap}
+          ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
         >
-          <RailButton
-            onClick={handleMuteTap}
-            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
-          >
-            {isAudioMuted ? (
-              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
-            ) : (
-              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
-            )}
-          </RailButton>
+          {isAudioMuted ? (
+            <VolumeX size={32} stroke="#fff" strokeWidth={2} />
+          ) : (
+            <Volume2 size={32} stroke="#fff" strokeWidth={2} />
+          )}
+        </RailButton>
 
+        {!readOnly && (
+          <>
           <RailButton
+
             onClick={() => onLike(activePost)}
             ariaLabel={likeState.isLiked ? 'Unlike' : 'Like'}
             count={likeStr}
