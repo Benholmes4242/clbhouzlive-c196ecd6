@@ -29,6 +29,99 @@ async function sweepStaleRows(supabase, tourCode, seasonYear, label) {
   }
 }
 
+// Compute position_change from OUR OWN previous run.
+//
+// SIGN CONVENTION - single source of truth for every tour:
+//     position_change = previousPosition - newPosition
+//     POSITIVE = MOVED UP.
+// This matches what is already deployed for DP World (Mazzoli 127 -> 39 = +88)
+// and what MovementFigure renders. Never inverted, never per-tour.
+//
+// MUST be called BEFORE the upsert: it reads the very rows the upsert
+// overwrites. If the first run after deploy produces all nulls, the call has
+// been placed after the upsert.
+//
+// Edge cases:
+//   climber   prev 40, now 9  -> "31"
+//   faller    prev 5,  now 22 -> "-17"
+//   static    prev 12, now 12 -> "0"   (string zero, not null)
+//   new entrant / previous position null -> null (NOT "0": we cannot claim a
+//                                          player "held" a place they never had)
+//   dropped player -> simply absent, handled by sweepStaleRows
+//
+// compareOnly: leave row.position_change untouched and only report whether the
+// computed value agrees with the value already on the row (used for euro,
+// which still scrapes a movement cell).
+async function attachMovement(supabase, tourCode, seasonYear, rows, label, opts) {
+  const compareOnly = !!(opts && opts.compareOnly);
+
+  const prev = new Map();
+  const { data, error } = await supabase
+    .from('tour_season_rankings')
+    .select('player_name, position')
+    .eq('tour_code', tourCode)
+    .eq('season_year', seasonYear);
+
+  if (error) {
+    console.error(`[${label}] Previous-position read failed, movement left null:`, error.message);
+  } else {
+    for (const r of data || []) {
+      if (r.player_name && typeof r.position === 'number') prev.set(r.player_name, r.position);
+    }
+    console.log(`[${label}] Read ${prev.size} previous positions`);
+  }
+
+  let computedCount = 0;
+  let newEntrants = 0;
+  let agree = 0;
+  let disagree = 0;
+  const disagreements = [];
+
+  for (const row of rows) {
+    const previous = prev.get(row.player_name);
+    const computed =
+      typeof previous === 'number' && typeof row.position === 'number'
+        ? String(previous - row.position)
+        : null;
+
+    if (computed === null) newEntrants++;
+    else computedCount++;
+
+    if (compareOnly) {
+      const scraped = row.position_change === null || row.position_change === undefined
+        ? null
+        : String(row.position_change).trim();
+      if (computed !== null && scraped !== null && scraped !== '') {
+        if (computed === scraped) agree++;
+        else {
+          disagree++;
+          if (disagreements.length < 10) {
+            disagreements.push(`${row.player_name}: scraped=${scraped} computed=${computed}`);
+          }
+        }
+      }
+    } else {
+      row.position_change = computed;
+    }
+  }
+
+  if (compareOnly) {
+    console.log(
+      `[${label}] Movement agreement check: ${agree} agree, ${disagree} disagree ` +
+      `(of ${computedCount} comparable, ${newEntrants} new entrants). Scraped cell still authoritative.`
+    );
+    if (disagreements.length > 0) {
+      console.log(`[${label}] Sample disagreements: ${disagreements.join(' | ')}`);
+    }
+  } else {
+    console.log(
+      `[${label}] Movement computed for ${computedCount} rows, ${newEntrants} new entrants left null`
+    );
+  }
+
+  return rows;
+}
+
 async function scrape() {
   console.log(`[R2D Scraper] Starting for season ${SEASON_YEAR}...`);
 
