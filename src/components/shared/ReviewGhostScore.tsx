@@ -14,13 +14,33 @@ import React from 'react';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 
-/** One neutral ghost value for every tier — 9.2 and 4.1 render identically. */
+export type ReviewGhostSurface = 'dark' | 'light';
+
+/** One neutral ghost value for every tier — 9.2 and 4.1 render identically.
+ *  Dark = paper-white at 16%; light = ink at 10% (a quiet grey watermark). */
 export const REVIEW_GHOST_COLOR_NEUTRAL = 'rgba(248,250,252,0.16)';
+export const REVIEW_GHOST_COLOR_NEUTRAL_LIGHT = 'rgba(14,18,22,0.10)';
+
+export function reviewGhostColor(surface: ReviewGhostSurface = 'dark'): string {
+  return surface === 'light'
+    ? REVIEW_GHOST_COLOR_NEUTRAL_LIGHT
+    : REVIEW_GHOST_COLOR_NEUTRAL;
+}
 
 /** Band colour at DARK-legible values. scoreBands.tsx's bandColor() returns
  *  light-surface values (#047857 green, #DC2626 red) that fail on the dark
  *  feed — same thresholds, dark tokens. */
-export function reviewLabelColor(rating: number): string {
+export function reviewLabelColor(
+  rating: number,
+  surface: ReviewGhostSurface = 'dark',
+): string {
+  if (surface === 'light') {
+    // Light-surface values. The mid band is amber-DEEP, never #F7931E: the word
+    // is ~10-12px and small bright amber on white fails contrast (house rule).
+    if (rating >= 9) return '#047857';
+    if (rating >= 5) return '#C2620A';
+    return '#DC2626';
+  }
   if (rating >= 9) return '#5EE9A6';
   if (rating >= 5) return '#F7931E';
   return '#FF6B6B';
@@ -34,6 +54,8 @@ interface ReviewGhostNumeralProps {
   right?: number;
   /** Absolute-position `top` (before translateY(-50%)). Card uses 28. */
   top?: number;
+  /** Host surface. Default 'dark' — FeedCard and ReviewBottomSheet unchanged. */
+  surface?: ReviewGhostSurface;
 }
 
 /**
@@ -46,6 +68,7 @@ export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
   fontSize = 110,
   right = -7,
   top = 28,
+  surface = 'dark',
 }) => {
   return (
     <span
@@ -63,7 +86,7 @@ export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
         whiteSpace: 'nowrap',
         zIndex: 0,
         fontVariantNumeric: 'tabular-nums',
-        color: REVIEW_GHOST_COLOR_NEUTRAL,
+        color: reviewGhostColor(surface),
       }}
     >
       {formatRatingValue(rating)}
@@ -78,12 +101,9 @@ interface ReviewVerdictLabelProps {
   /** Optional click handler — wraps the label in a bare button when provided. */
   onClick?: (e: React.MouseEvent) => void;
   ariaLabel?: string;
-  /**
-   * Retained for caller compatibility. The label now takes its colour from the
-   * app-wide score bands (`reviewLabelColor`) on every surface, so this has no
-   * effect on rendering.
-   */
-  surface?: 'light' | 'dark';
+  /** Host surface. Default 'dark'. Selects the band palette (see
+   *  `reviewLabelColor`) — same thresholds, per-surface values. */
+  surface?: ReviewGhostSurface;
 }
 
 /**
@@ -96,10 +116,10 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   fontSize = 12.5,
   onClick,
   ariaLabel,
+  surface = 'dark',
 }) => {
-
   const tierLabel = getRatingTierLabel(rating);
-  const labelColor = reviewLabelColor(rating);
+  const labelColor = reviewLabelColor(rating, surface);
   const labelSpan = (
     <span
       style={{
