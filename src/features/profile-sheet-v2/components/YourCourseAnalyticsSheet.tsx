@@ -605,28 +605,17 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                   overflow: 'hidden',
                 }}
               >
-                {listItems.map((c) => {
-                  const delta =
-                    baseline != null && c.avg_to_par !== null && c.avg_to_par !== undefined
-                      ? (c.avg_to_par as number) - baseline
-                      : null;
-                  return (
-                    <AnalyticsCourseRow
-                      key={c.course_id}
-                      course={c}
-                      delta={delta}
-                      expanded={expandedIds.has(c.course_id)}
-                      onToggle={() => toggle(c, delta)}
-                      onOpen={(from) => go(c.course_id, from)}
-                    />
-                  );
-                })}
+                {listItems.map((c) => (
+                  <AnalyticsCourseRow
+                    key={c.course_id}
+                    course={c}
+                    expanded={expandedIds.has(c.course_id)}
+                    onToggle={() => toggle(c)}
+                    onOpen={(from) => go(c.course_id, from)}
+                  />
+                ))}
               </div>
-              {signedBaseline != null && (
-                <div style={{ ...CAPTION, padding: '14px 24px 4px', textAlign: 'center' }}>
-                  {t('yourCourses.footnote', { avg: signedBaseline, rounds: totalRounds })}
-                </div>
-              )}
+
             </>
           ) : null}
 
