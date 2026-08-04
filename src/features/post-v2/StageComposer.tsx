@@ -26,7 +26,6 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
