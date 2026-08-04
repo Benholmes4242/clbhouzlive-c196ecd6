@@ -59,6 +59,7 @@ export function FeedCard({
   hideCourseAttribution = false,
   hideFormatBadge = false,
   bareTile = false,
+  readOnlyFullscreen = false,
 }: {
 
   row: FeedCardRow;
@@ -146,6 +147,7 @@ export function FeedCard({
       originEl: rootRef.current as HTMLElement | null,
       posterUrl,
       railOwnerKey: ownerKey,
+      ...(readOnlyFullscreen ? { options: { readOnly: true } } : {}),
     });
   };
 
