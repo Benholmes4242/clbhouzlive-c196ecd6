@@ -253,6 +253,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideFormatBadge
               bareTile
                 readOnlyFullscreen
+                hideLikeCount
               />
 
             );
@@ -274,6 +275,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideFormatBadge
               bareTile
                 readOnlyFullscreen
+                hideLikeCount
               />
 
             );
