@@ -69,7 +69,7 @@ function figure(label: string, value: string, opts: { hero?: boolean; colour?: s
     el(
       'div',
       {
-        fontSize: hero ? 128 : 60,
+        fontSize: hero ? 104 : 52,
         fontWeight: 800,
         letterSpacing: -3,
         lineHeight: 1,
@@ -99,7 +99,7 @@ function buildTree(data: RoundCardData): El {
     panelChildren.push(
       el(
         'div',
-        { fontSize: 22, fontWeight: 700, letterSpacing: 3, color: AMBER_DEEP, marginBottom: 18 },
+        { fontSize: 22, fontWeight: 700, letterSpacing: 3, color: AMBER_DEEP, marginBottom: 14 },
         kicker,
       ),
     );
@@ -110,20 +110,20 @@ function buildTree(data: RoundCardData): El {
         'div',
         {
           display: 'flex',
-          fontSize: data.courseName.length > 30 ? 60 : 74,
+          fontSize: data.courseName.length > 30 ? 52 : 68,
           fontWeight: 800,
           letterSpacing: -1.8,
           lineHeight: 1.06,
           color: INK,
           maxWidth: 1000,
-          marginBottom: 44,
+          marginBottom: 30,
         },
         data.courseName,
       ),
     );
   }
   if (heroFigures.length > 0) {
-    panelChildren.push(el('div', { display: 'flex', gap: 104, marginBottom: 34 }, heroFigures));
+    panelChildren.push(el('div', { display: 'flex', gap: 96, marginBottom: 26 }, heroFigures));
   }
   if (subFigures.length > 0) {
     panelChildren.push(el('div', { display: 'flex', gap: 104 }, subFigures));
@@ -159,7 +159,7 @@ function buildTree(data: RoundCardData): El {
           backgroundColor: PANEL,
           border: '1px solid ' + HAIRLINE,
           borderRadius: 10,
-          padding: '56px 64px',
+          padding: '44px 56px',
           justifyContent: 'space-between',
         },
         [
