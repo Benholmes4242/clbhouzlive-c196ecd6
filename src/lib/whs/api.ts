@@ -147,7 +147,7 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
 }
 
 const SCORE_SELECT = `
-  id, play_date, adjusted_gross, stableford_points,
+  id, play_date, course_id, adjusted_gross, stableford_points,
   handicap_differential, course_rating, slope_rating, marker_name,
   is_counter, handicap_index_at_time,
   course:whs_courses(name, country_name, country_code)
