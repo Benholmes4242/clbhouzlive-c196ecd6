@@ -422,5 +422,24 @@
       "window90d": "90 days",
       "windowAllTime": "All time"
     }
+  },
+  "comments": {
+    "countNone": "No comments yet",
+    "count_one": "{{count}} comment",
+    "count_other": "{{count}} comments",
+    "emptyLine": "Say something about this round.",
+    "placeholder": "Add a comment\u2026",
+    "replyPlaceholder": "Reply to {{name}}\u2026",
+    "replyingTo": "Replying to",
+    "reply": "Reply",
+    "viewMoreReplies_one": "View {{count}} more reply",
+    "viewMoreReplies_other": "View {{count}} more replies",
+    "viewEarlier": "VIEW EARLIER COMMENTS",
+    "loading": "Loading\u2026",
+    "edited": "edited",
+    "business": "BUSINESS",
+    "like": "Like",
+    "unlike": "Unlike",
+    "more": "More"
   }
 }
