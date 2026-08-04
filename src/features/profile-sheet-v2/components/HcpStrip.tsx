@@ -51,14 +51,6 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     ).length;
   }, [scores]);
 
-  const coursesPlayed = useMemo<number | null>(() => {
-    if (!scores) return null;
-    const ids = new Set<string>();
-    for (const s of scores) {
-      if (s.course_id) ids.add(s.course_id);
-    }
-    return ids.size;
-  }, [scores]);
 
   if (isBusiness) return null;
 
