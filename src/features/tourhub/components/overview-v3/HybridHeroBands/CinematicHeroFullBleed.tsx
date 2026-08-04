@@ -28,7 +28,9 @@ import {
   type HeroState,
   type TopTie,
 } from '../HybridHero.utils';
-import { NUMERIC_STYLE, AMBER } from '../HybridHero.constants';
+import { NUMERIC_STYLE } from '../HybridHero.constants';
+
+const DARK_ACTION = 'rgba(255,255,255,0.62)';
 import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 import { formatNumber } from '@/i18n/format';
@@ -1201,12 +1203,13 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.06em',
-            color: AMBER,
+            // Quiet action on a dark band: white-62, never amber (ACTION INK FLIP).
+            color: DARK_ACTION,
           }}
         >
           {t('overview.cinematic.ctaTournament')}
         </span>
-        <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
+        <ChevronRight size={13} strokeWidth={2.5} color={DARK_ACTION} style={{ flexShrink: 0 }} />
       </span>
       {/* underscores to silence unused-var lints across forks */}
       <span style={{ display: 'none' }}>{isLive ? '1' : '0'}</span>
