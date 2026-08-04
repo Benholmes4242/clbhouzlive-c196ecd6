@@ -188,7 +188,10 @@
       "yourBestHere": "your best here",
       "roundTracked_one": "round tracked",
       "roundTracked_other": "rounds tracked",
-      "harderThan": "harder than {{pct}}% of courses"
+      "harderThan": "harder than {{pct}}% of courses",
+      "fieldAvg": "field avg",
+      "topHardest": "top {{pct}}% hardest courses",
+      "topEasiest": "top {{pct}}% easiest courses"
     },
     "courseSheet": {
       "kicker": "Course stats",
