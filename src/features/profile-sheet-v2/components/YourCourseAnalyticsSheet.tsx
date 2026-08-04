@@ -251,10 +251,10 @@ function AnalyticsCourseRow({
           )}
         </div>
 
-        {deltaRounded != null && (
+        {avgVal != null && (
           <div style={{ width: 62, flex: '0 0 62px', textAlign: 'right' }}>
-            <div style={{ ...NUM, fontSize: 17, color: deltaTone }}>{fmtSigned(deltaRounded, 1)}</div>
-            <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.vsYou')}</div>
+            <div style={{ ...NUM, fontSize: 17, color: A.INK }}>{fmtSigned(avgVal, 1)}</div>
+            <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.avgToPar')}</div>
           </div>
         )}
 
