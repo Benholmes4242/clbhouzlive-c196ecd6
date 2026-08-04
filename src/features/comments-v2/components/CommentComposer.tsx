@@ -44,6 +44,7 @@ interface Props {
 
 export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitting }: Props) {
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('common');
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
