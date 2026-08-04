@@ -7,8 +7,9 @@
  *   steady       — index number alone (|delta| < 0.3 or insufficient history)
  *   disconnected — amber "Connect WHS" label
  *
- * Logged-out users render nothing. While the WHS connection resolves we
- * render a fixed-width skeleton pill to prevent layout shift.
+ * Logged-out users render nothing. Nothing renders until both the profile and
+ * the WHS connection resolve, so the pill only ever appears at its final size.
+
  */
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TrendingDown, TrendingUp } from 'lucide-react';
