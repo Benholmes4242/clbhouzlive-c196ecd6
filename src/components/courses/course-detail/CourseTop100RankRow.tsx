@@ -42,9 +42,9 @@ export const CourseTop100RankRow: React.FC<Props> = ({ courseId }) => {
         style={{
           flex: 1,
           minWidth: 0,
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
-          gap: 8,
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          alignItems: 'flex-start',
         }}
       >
         {cells.map((m) => (
@@ -56,9 +56,12 @@ export const CourseTop100RankRow: React.FC<Props> = ({ courseId }) => {
               background: 'transparent',
               border: 'none',
               padding: 0,
-              textAlign: 'left',
+              textAlign: 'center',
               minWidth: 0,
               cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
             }}
           >
             <div style={{ ...NUM, fontSize: 15, color: A.INK, lineHeight: 1 }}>#{m.rank}</div>
