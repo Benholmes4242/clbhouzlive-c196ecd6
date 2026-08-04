@@ -25,7 +25,7 @@ import {
   currentSeasonYear,
   useLeaderCategories,
 } from '../leaders-v2/data/useLeaderCategories';
-import { AMBER_DEEP, INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
+import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
 
 interface StatsSheetProps {
   open: boolean;

@@ -23,7 +23,6 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import {
-  AMBER_DEEP,
   FONT,
   HAIRLINE_INK_10,
   INK,

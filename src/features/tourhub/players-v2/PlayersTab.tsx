@@ -22,7 +22,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 import {
-  AMBER_DEEP,
   FONT,
   HAIRLINE_INK_10,
   INK,

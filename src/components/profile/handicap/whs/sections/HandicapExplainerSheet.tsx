@@ -14,7 +14,6 @@ const INK_70 = 'rgba(255,255,255,0.72)';
 const INK_55 = 'rgba(255,255,255,0.55)';
 const INK_10 = 'rgba(255,255,255,0.10)';
 const INK_06 = '#272C37';
-const AMBER_DEEP = '#C97211';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
 
