@@ -6,7 +6,25 @@ import {
   canonicalUrl,
   clip,
   isUuid,
+  SUPABASE_URL,
 } from '../_lib/og.js';
+
+/**
+ * Deterministic public path for a round share card, or null when the card has
+ * not been generated yet. No blocking, no placeholder - the caller falls
+ * straight through to the existing image chain.
+ */
+async function roundShareCardUrl(postId) {
+  const url =
+    SUPABASE_URL + '/storage/v1/object/public/share-cards/round/' + postId + '.png';
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    return res.ok ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 
 function pickImage(media) {
   const list = (media || [])
