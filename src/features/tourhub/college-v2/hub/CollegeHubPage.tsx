@@ -399,7 +399,7 @@ export function CollegeHubPage() {
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                color: AMBER_DEEP,
+                color: INK,
               }}
             >
               {t('college.hub.kicker')}
@@ -415,7 +415,7 @@ export function CollegeHubPage() {
                 background: 'transparent',
                 border: 'none',
                 padding: 0,
-                color: AMBER_DEEP,
+                color: INK,
                 fontSize: 10,
                 fontWeight: 800,
                 letterSpacing: '0.13em',

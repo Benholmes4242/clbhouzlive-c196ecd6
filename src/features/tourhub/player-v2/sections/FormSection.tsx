@@ -3,7 +3,7 @@
  *
  * A horizontal rail of discrete results, so chips are the correct treatment
  * here - do not convert to rows. Wins are marked with an amber border and an
- * AMBER_DEEP label, never a fill or a gradient. MC/WD/DQ mute to INK_FAINT
+ * INK eyebrow (never amber) with an AMBER_DEEP win tone, never a fill or a gradient. MC/WD/DQ mute to INK_FAINT
  * because a missed cut is genuinely absent of a result.
  * Section self-hides when < 2 rendered chips.
  */
@@ -47,7 +47,7 @@ export function FormSection({ results }: FormSectionProps) {
           margin: '0 16px 12px',
           fontSize: 10,
           fontWeight: 700,
-          color: AMBER_DEEP,
+          color: INK,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
         }}

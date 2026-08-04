@@ -5,7 +5,7 @@
  * BORN is deliberately absent: it and AGE are the same fact off the same
  * birth_date field, so only AGE is stated. Cell rules are gone - the grid
  * separates with rowGap, not a ladder of hairlines.
- * The college link's affordance is AMBER_DEEP colour with no underline (an
+ * The college link renders in INK per the app-wide action ink flip (an
  * underline under a proper noun reads as a spelling error).
  */
 
@@ -58,7 +58,7 @@ export function AboutSection({ player }: AboutSectionProps) {
               college_slug: player.college_normalized,
             });
           }}
-          style={{ color: AMBER_DEEP, textDecoration: 'none' }}
+          style={{ color: INK, textDecoration: 'none' }}
           className="active:opacity-60 transition-opacity"
         >
           {player.college}
@@ -79,7 +79,7 @@ export function AboutSection({ player }: AboutSectionProps) {
           margin: '0 0 12px',
           fontSize: 10,
           fontWeight: 700,
-          color: AMBER_DEEP,
+          color: INK,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
         }}

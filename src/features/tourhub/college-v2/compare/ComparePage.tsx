@@ -68,7 +68,7 @@ const KICKER_STYLE = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 function SkeletonKicker() {
