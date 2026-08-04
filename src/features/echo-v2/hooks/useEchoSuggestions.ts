@@ -56,20 +56,25 @@ export function useEchoSuggestions(): { suggestions: string[]; isLoading: boolea
   const clubId = profile?.primary_club_id ?? null;
   const city = cityFromLocation(profile?.location);
 
-  // Only needed when the profile carries no free-text location: the home
-  // club's country is the coarsest acceptable place anchor for prompt 3.
-  const { data: clubCountry, isLoading: clubLoading } = useQuery<string | null>({
-    queryKey: ['echo-v2', 'club-country', clubId],
+  // Only needed when the profile carries no free-text location. Region
+  // (county) is the right granularity for a golf trip — "in Kent" — so it
+  // leads, then sub_country, then country as the coarse last resort.
+  const { data: clubPlace, isLoading: clubLoading } = useQuery<string | null>({
+    queryKey: ['echo-v2', 'club-place', clubId],
     enabled: !!clubId && !city,
     staleTime: 10 * 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('golf_clubs')
-        .select('country')
+        .select('region, sub_country, country')
         .eq('id', clubId as string)
         .maybeSingle();
       if (error) throw error;
-      return (data?.country as string | null) ?? null;
+      const pick = (v: unknown) => {
+        const t = typeof v === 'string' ? v.trim() : '';
+        return t.length >= 3 ? t : null;
+      };
+      return pick(data?.region) ?? pick(data?.sub_country) ?? pick(data?.country) ?? null;
     },
   });
 
@@ -89,13 +94,13 @@ export function useEchoSuggestions(): { suggestions: string[]; isLoading: boolea
         : profile?.eg_handicap_index != null
           ? Number(profile.eg_handicap_index).toFixed(1)
           : null;
-    const place = city ?? clubCountry ?? null;
+    const place = city ?? clubPlace ?? null;
 
     const out: string[] = [];
     // 1 — club name inline so echo_get_course_context fires. See file header.
     if (homeClub) out.push(`How should I play ${homeClub}?`);
     if (indexValue) out.push(`How does my game compare to a ${indexValue} handicap?`);
-    if (place) out.push(`Which Top 100 course near ${place} is worth the trip?`);
+    if (place) out.push(`Which Top 100 course in ${place} is worth the trip?`);
 
     // Top up with the fallback set so the welcome always offers three, and
     // never repeats a prompt.
@@ -104,7 +109,7 @@ export function useEchoSuggestions(): { suggestions: string[]; isLoading: boolea
       if (!out.includes(f)) out.push(f);
     }
     return out.slice(0, 3);
-  }, [isLoading, profile, trend, city, clubCountry]);
+  }, [isLoading, profile, trend, city, clubPlace]);
 
   return { suggestions, isLoading };
 }
