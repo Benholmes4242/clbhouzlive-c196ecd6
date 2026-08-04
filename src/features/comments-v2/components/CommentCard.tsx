@@ -1,10 +1,11 @@
 /**
- * CommentCard — a full "conversation card" for one top-level comment.
- * White surface, hairline border, subtle shadow. Encloses replies in-card
- * with a left connector; shows the latest 3 replies + a "View N more" expander.
+ * CommentCard — one top-level comment rendered as a ROW (no card, no shadow,
+ * no radius). Rows are separated by a hairline; the first row has no top
+ * border. Replies stay threaded in-row via ReplyRow.
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Heart, MoreHorizontal } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -12,20 +13,22 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { getActorRouteByType } from '@/types/actor';
 import { CommentImageV2 } from './CommentImageV2';
 import { ReplyRow } from './ReplyRow';
+import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
 
-const INK = '#1F2428';
-const MUTED = '#AEB4BC';
-const SECONDARY = '#8A9099';
+const INK = '#0E1216';
+const MUTE = '#68707B';
+const DIM = '#A2A9B2';
 const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
-const CONNECTOR = '#EDEFF2';
+const BORDER = '#EDF0F3';
+const CONNECTOR = '#EDF0F3';
 
 const INITIAL_REPLIES = 3;
 
 interface Props {
   comment: CommentV2;
   currentUserId: string | null;
+  isFirst?: boolean;
   registerRef?: (id: string) => (el: HTMLDivElement | null) => void;
   highlightedId?: string | null;
   onReply: (c: CommentV2) => void;
@@ -37,6 +40,7 @@ interface Props {
 export function CommentCard({
   comment,
   currentUserId,
+  isFirst,
   registerRef,
   highlightedId,
   onReply,
@@ -45,6 +49,7 @@ export function CommentCard({
   onClose,
 }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
 
   const deleted = !comment.user_id || comment.display_name === 'Deleted user';
@@ -52,22 +57,20 @@ export function CommentCard({
   const showAll = expanded || replies.length <= INITIAL_REPLIES;
   const visibleReplies = showAll ? replies : replies.slice(replies.length - INITIAL_REPLIES);
   const hiddenCount = replies.length - visibleReplies.length;
+  const big = isEmojiOnly(comment.content);
 
   return (
     <div
       ref={registerRef?.(comment.id)}
       style={{
-        background: '#FFFFFF',
-        border: `1px solid ${HAIRLINE}`,
-        borderRadius: 16,
-        boxShadow: '0 2px 10px rgba(31,36,40,0.04)',
-        padding: 14,
+        padding: isFirst ? '0 0 16px' : '16px 0',
+        borderTop: isFirst ? undefined : `1px solid ${BORDER}`,
         transition: 'background-color 300ms',
-        ...(highlightedId === comment.id ? { background: 'rgba(247,147,30,0.05)' } : null),
+        background: highlightedId === comment.id ? 'rgba(247,147,30,0.06)' : 'transparent',
       }}
     >
       {/* Parent row */}
-      <div className="flex gap-3">
+      <div className="flex" style={{ gap: 11 }}>
         <button
           type="button"
           disabled={deleted}
@@ -80,7 +83,7 @@ export function CommentCard({
           style={{ cursor: deleted ? 'default' : 'pointer' }}
         >
           <SquircleAvatar
-            size={40}
+            size={34}
             src={comment.avatar_url}
             alt={comment.display_name}
             fallback={comment.display_name?.charAt(0) || '?'}
@@ -98,12 +101,12 @@ export function CommentCard({
                 padding: '1px 5px', borderRadius: 3, fontSize: 9, fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.14em',
                 background: 'rgba(247,147,30,0.10)', color: AMBER,
-              }}>BUSINESS</span>
+              }}>{t('comments.business')}</span>
             )}
-            <span style={{ fontSize: 11, color: MUTED }}>
+            <span style={{ fontSize: 11, color: DIM }}>
               {relativeTime(comment.created_at)}
             </span>
-            {comment.is_edited && <span style={{ fontSize: 11, color: MUTED }}>· edited</span>}
+            {comment.is_edited && <span style={{ fontSize: 11, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
           </div>
 
           {comment.content && (
@@ -111,75 +114,76 @@ export function CommentCard({
               as="div"
               text={comment.content}
               className="mt-1 whitespace-pre-wrap"
-              style={{ fontSize: 14, lineHeight: 1.5, color: INK }}
+              style={big
+                ? { fontSize: 30, lineHeight: 1.15, color: INK }
+                : { fontSize: 14, lineHeight: 1.5, color: INK }}
               onMentionTap={(m) => {
                 onClose?.();
                 navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
               }}
             />
           )}
+
+          {comment.media_url && comment.media_type === 'image' && (
+            <CommentImageV2 mediaUrl={comment.media_url} />
+          )}
+
+          {/* Action bar */}
+          <div className="flex items-center gap-4 mt-2">
+            <button
+              type="button"
+              onClick={() => onLike(comment.id)}
+              className="flex items-center gap-1.5 bg-transparent border-0 p-0 cursor-pointer"
+              aria-label={comment.has_liked ? t('comments.unlike') : t('comments.like')}
+            >
+              <Heart
+                size={15}
+                strokeWidth={2}
+                style={{
+                  fill: comment.has_liked ? AMBER : 'none',
+                  color: comment.has_liked ? AMBER : MUTE,
+                  transition: 'color 150ms, fill 150ms',
+                }}
+              />
+              {comment.likes_count > 0 && (
+                <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
+                  {comment.likes_count}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => onReply(comment)}
+              className="bg-transparent border-0 p-0 cursor-pointer"
+              style={{ fontSize: 12, fontWeight: 600, color: MUTE }}
+            >
+              {t('comments.reply')}
+            </button>
+          </div>
         </div>
 
         <button
           type="button"
           onClick={() => onMore(comment)}
           className="shrink-0 self-start bg-transparent border-0 p-1 cursor-pointer"
-          aria-label="More"
-          style={{ color: MUTED }}
+          aria-label={t('comments.more')}
+          style={{ color: DIM }}
         >
           <MoreHorizontal size={16} />
         </button>
       </div>
 
-      {/* Full-width image */}
-      {comment.media_url && comment.media_type === 'image' && (
-        <CommentImageV2 mediaUrl={comment.media_url} />
-      )}
-
-      {/* Action bar */}
-      <div className="flex items-center gap-4 mt-2" style={{ paddingLeft: 51 }}>
-        <button
-          type="button"
-          onClick={() => onLike(comment.id)}
-          className="flex items-center gap-1.5 bg-transparent border-0 p-0 cursor-pointer"
-          aria-label={comment.has_liked ? 'Unlike' : 'Like'}
-        >
-          <Heart
-            size={15}
-            strokeWidth={2}
-            style={{
-              fill: comment.has_liked ? AMBER : 'none',
-              color: comment.has_liked ? AMBER : SECONDARY,
-              transition: 'color 150ms, fill 150ms',
-            }}
-          />
-          {comment.likes_count > 0 && (
-            <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: comment.has_liked ? AMBER : SECONDARY }}>
-              {comment.likes_count}
-            </span>
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={() => onReply(comment)}
-          className="bg-transparent border-0 p-0 cursor-pointer"
-          style={{ fontSize: 12, fontWeight: 600, color: SECONDARY }}
-        >
-          Reply
-        </button>
-      </div>
-
-      {/* Replies enclosed */}
+      {/* Replies */}
       {replies.length > 0 && (
-        <div style={{ marginLeft: 19, paddingLeft: 20, marginTop: 10, borderLeft: `2px solid ${CONNECTOR}` }}>
+        <div style={{ marginLeft: 17, paddingLeft: 20, marginTop: 8, borderLeft: `1px solid ${CONNECTOR}` }}>
           {hiddenCount > 0 && (
             <button
               type="button"
               onClick={() => setExpanded(true)}
               className="bg-transparent border-0 p-0 cursor-pointer"
-              style={{ fontSize: 12, fontWeight: 600, color: SECONDARY, marginBottom: 4 }}
+              style={{ fontSize: 12, fontWeight: 600, color: MUTE, marginBottom: 4 }}
             >
-              View {hiddenCount} more {hiddenCount === 1 ? 'reply' : 'replies'}
+              {t('comments.viewMoreReplies', { count: hiddenCount })}
             </button>
           )}
           {visibleReplies.map((r) => (
