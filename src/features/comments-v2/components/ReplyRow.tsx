@@ -1,18 +1,21 @@
 /**
- * ReplyRow — in-card reply row for CommentCard. Smaller avatar, own like.
+ * ReplyRow — in-thread reply row. Same row treatment as CommentCard:
+ * no background, no radius, no shadow; hairline separated, indented.
  */
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Heart, MoreHorizontal } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { getActorRouteByType } from '@/types/actor';
 import { CommentImageV2 } from './CommentImageV2';
+import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
 
-const INK = '#1F2428';
-const MUTED = '#AEB4BC';
-const SECONDARY = '#8A9099';
+const INK = '#0E1216';
+const MUTE = '#68707B';
+const DIM = '#A2A9B2';
 const AMBER = '#F7931E';
 
 interface Props {
@@ -25,19 +28,21 @@ interface Props {
   onClose?: () => void;
 }
 
-export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onLike, onMore, onClose }: Props) {
+export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, onClose }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const deleted = !comment.user_id || comment.display_name === 'Deleted user';
+  const big = isEmojiOnly(comment.content);
 
   return (
     <div
       ref={registerRef?.(comment.id)}
-      className="flex gap-2 pt-2"
+      className="flex"
       style={{
+        gap: 11,
+        padding: '10px 0 0',
         transition: 'background-color 300ms',
-        background: highlighted ? 'rgba(247,147,30,0.05)' : 'transparent',
-        borderRadius: 8,
-        padding: highlighted ? '6px 6px 2px' : undefined,
+        background: highlighted ? 'rgba(247,147,30,0.06)' : 'transparent',
       }}
     >
       <button
@@ -70,12 +75,12 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
               padding: '1px 5px', borderRadius: 3, fontSize: 8.5, fontWeight: 800,
               textTransform: 'uppercase', letterSpacing: '0.14em',
               background: 'rgba(247,147,30,0.10)', color: AMBER,
-            }}>BUSINESS</span>
+            }}>{t('comments.business')}</span>
           )}
-          <span style={{ fontSize: 10.5, color: MUTED }}>
+          <span style={{ fontSize: 10.5, color: DIM }}>
             {relativeTime(comment.created_at)}
           </span>
-          {comment.is_edited && <span style={{ fontSize: 10.5, color: MUTED }}>· edited</span>}
+          {comment.is_edited && <span style={{ fontSize: 10.5, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
         </div>
 
         {comment.content && (
@@ -83,7 +88,9 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
             as="div"
             text={comment.content}
             className="mt-0.5 whitespace-pre-wrap"
-            style={{ fontSize: 12.5, lineHeight: 1.5, color: INK }}
+            style={big
+              ? { fontSize: 26, lineHeight: 1.15, color: INK }
+              : { fontSize: 12.5, lineHeight: 1.5, color: INK }}
             onMentionTap={(m) => {
               onClose?.();
               navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
@@ -100,18 +107,18 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
             type="button"
             onClick={() => onLike(comment.id)}
             className="flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer"
-            aria-label={comment.has_liked ? 'Unlike' : 'Like'}
+            aria-label={comment.has_liked ? t('comments.unlike') : t('comments.like')}
           >
             <Heart
               size={13}
               strokeWidth={2}
               style={{
                 fill: comment.has_liked ? AMBER : 'none',
-                color: comment.has_liked ? AMBER : SECONDARY,
+                color: comment.has_liked ? AMBER : MUTE,
               }}
             />
             {comment.likes_count > 0 && (
-              <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: comment.has_liked ? AMBER : SECONDARY }}>
+              <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
                 {comment.likes_count}
               </span>
             )}
@@ -123,8 +130,8 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
         type="button"
         onClick={() => onMore(comment)}
         className="shrink-0 self-start bg-transparent border-0 p-1 cursor-pointer"
-        aria-label="More"
-        style={{ color: MUTED }}
+        aria-label={t('comments.more')}
+        style={{ color: DIM }}
       >
         <MoreHorizontal size={14} />
       </button>
