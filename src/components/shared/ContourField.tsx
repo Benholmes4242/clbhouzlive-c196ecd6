@@ -15,7 +15,7 @@ import React from 'react';
 
 const INK = '#1F2428';
 
-/** Four families, deliberately offset so no seam or tile is legible. */
+/** Three broad families, deliberately offset so no seam or tile is legible. */
 const FAMILIES: {
   cx: number;
   cy: number;
@@ -25,10 +25,9 @@ const FAMILIES: {
   rings: number;
   step: number;
 }[] = [
-  { cx: 62, cy: 120, rx: 96, ry: 132, rot: -14, rings: 7, step: 34 },
-  { cx: 318, cy: 430, rx: 118, ry: 88, rot: 22, rings: 8, step: 38 },
-  { cx: 108, cy: 742, rx: 140, ry: 172, rot: -6, rings: 6, step: 44 },
-  { cx: 300, cy: 1010, rx: 104, ry: 128, rot: 34, rings: 7, step: 36 },
+  { cx: 30, cy: 90, rx: 130, ry: 175, rot: -16, rings: 5, step: 58 },
+  { cx: 400, cy: 520, rx: 165, ry: 125, rot: 24, rings: 5, step: 62 },
+  { cx: 90, cy: 990, rx: 150, ry: 195, rot: -4, rings: 4, step: 66 },
 ];
 
 interface Props {
