@@ -816,43 +816,87 @@ async function scrapeLIV(browser, supabase) {
       await sweepStaleRows(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, 'LIV Scraper');
     }
 
-    // Match to sr_players
+    // Match to sr_players - TWO PASS, EXACT ONLY.
+    // Pass 1: exact within LIV-tagged players.
+    // Pass 2: unmatched only, exact first_name AND last_name across all of
+    // sr_players (a LIV player's primary tour tag is usually pga, so the
+    // LIV-tagged pool excludes most of them by construction). Never accept a
+    // pass-2 match with more than one candidate.
     const { data: livPlayers } = await supabase
       .from('sr_players')
       .select('id, full_name, last_name, first_name')
       .contains('tour_codes', ['LIV']);
 
-    if (livPlayers && livPlayers.length > 0) {
-      let matched = 0;
-      for (const row of rows) {
-        if (!row.player_name) continue;
-        const scraped = row.player_name.toUpperCase();
-        const match = livPlayers.find(p => {
-          const fullUpper = p.full_name?.toUpperCase();
-          return fullUpper === scraped;
-        });
-        const match2 = !match ? livPlayers.find(p => {
-          const combined = (p.first_name + ' ' + p.last_name).toUpperCase();
-          return combined === scraped;
-        }) : null;
-        const match3 = (!match && !match2) ? livPlayers.find(p => {
-          return p.last_name?.toUpperCase() === scraped.split(' ').pop() &&
-                 p.first_name?.toUpperCase().startsWith(scraped.split(' ')[0][0]);
-        }) : null;
+    let matched = 0;
+    let pass1 = 0;
+    let pass2 = 0;
+    const ambiguous = [];
+    const unmatched = [];
+    const toBind = [];
 
-        const finalMatch = match || match2 || match3;
-        if (finalMatch) {
-          await supabase
-            .from('tour_season_rankings')
-            .update({ player_id: finalMatch.id })
-            .eq('tour_code', LIV_TOUR_CODE)
-            .eq('season_year', LIV_SEASON_YEAR)
-            .eq('player_name', row.player_name);
-          matched++;
+    const pool = livPlayers || [];
+    const stillUnmatched = [];
+
+    for (const row of rows) {
+      if (!row.player_name) continue;
+      const scraped = foldName(row.player_name);
+      const hit =
+        pool.find(p => foldName(p.full_name) === scraped) ||
+        pool.find(p => foldName((p.first_name || '') + ' ' + (p.last_name || '')) === scraped);
+      if (hit) {
+        toBind.push({ row, id: hit.id });
+        pass1++;
+      } else {
+        stillUnmatched.push(row);
+      }
+    }
+
+    if (stillUnmatched.length > 0) {
+      const { data: allPlayers } = await supabase
+        .from('sr_players')
+        .select('id, full_name, last_name, first_name');
+      const wide = allPlayers || [];
+      for (const row of stillUnmatched) {
+        const parts = row.player_name.trim().split(/\s+/);
+        const firstScraped = foldName(parts[0]);
+        const lastScraped = foldName(parts.slice(1).join(' '));
+        if (!firstScraped || !lastScraped) { unmatched.push(row.player_name); continue; }
+        const candidates = wide.filter(p =>
+          foldName(p.first_name) === firstScraped && foldName(p.last_name) === lastScraped
+        );
+        if (candidates.length === 1) {
+          toBind.push({ row, id: candidates[0].id });
+          pass2++;
+        } else if (candidates.length > 1) {
+          ambiguous.push({ name: row.player_name, count: candidates.length });
+          unmatched.push(row.player_name);
+        } else {
+          unmatched.push(row.player_name);
         }
       }
-      console.log(`[LIV Scraper] Matched ${matched} of ${rows.length} players`);
     }
+
+    for (const { row, id } of toBind) {
+      const { error } = await supabase
+        .from('tour_season_rankings')
+        .update({ player_id: id })
+        .eq('tour_code', LIV_TOUR_CODE)
+        .eq('season_year', LIV_SEASON_YEAR)
+        .eq('player_name', row.player_name);
+      if (!error) matched++;
+    }
+
+    console.log(
+      `[LIV Scraper] Matched ${matched} of ${rows.length} players ` +
+      `(pass 1: ${pass1}, pass 2: ${pass2})`
+    );
+    for (const a of ambiguous) {
+      console.log(`[LIV Scraper] AMBIGUOUS - left null: "${a.name}" (${a.count} candidates)`);
+    }
+    if (unmatched.length > 0) {
+      console.log(`[LIV Scraper] Unmatched (${unmatched.length}): ${unmatched.join(', ')}`);
+    }
+
 
   } catch (err) {
     console.error('[LIV Scraper] Error:', err.message);
