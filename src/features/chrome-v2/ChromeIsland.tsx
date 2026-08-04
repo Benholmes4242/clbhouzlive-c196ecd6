@@ -210,25 +210,6 @@ const HCP_LABEL_TYPE: React.CSSProperties = {
 };
 
 /** Grid wrapper that reserves the widest outcome's width for its child. */
-const HcpReserve: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
-  <span style={{ display: 'inline-grid', alignItems: 'center', justifyItems: 'end' }}>
-    <span
-      aria-hidden
-      style={{
-        ...HCP_LABEL_TYPE,
-        gridArea: '1 / 1',
-        visibility: 'hidden',
-        pointerEvents: 'none',
-      }}
-    >
-      {HCP_RESERVE_LABEL}
-    </span>
-    <span style={{ gridArea: '1 / 1', display: 'inline-flex', alignItems: 'center' }}>
-      {children}
-    </span>
-  </span>
-);
-
 const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
   <span aria-hidden style={{ width: 1, height: 18, background: color, flexShrink: 0 }} />
 );
@@ -250,12 +231,12 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
   if (profileLoading) return null;
   if (profile?.hide_handicap_chip) return null;
 
+  // Nothing renders until the connection state is known: no ghost width, so the
+  // capsule never reserves the wide "Connect HCP" label when the index is short.
+  if (whsLoading) return null;
+
   const body = (() => {
-    if (whsLoading) {
-      // Width is already reserved by HcpReserve; nothing visible goes here so
-      // the capsule settles at its final size on the first paint.
-      return null;
-    }
+
 
     const disconnected = !connection || trendData?.current == null;
 
@@ -322,9 +303,10 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
   return (
     <>
       <HcpDivider color={dividerColor} />
-      <HcpReserve>{body}</HcpReserve>
+      {body}
     </>
   );
+
 };
 
 
