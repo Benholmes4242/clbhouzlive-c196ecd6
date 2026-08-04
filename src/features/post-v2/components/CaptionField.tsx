@@ -1,7 +1,7 @@
-// CaptionField - MentionsComposerInput host.
+// CaptionField - bare textarea on the dark composer canvas.
 
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
-import { CT } from '@/features/_shared/composerTokens';
+import { CT_DARK } from '@/features/_shared/composerTokens';
 
 interface Props {
   value: string;
@@ -14,9 +14,16 @@ export default function CaptionField({ value, onChange, currentUserId }: Props) 
     <MentionsComposerInput
       value={value}
       onChange={onChange}
-      placeholder="Write a caption, or @mention friends and businesses"
+      placeholder="Say something about it"
       currentUserId={currentUserId}
-      textStyle={{ fontSize: 15, lineHeight: '22px', color: CT.ink, minHeight: 96, maxHeight: 96, padding: '4px 0' }}
+      textStyle={{
+        fontSize: 16,
+        lineHeight: '24px',
+        color: CT_DARK.ink,
+        caretColor: CT_DARK.amber,
+        minHeight: 80,
+        padding: '12px 0',
+      }}
     />
   );
 }

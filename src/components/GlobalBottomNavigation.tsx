@@ -15,7 +15,6 @@ import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
-import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
@@ -111,8 +110,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
   const isTourHubLive = liveTournamentCount > 0;
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
-  void openPostStudio;
-  const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
@@ -187,7 +185,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      setCreateSheetOpen(true);
+      // Open the composer immediately so a cancelled picker never leaves a
+      // dead tap / blank screen. Then trigger the native picker synchronously
+      // from the tap to keep iOS WKWebView user-activation. If files are
+      // chosen, the same store update pushes them into the already-open stage.
+      openPostStudio({ returnPath: location.pathname });
+      fileInputRef.current?.click();
       return;
     }
     if (tab.id === 'clubhouse' && (location.pathname === '/' || location.pathname === '/clubhouse')) {
@@ -200,6 +203,14 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       return;
     }
     handleTabClick(tab);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (files.length > 0) {
+      openPostStudio({ media: files, returnPath: location.pathname });
+    }
   };
 
   // Sizes (icons-only, no visible labels) — sized to match IG's pill.
@@ -411,10 +422,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
-      <CreateSheetV2
-        open={createSheetOpen}
-        onClose={() => setCreateSheetOpen(false)}
-        returnPath={location.pathname}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        hidden
+        onChange={handleFileChange}
       />
     </>
   );

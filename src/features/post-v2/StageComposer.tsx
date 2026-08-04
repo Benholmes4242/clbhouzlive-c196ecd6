@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MoreHorizontal } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -36,7 +36,6 @@ import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
 import MediaTray from './components/MediaTray';
 import CaptionField from './components/CaptionField';
-import DetailRows from './components/DetailRows';
 import CourseTagSheet from './components/CourseTagSheet';
 import ActorSheet from './components/ActorSheet';
 import ScheduleSheetV2 from './components/ScheduleSheetV2';
@@ -47,26 +46,21 @@ import CoverFrameSheet from './components/CoverFrameSheet';
 import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
-import { CT } from '@/features/_shared/composerTokens';
-
-const EYEBROW: React.CSSProperties = {
-  fontSize: 10.5,
-  fontWeight: 700,
-  color: CT.eyebrow,
-  textTransform: 'uppercase',
-  letterSpacing: '0.14em',
-};
+import { CT_DARK } from '@/features/_shared/composerTokens';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
   onClose: () => void;
   onPosted?: () => void;
+  /** Files already chosen by the nav picker before the composer opened. */
+  initialMedia?: File[];
   /** Edit mode: existing post id (owner-scoped). */
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
@@ -242,7 +236,23 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     });
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
+  // Files chosen by the bottom-nav picker are injected whenever the store's
+  // initialMedia array changes. The nav opens the composer immediately (even on
+  // picker cancel) and then re-opens it with files once the user chooses them.
+  const lastInitialMediaRef = useRef<File[]>([]);
+  useEffect(() => {
+    if (isEditMode || draftId) return;
+    const files = initialMedia ?? [];
+    const prev = lastInitialMediaRef.current;
+    const isNew = files.length !== prev.length || files.some((f, i) => f !== prev[i]);
+    if (!isNew) return;
+    lastInitialMediaRef.current = files;
+    if (files.length > 0) {
+      void addFiles(files);
+    }
+  }, [isEditMode, draftId, initialMedia, addFiles]);
+
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -298,17 +308,17 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Edit-mode: schedule row visible only for still-scheduled posts.
   const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
 
-  const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Post');
+  const primaryLabel = isEditMode ? 'Save changes' : (state.scheduledAt ? 'Schedule' : 'Share');
   const primaryStyle: React.CSSProperties = {
-    width: '100%',
-    padding: 16,
-    borderRadius: CT.panelRadius,
+    flex: 1,
+    minWidth: 0,
+    padding: '14px 20px',
+    borderRadius: 999,
     border: 'none',
-    fontSize: 14.5,
+    fontSize: 15,
     fontWeight: 700,
-    background: canSubmit ? CT.amber : 'rgba(15,23,42,0.10)',
-    color: canSubmit ? '#fff' : CT.secondary,
-    boxShadow: canSubmit ? '0 6px 16px rgba(247,147,30,0.28)' : undefined,
+    background: canSubmit ? CT_DARK.amber : CT_DARK.dim,
+    color: CT_DARK.ink,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
   };
 
@@ -521,7 +531,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (saveSuccess) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2
           result={{ kind: 'published', postId: editPostId ?? '' }}
           onDone={() => { setSaveSuccess(false); onPosted?.(); onClose(); }}
@@ -532,7 +542,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   if (success) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
         <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
       </div>
     );
@@ -549,29 +559,29 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // post is being fetched for editing.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
     return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
-        {/* Header mirror: close X + "Edit post" title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
-          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+        {/* Header mirror */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT_DARK.bg, borderBottom: `1px solid ${CT_DARK.line}`, flex: 'none' }}>
+          <button onClick={onClose} aria-label="Close" style={closeButtonStyle}>
             {'\u2039'}
           </button>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Edit post</div>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Edit post</div>
           </div>
         </div>
         {/* Stage block */}
         <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
-          <div className="clb-shimmer-light" style={{ width: '100%', height: '100%', borderRadius: 16, background: 'rgba(0,0,0,0.06)' }} />
+          <div className="clb-shimmer-dark" style={{ width: '100%', height: '100%', borderRadius: 16, background: 'rgba(255,255,255,0.06)' }} />
         </div>
         {/* Tray thumbs + caption bars */}
         <div style={{ flex: 'none', padding: '8px 12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', gap: 8 }}>
-            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
-            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
-            <div className="clb-shimmer-light" style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(0,0,0,0.06)' }} />
+            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
+            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
+            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
           </div>
-          <div className="clb-shimmer-light" style={{ height: 14, width: '80%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
-          <div className="clb-shimmer-light" style={{ height: 14, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+          <div className="clb-shimmer-dark" style={{ height: 14, width: '80%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
+          <div className="clb-shimmer-dark" style={{ height: 14, width: '55%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
         </div>
       </div>
     );
@@ -580,10 +590,10 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Edit target failed to load or does not exist.
   if (isEditMode && !editable.isLoading && !editable.data) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Couldn't load this post</div>
-        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
-        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT_DARK.ink }}>Couldn't load this post</div>
+        <div style={{ fontSize: 13, color: CT_DARK.mute, textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
+        <button onClick={onClose} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
@@ -591,46 +601,53 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT.canvas, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: CT.ink }}>Can't edit this post</div>
-        <div style={{ fontSize: 13, color: CT.secondary, textAlign: 'center' }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: CT_DARK.ink }}>Can't edit this post</div>
+        <div style={{ fontSize: 13, color: CT_DARK.mute, textAlign: 'center' }}>
           {editable.data.blockedReason === 'review-derived'
             ? 'Review posts are edited from the course page.'
             : "You don't have permission to edit this post."}
         </div>
-        <button onClick={onClose} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
+        <button onClick={onClose} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
       </div>
     );
   }
 
+  const courseLabel = state.course?.name ?? 'Add course';
+
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT.canvas, borderBottom: `1px solid ${CT.hairline}`, flex: 'none' }}>
-        <button onClick={handleClose} aria-label="Close" style={{ background: 'none', border: 0, color: CT.ink, cursor: 'pointer', padding: 0, fontSize: 21, lineHeight: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
+        <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
           {'\u2039'}
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: CT.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {isEditMode ? 'Edit post' : 'New post'}
           </div>
-          {activeActor?.name && (
-            <div style={{ fontSize: 11.5, color: CT.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {`Posting as ${activeActor.name}`}
-            </div>
-          )}
         </div>
-        {!isEditMode && drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={{ background: 'none', border: 0, fontSize: 12.5, fontWeight: 700, color: CT.secondary, cursor: 'pointer' }}>
-            Drafts
-          </button>
-        )}
+        <button
+          onClick={() => { openDetail('actor'); setSheet('actor'); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', border: 0, cursor: 'pointer', padding: 0, minWidth: 0 }}
+        >
+          <span style={{ fontSize: 12, fontWeight: 600, color: CT_DARK.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>
+            {authorName}
+          </span>
+          <SquircleAvatar
+            src={authorAvatar}
+            alt={authorName}
+            size={32}
+            fallback={authorUsername?.[0]}
+            hairlineRing
+          />
+        </button>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      {/* Stage — shrinkable */}
-      <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0, display: 'flex' }}>
+      {/* Stage — fixed 4:5 aspect, full width */}
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden' }}>
         <MediaStageV2
           item={active}
           index={state.activeIndex}
@@ -639,59 +656,82 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
           onOpenCover={() => setSheet('cover')}
           onRequestAdd={handleStageAdd}
         />
+
+        {/* Edit chip */}
         {active && !active.existingId && (
-          <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+          <button
+            onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
+            style={floatingChipStyle}
+          >
+            Edit
+          </button>
         )}
-      </div>
 
-      {/* Bottom stack — never grows the page; scrolls itself only if too tall */}
-      <div style={{ flex: 'none', maxHeight: '48dvh', overflowY: 'auto', padding: '16px 16px 0', background: CT.canvas }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ ...EYEBROW, marginBottom: 9 }}>PHOTOS</div>
-          <MediaTray
-            media={state.media}
-            activeIndex={state.activeIndex}
-            onSelect={setActiveIndex}
-            onRemove={handleRemoveAt}
-            onReorder={reorder}
-            onAddFiles={handleAddFiles}
-          />
-        </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ ...EYEBROW, marginBottom: 9 }}>IN YOUR WORDS</div>
-          <div style={{ background: CT.cardBg, borderRadius: CT.panelRadius, border: `1px solid ${CT.hairline}`, padding: 14, minHeight: 96 }}>
-            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 8 }}>
-          <div style={{ ...EYEBROW, marginBottom: 9 }}>DETAILS</div>
-          <div style={{ background: CT.cardBg, borderRadius: CT.cardRadius, border: `1px solid ${CT.hairline}`, padding: '2px 16px' }}>
-            <DetailRows
-              course={state.course}
-              courses={state.courses}
-              onOpenCourse={() => { openDetail('course'); setSheet('course'); }}
-              actor={activeActor}
-              onOpenActor={() => { openDetail('actor'); setSheet('actor'); }}
-              scheduledAt={state.scheduledAt}
-              onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
-              actorLocked={isEditMode}
-              showSchedule={showScheduleRow}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Action bar — sibling of the scrolling stack, so it never scrolls away */}
-      <div style={{ flex: 'none', background: CT.canvas, borderTop: `1px solid ${CT.hairline}`, padding: '12px 16px max(env(safe-area-inset-bottom), 18px)' }}>
-        <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
-          {(submitting || saving)
-            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
-            : primaryLabel}
+        {/* Course chip */}
+        <button
+          onClick={() => { openDetail('course'); setSheet('course'); }}
+          style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, maxWidth: 'calc(100% - 24px)' }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseLabel}</span>
         </button>
       </div>
 
+      {/* Frame pills — between stage and filmstrip */}
+      {active && !active.existingId && (
+        <div style={{ flex: 'none', display: 'flex', justifyContent: 'center', padding: '10px 0', background: CT_DARK.bg }}>
+          <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+        </div>
+      )}
+
+      {/* Filmstrip */}
+      <div style={{ flex: 'none', padding: '10px 12px', background: CT_DARK.bg }}>
+        <MediaTray
+          media={state.media}
+          activeIndex={state.activeIndex}
+          onSelect={setActiveIndex}
+          onRemove={handleRemoveAt}
+          onReorder={reorder}
+          onAddFiles={handleAddFiles}
+        />
+      </div>
+
+      {/* Caption */}
+      <div style={{ flex: 1, minHeight: 0, padding: '0 16px', background: CT_DARK.bg, overflowY: 'auto' }}>
+        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
+      </div>
+
+      {/* Action bar */}
+      <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => { openDetail('actor'); setSheet('actor'); }}
+            aria-label="Switch account"
+            style={{ ...iconButtonStyle, padding: 2 }}
+          >
+            <SquircleAvatar
+              src={authorAvatar}
+              alt={authorName}
+              size={32}
+              fallback={authorUsername?.[0]}
+              hairlineRing
+            />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSheet('more')}
+            aria-label="More options"
+            style={iconButtonStyle}
+          >
+            <MoreHorizontal size={20} color={CT_DARK.ink} />
+          </button>
+          <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
+            {(submitting || saving)
+              ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
+              : primaryLabel}
+          </button>
+        </div>
+      </div>
 
       {/* Sheets */}
       <CourseTagSheet
@@ -746,22 +786,105 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         onApply={(crop) => updateActive({ crop })}
       />
 
+      {/* More options sheet */}
+      <BottomSheet open={sheet === 'more'} onClose={() => setSheet(null)} title="Options">
+        <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button
+            onClick={() => setSheet('schedule')}
+            style={moreRowStyle}
+          >
+            <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Schedule post</span>
+            {state.scheduledAt && <span style={{ fontSize: 12, color: CT_DARK.amber }}>Set</span>}
+          </button>
+          {!isEditMode && (
+            <button
+              onClick={() => setSheet('drafts')}
+              style={moreRowStyle}
+            >
+              <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
+              {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
+            </button>
+          )}
+        </div>
+      </BottomSheet>
+
       {/* Close guard */}
       <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
         <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {!isEditMode && (
             <>
               {state.media.length > 0 && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: CT.secondary, marginBottom: 8, textAlign: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
                   {t('closeGuard.mediaNotSaved', { count: state.media.length })}
                 </div>
               )}
-              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
+              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
             </>
           )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: '#fff', border: `1px solid ${CT.hairlineStrong}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.danger }}>Discard</button>
+          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
         </div>
       </BottomSheet>
     </div>
   );
 }
+
+const closeButtonStyle: React.CSSProperties = {
+  width: 32,
+  height: 32,
+  borderRadius: 999,
+  background: 'rgba(248,250,252,0.08)',
+  border: 0,
+  color: '#F8FAFC',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 21,
+  lineHeight: 1,
+  padding: 0,
+};
+
+const iconButtonStyle: React.CSSProperties = {
+  width: 40,
+  height: 40,
+  borderRadius: 999,
+  background: 'rgba(248,250,252,0.08)',
+  border: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  flex: 'none',
+};
+
+const floatingChipStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  background: 'rgba(15, 18, 24, 0.72)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  color: '#F8FAFC',
+  border: '1px solid rgba(248,250,252,0.10)',
+  borderRadius: 999,
+  padding: '6px 12px',
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+};
+
+const moreRowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  padding: '14px 16px',
+  background: 'rgba(248,250,252,0.06)',
+  border: '1px solid rgba(248,250,252,0.08)',
+  borderRadius: 14,
+  cursor: 'pointer',
+  textAlign: 'left',
+};
