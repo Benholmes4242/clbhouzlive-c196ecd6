@@ -614,8 +614,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const showFieldRow = withField && isTour;
 
   // The card column header has no room for a name and the legend above already
-  // names the player, so a third-person card marks the column with an em dash.
-  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '\u2014';
+  // names the player, so a third-person card leaves the score-column label blank.
+  const cardScoreLabel = isOwner ? t('courses:scorecard.you') : '';
 
 
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
