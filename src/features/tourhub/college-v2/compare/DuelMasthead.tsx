@@ -38,7 +38,7 @@ interface Props {
   onChangeRight: () => void;
 }
 
-const CREST_SIZE = 104;
+const CREST_SIZE = 78;
 
 function Column({
   standing,
@@ -60,7 +60,7 @@ function Column({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
         minWidth: 0,
       }}
     >
@@ -109,7 +109,7 @@ function Column({
       {/* Name */}
       <div
         style={{
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: 800,
           color: '#FFFFFF',
           letterSpacing: '-0.02em',
@@ -151,8 +151,8 @@ function Column({
         style={{
           marginTop: 2,
           fontFamily: FONT,
-          height: 30,
-          padding: '0 14px',
+          height: 26,
+          padding: '0 12px',
           borderRadius: 999,
           background: 'transparent',
           border: '0.75px solid rgba(255,255,255,0.28)',
@@ -180,7 +180,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 12,
         paddingRight: 12,
-        paddingBottom: 24,
+        paddingBottom: 16,
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
@@ -195,7 +195,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
           textTransform: 'uppercase',
           color: AMBER,
           textAlign: 'center',
-          marginBottom: 16,
+          marginBottom: 12,
         }}
       >
         {t('college.compare.headToHead')}

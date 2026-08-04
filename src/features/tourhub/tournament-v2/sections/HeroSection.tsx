@@ -70,7 +70,7 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
         style={{
-          fontSize: 22,
+          fontSize: 19,
           fontWeight: 800,
           lineHeight: 1,
           color: tone ?? '#fff',
@@ -158,7 +158,7 @@ function PersonLockup({
         </div>
         <div
           style={{
-            fontSize: 17,
+            fontSize: 15.5,
             fontWeight: 800,
             color: '#fff',
             marginTop: 3,
@@ -393,7 +393,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         justifyContent: 'flex-end',
       }}
     >
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: '12px 16px 14px' }}>
         {/* Shared lockup */}
         <div
           style={{
@@ -408,7 +408,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             color: chip.color,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
-            marginBottom: 12,
+            marginBottom: 10,
             textShadow: TEXT_SHADOW,
           }}
         >
@@ -417,7 +417,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
         <h1
           style={{
-            fontSize: 27,
+            fontSize: 23,
             fontWeight: 800,
             color: '#fff',
             lineHeight: 1.02,
@@ -449,14 +449,14 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           style={{
             height: 0,
             borderTop: `0.5px solid ${HAIRLINE}`,
-            marginTop: 14,
-            marginBottom: 12,
+            marginTop: 10,
+            marginBottom: 10,
           }}
         />
 
         {/* THREE FIGURES - one row, every state. */}
         {figures.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 10 }}>
             {figures.map((f) => (
               <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
             ))}
