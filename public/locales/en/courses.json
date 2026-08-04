@@ -1020,7 +1020,7 @@
     "sheetSubNoAvg": "{{courses}} courses . {{rounds}} rounds",
     "vsYou": "VS YOU",
     "avgToPar": "AVG",
-    "lastPlayedMeta": "last played {{date}}",
+    "lastPlayedMeta": "{{date}}",
     "avgLabel": "{{avg}} avg",
     "hardestHole": "hardest hole {{n}}",
     "colRounds": "ROUNDS",
