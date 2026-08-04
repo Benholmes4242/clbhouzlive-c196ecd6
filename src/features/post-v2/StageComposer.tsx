@@ -138,11 +138,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   }, [editPostId]);
 
 
-  // Composer is a light canvas surface -> dark status-bar icons.
-  // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
-  // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
-    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch { /* status bar best-effort */ }
     return () => {
       try { applyRouteChrome(window.location.pathname, true); } catch { /* chrome re-resolve best-effort */ }
     };
@@ -236,6 +232,21 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     });
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
+  // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
+  // Edit / draft / course-prefill entries and a cancelled picker land on
+  // page 2; media chosen through the picker jumps to page 1.
+  const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+
+  // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
+  // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
+  // Watch light, profile immersive, etc.) because overlay close is not a route change.
+  useEffect(() => {
+    try {
+      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
+      else setStatusBarStyleColor('dark', 'FFF8FAFC');
+    } catch { /* status bar best-effort */ }
+  }, [page]);
+
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
   // picker cancel) and then re-opens it with files once the user chooses them.
@@ -249,6 +260,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     lastInitialMediaRef.current = files;
     if (files.length > 0) {
       void addFiles(files);
+      setPage(1);
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
 
@@ -613,220 +625,332 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     );
   }
 
-  const courseLabel = state.course?.name ?? 'Add course';
+  const sheets = (
+    <>
+        {/* Sheets */}
+        <CourseTagSheet
+          open={sheet === 'course'}
+          onClose={() => setSheet(null)}
+          onDone={setCourses}
+          selected={state.courses}
+          userId={profile?.id ?? null}
+        />
+        <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
+  
+        <ScheduleSheetV2
+          open={sheet === 'schedule'}
+          onClose={() => setSheet(null)}
+          value={state.scheduledAt}
+          onChange={setScheduledAt}
+          onOpenScheduled={() => setSheet('scheduled')}
+          scheduledCount={scheduledCount}
+        />
+        <DraftsSheetV2
+          open={sheet === 'drafts'}
+          onClose={() => setSheet(null)}
+          drafts={drafts.drafts}
+          onRestore={(d) => {
+            const primary = d.course_id && d.course_name
+              ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
+              : null;
+            const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
+            const savedCourses = cd?.courses ?? [];
+            const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
+            restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+            setRestoredDraftId(d.id);
+          }}
+          onDelete={drafts.remove}
+        />
+        <ScheduledPostsSheetV2
+          open={sheet === 'scheduled'}
+          onClose={() => setSheet(null)}
+          userId={profile?.id}
+          onCountChange={setScheduledCount}
+        />
+        <CoverFrameSheet
+          open={sheet === 'cover'}
+          onClose={() => setSheet(null)}
+          item={active}
+          onApply={(ts) => updateActive({ posterTimestamp: ts })}
+        />
+        <AdjustSheet
+          open={sheet === 'adjust'}
+          onClose={() => setSheet(null)}
+          item={active}
+          onApply={(crop) => updateActive({ crop })}
+        />
+  
+        {/* More options sheet */}
+        <BottomSheet open={sheet === 'more'} onClose={() => setSheet(null)} title="Options">
+          <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              onClick={() => setSheet('schedule')}
+              style={moreRowStyle}
+            >
+              <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Schedule post</span>
+              {state.scheduledAt && <span style={{ fontSize: 12, color: CT_DARK.amber }}>Set</span>}
+            </button>
+            {!isEditMode && (
+              <button
+                onClick={() => setSheet('drafts')}
+                style={moreRowStyle}
+              >
+                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
+                {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
+              </button>
+            )}
+          </div>
+        </BottomSheet>
+  
+        {/* Close guard */}
+        <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {!isEditMode && (
+              <>
+                {state.media.length > 0 && (
+                  <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
+                    {t('closeGuard.mediaNotSaved', { count: state.media.length })}
+                  </div>
+                )}
+                <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
+              </>
+            )}
+            <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
+          </div>
+        </BottomSheet>
+    </>
+  );
 
+  const courseNames = state.courses.map((c) => c.name).join(' · ');
+  const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
+  const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
+  const firstItem = state.media[0] ?? null;
+
+  // ---- PAGE 1 — MEDIA, DARK -------------------------------------------------
+  if (page === 1) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+        {/* Top bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
+          <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>×</button>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {isEditMode ? 'Edit post' : 'New post'}
+            </div>
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: CT_DARK.mute, fontVariantNumeric: 'tabular-nums' }}>1 / 2</div>
+        </div>
+
+        <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
+
+        {/* Media preview — aspect follows the frame pill, capped at 56vh */}
+        <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden' }}>
+          <MediaStageV2
+            item={active}
+            index={state.activeIndex}
+            total={state.media.length}
+            onOpenAdjust={() => setSheet('adjust')}
+            onOpenCover={() => setSheet('cover')}
+            onRequestAdd={handleStageAdd}
+          />
+
+          {/* Edit chip — bottom-left glass pill */}
+          {active && !active.existingId && (
+            <button
+              onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
+              style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12 }}
+            >
+              Edit
+            </button>
+          )}
+        </div>
+
+        {/* Frame pills row (+ Add pill when there is exactly one slide) */}
+        {active && !active.existingId && (
+          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 12px', background: CT_DARK.bg }}>
+            <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+            {state.media.length === 1 && (
+              <button
+                onClick={handleStageAdd}
+                style={{
+                  background: 'transparent',
+                  border: `1px dashed ${CT_DARK.dim}`,
+                  color: CT_DARK.mute,
+                  borderRadius: 999,
+                  padding: '5px 12px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  flex: 'none',
+                }}
+              >+ Add</button>
+            )}
+          </div>
+        )}
+
+        {/* Filmstrip — only when there is more than one slide, centred in the gap */}
+        {state.media.length > 1 ? (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
+            <MediaTray
+              media={state.media}
+              activeIndex={state.activeIndex}
+              onSelect={setActiveIndex}
+              onRemove={handleRemoveAt}
+              onReorder={reorder}
+              onAddFiles={handleAddFiles}
+            />
+          </div>
+        ) : (
+          <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+        )}
+
+        {/* Next */}
+        <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+          <button
+            onClick={() => setPage(2)}
+            style={{
+              width: '100%',
+              padding: '14px 20px',
+              borderRadius: 999,
+              border: 'none',
+              fontSize: 15,
+              fontWeight: 700,
+              background: CT_DARK.ink,
+              color: '#11131A',
+              cursor: 'pointer',
+            }}
+          >
+            Next
+          </button>
+        </div>
+
+        {sheets}
+      </div>
+    );
+  }
+
+  // ---- PAGE 2 — WORDS, LIGHT ----------------------------------------------
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
-        <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
-          {'\u2039'}
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: LIGHT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+      {/* Top bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: LIGHT.canvas, flex: 'none' }}>
+        <button
+          onClick={() => (state.media.length > 0 ? setPage(1) : handleClose())}
+          aria-label={state.media.length > 0 ? 'Back' : 'Close'}
+          style={lightIconButtonStyle}
+        >
+          {state.media.length > 0 ? '\u2039' : '\u00d7'}
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: LIGHT.ink, letterSpacing: '-0.015em' }}>
             {isEditMode ? 'Edit post' : 'New post'}
           </div>
         </div>
-        <button
-          onClick={() => { openDetail('actor'); setSheet('actor'); }}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', border: 0, cursor: 'pointer', padding: 0, minWidth: 0 }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 600, color: CT_DARK.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>
-            {authorName}
-          </span>
-          <SquircleAvatar
-            src={authorAvatar}
-            alt={authorName}
-            size={32}
-            fallback={authorUsername?.[0]}
-            hairlineRing
-          />
-        </button>
+        <div style={{ fontSize: 12, fontWeight: 700, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      {/* Stage — fixed 4:5 aspect, full width */}
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden' }}>
-        <MediaStageV2
-          item={active}
-          index={state.activeIndex}
-          total={state.media.length}
-          onOpenAdjust={() => setSheet('adjust')}
-          onOpenCover={() => setSheet('cover')}
-          onRequestAdd={handleStageAdd}
-        />
-
-        {/* Edit chip */}
-        {active && !active.existingId && (
-          <button
-            onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
-            style={floatingChipStyle}
-          >
-            Edit
-          </button>
-        )}
-
-        {/* Course chip */}
-        <button
-          onClick={() => { openDetail('course'); setSheet('course'); }}
-          style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, maxWidth: 'calc(100% - 24px)' }}
-        >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseLabel}</span>
-        </button>
-      </div>
-
-      {/* Frame pills — between stage and filmstrip */}
-      {active && !active.existingId && (
-        <div style={{ flex: 'none', display: 'flex', justifyContent: 'center', padding: '10px 0', background: CT_DARK.bg }}>
-          <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
-        </div>
-      )}
-
-      {/* Filmstrip */}
-      <div style={{ flex: 'none', padding: '10px 12px', background: CT_DARK.bg }}>
-        <MediaTray
-          media={state.media}
-          activeIndex={state.activeIndex}
-          onSelect={setActiveIndex}
-          onRemove={handleRemoveAt}
-          onReorder={reorder}
-          onAddFiles={handleAddFiles}
-        />
-      </div>
-
-      {/* Caption */}
-      <div style={{ flex: 1, minHeight: 0, padding: '0 16px', background: CT_DARK.bg, overflowY: 'auto' }}>
-        <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} />
-      </div>
-
-      {/* Action bar */}
-      <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            type="button"
-            onClick={() => { openDetail('actor'); setSheet('actor'); }}
-            aria-label="Switch account"
-            style={{ ...iconButtonStyle, padding: 2 }}
-          >
-            <SquircleAvatar
-              src={authorAvatar}
-              alt={authorName}
-              size={32}
-              fallback={authorUsername?.[0]}
-              hairlineRing
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => setSheet('more')}
-            aria-label="More options"
-            style={iconButtonStyle}
-          >
-            <MoreHorizontal size={20} color={CT_DARK.ink} />
-          </button>
-          <button onClick={onPrimary} disabled={!canSubmit} style={primaryStyle}>
-            {(submitting || saving)
-              ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
-              : primaryLabel}
-          </button>
-        </div>
-      </div>
-
-      {/* Sheets */}
-      <CourseTagSheet
-        open={sheet === 'course'}
-        onClose={() => setSheet(null)}
-        onDone={setCourses}
-        selected={state.courses}
-        userId={profile?.id ?? null}
-      />
-      <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
-
-      <ScheduleSheetV2
-        open={sheet === 'schedule'}
-        onClose={() => setSheet(null)}
-        value={state.scheduledAt}
-        onChange={setScheduledAt}
-        onOpenScheduled={() => setSheet('scheduled')}
-        scheduledCount={scheduledCount}
-      />
-      <DraftsSheetV2
-        open={sheet === 'drafts'}
-        onClose={() => setSheet(null)}
-        drafts={drafts.drafts}
-        onRestore={(d) => {
-          const primary = d.course_id && d.course_name
-            ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
-            : null;
-          const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
-          const savedCourses = cd?.courses ?? [];
-          const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
-          restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
-          setRestoredDraftId(d.id);
-        }}
-        onDelete={drafts.remove}
-      />
-      <ScheduledPostsSheetV2
-        open={sheet === 'scheduled'}
-        onClose={() => setSheet(null)}
-        userId={profile?.id}
-        onCountChange={setScheduledCount}
-      />
-      <CoverFrameSheet
-        open={sheet === 'cover'}
-        onClose={() => setSheet(null)}
-        item={active}
-        onApply={(ts) => updateActive({ posterTimestamp: ts })}
-      />
-      <AdjustSheet
-        open={sheet === 'adjust'}
-        onClose={() => setSheet(null)}
-        item={active}
-        onApply={(crop) => updateActive({ crop })}
-      />
-
-      {/* More options sheet */}
-      <BottomSheet open={sheet === 'more'} onClose={() => setSheet(null)} title="Options">
-        <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button
-            onClick={() => setSheet('schedule')}
-            style={moreRowStyle}
-          >
-            <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Schedule post</span>
-            {state.scheduledAt && <span style={{ fontSize: 12, color: CT_DARK.amber }}>Set</span>}
-          </button>
-          {!isEditMode && (
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Thumbnail + caption */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, padding: 12, display: 'flex', gap: 12 }}>
+          {firstItem ? (
             <button
-              onClick={() => setSheet('drafts')}
-              style={moreRowStyle}
+              onClick={() => setPage(1)}
+              aria-label="Edit media"
+              style={{ position: 'relative', width: 64, height: 80, borderRadius: 8, overflow: 'hidden', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', flex: 'none', cursor: 'pointer' }}
             >
-              <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
-              {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
+              {firstItem.type === 'video' ? (
+                <video src={firstItem.previewUrl} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              ) : (
+                <img src={firstItem.previewUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              )}
+              {state.media.length > 1 && (
+                <span style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>
+                  {state.media.length}
+                </span>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={handleStageAdd}
+              style={{ width: 64, height: 80, borderRadius: 8, border: `1px dashed ${LIGHT.mute}`, background: 'transparent', color: LIGHT.mute, fontSize: 11, fontWeight: 600, flex: 'none', cursor: 'pointer', lineHeight: 1.2 }}
+            >
+              + Add<br />photos
+            </button>
+          )}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
+            <CaptionField
+              value={state.caption}
+              onChange={handleSetCaption}
+              currentUserId={profile?.id ?? null}
+              variant="light"
+              minHeight={80}
+              placeholder="Say something about it"
+            />
+          </div>
+        </div>
+
+        {/* Detail rows */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, overflow: 'hidden' }}>
+          <button onClick={() => { openDetail('course'); setSheet('course'); }} style={lightRowStyle(false)}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Tag a course</span>
+            <span style={{ fontSize: 13, color: courseNames ? LIGHT.ink : LIGHT.mute, maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {courseNames || 'None'}
+            </span>
+          </button>
+          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(true)}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Posting as</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 13, color: LIGHT.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
+              <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={LIGHT_HAIRLINE} />
+            </span>
+          </button>
+          {showScheduleRow && (
+            <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={lightRowStyle(true)}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Schedule for later</span>
+              <span style={{ fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
+                {state.scheduledAt ? state.scheduledAt.toLocaleString() : 'Off'}
+              </span>
+            </button>
+          )}
+          {!isEditMode && (
+            <button onClick={() => setSheet('drafts')} style={lightRowStyle(true)}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Drafts</span>
+              <span style={{ fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length || 'None'}</span>
             </button>
           )}
         </div>
-      </BottomSheet>
+      </div>
 
-      {/* Close guard */}
-      <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {!isEditMode && (
-            <>
-              {state.media.length > 0 && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
-                  {t('closeGuard.mediaNotSaved', { count: state.media.length })}
-                </div>
-              )}
-              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
-            </>
-          )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
-        </div>
-      </BottomSheet>
+      {/* Share */}
+      <div style={{ flex: 'none', background: LIGHT.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+        <button
+          onClick={onPrimary}
+          disabled={!canSubmit}
+          style={{
+            width: '100%',
+            padding: '14px 20px',
+            borderRadius: 999,
+            border: 'none',
+            fontSize: 15,
+            fontWeight: 700,
+            background: canSubmit ? LIGHT.ink : '#C7CDD4',
+            color: '#FFFFFF',
+            cursor: canSubmit ? 'pointer' : 'not-allowed',
+          }}
+        >
+          {(submitting || saving)
+            ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
+            : primaryLabel}
+        </button>
+      </div>
+
+      {sheets}
     </div>
   );
 }
+
 
 const closeButtonStyle: React.CSSProperties = {
   width: 32,
@@ -888,3 +1012,42 @@ const moreRowStyle: React.CSSProperties = {
   cursor: 'pointer',
   textAlign: 'left',
 };
+
+// Page 2 (words) light tokens — the canvas is the app's editorial light surface.
+const LIGHT = {
+  canvas: '#F8FAFC',
+  panel: '#FFFFFF',
+  line: '#E9EDF2',
+  ink: '#0E1216',
+  mute: '#8A9099',
+} as const;
+
+const lightIconButtonStyle: React.CSSProperties = {
+  width: 32,
+  height: 32,
+  borderRadius: 999,
+  border: `1px solid ${LIGHT.line}`,
+  background: LIGHT.panel,
+  color: LIGHT.ink,
+  fontSize: 20,
+  lineHeight: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  flex: 'none',
+};
+
+const lightRowStyle = (divider: boolean): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  width: '100%',
+  padding: '14px 14px',
+  background: 'transparent',
+  border: 0,
+  borderTop: divider ? `1px solid ${LIGHT.line}` : 0,
+  cursor: 'pointer',
+  textAlign: 'left',
+});
