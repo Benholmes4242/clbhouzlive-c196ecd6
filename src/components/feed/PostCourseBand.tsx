@@ -289,9 +289,19 @@ export const PostCourseBand: React.FC<Props> = ({
             flexShrink: 0,
           }}
         >
+          {figure.prefix ? (
+            <span style={{ ...figureLabelStyle, color: T28 }}>
+              {figure.prefix}
+            </span>
+          ) : null}
           <span style={{ ...figureValueStyle, color: figure.color }}>
             {figure.figure}
           </span>
+          {figure.prefix ? (
+            <span style={{ ...figureLabelStyle, color: T28, fontSize: 11 }}>
+              {'\u00B7'}
+            </span>
+          ) : null}
           <span style={figureLabelStyle}>{figure.label}</span>
         </div>
       )}
