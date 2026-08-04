@@ -514,20 +514,10 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
           </button>
 
-          {!spec.hideHcp && (
-            <>
-              <span
-                aria-hidden
-                style={{
-                  width: 1,
-                  height: 18,
-                  background: dividerColor,
-                  flexShrink: 0,
-                }}
-              />
-              <HcpCell tone={tone} />
-            </>
-          )}
+          {/* HcpCell renders its own leading divider so the rule can never be
+              stranded when the chip is hidden. */}
+          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} />}
+
 
 
           <AvatarCell
