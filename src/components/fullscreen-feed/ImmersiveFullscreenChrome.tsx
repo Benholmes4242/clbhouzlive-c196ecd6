@@ -629,8 +629,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           <RailButton onClick={onMore} ariaLabel="More options">
             <MoreHorizontal size={28} stroke="#fff" strokeWidth={2} />
           </RailButton>
-        </div>
-      )}
+          </>
+        )}
+      </div>
+
 
     </div>
   );
