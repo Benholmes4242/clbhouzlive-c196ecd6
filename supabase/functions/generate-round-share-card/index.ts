@@ -169,8 +169,34 @@ async function backfill(limit: number, force: boolean) {
   };
 }
 
+// AUTHORISATION
+//   - No Authorization header            -> 401
+//   - Invalid / unresolvable JWT         -> 401
+//   - Service role                       -> full access (backfill + any post)
+//   - Member                             -> single post, own posts only (403)
+//   - action:'backfill' as a member       -> 403
+type Caller = { kind: 'service' } | { kind: 'user'; userId: string } | null;
+
+async function resolveCaller(req: Request): Promise<Caller> {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token = authHeader.slice('Bearer '.length).trim();
+  if (!token) return null;
+  if (token === SERVICE_KEY) return { kind: 'service' };
+
+  const { data, error } = await admin.auth.getClaims(token);
+  const claims = data?.claims as { sub?: string; role?: string } | undefined;
+  if (error || !claims) return null;
+  if (claims.role === 'service_role') return { kind: 'service' };
+  if (!claims.sub) return null;
+  return { kind: 'user', userId: claims.sub };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  const caller = await resolveCaller(req);
+  if (!caller) return json({ ok: false, error: 'unauthorized' }, 401);
 
   let body: { postId?: string; scoreId?: string; action?: string; limit?: number; force?: boolean } = {};
   try {
@@ -181,6 +207,7 @@ Deno.serve(async (req) => {
 
   try {
     if (body.action === 'backfill') {
+      if (caller.kind !== 'service') return json({ ok: false, error: 'forbidden' }, 403);
       const limit = Math.min(Math.max(Number(body.limit ?? 25), 1), 100);
       return json(await backfill(limit, !!body.force));
     }
@@ -190,9 +217,15 @@ Deno.serve(async (req) => {
     const post = await resolvePost(body);
     if (!post) return json({ ok: false, error: 'not a round post' });
 
+    // Ownership: members may only generate cards for their own round posts.
+    if (caller.kind === 'user' && post.user_id !== caller.userId) {
+      return json({ ok: false, error: 'forbidden' }, 403);
+    }
+
     return json(await generateFor(post));
   } catch (e) {
     console.error('[generate-round-share-card]', e);
     return json({ ok: false, error: String(e) });
   }
 });
+
