@@ -66,17 +66,9 @@ export default function MediaStageV2({ item, index, total, onRequestAdd }: Props
     );
   }
 
-  const ratio = FRAME_RATIO[item.frame];
-  const boxStyle: React.CSSProperties = ratio
-    ? (() => {
-        const stageW = stageSize.w || 0;
-        const stageH = stageSize.h || 0;
-        if (stageW === 0 || stageH === 0) return { width: 0, height: 0 };
-        const boxW = Math.min(stageW, stageH * ratio);
-        const boxH = boxW / ratio;
-        return { width: boxW, height: boxH };
-      })()
-    : { width: '100%', height: '100%' };
+  // The parent (StageComposer page 1) owns the frame aspect ratio, so the
+  // media box simply fills it — no second letterbox pass here.
+  const boxStyle: React.CSSProperties = { width: '100%', height: '100%' };
 
   return (
     <div ref={stageRef} style={{ flex: 1, background: CT_DARK.surface, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
