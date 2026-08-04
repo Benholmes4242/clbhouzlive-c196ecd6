@@ -75,7 +75,12 @@ export async function onRequest(context) {
     else if (date) description = `Posted on clbhouz - ${date}`;
   }
 
-  const image = pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+  // A round post with a generated share card leads the chain; anything else
+  // keeps the existing behaviour (first media, then the course thumbnail).
+  const roundCard = post.whs_score_id ? await roundShareCardUrl(post.id) : null;
+  const image =
+    roundCard || pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+
 
   if (!title && !description && !image) return genericDocument(request);
 
