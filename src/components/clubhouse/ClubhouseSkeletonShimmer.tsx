@@ -243,9 +243,9 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
-const CARD_BG = '#1B1E27';
+const CARD_BG = '#10151C';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
-const CANVAS = '#15171F';
+const CANVAS = '#05070A';
 
 export const CardSkeleton: React.FC<{
   isStatic?: boolean;
@@ -374,7 +374,7 @@ const CardFeedSkeleton: React.FC<{
           paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
           <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
           <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
@@ -402,7 +402,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#15171F]', className)}
+          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#05070A]', className)}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
