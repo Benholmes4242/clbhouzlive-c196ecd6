@@ -166,12 +166,10 @@ function AnalyticsCourseRow({
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
     avgVal != null ? t('yourCourses.avgLabel', { avg: fmtSigned(avgVal, 1) }) : null,
-    course.hardest_hole_no != null
-      ? t('yourCourses.hardestHole', { n: course.hardest_hole_no })
-      : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
+
 
   // Round FIRST, then branch on the rounded value: a delta of -0.04 renders
   // "0.0", never "-0.0".
