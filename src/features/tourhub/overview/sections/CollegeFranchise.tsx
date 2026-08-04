@@ -31,7 +31,7 @@ import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useC
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
 import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatCurrencyUsdCompact } from '@/i18n/format';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -281,13 +281,13 @@ export function CollegeFranchise() {
         </div>
         <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'baseline' }}>
           <span style={{ fontSize: 11.5, fontWeight: 800, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
-            {formatCurrency(leader.earnings_total)}
+            {formatCurrencyUsdCompact(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
             {t('overview.collegeFranchise.tugLabel')}
           </span>
           <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
-            {formatCurrency(chaser.earnings_total)}
+            {formatCurrencyUsdCompact(chaser.earnings_total)}
           </span>
         </div>
       </div>
@@ -340,7 +340,7 @@ export function CollegeFranchise() {
 
               </div>
               <span style={{ fontSize: 12, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-                {formatCurrency(s.earnings_total)}
+                {formatCurrencyUsdCompact(s.earnings_total)}
               </span>
             </button>
           );
