@@ -258,25 +258,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     return r;
   }, [groupedWithTotals, visibleCategories]);
 
-  // Viewer's closest duel: category where they're on the board but not #1
-  // and the numeric gap to the champion is smallest.
-  const closestDuelCategory = useMemo<LegendCategory | null>(() => {
-    let bestCat: LegendCategory | null = null;
-    let bestGap = Infinity;
-    visibleCategories.forEach((cat) => {
-      const entry = groupedWithTotals.get(cat);
-      if (!entry || entry.rows.length === 0) return;
-      const champ = entry.rows[0];
-      const self = entry.rows.find((r) => r.isSelf);
-      if (!self || self.rank === 1) return;
-      const gap = Math.abs(self.value - champ.value);
-      if (gap < bestGap) {
-        bestGap = gap;
-        bestCat = cat;
-      }
-    });
-    return bestCat;
-  }, [groupedWithTotals, visibleCategories]);
 
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -460,76 +441,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             toggleVariant={theme === 'light' ? 'light' : 'dark'}
           />
 
-          {/* Your closest duel — highlight the tightest gap for the viewer at this club.
-              Hidden when the viewer holds every crown here or has no on-board data. */}
-          {closestDuelCategory && youOwnedCount < visibleCategories.length && (() => {
-            const cat = closestDuelCategory;
-            const entry = groupedWithTotals.get(cat);
-            if (!entry) return null;
-            const champion = entry.rows[0];
-            const sectionRows = entry.rows.map((r) => ({
-              rank: r.rank,
-              name: r.isSelf ? 'You' : r.name,
-              photoUrl: r.photoUrl,
-              valueDisplay: r.valueDisplay,
-              value: r.value,
-              isSelf: r.isSelf,
-              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
-              userId: r.userId,
-              rank30d: r.rank30d,
-              delta: r.delta,
-            }));
-            const selfRow = entry.rows.find((r) => r.isSelf);
-            const ctaLine = selfRow
-              ? chaseCtaLine(cat, champion.value, selfRow.value)
-              : undefined;
-            return (
-              <div data-closest-duel>
-                {/* Eyebrow + explainer — teaches the section, then the panel
-                    below headlines the actual crown name. */}
-                <div style={{ padding: '4px 16px 8px' }}>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      color: '#C2620A',
-                    }}
-                  >
-                    {t('courseDetail.legends.closestDuel')}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 4,
-                      fontSize: 12.5,
-                      color: '#68707B',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {t('courseDetail.legends.closestDuelBody')}
-                  </div>
-                </div>
-                <ChampionsDuelCard
-                  category={cat}
-                  categoryLabel={legendCategoryLabel[cat]}
-                  categoryIcon={legendCategoryIcon[cat]}
-                  rows={sectionRows}
-                  yourRank={yourRanks[cat] ?? null}
-                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
-                  totalCount={entry.total}
-                  unitLabel={UNITS[cat] || SHORT_LABELS[cat]}
-                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
-                  proBenchmark={null}
-                  theme={theme}
-                  banded={false}
-                  chaseCta={ctaLine}
-                  suppressTopBorder
-                />
-              </div>
-
-            );
-          })()}
 
           
 
