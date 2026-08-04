@@ -769,7 +769,7 @@ const StoryTiles: React.FC<{
         emoji: '⛳',
         label: 'Birdie map',
         value: `${birdiedCount}/${totalHoles}`,
-        note: `${totalHoles - birdiedCount} still waiting for your first birdie.`,
+        note: `${totalHoles - birdiedCount} holes still waiting for your first birdie.`,
       });
     }
 
