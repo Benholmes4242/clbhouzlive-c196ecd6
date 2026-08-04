@@ -1,0 +1,19 @@
+{
+  "history": {
+    "title": "History",
+    "group": {
+      "count": "{{count}} conversations",
+      "collapse": "Collapse"
+    },
+    "delete": {
+      "one": {
+        "title": "Delete this chat?",
+        "body": "This can't be undone."
+      },
+      "group": {
+        "title": "Delete all {{count}} conversations?",
+        "body": "This can't be undone."
+      }
+    }
+  }
+}

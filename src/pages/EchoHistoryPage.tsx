@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, MoreHorizontal, Pin, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, Pin, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,12 +26,63 @@ const relativeTime = formatRelativeRounded;
 
 type SheetMode = null | 'actions' | 'rename' | 'confirm-delete';
 
+/**
+ * Titles are auto-generated from the opening question, so asking the same
+ * thing five times yields five identically-titled rows. Group them under the
+ * most recent one rather than deduplicating (no chat is ever hidden).
+ * Pinned chats are deliberately excluded: pinning is how a chat LEAVES a
+ * group.
+ */
+function titleKey(title: string | null): string {
+  return (title ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[.?!,;:]+$/, '');
+}
+
+interface ChatGroup {
+  key: string;
+  /** Most recent chat — the visible leader row. */
+  leader: EchoChatRow;
+  /** Remaining chats, most-recent-first. Empty for a singleton. */
+  rest: EchoChatRow[];
+}
+
+function buildGroups(chats: EchoChatRow[]): ChatGroup[] {
+  const out: ChatGroup[] = [];
+  const index = new Map<string, ChatGroup>();
+  // `chats` arrives pinned-first then most-recent-first, so the first row
+  // seen for a key is always the leader and `rest` stays ordered.
+  for (const c of chats) {
+    const key = titleKey(c.title);
+    if (c.pinned || !key) {
+      out.push({ key: c.id, leader: c, rest: [] });
+      continue;
+    }
+    const existing = index.get(key);
+    if (existing) {
+      existing.rest.push(c);
+      continue;
+    }
+    const group: ChatGroup = { key, leader: c, rest: [] };
+    index.set(key, group);
+    out.push(group);
+  }
+  return out;
+}
+
 const EchoHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: chats = [], isLoading, isError, refetch } = useEchoChats();
 
+  const { t } = useTranslation('echo');
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(() => new Set());
   const [sheetChatId, setSheetChatId] = useState<string | null>(null);
+  // When the sheet was opened from a GROUP LEADER, Delete removes the whole
+  // group; Pin and Rename still act on the leader alone.
+  const [sheetGroupIds, setSheetGroupIds] = useState<string[]>([]);
   const [sheetMode, setSheetMode] = useState<SheetMode>(null);
   const [renameValue, setRenameValue] = useState('');
   const [busy, setBusy] = useState(false);
@@ -46,15 +98,28 @@ const EchoHistoryPage: React.FC = () => {
     return () => unlockBodyScroll();
   }, [sheetMode]);
 
+  const groups = useMemo(() => buildGroups(chats), [chats]);
+
+  const toggleGroup = useCallback((key: string) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
   const closeSheet = useCallback(() => {
     setSheetMode(null);
     setSheetChatId(null);
+    setSheetGroupIds([]);
     setRenameValue('');
     setBusy(false);
   }, []);
 
-  const openActions = useCallback((c: EchoChatRow) => {
+  const openActions = useCallback((c: EchoChatRow, groupIds: string[] = []) => {
     setSheetChatId(c.id);
+    setSheetGroupIds(groupIds);
     setRenameValue(c.title ?? '');
     setSheetMode('actions');
   }, []);
@@ -71,6 +136,9 @@ const EchoHistoryPage: React.FC = () => {
   const handlePinToggle = useCallback(async () => {
     if (!sheetChat) return;
     const nextPinned = !sheetChat.pinned;
+    // Pinning lifts this chat out of its group; the remaining siblings
+    // re-collapse rather than being left orphaned in an expanded state.
+    setExpandedKeys(new Set());
     patchList((rows) =>
       rows
         .map((r) => (r.id === sheetChat.id ? { ...r, pinned: nextPinned } : r))
@@ -97,6 +165,8 @@ const EchoHistoryPage: React.FC = () => {
     if (!sheetChat) return;
     const next = renameValue.trim();
     if (!next) return;
+    // Renaming changes the group key, so the leader leaves; re-collapse.
+    setExpandedKeys(new Set());
     setBusy(true);
     patchList((rows) =>
       rows.map((r) => (r.id === sheetChat.id ? { ...r, title: next } : r)),
@@ -115,15 +185,17 @@ const EchoHistoryPage: React.FC = () => {
   const handleDeleteConfirm = useCallback(async () => {
     if (!sheetChat) return;
     setBusy(true);
-    const id = sheetChat.id;
-    patchList((rows) => rows.filter((r) => r.id !== id));
+    const ids = sheetGroupIds.length > 1 ? sheetGroupIds : [sheetChat.id];
+    patchList((rows) => rows.filter((r) => !ids.includes(r.id)));
     closeSheet();
-    const { error } = await supabase.from('echo_chats').delete().eq('id', id);
+    const { error } = await supabase.from('echo_chats').delete().in('id', ids);
     if (error) {
       toast.error("Couldn't delete this chat");
       void qc.invalidateQueries({ queryKey: ['echo-v2', 'chats'] });
     }
-  }, [sheetChat, patchList, closeSheet, qc]);
+  }, [sheetChat, sheetGroupIds, patchList, closeSheet, qc]);
+
+  const deleteCount = sheetGroupIds.length > 1 ? sheetGroupIds.length : 1;
 
   return (
     <div className="echo-root" style={{ background: CANVAS }}>
@@ -283,82 +355,35 @@ const EchoHistoryPage: React.FC = () => {
             </div>
           ) : (
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-              {chats.map((c) => {
-                const title = (c.title && c.title.trim()) || 'New chat';
+              {groups.map((g) => {
+                const expanded = expandedKeys.has(g.key);
+                const groupIds = [g.leader.id, ...g.rest.map((r) => r.id)];
                 return (
-                  <li
-                    key={c.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: '12px 14px',
-                      borderBottom: `0.5px solid ${HAIRLINE}`,
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(`/echo/${c.id}`, { state: { from: 'history' } })
-                      }
-                      className="active:opacity-70"
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        background: 'transparent',
-                        border: 'none',
-                        padding: 0,
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {c.pinned ? (
-                        <Pin size={12} color={AMBER} style={{ flexShrink: 0 }} />
-                      ) : null}
-                      <span
-                        style={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: INK,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          flex: 1,
-                          minWidth: 0,
-                        }}
-                      >
-                        {title}
-                      </span>
-                      <span
-                        style={{ fontSize: 11, color: MUTED, flexShrink: 0 }}
-                      >
-                        {relativeTime(c.last_message_at)}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="More"
-                      onClick={() => openActions(c)}
-                      className="active:opacity-60"
-                      style={{
-                        width: 32,
-                        height: 32,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'transparent',
-                        border: 'none',
-                        color: SUB,
-                        flexShrink: 0,
-                        marginLeft: 2,
-                      }}
-                    >
-                      <MoreHorizontal size={18} />
-                    </button>
-                  </li>
+                  <React.Fragment key={g.key}>
+                    <ChatRow
+                      chat={g.leader}
+                      onOpen={() => navigate(`/echo/${g.leader.id}`, { state: { from: 'history' } })}
+                      onActions={() => openActions(g.leader, groupIds)}
+                      groupCount={g.rest.length > 0 ? groupIds.length : 0}
+                      expanded={expanded}
+                      onToggleGroup={() => toggleGroup(g.key)}
+                      countLabel={t('history.group.count', {
+                        count: groupIds.length,
+                        defaultValue: '{{count}} conversations',
+                      })}
+                    />
+                    {g.rest.length > 0 && expanded
+                      ? g.rest.map((c) => (
+                          <ChatRow
+                            key={c.id}
+                            chat={c}
+                            indented
+                            onOpen={() => navigate(`/echo/${c.id}`, { state: { from: 'history' } })}
+                            onActions={() => openActions(c)}
+                          />
+                        ))
+                      : null}
+                  </React.Fragment>
                 );
               })}
             </ul>
@@ -482,10 +507,15 @@ const EchoHistoryPage: React.FC = () => {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
-                  Delete this chat?
+                  {deleteCount > 1
+                    ? t('history.delete.group.title', {
+                        count: deleteCount,
+                        defaultValue: 'Delete all {{count}} conversations?',
+                      })
+                    : t('history.delete.one.title', { defaultValue: 'Delete this chat?' })}
                 </span>
                 <span style={{ fontSize: 13, color: SUB, lineHeight: 1.45 }}>
-                  This can&apos;t be undone.
+                  {t('history.delete.one.body', { defaultValue: "This can't be undone." })}
                 </span>
                 <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                   <button
@@ -529,6 +559,115 @@ const EchoHistoryPage: React.FC = () => {
         </div>
       ) : null}
     </div>
+  );
+};
+
+const ChatRow: React.FC<{
+  chat: EchoChatRow;
+  onOpen: () => void;
+  onActions: () => void;
+  /** >0 when this row leads a group of identically-titled chats. */
+  groupCount?: number;
+  expanded?: boolean;
+  onToggleGroup?: () => void;
+  countLabel?: string;
+  indented?: boolean;
+}> = ({ chat, onOpen, onActions, groupCount = 0, expanded, onToggleGroup, countLabel, indented }) => {
+  const title = (chat.title && chat.title.trim()) || 'New chat';
+  return (
+    <li
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '12px 14px',
+        paddingLeft: indented ? 32 : 14,
+        borderBottom: `0.5px solid ${HAIRLINE}`,
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <button
+          type="button"
+          onClick={onOpen}
+          className="active:opacity-70"
+          style={{
+            width: '100%',
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          {chat.pinned ? <Pin size={12} color={AMBER} style={{ flexShrink: 0 }} /> : null}
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: INK,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            {title}
+          </span>
+          <span style={{ fontSize: 11, color: MUTED, flexShrink: 0 }}>
+            {relativeTime(chat.last_message_at)}
+          </span>
+        </button>
+        {groupCount > 1 && onToggleGroup ? (
+          <button
+            type="button"
+            onClick={onToggleGroup}
+            aria-expanded={!!expanded}
+            className="active:opacity-70"
+            style={{
+              alignSelf: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontSize: 11,
+              fontWeight: 600,
+              color: SUB,
+              cursor: 'pointer',
+            }}
+          >
+            {countLabel}
+            {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+          </button>
+        ) : null}
+      </div>
+      <button
+        type="button"
+        aria-label="More"
+        onClick={onActions}
+        className="active:opacity-60"
+        style={{
+          width: 32,
+          height: 32,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'transparent',
+          border: 'none',
+          color: SUB,
+          flexShrink: 0,
+          marginLeft: 2,
+        }}
+      >
+        <MoreHorizontal size={18} />
+      </button>
+    </li>
   );
 };
 
