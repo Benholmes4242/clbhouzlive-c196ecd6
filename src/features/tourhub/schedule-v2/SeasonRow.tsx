@@ -242,10 +242,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
         >
           {isLive && <LiveMark />}
           {event.state === 'upcoming' && event.daysAway !== null && (
-            <UpcomingRail
-              daysAway={event.daysAway}
-              highlight={event.isMajor && event.daysAway <= 7}
-            />
+            <UpcomingRail daysAway={event.daysAway} highlight={false} />
           )}
         </div>
       </button>
