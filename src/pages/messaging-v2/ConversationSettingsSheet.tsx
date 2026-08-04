@@ -533,7 +533,6 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                             background: '#FFF',
                             border: `1px solid ${HAIRLINE}`,
                             borderRadius: 12,
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
                             minWidth: 180,
                             padding: 6,
                             zIndex: 20,
