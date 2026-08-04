@@ -98,6 +98,10 @@ export function FeedCard({
    * courses Discover on-the-course, course details Media tab.
    */
   bareTile?: boolean;
+  /** Open the fullscreen viewer in read-only / gallery mode: no like,
+   *  comment, share or follow chrome. Used by course-detail surfaces.
+   *  Watch surfaces must NOT set this. */
+  readOnlyFullscreen?: boolean;
 }) {
 
 
