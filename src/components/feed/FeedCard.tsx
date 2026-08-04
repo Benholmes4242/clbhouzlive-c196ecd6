@@ -53,8 +53,8 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 
 
 
-// Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
-// underline, primary text base, and the feed card surface all share this token.
+// Full-bleed slab chrome — the post slab is #10151C and the feed canvas behind
+// it (#05070A) is darker, so the gap between posts does the separating.
 // Text constants flip to light-on-dark; LINE becomes a white hairline.
 const CARD = '#10151C';
 const T100 = '#F8FAFC';
