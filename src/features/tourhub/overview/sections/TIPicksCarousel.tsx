@@ -488,7 +488,7 @@ function CaseSheet({
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: AMBER_DEEP,
+              color: INK,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
             }}
@@ -921,7 +921,7 @@ function AllPicksSheet({
         style={{
           fontSize: 10,
           fontWeight: 800,
-          color: AMBER_DEEP,
+          color: INK,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
           marginBottom: 6,

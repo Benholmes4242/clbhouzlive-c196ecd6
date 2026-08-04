@@ -33,7 +33,6 @@ import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,
@@ -68,7 +67,7 @@ const KICKER_STYLE = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 function SkeletonKicker() {

@@ -265,7 +265,7 @@ function CutWatchLine({ tournamentId }: { tournamentId: string | undefined }) {
   return (
     <div style={{ padding: `0 ${SPACE.pagePadX}px 10px` }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{t('tour.projectedCut')}</span>
+        <span style={{ ...LABEL, color: A.INK }}>{t('tour.projectedCut')}</span>
         <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, ...FIGS }}>
           {formatToPar(cut.cutline)}
         </span>

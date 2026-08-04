@@ -2,7 +2,7 @@
  * TheClass - full alumni roster.
  *
  * Analytical grammar (BRIEF_TOUR_COLLEGE_PROFILE):
- *   - AMBER_DEEP kicker with right-hand alumni count aside.
+ *   - INK kicker (eyebrows are never amber) with right-hand alumni count aside.
  *   - Sorted purely by season earnings desc, so the "#" numeral IS the
  *     earnings rank. The old star-first sort is gone.
  *   - Sub-line carries season facts (World {n} . {n} wins . {n} events),
@@ -24,7 +24,6 @@ import { playerRoute } from '@/features/tourhub/routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import {
-  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,
@@ -45,7 +44,7 @@ const KICKER_STYLE: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 const LABEL_STYLE: React.CSSProperties = {

@@ -2,7 +2,7 @@
  * ThisWeek - leads with alumni playing / just-played this week.
  *
  * Analytical grammar (BRIEF_TOUR_COLLEGE_PROFILE):
- *   - AMBER_DEEP kicker with a right-hand sample-size aside.
+ *   - INK kicker (eyebrows are never amber) with a right-hand sample-size aside.
  *   - Position is plain neutral text in a fixed 44px column, thru label
  *     beneath it in the LABEL token, same colour live or final.
  *   - Score sits in a fixed 46px column and is coloured by the canonical
@@ -27,7 +27,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
-  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,
@@ -46,7 +45,7 @@ const KICKER_STYLE: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 const LABEL_STYLE: React.CSSProperties = {

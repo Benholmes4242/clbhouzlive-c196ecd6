@@ -186,7 +186,7 @@ function SpotlightRow({
           ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.amberDeep, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
             {t('overview.rankings.worldNo1Label')}
           </div>
           <div style={{ marginTop: 2, fontSize: 16.5, fontWeight: 800, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

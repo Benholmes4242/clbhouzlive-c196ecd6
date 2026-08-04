@@ -489,7 +489,9 @@ export function PhotoBand({
                   fontSize: 12,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: AMBER,
+                  // Quiet action on a dark hero band: white-62, never amber
+                  // (ACTION INK FLIP). Amber here stays only on the figure above.
+                  color: 'rgba(255,255,255,0.62)',
                   textTransform: 'uppercase',
                   textShadow: '0 1px 3px rgba(0,0,0,0.55)',
                   flexShrink: 0,
