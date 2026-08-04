@@ -68,6 +68,19 @@ const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
 const FALLBACK_RATIO = 4 / 5;
 
+// Chrome measured on a 390x844 card. Standard: header 54.7 + caption 49.2
+// + unified band incl. actions 100.2 + hairline + 88 nav = 293, reserved at
+// 305 (12px margin). Review posts carry the tier word (absolute ghost
+// numeral + header chip, zero layout) and a THIRD clamped line of review
+// text plus the absolutely-positioned "Read review" affordance, so the only
+// real layout delta is one 14/1.4 line: measured caption block 68.8 (review,
+// 3 lines) vs 49.2 (standard, 2 lines) = 19.6 -> reserve 20.
+const MEDIA_CHROME_RESERVE = 305;
+const REVIEW_HEADER_EXTRA = 20;
+const mediaMaxHeight = (isReview: boolean) =>
+  `max(280px, calc(100svh - ${MEDIA_CHROME_RESERVE + (isReview ? REVIEW_HEADER_EXTRA : 0)}px - env(safe-area-inset-bottom)))`;
+
+
 // formatCount / timeAgo moved to @/i18n/format (Wave 1 drift-consolidation).
 
 
