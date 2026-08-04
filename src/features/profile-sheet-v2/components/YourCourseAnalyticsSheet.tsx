@@ -209,7 +209,7 @@ function AnalyticsCourseRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 16px 62px',
+        gridTemplateColumns: '1fr 16px 52px',
         gap: '0 10px',
         alignItems: 'end',
         minWidth: 0,
