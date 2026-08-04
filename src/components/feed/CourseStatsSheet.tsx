@@ -291,6 +291,32 @@ export const CourseStatsSheet: React.FC<Props> = ({
           }
         />
 
+        {/* Hardest hole */}
+        {data?.hardest_hole_no != null ? (
+          <section style={{ padding: '14px 18px', borderTop: `1px solid ${LINE}` }}>
+            <div style={sectionLabel}>{t('feed.courseSheet.hardestHoleLabel')}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: 26,
+                  fontWeight: 800,
+                  letterSpacing: '-0.035em',
+                  color: T100,
+                }}
+              >
+                {data.hardest_hole_no}
+              </span>
+              <span style={{ fontSize: 13, color: T70 }}>
+                {t('feed.courseSheet.hardestHoleMeta', { par: data.hardest_hole_par ?? 0 })}{' '}
+                <span style={{ color: RED, fontFamily: MONO, fontWeight: 800 }}>
+                  {data.hardest_hole_plays != null ? data.hardest_hole_plays.toFixed(2) : ''}
+                </span>
+              </span>
+            </div>
+          </section>
+        ) : null}
 
         {/* Action */}
         <div style={{ padding: '16px 18px 8px', borderTop: `1px solid ${LINE}` }}>
