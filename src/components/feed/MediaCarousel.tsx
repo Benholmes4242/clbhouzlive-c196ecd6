@@ -4,9 +4,11 @@
  * Rules from the brief:
  *  - Stable card height: ONE fixed 4:5 frame ratio for all slides so the
  *    card height never jumps as you swipe.
- *  - Per-slide no-crop ambient fill: a blurred, scaled copy of the slide
- *    fills the frame behind it, then the slide is `object-fit: contain`
- *    on top. Wide and tall in the same post both show whole, no bars.
+ *  - Every slide is `object-fit: cover` / `object-position: center` into the
+ *    shared frame: a portrait taller than the frame is centre-cropped, never
+ *    letterboxed. The full frame is one tap away in the fullscreen viewer.
+ *  - `maxHeight` caps the frame against the viewport (feed budget) so the
+ *    course band + actions row stay above the floating nav.
  *  - Dots overlay bottom-centre (`CarouselDots`) are the sole indicator.
  *  - Swipe + tap a dot navigates. Active index persisted in
  *    `clubhouseStore.carouselPositions` keyed by post index.
@@ -29,6 +31,13 @@ interface Props {
   isCardActive: boolean;
   initialIndex: number;
   frameRatio?: number; // default 4/5
+  /**
+   * Viewport cap for the frame (CSS length, e.g. the feed's
+   * `max(280px, calc(100svh - ...))`). Applied as maxHeight on the frame so
+   * the band + actions row stay above the floating nav. ALL slides share this
+   * one height — the frame owns it, slides cover-crop into it.
+   */
+  maxHeight?: string;
   /** When false, video slides render their poster only (no <video> element). */
   mountVideo?: boolean;
   /**
@@ -61,6 +70,7 @@ export const MediaCarousel: React.FC<Props> = ({
   isCardActive,
   initialIndex,
   frameRatio = FRAME_DEFAULT,
+  maxHeight,
   mountVideo = false,
   postId,
   onIndexChange,
@@ -381,7 +391,8 @@ export const MediaCarousel: React.FC<Props> = ({
         position: 'relative',
         width: '100%',
         aspectRatio: String(frameRatio),
-        background: '#05080F',
+        maxHeight,
+        background: '#10151C',
         overflow: 'hidden',
       }}
     >
