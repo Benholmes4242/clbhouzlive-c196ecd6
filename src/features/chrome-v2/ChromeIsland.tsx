@@ -178,20 +178,67 @@ const LeftCapsule: React.FC<{
 };
 
 // ---------------------------------------------------------------------------
-// HCP cell — visibility mirrors HandicapChip:
-//   - logged-out user      -> render nothing
-//   - !user (business)     -> render nothing (HandicapChip returns null too)
-//   - whsLoading           -> fixed-width skeleton
-//   - !connection          -> disconnected pill (Connect HCP)
-//   - connection & no idx  -> disconnected pill
-//   - connected            -> index + optional trend arrow
+// HCP cell — owns BOTH the divider and the chip, because whatever governs the
+// chip's visibility must govern the divider (an empty capsule with a stranded
+// 1px rule is worse than either state).
+//
+// Visibility:
+//   - logged-out user            -> render nothing
+//   - business actor            -> render nothing
+//   - profile still loading      -> render nothing (hide_handicap_chip is
+//                                   undefined while loading and would read as
+//                                   false, flashing the chip at a member who
+//                                   hid it)
+//   - hide_handicap_chip         -> render nothing
+//   - whs loading                -> reserved-width placeholder, no visible mark
+//   - !connection / no index     -> disconnected pill (Connect HCP)
+//   - connected                  -> index + optional trend arrow
+//
+// Width: the cell reserves the WIDEST outcome so the right capsule never
+// resizes. Rather than a magic pixel value, a hidden ghost of the widest
+// label ("Connect HCP", at its rendered type) sits in the same grid area and
+// sets the floor. If either label's text or type changes, the reservation
+// follows automatically.
 // ---------------------------------------------------------------------------
-const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
+const HCP_RESERVE_LABEL = 'Connect HCP';
+const HCP_LABEL_TYPE: React.CSSProperties = {
+  fontFamily: 'Geist, system-ui, sans-serif',
+  fontSize: 11.5,
+  fontWeight: 700,
+  letterSpacing: '0.01em',
+  whiteSpace: 'nowrap',
+};
+
+/** Grid wrapper that reserves the widest outcome's width for its child. */
+const HcpReserve: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+  <span style={{ display: 'inline-grid', alignItems: 'center', justifyItems: 'end' }}>
+    <span
+      aria-hidden
+      style={{
+        ...HCP_LABEL_TYPE,
+        gridArea: '1 / 1',
+        visibility: 'hidden',
+        pointerEvents: 'none',
+      }}
+    >
+      {HCP_RESERVE_LABEL}
+    </span>
+    <span style={{ gridArea: '1 / 1', display: 'inline-flex', alignItems: 'center' }}>
+      {children}
+    </span>
+  </span>
+);
+
+const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
+  <span aria-hidden style={{ width: 1, height: 18, background: color, flexShrink: 0 }} />
+);
+
+const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
-  const { data: profile } = useUserProfile(user?.id);
+  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
@@ -199,88 +246,87 @@ const HcpCell: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
 
   if (!user) return null;
   if (isBusinessActor) return null;
+  // Wait for the flag before committing to a visible state.
+  if (profileLoading) return null;
   if (profile?.hide_handicap_chip) return null;
 
-  if (whsLoading) {
-    return (
-      <div
-        aria-hidden
-        style={{
-          width: 28,
-          height: 14,
-          borderRadius: 4,
-          background: tone === 'light' ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.08)',
-        }}
-      />
-    );
-  }
+  const body = (() => {
+    if (whsLoading) {
+      // Width is already reserved by HcpReserve; nothing visible goes here so
+      // the capsule settles at its final size on the first paint.
+      return null;
+    }
 
-  const disconnected =
-    !connection || trendData?.current == null;
+    const disconnected = !connection || trendData?.current == null;
 
-  if (disconnected) {
+    if (disconnected) {
+      return (
+        <button
+          type="button"
+          onClick={() => navigate('/manage/handicap')}
+          aria-label="Connect handicap"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            color: '#F7931E',
+            ...HCP_LABEL_TYPE,
+          }}
+        >
+          {HCP_RESERVE_LABEL}
+        </button>
+      );
+    }
+
+    const indexValue = Number(trendData!.current).toFixed(1);
+    const direction = trend.direction;
+    const showArrow = direction === 'improving' || direction === 'drifting';
+    const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
+    const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
+
     return (
       <button
         type="button"
-        onClick={() => navigate('/manage/handicap')}
-        aria-label="Connect handicap"
+        onClick={() => navigate('/handicap')}
+        aria-label={`Handicap ${indexValue}`}
         style={{
           background: 'none',
           border: 'none',
           padding: 0,
           cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
           fontFamily: 'Geist, system-ui, sans-serif',
-          fontSize: 11.5,
-          fontWeight: 700,
-          color: '#F7931E',
-          letterSpacing: '0.01em',
-          whiteSpace: 'nowrap',
         }}
       >
-        Connect HCP
+        <span
+          style={{
+            fontWeight: 800,
+            fontSize: 12.5,
+            color: inkFor(tone),
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {indexValue}
+        </span>
+        {showArrow && (
+          <ArrowIcon size={8} color={arrowColor} strokeWidth={3} />
+        )}
       </button>
     );
-  }
-
-  const indexValue = Number(trendData!.current).toFixed(1);
-  const direction = trend.direction;
-  const showArrow = direction === 'improving' || direction === 'drifting';
-  const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
-  const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
+  })();
 
   return (
-    <button
-      type="button"
-      onClick={() => navigate('/handicap')}
-      aria-label={`Handicap ${indexValue}`}
-      style={{
-        background: 'none',
-        border: 'none',
-        padding: 0,
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        fontFamily: 'Geist, system-ui, sans-serif',
-      }}
-    >
-      <span
-        style={{
-          fontWeight: 800,
-          fontSize: 12.5,
-          color: inkFor(tone),
-          fontVariantNumeric: 'tabular-nums',
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {indexValue}
-      </span>
-      {showArrow && (
-        <ArrowIcon size={8} color={arrowColor} strokeWidth={3} />
-      )}
-    </button>
+    <>
+      <HcpDivider color={dividerColor} />
+      <HcpReserve>{body}</HcpReserve>
+    </>
   );
 };
+
 
 // ---------------------------------------------------------------------------
 // Avatar cell — trigger for PostingAsMenu (identical wiring to CompactHeader)
@@ -468,20 +514,10 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
           </button>
 
-          {!spec.hideHcp && (
-            <>
-              <span
-                aria-hidden
-                style={{
-                  width: 1,
-                  height: 18,
-                  background: dividerColor,
-                  flexShrink: 0,
-                }}
-              />
-              <HcpCell tone={tone} />
-            </>
-          )}
+          {/* HcpCell renders its own leading divider so the rule can never be
+              stranded when the chip is hidden. */}
+          {!spec.hideHcp && <HcpCell tone={tone} dividerColor={dividerColor} />}
+
 
 
           <AvatarCell
