@@ -9,7 +9,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { toast } from '@/lib/toast';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -35,12 +35,20 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SECONDARY = '#8A9099';
-const MUTED = '#AEB4BC';
+const CANVAS = '#F4F6F9';
+const INK = '#0E1216';
+const MUTE = '#68707B';
 const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+const BORDER = '#EDF0F3';
+const HAIRLINE = BORDER;
+
+/**
+ * Floor for the content-driven sheet. Measured on the smallest supported
+ * viewport (320x568, iPhone SE): handle 12 + header 44 + empty line 20 +
+ * composer 72 = ~148, so 160 clears it without clipping while still leaving
+ * the post behind the sheet visible.
+ */
+const MIN_SHEET_HEIGHT = 160;
 
 interface Props {
   isOpen: boolean;
@@ -56,6 +64,7 @@ function CommentsSheetV2Inner({
   isOpen, onClose, targetType, targetId, targetSecondaryId, initialCommentId,
 }: Props) {
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('common');
   const kb = useKeyboardHeight();
 
   const {
@@ -213,8 +222,8 @@ function CommentsSheetV2Inner({
             style={{
               background: CANVAS,
               borderRadius: '20px 20px 0 0',
-              height: '75dvh',
               maxHeight: '75dvh',
+              minHeight: MIN_SHEET_HEIGHT,
               paddingBottom: kb > 0 ? kb : 0,
               transition: 'padding-bottom 120ms ease-out',
             }}
@@ -224,58 +233,50 @@ function CommentsSheetV2Inner({
               <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
             </div>
 
-            {/* Header */}
-            <div className="flex items-start justify-between px-5 pb-3 shrink-0">
-              <div>
+            {/* Header - the count is stated ONCE; no kicker, no close button. */}
+            <div className="px-5 pb-3 shrink-0">
+              {totalCountLoading ? (
                 <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: AMBER,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    marginBottom: 4,
-                  }}
-                >
-                  COMMENTS
+                  className="clb-shimmer-light rounded-sm"
+                  style={{ width: 96, height: 21, background: 'rgba(14,18,22,0.06)' }}
+                />
+              ) : (
+                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em', lineHeight: '21px' }}>
+                  {totalCount === 0
+                    ? t('comments.countNone')
+                    : t('comments.count', { count: totalCount })}
                 </div>
-                {totalCountLoading ? (
-                  <div
-                    className="clb-shimmer-light rounded-sm"
-                    style={{ width: 96, height: 21, background: 'rgba(15,23,42,0.06)' }}
-                  />
-                ) : (
-                  <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em', lineHeight: '21px' }}>
-                    {totalCount} {totalCount === 1 ? 'comment' : 'comments'}
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
-                aria-label="Close"
-              >
-                <X size={18} style={{ color: SECONDARY }} />
-              </button>
+              )}
+              {!totalCountLoading && totalCount === 0 && (
+                <div style={{ fontSize: 13, color: MUTE, marginTop: 4 }}>
+                  {t('comments.emptyLine')}
+                </div>
+              )}
             </div>
 
             {/* Scroll area */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto overscroll-contain"
-              style={{ WebkitOverflowScrolling: 'touch', padding: '4px 12px 16px' }}
+              className="overflow-y-auto overscroll-contain"
+              style={{
+                // 0 1 auto: take only what the content needs, shrink when the
+                // 75dvh cap bites, and scroll from that point.
+                flex: '0 1 auto',
+                minHeight: 0,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                padding: threads.length === 0 ? 0 : '4px 16px 16px',
+              }}
             >
               {isLoading ? (
-                <SkeletonCards />
-              ) : threads.length === 0 ? (
-                <EmptyState />
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {threads.map((t) => (
+                <SkeletonRows />
+              ) : threads.length === 0 ? null : (
+                <div>
+                  {threads.map((c, i) => (
                     <CommentCard
-                      key={t.id}
-                      comment={t}
+                      key={c.id}
+                      comment={c}
+                      isFirst={i === 0}
                       currentUserId={user?.id ?? null}
                       registerRef={registerRef}
                       highlightedId={highlightedId}
@@ -294,7 +295,7 @@ function CommentsSheetV2Inner({
                       className="mt-1 mx-auto py-2 px-3 bg-transparent border-0 cursor-pointer"
                       style={{ fontSize: 12, fontWeight: 700, color: AMBER, letterSpacing: '0.06em' }}
                     >
-                      {isFetchingNextPage ? 'Loading…' : 'VIEW EARLIER COMMENTS'}
+                      {isFetchingNextPage ? t('comments.loading') : t('comments.viewEarlier')}
                     </button>
                   )}
                 </div>
@@ -411,43 +412,27 @@ function CommentsSheetV2Inner({
   return typeof window !== 'undefined' ? createPortal(content, document.body) : null;
 }
 
-function SkeletonCards() {
+function SkeletonRows() {
   return (
-    <div className="flex flex-col gap-3">
+    <div style={{ padding: '4px 16px 16px' }}>
       {[0, 1, 2].map((i) => (
         <div
           key={i}
+          className="flex"
           style={{
-            background: '#FFFFFF', border: `1px solid ${HAIRLINE}`,
-            borderRadius: 16, padding: 14,
+            gap: 11,
+            padding: i === 0 ? '0 0 16px' : '16px 0',
+            borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
           }}
         >
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-[34%] shrink-0 clb-shimmer-light" style={{ background: 'rgba(15,23,42,0.06)' }} />
-            <div className="flex-1 space-y-2 py-0.5">
-              <div className="h-4 w-24 rounded clb-shimmer-light" style={{ background: 'rgba(15,23,42,0.06)' }} />
-              <div className="h-4 w-[85%] rounded clb-shimmer-light" style={{ background: 'rgba(15,23,42,0.06)' }} />
-              <div className="h-4 w-[55%] rounded clb-shimmer-light" style={{ background: 'rgba(15,23,42,0.06)' }} />
-            </div>
+          <div className="w-[34px] h-[34px] rounded-[34%] shrink-0 clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
+          <div className="flex-1 space-y-2 py-0.5">
+            <div className="h-4 w-24 rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
+            <div className="h-4 w-[85%] rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
+            <div className="h-4 w-[55%] rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 px-8" style={{ minHeight: 220 }}>
-      <div className="flex gap-3 text-4xl">
-        <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
-        <span className="inline-block animate-bounce" style={{ animationDelay: '180ms' }}>🏌️</span>
-        <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
-      </div>
-      <div className="flex flex-col items-center gap-1">
-        <p style={{ fontSize: 16, fontWeight: 700, color: INK }}>No comments yet</p>
-        <p style={{ fontSize: 13, color: MUTED }}>Be the first to drop your thoughts</p>
-      </div>
     </div>
   );
 }
