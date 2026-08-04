@@ -430,7 +430,7 @@
     "countNone": "No comments yet",
     "count_one": "{{count}} comment",
     "count_other": "{{count}} comments",
-    "emptyLine": "Say something about this round.",
+    "emptyLine": "What's on your mind?",
     "placeholder": "Add a comment\u2026",
     "replyPlaceholder": "Reply to {{name}}\u2026",
     "replyingTo": "Replying to",
