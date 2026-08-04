@@ -511,6 +511,13 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                 width: '100%',
                 aspectRatio: String(ratio),
                 minHeight: 120,
+                // SINGLE media only (the carousel keeps its own fixed frame).
+                // Parity with the Clubhouse FeedCard's chrome reserve, but 330
+                // not 305 — DELIBERATE, not a typo. The light card sits on a
+                // wider content column with less surrounding chrome, so it can
+                // carry slightly more height without dominating. Do not
+                // "correct" this to match Clubhouse.
+                maxHeight: 'calc(100vh - 330px - env(safe-area-inset-bottom))',
                 overflow: 'hidden',
                 background: MEDIA_LETTERBOX,
               }}
