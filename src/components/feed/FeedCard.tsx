@@ -596,6 +596,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             items={items}
             isCardActive={isActive}
             initialIndex={initialMediaIndex}
+            maxHeight={mediaMaxHeight(!!post.isReview)}
             mountVideo={mountVideo}
             postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
