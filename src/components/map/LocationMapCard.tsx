@@ -97,7 +97,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             onClick={() => setExpanded(true)}
             style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
-              background: 'transparent', color: '#C2620A',
+              background: 'transparent', color: '#0E1216',
               border: 'none', padding: '8px 0', minHeight: 44,
               fontSize: 9, fontWeight: 800, letterSpacing: '0.13em',
               textTransform: 'uppercase', cursor: 'pointer',

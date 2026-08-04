@@ -36,7 +36,7 @@ export default function RegionSheet({
           style={{
             fontSize: 10.5,
             fontWeight: 600,
-            color: '#F7931E',
+            color: '#0E1216',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             marginBottom: 4,

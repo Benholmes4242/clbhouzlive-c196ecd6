@@ -139,7 +139,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   // --- Render ---
   const renderHeader = () => (
     <div style={{ padding: '4px 0 12px' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C2620A' }}>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
         {t('courseDetail.claim.sheet.kicker')}
       </div>
       <h2 style={{ fontSize: 18, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1.25 }}>
