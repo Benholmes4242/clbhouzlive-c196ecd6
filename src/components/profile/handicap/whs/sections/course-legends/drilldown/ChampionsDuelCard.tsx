@@ -148,7 +148,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         aside={
           yourRank != null
             ? t('champions.youreNth', { rank: yourRank, suffix: ordinalSuffix(yourRank) })
-            : t('champions.notOnBoard')
+            : undefined
         }
       >
         <StatRow

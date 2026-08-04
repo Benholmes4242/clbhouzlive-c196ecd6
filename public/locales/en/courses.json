@@ -1264,7 +1264,7 @@
     "crown": "Crown",
     "youreNth": "You're {{rank}}{{suffix}}",
     "notOnBoard": "Not on this board",
-    "entryRequirement": "Log a round here to enter",
+    "entryRequirement": "Log a round",
     "unclaimed": "Unclaimed",
     "unclaimedFirst": "No champion yet. Be the first to claim this crown.",
     "unclaimedAlbatross": "No champion yet. Your first albatross takes the crown.",
