@@ -10,6 +10,7 @@
  * hook (`useKeyboardHeight`), which pads the sheet bottom.
  */
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Image as ImageIcon, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -110,7 +111,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
       {replyingTo && (
         <div className="flex items-center justify-between mb-2">
           <span style={{ fontSize: 12, color: SECONDARY }}>
-            Replying to <span style={{ color: INK, fontWeight: 600 }}>{replyingTo.displayName}</span>
+            {t('comments.replyingTo')} <span style={{ color: INK, fontWeight: 600 }}>{replyingTo.displayName}</span>
           </span>
           <button
             type="button"
@@ -210,7 +211,9 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
             value={text}
             onChange={setText}
             onSubmit={handleSend}
-            placeholder={replyingTo ? `Reply to ${replyingTo.displayName}…` : 'Add a comment…'}
+            placeholder={replyingTo
+              ? t('comments.replyPlaceholder', { name: replyingTo.displayName })
+              : t('comments.placeholder')}
             inputRef={(el) => { inputRef.current = el; }}
             currentUserId={user?.id ?? null}
           />
