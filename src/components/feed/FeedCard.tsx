@@ -677,11 +677,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
-        // Secondary-figure rule (same as the Courses stat browse): the
-        // community rating renders unless it would duplicate a figure already
-        // on the card. On a review post the reviewer's own rating is already
-        // shown as the ghost numeral, so it is suppressed.
-        const suppressRating = Boolean(post.isReview) && reviewRating != null;
         const hasCourse = Boolean(post.courseName || courseContext);
 
         const actionsRow = (

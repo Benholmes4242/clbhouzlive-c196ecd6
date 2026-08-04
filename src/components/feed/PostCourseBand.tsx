@@ -179,7 +179,7 @@ export const PostCourseBand: React.FC<Props> = ({
       >
         {courseName}
       </div>
-      {courseRating != null ? (
+      {rating != null ? (
         <span
           style={{
             display: 'inline-flex',
@@ -205,7 +205,7 @@ export const PostCourseBand: React.FC<Props> = ({
               lineHeight: 1,
             }}
           >
-            {formatRatingValue(courseRating)}
+            {formatRatingValue(rating)}
           </span>
         </span>
       ) : null}

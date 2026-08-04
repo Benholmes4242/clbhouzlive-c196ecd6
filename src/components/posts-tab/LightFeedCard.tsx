@@ -580,7 +580,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
-        const suppressRating = Boolean(post.isReview) && reviewRating != null;
+        
         const hasCourse = Boolean(post.courseName || courseContext);
 
         const actionsRow = (
