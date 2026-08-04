@@ -19621,8 +19621,10 @@ export type Database = {
         Args: { p_course_ids: string[] }
         Returns: {
           avg_over_par: number
+          community_rating: number
           course_id: string
           harder_than_pct: number
+          rating_count: number
           rounds_tracked: number
           your_best: number
           your_rounds: number

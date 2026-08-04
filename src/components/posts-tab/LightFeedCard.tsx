@@ -580,7 +580,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
-        const suppressRating = Boolean(post.isReview) && reviewRating != null;
+        
         const hasCourse = Boolean(post.courseName || courseContext);
 
         const actionsRow = (
@@ -619,7 +619,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             <PostCourseBand
               courseName={post.courseName}
               courseLocation={courseLocation || null}
-              courseRating={suppressRating ? null : post.courseRating ?? null}
+              courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               actions={actionsRow}
@@ -632,7 +632,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                 courseId={post.courseId}
                 courseName={post.courseName}
                 courseLocation={courseLocation || null}
-                courseRating={post.courseRating ?? null}
+                courseRating={courseContext?.community_rating ?? post.courseRating ?? null}
               />
             )}
           </>

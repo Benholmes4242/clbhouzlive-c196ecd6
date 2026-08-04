@@ -135,6 +135,12 @@ export const PostCourseBand: React.FC<Props> = ({
   const hasYourBest = (ctx?.your_rounds ?? 0) > 0 && ctx?.your_best != null;
   const figure = pickCourseBandFigure(ctx, t);
 
+  // Prefer ctx: it is keyed off resolvePostCourseId (course_id, else the first
+  // golf_club tag), which is the SAME course line 2's figures describe. The
+  // courseRating prop comes from the feed payload's course_avg_overall_score,
+  // joined via review_course_id-or-course_id, and is absent on tag-only posts.
+  const rating = ctx?.community_rating ?? courseRating ?? null;
+
   const tappable = !!figure && !!onOpenStats;
 
   const handleTap = (e: React.MouseEvent) => {
@@ -173,7 +179,7 @@ export const PostCourseBand: React.FC<Props> = ({
       >
         {courseName}
       </div>
-      {courseRating != null ? (
+      {rating != null ? (
         <span
           style={{
             display: 'inline-flex',
@@ -199,7 +205,7 @@ export const PostCourseBand: React.FC<Props> = ({
               lineHeight: 1,
             }}
           >
-            {formatRatingValue(courseRating)}
+            {formatRatingValue(rating)}
           </span>
         </span>
       ) : null}
@@ -263,7 +269,10 @@ export const PostCourseBand: React.FC<Props> = ({
         <ChevronRight
           size={16}
           color={T40}
-          style={{ flexShrink: 0, marginLeft: 'auto' }}
+          // Optical alignment with the community rating on line 1. lucide
+          // leaves ~5px of dead space right of the glyph inside its 16px box,
+          // so the box edges align but the ink does not. Pull it out by 4.
+          style={{ flexShrink: 0, marginLeft: 'auto', marginRight: -4 }}
         />
       )}
     </div>
