@@ -27,7 +27,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
-  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,

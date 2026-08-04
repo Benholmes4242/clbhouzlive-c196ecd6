@@ -24,7 +24,6 @@ import { playerRoute } from '@/features/tourhub/routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
 import {
-  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,

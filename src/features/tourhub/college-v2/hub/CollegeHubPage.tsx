@@ -21,7 +21,6 @@ import { TourHubShell } from '@/features/tourhub/components';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
-  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,

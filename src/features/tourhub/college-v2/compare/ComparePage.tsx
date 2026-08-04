@@ -33,7 +33,6 @@ import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  AMBER_DEEP,
   CHARCOAL,
   FONT,
   HAIRLINE_INK_10,

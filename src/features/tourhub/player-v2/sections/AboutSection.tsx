@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { AMBER_DEEP, INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
 
 interface AboutSectionProps {
   player: TourPlayer;
