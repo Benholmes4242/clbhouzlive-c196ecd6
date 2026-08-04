@@ -56,7 +56,7 @@ export function VenueRecordBand({ tournamentId }: { tournamentId: string | undef
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <span style={{ ...KICKER, color: A.AMBER_DEEP }}>{t('overview.venueRecord.kicker')}</span>
+          <span style={KICKER}>{t('overview.venueRecord.kicker')}</span>
           <span style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}>
             {data.courseName}
           </span>

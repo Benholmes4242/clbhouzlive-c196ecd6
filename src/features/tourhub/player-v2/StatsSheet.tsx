@@ -130,7 +130,7 @@ function Kicker({ children }: { children: React.ReactNode }) {
         margin: '0 0 6px',
         fontSize: 10,
         fontWeight: 700,
-        color: AMBER_DEEP,
+        color: INK,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
       }}

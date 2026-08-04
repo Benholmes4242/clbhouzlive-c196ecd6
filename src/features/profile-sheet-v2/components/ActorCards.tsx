@@ -67,7 +67,7 @@ export default function ActorCards({
           fontSize: 10,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: A.AMBER_DEEP,
+          color: A.INK,
           padding: '0 20px 8px',
         }}
       >

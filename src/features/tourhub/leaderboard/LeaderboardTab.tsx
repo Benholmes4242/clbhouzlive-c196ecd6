@@ -627,7 +627,7 @@ export function LeaderboardTab() {
       <div
         style={{
           ...LABEL,
-          color: A.AMBER_DEEP,
+          color: A.INK,
           textAlign: 'center',
           padding: '14px 16px 0',
         }}

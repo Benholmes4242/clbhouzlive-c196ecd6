@@ -95,7 +95,7 @@ export const Top100ProgressPanel: React.FC<Props> = ({ list, onOpenList }) => {
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: A.AMBER_DEEP,
+            color: A.INK,
           }}
         >
           {t('top100.progressPanel.heading')}

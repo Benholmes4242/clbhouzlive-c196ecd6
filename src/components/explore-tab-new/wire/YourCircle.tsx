@@ -161,7 +161,7 @@ export function YourCircle({ userId, onRowPress }: Props) {
                 alignItems: 'center',
                 gap: 5,
                 ...LABEL,
-                color: A.AMBER_DEEP,
+                color: A.INK,
               }}
             >
               {t('discover.viewAll', 'View all')}

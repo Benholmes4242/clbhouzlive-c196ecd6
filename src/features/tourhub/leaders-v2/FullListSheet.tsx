@@ -141,7 +141,7 @@ export function FullListSheet({
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: AMBER_DEEP,
+              color: INK,
               marginBottom: 5,
               fontVariantNumeric: 'tabular-nums',
             }}

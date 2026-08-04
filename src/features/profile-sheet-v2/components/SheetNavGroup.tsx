@@ -68,7 +68,7 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
       </div>
       {/* A tag OR a chevron — never both. */}
       {trailing ?? (
-        <span style={{ color: A.AMBER_DEEP, fontSize: 16, fontWeight: 800 }}>{CHEVRON}</span>
+        <span style={{ color: A.INK, fontSize: 16, fontWeight: 800 }}>{CHEVRON}</span>
       )}
     </button>
   );

@@ -42,7 +42,7 @@ const KICKER: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 const LABEL: React.CSSProperties = {
