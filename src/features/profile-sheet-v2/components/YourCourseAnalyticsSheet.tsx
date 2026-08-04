@@ -26,7 +26,7 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import { DIST_SEG_COLORS } from '@/features/courses/components/holes/HoleDataSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { formatMonthYearShortGB } from '@/i18n/format';
+import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
@@ -34,9 +34,6 @@ import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
 
-/** Course-difficulty tones: harder for you reads red, easier reads green. */
-const HARDER = '#C8372B';
-const EASIER = '#0F8F4A';
 
 interface Props {
   open: boolean;
