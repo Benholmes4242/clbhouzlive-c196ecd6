@@ -31,7 +31,6 @@ import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { MovementFigure } from '../../_shared/movement';
 import {
-  AMBER_DEEP,
   FONT,
   INK,
   INK_FAINT,

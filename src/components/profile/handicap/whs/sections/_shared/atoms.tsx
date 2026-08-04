@@ -5,7 +5,6 @@ const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
 const CREAM = '#FFFBF5';
 
 /**

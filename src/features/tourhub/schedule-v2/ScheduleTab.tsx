@@ -27,7 +27,6 @@ import { useMergedSchedule } from './useMergedSchedule';
 import { SeasonRow } from './SeasonRow';
 import { getScrollAncestor, scrollElementIntoView } from '@/lib/getScrollParent';
 import {
-  AMBER_DEEP,
   FONT,
   HAIRLINE_INK_10,
   INK,

@@ -9,7 +9,6 @@ const FONT_SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
 
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
 const INK_TERTIARY = '#94A3B8';
 const HAIRLINE = '#E2E8F0';
 

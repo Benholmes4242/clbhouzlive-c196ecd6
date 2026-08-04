@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 
 const INK = '#0E1216';
 const DIM = '#68707B';
-const AMBER_DEEP = '#C2620A';
 const CANVAS = '#F4F6F9';
 
 const FALLBACK_MESSAGE =
