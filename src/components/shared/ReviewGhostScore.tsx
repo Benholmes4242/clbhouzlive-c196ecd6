@@ -79,27 +79,25 @@ interface ReviewVerdictLabelProps {
   onClick?: (e: React.MouseEvent) => void;
   ariaLabel?: string;
   /**
-   * Surface behind the label. 'dark' preserves the original low-alpha white
-   * for FAIR/POOR (used on charcoal feed cards / dark review sheets).
-   * 'light' uses the opaque tier colours from `ratingTextColor` so the label
-   * remains legible on white cards such as the Review Wizard preview.
+   * Retained for caller compatibility. The label now takes its colour from the
+   * app-wide score bands (`reviewLabelColor`) on every surface, so this has no
+   * effect on rendering.
    */
   surface?: 'light' | 'dark';
 }
 
 /**
  * The tier verdict word (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR).
- * On dark surfaces FAIR/POOR stay low-alpha white; on light surfaces they use
- * the same opaque ember/amber colours as the profile feed.
- * EXCEPTIONAL gets the gold shimmer sweep on both surfaces.
+ * Colour comes from the score bands at dark-legible values:
+ * >= 9.0 green, >= 5.0 amber, below 5.0 red. No shimmer.
  */
 export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   rating,
   fontSize = 12.5,
   onClick,
   ariaLabel,
-  surface = 'dark',
 }) => {
+
   const tierLabel = getRatingTierLabel(rating);
   const labelColor = reviewLabelColor(rating);
   const labelSpan = (
