@@ -25,16 +25,15 @@ export default function FramePills({ value, onChange }: Props) {
             key={p.id}
             onClick={() => onChange(p.id)}
             style={{
-              background: active ? CT_DARK.ink : 'rgba(15, 18, 24, 0.72)',
-              color: active ? CT_DARK.bg : CT_DARK.ink,
-              border: '1px solid rgba(248,250,252,0.10)',
+              background: active ? CT_DARK.ink : CT_DARK.surface,
+              color: active ? '#11131A' : CT_DARK.mute,
+              border: `1px solid ${active ? 'transparent' : CT_DARK.line}`,
               fontSize: 12,
               fontWeight: active ? 700 : 500,
               padding: '5px 10px',
               borderRadius: 999,
               cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+              flex: 'none',
             }}
           >
             {p.label}
