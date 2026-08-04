@@ -29,6 +29,99 @@ async function sweepStaleRows(supabase, tourCode, seasonYear, label) {
   }
 }
 
+// Compute position_change from OUR OWN previous run.
+//
+// SIGN CONVENTION - single source of truth for every tour:
+//     position_change = previousPosition - newPosition
+//     POSITIVE = MOVED UP.
+// This matches what is already deployed for DP World (Mazzoli 127 -> 39 = +88)
+// and what MovementFigure renders. Never inverted, never per-tour.
+//
+// MUST be called BEFORE the upsert: it reads the very rows the upsert
+// overwrites. If the first run after deploy produces all nulls, the call has
+// been placed after the upsert.
+//
+// Edge cases:
+//   climber   prev 40, now 9  -> "31"
+//   faller    prev 5,  now 22 -> "-17"
+//   static    prev 12, now 12 -> "0"   (string zero, not null)
+//   new entrant / previous position null -> null (NOT "0": we cannot claim a
+//                                          player "held" a place they never had)
+//   dropped player -> simply absent, handled by sweepStaleRows
+//
+// compareOnly: leave row.position_change untouched and only report whether the
+// computed value agrees with the value already on the row (used for euro,
+// which still scrapes a movement cell).
+async function attachMovement(supabase, tourCode, seasonYear, rows, label, opts) {
+  const compareOnly = !!(opts && opts.compareOnly);
+
+  const prev = new Map();
+  const { data, error } = await supabase
+    .from('tour_season_rankings')
+    .select('player_name, position')
+    .eq('tour_code', tourCode)
+    .eq('season_year', seasonYear);
+
+  if (error) {
+    console.error(`[${label}] Previous-position read failed, movement left null:`, error.message);
+  } else {
+    for (const r of data || []) {
+      if (r.player_name && typeof r.position === 'number') prev.set(r.player_name, r.position);
+    }
+    console.log(`[${label}] Read ${prev.size} previous positions`);
+  }
+
+  let computedCount = 0;
+  let newEntrants = 0;
+  let agree = 0;
+  let disagree = 0;
+  const disagreements = [];
+
+  for (const row of rows) {
+    const previous = prev.get(row.player_name);
+    const computed =
+      typeof previous === 'number' && typeof row.position === 'number'
+        ? String(previous - row.position)
+        : null;
+
+    if (computed === null) newEntrants++;
+    else computedCount++;
+
+    if (compareOnly) {
+      const scraped = row.position_change === null || row.position_change === undefined
+        ? null
+        : String(row.position_change).trim();
+      if (computed !== null && scraped !== null && scraped !== '') {
+        if (computed === scraped) agree++;
+        else {
+          disagree++;
+          if (disagreements.length < 10) {
+            disagreements.push(`${row.player_name}: scraped=${scraped} computed=${computed}`);
+          }
+        }
+      }
+    } else {
+      row.position_change = computed;
+    }
+  }
+
+  if (compareOnly) {
+    console.log(
+      `[${label}] Movement agreement check: ${agree} agree, ${disagree} disagree ` +
+      `(of ${computedCount} comparable, ${newEntrants} new entrants). Scraped cell still authoritative.`
+    );
+    if (disagreements.length > 0) {
+      console.log(`[${label}] Sample disagreements: ${disagreements.join(' | ')}`);
+    }
+  } else {
+    console.log(
+      `[${label}] Movement computed for ${computedCount} rows, ${newEntrants} new entrants left null`
+    );
+  }
+
+  return rows;
+}
+
 async function scrape() {
   console.log(`[R2D Scraper] Starting for season ${SEASON_YEAR}...`);
 
@@ -143,6 +236,13 @@ async function scrape() {
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // Euro already scrapes a movement cell. Report whether the computed value
+    // agrees before we retire the scraped one (see brief 1.4). Read happens
+    // BEFORE the upsert.
+    await attachMovement(supabase, TOUR_CODE, SEASON_YEAR, rows, 'R2D Scraper', { compareOnly: true });
+
+
 
     // Upsert in batches of 50
     let upserted = 0;
@@ -267,10 +367,33 @@ async function scrapeLPGA(browser, supabase) {
           if (/^[A-Z]{3}$/.test(v)) { country = v; break; }
         }
 
+        // EVENTS and WINS are on the page and were previously ignored.
+        // Row reads: RANK | movement | ATHLETE | CTY | CME POINTS | POINTS
+        // BEHIND | EVENTS | WINS | TOP 10S | PROJECTED POINTS | PROJECTED RANK
+        // Anchor on the CME points cell (3 decimal places), skip POINTS BEHIND
+        // (also 3dp), then read the two plain integers that follow.
+        let events = null;
+        let wins = null;
+        const lines = (row.innerText || '').split('\n').map(s => s.trim()).filter(Boolean);
+        const anchor = lines.findIndex(v => /^[\d,]+\.\d{3}$/.test(v));
+        if (anchor !== -1 && /^[\d,]+\.\d{3}$/.test(lines[anchor + 1] || '')) {
+          const ev = lines[anchor + 2];
+          const wn = lines[anchor + 3];
+          if (/^\d{1,2}$/.test(ev || '')) {
+            const n = parseInt(ev, 10);
+            if (n >= 0 && n <= 60) events = n;
+          }
+          if (/^\d{1,2}$/.test(wn || '')) {
+            const n = parseInt(wn, 10);
+            if (n >= 0 && n <= 30) wins = n;
+          }
+        }
+
         if (rank && name && points !== null) {
           seen.add(name);
-          data.push({ position: rank, name, country, points });
+          data.push({ position: rank, name, country, points, events, wins });
         }
+
       });
 
       data.sort((a, b) => a.position - b.position || b.points - a.points);
@@ -278,6 +401,10 @@ async function scrapeLPGA(browser, supabase) {
     });
 
     console.log(`[LPGA Scraper] Parsed ${players.length} players`);
+    console.log(
+      `[LPGA Scraper] Events read on ${players.filter(p => p.events !== null).length}, ` +
+      `wins read on ${players.filter(p => p.wins !== null).length} of ${players.length}`
+    );
 
     if (players.length === 0) {
       console.log('[LPGA Scraper] No players parsed — HTML structure may have changed, skipping');
@@ -289,13 +416,19 @@ async function scrapeLPGA(browser, supabase) {
       tour_code: LPGA_TOUR_CODE,
       season_year: LPGA_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
-      tournaments_played: null,
+      tournaments_played: p.events !== null && p.events !== undefined ? p.events : null,
       country: p.country || null,
-      wins: 0,
+      wins: p.wins !== null && p.wins !== undefined ? p.wins : 0,
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, LPGA_TOUR_CODE, LPGA_SEASON_YEAR, rows, 'LPGA Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
@@ -451,11 +584,16 @@ async function scrapeKornFerry(browser, supabase) {
       return;
     }
 
+    // The Korn Ferry points list publishes rank and points ONLY - no events,
+    // no wins, no movement column (verified against the live page). Wins are
+    // filled afterwards by the populate_tour_ranking_wins RPC; events stay
+    // null rather than invented.
     const rows = players.map(p => ({
       player_name: p.name,
       tour_code: KFT_TOUR_CODE,
       season_year: KFT_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
       tournaments_played: null,
       country: null,
@@ -463,6 +601,11 @@ async function scrapeKornFerry(browser, supabase) {
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, KFT_TOUR_CODE, KFT_SEASON_YEAR, rows, 'KFT Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
@@ -634,11 +777,15 @@ async function scrapeLIV(browser, supabase) {
       return;
     }
 
+    // The LIV standings table publishes POS / PLAYER / POINTS only - no events,
+    // no wins, no movement column (verified against the live page). Wins are
+    // filled afterwards by the populate_tour_ranking_wins RPC.
     const rows = cleaned.map(p => ({
       player_name: p.name,
       tour_code: LIV_TOUR_CODE,
       season_year: LIV_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
       tournaments_played: null,
       country: null,
@@ -646,6 +793,11 @@ async function scrapeLIV(browser, supabase) {
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, rows, 'LIV Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
