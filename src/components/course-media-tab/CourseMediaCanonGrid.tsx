@@ -9,13 +9,14 @@
  * Orientation frames: FeedCard's canonical rule (w > h → 16/9, else
  * 9/14) via packColumns.
  *
- * Tap wiring (canonical) — openWithOrigin({ openedFrom: 'watch', ... })
- * emitted by FeedCard directly. The previous grid used
- * openedFrom: 'course-media' with readOnly:true and pagination
- * options threaded into the fullscreen store; both wirings opened
- * the SAME fullscreen viewer for photos and videos alike (no split
- * lightbox path), and the pagination callbacks are still mirrored
- * into the fullscreen store below.
+ * Tap wiring (canonical) — FeedCard emits
+ * openWithOrigin({ openedFrom: 'course-media', options: { readOnly: true } })
+ * via the opt-in readOnlyFullscreen prop set on both mosaic columns
+ * below. Read-only matches every other course-detail surface (About
+ * strip, Reviews tab): no like / comment / share / follow chrome, mute
+ * still available on videos. Photos and videos share the SAME
+ * fullscreen viewer (no split lightbox path), and the pagination
+ * callbacks are mirrored into the fullscreen store below.
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -251,6 +252,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideCourseAttribution
                 hideFormatBadge
               bareTile
+                readOnlyFullscreen
               />
 
             );
@@ -271,6 +273,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideCourseAttribution
                 hideFormatBadge
               bareTile
+                readOnlyFullscreen
               />
 
             );
