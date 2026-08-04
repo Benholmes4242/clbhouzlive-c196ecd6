@@ -254,6 +254,12 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
+  // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
+  // Edit / draft / course-prefill entries and a cancelled picker land on
+  // page 2; media chosen through the picker jumps to page 1.
+  const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+  const pageTouchedRef = useRef(false);
+
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [scheduledCount, setScheduledCount] = useState<number>(0);
