@@ -280,7 +280,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         style={{
                           fontSize: 11,
                           fontWeight: 800,
-                          color: AMBER_DEEP,
+                          color: '#0E1216',
                           letterSpacing: '0.06em',
                           textTransform: 'uppercase',
                         }}

@@ -81,7 +81,7 @@ export function CoursesInTheNews({ courses, isLoading, onCardPress, onBrowseAll 
             alignItems: 'center',
             gap: 5,
             ...LABEL,
-            color: A.AMBER_DEEP,
+            color: A.INK,
           }}
         >
           {t('discover.browseAllCourses', 'Browse all courses')}

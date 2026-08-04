@@ -105,7 +105,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             margin: 0,
             fontSize: 10,
             fontWeight: 700,
-            color: AMBER_DEEP,
+            color: INK,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
@@ -124,7 +124,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
               fontWeight: 800,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
-              color: AMBER_DEEP,
+              color: INK,
               background: 'transparent',
               border: 'none',
               padding: 0,

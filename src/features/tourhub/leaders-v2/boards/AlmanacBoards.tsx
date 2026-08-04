@@ -51,7 +51,7 @@ const KICKER: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: AMBER_DEEP,
+  color: INK,
   lineHeight: 1,
 };
 
@@ -108,7 +108,7 @@ function FullListAction({ onOpen }: { onOpen: () => void }) {
           border: 'none',
           padding: 0,
           cursor: 'pointer',
-          color: AMBER_DEEP,
+          color: INK,
           fontFamily: FONT,
           display: 'inline-flex',
           alignItems: 'center',

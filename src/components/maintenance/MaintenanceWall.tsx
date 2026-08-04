@@ -71,7 +71,7 @@ export function MaintenanceWall({ message }: Props) {
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER_DEEP,
+            color: '#0E1216',
           }}
         >
           {t('maintenance.kicker', { defaultValue: 'MAINTENANCE' })}
@@ -117,7 +117,7 @@ export function MaintenanceWall({ message }: Props) {
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: AMBER_DEEP,
+            color: '#0E1216',
             cursor: 'pointer',
           }}
         >

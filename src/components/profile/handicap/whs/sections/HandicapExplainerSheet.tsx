@@ -117,21 +117,21 @@ const HandicapExplainerSheet: React.FC<Props> = ({
 
           <ExplainerBlock
             eyebrow="STEP 1"
-            eyebrowColor={AMBER_DEEP}
+            eyebrowColor={'rgba(255,255,255,0.62)'}
             title="Your last 20 rounds"
             body="Every time you play a counted round, the system keeps the most recent 20. The oldest round drops off automatically."
           />
 
           <ExplainerBlock
             eyebrow="STEP 2"
-            eyebrowColor={AMBER_DEEP}
+            eyebrowColor={'rgba(255,255,255,0.62)'}
             title="Best 8 of those 20"
             body="From those 20 rounds, only the 8 lowest differentials count toward your index. Your worst 12 are ignored — bad rounds genuinely don't hurt you."
           />
 
           <ExplainerBlock
             eyebrow="STEP 3"
-            eyebrowColor={AMBER_DEEP}
+            eyebrowColor={'rgba(255,255,255,0.62)'}
             title="Average those 8"
             body={
               <>

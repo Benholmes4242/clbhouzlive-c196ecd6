@@ -563,10 +563,10 @@ function EGFriendRow({
             opacity: busy ? 0.5 : 1,
           }}
         >
-          <span style={{ ...LABEL, color: A.AMBER_DEEP }}>
+          <span style={{ ...LABEL, color: A.INK }}>
             {already ? t('invite.reshare') : t('invite.invite')}
           </span>
-          <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+          <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
             {'\u203A'}
           </span>
         </button>

@@ -333,7 +333,7 @@ export function PlayersTab() {
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.16em',
-            color: AMBER_DEEP,
+            color: INK,
             textTransform: 'uppercase',
           }}
         >

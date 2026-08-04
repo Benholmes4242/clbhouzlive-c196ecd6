@@ -50,7 +50,7 @@ const KICKER = {
   fontWeight: 700 as const,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
-  color: AMBER_DEEP,
+  color: INK,
 };
 
 const LABEL = {
@@ -347,7 +347,7 @@ export function TournamentsSection({
               alignItems: 'center',
               gap: 4,
               ...LABEL,
-              color: AMBER_DEEP,
+              color: INK,
               background: 'transparent',
               border: 'none',
               padding: 0,
