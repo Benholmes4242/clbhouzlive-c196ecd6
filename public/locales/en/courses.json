@@ -890,7 +890,7 @@
       "rounds_one": "{{rounds}} round",
       "rounds_other": "{{rounds}} rounds",
       "beastLabel": "Beast · hole {{hole}}",
-      "bestLabel": "Best · hole {{hole}}"
+      "bestLabel": "Easiest · hole {{hole}}"
     },
     "holes": {
       "tapHint": "Tap a hole for detail",
