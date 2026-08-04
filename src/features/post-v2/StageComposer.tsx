@@ -236,6 +236,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     });
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
+  // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
+  // Edit / draft / course-prefill entries and a cancelled picker land on
+  // page 2; media chosen through the picker jumps to page 1.
+  const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
   // picker cancel) and then re-opens it with files once the user chooses them.
@@ -249,6 +254,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     lastInitialMediaRef.current = files;
     if (files.length > 0) {
       void addFiles(files);
+      setPage(1);
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
 
