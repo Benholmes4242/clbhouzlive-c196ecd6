@@ -11,7 +11,6 @@ export const INK = '#0E1216';
 export const MUTE = '#68707B';
 export const DIM = '#A2A9B2';
 export const AMBER = '#F7931E';
-export const AMBER_DEEP = '#C2620A';
 export const GOOD = '#0F8F4A';
 export const BAD = '#C8372B';
 export const TRACK = 'rgba(14,18,22,0.08)';

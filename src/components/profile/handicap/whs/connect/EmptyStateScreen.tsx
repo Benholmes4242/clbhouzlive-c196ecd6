@@ -1,5 +1,5 @@
 import React from 'react';
-import { INK, MUTE, AMBER_DEEP, LABEL, H1, H1_SUB, BORDER } from './designTokens';
+import { INK, MUTE, LABEL, H1, H1_SUB, BORDER } from './designTokens';
 import { Panel, PanelGap, PrimaryButton, Action, FooterBar, CopyBlock } from './Primitives';
 
 interface Props {
@@ -60,7 +60,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
               borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
             }}
           >
-            <div style={{ ...LABEL, color: AMBER_DEEP, width: 78, flexShrink: 0 }}>{r.when}</div>
+            <div style={{ ...LABEL, color: INK, width: 78, flexShrink: 0 }}>{r.when}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, lineHeight: 1.35 }}>
                 {r.title}
