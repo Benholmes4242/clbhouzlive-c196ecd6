@@ -2,36 +2,29 @@
  * ReviewGhostScore — shared ghost numeral + verdict label used by
  * Clubhouse FeedCard AND ReviewBottomSheet. Palettes MUST never fork.
  *
- * Palettes are the single source of truth for:
- *   - The huge low-alpha watermark numeral behind card/sheet headers
+ * Split of duties:
+ *   - The huge low-alpha watermark numeral is NEUTRAL for every tier. It is
+ *     structure, not semantics: a 110px band-coloured numeral would read as an
+ *     alarm in a feed where red already means over par. No shimmer, flat.
  *   - The tier verdict label (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR)
- *
- * EXCEPTIONAL uses the shared 'clbhouz-gold-shimmer' class at reduced
- * opacity so the numeral keeps its ghost character while shimmering with
- * the label above it.
+ *     carries the band colour at label scale, where colour reads as
+ *     information. Thresholds match the app-wide bands exactly.
  */
 import React from 'react';
-import { getRatingTier, getRatingTierLabel, ratingTextColor, type RatingTier } from '@/lib/ratingTier';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 
-export const REVIEW_GHOST_COLOR: Record<RatingTier, string> = {
-  EXCEPTIONAL: 'rgba(255,194,61,0.16)',
-  EXCELLENT:   'rgba(247,147,30,0.17)',
-  GOOD:        'rgba(247,147,30,0.15)',
-  FAIR:        'rgba(201,118,43,0.20)',
-  POOR:        'rgba(201,118,43,0.16)',
-};
+/** One neutral ghost value for every tier — 9.2 and 4.1 render identically. */
+export const REVIEW_GHOST_COLOR_NEUTRAL = 'rgba(248,250,252,0.16)';
 
-export const REVIEW_LABEL_COLOR: Record<RatingTier, string> = {
-  EXCEPTIONAL: '#FFCE5C',
-  EXCELLENT:   '#FBA63F',
-  GOOD:        '#FBA63F',
-  FAIR:        'rgba(255,255,255,0.68)',
-  POOR:        'rgba(255,255,255,0.58)',
-};
-
-/** Opacity applied to the shimmering EXCEPTIONAL numeral so it stays ghostly. */
-export const REVIEW_GHOST_EXCEPTIONAL_OPACITY = 0.22;
+/** Band colour at DARK-legible values. scoreBands.tsx's bandColor() returns
+ *  light-surface values (#047857 green, #DC2626 red) that fail on the dark
+ *  feed — same thresholds, dark tokens. */
+export function reviewLabelColor(rating: number): string {
+  if (rating >= 9) return '#5EE9A6';
+  if (rating >= 5) return '#F7931E';
+  return '#FF6B6B';
+}
 
 interface ReviewGhostNumeralProps {
   rating: number;
@@ -54,12 +47,9 @@ export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
   right = -7,
   top = 28,
 }) => {
-  const tierKey = getRatingTier(rating);
-  const ghostExceptional = tierKey === 'EXCEPTIONAL';
   return (
     <span
       aria-hidden
-      className={ghostExceptional ? 'clbhouz-gold-shimmer' : undefined}
       style={{
         position: 'absolute',
         right,
@@ -73,9 +63,7 @@ export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
         whiteSpace: 'nowrap',
         zIndex: 0,
         fontVariantNumeric: 'tabular-nums',
-        ...(ghostExceptional
-          ? { opacity: REVIEW_GHOST_EXCEPTIONAL_OPACITY }
-          : { color: REVIEW_GHOST_COLOR[tierKey] }),
+        color: REVIEW_GHOST_COLOR_NEUTRAL,
       }}
     >
       {formatRatingValue(rating)}
@@ -112,23 +100,17 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   ariaLabel,
   surface = 'dark',
 }) => {
-  const tierKey = getRatingTier(rating);
   const tierLabel = getRatingTierLabel(rating);
-  const isExceptional = tierKey === 'EXCEPTIONAL';
-  const labelColor =
-    surface === 'light' && !isExceptional
-      ? ratingTextColor(rating)
-      : REVIEW_LABEL_COLOR[tierKey];
+  const labelColor = reviewLabelColor(rating);
   const labelSpan = (
     <span
-      className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
       style={{
         fontSize,
         fontWeight: 800,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
-        ...(isExceptional ? {} : { color: labelColor }),
+        color: labelColor,
       }}
     >
       {tierLabel}
