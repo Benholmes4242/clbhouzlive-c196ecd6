@@ -142,21 +142,21 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
               {
                 label: t('profileSheet.handicap'),
                 value: indexText,
-                sub: deltaSub,
-                subTone: deltaTone,
+                sub: t('profileSheet.current'),
               },
-              ...(rounds90d != null
+              ...(rounds90d
                 ? [{
                     label: t('profileSheet.rounds'),
                     value: rounds90d,
                     sub: t('profileSheet.ninetyDays'),
                   }]
                 : []),
-              ...(coursesPlayed
+              ...(deltaValue != null
                 ? [{
-                    label: t('profileSheet.courses'),
-                    value: coursesPlayed,
-                    sub: t('profileSheet.allTime'),
+                    label: t('profileSheet.indexMove'),
+                    value: deltaValue,
+                    tone: deltaTone,
+                    sub: t('profileSheet.ninetyDays'),
                   }]
                 : []),
             ]}
