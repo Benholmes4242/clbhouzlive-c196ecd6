@@ -376,7 +376,7 @@ function CommentsSheetV2Inner({
                   disabled={editComment.isPending || !editText.trim()}
                   style={{ background: AMBER, color: '#FFFFFF' }}
                 >
-                  {editComment.isPending ? 'Saving…' : 'Save'}
+                  {editComment.isPending ? 'Saving\u2026' : 'Save'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -400,7 +400,7 @@ function CommentsSheetV2Inner({
                   disabled={deleteComment.isPending}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {deleteComment.isPending ? 'Deleting…' : 'Delete'}
+                  {deleteComment.isPending ? 'Deleting\u2026' : 'Delete'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
