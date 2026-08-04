@@ -17,7 +17,7 @@
  */
 
 import type { FranchiseCaptain } from '../hooks/useFranchiseCaptains';
-import { formatCurrencyUsd } from '@/i18n/format';
+import { formatCurrencyUsdCompact } from '@/i18n/format';
 
 const MARGIN_THRESHOLD = 0.20;
 
