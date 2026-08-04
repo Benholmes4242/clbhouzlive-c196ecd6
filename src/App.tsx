@@ -28,6 +28,7 @@ import { LockAnchorSync } from '@/components/LockAnchorSync';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import { MaintenanceGate } from "@/components/maintenance/MaintenanceGate";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import BootHold from "@/components/BootHold";
 
@@ -947,6 +948,7 @@ const AppInner: React.FC = () => {
     <TooltipProvider>
       <SecurityHeaders />
       <BrowserRouter>
+        <MaintenanceGate>
         <NavTimingProvider>
         <AdminGatedPerfHud />
         <AdminGatedLogHud />
@@ -1029,6 +1031,7 @@ const AppInner: React.FC = () => {
             </ModalProvider>
           </HeaderProvider>
         </NavTimingProvider>
+        </MaintenanceGate>
       </BrowserRouter>
     </TooltipProvider>
   );
