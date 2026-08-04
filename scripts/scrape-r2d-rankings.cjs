@@ -777,20 +777,37 @@ async function scrapeLIV(browser, supabase) {
     // a main list with the TEAM NAME appended ("Jon Rahm Legion XIII") and an
     // ordinal strip whose "1ST/2ND/3RD" splits into junk fragments
     // ("ST J. Rahm"). Strip team suffixes, drop ordinal fragments, dedupe.
-    const LIV_TEAMS = [
-      'Legion XIII', 'Crushers GC', 'Torque GC', '4Aces GC', 'Ripper GC',
+    // Team names appear in BOTH short ("Cleeks GC") and long ("Cleeks Golf
+    // Club") form on the page, and some rows carry a status instead of a team
+    // ("Wild Card", "Reserve"). Sorted LONGEST-FIRST so the long form is
+    // stripped before the short one - otherwise "Cleeks" would leave a
+    // trailing " Golf Club". Anchored to the END of the string only, so a
+    // surname that happened to contain a token is never mangled.
+    const LIV_SUFFIXES = [
+      'Legion XIII',
+      'Crushers GC', 'Torque GC', '4Aces GC', 'Ripper GC',
       'Fireballs GC', 'Stinger GC', 'Smash GC', 'RangeGoats GC',
-      'HyFlyers GC', 'Iron Heads GC', 'Cleeks GC', 'Majesticks GC'
-    ];
+      'HyFlyers GC', 'Iron Heads GC', 'Cleeks GC', 'Majesticks GC',
+      'Southern Guards GC', 'OKGC',
+      'Crushers Golf Club', 'Torque Golf Club', '4Aces Golf Club',
+      'Ripper Golf Club', 'Fireballs Golf Club', 'Stinger Golf Club',
+      'Smash Golf Club', 'RangeGoats Golf Club', 'HyFlyers Golf Club',
+      'Iron Heads Golf Club', 'Cleeks Golf Club', 'Majesticks Golf Club',
+      'Southern Guards Golf Club', 'Korean Golf Club',
+      'Wild Card', 'Reserve'
+    ].sort((a, b) => b.length - a.length);
+
     const seenClean = new Set();
     const cleaned = [];
+    let strippedCount = 0;
     for (const p of players) {
       let name = p.name.trim().replace(/\s+/g, ' ');
       // Ordinal fragments: "ST J. Rahm" (from 1ST), "ND B. DeChambeau" (2ND), "RD ..." (3RD), "TH ..." (4TH+)
       if (/^(ST|ND|RD|TH)\s/i.test(name)) continue;
-      for (const t of LIV_TEAMS) {
+      for (const t of LIV_SUFFIXES) {
         if (name.toUpperCase().endsWith(' ' + t.toUpperCase())) {
           name = name.slice(0, name.length - t.length - 1).trim();
+          strippedCount++;
           break;
         }
       }
@@ -801,6 +818,8 @@ async function scrapeLIV(browser, supabase) {
       cleaned.push({ ...p, name });
     }
     console.log(`[LIV Scraper] Cleaned ${players.length} -> ${cleaned.length} players`);
+    console.log(`[LIV Scraper] Stripped a team/status suffix from ${strippedCount} names`);
+
 
     if (cleaned.length === 0) {
       console.log('[LIV Scraper] No players after cleaning — skipping');
@@ -826,6 +845,20 @@ async function scrapeLIV(browser, supabase) {
 
     // BEFORE the upsert - reads last run's positions.
     await attachMovement(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, rows, 'LIV Scraper');
+
+    // player_name is the upsert key, so the suffix strip above creates NEW keys
+    // on its first run: no previous position exists for anyone and movement is
+    // null across every row for exactly one week, then self-heals. That is our
+    // own rule (no previous position means null, never a fabricated zero) and
+    // must NOT be misread as the read-after-upsert ordering bug.
+    const withMovement = rows.filter(r => r.position_change !== null).length;
+    if (withMovement === 0 && rows.length > 0) {
+      console.log(
+        `[LIV Scraper] LIV: ${rows.length} rows, 0 previous positions matched ` +
+        `(expected after a player_name key change - movement self-heals next run)`
+      );
+    }
+
 
 
 
