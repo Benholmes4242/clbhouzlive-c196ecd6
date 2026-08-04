@@ -138,11 +138,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   }, [editPostId]);
 
 
-  // Composer is a light canvas surface -> dark status-bar icons.
+  // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
-    try { setStatusBarStyleColor('dark', 'FFF8FAFC'); } catch { /* status bar best-effort */ }
+    try {
+      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
+      else setStatusBarStyleColor('dark', 'FFF8FAFC');
+    } catch { /* status bar best-effort */ }
+  }, [page]);
+  useEffect(() => {
     return () => {
       try { applyRouteChrome(window.location.pathname, true); } catch { /* chrome re-resolve best-effort */ }
     };
