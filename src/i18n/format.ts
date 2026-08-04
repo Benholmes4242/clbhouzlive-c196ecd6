@@ -241,6 +241,21 @@ export function formatCurrencyUsd(n: number): string {
 }
 
 /**
+ * US-dollar money in COMPACT form - `$1.2M`, `$850K`. Sibling of
+ * formatCurrencyUsd (which renders the full `$1,200,000`); the two do
+ * different jobs and must not be merged.
+ *
+ * Number formatting goes through Intl on the active locale rather than
+ * toFixed, so a non-en surface groups and suffixes in its own convention
+ * (de: `1,2 Mio.`). Values under 1000 fall through to formatCurrencyUsd
+ * because compact notation adds nothing there.
+ */
+export function formatCurrencyUsdCompact(n: number): string {
+  if (Math.abs(n) < 1000) return formatCurrencyUsd(n);
+  return `$${formatCompact(n)}`;
+}
+
+/**
  * Number with a MAX-fraction-digits cap — matches
  * `n.toLocaleString(undefined, { maximumFractionDigits: max })`.
  * En output byte-matches the legacy call; groups with commas.
