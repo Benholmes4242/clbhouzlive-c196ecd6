@@ -322,9 +322,10 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
   return (
     <>
       <HcpDivider color={dividerColor} />
-      <HcpReserve>{body}</HcpReserve>
+      {body}
     </>
   );
+
 };
 
 
