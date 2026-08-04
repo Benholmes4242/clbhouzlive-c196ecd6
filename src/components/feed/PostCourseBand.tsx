@@ -61,6 +61,8 @@ const figureLabelStyle: React.CSSProperties = {
 
 export interface CourseBandFigure {
   key: string;
+  /** Small dim word ahead of the figure. Only the difficulty branch sets it. */
+  prefix?: string;
   figure: string;
   label: string;
   color: string;
