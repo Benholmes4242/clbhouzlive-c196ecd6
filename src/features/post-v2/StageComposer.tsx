@@ -23,11 +23,9 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
-import { useStageComposer, type StageMediaItem, type AttachedRound } from './hooks/useStageComposer';
+import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useMyRoundsAtCourse, pickPreselectedRound, daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
-import AttachRoundSheet, { formatRoundLabel } from './components/AttachRoundSheet';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
@@ -75,7 +73,7 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   const { activeActor, setActiveActor } = useActiveActor();
   const composer = useStageComposer();
-  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setAttachedRound, setScheduledAt, restoreDraft, hydrate, reset } = composer;
+  const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
   const queryClient = useQueryClient();
@@ -120,29 +118,27 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
 
   // Edit-mode load
   const editable = useEditablePost(editPostId ?? null);
-  const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null; whsScoreId: string | null } | null>(null);
+  const [editStatus, setEditStatus] = useState<{ status: string | null; scheduledAt: string | null } | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const stageAddInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch the post's status + scheduled_at + attached round
-  // (useEditablePost doesn't return them).
+  // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
   useEffect(() => {
     if (!editPostId) return;
     let cancelled = false;
     supabase
       .from('posts')
-      .select('status, scheduled_at, whs_score_id')
+      .select('status, scheduled_at')
       .eq('id', editPostId)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        const row = data as { status?: string | null; scheduled_at?: string | null; whs_score_id?: string | null } | null;
+        const row = data as { status?: string | null; scheduled_at?: string | null } | null;
         setEditStatus({
           status: row?.status ?? null,
           scheduledAt: row?.scheduled_at ?? null,
-          whsScoreId: row?.whs_score_id ?? null,
         });
       });
     return () => { cancelled = true; };
@@ -188,11 +184,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
       scheduledAt: editStatus?.status === 'scheduled' && editStatus.scheduledAt
         ? new Date(editStatus.scheduledAt)
         : null,
-      // C2 edit path: restore the attached round so an edit never drops it.
-      // Detail (score/tee) is filled in once the round list resolves.
-      attachedRound: editStatus?.whsScoreId
-        ? { whsScoreId: editStatus.whsScoreId, playDate: '', grossScore: null, coursePar: null, teeMarker: null }
-        : null,
       media,
       activeIndex: 0,
     });
@@ -235,31 +226,24 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
   // C3 "Share this round" — open the composer pre-filled with the course and
   // the round the member tapped share on.
   const prefillCourse = usePostStudioStore((st) => st.prefillCourse);
-  const prefillWhsScoreId = usePostStudioStore((st) => st.prefillWhsScoreId);
   const prefillAppliedRef = useRef(false);
-  const skipNextCourseClearRef = useRef(false);
 
   useEffect(() => {
     if (isEditMode || draftId) return;
     if (prefillAppliedRef.current) return;
     if (!prefillCourse) return;
     prefillAppliedRef.current = true;
-    // The course-change guard must not strip the round we just attached.
-    skipNextCourseClearRef.current = true;
     hydrate({
       caption: '',
       courses: [prefillCourse],
       course: prefillCourse,
       scheduledAt: null,
-      attachedRound: prefillWhsScoreId
-        ? { whsScoreId: prefillWhsScoreId, playDate: '', grossScore: null, coursePar: null, teeMarker: null }
-        : null,
       media: [],
       activeIndex: 0,
     });
-  }, [isEditMode, draftId, prefillCourse, prefillWhsScoreId, hydrate]);
+  }, [isEditMode, draftId, prefillCourse, hydrate]);
 
-  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'round' | 'close-guard'>(null);
+  const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard'>(null);
 
   const [success, setSuccess] = useState<SubmitResult | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -301,51 +285,12 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
     setCaption(v);
   }, [setCaption, mode]);
 
-  const openDetail = useCallback((row: 'course' | 'round' | 'actor' | 'schedule') => {
+  const openDetail = useCallback((row: 'course' | 'actor' | 'schedule') => {
     // Analytics callsite: post_detail_opened
     analyticsEvents.track('post_detail_opened', { mode, row });
   }, [mode]);
 
 
-  // ---- C2: attach a logged round -----------------------------------------
-  // Rounds are scoped to the PRIMARY tagged course only.
-  const primaryCourseId = state.course?.id ?? null;
-  const { data: myRounds } = useMyRoundsAtCourse(primaryCourseId);
-  const roundsAtCourse = useMemo(() => myRounds ?? [], [myRounds]);
-  const preselectAppliedFor = useRef<string | null>(null);
-
-  // A round belongs to exactly one course. When the PRIMARY course changes -
-  // to another club or to nothing - the attachment must go with it, otherwise
-  // a post can carry course_id from club A and whs_score_id from club B.
-  // `undefined` = first render, so an edit-mode restore is never wiped.
-  const prevPrimaryCourseId = useRef<string | null | undefined>(undefined);
-  const attachedRoundRef = useRef(state.attachedRound);
-  attachedRoundRef.current = state.attachedRound;
-
-  useEffect(() => {
-    const prev = prevPrimaryCourseId.current;
-    prevPrimaryCourseId.current = primaryCourseId;
-    if (prev === undefined) return; // first mount (incl. edit-mode hydration)
-    if (prev === primaryCourseId) return;
-    if (skipNextCourseClearRef.current) {
-      // Share-a-round prefill set the course and the round together.
-      skipNextCourseClearRef.current = false;
-      preselectAppliedFor.current = primaryCourseId;
-      return;
-    }
-
-    // Let the new course run its own pre-selection.
-    preselectAppliedFor.current = null;
-
-    if (!attachedRoundRef.current) return;
-    setAttachedRound(null);
-    // Analytics callsite: post_round_detached - reported against the OLD
-    // course so "course changed" is distinguishable from "member removed it".
-    analyticsEvents.track('post_round_detached', {
-      course_id: prev,
-      reason: 'course_changed',
-    });
-  }, [primaryCourseId, setAttachedRound]);
 
 
   // Pre-selection: only a round played today or yesterday, and only once per
@@ -447,7 +392,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         media: state.media,
         course: state.course,
         courses: state.courses,
-        whsScoreId: state.attachedRound?.whsScoreId ?? null,
 
         scheduledAt: state.scheduledAt,
         actorType: activeActor.type,
@@ -465,7 +409,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
         courses_count: state.courses.length,
-        round_attached: !!state.attachedRound,
         scheduled: !!state.scheduledAt,
         actor_type: activeActor.type,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
@@ -486,7 +429,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
         tagged_course_ids: state.courses.map((c) => c.id),
-        whs_score_id: state.attachedRound?.whsScoreId ?? null,
 
       };
       // Only touch scheduled_at when the post is still scheduled.
@@ -576,7 +518,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         caption_len: state.caption.trim().length,
         course_tagged: !!state.course,
         courses_count: state.courses.length,
-        round_attached: !!state.attachedRound,
         scheduled: !!state.scheduledAt,
         actor_type: activeActor?.type ?? editable.data.actorType,
         total_ms: Math.round(Date.now() - mountedAtRef.current),
@@ -804,9 +745,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
               onOpenSchedule={() => { openDetail('schedule'); setSheet('schedule'); }}
               actorLocked={isEditMode}
               showSchedule={showScheduleRow}
-              showAttachRound={!!primaryCourseId && roundsAtCourse.length > 0}
-              attachRoundLabel={attachRoundLabel}
-              onOpenAttachRound={openRoundSheet}
             />
           </div>
         </div>
@@ -829,13 +767,6 @@ export default function StageComposer({ onClose, onPosted, editPostId, draftId }
         onDone={setCourses}
         selected={state.courses}
         userId={profile?.id ?? null}
-      />
-      <AttachRoundSheet
-        open={sheet === 'round'}
-        onClose={() => setSheet(null)}
-        rounds={roundsAtCourse}
-        selectedId={state.attachedRound?.whsScoreId ?? null}
-        onSelect={handleSelectRound}
       />
       <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
 
