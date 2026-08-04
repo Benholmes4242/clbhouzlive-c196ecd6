@@ -138,15 +138,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   }, [editPostId]);
 
 
-  // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
-  // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
-  // Watch light, profile immersive, etc.) because overlay close is not a route change.
-  useEffect(() => {
-    try {
-      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
-      else setStatusBarStyleColor('dark', 'FFF8FAFC');
-    } catch { /* status bar best-effort */ }
-  }, [page]);
   useEffect(() => {
     return () => {
       try { applyRouteChrome(window.location.pathname, true); } catch { /* chrome re-resolve best-effort */ }
@@ -245,6 +236,16 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   // Edit / draft / course-prefill entries and a cancelled picker land on
   // page 2; media chosen through the picker jumps to page 1.
   const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+
+  // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
+  // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
+  // Watch light, profile immersive, etc.) because overlay close is not a route change.
+  useEffect(() => {
+    try {
+      if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
+      else setStatusBarStyleColor('dark', 'FFF8FAFC');
+    } catch { /* status bar best-effort */ }
+  }, [page]);
 
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
