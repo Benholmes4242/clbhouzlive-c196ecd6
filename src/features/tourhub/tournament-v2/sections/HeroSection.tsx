@@ -393,7 +393,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         justifyContent: 'flex-end',
       }}
     >
-      <div style={{ padding: '12px 16px 14px' }}>
+      <div style={{ padding: '10px 16px 12px' }}>
         {/* Shared lockup */}
         <div
           style={{
@@ -408,7 +408,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             color: chip.color,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
-            marginBottom: 10,
+            marginBottom: 8,
             textShadow: TEXT_SHADOW,
           }}
         >
@@ -417,13 +417,17 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
         <h1
           style={{
-            fontSize: 23,
+            fontSize: 21,
             fontWeight: 800,
             color: '#fff',
-            lineHeight: 1.02,
+            lineHeight: 1.04,
             letterSpacing: '-0.02em',
             margin: 0,
             textShadow: TEXT_SHADOW,
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden',
           }}
         >
           {meta.name}
@@ -435,7 +439,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               fontSize: 12.5,
               fontWeight: 500,
               color: 'rgba(255,255,255,0.65)',
-              marginTop: 6,
+              marginTop: 4,
               fontVariantNumeric: 'tabular-nums',
               textShadow: TEXT_SHADOW,
             }}
@@ -449,14 +453,14 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           style={{
             height: 0,
             borderTop: `0.5px solid ${HAIRLINE}`,
-            marginTop: 10,
-            marginBottom: 10,
+            marginTop: 8,
+            marginBottom: 8,
           }}
         />
 
         {/* THREE FIGURES - one row, every state. */}
         {figures.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 8 }}>
             {figures.map((f) => (
               <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
             ))}

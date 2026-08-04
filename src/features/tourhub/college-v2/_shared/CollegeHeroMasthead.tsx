@@ -131,7 +131,7 @@ export function CollegeHeroMasthead({
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 16,
+        paddingBottom: 12,
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
@@ -145,10 +145,10 @@ export function CollegeHeroMasthead({
       <div
         style={{
           position: 'relative',
-          width: 84,
-          height: 84,
+          width: 64,
+          height: 64,
           flexShrink: 0,
-          marginBottom: 10,
+          marginBottom: 8,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -194,7 +194,7 @@ export function CollegeHeroMasthead({
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: WHITE_ALPHA_55,
-            marginBottom: 4,
+            marginBottom: 2,
           }}
         >
           THE FRANCHISE {rank ? `\u00B7 No.${rank}` : ''}
@@ -219,7 +219,7 @@ export function CollegeHeroMasthead({
         {(showEarnings || showAlumni || showPlaying) && (
           <div
             style={{
-              marginTop: 12,
+              marginTop: 8,
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center',
@@ -265,7 +265,7 @@ export function CollegeHeroMasthead({
       {actions && (
         <div
           style={{
-            marginTop: 12,
+            marginTop: 8,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -281,7 +281,7 @@ export function CollegeHeroMasthead({
       <div
         aria-hidden
         style={{
-          marginTop: 12,
+          marginTop: 8,
           alignSelf: 'stretch',
           height: 0.5,
           background: WHITE_ALPHA_10,
