@@ -209,7 +209,7 @@ function AnalyticsCourseRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 16px 62px',
+        gridTemplateColumns: '1fr 16px 52px',
         gap: '0 10px',
         alignItems: 'end',
         minWidth: 0,
@@ -261,7 +261,7 @@ function AnalyticsCourseRow({
       )}
 
       {avgVal != null && (
-        <div style={{ width: 62, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
+        <div style={{ width: 52, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
           <div style={{ fontWeight: 800, fontSize: 13.5, color: A.INK }}>
             {fmtSigned(avgVal, 1)}
           </div>
