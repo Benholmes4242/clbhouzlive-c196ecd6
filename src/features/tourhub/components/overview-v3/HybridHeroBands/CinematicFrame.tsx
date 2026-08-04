@@ -26,11 +26,15 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { AMBER_INK, GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
 import { formatPurse } from '../../../_shared/formatPurse';
+
+// Eyebrows and quiet actions on this dark hero band render in white-62,
+// never amber and never pure white (EYEBROW / ACTION INK FLIP, dark rule).
+const DARK_EYEBROW = 'rgba(255,255,255,0.62)';
 
 const TICKER_BAR_H = 34;
 const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
@@ -515,7 +519,7 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
             fontSize: 9.5,
             fontWeight: 800,
             letterSpacing: '0.14em',
-            color: AMBER,
+            color: DARK_EYEBROW,
             textTransform: 'uppercase',
           }}
         >
@@ -1138,8 +1142,8 @@ export function CinematicFrame({
                   {fieldStrength?.totalPlayers != null ? t('overview.cinematic.inTheField', { count: fieldStrength.totalPlayers }) : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>{t('overview.cinematic.ctaTournament')}</span>
-                  <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
+                  <ChevronRight size={13} strokeWidth={2.5} color={DARK_EYEBROW} style={{ flexShrink: 0 }} />
                 </span>
               </div>
             </button>
@@ -1301,8 +1305,8 @@ export function CinematicFrame({
                 {t('overview.cinematic.inTheField', { count: fieldSize })}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>{t('overview.cinematic.ctaTournament')}</span>
-                <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
+                <ChevronRight size={13} strokeWidth={2.5} color={DARK_EYEBROW} style={{ flexShrink: 0 }} />
               </span>
             </div>
           </button>
