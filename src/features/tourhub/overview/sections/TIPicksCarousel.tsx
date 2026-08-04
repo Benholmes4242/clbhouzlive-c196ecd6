@@ -32,6 +32,7 @@ const INK_60 = 'rgba(15,23,42,0.60)';
 const INK_45 = 'rgba(15,23,42,0.45)';
 const HAIR = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
+const AMBER_DEEP = '#C2620A';
 const GREEN_BG = '#DCFCE7';
 const GREEN_TX = '#166534';
 const RED_BG = '#FEE2E2';
@@ -279,7 +280,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         style={{
                           fontSize: 11,
                           fontWeight: 800,
-                          color: AMBER,
+                          color: AMBER_DEEP,
                           letterSpacing: '0.06em',
                           textTransform: 'uppercase',
                         }}
@@ -487,7 +488,7 @@ function CaseSheet({
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: AMBER,
+              color: AMBER_DEEP,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
             }}
@@ -570,7 +571,7 @@ function CaseSheet({
               borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 800, color: AMBER, minWidth: 22, letterSpacing: '0.06em' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: AMBER_DEEP, minWidth: 22, letterSpacing: '0.06em' }}>
               {String(i + 1).padStart(2, '0')}
             </div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
@@ -630,7 +631,6 @@ function CaseSheet({
               <StatTile
                 label={t('overview.tiPicks.case.sgTotalTile')}
                 value={typeof stats?.strokes_gained_total === 'number' ? stats.strokes_gained_total.toFixed(2) : '—'}
-                accent
               />
             </>
           )}
@@ -921,7 +921,7 @@ function AllPicksSheet({
         style={{
           fontSize: 10,
           fontWeight: 800,
-          color: AMBER,
+          color: AMBER_DEEP,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
           marginBottom: 6,
