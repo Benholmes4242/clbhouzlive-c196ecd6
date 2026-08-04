@@ -846,6 +846,20 @@ async function scrapeLIV(browser, supabase) {
     // BEFORE the upsert - reads last run's positions.
     await attachMovement(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, rows, 'LIV Scraper');
 
+    // player_name is the upsert key, so the suffix strip above creates NEW keys
+    // on its first run: no previous position exists for anyone and movement is
+    // null across every row for exactly one week, then self-heals. That is our
+    // own rule (no previous position means null, never a fabricated zero) and
+    // must NOT be misread as the read-after-upsert ordering bug.
+    const withMovement = rows.filter(r => r.position_change !== null).length;
+    if (withMovement === 0 && rows.length > 0) {
+      console.log(
+        `[LIV Scraper] LIV: ${rows.length} rows, 0 previous positions matched ` +
+        `(expected after a player_name key change - movement self-heals next run)`
+      );
+    }
+
+
 
 
     let upserted = 0;
