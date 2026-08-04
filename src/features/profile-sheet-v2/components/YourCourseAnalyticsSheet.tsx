@@ -143,14 +143,11 @@ function hasScoringData(course: UserAnalyticsCourse): boolean {
  */
 function AnalyticsCourseRow({
   course,
-  delta,
   expanded,
   onToggle,
   onOpen,
 }: {
   course: UserAnalyticsCourse;
-  /** Null when there is no baseline, or a single-course list. */
-  delta: number | null;
   expanded: boolean;
   onToggle: () => void;
   onOpen: (from: 'expanded' | 'row') => void;
@@ -162,20 +159,13 @@ function AnalyticsCourseRow({
 
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
-    avgVal != null ? t('yourCourses.avgLabel', { avg: fmtSigned(avgVal, 1) }) : null,
+    course.last_played
+      ? t('yourCourses.lastPlayedMeta', { date: formatDayMonthYearShortGB(course.last_played) })
+      : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
 
-  // Round FIRST, then branch on the rounded value: a delta of -0.04 renders
-  // "0.0", never "-0.0".
-  const deltaRounded = delta == null ? null : Number(delta.toFixed(1));
-  // COURSE-DIFFICULTY convention, NOT the player-score one used on every
-  // leaderboard in the app. The statement is about the course: positive means
-  // "this one plays harder for you than your own baseline", so positive is RED.
-  // Do not "correct" this to the leaderboard colouring.
-  const deltaTone =
-    deltaRounded == null || deltaRounded === 0 ? A.INK : deltaRounded > 0 ? HARDER : EASIER;
 
   const segs = hasScoring
     ? [
