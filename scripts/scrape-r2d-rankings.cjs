@@ -777,11 +777,15 @@ async function scrapeLIV(browser, supabase) {
       return;
     }
 
+    // The LIV standings table publishes POS / PLAYER / POINTS only - no events,
+    // no wins, no movement column (verified against the live page). Wins are
+    // filled afterwards by the populate_tour_ranking_wins RPC.
     const rows = cleaned.map(p => ({
       player_name: p.name,
       tour_code: LIV_TOUR_CODE,
       season_year: LIV_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
       tournaments_played: null,
       country: null,
@@ -789,6 +793,11 @@ async function scrapeLIV(browser, supabase) {
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, LIV_TOUR_CODE, LIV_SEASON_YEAR, rows, 'LIV Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
