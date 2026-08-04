@@ -23,8 +23,6 @@ export interface SubmitInput {
   course: StageCourse | null;
   /** Full ordered tag list - written to posts.tagged_course_ids. */
   courses?: StageCourse[];
-  /** Optional logged round linked to the post (posts.whs_score_id). */
-  whsScoreId?: string | null;
   scheduledAt: Date | null;
 
   actorType: 'personal' | 'business';
@@ -120,26 +118,16 @@ export function usePostSubmit() {
       const taggedIds = (input.courses && input.courses.length > 0)
         ? input.courses.map((c) => c.id)
         : (input.course ? [input.course.id] : []);
-      // C2: the optional attached round rides along with the tag write.
       const postPatch: Record<string, unknown> = {};
       if (taggedIds.length > 0) postPatch.tagged_course_ids = taggedIds;
-      if (input.whsScoreId) postPatch.whs_score_id = input.whsScoreId;
       if (Object.keys(postPatch).length > 0) {
         const { error: tagErr } = await supabase
           .from('posts')
           .update(postPatch as never)
           .eq('id', postId);
-        if (tagErr) console.warn('[post-v2] tag/round write failed:', tagErr);
+        if (tagErr) console.warn('[post-v2] tag write failed:', tagErr);
       }
 
-      // Round share card: fire-and-forget. The link-preview layer falls back to
-      // the course thumbnail when the card is missing, so a failure here must
-      // never surface to the member or block the post.
-      if (input.whsScoreId) {
-        void supabase.functions
-          .invoke('generate-round-share-card', { body: { postId } })
-          .catch((e) => console.warn('[post-v2] share card generation skipped:', e));
-      }
 
 
 
