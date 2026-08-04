@@ -1,7 +1,8 @@
 /**
  * Shared SectionShell — dispatch section header + optional right link.
- * Spec (analytical): eyebrow is the KICKER token in AMBER_DEEP,
- * right link 11/700 muted.
+ * Spec (analytical): eyebrow is the KICKER token in surface ink (A.INK),
+ * right link 11/700 muted. Eyebrows are never amber (EYEBROW INK FLIP) —
+ * eyebrowColor stays for SEMANTIC overrides only (live green etc).
  */
 
 import type { ReactNode } from 'react';
@@ -31,7 +32,7 @@ export function SectionShell({
     <section style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ ...KICKER, color: eyebrowColor ?? A.AMBER_DEEP }}>
+          <span style={{ ...KICKER, color: eyebrowColor ?? A.INK }}>
             {eyebrow}
           </span>
 
