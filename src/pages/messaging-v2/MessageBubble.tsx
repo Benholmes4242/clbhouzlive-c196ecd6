@@ -15,7 +15,8 @@ const SUB = '#8A9099';
 const HINT = '#AEB4BC';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
-const IN_BG = '#EDEFF2';
+// Pure white so the incoming bubble edge holds against the contour canvas.
+const IN_BG = '#FFFFFF';
 const OUT_BG = '#15171F';
 const OUT_FG = '#F5F6F7';
 
