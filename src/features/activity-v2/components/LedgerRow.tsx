@@ -201,10 +201,10 @@ const ResolvePill: React.FC = () => (
 );
 
 // -- C4 share prompt action ------------------------------------------
-// Reuses the RoundDetailSheet path: openPostStudioForRound. Never posts.
+// Reuses the RoundDetailSheet path: openPostStudioForCourse. Never posts.
 const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ candidate }) => {
   const { t } = useTranslation('common');
-  const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
+  const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const shown = useRef(false);
 
   useEffect(() => {
@@ -235,13 +235,12 @@ const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ cand
           course_id: candidate.course_id,
           source: 'share_prompt',
         });
-        openPostStudioForRound({
+        openPostStudioForCourse({
           course: {
             id: candidate.course_id,
             name: candidate.course_name ?? '',
             country: candidate.course_country,
           },
-          whsScoreId: candidate.whs_score_id,
         });
       }}
       style={{

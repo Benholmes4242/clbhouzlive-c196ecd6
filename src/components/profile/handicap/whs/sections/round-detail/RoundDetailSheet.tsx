@@ -53,7 +53,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const openPostStudioForRound = usePostStudioStore((st) => st.openPostStudioForRound);
+  const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const isRoundLoading = userQuery.isLoading;
@@ -150,9 +150,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
           course_id: shareCourseId,
         });
         onClose();
-        openPostStudioForRound({
+        openPostStudioForCourse({
           course: { id: shareCourseId, name: courseName, country: courseLocation },
-          whsScoreId: scoreId,
         });
       }
     : undefined;
