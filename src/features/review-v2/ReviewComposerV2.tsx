@@ -43,7 +43,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
       style={{
         fontSize: 10.5,
         fontWeight: 700,
-        color: RV2.amber,
+        color: RV2.amberDeep,
         textTransform: 'uppercase',
         letterSpacing: '0.14em',
         marginBottom: 12,
