@@ -769,7 +769,7 @@ const StoryTiles: React.FC<{
         emoji: '⛳',
         label: 'Birdie map',
         value: `${birdiedCount}/${totalHoles}`,
-        note: `${totalHoles - birdiedCount} still waiting for your first birdie.`,
+        note: `${totalHoles - birdiedCount} holes still waiting for your first birdie.`,
       });
     }
 
@@ -853,7 +853,7 @@ const StoryTiles: React.FC<{
         emoji="⛳"
         cap="BIRDIE MAP"
         headline={`${birdiedCount} of ${totalHoles} birdied`}
-        sentence={`${totalHoles - birdiedCount} still waiting for your first birdie.`}
+        sentence={`${totalHoles - birdiedCount} holes still waiting for your first birdie.`}
         personal
       />,
     );
