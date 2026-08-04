@@ -466,8 +466,7 @@
       "ratingLabel": "Rating",
       "avgToParLabel": "Avg to par",
       "harderThanLabel": "Harder than",
-      "easierThanLabel": "Easier than",
-      "ofCourses": "of courses"
+      "easierThanLabel": "Easier than"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",

@@ -196,7 +196,6 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
               : t('top100.stats.easierThanLabel'),
           value: `${band === 'hard' ? pct : 100 - pct}%`,
           tone: A.INK,
-          sub: t('top100.stats.ofCourses'),
         });
       }
     }
