@@ -29,7 +29,7 @@ export const KICKER: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: AMBER_DEEP,
+  color: '#0E1216',
 };
 
 export const LABEL: React.CSSProperties = {

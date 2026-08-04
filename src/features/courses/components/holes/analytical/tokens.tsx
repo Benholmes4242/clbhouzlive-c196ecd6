@@ -55,7 +55,7 @@ export const KICKER: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: A.AMBER_DEEP,
+  color: A.INK,
 };
 
 /** Quiet sentence-case caption. Not a figure and not a column label. */
@@ -139,8 +139,8 @@ export const Panel: React.FC<{
           fontFamily: SANS,
         }}
       >
-        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{footer}</span>
-        <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+        <span style={{ ...LABEL, color: A.INK }}>{footer}</span>
+        <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
           {'\u203A'}
         </span>
       </button>
@@ -206,7 +206,7 @@ export const Action: React.FC<{
   align?: 'left' | 'center';
   tone?: string;
   style?: React.CSSProperties;
-}> = ({ label, onClick, align = 'center', tone = A.AMBER_DEEP, style }) => (
+}> = ({ label, onClick, align = 'center', tone = A.INK, style }) => (
   <button
     type="button"
     onClick={onClick}

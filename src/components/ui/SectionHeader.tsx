@@ -10,7 +10,7 @@ import { formatNumber } from '@/i18n/format';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const AMBER = '#F7931E';
-const AMBER_AA = '#c97a10'; // AA-safe amber for caps eyebrows on white
+const AMBER_AA = '#0E1216'; // eyebrow ink (flipped from amber — EYEBROW INK FLIP)
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
 const SLATE = '#94A3B8';
@@ -29,7 +29,7 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
   slate: '#64748B',
-  amber: AMBER,
+  amber: '#0E1216',
   danger: '#DC2626',
 };
 

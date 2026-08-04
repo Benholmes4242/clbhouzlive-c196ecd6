@@ -41,7 +41,7 @@ export const KICKER = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
-  color: REC.AMBER,
+  color: 'rgba(255,255,255,0.62)',
 };
 
 export const LABEL = {
