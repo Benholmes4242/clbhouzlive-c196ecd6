@@ -290,35 +290,47 @@ const InboxV2Page: React.FC = () => {
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     gap: 12,
-                    padding: '12px',
-                    borderRadius: 14,
-                    background: 'linear-gradient(135deg, rgba(247,147,30,0.09), rgba(247,147,30,0.05))',
-                    border: '0.5px solid rgba(247,147,30,0.22)',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    background: '#FFFFFF',
+                    border: `1px solid ${HAIRLINE}`,
                   }}
                 >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 11,
-                      background: '#F7931E',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Sparkles size={18} color="#FFFFFF" />
-                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#1F2428', lineHeight: 1.3 }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 10,
+                        fontWeight: 600,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: SUB,
+                      }}
+                    >
                       {t('messaging:banner.businessTitle')}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#6B7280', lineHeight: 1.45 }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 13, color: INK, lineHeight: 1.45 }}>
                       {t('messaging:banner.businessBody')}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => setComposeOpen(true)}
+                      className="active:opacity-60 transition-opacity"
+                      style={{
+                        marginTop: 8,
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        color: SLATE,
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('messaging:action.newMessage')}
+                    </button>
                   </div>
                   <button
                     type="button"
@@ -349,6 +361,7 @@ const InboxV2Page: React.FC = () => {
                   </button>
                 </div>
               </div>
+
             )}
             {conversations.map((c) => (
               <ConversationRow key={c.conversation_id} conversation={c} />
