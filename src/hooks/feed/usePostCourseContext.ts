@@ -17,6 +17,10 @@ export interface PostCourseContext {
   harder_than_pct: number | null;
   your_rounds: number | null;
   your_best: number | null;
+  /** Community rating for this course, batched from get_post_course_context. */
+  community_rating: number | null;
+  /** Review count behind community_rating. Returned, not currently rendered. */
+  rating_count: number | null;
 }
 
 export type PostCourseContextMap = Map<string, PostCourseContext>;

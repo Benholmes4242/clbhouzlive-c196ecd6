@@ -263,7 +263,10 @@ export const PostCourseBand: React.FC<Props> = ({
         <ChevronRight
           size={16}
           color={T40}
-          style={{ flexShrink: 0, marginLeft: 'auto' }}
+          // Optical alignment with the community rating on line 1. lucide
+          // leaves ~5px of dead space right of the glyph inside its 16px box,
+          // so the box edges align but the ink does not. Pull it out by 4.
+          style={{ flexShrink: 0, marginLeft: 'auto', marginRight: -4 }}
         />
       )}
     </div>
