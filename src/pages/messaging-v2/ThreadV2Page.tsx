@@ -374,15 +374,21 @@ const ThreadV2Page: React.FC = () => {
         </button>
       </header>
 
-      <div
-        ref={scrollerRef}
-        className="flex-1 overflow-y-auto"
-        style={{
-          padding: '8px 12px 12px 12px',
-          paddingBottom: `calc(${composerHeight + keyboardHeight + 12}px + env(safe-area-inset-bottom, 0px))`,
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+      {/* Canvas: the contour field is pinned to this positioned parent so it
+          stays put while the message list scrolls over it. */}
+      <div className="flex-1 min-h-0" style={{ position: 'relative', zIndex: 0 }}>
+        <ContourField opacity={0.06} />
+        <div
+          ref={scrollerRef}
+          className="overflow-y-auto"
+          style={{
+            position: 'relative',
+            height: '100%',
+            padding: '8px 12px 12px 12px',
+            paddingBottom: `calc(${composerHeight + keyboardHeight + 12}px + env(safe-area-inset-bottom, 0px))`,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
         {isLoading ? (
           <div className="flex flex-col">
             <SkeletonBubble side="left" w={55} />
