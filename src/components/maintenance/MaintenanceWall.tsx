@@ -14,7 +14,8 @@ const AMBER_DEEP = '#C2620A';
 const CANVAS = '#F4F6F9';
 
 const FALLBACK_MESSAGE =
-  'We are making some improvements and will be back shortly.';
+  "We've listened to your early feedback and we're making changes to bring better data and analytics into clbhouz. We'll be back online in a few days - bear with us.";
+
 
 interface Props {
   message?: string | null;
@@ -73,7 +74,7 @@ export function MaintenanceWall({ message }: Props) {
             color: AMBER_DEEP,
           }}
         >
-          {t('maintenance.kicker', { defaultValue: 'COURSE CLOSED' })}
+          {t('maintenance.kicker', { defaultValue: 'MAINTENANCE' })}
         </div>
 
         <h1
@@ -85,8 +86,9 @@ export function MaintenanceWall({ message }: Props) {
             color: INK,
           }}
         >
-          {t('maintenance.headline', { defaultValue: 'Back shortly' })}
+          {t('maintenance.headline', { defaultValue: "We're undergoing some maintenance" })}
         </h1>
+
 
         <p
           style={{
