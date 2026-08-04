@@ -12,6 +12,36 @@ const now = new Date();
 const SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
 const RUN_START = new Date().toISOString();
 
+// ONE shared name normaliser - used on BOTH the scraped side and the
+// sr_players side so a stored name with a stroke character still matches.
+// Stroke characters (O-slash, AE, L-stroke, D-stroke, eth, thorn, sharp-s)
+// are single codepoints with NO canonical decomposition, so NFD leaves them
+// alone and the non-ASCII strip afterwards would delete them outright
+// (HOJGAARD -> HJGAARD). Map them BEFORE the NFD call - order matters.
+const STROKE_MAP = [
+  [/\u00d8/g, 'O'], [/\u00f8/g, 'O'],   // O with stroke
+  [/\u00c6/g, 'AE'], [/\u00e6/g, 'AE'], // AE ligature
+  [/\u0141/g, 'L'], [/\u0142/g, 'L'],   // L with stroke
+  [/\u0110/g, 'D'], [/\u0111/g, 'D'],   // D with stroke
+  [/\u00d0/g, 'D'], [/\u00f0/g, 'D'],   // eth
+  [/\u00de/g, 'TH'], [/\u00fe/g, 'TH'], // thorn
+  [/\u00df/g, 'ss'],                    // sharp s
+];
+
+function foldName(value) {
+  if (!value) return '';
+  let out = String(value);
+  for (const [re, sub] of STROKE_MAP) out = out.replace(re, sub);
+  return out
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z\s'-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toUpperCase();
+}
+
+
 // Delete rows for a tour that this run did NOT refresh (departed players,
 // renamed players). Only ever called after a successful non-zero upsert so a
 // broken site can never wipe a tour's table.
