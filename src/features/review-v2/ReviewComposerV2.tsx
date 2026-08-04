@@ -656,7 +656,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                 height: 3,
                 borderRadius: 999,
                 marginBottom: 6,
-                background: i <= step ? RV2.amberDeep : 'rgba(15,23,42,0.10)',
+                background: i <= step ? RV2.dark : 'rgba(15,23,42,0.10)',
               }}
             />
             <div
