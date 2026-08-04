@@ -1,6 +1,6 @@
-// DetailRows - tap-through rows: course, round, actor, schedule.
+// DetailRows - tap-through rows: course, actor, schedule.
 
-import { ChevronRight, MapPin, User2, Clock, Flag } from 'lucide-react';
+import { ChevronRight, MapPin, User2, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { StageCourse } from '../hooks/useStageComposer';
 import type { ActiveActor } from '@/types/actor';
@@ -19,13 +19,9 @@ interface Props {
   /** Edit mode: actor is display-only; schedule row can be hidden. */
   actorLocked?: boolean;
   showSchedule?: boolean;
-  /** C2: shown only when the primary course has logged rounds for the viewer. */
-  showAttachRound?: boolean;
-  attachRoundLabel?: string | null;
-  onOpenAttachRound?: () => void;
 }
 
-export default function DetailRows({ course, courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true, showAttachRound, attachRoundLabel, onOpenAttachRound }: Props) {
+export default function DetailRows({ course, courses, onOpenCourse, actor, onOpenActor, scheduledAt, onOpenSchedule, actorLocked, showSchedule = true }: Props) {
   const { t } = useTranslation('composer');
   const list = courses ?? (course ? [course] : []);
   const courseLabel = list.length === 0
@@ -38,9 +34,6 @@ export default function DetailRows({ course, courses, onOpenCourse, actor, onOpe
   // actually rendered rather than assumed.
   const rows: Array<{ key: string; icon: React.ReactNode; label: string; value: string | null; optional: boolean; onClick: () => void; disabled?: boolean }> = [];
   rows.push({ key: 'course', icon: <MapPin size={16} />, label: 'Tag a course', value: courseLabel, optional: true, onClick: onOpenCourse });
-  if (showAttachRound && onOpenAttachRound) {
-    rows.push({ key: 'round', icon: <Flag size={16} />, label: t('attachRound.row'), value: attachRoundLabel ?? null, optional: true, onClick: onOpenAttachRound });
-  }
   rows.push({ key: 'actor', icon: <User2 size={16} />, label: 'Posting as', value: actor?.name ?? null, optional: false, onClick: onOpenActor, disabled: actorLocked });
   if (showSchedule) {
     rows.push({ key: 'schedule', icon: <Clock size={16} />, label: 'Schedule for later', value: scheduledAt ? formatSchedule(scheduledAt) : null, optional: true, onClick: onOpenSchedule });
