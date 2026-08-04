@@ -401,6 +401,10 @@ async function scrapeLPGA(browser, supabase) {
     });
 
     console.log(`[LPGA Scraper] Parsed ${players.length} players`);
+    console.log(
+      `[LPGA Scraper] Events read on ${players.filter(p => p.events !== null).length}, ` +
+      `wins read on ${players.filter(p => p.wins !== null).length} of ${players.length}`
+    );
 
     if (players.length === 0) {
       console.log('[LPGA Scraper] No players parsed — HTML structure may have changed, skipping');
@@ -412,13 +416,19 @@ async function scrapeLPGA(browser, supabase) {
       tour_code: LPGA_TOUR_CODE,
       season_year: LPGA_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
-      tournaments_played: null,
+      tournaments_played: p.events !== null && p.events !== undefined ? p.events : null,
       country: p.country || null,
-      wins: 0,
+      wins: p.wins !== null && p.wins !== undefined ? p.wins : 0,
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, LPGA_TOUR_CODE, LPGA_SEASON_YEAR, rows, 'LPGA Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
