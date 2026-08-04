@@ -18,7 +18,7 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -34,6 +34,7 @@ import Pressable from '@/components/ui/Pressable';
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { PostCourseBand } from '@/components/feed/PostCourseBand';
+import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { CourseStatsSheet } from '@/components/feed/CourseStatsSheet';
 import { PostRoundCard } from '@/components/feed/PostRoundCard';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
@@ -296,37 +297,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         minHeight: 1,
       }}
     >
-      {/* Ghost numeral — drop alpha ~30% for contrast on light bg */}
-      {reviewRating != null && (() => {
-        const GHOST = {
-          EXCEPTIONAL: 'rgba(240,165,0,0.20)',    // #F0A500 gold
-          EXCELLENT:   'rgba(217,119,6,0.18)',    // #D97706 amber
-          GOOD:        'rgba(217,119,6,0.15)',    // #D97706 amber
-          FAIR:        'rgba(154,74,14,0.18)',    // #9A4A0E ember (Option B low end)
-          POOR:        'rgba(154,74,14,0.15)',    // #9A4A0E ember (Option B low end)
-        } as const;
-        const tierKey = getRatingTier(reviewRating);
-        const ghostExceptional = tierKey === 'EXCEPTIONAL';
-        return (
-          <span
-            aria-hidden
-            className={ghostExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-            style={{
-              position: 'absolute',
-              right: -7,
-              top: 28,
-              transform: 'translateY(-50%)',
-              fontSize: 110,
-              fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
-              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
-              fontVariantNumeric: 'tabular-nums',
-              ...(ghostExceptional ? { opacity: 0.30 } : { color: GHOST[tierKey] }),
-            }}
-          >
-            {formatRatingValue(reviewRating)}
-          </span>
-        );
-      })()}
+      {/* Ghost numeral — shared component, light surface (ink watermark).
+          Palettes must never fork: this used to carry a local gold ramp. */}
+      {reviewRating != null && (
+        <ReviewGhostNumeral rating={reviewRating} surface="light" />
+      )}
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
@@ -397,33 +372,14 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               DEAL
             </span>
           )}
-          {reviewRating != null && (() => {
-            const tierLabel = getRatingTierLabel(reviewRating);
-            const isExceptional = getRatingTier(reviewRating) === 'EXCEPTIONAL';
-            return (
-              <button
-                type="button"
-                onClick={handleReadReview}
-                style={{
-                  position: 'relative', zIndex: 3,
-                  background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-                aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
-              >
-                <span
-                  className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
-                  style={{
-                    fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                    ...(isExceptional ? {} : { color: ratingTextColor(reviewRating) }),
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {tierLabel}
-                </span>
-              </button>
-            );
-          })()}
+          {reviewRating != null && (
+            <ReviewVerdictLabel
+              rating={reviewRating}
+              surface="light"
+              onClick={handleReadReview}
+              ariaLabel={`Your review: ${formatRatingValue(reviewRating)} ${getRatingTierLabel(reviewRating)}`}
+            />
+          )}
         </div>
       </div>
 
@@ -631,6 +587,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               actions={actionsRow}
               surface="solid"
+              tone="light"
             />
             {post.courseId && statsOpen && (
               <CourseStatsSheet
