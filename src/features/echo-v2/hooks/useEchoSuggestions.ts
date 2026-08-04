@@ -28,11 +28,23 @@ export const ECHO_FALLBACK_SUGGESTIONS = [
   'Which Top 100 courses should be on my list?',
 ] as const;
 
-/** First segment of a free-text location ("St Andrews, Fife" -> "St Andrews"). */
+/**
+ * `user_profiles.location` is FREE TEXT — "Kent", "Bromley, Kent",
+ * "South East London", or a postcode. A postcode in a prompt reads as a
+ * database leak ("...near BR1 3TD is worth the trip?"), so anything that is
+ * too short or looks like a UK/US postcode falls through to the club country.
+ */
+const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?(\s*\d[A-Z]{2})?$/i;
+const US_ZIP = /^\d{5}(-\d{4})?$/;
+
 function cityFromLocation(location: string | null | undefined): string | null {
   if (!location) return null;
   const first = location.split(',')[0]?.trim();
-  return first && first.length > 1 ? first : null;
+  if (!first || first.length < 3) return null;
+  if (UK_POSTCODE.test(first) || US_ZIP.test(first)) return null;
+  // Reject anything that is mostly digits — plot numbers, coordinates, junk.
+  if (/\d/.test(first) && first.replace(/\D/g, '').length >= first.length / 2) return null;
+  return first;
 }
 
 export function useEchoSuggestions(): { suggestions: string[]; isLoading: boolean } {
