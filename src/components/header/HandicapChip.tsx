@@ -71,7 +71,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   useHandicapTrend(connection?.id); // keep query warm for trend hooks below
   const trend = useHandicapTrend90d(connection?.id);
-  const { data: profile } = useUserProfile(user?.id);
+  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
 
   // Theme-aware tokens
   const INK = light ? DARK_INK : WHITE;
