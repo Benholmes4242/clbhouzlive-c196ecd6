@@ -1,13 +1,9 @@
-// CreateSheetV2 - the Post-or-Review chooser opened by the bottom-nav (+).
-// House sheet style (grabber, 17/800 title). Two large option rows:
-//   1) Post          -> opens the Stage composer via openPostStudio
-//   2) Course review -> opens CourseTagSheet search; on pick, navigate to
-//                       /courses/<id>/rate (the review Composer).
+// CreateSheetV2 - the Course review chooser. The Post path now lives in the
+// bottom-nav file picker, so this sheet only opens the review wizard.
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ImageIcon, Star } from 'lucide-react';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { Star } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import BottomSheet from './BottomSheet';
 import CourseTagSheet from './CourseTagSheet';
@@ -20,15 +16,9 @@ interface Props {
 }
 
 export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
-  const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   const { profile } = useProfileData();
   const navigate = useNavigate();
   const [courseOpen, setCourseOpen] = useState(false);
-
-  const handlePost = () => {
-    onClose();
-    openPostStudio({ returnPath });
-  };
 
   const handleReview = () => {
     setCourseOpen(true);
@@ -38,12 +28,6 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
     <>
       <BottomSheet open={open && !courseOpen} title="Create" onClose={onClose}>
         <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <OptionRow
-            glyph={<ImageIcon size={22} color={CT.amber} />}
-            title="Post"
-            subtitle="Share photos, clips or words to your feed"
-            onClick={handlePost}
-          />
           <OptionRow
             glyph={<Star size={22} color={CT.amber} />}
             title="Course review"

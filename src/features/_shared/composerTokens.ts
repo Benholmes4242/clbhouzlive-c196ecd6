@@ -27,3 +27,19 @@ export const CT = {
   success: '#0F8F4A',
   shellBg: '#0A0B0D',
 } as const;
+
+/**
+ * Dark composer tokens for post-v2 media-first composer.
+ * Review-v2 stays on CT (light) — do not use CT_DARK there.
+ */
+export const CT_DARK = {
+  bg: '#0B0F14',
+  surface: '#15171F',
+  elev: '#1B222B',
+  line: 'rgba(248,250,252,0.09)',
+  ink: '#F8FAFC',
+  mute: 'rgba(248,250,252,0.60)',
+  dim: 'rgba(248,250,252,0.34)',
+  amber: '#F7931E',
+  danger: '#FF6B6B',
+} as const;

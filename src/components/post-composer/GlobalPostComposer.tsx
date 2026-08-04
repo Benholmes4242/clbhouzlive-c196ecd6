@@ -18,6 +18,7 @@ export function GlobalPostComposer() {
     returnPath,
     editPostId,
     draftId,
+    initialMedia,
     closePostStudio,
   } = usePostStudioStore();
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export function GlobalPostComposer() {
       onClose={handleClose}
       editPostId={editPostId}
       draftId={draftId}
+      initialMedia={initialMedia}
     />
   );
 }
