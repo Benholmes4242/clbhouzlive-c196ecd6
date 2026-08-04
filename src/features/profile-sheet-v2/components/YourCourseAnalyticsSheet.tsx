@@ -319,8 +319,8 @@ function AnalyticsCourseRow({
             items={[
               { label: t('yourCourses.colRounds'), value: course.rounds_count },
               ...(avgVal != null
-                ? // YOUR AVG carries no colour: it is the member's own score and
-                  // the comparison lives in the delta column.
+                ? // YOUR AVG carries no colour: it is the member's own score.
+
                   [{ label: t('yourCourses.colYourAvg'), value: fmtSigned(avgVal, 1) }]
                 : []),
               ...(course.last_played
