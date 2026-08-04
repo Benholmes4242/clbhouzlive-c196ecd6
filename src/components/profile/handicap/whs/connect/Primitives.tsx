@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import {
-  PANEL, BORDER, INK, MUTE, DIM, AMBER, AMBER_DEEP, TRACK, FONT,
+  PANEL, BORDER, INK, MUTE, DIM, AMBER, TRACK, FONT,
   KICKER, LABEL, NUM,
 } from './designTokens';
 
@@ -132,7 +132,7 @@ export const Action: React.FC<{
   onClick?: () => void;
   color?: string;
   chevron?: boolean;
-}> = ({ children, onClick, color = AMBER_DEEP, chevron = true }) => (
+}> = ({ children, onClick, color = INK, chevron = true }) => (
   <button
     type="button"
     onClick={onClick}
