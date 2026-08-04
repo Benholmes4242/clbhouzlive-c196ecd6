@@ -40,12 +40,13 @@ export async function onRequest(context) {
   if (!isUuid(postId)) return genericDocument(request);
 
   const select =
-    'id,content,course_id,user_id,created_at,post_media(media_url,poster_url,media_type,display_order)';
+    'id,content,course_id,user_id,created_at,whs_score_id,post_media(media_url,poster_url,media_type,display_order)';
   const rows = await restSelect(
     `posts?select=${encodeURIComponent(select)}&id=eq.${postId}&limit=1`,
   );
   const post = rows[0];
   if (!post) return genericDocument(request);
+
 
   const [authors, courses] = await Promise.all([
     post.user_id
