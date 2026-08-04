@@ -6,9 +6,9 @@
  * most-rounds first. Search field above the list uses the shared
  * useCourseSearch hook so members can jump to a course they have no rounds at.
  *
- * The figure that varies is the "vs you" delta: each course's avg_to_par
- * measured against the member's own weighted baseline. See baseline notes in
- * the component and the difficulty-convention comment on DeltaCell.
+ * The figure on each row is the member's OWN average to par at that course.
+ * It carries no tone: it is a fact about their play, not a claim about the
+ * course. The list is sorted by last played, most recent first.
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -26,7 +26,7 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import { DIST_SEG_COLORS } from '@/features/courses/components/holes/HoleDataSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { formatMonthYearShortGB } from '@/i18n/format';
+import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
@@ -34,9 +34,6 @@ import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
 
-/** Course-difficulty tones: harder for you reads red, easier reads green. */
-const HARDER = '#C8372B';
-const EASIER = '#0F8F4A';
 
 interface Props {
   open: boolean;
@@ -146,14 +143,11 @@ function hasScoringData(course: UserAnalyticsCourse): boolean {
  */
 function AnalyticsCourseRow({
   course,
-  delta,
   expanded,
   onToggle,
   onOpen,
 }: {
   course: UserAnalyticsCourse;
-  /** Null when there is no baseline, or a single-course list. */
-  delta: number | null;
   expanded: boolean;
   onToggle: () => void;
   onOpen: (from: 'expanded' | 'row') => void;
@@ -165,20 +159,13 @@ function AnalyticsCourseRow({
 
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
-    avgVal != null ? t('yourCourses.avgLabel', { avg: fmtSigned(avgVal, 1) }) : null,
+    course.last_played
+      ? t('yourCourses.lastPlayedMeta', { date: formatDayMonthYearShortGB(course.last_played) })
+      : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
 
-  // Round FIRST, then branch on the rounded value: a delta of -0.04 renders
-  // "0.0", never "-0.0".
-  const deltaRounded = delta == null ? null : Number(delta.toFixed(1));
-  // COURSE-DIFFICULTY convention, NOT the player-score one used on every
-  // leaderboard in the app. The statement is about the course: positive means
-  // "this one plays harder for you than your own baseline", so positive is RED.
-  // Do not "correct" this to the leaderboard colouring.
-  const deltaTone =
-    deltaRounded == null || deltaRounded === 0 ? A.INK : deltaRounded > 0 ? HARDER : EASIER;
 
   const segs = hasScoring
     ? [
@@ -264,10 +251,10 @@ function AnalyticsCourseRow({
           )}
         </div>
 
-        {deltaRounded != null && (
+        {avgVal != null && (
           <div style={{ width: 62, flex: '0 0 62px', textAlign: 'right' }}>
-            <div style={{ ...NUM, fontSize: 17, color: deltaTone }}>{fmtSigned(deltaRounded, 1)}</div>
-            <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.vsYou')}</div>
+            <div style={{ ...NUM, fontSize: 17, color: A.INK }}>{fmtSigned(avgVal, 1)}</div>
+            <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.avgToPar')}</div>
           </div>
         )}
 
@@ -332,8 +319,8 @@ function AnalyticsCourseRow({
             items={[
               { label: t('yourCourses.colRounds'), value: course.rounds_count },
               ...(avgVal != null
-                ? // YOUR AVG carries no colour: it is the member's own score and
-                  // the comparison lives in the delta column.
+                ? // YOUR AVG carries no colour: it is the member's own score.
+
                   [{ label: t('yourCourses.colYourAvg'), value: fmtSigned(avgVal, 1) }]
                 : []),
               ...(course.last_played
@@ -370,10 +357,24 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const showSearchField = showList; // per brief: search only when list non-empty
   const searchActive = q.trim().length >= 2;
 
-  const listItems = useMemo<UserAnalyticsCourse[]>(() => myCourses, [myCourses]);
+  // Sorted CLIENT-SIDE, not in the RPC: gam_user_courses is shared with the
+  // Phase C rail and the Phase E chip provider, which want most-played first.
+  // Nulls last, ties broken on rounds so a same-day pair is stable.
+  const listItems = useMemo<UserAnalyticsCourse[]>(() => {
+    return [...myCourses].sort((a, b) => {
+      const ta = a.last_played ? Date.parse(a.last_played) : null;
+      const tb = b.last_played ? Date.parse(b.last_played) : null;
+      if (ta == null && tb == null) return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
+      if (ta == null) return 1;
+      if (tb == null) return -1;
+      if (tb !== ta) return tb - ta;
+      return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
+    });
+  }, [myCourses]);
 
   /**
-   * The member's own baseline: shots over par per round, WEIGHTED by rounds.
+   * The member's own pooled average, used ONLY by the header sheetSub (it no
+   * longer feeds the rows): shots over par per round, WEIGHTED by rounds.
    * A course with 103 rounds describes their game far better than one with 2,
    * and an unweighted mean would make small-sample courses look dramatic.
    * Consequence: the most-played course usually sits close to zero.
@@ -445,7 +446,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   );
 
   const toggle = useCallback(
-    (course: UserAnalyticsCourse, delta: number | null) => {
+    (course: UserAnalyticsCourse) => {
       setExpandedIds((prev) => {
         const next = new Set(prev);
         if (next.has(course.course_id)) {
@@ -455,7 +456,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           analyticsEvents.track('course_analytics_row_expanded', {
             course_id: course.course_id,
             rounds: course.rounds_count,
-            delta_vs_baseline: delta == null ? 0 : Number(delta.toFixed(1)),
+            
           });
         }
         return next;
@@ -618,28 +619,17 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                   overflow: 'hidden',
                 }}
               >
-                {listItems.map((c) => {
-                  const delta =
-                    baseline != null && c.avg_to_par !== null && c.avg_to_par !== undefined
-                      ? (c.avg_to_par as number) - baseline
-                      : null;
-                  return (
-                    <AnalyticsCourseRow
-                      key={c.course_id}
-                      course={c}
-                      delta={delta}
-                      expanded={expandedIds.has(c.course_id)}
-                      onToggle={() => toggle(c, delta)}
-                      onOpen={(from) => go(c.course_id, from)}
-                    />
-                  );
-                })}
+                {listItems.map((c) => (
+                  <AnalyticsCourseRow
+                    key={c.course_id}
+                    course={c}
+                    expanded={expandedIds.has(c.course_id)}
+                    onToggle={() => toggle(c)}
+                    onOpen={(from) => go(c.course_id, from)}
+                  />
+                ))}
               </div>
-              {signedBaseline != null && (
-                <div style={{ ...CAPTION, padding: '14px 24px 4px', textAlign: 'center' }}>
-                  {t('yourCourses.footnote', { avg: signedBaseline, rounds: totalRounds })}
-                </div>
-              )}
+
             </>
           ) : null}
 
