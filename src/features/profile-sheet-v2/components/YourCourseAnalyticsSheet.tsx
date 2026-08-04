@@ -445,7 +445,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   );
 
   const toggle = useCallback(
-    (course: UserAnalyticsCourse, delta: number | null) => {
+    (course: UserAnalyticsCourse) => {
       setExpandedIds((prev) => {
         const next = new Set(prev);
         if (next.has(course.course_id)) {
