@@ -373,7 +373,8 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   }, [myCourses]);
 
   /**
-   * The member's own baseline: shots over par per round, WEIGHTED by rounds.
+   * The member's own pooled average, used ONLY by the header sheetSub (it no
+   * longer feeds the rows): shots over par per round, WEIGHTED by rounds.
    * A course with 103 rounds describes their game far better than one with 2,
    * and an unweighted mean would make small-sample courses look dramatic.
    * Consequence: the most-played course usually sits close to zero.
