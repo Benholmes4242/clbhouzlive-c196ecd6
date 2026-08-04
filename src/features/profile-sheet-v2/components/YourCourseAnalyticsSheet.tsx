@@ -6,9 +6,9 @@
  * most-rounds first. Search field above the list uses the shared
  * useCourseSearch hook so members can jump to a course they have no rounds at.
  *
- * The figure that varies is the "vs you" delta: each course's avg_to_par
- * measured against the member's own weighted baseline. See baseline notes in
- * the component and the difficulty-convention comment on DeltaCell.
+ * The figure on each row is the member's OWN average to par at that course.
+ * It carries no tone: it is a fact about their play, not a claim about the
+ * course. The list is sorted by last played, most recent first.
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
