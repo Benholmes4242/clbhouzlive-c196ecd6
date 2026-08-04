@@ -13,6 +13,7 @@ import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ContourField } from '@/components/shared/ContourField';
 import type {
   ConversationDetail,
   ConversationMember,
