@@ -540,7 +540,9 @@ const ThreadV2Page: React.FC = () => {
             <div ref={bottomAnchorRef} />
           </>
         )}
+        </div>
       </div>
+
 
       <Composer
         conversationId={conversationId}
