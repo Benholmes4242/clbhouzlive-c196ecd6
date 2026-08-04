@@ -621,8 +621,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 // unified course band incl. actions 100.2 + 1px hairline + 88px nav
                 // = 293px. Reserve 305px (12px margin) and subtract the home
                 // indicator, since 100vh on iOS does not exclude it.
-                // Portrait cap trimmed 10% off the full-screen reserve.
-                maxHeight: 'calc((100vh - 305px - env(safe-area-inset-bottom)) * 0.9)',
+                maxHeight: 'calc(100vh - 305px - env(safe-area-inset-bottom))',
                 overflow: 'hidden',
                 background: '#05080F',
               }}
