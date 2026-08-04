@@ -40,8 +40,8 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
           }}
           className="active:opacity-70 transition-opacity"
         >
-          <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{actionLabel}</span>
-          <span style={{ fontSize: 12, color: A.AMBER_DEEP, fontWeight: 800 }} aria-hidden="true">
+          <span style={{ ...LABEL, color: A.INK }}>{actionLabel}</span>
+          <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
             {'\u203A'}
           </span>
         </button>

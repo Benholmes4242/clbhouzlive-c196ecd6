@@ -12,6 +12,8 @@ export const CT = {
   hairlineStrong: 'rgba(0,0,0,0.12)',
   dark: '#15171F',
   onDark: '#F5F6F7',
+  // Canonical eyebrow/kicker ink on light surfaces (Aug 2026 ink flip).
+  eyebrow: '#0E1216',
   amber: '#F7931E',
   amberDeep: '#C2620A',
   amberSoft: 'rgba(247,147,30,0.10)',

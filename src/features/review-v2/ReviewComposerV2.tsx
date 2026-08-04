@@ -43,7 +43,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
       style={{
         fontSize: 10.5,
         fontWeight: 700,
-        color: RV2.amberDeep,
+        color: RV2.eyebrow,
         textTransform: 'uppercase',
         letterSpacing: '0.14em',
         marginBottom: 12,
@@ -772,7 +772,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                 style={{
                   fontSize: 10.5,
                   fontWeight: 700,
-                  color: RV2.amberDeep,
+                  color: RV2.eyebrow,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
                 }}

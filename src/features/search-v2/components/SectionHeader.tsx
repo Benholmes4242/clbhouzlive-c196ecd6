@@ -37,7 +37,7 @@ export const ACTION: React.CSSProperties = {
   fontWeight: 800,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
-  color: A.AMBER_DEEP,
+  color: A.INK,
   background: 'none',
   border: 'none',
   cursor: 'pointer',
