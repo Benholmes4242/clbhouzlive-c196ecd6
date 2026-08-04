@@ -7,8 +7,9 @@
  *   steady       — index number alone (|delta| < 0.3 or insufficient history)
  *   disconnected — amber "Connect WHS" label
  *
- * Logged-out users render nothing. While the WHS connection resolves we
- * render a fixed-width skeleton pill to prevent layout shift.
+ * Logged-out users render nothing. Nothing renders until both the profile and
+ * the WHS connection resolve, so the pill only ever appears at its final size.
+
  */
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TrendingDown, TrendingUp } from 'lucide-react';
@@ -71,7 +72,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   useHandicapTrend(connection?.id); // keep query warm for trend hooks below
   const trend = useHandicapTrend90d(connection?.id);
-  const { data: profile } = useUserProfile(user?.id);
+  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
 
   // Theme-aware tokens
   const INK = light ? DARK_INK : WHITE;
@@ -90,23 +91,14 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
 
   if (!user) return null;
 
+  // Render nothing until BOTH the profile (visibility) and the WHS connection
+  // (shape) are settled. No skeleton: the two outcomes ("3.0" vs "Connect WHS")
+  // are different widths, so any reserved width guarantees a resize on load.
+  if (profileLoading || whsLoading) return null;
+
   // User-controlled visibility — Settings toggle is the single source of truth.
-  // Hides the chip in every state (disconnected, skeleton, connected).
   if (profile?.hide_handicap_chip) return null;
 
-  // Skeleton — reserves space to prevent layout shift on initial load.
-  if (whsLoading) {
-    return (
-      <div
-        aria-hidden
-        style={{
-          ...baseStyle,
-          width: 60,
-          cursor: 'default',
-        }}
-      />
-    );
-  }
 
   const handleTap = (state: HandicapTrend90dDirection | 'disconnected') => {
     analyticsEvents.track('header_handicap_chip_tapped', {
