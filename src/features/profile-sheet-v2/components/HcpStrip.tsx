@@ -54,8 +54,8 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   const coursesPlayed = useMemo<number | null>(() => {
     if (!scores) return null;
     const ids = new Set<string>();
-    for (const s of scores as any[]) {
-      if (s?.course_id) ids.add(String(s.course_id));
+    for (const s of scores) {
+      if (s.course_id) ids.add(s.course_id);
     }
     return ids.size;
   }, [scores]);

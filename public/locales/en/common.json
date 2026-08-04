@@ -248,6 +248,7 @@
     "courses": "Courses",
     "ninetyDays": "90 days",
     "played": "played",
+    "allTime": "all time",
     "levelNinety": "Level 90d",
     "deltaNinety": "{{delta}} 90d"
   },

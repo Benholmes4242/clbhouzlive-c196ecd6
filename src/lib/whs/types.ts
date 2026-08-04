@@ -37,6 +37,8 @@ export interface WhsScore {
   slope_rating: number | null;
   marker_name: string | null;
   is_counter: boolean;
+  /** WHS-side course id. NOT a golf_courses id - bridge via whs_to_golf_course_map. */
+  course_id: string | null;
   course: WhsCourseRef | null;
 }
 
