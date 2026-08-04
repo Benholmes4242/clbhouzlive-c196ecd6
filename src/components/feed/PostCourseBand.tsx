@@ -72,7 +72,7 @@ export interface CourseBandFigure {
  * ONE contextual figure per card, first match wins:
  *  1 viewer has played it        -> their best, amber
  *  2 fewer than 3 rounds tracked -> the round count, muted (no difficulty)
- *  3 otherwise                   -> +avg over par, red, with the percentile
+ *  3 otherwise                   -> field avg over par, with a tail percentile
  * No tracked rounds at all -> null, and the row is not tappable.
  */
 export function pickCourseBandFigure(
@@ -101,11 +101,38 @@ export function pickCourseBandFigure(
     };
   }
 
+  const HARD_TAIL = 85;
+  const EASY_TAIL = 15;
+
+  // harder_than_pct is the share of courses this one is HARDER than, so the
+  // two tails are NOT the same sum: hardest is 100 - pct, easiest is pct.
+  // Both clamp at 1 - "top 0% hardest" is not a sentence.
+  let label: string;
+  let color: string;
+  if (ctx.harder_than_pct >= HARD_TAIL) {
+    label = t('feed.courseBand.topHardest', {
+      pct: Math.max(1, 100 - ctx.harder_than_pct),
+    });
+    color = RED;
+  } else if (ctx.harder_than_pct <= EASY_TAIL) {
+    label = t('feed.courseBand.topEasiest', {
+      pct: Math.max(1, ctx.harder_than_pct),
+    });
+    color = GREEN;
+  } else {
+    // Between the tails a percentile states nothing, so it is withheld and the
+    // sample size takes the slot instead.
+    label = t('feed.courseBand.roundTracked', { count: rounds });
+    color = T60;
+  }
+
   return {
     key: 'difficulty',
-    figure: `${ctx.avg_over_par > 0 ? '+' : ''}${ctx.avg_over_par.toFixed(1)}`,
-    label: t('feed.courseBand.harderThan', { pct: ctx.harder_than_pct }),
-    color: RED,
+    prefix: t('feed.courseBand.fieldAvg'),
+    // No '+' sign: scorecard notation made this read as the poster's score.
+    figure: `${ctx.avg_over_par.toFixed(1)}`,
+    label,
+    color,
   };
 }
 
