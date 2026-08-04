@@ -166,9 +166,6 @@ function AnalyticsCourseRow({
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
     avgVal != null ? t('yourCourses.avgLabel', { avg: fmtSigned(avgVal, 1) }) : null,
-    course.hardest_hole_no != null
-      ? t('yourCourses.hardestHole', { n: course.hardest_hole_no })
-      : null,
   ]
     .filter(Boolean)
     .join(` ${DOT} `);
