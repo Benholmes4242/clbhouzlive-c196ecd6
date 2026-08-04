@@ -31,11 +31,14 @@ export function captainDominates(captain: FranchiseCaptain | undefined): boolean
   return margin > MARGIN_THRESHOLD;
 }
 
-/** Compact USD: $1.2M / $850K / $1,200. Mirrors FranchiseCard.formatCompact. */
+/**
+ * Compact USD: $1.2M / $850K / $1,200. Delegates to the shared compact money
+ * formatter in i18n/format so this surface cannot drift from the college
+ * franchise one. (The old comment here pointed at FranchiseCard.formatCompact,
+ * which no longer exists.)
+ */
 export function formatCaptainEarnings(n: number): string {
-  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return formatCurrencyUsd(n);
+  return formatCurrencyUsdCompact(n);
 }
 
 /** Last-name shortener for tight pill copy ("Scottie Scheffler" → "Scheffler"). */
