@@ -1006,3 +1006,42 @@ const moreRowStyle: React.CSSProperties = {
   cursor: 'pointer',
   textAlign: 'left',
 };
+
+// Page 2 (words) light tokens — the canvas is the app's editorial light surface.
+const LIGHT = {
+  canvas: '#F8FAFC',
+  panel: '#FFFFFF',
+  line: '#E9EDF2',
+  ink: '#0E1216',
+  mute: '#8A9099',
+} as const;
+
+const lightIconButtonStyle: React.CSSProperties = {
+  width: 32,
+  height: 32,
+  borderRadius: 999,
+  border: `1px solid ${LIGHT.line}`,
+  background: LIGHT.panel,
+  color: LIGHT.ink,
+  fontSize: 20,
+  lineHeight: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  flex: 'none',
+};
+
+const lightRowStyle = (divider: boolean): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  width: '100%',
+  padding: '14px 14px',
+  background: 'transparent',
+  border: 0,
+  borderTop: divider ? `1px solid ${LIGHT.line}` : 0,
+  cursor: 'pointer',
+  textAlign: 'left',
+});
