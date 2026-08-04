@@ -489,6 +489,7 @@ function AppRoutes() {
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
+        <Route path="/_test/analytics-sheet" element={<Suspense fallback={<GenericPageSkeleton />}><TestAnalyticsSheetPage /></Suspense>} />
         <Route path="/handicap" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/handicap/legends" element={<Navigate to="/handicap?subtab=circle" replace />} />
         
