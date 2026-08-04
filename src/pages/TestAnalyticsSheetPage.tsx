@@ -1,4 +1,5 @@
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import YourCourseAnalyticsSheet from '@/features/profile-sheet-v2/components/YourCourseAnalyticsSheet';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
@@ -110,27 +111,24 @@ const mockCourses: UserAnalyticsCourse[] = [
   },
 ];
 
-// Stub the hook so the sheet renders our mock data without a Supabase call.
-jest.mock('@/hooks/gam/useUserAnalyticsCourses', () => ({
-  __esModule: true,
-  ...jest.requireActual('@/hooks/gam/useUserAnalyticsCourses'),
-  useUserAnalyticsCourses: ({ enabled }: { enabled?: boolean }) => ({
-    data: mockCourses,
-    isLoading: false,
-    isFetching: false,
-    error: null,
-  }),
-}));
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: Infinity, refetchOnMount: false, refetchOnWindowFocus: false },
+  },
+});
+queryClient.setQueryData(['gam', 'user-analytics-courses'], mockCourses);
 
 export default function TestAnalyticsSheetPage() {
   return (
-    <div style={{ paddingTop: 40 }}>
-      <YourCourseAnalyticsSheet
-        open
-        onClose={() => {}}
-        onNavigate={() => {}}
-        synced
-      />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div style={{ paddingTop: 40 }}>
+        <YourCourseAnalyticsSheet
+          open
+          onClose={() => {}}
+          onNavigate={() => {}}
+          synced
+        />
+      </div>
+    </QueryClientProvider>
   );
 }
