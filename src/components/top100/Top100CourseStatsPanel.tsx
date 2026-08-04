@@ -204,7 +204,7 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
   };
 
   return (
-    <div style={{ paddingTop: 10 }}>
+    <div style={{ paddingTop: 4 }}>
       <header style={{ marginBottom: 10 }}>
         {shortName ? <span style={headingStyle}>{shortName}</span> : null}
       </header>
