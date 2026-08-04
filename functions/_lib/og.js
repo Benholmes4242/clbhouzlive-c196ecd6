@@ -104,7 +104,6 @@ export function metaDocument(opts) {
   const title = opts.title || GENERIC_TITLE;
   const description = opts.description || GENERIC_DESCRIPTION;
   const image = opts.image || GENERIC_IMAGE;
-  const hasImage = Boolean(opts.image);
   const type = opts.type || 'website';
   const url = opts.url;
 
@@ -122,7 +121,7 @@ export function metaDocument(opts) {
     <meta property="og:type" content="${esc(type)}" />
     <meta property="og:url" content="${esc(url)}" />
     <meta property="og:image" content="${esc(image)}" />
-    <meta name="twitter:card" content="${hasImage ? 'summary_large_image' : 'summary'}" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@clbhouz" />
     <meta name="twitter:title" content="${esc(title)}" />
     <meta name="twitter:description" content="${esc(description)}" />
