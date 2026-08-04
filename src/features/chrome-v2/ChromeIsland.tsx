@@ -250,12 +250,12 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
   if (profileLoading) return null;
   if (profile?.hide_handicap_chip) return null;
 
+  // Nothing renders until the connection state is known: no ghost width, so the
+  // capsule never reserves the wide "Connect HCP" label when the index is short.
+  if (whsLoading) return null;
+
   const body = (() => {
-    if (whsLoading) {
-      // Width is already reserved by HcpReserve; nothing visible goes here so
-      // the capsule settles at its final size on the first paint.
-      return null;
-    }
+
 
     const disconnected = !connection || trendData?.current == null;
 
