@@ -29,6 +29,13 @@ interface Props {
   isCardActive: boolean;
   initialIndex: number;
   frameRatio?: number; // default 4/5
+  /**
+   * Viewport cap for the frame (CSS length, e.g. the feed's
+   * `max(280px, calc(100svh - ...))`). Applied as maxHeight on the frame so
+   * the band + actions row stay above the floating nav. ALL slides share this
+   * one height — the frame owns it, slides cover-crop into it.
+   */
+  maxHeight?: string;
   /** When false, video slides render their poster only (no <video> element). */
   mountVideo?: boolean;
   /**
@@ -61,6 +68,7 @@ export const MediaCarousel: React.FC<Props> = ({
   isCardActive,
   initialIndex,
   frameRatio = FRAME_DEFAULT,
+  maxHeight,
   mountVideo = false,
   postId,
   onIndexChange,
@@ -381,7 +389,8 @@ export const MediaCarousel: React.FC<Props> = ({
         position: 'relative',
         width: '100%',
         aspectRatio: String(frameRatio),
-        background: '#05080F',
+        maxHeight,
+        background: '#10151C',
         overflow: 'hidden',
       }}
     >
