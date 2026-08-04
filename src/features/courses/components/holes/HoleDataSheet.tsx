@@ -853,7 +853,7 @@ const StoryTiles: React.FC<{
         emoji="⛳"
         cap="BIRDIE MAP"
         headline={`${birdiedCount} of ${totalHoles} birdied`}
-        sentence={`${totalHoles - birdiedCount} still waiting for your first birdie.`}
+        sentence={`${totalHoles - birdiedCount} holes still waiting for your first birdie.`}
         personal
       />,
     );
