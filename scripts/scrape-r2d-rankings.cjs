@@ -237,6 +237,13 @@ async function scrape() {
       updated_at: new Date().toISOString()
     }));
 
+    // Euro already scrapes a movement cell. Report whether the computed value
+    // agrees before we retire the scraped one (see brief 1.4). Read happens
+    // BEFORE the upsert.
+    await attachMovement(supabase, TOUR_CODE, SEASON_YEAR, rows, 'R2D Scraper', { compareOnly: true });
+
+
+
     // Upsert in batches of 50
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
