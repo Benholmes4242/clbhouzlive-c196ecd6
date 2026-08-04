@@ -1,54 +1,51 @@
-## What's actually broken
+# Post Composer — Media-First Rebuild (Part 2)
 
-I audited the data behind the "The Case For …" sheet. Two independent failures conspire to blank the tiles for every non-PGA tour:
+## Goal
+Rebuild the post composer so media is the screen and the chrome floats over it. The bottom-nav Share item opens the OS picker immediately; cancelling still lands in a caption-first composer. Course tagging, actor selection, scheduling and drafts move to chips/avatar/dots on a dark canvas.
 
-**1. Season Snapshot (Wins / Top 10s / SG Total)** reads `sr_player_statistics`. That table has:
-- 312 rows for PGA players
-- **0 rows for LPGA**
-- 21 for PGAD, 8 for EURO, 1 for LIV
+## What changes
 
-So Anna Nordqvist's tiles blank out even though her Last-5 shows a 3rd and a T7 — the results are in `sr_leaderboards`, not `sr_player_statistics`.
+### 1. Entry point — nav owns the picker
+- `src/components/GlobalBottomNavigation.tsx`: replace the `post` tab's "open CreateSheetV2" path with a hidden `<input type="file" accept="image/*,video/*" multiple>` rendered by the nav. On the (+) tap call `input.click()` synchronously from the click handler, then open the composer with the chosen files.
+- Cancelling the picker (no files) still opens the composer via `openPostStudio({ returnPath })` so there is no dead tap.
+- `CreateSheetV2` is kept for the "Course review" path only; the Post option is removed from it.
 
-**2. World Rank** reads `sr_world_rankings`. That table only holds OWGR (men). LPGA needs the Rolex Women's World Golf Rankings, which we've never synced.
+### 2. Composer tokens go dark
+- `src/features/_shared/composerTokens.ts`: add a `CT_DARK` export with the brief's values (`bg #0B0F14`, `surface #15171F`, `elev #1B222B`, `line rgba(248,250,252,0.09)`, `ink #F8FAFC`, `mute rgba(248,250,252,0.60)`, `dim rgba(248,250,252,0.34)`, `amber #F7931E`). Existing `CT` is untouched so review-v2 stays light.
 
-## Fix, in two parts
+### 3. StageComposer layout rebuild
+- Header: close/back circular button, "New post", actor name on the right.
+- Media stage: full-width, fixed 4/5 aspect, page counter when >1 item.
+- FramePills moved between stage and filmstrip.
+- Filmstrip: 46px thumbnails, active amber ring, trailing "+" tile that re-opens the picker.
+- Caption: bare textarea on the dark canvas, placeholder "Say something about it", expands up to 4 lines while keeping the photo visible.
+- Glass course chip docked bottom-left of the slide.
+- Edit chip (AdjustSheet) top-right of slide; video Cover/Original chips stay.
+- Bottom bar: actor avatar (opens ActorSheet), dots menu (schedule + drafts), full-width amber Share/Post pill.
+- DETAILS panel and chevron rows removed.
 
-### Part A — Results-derived fallback for Wins / Top 10s (all tours)
+### 4. Components touched / reused
+- `src/features/post-v2/StageComposer.tsx` — main shell rebuilt.
+- `src/features/post-v2/components/MediaStageV2.tsx` — fixed 4:5 stage, page counter, dark letterbox.
+- `src/features/post-v2/components/MediaTray.tsx` — 46px filmstrip with dashed add tile and long-press-drag reorder.
+- `src/features/post-v2/components/CaptionField.tsx` — bare expanding textarea on dark canvas.
+- `src/features/post-v2/components/FramePills.tsx` — moved between stage and filmstrip; dark styling.
+- `src/features/post-v2/components/DetailRows.tsx` — deleted (functionality moved to chips/dots).
+- `src/features/post-v2/components/PostEmptyStage.tsx` — deleted; replaced by a minimal dark empty state with "Add photos or video" CTA.
+- `src/features/post-v2/components/CreateSheetV2.tsx` — remove Post option, keep Course review.
+- Existing sheets (`CourseTagSheet`, `ActorSheet`, `ScheduleSheetV2`, `DraftsSheetV2`, `ScheduledPostsSheetV2`, `AdjustSheet`, `CoverFrameSheet`) keep their current behaviour and props.
 
-The Case sheet already loads `usePlayerResults` for Last-5. Extend the Season Snapshot tiles to:
+### 5. State / orchestration unchanged
+- `useStageComposer`, `usePostSubmit`, `postUploadController`, analytics events, dirty close guard and submit gate stay as-is.
+- `GlobalPostComposer.tsx` passes initial media from the store into `StageComposer`.
 
-1. Prefer `sr_player_statistics.wins` / `top_10s` when present (keeps PGA numbers exactly as today).
-2. Fall back to counting the player's completed events in the **current season year** from `sr_leaderboards`:
-   - Wins = `position === 1` (ignore `status in ('cut','WD','DQ')`)
-   - Top 10s = `position !== null && position <= 10` (same status filter)
-3. Extend the results fetch to the full season (not just the last 5) so counts are accurate. Add a `useSeasonResultsSummary(playerId, year)` hook that queries `sr_leaderboards` filtered by tournament season year and returns `{ wins, top10s, starts }`.
-4. SG Total stays "—" when stats are absent — it isn't recoverable from finish positions and we don't fake numbers.
+## Acceptance
+- `#[0-9A-Fa-f]{6}` in `src/features/post-v2/` returns nothing.
+- `fontWeight: [0-4][0-9][0-9]` in `src/features/post-v2/` returns nothing.
+- `git diff -- src/features/review-v2/` is empty.
+- TypeScript build passes.
 
-This fixes every non-PGA tour immediately, without any new sync.
-
-### Part B — Per-tour World Rank (Rolex for LPGA, WGR otherwise)
-
-1. **Schema**: add `ranking_type text` (`'wgr'` | `'rolex'`) to `sr_world_rankings`, backfill existing rows to `'wgr'`, and change the unique constraint to `(player_id, ranking_date, ranking_type)`.
-2. **Sync**: extend `sportradar-sync` `rankings` action to accept a `rankingType` param and hit the correct endpoint:
-   - `wgr` → `/players/wgr/{year}/rankings.json` (unchanged)
-   - `rolex` → `/players/rolex/{year}/rankings.json`
-   Stamp each row with the correct `ranking_type`.
-3. **Cron**: add a scheduled Rolex sync alongside the existing WGR sync.
-4. **generate-predictions**: pick the ranking source per tournament — LPGA tour ⇒ `rolex`, otherwise ⇒ `wgr` — when building `rankingsMap`. Everything downstream (`worldRanking`, `priorRank`, momentum) then reflects the right board.
-5. Kick off a one-off Rolex sync for 2026 so the LPGA sheets aren't blank until the next scheduled run.
-
-### Files touched
-
-- `src/features/tourhub/overview/sections/TIPicksCarousel.tsx` — read derived wins/top10s.
-- `src/features/tourhub/hooks/useSeasonResultsSummary.ts` — new hook.
-- `supabase/migrations/*` — add `ranking_type` + unique index change.
-- `supabase/functions/sportradar-sync/index.ts` — Rolex branch + `rankingType` param.
-- `supabase/functions/generate-predictions/index.ts` — per-tour ranking source; bump `PREDICTION_LOGIC_VERSION` to 3.
-- `src/features/tourhub/lib/predictionLogicVersion.ts` — bump to 3.
-- Cron entry for Rolex weekly sync.
-
-### Out of scope (flag for later)
-
-- Ingesting full LPGA player statistics (`sr_player_statistics` for LPGA) — needs a separate season-stats sync path per tour. Once shipped, the Part-A fallback quietly hands over to real stats without any UI change.
-
-Confirm and I'll ship all of the above in one pass.
+## Risks / notes
+- The OS picker must be triggered synchronously from the nav tap to satisfy iOS WKWebView user-activation rules.
+- Long-press-drag reorder may be flaky in WebView; brief allows fallback to tap-to-promote if needed. I will implement long-press-drag and report.
+- Device-only cases (picker timing, background upload survival) cannot be verified in the sandbox; they will be flagged for QA.
