@@ -357,7 +357,20 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const showSearchField = showList; // per brief: search only when list non-empty
   const searchActive = q.trim().length >= 2;
 
-  const listItems = useMemo<UserAnalyticsCourse[]>(() => myCourses, [myCourses]);
+  // Sorted CLIENT-SIDE, not in the RPC: gam_user_courses is shared with the
+  // Phase C rail and the Phase E chip provider, which want most-played first.
+  // Nulls last, ties broken on rounds so a same-day pair is stable.
+  const listItems = useMemo<UserAnalyticsCourse[]>(() => {
+    return [...myCourses].sort((a, b) => {
+      const ta = a.last_played ? Date.parse(a.last_played) : null;
+      const tb = b.last_played ? Date.parse(b.last_played) : null;
+      if (ta == null && tb == null) return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
+      if (ta == null) return 1;
+      if (tb == null) return -1;
+      if (tb !== ta) return tb - ta;
+      return (b.rounds_count ?? 0) - (a.rounds_count ?? 0);
+    });
+  }, [myCourses]);
 
   /**
    * The member's own baseline: shots over par per round, WEIGHTED by rounds.
