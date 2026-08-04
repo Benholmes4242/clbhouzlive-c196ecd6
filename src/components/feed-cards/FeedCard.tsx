@@ -60,6 +60,7 @@ export function FeedCard({
   hideFormatBadge = false,
   bareTile = false,
   readOnlyFullscreen = false,
+  hideLikeCount = false,
 }: {
 
   row: FeedCardRow;
@@ -102,6 +103,9 @@ export function FeedCard({
    *  comment, share or follow chrome. Used by course-detail surfaces.
    *  Watch surfaces must NOT set this. */
   readOnlyFullscreen?: boolean;
+  /** Suppress the like-count overlay / meta figure on the tile. Opt-in;
+   *  used by the course-details Media tab. Watch surfaces must NOT set it. */
+  hideLikeCount?: boolean;
 }) {
 
 
@@ -296,7 +300,7 @@ export function FeedCard({
             </div>
           </>
         ) : null}
-        {bareTile && row.like_count > 0 ? (
+        {bareTile && !hideLikeCount && row.like_count > 0 ? (
           <div
             style={{
               position: 'absolute',
@@ -364,7 +368,7 @@ export function FeedCard({
               </span>
             ) : null}
 
-            {row.like_count > 0 && (
+            {!hideLikeCount && row.like_count > 0 && (
               <span
                 style={{
                   display: 'inline-flex',
