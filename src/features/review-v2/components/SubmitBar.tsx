@@ -32,12 +32,12 @@ export function SubmitBar({ label, enabled, onPress }: Props) {
           padding: 16,
           borderRadius: 14,
           border: 'none',
-          background: enabled ? RV2.amber : 'rgba(15,23,42,0.10)',
-          color: enabled ? '#FFFFFF' : RV2.secondary,
+          background: enabled ? RV2.dark : 'rgba(15,23,42,0.10)',
+          color: enabled ? RV2.onDark : RV2.secondary,
           fontSize: 14.5,
           fontWeight: 700,
           cursor: enabled ? 'pointer' : 'not-allowed',
-          boxShadow: enabled ? '0 6px 16px rgba(247,147,30,0.28)' : 'none',
+          boxShadow: enabled ? '0 6px 16px rgba(21,23,31,0.22)' : 'none',
           transition: 'background 160ms, color 160ms',
         }}
       >

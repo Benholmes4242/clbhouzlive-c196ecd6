@@ -656,7 +656,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                 height: 3,
                 borderRadius: 999,
                 marginBottom: 6,
-                background: i <= step ? RV2.amber : 'rgba(15,23,42,0.10)',
+                background: i <= step ? RV2.amberDeep : 'rgba(15,23,42,0.10)',
               }}
             />
             <div
@@ -772,7 +772,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                 style={{
                   fontSize: 10.5,
                   fontWeight: 700,
-                  color: RV2.amber,
+                  color: RV2.amberDeep,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
                 }}
