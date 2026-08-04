@@ -1,15 +1,11 @@
 import React from 'react';
 import { AnimatedEchoWave } from './AnimatedEchoWave';
+import { useEchoSuggestions } from '../hooks/useEchoSuggestions';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
-const SUGGESTIONS = [
-  'How do I play firm links greens?',
-  'Who is in form this week?',
-  'Compare two courses for a trip',
-];
 
 interface Props {
   onPick: (prompt: string) => void;
@@ -17,7 +13,9 @@ interface Props {
 }
 
 export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
+  const { suggestions, isLoading } = useEchoSuggestions();
   return (
+
     <div
       style={{
         flex: 1,
@@ -51,12 +49,12 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
         </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', maxWidth: 360, marginTop: 4 }}>
-        {SUGGESTIONS.map((s) => (
+        {(isLoading ? ['', '', ''] : suggestions).map((s, i) => (
           <button
-            key={s}
+            key={s || `ghost-${i}`}
+            disabled={disabled || isLoading || !s}
             type="button"
-            onClick={() => !disabled && onPick(s)}
-            disabled={disabled}
+            onClick={() => { if (!disabled && s) onPick(s); }}
             className="active:opacity-70"
             style={{
               background: '#FFFFFF',
@@ -66,11 +64,13 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
               fontSize: 12.5,
               color: INK,
               textAlign: 'left',
-              cursor: disabled ? 'default' : 'pointer',
+              minHeight: 43,
+              cursor: disabled || isLoading ? 'default' : 'pointer',
               boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
             }}
           >
             {s}
+
           </button>
         ))}
       </div>

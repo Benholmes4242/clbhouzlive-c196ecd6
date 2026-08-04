@@ -43,6 +43,7 @@ if (!i18n.isInitialized) {
         'courses',
         'tourhub',
         'handicap',
+        'echo',
       ],
       load: 'languageOnly',
       // React already escapes.
