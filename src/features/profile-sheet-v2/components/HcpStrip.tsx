@@ -51,14 +51,6 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     ).length;
   }, [scores]);
 
-  const coursesPlayed = useMemo<number | null>(() => {
-    if (!scores) return null;
-    const ids = new Set<string>();
-    for (const s of scores) {
-      if (s.course_id) ids.add(s.course_id);
-    }
-    return ids.size;
-  }, [scores]);
 
   if (isBusiness) return null;
 
@@ -99,16 +91,19 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
   // different causes. Do NOT "fix" this to the generic rule — that inverts the
   // meaning.
   const rounded = delta90 == null ? null : Math.round(delta90 * 10) / 10;
-  let deltaSub: string;
+  let deltaValue: string | null;
   let deltaTone: string;
-  if (rounded == null || rounded === 0) {
-    deltaSub = t('profileSheet.levelNinety');
+  if (rounded == null) {
+    deltaValue = null;
+    deltaTone = A.DIM;
+  } else if (rounded === 0) {
+    deltaValue = '0.0';
     deltaTone = A.DIM;
   } else if (rounded > 0) {
-    deltaSub = t('profileSheet.deltaNinety', { delta: `+${rounded.toFixed(1)}` });
+    deltaValue = `+${rounded.toFixed(1)}`;
     deltaTone = A.OVER;
   } else {
-    deltaSub = t('profileSheet.deltaNinety', { delta: `\u2212${Math.abs(rounded).toFixed(1)}` });
+    deltaValue = `\u2212${Math.abs(rounded).toFixed(1)}`;
     deltaTone = A.UNDER;
   }
 
@@ -147,21 +142,21 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
               {
                 label: t('profileSheet.handicap'),
                 value: indexText,
-                sub: deltaSub,
-                subTone: deltaTone,
+                sub: t('profileSheet.current'),
               },
-              ...(rounds90d != null
+              ...(rounds90d
                 ? [{
                     label: t('profileSheet.rounds'),
                     value: rounds90d,
                     sub: t('profileSheet.ninetyDays'),
                   }]
                 : []),
-              ...(coursesPlayed
+              ...(deltaValue != null
                 ? [{
-                    label: t('profileSheet.courses'),
-                    value: coursesPlayed,
-                    sub: t('profileSheet.allTime'),
+                    label: t('profileSheet.indexMove'),
+                    value: deltaValue,
+                    tone: deltaTone,
+                    sub: t('profileSheet.ninetyDays'),
                   }]
                 : []),
             ]}
