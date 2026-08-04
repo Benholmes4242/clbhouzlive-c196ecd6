@@ -1,4 +1,5 @@
 import React from 'react';
+import { ContourField } from '@/components/shared/ContourField';
 import { AnimatedEchoWave } from './AnimatedEchoWave';
 import { useEchoSuggestions } from '../hooks/useEchoSuggestions';
 
@@ -19,14 +20,20 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
     <div
       style={{
         flex: 1,
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        // Anchored near the top on purpose: centred in a tall canvas the block
+        // floats in a void. The dead space consolidates at the bottom, where
+        // the composer already sits.
+        justifyContent: 'flex-start',
         gap: 16,
-        padding: '32px 24px',
+        padding: '28px 24px 32px',
       }}
     >
+      {/* Empty state only — the canvas is plain the moment a chat starts. */}
+      <ContourField opacity={0.035} />
       <div
         style={{
           width: 64,
@@ -45,7 +52,7 @@ export const EchoWelcome: React.FC<Props> = ({ onPick, disabled }) => {
           Ask Echo anything golf
         </span>
         <span style={{ fontSize: 12.5, color: SUB }}>
-          Course intel, player form, your game
+          Course intel, player form, tour news
         </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', maxWidth: 360, marginTop: 4 }}>
