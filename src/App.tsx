@@ -288,7 +288,6 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 
 const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
-const TestAnalyticsSheetPage = lazy(() => import("./pages/TestAnalyticsSheetPage"));
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
