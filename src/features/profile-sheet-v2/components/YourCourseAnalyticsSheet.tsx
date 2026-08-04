@@ -209,7 +209,7 @@ function AnalyticsCourseRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 62px 16px',
+        gridTemplateColumns: '1fr 16px 62px',
         gap: '0 10px',
         alignItems: 'end',
         minWidth: 0,
@@ -246,17 +246,36 @@ function AnalyticsCourseRow({
         </div>
       </div>
 
-      {avgVal != null && (
-        <div style={{ width: 62, textAlign: 'center', minWidth: 0 }}>
-          <div style={{ ...NUM, fontSize: 17, color: A.INK }}>{fmtSigned(avgVal, 1)}</div>
-          <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.avgToPar')}</div>
-        </div>
-      )}
-
       {!hasScoring && (
-        <span style={{ color: A.DIM, fontSize: 16, lineHeight: 1.2, alignSelf: 'start' }}>
+        <span
+          style={{
+            color: A.DIM,
+            fontSize: 16,
+            lineHeight: 1.2,
+            alignSelf: 'start',
+            gridColumn: avgVal != null ? 2 : 3,
+          }}
+        >
           {CHEVRON}
         </span>
+      )}
+
+      {avgVal != null && (
+        <div style={{ width: 62, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
+          <div style={{ fontWeight: 800, fontSize: 13.5, color: A.INK }}>
+            {fmtSigned(avgVal, 1)}
+          </div>
+          <div
+            style={{
+              ...LABEL,
+              letterSpacing: '0.06em',
+              color: A.MUTE,
+              marginTop: 3,
+            }}
+          >
+            {t('yourCourses.avgToPar')}
+          </div>
+        </div>
       )}
 
       {hasScoring && (
