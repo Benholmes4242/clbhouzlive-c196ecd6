@@ -584,11 +584,16 @@ async function scrapeKornFerry(browser, supabase) {
       return;
     }
 
+    // The Korn Ferry points list publishes rank and points ONLY - no events,
+    // no wins, no movement column (verified against the live page). Wins are
+    // filled afterwards by the populate_tour_ranking_wins RPC; events stay
+    // null rather than invented.
     const rows = players.map(p => ({
       player_name: p.name,
       tour_code: KFT_TOUR_CODE,
       season_year: KFT_SEASON_YEAR,
       position: p.position,
+      position_change: null,
       points: p.points,
       tournaments_played: null,
       country: null,
@@ -596,6 +601,11 @@ async function scrapeKornFerry(browser, supabase) {
       scraped_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }));
+
+    // BEFORE the upsert - reads last run's positions.
+    await attachMovement(supabase, KFT_TOUR_CODE, KFT_SEASON_YEAR, rows, 'KFT Scraper');
+
+
 
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 50) {
