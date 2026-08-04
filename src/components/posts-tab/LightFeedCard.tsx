@@ -18,7 +18,7 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';

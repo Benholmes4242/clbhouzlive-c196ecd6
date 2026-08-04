@@ -23,14 +23,48 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 
-const T100 = '#F8FAFC';
-const T60 = 'rgba(248,250,252,0.62)';
-const T40 = 'rgba(248,250,252,0.42)';
-const T28 = 'rgba(248,250,252,0.28)';
-const RED = '#EF4444';
-const GREEN = '#5EE9A6';
-const AMBER = '#F7931E';
-const LINE = 'rgba(255,255,255,0.10)';
+/**
+ * TONE MAP — the band renders on the dark Clubhouse slab AND on the light
+ * profile feed. Every text, chevron, separator and difficulty-tail colour
+ * resolves through here; nothing in the band hardcodes a colour.
+ * The dark column is the shipped set verbatim, so dark stays pixel-identical.
+ */
+export type CourseBandTone = 'dark' | 'light';
+
+interface ToneMap {
+  ink: string;
+  mute: string;
+  dim: string;
+  faint: string;
+  hairline: string;
+  over: string;
+  under: string;
+  bestFigure: string;
+}
+
+const TONES: Record<CourseBandTone, ToneMap> = {
+  dark: {
+    ink: '#F8FAFC',
+    mute: 'rgba(248,250,252,0.62)',
+    dim: 'rgba(248,250,252,0.42)',
+    faint: 'rgba(248,250,252,0.28)',
+    hairline: 'rgba(255,255,255,0.10)',
+    over: '#EF4444',
+    under: '#5EE9A6',
+    bestFigure: '#F7931E',
+  },
+  light: {
+    ink: '#0E1216',
+    mute: '#68707B',
+    dim: '#A2A9B2',
+    faint: '#A2A9B2',
+    hairline: 'rgba(14,18,22,0.08)',
+    over: '#C8372B',
+    under: '#0F8F4A',
+    // ~13px figure on white: amber-DEEP per the contrast rule, not #F7931E.
+    bestFigure: '#C2620A',
+  },
+};
 /** Solid feed card surface, used to keep the actions row off the photo backdrop. */
 const OPAQUE_SURFACE = '#10151C';
 
@@ -53,7 +87,6 @@ const figureLabelStyle: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.07em',
   textTransform: 'uppercase',
-  color: T40,
   lineHeight: 1,
   whiteSpace: 'nowrap',
 };
@@ -77,7 +110,9 @@ export interface CourseBandFigure {
 export function pickCourseBandFigure(
   ctx: PostCourseContext | null | undefined,
   t: (key: string, opts?: Record<string, unknown>) => string,
+  tone: CourseBandTone = 'dark',
 ): CourseBandFigure | null {
+  const C = TONES[tone];
   const rounds = ctx?.rounds_tracked ?? 0;
   if (!ctx || rounds <= 0) return null;
 
@@ -86,7 +121,7 @@ export function pickCourseBandFigure(
       key: 'your-best',
       figure: String(ctx.your_best),
       label: t('feed.courseBand.yourBestHere'),
-      color: AMBER,
+      color: C.bestFigure,
     };
   }
 
@@ -96,7 +131,7 @@ export function pickCourseBandFigure(
       figure: String(rounds),
       // count is passed as a NUMBER so i18next can pluralise (_one/_other).
       label: t('feed.courseBand.roundTracked', { count: rounds }),
-      color: T60,
+      color: C.mute,
     };
   }
 
@@ -112,17 +147,17 @@ export function pickCourseBandFigure(
     label = t('feed.courseBand.topHardest', {
       pct: Math.max(1, 100 - ctx.harder_than_pct),
     });
-    color = RED;
+    color = C.over;
   } else if (ctx.harder_than_pct <= EASY_TAIL) {
     label = t('feed.courseBand.topEasiest', {
       pct: Math.max(1, ctx.harder_than_pct),
     });
-    color = GREEN;
+    color = C.under;
   } else {
     // Between the tails a percentile states nothing, so it is withheld and the
     // sample size takes the slot instead.
     label = t('feed.courseBand.roundTracked', { count: rounds });
-    color = T60;
+    color = C.mute;
   }
 
   return {
@@ -148,6 +183,10 @@ interface Props {
   extra?: React.ReactNode;
   /** 'glass' when the card carries a photo backdrop. Default 'solid'. */
   surface?: 'solid' | 'glass';
+  /** Host surface palette. Default 'dark' (Clubhouse slab); the light profile
+   *  feed passes 'light'. Named `tone` because `surface` already means
+   *  solid-vs-glass (media context), which is an orthogonal question. */
+  tone?: CourseBandTone;
 }
 
 export const PostCourseBand: React.FC<Props> = ({
@@ -159,11 +198,13 @@ export const PostCourseBand: React.FC<Props> = ({
   actions,
   extra,
   surface = 'solid',
+  tone = 'dark',
 }) => {
   const { t } = useTranslation('common');
+  const C = TONES[tone];
 
   const hasYourBest = (ctx?.your_rounds ?? 0) > 0 && ctx?.your_best != null;
-  const figure = pickCourseBandFigure(ctx, t);
+  const figure = pickCourseBandFigure(ctx, t, tone);
 
   // Prefer ctx: it is keyed off resolvePostCourseId (course_id, else the first
   // golf_club tag), which is the SAME course line 2's figures describe. The
@@ -201,7 +242,7 @@ export const PostCourseBand: React.FC<Props> = ({
           fontWeight: 800,
           letterSpacing: '-0.015em',
           lineHeight: 1.05,
-          color: T100,
+          color: C.ink,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -231,7 +272,7 @@ export const PostCourseBand: React.FC<Props> = ({
               fontFamily: MONO,
               fontVariantNumeric: 'tabular-nums',
               fontWeight: 800,
-              color: T60,
+              color: C.mute,
               lineHeight: 1,
             }}
           >
@@ -266,7 +307,7 @@ export const PostCourseBand: React.FC<Props> = ({
             style={{
               fontSize: 12,
               lineHeight: 1,
-              color: T40,
+              color: C.dim,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -289,7 +330,7 @@ export const PostCourseBand: React.FC<Props> = ({
           }}
         >
           {figure.prefix ? (
-            <span style={{ ...figureLabelStyle, color: T28 }}>
+            <span style={{ ...figureLabelStyle, color: C.faint }}>
               {figure.prefix}
             </span>
           ) : null}
@@ -297,18 +338,18 @@ export const PostCourseBand: React.FC<Props> = ({
             {figure.figure}
           </span>
           {figure.prefix ? (
-            <span style={{ ...figureLabelStyle, color: T28, fontSize: 11 }}>
+            <span style={{ ...figureLabelStyle, color: C.faint, fontSize: 11 }}>
               {'\u00B7'}
             </span>
           ) : null}
-          <span style={figureLabelStyle}>{figure.label}</span>
+          <span style={{ ...figureLabelStyle, color: C.dim }}>{figure.label}</span>
         </div>
       )}
 
       {tappable && (
         <ChevronRight
           size={16}
-          color={T40}
+          color={C.dim}
           // Optical alignment with the community rating on line 1. lucide
           // leaves ~5px of dead space right of the glyph inside its 16px box,
           // so the box edges align but the ink does not. Pull it out by 4.
@@ -336,7 +377,7 @@ export const PostCourseBand: React.FC<Props> = ({
     <div
       style={{
         background: 'transparent',
-        borderTop: `1px solid ${LINE}`,
+        borderTop: `1px solid ${C.hairline}`,
       }}
     >
       {tappable ? (
@@ -362,7 +403,7 @@ export const PostCourseBand: React.FC<Props> = ({
           backdrop stops here. */}
       <div
         style={{
-          borderTop: `1px solid ${LINE}`,
+          borderTop: `1px solid ${C.hairline}`,
           background: glass ? OPAQUE_SURFACE : undefined,
         }}
       >
