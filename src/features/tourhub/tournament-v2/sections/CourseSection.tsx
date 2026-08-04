@@ -73,7 +73,7 @@ export function CourseSection({ tournamentId }: Props) {
   };
 
   return (
-    <div style={{ padding: '0 16px 4px' }}>
+    <div style={{ padding: '0 16px 4px', marginTop: 16 }}>
       <Panel
         kicker={t('tournament.course.title', { ns: 'tourhub' })}
         aside={t('tournament.course.fromPlayers', {
