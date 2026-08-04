@@ -140,7 +140,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
       }}
     >
       <div style={{ maxWidth: 440, width: '100%', margin: '0 auto' }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#F7931E', fontWeight: 600, marginBottom: 12 }}>
+        <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.62)', fontWeight: 600, marginBottom: 12 }}>
           Account status
         </div>
         <h1 style={{ fontSize: 28, lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.01em', margin: 0, marginBottom: 12 }}>

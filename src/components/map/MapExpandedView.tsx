@@ -239,7 +239,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           style={{ padding: '6px 16px 12px' }}
         >
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C2620A' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
               {t('map.kicker')}
             </div>
             <div style={{ fontSize: 17, fontWeight: 800, color: '#0E1216', marginTop: 3, letterSpacing: '-0.01em' }}>
@@ -290,7 +290,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
               <span style={{ fontSize: 14, fontWeight: 700, color: '#0E1216' }}>{d.label}</span>
               <span
                 aria-hidden="true"
-                style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.13em', color: '#C2620A' }}
+                style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.13em', color: '#0E1216' }}
               >
                 {'\u2197'}
               </span>

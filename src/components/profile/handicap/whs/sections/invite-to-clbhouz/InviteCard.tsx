@@ -139,7 +139,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           fontWeight: 800,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
-          color: '#F7931E',
+          color: 'rgba(255,255,255,0.62)',
         }}
       >
         Invite

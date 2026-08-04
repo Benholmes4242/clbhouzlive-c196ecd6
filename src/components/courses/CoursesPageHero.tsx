@@ -207,7 +207,7 @@ function CoursesPageHeroInner() {
                   fontWeight: 800,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  color: '#F7931E',
+                  color: 'rgba(255,255,255,0.62)',
                   marginBottom: 8,
                   fontFeatureSettings: '"tnum" 1',
                 }}
