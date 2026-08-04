@@ -619,6 +619,102 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     );
   }
 
+  const sheets = (
+    <>
+        {/* Sheets */}
+        <CourseTagSheet
+          open={sheet === 'course'}
+          onClose={() => setSheet(null)}
+          onDone={setCourses}
+          selected={state.courses}
+          userId={profile?.id ?? null}
+        />
+        <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
+  
+        <ScheduleSheetV2
+          open={sheet === 'schedule'}
+          onClose={() => setSheet(null)}
+          value={state.scheduledAt}
+          onChange={setScheduledAt}
+          onOpenScheduled={() => setSheet('scheduled')}
+          scheduledCount={scheduledCount}
+        />
+        <DraftsSheetV2
+          open={sheet === 'drafts'}
+          onClose={() => setSheet(null)}
+          drafts={drafts.drafts}
+          onRestore={(d) => {
+            const primary = d.course_id && d.course_name
+              ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
+              : null;
+            const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
+            const savedCourses = cd?.courses ?? [];
+            const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
+            restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
+            setRestoredDraftId(d.id);
+          }}
+          onDelete={drafts.remove}
+        />
+        <ScheduledPostsSheetV2
+          open={sheet === 'scheduled'}
+          onClose={() => setSheet(null)}
+          userId={profile?.id}
+          onCountChange={setScheduledCount}
+        />
+        <CoverFrameSheet
+          open={sheet === 'cover'}
+          onClose={() => setSheet(null)}
+          item={active}
+          onApply={(ts) => updateActive({ posterTimestamp: ts })}
+        />
+        <AdjustSheet
+          open={sheet === 'adjust'}
+          onClose={() => setSheet(null)}
+          item={active}
+          onApply={(crop) => updateActive({ crop })}
+        />
+  
+        {/* More options sheet */}
+        <BottomSheet open={sheet === 'more'} onClose={() => setSheet(null)} title="Options">
+          <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              onClick={() => setSheet('schedule')}
+              style={moreRowStyle}
+            >
+              <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Schedule post</span>
+              {state.scheduledAt && <span style={{ fontSize: 12, color: CT_DARK.amber }}>Set</span>}
+            </button>
+            {!isEditMode && (
+              <button
+                onClick={() => setSheet('drafts')}
+                style={moreRowStyle}
+              >
+                <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
+                {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
+              </button>
+            )}
+          </div>
+        </BottomSheet>
+  
+        {/* Close guard */}
+        <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {!isEditMode && (
+              <>
+                {state.media.length > 0 && (
+                  <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
+                    {t('closeGuard.mediaNotSaved', { count: state.media.length })}
+                  </div>
+                )}
+                <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
+              </>
+            )}
+            <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
+          </div>
+        </BottomSheet>
+    </>
+  );
+
   const courseNames = state.courses.map((c) => c.name).join(' · ');
   const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
   const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
@@ -849,100 +945,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   );
 }
 
-      {/* Sheets */}
-      <CourseTagSheet
-        open={sheet === 'course'}
-        onClose={() => setSheet(null)}
-        onDone={setCourses}
-        selected={state.courses}
-        userId={profile?.id ?? null}
-      />
-      <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
-
-      <ScheduleSheetV2
-        open={sheet === 'schedule'}
-        onClose={() => setSheet(null)}
-        value={state.scheduledAt}
-        onChange={setScheduledAt}
-        onOpenScheduled={() => setSheet('scheduled')}
-        scheduledCount={scheduledCount}
-      />
-      <DraftsSheetV2
-        open={sheet === 'drafts'}
-        onClose={() => setSheet(null)}
-        drafts={drafts.drafts}
-        onRestore={(d) => {
-          const primary = d.course_id && d.course_name
-            ? { id: d.course_id, name: d.course_name, country: d.course_country ?? null }
-            : null;
-          const cd = (d as unknown as { course_data?: { courses?: Array<{ id: string; name: string; country: string | null }> } }).course_data ?? null;
-          const savedCourses = cd?.courses ?? [];
-          const courses = savedCourses.length > 0 ? savedCourses : (primary ? [primary] : []);
-          restoreDraft({ caption: d.content ?? '', course: courses[0] ?? null, courses });
-          setRestoredDraftId(d.id);
-        }}
-        onDelete={drafts.remove}
-      />
-      <ScheduledPostsSheetV2
-        open={sheet === 'scheduled'}
-        onClose={() => setSheet(null)}
-        userId={profile?.id}
-        onCountChange={setScheduledCount}
-      />
-      <CoverFrameSheet
-        open={sheet === 'cover'}
-        onClose={() => setSheet(null)}
-        item={active}
-        onApply={(ts) => updateActive({ posterTimestamp: ts })}
-      />
-      <AdjustSheet
-        open={sheet === 'adjust'}
-        onClose={() => setSheet(null)}
-        item={active}
-        onApply={(crop) => updateActive({ crop })}
-      />
-
-      {/* More options sheet */}
-      <BottomSheet open={sheet === 'more'} onClose={() => setSheet(null)} title="Options">
-        <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button
-            onClick={() => setSheet('schedule')}
-            style={moreRowStyle}
-          >
-            <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Schedule post</span>
-            {state.scheduledAt && <span style={{ fontSize: 12, color: CT_DARK.amber }}>Set</span>}
-          </button>
-          {!isEditMode && (
-            <button
-              onClick={() => setSheet('drafts')}
-              style={moreRowStyle}
-            >
-              <span style={{ fontSize: 15, fontWeight: 600, color: CT_DARK.ink }}>Drafts</span>
-              {drafts.drafts.length > 0 && <span style={{ fontSize: 12, color: CT_DARK.mute }}>{drafts.drafts.length}</span>}
-            </button>
-          )}
-        </div>
-      </BottomSheet>
-
-      {/* Close guard */}
-      <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {!isEditMode && (
-            <>
-              {state.media.length > 0 && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
-                  {t('closeGuard.mediaNotSaved', { count: state.media.length })}
-                </div>
-              )}
-              <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
-            </>
-          )}
-          <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
-        </div>
-      </BottomSheet>
-    </div>
-  );
-}
 
 const closeButtonStyle: React.CSSProperties = {
   width: 32,
