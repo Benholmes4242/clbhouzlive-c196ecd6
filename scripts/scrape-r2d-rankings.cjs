@@ -367,10 +367,33 @@ async function scrapeLPGA(browser, supabase) {
           if (/^[A-Z]{3}$/.test(v)) { country = v; break; }
         }
 
+        // EVENTS and WINS are on the page and were previously ignored.
+        // Row reads: RANK | movement | ATHLETE | CTY | CME POINTS | POINTS
+        // BEHIND | EVENTS | WINS | TOP 10S | PROJECTED POINTS | PROJECTED RANK
+        // Anchor on the CME points cell (3 decimal places), skip POINTS BEHIND
+        // (also 3dp), then read the two plain integers that follow.
+        let events = null;
+        let wins = null;
+        const lines = (row.innerText || '').split('\n').map(s => s.trim()).filter(Boolean);
+        const anchor = lines.findIndex(v => /^[\d,]+\.\d{3}$/.test(v));
+        if (anchor !== -1 && /^[\d,]+\.\d{3}$/.test(lines[anchor + 1] || '')) {
+          const ev = lines[anchor + 2];
+          const wn = lines[anchor + 3];
+          if (/^\d{1,2}$/.test(ev || '')) {
+            const n = parseInt(ev, 10);
+            if (n >= 0 && n <= 60) events = n;
+          }
+          if (/^\d{1,2}$/.test(wn || '')) {
+            const n = parseInt(wn, 10);
+            if (n >= 0 && n <= 30) wins = n;
+          }
+        }
+
         if (rank && name && points !== null) {
           seen.add(name);
-          data.push({ position: rank, name, country, points });
+          data.push({ position: rank, name, country, points, events, wins });
         }
+
       });
 
       data.sort((a, b) => a.position - b.position || b.points - a.points);
