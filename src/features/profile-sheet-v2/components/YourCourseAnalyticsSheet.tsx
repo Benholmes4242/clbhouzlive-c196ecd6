@@ -206,63 +206,77 @@ function AnalyticsCourseRow({
   const segTotal = segs.reduce((s, x) => s + (x.pct ?? 0), 0) || 1;
 
   const body = (
-    <>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontWeight: 800,
-              fontSize: 13.5,
-              color: A.INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {course.course_name}
-          </div>
-          <div
-            style={{
-              ...LABEL,
-              color: A.MUTE,
-              marginTop: 4,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {meta}
-          </div>
-          {hasScoring && (
-            <span
-              style={{
-                marginTop: 9,
-                height: 5,
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                background: A.TRACK,
-              }}
-            >
-              {segs.map((s) => (
-                <i key={s.key} style={{ width: `${((s.pct ?? 0) / segTotal) * 100}%`, background: s.bg }} />
-              ))}
-            </span>
-          )}
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 62px 16px',
+        gap: '0 10px',
+        alignItems: 'end',
+        minWidth: 0,
+      }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontWeight: 800,
+            fontSize: 13.5,
+            color: A.INK,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {course.course_name}
         </div>
-
-        {avgVal != null && (
-          <div style={{ width: 62, flex: '0 0 62px', textAlign: 'right' }}>
-            <div style={{ ...NUM, fontSize: 17, color: A.INK }}>{fmtSigned(avgVal, 1)}</div>
-            <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.avgToPar')}</div>
-          </div>
-        )}
-
-        {!hasScoring && (
-          <span style={{ color: A.DIM, fontSize: 16, flexShrink: 0, lineHeight: 1.2 }}>{CHEVRON}</span>
-        )}
+        <div
+          style={{
+            ...LABEL,
+            // The shared LABEL tracking (0.13em) is tuned for two- or three-word
+            // captions. This line runs to ~24 characters, where that tracking costs
+            // more width than the words do. Relaxed HERE ONLY.
+            letterSpacing: '0.06em',
+            color: A.MUTE,
+            marginTop: 4,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {meta}
+        </div>
       </div>
-    </>
+
+      {avgVal != null && (
+        <div style={{ width: 62, textAlign: 'center', minWidth: 0 }}>
+          <div style={{ ...NUM, fontSize: 17, color: A.INK }}>{fmtSigned(avgVal, 1)}</div>
+          <div style={{ ...LABEL, marginTop: 3 }}>{t('yourCourses.avgToPar')}</div>
+        </div>
+      )}
+
+      {!hasScoring && (
+        <span style={{ color: A.DIM, fontSize: 16, lineHeight: 1.2, alignSelf: 'start' }}>
+          {CHEVRON}
+        </span>
+      )}
+
+      {hasScoring && (
+        <span
+          style={{
+            gridColumn: '1 / -1',
+            marginTop: 9,
+            height: 5,
+            borderRadius: 3,
+            overflow: 'hidden',
+            display: 'flex',
+            background: A.TRACK,
+          }}
+        >
+          {segs.map((s) => (
+            <i key={s.key} style={{ width: `${((s.pct ?? 0) / segTotal) * 100}%`, background: s.bg }} />
+          ))}
+        </span>
+      )}
+    </div>
   );
 
   const shell: React.CSSProperties = {
