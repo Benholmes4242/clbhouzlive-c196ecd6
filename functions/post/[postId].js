@@ -6,7 +6,25 @@ import {
   canonicalUrl,
   clip,
   isUuid,
+  SUPABASE_URL,
 } from '../_lib/og.js';
+
+/**
+ * Deterministic public path for a round share card, or null when the card has
+ * not been generated yet. No blocking, no placeholder - the caller falls
+ * straight through to the existing image chain.
+ */
+async function roundShareCardUrl(postId) {
+  const url =
+    SUPABASE_URL + '/storage/v1/object/public/share-cards/round/' + postId + '.png';
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    return res.ok ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 
 function pickImage(media) {
   const list = (media || [])
@@ -40,12 +58,13 @@ export async function onRequest(context) {
   if (!isUuid(postId)) return genericDocument(request);
 
   const select =
-    'id,content,course_id,user_id,created_at,post_media(media_url,poster_url,media_type,display_order)';
+    'id,content,course_id,user_id,created_at,whs_score_id,post_media(media_url,poster_url,media_type,display_order)';
   const rows = await restSelect(
     `posts?select=${encodeURIComponent(select)}&id=eq.${postId}&limit=1`,
   );
   const post = rows[0];
   if (!post) return genericDocument(request);
+
 
   const [authors, courses] = await Promise.all([
     post.user_id
@@ -74,7 +93,12 @@ export async function onRequest(context) {
     else if (date) description = `Posted on clbhouz - ${date}`;
   }
 
-  const image = pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+  // A round post with a generated share card leads the chain; anything else
+  // keeps the existing behaviour (first media, then the course thumbnail).
+  const roundCard = post.whs_score_id ? await roundShareCardUrl(post.id) : null;
+  const image =
+    roundCard || pickImage(post.post_media) || (course && course.thumbnail_image) || null;
+
 
   if (!title && !description && !image) return genericDocument(request);
 

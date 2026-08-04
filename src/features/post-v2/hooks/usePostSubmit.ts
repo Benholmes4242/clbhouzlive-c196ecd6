@@ -132,6 +132,17 @@ export function usePostSubmit() {
         if (tagErr) console.warn('[post-v2] tag/round write failed:', tagErr);
       }
 
+      // Round share card: fire-and-forget. The link-preview layer falls back to
+      // the course thumbnail when the card is missing, so a failure here must
+      // never surface to the member or block the post.
+      if (input.whsScoreId) {
+        void supabase.functions
+          .invoke('generate-round-share-card', { body: { postId } })
+          .catch((e) => console.warn('[post-v2] share card generation skipped:', e));
+      }
+
+
+
 
       // Mention notifications: insert into the canonical public.mentions
       // pipeline (source_type='post'). The trg_create_mention_notification

@@ -237,3 +237,6 @@ verify_jwt = false
 
 [functions.weather-backfill-rounds]
 verify_jwt = false
+
+[functions.generate-round-share-card]
+verify_jwt = false
