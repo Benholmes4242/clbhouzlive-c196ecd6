@@ -1,5 +1,5 @@
 /**
- * CommentCard — one top-level comment rendered as a ROW (no card, no shadow,
+ * CommentCard - one top-level comment rendered as a ROW (no card, no shadow,
  * no radius). Rows are separated by a hairline; the first row has no top
  * border. Replies stay threaded in-row via ReplyRow.
  */

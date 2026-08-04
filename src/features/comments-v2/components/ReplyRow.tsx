@@ -1,5 +1,5 @@
 /**
- * ReplyRow — in-thread reply row. Same row treatment as CommentCard:
+ * ReplyRow - in-thread reply row. Same row treatment as CommentCard:
  * no background, no radius, no shadow; hairline separated, indented.
  */
 import { useNavigate } from 'react-router-dom';

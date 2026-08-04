@@ -1,10 +1,11 @@
 /**
- * CommentsSheetV2 — the ONE conversation-cards sheet for posts, top-ten cards,
+ * CommentsSheetV2 - the ONE comments sheet for posts, top-ten cards,
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light canvas #F8FAFC, amber eyebrow "CLBHOUZ CHAT", conversation
- * cards on white with hairline borders. Keyboard-aware via useKeyboardHeight.
+ * Design: light analytical surface. Canvas #F4F6F9, comments as hairline
+ * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
+ * Keyboard-aware via useKeyboardHeight.
  */
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -131,7 +132,7 @@ function CommentsSheetV2Inner({
     return () => clearTimeout(t);
   }, [isOpen, initialCommentId, isLoading, threads, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Infinite loader — bottom sentinel triggers "earlier" pages (newest-first).
+  // Infinite loader - bottom sentinel triggers "earlier" pages (newest-first).
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const s = sentinelRef.current;
@@ -204,7 +205,7 @@ function CommentsSheetV2Inner({
     }
   }, [addComment, replyingTo]);
 
-  // ── Render ──
+  // -- Render --
   const content = (
     <AnimatePresence>
       {isOpen && (

@@ -1,5 +1,5 @@
 /**
- * CommentComposer — docked composer with:
+ * CommentComposer - docked composer with:
  * - actor picker (personal / business) on the self-squircle
  * - pill input (MentionsComposerInput)
  * - image attach (compressed, uploaded to comment-images bucket)
