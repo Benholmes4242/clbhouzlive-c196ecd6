@@ -157,11 +157,11 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
                     sub: t('profileSheet.ninetyDays'),
                   }]
                 : []),
-              ...(coursesPlayed != null
+              ...(coursesPlayed
                 ? [{
                     label: t('profileSheet.courses'),
                     value: coursesPlayed,
-                    sub: t('profileSheet.played'),
+                    sub: t('profileSheet.allTime'),
                   }]
                 : []),
             ]}
