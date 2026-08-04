@@ -205,19 +205,8 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
 
   return (
     <div style={{ paddingTop: 10 }}>
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 10,
-        }}
-      >
+      <header style={{ marginBottom: 10 }}>
         {shortName ? <span style={headingStyle}>{shortName}</span> : null}
-        <span style={{ ...LABEL, flex: 'none', lineHeight: 1 }}>
-          {shortName ? t('top100.stats.courseStatsLabel') : t('top100.stats.heading')}
-        </span>
       </header>
 
       <div ref={difficultyRef}>
