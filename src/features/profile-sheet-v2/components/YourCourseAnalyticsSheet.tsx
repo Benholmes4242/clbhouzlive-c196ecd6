@@ -455,7 +455,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           analyticsEvents.track('course_analytics_row_expanded', {
             course_id: course.course_id,
             rounds: course.rounds_count,
-            delta_vs_baseline: delta == null ? 0 : Number(delta.toFixed(1)),
+            
           });
         }
         return next;
