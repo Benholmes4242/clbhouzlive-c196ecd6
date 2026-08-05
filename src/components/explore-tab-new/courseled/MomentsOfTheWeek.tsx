@@ -46,11 +46,13 @@ const SHORT = 106;
 
 interface Props {
   moments: Moment[];
+  /** Size of the full ranked list behind the sheet (mosaic is capped). */
+  totalCount?: number;
   onTilePress: (m: Moment) => void;
   onSeeAll: () => void;
 }
 
-export function MomentsOfTheWeek({ moments, onTilePress, onSeeAll }: Props) {
+export function MomentsOfTheWeek({ moments, totalCount, onTilePress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
   if (moments.length === 0) return null;
 
@@ -60,7 +62,7 @@ export function MomentsOfTheWeek({ moments, onTilePress, onSeeAll }: Props) {
     <section>
       <Eyebrow
         aside={
-          moments.length > shown.length ? (
+          (totalCount ?? moments.length) > shown.length ? (
             <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>
           ) : undefined
         }
