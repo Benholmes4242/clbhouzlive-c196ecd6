@@ -54,13 +54,15 @@ interface Props {
   onPosted?: () => void;
   /** Files already chosen by the nav picker before the composer opened. */
   initialMedia?: File[];
+  /** True while the native picker is still up: page 1 shows its awaiting state. */
+  awaitingMedia?: boolean;
   /** Edit mode: existing post id (owner-scoped). */
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], awaitingMedia = false, editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
