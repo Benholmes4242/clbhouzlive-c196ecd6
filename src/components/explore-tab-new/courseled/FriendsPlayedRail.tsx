@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { RoundFeatChips, featChipBase } from '../RoundFeatChips';
+import { featChipBase, useRoundFeatLabel } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import {
@@ -29,6 +29,9 @@ import {
 
 const RAIL_CAP = 10;
 
+/** Feats that render in gold on the glass badge. */
+const LEGENDARY_KEYS = new Set(['holes_in_one', 'albatrosses']);
+
 interface Props {
   userId: string | undefined;
   onCardPress: (row: FriendRoundRow) => void;
@@ -49,6 +52,7 @@ function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
 
 export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
+  const featLabel = useRoundFeatLabel();
   const { data: rounds } = useFriendsLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
@@ -71,11 +75,12 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
 
       <div
         className="scrollbar-hide"
-        style={{ display: 'flex', alignItems: 'flex-start', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
+        style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
       >
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
+          const topFeat = r.feats[0];
           return (
             <button
               key={r.round_id}
@@ -103,20 +108,55 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   style={{
                     position: 'absolute',
                     left: 10,
-                    right: 10,
+                    right: 7,
                     bottom: 7,
-                    fontSize: 12.5,
-                    fontWeight: 800,
-                    color: '#fff',
-                    letterSpacing: '-0.015em',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
+                  <span
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      fontSize: 12.5,
+                      fontWeight: 800,
+                      color: '#fff',
+                      letterSpacing: '-0.015em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
+                  </span>
+                  {topFeat && (
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '3px 8px',
+                        borderRadius: 999,
+                        background: 'rgba(10,14,10,0.55)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        fontSize: 8,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                        color: LEGENDARY_KEYS.has(topFeat.key) ? '#D8A93C' : '#fff',
+                      }}
+                    >
+                      {featLabel(topFeat)}
+                    </span>
+                  )}
                 </div>
               </CourseImageFallback>
+
 
               <div style={{ padding: '9px 11px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -176,19 +216,6 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                     </div>
                   )}
                 </div>
-                {r.feats.length > 0 && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      marginTop: 5,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <RoundFeatChips feats={r.feats} maxChips={1} />
-                  </div>
-                )}
               </div>
 
 
