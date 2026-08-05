@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface LatestRating {
+  /** course_ratings.id — the review the rating row opens. */
+  reviewId: string | null;
+  reviewText: string | null;
   rating: number;
   at: string;
   userId: string | null;
@@ -30,7 +33,7 @@ export function useCourseLatestRatings(courseIds: string[], windowDays = 90) {
       const since = new Date(Date.now() - windowDays * 86_400_000).toISOString();
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('course_id, rating, created_at, user_id')
+        .select('id, course_id, rating, created_at, user_id, review')
         .in('course_id', key)
         .eq('is_mock', false)
         .gte('created_at', since)
@@ -38,6 +41,8 @@ export function useCourseLatestRatings(courseIds: string[], windowDays = 90) {
       if (error) throw error;
 
       const rows = (data ?? []) as Array<{
+        id: string;
+        review: string | null;
         course_id: string;
         rating: number;
         created_at: string;
@@ -46,6 +51,8 @@ export function useCourseLatestRatings(courseIds: string[], windowDays = 90) {
       for (const r of rows) {
         if (out.has(r.course_id)) continue;
         out.set(r.course_id, {
+          reviewId: r.id ?? null,
+          reviewText: r.review ?? null,
           rating: Number(r.rating),
           at: r.created_at,
           userId: r.user_id ?? null,

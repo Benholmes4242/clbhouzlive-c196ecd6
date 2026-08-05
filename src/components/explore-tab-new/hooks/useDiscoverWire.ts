@@ -59,6 +59,8 @@ export interface WireEvent {
   holeNo?: number | null;
   holePar?: number | null;
   holeYards?: number | null;
+  /** Round this feat came from. Absent on older cache rows — row is then inert. */
+  scoreId?: string | null;
 }
 
 
@@ -173,6 +175,7 @@ function baseEvent(row: FeatRow, kind: WireKind, at: string, index: number, user
     courseId: row.course_id ?? null,
     courseName: row.course_name ?? null,
     courseImage: row.course_image ?? row.thumbnail_image ?? null,
+    scoreId: row.score_id ?? null,
   };
 }
 

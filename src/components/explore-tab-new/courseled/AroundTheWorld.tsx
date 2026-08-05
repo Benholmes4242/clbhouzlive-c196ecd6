@@ -2,6 +2,10 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PersonAvatar } from '@/components/shared/PersonAvatar';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useScorecardOpener } from '../useScorecardOpener';
 
 import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDiscoverWire';
 import { CourseImageFallback } from './CourseImageFallback';
@@ -69,6 +73,9 @@ export function AroundTheWorld({
 }: Props) {
   const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
+  const [pressed, setPressed] = useState<string | null>(null);
+  const opener = useScorecardOpener();
+  const openReview = useReviewSheetStore((st) => st.open);
 
   const groups = useMemo<CourseGroup[]>(() => {
     const byCourse = new Map<string, CourseGroup>();
@@ -161,6 +168,7 @@ export function AroundTheWorld({
   }
 
   return (
+    <>
     <section>
       <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
         {t('discover.aroundTheWorld', 'Around the world')}
@@ -192,6 +200,7 @@ export function AroundTheWorld({
               fig: string | null;
               figLabel: string;
               tone: string;
+              onPress?: () => void;
             }> = g.events.map((e) => ({
               key: e.id,
               name: nameFor(e),
@@ -202,6 +211,12 @@ export function AroundTheWorld({
               fig: e.figure ?? null,
               figLabel: figLabelFor(e),
               tone: toneFor(e.kind),
+              onPress: e.scoreId
+                ? () => {
+                    analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
+                    opener.openByScore(e.scoreId, null, e.userId);
+                  }
+                : undefined,
             }));
             if (rating) {
               rows.push({
@@ -214,6 +229,23 @@ export function AroundTheWorld({
                 fig: rating.rating.toFixed(1),
                 figLabel: t('discover.row.labelRating', 'RATING'),
                 tone: toneFor('rating'),
+                onPress: rating.reviewId
+                  ? () => {
+                      analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
+                      openReview({
+                        user: {
+                          id: rating.userId ?? '',
+                          name: rating.actorName?.trim() || t('discover.wire.you', 'You'),
+                          avatar: rating.actorAvatar ?? undefined,
+                        },
+                        courseId: g.courseId,
+                        courseName: m?.name ?? g.courseName ?? '',
+                        rating: rating.rating,
+                        reviewId: rating.reviewId,
+                        reviewText: rating.reviewText,
+                      });
+                    }
+                  : undefined,
               });
             }
 
@@ -268,12 +300,29 @@ export function AroundTheWorld({
                   {rows.map((r, i) => (
                     <div
                       key={r.key}
+                      role={r.onPress ? 'button' : undefined}
+                      tabIndex={r.onPress ? 0 : undefined}
+                      onClick={
+                        r.onPress
+                          ? (ev) => {
+                              ev.stopPropagation();
+                              r.onPress?.();
+                            }
+                          : undefined
+                      }
+                      onPointerDown={r.onPress ? () => setPressed(r.key) : undefined}
+                      onPointerUp={r.onPress ? () => setPressed(null) : undefined}
+                      onPointerLeave={r.onPress ? () => setPressed(null) : undefined}
+                      onPointerCancel={r.onPress ? () => setPressed(null) : undefined}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: 10,
                         padding: '9px 0',
                         borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
+                        cursor: r.onPress ? 'pointer' : 'default',
+                        opacity: r.onPress && pressed === r.key ? 0.62 : 1,
+                        transition: 'opacity 120ms ease',
                       }}
                     >
                       <PersonAvatar
@@ -353,6 +402,15 @@ export function AroundTheWorld({
         </div>
       )}
     </section>
+
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={opener.close}
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+      />
+    </>
   );
 }
 
