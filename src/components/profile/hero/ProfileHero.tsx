@@ -1,12 +1,11 @@
 /**
  * ProfileHero - BRIEF_PROFILE_HERO_AND_TOP10 section 1.
  *
- * One dark block (INK #0E1216) replacing six stacked light elements on the
- * personal profile: identity row, the INDEX headline with its 12-month trend,
- * a 12-month sparkline, and a four-cell counter strip.
- *
- * This is the app's ONLY dark block outside media chrome - a deliberate
- * exception to the light-only rule. Do not copy it elsewhere.
+ * The personal profile's mounting of the shared HeroShell: identity row, the
+ * INDEX headline with its 12-month trend, a 12-month sparkline, and a four-cell
+ * counter strip. Geometry, scrim and cover handling live in HeroShell so the
+ * business profile cannot drift away from this one (BRIEF_BUSINESS_PROFILE_HERO
+ * rule 5).
  *
  * Every figure reuses a hook the page (or the handicap tab) already mounts;
  * no new queries are introduced here.
@@ -18,43 +17,16 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { HeroShell, HeroPill, W_35, W_40 } from './HeroShell';
 
-const HERO_INK = A.INK;
-const W_45 = 'rgba(255,255,255,0.45)';
-const W_55 = 'rgba(255,255,255,0.55)';
-const W_40 = 'rgba(255,255,255,0.40)';
-const W_35 = 'rgba(255,255,255,0.35)';
-const W_25 = 'rgba(255,255,255,0.25)';
-const W_12 = 'rgba(255,255,255,0.12)';
-const W_10 = 'rgba(255,255,255,0.10)';
 const GREEN = '#4ADE80';
 const RED = '#F87171';
 
 const MS_PER_DAY = 86_400_000;
 
 export type HeroStat = 'index' | 'rounds' | 'rated' | 'friends' | 'followers';
-
-/** Round 3 §2: scrim comes down a touch. Flat wash, then vertical ramp.
- *  If the index or counters ever lose contrast on a bright cover, DEEPEN
- *  these again - never lighten the text. */
-const COVER_WASH = 'rgba(14,18,22,0.58)';
-const COVER_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
-
-/** Round 4 §1: the hero ARTWORK bleeds to the very top of the viewport (behind
- *  the status bar and both floating islands); only the CONTENT is inset by
- *  safe-area + island row (top offset 10 + ISLAND_H 44) + 8px. So the offset
- *  moved from marginTop to paddingTop. */
-const HERO_CONTENT_INSET =
-  'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)';
-
-/** Short top gradient so white status-bar text stays legible over a bright
- *  cover; fades out by 60px. */
-const COVER_TOP_GUARD =
-  'linear-gradient(180deg, rgba(14,18,22,0.45) 0%, rgba(14,18,22,0) 60px)';
-
 
 interface Props {
   userId: string;
@@ -139,74 +111,13 @@ const Sparkline: React.FC<{ points: number[] }> = ({ points }) => {
   );
 };
 
-
-const Cell: React.FC<{
-  label: string;
-  value: number | null;
-  onTap?: () => void;
-}> = ({ label, value, onTap }) => {
-  const inert = !onTap;
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        // Round 3 §3: FRIENDS/FOLLOWERS must never bubble into the hero or
-        // index handicap tap.
-        e.stopPropagation();
-        onTap?.();
-      }}
-      disabled={inert}
-      onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
-      onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
-      onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-      style={{
-        flex: 1,
-        minWidth: 0,
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        textAlign: 'center',
-        cursor: inert ? 'default' : 'pointer',
-        fontFamily: SANS,
-        transition: 'opacity 120ms ease',
-      }}
-    >
-
-      <div
-        style={{
-          fontSize: 17,
-          fontWeight: 800,
-          color: '#FFFFFF',
-          lineHeight: 1.1,
-          letterSpacing: '-0.01em',
-          ...FIGS,
-        }}
-      >
-        {value == null ? '\u2014' : value.toLocaleString()}
-      </div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 7.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: W_45,
-        }}
-      >
-        {label}
-      </div>
-    </button>
-  );
-};
-
 export const ProfileHero: React.FC<Props> = ({
   userId,
   viewerUserId,
   displayName,
   avatarUrl,
   region,
-  isSelf,
+  isSelf: _isSelf,
   indexValue,
   roundsCount,
   ratedCount,
@@ -232,12 +143,6 @@ export const ProfileHero: React.FC<Props> = ({
     [topTen],
   );
   const cover = coverUrl || topCourse?.thumbnail_image || null;
-  const [coverBroken, setCoverBroken] = React.useState(false);
-  React.useEffect(() => setCoverBroken(false), [cover]);
-  const showCover = !!cover && !coverBroken;
-
-
-
 
   const series = React.useMemo(() => {
     if (!history || history.length < 2) return [];
@@ -264,260 +169,66 @@ export const ProfileHero: React.FC<Props> = ({
   const drifted = trend12.direction === 'up';
 
   return (
-    <section
-      style={{
-        position: 'relative',
-        background: HERO_INK,
-        marginTop: 0,
-        padding: '0 16px 16px',
-        paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
-
-
-        fontFamily: SANS,
-        color: '#FFFFFF',
-        isolation: 'isolate',
-      }}
-    >
-      {/* Cover photograph under a heavy scrim - decoration only, never a
-          control, and it never changes the height of the block. */}
-      {showCover && (
-        <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <img
-            src={cover as string}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={() => setCoverBroken(true)}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-            }}
-          />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
-          <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 60, background: COVER_TOP_GUARD }} />
-
-        </div>
-      )}
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
-      {/* 1a. Identity row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button
-          type="button"
-          onClick={onAvatarTap}
-          disabled={!onAvatarTap}
-          aria-label={displayName}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            flexShrink: 0,
-            borderRadius: 16,
-            cursor: onAvatarTap ? 'pointer' : 'default',
-            lineHeight: 0,
-          }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              overflow: 'hidden',
-              border: `2px solid ${W_12}`,
-            }}
-          >
-            <SquircleAvatar
-              size={52}
-              src={avatarUrl ?? undefined}
-              alt={displayName}
-              userId={userId}
-              hideRing
-              className="w-full h-full"
-            />
-
-          </div>
-        </button>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 20,
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: '#FFFFFF',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {displayName}
-          </h1>
-          {subline && (
-            <div
-              style={{
-                marginTop: 3,
-                fontSize: 11.5,
-                fontWeight: 600,
-                color: W_55,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {subline}
-            </div>
-          )}
-        </div>
-
-        {action && <div style={{ flexShrink: 0 }}>{action}</div>}
-      </div>
-
-      {/* 1b. The index */}
-      {shownIndex != null && (
-        <button
-          type="button"
-          onClick={tap('index')}
-          aria-label={t('hero.handicapIndex', 'Handicap index')}
-          style={{
-            display: 'block',
-            width: '100%',
-            marginTop: 18,
-            padding: 0,
-            background: 'transparent',
-            border: 'none',
-            textAlign: 'left',
-            color: 'inherit',
-            fontFamily: SANS,
-            cursor: 'pointer',
-            transition: 'opacity 120ms ease',
-          }}
-          onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
-          onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
-          onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-        >
-          <div
-            style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: W_45,
-            }}
-          >
-            {t('hero.handicapIndex', 'Handicap index')}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginTop: 4 }}>
-            <span
-              style={{
-                fontSize: 40,
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                color: '#FFFFFF',
-                ...FIGS,
-              }}
-            >
-              {formatIndex(shownIndex)}
-            </span>
-            {delta != null && (improved || drifted) && (
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'baseline',
-                  gap: 5,
-                  paddingBottom: 3,
-                  fontSize: 11.5,
-                  fontWeight: 800,
-                  ...FIGS,
-                }}
-              >
-                <span style={{ color: improved ? GREEN : RED }}>
-                  {improved ? '\u2193' : '\u2191'} {Math.abs(delta).toFixed(1)}
-                </span>
-                <span style={{ color: W_40, fontWeight: 600 }}>
-                  {t('hero.trendWindow', '12mo')}
-                </span>
-              </span>
-            )}
-          </div>
-
-          {/* 1c. Sparkline */}
-          <Sparkline points={series} />
-        </button>
-      )}
-
-      {/* 1d. Counter strip */}
-      <div
-        style={{
-          marginTop: 14,
-          borderTop: `1px solid ${W_10}`,
-          paddingTop: 13,
-          display: 'flex',
-          alignItems: 'flex-start',
-        }}
-      >
-        <Cell
-          label={t('hero.rounds', 'Rounds')}
-          value={roundsCount}
-          onTap={tap('rounds')}
+    <HeroShell
+      coverUrl={cover}
+      onAvatarTap={onAvatarTap}
+      avatarLabel={displayName}
+      avatar={
+        <SquircleAvatar
+          size={52}
+          src={avatarUrl ?? undefined}
+          alt={displayName}
+          userId={userId}
+          hideRing
+          className="w-full h-full"
         />
-        <Cell
-          label={t('hero.rated', 'Rated')}
-          value={ratedCount}
-          onTap={tap('rated')}
-        />
-        <Cell
-          label={t('hero.friends', 'Friends')}
-          value={friendsCount ?? null}
-          onTap={tap('friends')}
-        />
-        <Cell
-          label={t('hero.followers', 'Followers')}
-          value={followersCount ?? null}
-          onTap={tap('followers')}
-        />
-      </div>
-
-      </div>
-    </section>
+      }
+      displayName={displayName}
+      subline={subline || null}
+      action={action}
+      headline={
+        shownIndex == null
+          ? null
+          : {
+              label: t('hero.handicapIndex', 'Handicap index'),
+              ariaLabel: t('hero.handicapIndex', 'Handicap index'),
+              value: formatIndex(shownIndex),
+              onTap: tap('index'),
+              aside:
+                delta != null && (improved || drifted) ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'baseline',
+                      gap: 5,
+                      paddingBottom: 3,
+                      fontSize: 11.5,
+                      fontWeight: 800,
+                      fontFamily: SANS,
+                      ...FIGS,
+                    }}
+                  >
+                    <span style={{ color: improved ? GREEN : RED }}>
+                      {improved ? '\u2193' : '\u2191'} {Math.abs(delta).toFixed(1)}
+                    </span>
+                    <span style={{ color: W_40, fontWeight: 600 }}>
+                      {t('hero.trendWindow', '12mo')}
+                    </span>
+                  </span>
+                ) : undefined,
+              below: <Sparkline points={series} />,
+            }
+      }
+      counters={[
+        { key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, onTap: tap('rounds') },
+        { key: 'rated', label: t('hero.rated', 'Rated'), value: ratedCount, onTap: tap('rated') },
+        { key: 'friends', label: t('hero.friends', 'Friends'), value: friendsCount ?? null, onTap: tap('friends') },
+        { key: 'followers', label: t('hero.followers', 'Followers'), value: followersCount ?? null, onTap: tap('followers') },
+      ]}
+    />
   );
 };
 
-/** The EDIT pill (own profile) and the shell for other-member controls. */
-export const HeroPill: React.FC<{
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-}> = ({ label, onClick, disabled }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    style={{
-      background: 'transparent',
-      border: `1px solid ${W_25}`,
-      borderRadius: 999,
-      color: '#FFFFFF',
-      fontFamily: SANS,
-      fontSize: 8,
-      fontWeight: 800,
-      letterSpacing: '0.14em',
-      textTransform: 'uppercase',
-      padding: '9px 14px',
-      minHeight: 34,
-      cursor: disabled ? 'default' : 'pointer',
-      opacity: disabled ? 0.6 : 1,
-      whiteSpace: 'nowrap',
-    }}
-  >
-    {label}
-  </button>
-);
+export { HeroPill };
 
 export default ProfileHero;
