@@ -774,7 +774,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         gap: 8,
                         marginBottom: 8,
                       }}>
-                        <div style={{ width: 3, height: 9, background: AMBER }} />
+                        <div style={{ width: 3, height: 9, background: INK }} />
                         <span style={{
                           fontSize: 10,
                           fontWeight: 800,
