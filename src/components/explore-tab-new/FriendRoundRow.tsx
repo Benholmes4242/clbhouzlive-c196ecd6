@@ -223,9 +223,8 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           >
             GROSS
           </div>
-
-          </div>
         </div>
+
       ) : null}
     </button>
   );
