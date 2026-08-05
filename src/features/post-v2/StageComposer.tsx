@@ -774,11 +774,21 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
           <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>×</button>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {isEditMode ? 'Edit post' : 'New post'}
-            </div>
+          {/* Fixed 22px = the 16/800 title's line box, so the bar height and
+              position are identical with or without the title. */}
+          <div style={{ minWidth: 0, flex: 1, height: 22, display: 'flex', alignItems: 'center' }}>
+
+            {/* Title is CONDITIONAL on page 1: the empty state has no other
+                context so it earns its place; with media present the
+                photograph is the context and the title is not rendered.
+                The bar keeps its height either way. */}
+            {emptyStage && (
+              <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {isEditMode ? 'Edit post' : 'New post'}
+              </div>
+            )}
           </div>
+
           <div style={{ fontSize: 12, fontWeight: 700, color: CT_DARK.mute, fontVariantNumeric: 'tabular-nums' }}>1 / 2</div>
         </div>
 
