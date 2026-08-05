@@ -765,8 +765,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       margin: '12px 16px',
                       padding: 16,
                       borderRadius: 12,
-                      border: `1px solid ${AMBER_BORDER}`,
-                      background: AMBER_WASH,
+                      border: `1px solid ${BORDER}`,
+                      background: PANEL,
                     }}>
                       <div style={{
                         display: 'flex',
