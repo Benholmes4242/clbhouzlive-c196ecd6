@@ -715,73 +715,19 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
 
-      {/* Action Buttons - different for self vs other */}
+      {/* Action Buttons - other members only. Correction 3: the self "..."
+          menu moved INTO the hero identity row beside the EDIT pill, so this
+          block (and the white gap it created) no longer renders for self. */}
+      {!isSelfView && (
       <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
-        {isSelfView ? (
-          /* ── Self-profile: prominent Edit Profile + overflow menu ── */
-          <div className="flex items-center justify-end w-full">
-            {/* Fix 3: Expanded self overflow menu */}
-            <DropdownMenu onOpenChange={(open) => {
-              if (!open) (document.activeElement as HTMLElement)?.blur();
-            }}>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: 'transparent', border: `1px solid ${A.BORDER}` }}
-                >
-                  <MoreHorizontal className="w-5 h-5 text-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    toast.success('Copied to clipboard');
-                  }
-                }}>
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success('Copied to clipboard');
-                }}>
-                  <Link2 className="w-4 h-4 mr-2" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate(editRoute)}>
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Edit profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                {myBusinesses && myBusinesses.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => {
-                      const biz = myBusinesses[0];
-                      navigate(`/business/${biz.business.slug || biz.business.id}`);
-                    }}>
-                      <Building2 className="w-4 h-4 mr-2" />
-                      Switch to business
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ) : (
+        {
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
           friendshipStatus === 'blocked' ? (
             <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-[#94A3B8]" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
               Unavailable
             </div>
           ) : (
+
           <div className="flex flex-col gap-2 w-full">
             {/* Row 1 — Message (primary CTA, full width) */}
             <button
