@@ -211,19 +211,6 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                     </div>
                   )}
                 </div>
-                {r.feats.length > 0 && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      marginTop: 5,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <RoundFeatChips feats={r.feats} maxChips={1} />
-                  </div>
-                )}
               </div>
 
 
