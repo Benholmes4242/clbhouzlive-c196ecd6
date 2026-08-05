@@ -403,8 +403,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <div
                       key={key}
                       style={{
-                        background: 'rgba(255,255,255,0.08)',
-                        borderRadius: 10,
+                        background: PANEL,
+                        border: `1px solid ${BORDER}`,
+                        borderRadius: 14,
                         padding: '10px 12px',
                         minHeight: 52,
                         display: 'flex',
@@ -419,8 +420,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           fontSize: 10.5,
                           fontWeight: 600,
                           letterSpacing: '0.12em',
-                          color: '#F8FAFC',
-                          opacity: 0.6,
+                          color: MUTE,
                           textTransform: 'uppercase',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -433,7 +433,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         style={{
                           fontSize: 19,
                           fontWeight: 300,
-                          color: '#F8FAFC',
+                          color: reviewLabelColor(value, 'light'),
                           fontVariantNumeric: 'tabular-nums',
                           flexShrink: 0,
                         }}
@@ -441,6 +441,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         {value.toFixed(1)}
                       </span>
                     </div>
+
                   ))}
                 </div>
               )}
