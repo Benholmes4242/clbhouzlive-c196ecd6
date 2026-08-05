@@ -135,7 +135,7 @@ export function RoundFeatChips({ feats, maxChips = 2 }: Props) {
             key={f.key}
             style={{
               ...badgeBase,
-              ...(isLegendary(f.key) ? LEGENDARY_STYLE : STANDARD_STYLE),
+              ...tierStyle(f.key),
               fontVariantNumeric: 'tabular-nums',
             }}
             title={label}
