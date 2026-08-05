@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { featChipBase, useRoundFeatLabel } from '../RoundFeatChips';
+import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import {
@@ -29,9 +29,6 @@ import {
 
 const RAIL_CAP = 10;
 
-/** Feats that render in gold on the glass badge. */
-const LEGENDARY_KEYS = new Set(['holes_in_one', 'albatrosses']);
-
 interface Props {
   userId: string | undefined;
   onCardPress: (row: FriendRoundRow) => void;
@@ -52,7 +49,6 @@ function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
 
 export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
-  const featLabel = useRoundFeatLabel();
   const { data: rounds } = useFriendsLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
@@ -80,7 +76,6 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
-          const topFeat = r.feats[0];
           return (
             <button
               key={r.round_id}
@@ -108,17 +103,13 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   style={{
                     position: 'absolute',
                     left: 10,
-                    right: 7,
+                    right: 10,
                     bottom: 7,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
                   }}
                 >
                   <span
                     style={{
-                      flex: 1,
-                      minWidth: 0,
+                      display: 'block',
                       fontSize: 12.5,
                       fontWeight: 800,
                       color: '#fff',
@@ -130,94 +121,67 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   >
                     {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
                   </span>
-                  {topFeat && (
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '3px 8px',
-                        borderRadius: 999,
-                        background: 'rgba(10,14,10,0.55)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        fontSize: 8,
-                        fontWeight: 800,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        lineHeight: 1,
-                        whiteSpace: 'nowrap',
-                        fontVariantNumeric: 'tabular-nums',
-                        color: LEGENDARY_KEYS.has(topFeat.key) ? '#D8A93C' : '#fff',
-                      }}
-                    >
-                      {featLabel(topFeat)}
-                    </span>
-                  )}
                 </div>
               </CourseImageFallback>
 
 
-              <div style={{ padding: '9px 11px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div
+                style={{
+                  padding: '9px 11px',
+                  minHeight: 52,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 6,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
                   <span
                     style={{
-                      flex: 1,
-                      minWidth: 0,
                       fontSize: 11.5,
                       color: A.MUTE,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
+                      lineHeight: 1.15,
                     }}
                   >
                     {r.display_name}
                   </span>
-                  {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
-                    <span
-                      style={{
-                        ...featChipBase,
-                        flexShrink: 0,
-                        background:
-                          r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
-                        color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
-                      }}
-                    >
-                      {r.hcp_delta < 0 ? '↓' : '↑'} {Math.abs(r.hcp_delta).toFixed(1)}
+                  {r.feats.length > 0 && (
+                    <span style={{ display: 'inline-flex' }}>
+                      <RoundFeatChips feats={r.feats} maxChips={1} />
                     </span>
                   )}
-                  {r.gross != null && (
-                    <div
-                      style={{
-                        flexShrink: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-end',
-                        gap: 1,
-                      }}
-                    >
-                      <span style={{ ...NUMF, fontSize: 15, color: A.INK, lineHeight: 1 }}>
-                        {r.gross}
-                      </span>
+                </div>
+
+                {r.gross != null && (
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-end',
+                      gap: 4,
+                    }}
+                  >
+                    <span style={{ ...NUMF, fontSize: 15, color: A.INK, lineHeight: 1 }}>
+                      {r.gross}
+                    </span>
+                    {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
                       <span
                         style={{
-                          ...NUMF,
-                          fontSize: 8.5,
-                          fontWeight: 800,
-                          letterSpacing: '0.1em',
-                          textTransform: 'uppercase',
-                          color: A.DIM,
-                          lineHeight: 1,
-                          whiteSpace: 'nowrap',
+                          ...featChipBase,
+                          background:
+                            r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
+                          color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
                         }}
                       >
-                        {r.stableford != null ? `${r.stableford} PTS` : 'GROSS'}
+                        {r.hcp_delta < 0 ? '\u2193' : '\u2191'} {Math.abs(r.hcp_delta).toFixed(1)}
                       </span>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
-
 
             </button>
           );
