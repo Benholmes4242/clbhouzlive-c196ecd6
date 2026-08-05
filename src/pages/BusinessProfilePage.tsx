@@ -288,7 +288,9 @@ const BusinessProfilePage: React.FC = () => {
 
   // ----- early returns -----
   if (authLoading || isLoading) {
-    return <ProfileSkeleton />;
+    // Same skeleton as the personal profile, configured: hero + headline
+    // figure + four-cell strip, no Top 10 rail, three chip tabs.
+    return <ProfileSurfaceSkeleton headline counters={4} tabs={3} />;
   }
 
   // Sentinel string from useBusinessProfile - keep in sync.
