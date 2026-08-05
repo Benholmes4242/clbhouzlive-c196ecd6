@@ -37,14 +37,14 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-// ---- Canonical tokens ----
+// ---- Canonical tokens (post-flip: no amber on this sheet) ----
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
-const AMBER = '#F7931E';
-const AMBER_WASH = 'rgba(247,147,30,0.08)';
-const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const BORDER = 'rgba(15,23,42,0.07)';
+const BORDER = '#EDF0F3';
+const PANEL = '#FFFFFF';
+const TILE = '#F4F6F9';
+const DANGER = '#DC2626';
 const BG_SURFACE = '#F8FAFC';
 
 interface AddCourseModalProps {
