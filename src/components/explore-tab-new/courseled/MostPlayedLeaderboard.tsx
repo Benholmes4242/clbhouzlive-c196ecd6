@@ -53,6 +53,7 @@ export function MostPlayedLeaderboard({
       <div style={{ ...CARD_SHELL, padding: '4px 14px', fontFamily: SANS }}>
         {shown.map((r, i) => {
           const m = meta?.get(r.courseId);
+          const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
           return (
             <button
               key={r.courseId}
@@ -63,7 +64,7 @@ export function MostPlayedLeaderboard({
                 alignItems: 'center',
                 gap: 11,
                 width: '100%',
-                padding: '11px 0',
+                padding: '10px 0',
                 border: 'none',
                 background: 'transparent',
                 borderBottom: i === shown.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
@@ -72,14 +73,21 @@ export function MostPlayedLeaderboard({
                 cursor: 'pointer',
               }}
             >
-              <span style={{ ...NUMF, fontSize: 12, color: A.DIM, width: 16, flexShrink: 0 }}>
+              <span style={{ ...NUMF, fontSize: 12, color: A.DIM, width: 14, flexShrink: 0 }}>
                 {formatNumber(i + 1)}
               </span>
+              <CourseImageFallback
+                courseId={r.courseId}
+                courseName={name}
+                imageUrl={m?.imageUrl}
+                initialsSize={13}
+                style={{ width: 40, height: 40, borderRadius: 11, flexShrink: 0 }}
+              />
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span
                   style={{
                     display: 'block',
-                    fontSize: 13.5,
+                    fontSize: 13,
                     fontWeight: 800,
                     color: A.INK,
                     letterSpacing: '-0.01em',
@@ -88,23 +96,53 @@ export function MostPlayedLeaderboard({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course')}
+                  {name}
                 </span>
-                {m?.region && (
-                  <span style={{ display: 'block', fontSize: 11, color: A.MUTE, marginTop: 1 }}>
-                    {m.region}
-                  </span>
-                )}
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginTop: 2,
+                    minWidth: 0,
+                  }}
+                >
+                  {m?.region && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: A.MUTE,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {m.region}
+                    </span>
+                  )}
+                  {r.delta != null && r.delta > 0 && (
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        color: '#0F8F4A',
+                        background: 'rgba(15,143,74,0.10)',
+                        border: '1px solid rgba(15,143,74,0.18)',
+                        borderRadius: 5,
+                        padding: '1.5px 6px',
+                        fontVariantNumeric: 'tabular-nums lining',
+                      }}
+                    >
+                      {t('discover.vsLastWeek', '+{{count}} vs last week', { count: r.delta })}
+                    </span>
+                  )}
+                </span>
               </span>
-              {r.delta != null && (
-                <span style={{ ...NUMF, fontSize: 11.5, color: A.UNDER, flexShrink: 0 }}>
-                  {`+${formatNumber(r.delta)}`}
-                </span>
-              )}
               <span
                 style={{
                   ...NUMF,
-                  fontSize: 16,
+                  fontSize: 17,
                   color: A.INK,
                   flexShrink: 0,
                   minWidth: 26,
@@ -117,6 +155,7 @@ export function MostPlayedLeaderboard({
           );
         })}
       </div>
+
     </section>
   );
 }
