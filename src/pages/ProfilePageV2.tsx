@@ -39,6 +39,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { useTranslation } from 'react-i18next';
 import { ProfileHero, HeroPill } from '@/components/profile/hero/ProfileHero';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
@@ -181,6 +182,7 @@ const ProfilePageV2Content: React.FC = () => {
   const isProfileDeleted = resolvedProfileId?.deleted === true;
   const profileNotFound = resolvedProfileId?.notFound === true;
   
+  const { t } = useTranslation('profile');
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
