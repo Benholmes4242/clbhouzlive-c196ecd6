@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { logDiscoverPageMount, logDiscoverPageUnmount } from '@/utils/discoverTimeline';
