@@ -60,8 +60,10 @@ interface Props {
   /** Resolved index (manual or WHS) as the page already resolves it. */
   indexValue: number | null;
   roundsCount: number | null;
-  coursesCount: number | null;
   ratedCount: number | null;
+  /** Round 3 §3: social counts from the page's existing realtime hook. */
+  friendsCount?: number | null;
+  followersCount?: number | null;
   /** Member's own cover/banner photo (user_profiles.header_photo_url). */
   coverUrl?: string | null;
   /** Right-hand control: EDIT pill (own) or the follow/friend set (other). */
