@@ -456,21 +456,22 @@ export const ProfileHero: React.FC<Props> = ({
           onTap={tap('rounds')}
         />
         <Cell
-          label={t('hero.courses', 'Courses')}
-          value={coursesCount}
-          onTap={tap('courses')}
-        />
-        <Cell
           label={t('hero.rated', 'Rated')}
           value={ratedCount}
           onTap={tap('rated')}
         />
         <Cell
-          label={t('hero.trophies', 'Trophies')}
-          value={trophiesCount}
-          onTap={tap('trophies')}
+          label={t('hero.friends', 'Friends')}
+          value={friendsCount ?? null}
+          onTap={tap('friends')}
+        />
+        <Cell
+          label={t('hero.followers', 'Followers')}
+          value={followersCount ?? null}
+          onTap={tap('followers')}
         />
       </div>
+
       </div>
     </section>
   );
