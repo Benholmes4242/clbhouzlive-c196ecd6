@@ -66,13 +66,13 @@ interface CourseWithRating {
 }
 
 // Plain tabular score - canonical replacement for the retired SerifScore.
-const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
+const PlainScore: React.FC<{ value: number; size?: number; color?: string }> = ({ value, size = 13, color = INK }) => {
   const safe = Number.isFinite(value) ? value : 0;
   return (
     <span style={{
       fontSize: size,
       fontWeight: 800,
-      color: INK,
+      color,
       letterSpacing: '-0.01em',
       fontVariantNumeric: 'tabular-nums',
       fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
