@@ -76,6 +76,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
+          const topFeat = r.feats[0];
           return (
             <button
               key={r.round_id}
