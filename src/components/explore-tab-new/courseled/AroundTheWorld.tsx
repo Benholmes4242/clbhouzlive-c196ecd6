@@ -21,6 +21,9 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_
  * NO badges: the detail line carries the feat wording instead.
  */
 
+/** Deep gold: 8px bright gold fails contrast on a light wash. */
+const GOLD_TEXT = '#A87718';
+
 const PAGE = 5;
 const DOT = '\u00B7';
 
