@@ -224,13 +224,15 @@ export function useMomentsOfTheWeek(limit = 24) {
           courseId,
           courseName: courseName.get(courseId) ?? undefined,
         };
+        const tile = mediaItems[mediaIndex] ?? mediaItems[0];
         return {
-          key: `${row.id}-${courseId}`,
+          key: `${row.id}-${courseId}-${mediaIndex}`,
           courseId,
           courseName: courseName.get(courseId) ?? null,
           post,
-          thumbnail: mediaItems[0]?.imageUrl ?? mediaItems[0]?.thumbnailUrl ?? null,
-          mediaType: mediaItems[0]?.type === 'video' ? 'video' : 'image',
+          thumbnail: tile?.imageUrl ?? tile?.thumbnailUrl ?? null,
+          mediaType: tile?.type === 'video' ? 'video' : 'image',
+          mediaIndex,
         };
       });
     },
