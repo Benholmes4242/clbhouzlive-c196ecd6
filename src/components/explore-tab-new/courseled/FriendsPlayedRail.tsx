@@ -118,44 +118,42 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                 </div>
               </CourseImageFallback>
 
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '9px 11px',
-                }}
-              >
-                <span
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    overflow: 'hidden',
-                  }}
-                >
+              <div style={{ padding: '9px 11px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span
                     style={{
+                      flex: 1,
+                      minWidth: 0,
                       fontSize: 11.5,
                       color: A.MUTE,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      flexShrink: 1,
                     }}
                   >
                     {r.display_name}
                   </span>
-                  <RoundFeatChips feats={r.feats} />
-                </span>
-                {r.gross != null && (
-                  <span style={{ ...NUMF, fontSize: 15, color: A.INK, flexShrink: 0 }}>
-                    {r.gross}
-                  </span>
+                  {r.gross != null && (
+                    <span style={{ ...NUMF, fontSize: 15, color: A.INK, flexShrink: 0 }}>
+                      {r.gross}
+                    </span>
+                  )}
+                </div>
+                {r.feats.length > 0 && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      marginTop: 4,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <RoundFeatChips feats={r.feats} />
+                  </div>
                 )}
               </div>
+
             </button>
           );
         })}
