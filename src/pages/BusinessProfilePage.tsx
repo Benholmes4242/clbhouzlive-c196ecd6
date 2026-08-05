@@ -11,7 +11,7 @@ import {
   Phone, Globe, MoreHorizontal, Loader2,
   Share2, Link2, Flag, Pencil, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
-  Navigation, Calendar,
+  Navigation, Calendar, Mail,
 } from 'lucide-react';
 
 import { toast } from '@/lib/toast';
