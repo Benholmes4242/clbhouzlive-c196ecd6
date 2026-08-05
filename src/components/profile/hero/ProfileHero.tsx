@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
-import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -35,12 +34,20 @@ const RED = '#F87171';
 
 const MS_PER_DAY = 86_400_000;
 
-export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'trophies';
+export type HeroStat = 'index' | 'rounds' | 'rated' | 'friends' | 'followers';
 
-/** Addendum A: photograph under a heavy scrim. Flat wash, then vertical ramp. */
-const COVER_WASH = 'rgba(14,18,22,0.72)';
+/** Round 3 §2: scrim comes down a touch. Flat wash, then vertical ramp.
+ *  If the index or counters ever lose contrast on a bright cover, DEEPEN
+ *  these again - never lighten the text. */
+const COVER_WASH = 'rgba(14,18,22,0.58)';
 const COVER_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.55) 0%, rgba(14,18,22,0.88) 100%)';
+  'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
+
+/** Round 3 §1: the hero starts BENEATH the floating islands - safe-area inset
+ *  + island row (top offset 10 + ISLAND_H 44) + 8px - so both islands sit on
+ *  plain canvas rather than on the photograph. */
+const HERO_TOP_OFFSET =
+  'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)';
 
 interface Props {
   userId: string;
@@ -52,8 +59,10 @@ interface Props {
   /** Resolved index (manual or WHS) as the page already resolves it. */
   indexValue: number | null;
   roundsCount: number | null;
-  coursesCount: number | null;
   ratedCount: number | null;
+  /** Round 3 §3: social counts from the page's existing realtime hook. */
+  friendsCount?: number | null;
+  followersCount?: number | null;
   /** Member's own cover/banner photo (user_profiles.header_photo_url). */
   coverUrl?: string | null;
   /** Right-hand control: EDIT pill (own) or the follow/friend set (other). */
@@ -133,8 +142,16 @@ const Cell: React.FC<{
   return (
     <button
       type="button"
-      onClick={onTap}
+      onClick={(e) => {
+        // Round 3 §3: FRIENDS/FOLLOWERS must never bubble into the hero or
+        // index handicap tap.
+        e.stopPropagation();
+        onTap?.();
+      }}
       disabled={inert}
+      onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
+      onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
+      onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
       style={{
         flex: 1,
         minWidth: 0,
@@ -144,8 +161,10 @@ const Cell: React.FC<{
         textAlign: 'center',
         cursor: inert ? 'default' : 'pointer',
         fontFamily: SANS,
+        transition: 'opacity 120ms ease',
       }}
     >
+
       <div
         style={{
           fontSize: 17,
@@ -183,8 +202,9 @@ export const ProfileHero: React.FC<Props> = ({
   isSelf,
   indexValue,
   roundsCount,
-  coursesCount,
   ratedCount,
+  friendsCount,
+  followersCount,
   coverUrl,
   action,
   onAvatarTap,
@@ -195,7 +215,6 @@ export const ProfileHero: React.FC<Props> = ({
   const { data: trend } = useHandicapTrend(connection?.id);
   const trend12 = useHandicapTrend12mo(connection?.id);
   const { data: history } = useHandicapHistory(connection?.id, 'all');
-  const { data: achievements } = useUserAchievements(userId);
   const { homeClub } = useProfileClubs(userId, viewerUserId ?? undefined);
   const { topTen } = useUserTopTenCourses(userId);
 
@@ -210,10 +229,8 @@ export const ProfileHero: React.FC<Props> = ({
   React.useEffect(() => setCoverBroken(false), [cover]);
   const showCover = !!cover && !coverBroken;
 
-  const trophiesCount = React.useMemo(() => {
-    if (!achievements) return null;
-    return achievements.filter((b) => b.is_earned).length;
-  }, [achievements]);
+
+
 
   const series = React.useMemo(() => {
     if (!history || history.length < 2) return [];
@@ -244,6 +261,7 @@ export const ProfileHero: React.FC<Props> = ({
       style={{
         position: 'relative',
         background: HERO_INK,
+        marginTop: HERO_TOP_OFFSET,
         padding: '18px 16px 16px',
         fontFamily: SANS,
         color: '#FFFFFF',
@@ -438,21 +456,22 @@ export const ProfileHero: React.FC<Props> = ({
           onTap={tap('rounds')}
         />
         <Cell
-          label={t('hero.courses', 'Courses')}
-          value={coursesCount}
-          onTap={tap('courses')}
-        />
-        <Cell
           label={t('hero.rated', 'Rated')}
           value={ratedCount}
           onTap={tap('rated')}
         />
         <Cell
-          label={t('hero.trophies', 'Trophies')}
-          value={trophiesCount}
-          onTap={tap('trophies')}
+          label={t('hero.friends', 'Friends')}
+          value={friendsCount ?? null}
+          onTap={tap('friends')}
+        />
+        <Cell
+          label={t('hero.followers', 'Followers')}
+          value={followersCount ?? null}
+          onTap={tap('followers')}
         />
       </div>
+
       </div>
     </section>
   );

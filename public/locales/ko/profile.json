@@ -12,7 +12,8 @@
     "addFriend": "Add friend",
     "friends": "Friends",
     "requested": "Requested",
-    "accept": "Accept"
+    "accept": "Accept",
+    "followers": "Followers"
   },
   "social": {
     "followers": "{{count}} followers",

@@ -268,37 +268,42 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 )}
               </CourseImageFallback>
 
-              <div
-                style={{
-                  marginTop: 7,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  color: A.INK,
-                  lineHeight: 1.25,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
-              >
-                {course.name}
-              </div>
-              {region && (
+              {/* Round 3 §4: the text block below the image holds ONE height -
+                  two lines of the 12/800 name (2 x 15) plus the 10.5/600
+                  region line (14.2) and its 2px gap. A one-line name simply
+                  leaves the gap; the rail never goes ragged. */}
+              <div style={{ marginTop: 7, height: 46, overflow: 'hidden' }}>
                 <div
                   style={{
-                    marginTop: 2,
-                    fontSize: 10.5,
-                    fontWeight: 600,
-                    color: A.BODY,
-                    lineHeight: 1.35,
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: A.INK,
+                    lineHeight: 1.25,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                   }}
                 >
-                  {region}
+                  {course.name}
                 </div>
-              )}
+                {region && (
+                  <div
+                    style={{
+                      marginTop: 2,
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: A.BODY,
+                      lineHeight: 1.35,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {region}
+                  </div>
+                )}
+              </div>
             </button>
           );
         })}

@@ -675,8 +675,9 @@ const ProfilePageV2Content: React.FC = () => {
             isSelf={isSelf}
             indexValue={resolvedHcp.value ?? null}
             roundsCount={shellRoundsCount}
-            coursesCount={shellCoursesPlayed ?? null}
             ratedCount={reviewsCount ?? null}
+            friendsCount={isPersonal ? friendsCount : null}
+            followersCount={followersCount}
             onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
             action={
               isSelfView ? (
@@ -770,12 +771,20 @@ const ProfilePageV2Content: React.FC = () => {
                 else if (profileUserId) navigate(`/handicap/${profileUserId}`);
                 return;
               }
-              if (stat === 'courses' || stat === 'rated') {
+              if (stat === 'rated') {
                 handleTabChange('courses');
                 return;
               }
-              if (stat === 'trophies') {
-                navigate(isSelf ? '/handicap?gam=trophies' : `/handicap/${profileUserId}?gam=trophies`);
+              // Round 3 §3: the deleted "N followers . N friends" line's
+              // destinations now live on the strip.
+              if (stat === 'followers') {
+                setActiveMiniNav('followers');
+                navigate(`/profile/${username}/followers`);
+                return;
+              }
+              if (stat === 'friends') {
+                setActiveMiniNav('friends');
+                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
               }
             }}
           />
@@ -933,69 +942,10 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
 
-      {/* The white INDEX/ROUNDS/COURSES panel and its "Open your handicap"
-          action are deleted — the dark hero owns both (§1e). The posts/reviews
-          figures are deleted too; followers and friends survive as social
-          actions on one quiet canvas line (§2). */}
-      <div className="mt-3 px-4 relative z-10 pointer-events-auto">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 6,
-            fontFamily: SANS,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: A.BODY,
-            fontVariantNumeric: 'tabular-nums lining',
-          }}
-        >
-          {[
-            {
-              key: 'followers',
-              label: t('social.followers', { count: followersCount, defaultValue: '{{count}} followers' }),
-              onTap: () => {
-                setActiveMiniNav('followers');
-                navigate(`/profile/${username}/followers`);
-              },
-            },
-            ...(isPersonal
-              ? [
-                  {
-                    key: 'friends',
-                    label: t('social.friendsCount', { count: friendsCount, defaultValue: '{{count}} friends' }),
-                    onTap: () => {
-                      setActiveMiniNav('friends');
-                      navigate(`/profile/${username}/followers?tab=following&filter=friends`);
-                    },
-                  },
-                ]
-              : []),
-          ].map((item, i, arr) => (
-            <React.Fragment key={item.key}>
-              <button
-                type="button"
-                onClick={item.onTap}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  minHeight: 32,
-                  cursor: 'pointer',
-                  fontFamily: SANS,
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  color: A.BODY,
-                }}
-              >
-                {item.label}
-              </button>
-              {i < arr.length - 1 && <span aria-hidden style={{ color: A.DIM }}>·</span>}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+      {/* Round 3 §3: the "N followers . N friends" canvas line is DELETED -
+          both counts (and both destinations) now live in the hero's counter
+          strip. */}
+
 
 
       {/* White content sheet */}
