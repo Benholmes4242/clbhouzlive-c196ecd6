@@ -235,9 +235,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
   // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
-  // Edit / draft / course-prefill entries and a cancelled picker land on
-  // page 2; media chosen through the picker jumps to page 1.
-  const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+  // Tapping Post opens page 1 immediately in its AWAITING state while the OS
+  // source menu floats above it. Files chosen -> page 1 comes alive; picker
+  // cancelled -> page 2, caption-only. Edit / draft / course-prefill entries
+  // land straight on page 2.
+  const isFreshCreate = !editPostId && !draftId;
+  const [page, setPage] = useState<1 | 2>(
+    isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
+  );
 
   // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
@@ -265,6 +270,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       setPage(1);
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
+
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
