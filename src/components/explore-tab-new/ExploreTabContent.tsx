@@ -274,7 +274,9 @@ export default function ExploreTabContent({
           userId={userId}
           scopeKey={activeRegion ?? 'worldwide'}
           pills={
-            <div style={{ margin: '0 -14px 12px' }}>
+            // The pills belong to Around the World: 12px above (10 from the
+            // eyebrow + 2), 14px below so they sit closer to their cards.
+            <div style={{ margin: '2px -14px 14px' }}>
               <ScopePills region={activeRegion} onChange={handleRegionChange} />
             </div>
           }
