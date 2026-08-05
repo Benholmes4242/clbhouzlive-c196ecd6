@@ -71,7 +71,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
 
       <div
         className="scrollbar-hide"
-        style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
+        style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
@@ -83,7 +83,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
               onClick={() => onCardPress(r)}
               style={{
                 ...CARD_SHELL,
-                width: 200,
+                width: 224,
                 flexShrink: 0,
                 padding: 0,
                 textAlign: 'left',
@@ -95,7 +95,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                 courseId={r.course_id}
                 courseName={m?.name ?? r.course_name}
                 imageUrl={m?.imageUrl}
-                style={{ height: 88 }}
+                style={{ height: 99 }}
               >
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM_SOFT }} />
                 <ImageChip gold={hasAce}>{relativeDay(r.play_date, t)}</ImageChip>

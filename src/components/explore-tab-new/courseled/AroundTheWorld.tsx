@@ -556,7 +556,7 @@ export function AroundTheWorld({
           })}
 
           {groups.length > PAGE && (
-            <div style={{ textAlign: 'center', paddingTop: 2 }}>
+            <div style={{ textAlign: 'center', paddingTop: 4 }}>
               <InkAction
                 onClick={() => {
                   analyticsEvents.track('discover_world_sheet_open', {
