@@ -103,20 +103,55 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   style={{
                     position: 'absolute',
                     left: 10,
-                    right: 10,
+                    right: 7,
                     bottom: 7,
-                    fontSize: 12.5,
-                    fontWeight: 800,
-                    color: '#fff',
-                    letterSpacing: '-0.015em',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
+                  <span
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      fontSize: 12.5,
+                      fontWeight: 800,
+                      color: '#fff',
+                      letterSpacing: '-0.015em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
+                  </span>
+                  {topFeat && (
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '3px 8px',
+                        borderRadius: 999,
+                        background: 'rgba(10,14,10,0.55)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        fontSize: 8,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                        color: LEGENDARY_KEYS.has(topFeat.key) ? '#D8A93C' : '#fff',
+                      }}
+                    >
+                      {featLabel(topFeat)}
+                    </span>
+                  )}
                 </div>
               </CourseImageFallback>
+
 
               <div style={{ padding: '9px 11px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
