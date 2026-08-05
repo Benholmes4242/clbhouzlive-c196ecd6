@@ -48,7 +48,7 @@ import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
  *   3 On tour this week           facts rail (next-up fallback off-week)
  *   4 Moments of the week         mosaic     read-only viewer
  *   5 Most played this week       leaderboard
- *   6 Rarest of all               ledger     never windowed
+ *   6 The honours board          board      never windowed
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
