@@ -12,6 +12,7 @@ import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDisc
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
+import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
@@ -29,7 +30,7 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_
 /** Deep gold: 8px bright gold fails contrast on a light wash. */
 const GOLD_TEXT = '#A87718';
 
-const PAGE = 5;
+const PAGE = 4;
 
 interface CourseGroup {
   courseId: string;
@@ -47,6 +48,8 @@ interface Props {
   pills: React.ReactNode;
   onCoursePress: (courseId: string) => void;
   onExpand?: (revealed: number) => void;
+  /** Human region label for the sheet caption ('GB&I', 'Worldwide'). */
+  regionLabel?: string;
 }
 
 function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
@@ -71,9 +74,10 @@ export function AroundTheWorld({
   pills,
   onCoursePress,
   onExpand,
+  regionLabel,
 }: Props) {
   const { t } = useTranslation('courses');
-  const [expanded, setExpanded] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [pressed, setPressed] = useState<string | null>(null);
   const opener = useScorecardOpener();
   const openReview = useReviewSheetStore((st) => st.open);
@@ -99,10 +103,19 @@ export function AroundTheWorld({
     return [...byCourse.values()].sort((a, b) => (a.at < b.at ? 1 : -1));
   }, [events]);
 
-  const shown = expanded ? groups : groups.slice(0, PAGE);
+  const shown = groups.slice(0, PAGE);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const { data: meta } = useCourseCardMeta(courseIds);
   const { data: ratings } = useCourseLatestRatings(courseIds);
+
+  /** Notability of a course's headline feat — drives the sheet's order. */
+  const notability = (e: WireEvent): number => {
+    if (e.kind === 'ace' || e.kind === 'albatross') return 0;
+    if (e.kind === 'crown') return 1;
+    if (e.kind === 'eagle') return 2;
+    if (e.kind === 'birdie_haul') return 3;
+    return 4;
+  };
 
   /** Tier colour for the right-hand figure (BRIEF: green / ink / gold). */
   const toneFor = (kind: WireEvent['kind'] | 'rating'): string => {
@@ -158,6 +171,32 @@ export function AroundTheWorld({
       }).toUpperCase();
     return t('discover.row.labelScore', 'SCORE');
   };
+
+  /** Complete list for the sheet, notability first, newest as the tie-break. */
+  const newsEntries = useMemo<CourseNewsEntry[]>(() => {
+    return groups
+      .map((g) => {
+        const top = [...g.events].sort(
+          (a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1),
+        )[0];
+        const actor =
+          top && userId && top.userId && top.userId === userId
+            ? t('discover.wire.you', 'You')
+            : (top?.actorName?.trim() ?? '');
+        const feat = top ? detailFor(top) : '';
+        return {
+          courseId: g.courseId,
+          courseName: g.courseName,
+          courseImage: g.courseImage,
+          at: g.at,
+          topLine: actor ? `${actor} \u00B7 ${feat}` : feat,
+          rank: top ? notability(top) : 5,
+        };
+      })
+      .sort((a, b) => a.rank - b.rank || (a.at < b.at ? 1 : -1))
+      .map(({ rank: _rank, ...rest }) => rest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groups, userId, t]);
 
   if (isLoading) {
     return (
@@ -409,17 +448,20 @@ export function AroundTheWorld({
             );
           })}
 
-          {!expanded && groups.length > PAGE && (
+          {groups.length > PAGE && (
             <div style={{ textAlign: 'center', paddingTop: 2 }}>
               <InkAction
                 onClick={() => {
-                  setExpanded(true);
+                  analyticsEvents.track('discover_world_sheet_open', {
+                    courses: groups.length,
+                  });
+                  setSheetOpen(true);
                   onExpand?.(groups.length - PAGE);
                 }}
               >
-                {t('discover.showMoreCourses', {
-                  defaultValue: 'Show {{count}} more courses',
-                  count: groups.length - PAGE,
+                {t('discover.seeAllCourses', {
+                  defaultValue: 'See all {{count}} courses',
+                  count: groups.length,
                 })}
               </InkAction>
             </div>
@@ -427,6 +469,15 @@ export function AroundTheWorld({
         </div>
       )}
     </section>
+
+      <CourseNewsSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        entries={newsEntries}
+        regionLabel={regionLabel ?? t('discover.worldwide', 'Worldwide')}
+        whenLabel={(iso) => relativeWhen(iso, t)}
+        onCoursePress={onCoursePress}
+      />
 
       <RoundDetailSheet
         open={!!opener.target}
