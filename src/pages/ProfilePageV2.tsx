@@ -703,119 +703,62 @@ const ProfilePageV2Content: React.FC = () => {
 
 
 
-        {/* Avatar - squircle, left-aligned */}
-        <div
-          className="absolute left-5 z-20 pointer-events-auto"
-          style={{ bottom: '-62px' }}
-        >
-          <div
-            className="relative w-[124px] h-[124px] rounded-[34%]"
-            data-debug-id="profile-photo"
-          >
-            {/* Avatar-on-cover: solid bg ring for separation --
-                canon exception, no hairline. */}
-            <div className="clbhouz-squircle absolute inset-0 bg-background pointer-events-none" />
+        {/* 124px cover avatar deleted — identity now lives in the dark hero. */}
 
-            {/* Avatar image */}
-            <div
-              className="clbhouz-squircle absolute overflow-hidden pointer-events-none"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-              }}
-            >
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
+      </div>
+
+
+      {/* Dark hero block — BRIEF_PROFILE_HERO_AND_TOP10 §1. Replaces the
+          124px cover avatar, the name row, the white figure panel, the counts
+          line, the handicap trend panel and the trophies row. */}
+      {profile?.id && (
+        <div className="relative z-10 pointer-events-auto">
+          <ProfileHero
+            userId={profile.id}
+            viewerUserId={user?.id}
+            displayName={displayName}
+            avatarUrl={profile.profile_photo_url}
+            region={profile.location ?? null}
+            isSelf={isSelf}
+            indexValue={resolvedHcp.value ?? null}
+            roundsCount={shellRoundsCount}
+            coursesCount={shellCoursesPlayed ?? null}
+            ratedCount={reviewsCount ?? null}
+            onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
+            action={
+              isSelfView ? (
+                <HeroPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
+              ) : friendshipStatus === 'blocked' ? null : (
+                <HeroPill
+                  label={
+                    isFollowing
+                      ? t('hero.following', 'Following')
+                      : t('hero.follow', 'Follow')
+                  }
+                  onClick={toggleFollow}
+                  disabled={followBusy}
                 />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white"
-                  style={{
-                    background: getAvatarFallbackColor(avatarFallbackKey),
-                    fontSize: '48px',
-                    fontWeight: 600,
-                    letterSpacing: '0.01em',
-                    lineHeight: 1,
-                  }}
-                >
-                  {avatarInitials}
-                </div>
-              )}
-            </div>
-
-            {/* Camera badge — bottom right, Instagram style */}
-            {isSelf && !isUploadingAvatar && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.55)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  border: '2px solid white',
-                }}
-              >
-                <Camera className="w-3.5 h-3.5 text-white" />
-              </div>
-            )}
-
-            {/* Spinner badge — shows during upload */}
-            {isSelf && isUploadingAvatar && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.55)',
-                  border: '2px solid white',
-                }}
-              >
-                <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              </div>
-            )}
-
-            {/* Full-rect transparent tap target — matches cover-photo pattern.
-                inset:-14px extends beyond squircle corners + covers badge overhang. */}
-            {isSelf && !isUploadingAvatar && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPhotoSheet('avatar');
-                }}
-                className="absolute z-20 pointer-events-auto cursor-pointer"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="Change profile photo"
-              />
-            )}
-            {!isSelf && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAvatarLightboxOpen(true);
-                }}
-                className="absolute z-20 pointer-events-auto cursor-pointer"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="View profile photo"
-              />
-            )}
-          </div>
+              )
+            }
+            onStatTap={(stat) => {
+              if (stat === 'rounds') {
+                if (isSelf) navigate('/handicap');
+                else if (profileUserId)
+                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hero_rounds' });
+                return;
+              }
+              if (stat === 'courses' || stat === 'rated') {
+                handleTabChange('courses');
+                return;
+              }
+              if (stat === 'trophies') {
+                navigate(isSelf ? '/handicap?gam=trophies' : `/handicap/${profileUserId}?gam=trophies`);
+              }
+            }}
+          />
         </div>
+      )}
 
-      </div>
-
-      {/* Hero HCP pill removed — the handicap is stated ONCE, as the INDEX
-          figure in the primary figure row below, which also owns the tap
-          through to /handicap (or the snapshot sheet for other members). */}
-
-      {/* Identity Stack - adjusted for left-aligned avatar */}
-      <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
-        {/* Name */}
-        <div className="flex items-center gap-1.5">
-          <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
-            {displayName}
-          </h1>
-        </div>
-      </div>
 
       {/* Action Buttons - different for self vs other */}
       <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
