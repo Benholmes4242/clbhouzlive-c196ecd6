@@ -228,7 +228,7 @@ export default function ExploreTabContent({
         <OnTourThisWeek
           onTournamentPress={handleTournament}
           onMediaPress={handleTourMedia}
-          onTourHub={() => navigate('/tour')}
+          onTourHub={() => navigate('/tourhub')}
         />
 
         <AroundTheWorld
