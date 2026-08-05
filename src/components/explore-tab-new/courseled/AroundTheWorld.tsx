@@ -456,8 +456,10 @@ export function AroundTheWorld({
                             </div>
                             <div
                               style={{
-                                fontSize: 11.5,
-                                color: A.MUTE,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                lineHeight: 1.35,
+                                color: A.BODY,
                                 marginTop: 1.5,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',

@@ -251,9 +251,10 @@ export function CourseNewsSheet({
                 <div
                   style={{
                     padding: '7px 9px',
-                    fontSize: 10.5,
-                    lineHeight: 1.32,
-                    color: A.MUTE,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    color: A.BODY,
                     minHeight: 42,
                     display: '-webkit-box',
                     WebkitLineClamp: 2,

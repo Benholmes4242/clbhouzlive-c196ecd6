@@ -19,6 +19,8 @@ export const A = {
   BORDER: '#EDF0F3',
   INK: '#0E1216',
   MUTE: '#68707B',
+  /** Detail lines: near-ink body text, heavier than MUTE. */
+  BODY: '#3A424C',
   DIM: '#A2A9B2',
   AMBER: '#F7931E',
   AMBER_DEEP: '#C2620A',
