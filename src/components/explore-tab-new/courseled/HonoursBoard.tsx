@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, InkAction, SANS, NUMF } from './tokens';
@@ -26,6 +25,33 @@ export const HONOURS_SHELL: React.CSSProperties = {
   overflow: 'hidden',
   boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
 };
+
+/** The mock's ring: one 30x30 gold circle, red tabular numeral. No inner ring. */
+function HonoursRing({ value }: { value: number }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 30,
+        height: 30,
+        flex: '0 0 auto',
+        borderRadius: 999,
+        border: '1.5px solid #D8A93C',
+        background: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 12,
+        fontWeight: 800,
+        color: '#C0392B',
+        fontFamily: SANS,
+        ...NUMF,
+      }}
+    >
+      {value}
+    </span>
+  );
+}
 
 export function sortHonours(events: WireEvent[]): WireEvent[] {
   const groupRank = (e: WireEvent) => (e.kind === 'ace' ? 0 : 1);
@@ -55,13 +81,13 @@ export function HonoursRow({
       ? t(
           isAce ? 'discover.row.ace' : 'discover.row.albatross',
           isAce
-            ? 'Hole in one! - the {{hole}}, par {{par}}'
-            : 'Albatross! - the {{hole}}, par {{par}}',
+            ? 'Hole in one - the {{hole}}, par {{par}}'
+            : 'Albatross - the {{hole}}, par {{par}}',
           { hole: formatOrdinal(e.holeNo), par },
         )
       : t(
           isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
-          isAce ? 'Hole in one!' : 'Albatross!',
+          isAce ? 'Hole in one' : 'Albatross',
         );
 
   const who = e.isOwn ? t('discover.wire.you', 'You') : e.actorName;
@@ -91,7 +117,7 @@ export function HonoursRow({
         cursor: tappable ? 'pointer' : 'default',
       }}
     >
-      <ScoreMark strokes={strokes} par={par} size={34} />
+      <HonoursRing value={strokes} />
 
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
