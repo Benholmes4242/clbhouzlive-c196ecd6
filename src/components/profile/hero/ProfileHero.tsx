@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
-import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -216,7 +215,6 @@ export const ProfileHero: React.FC<Props> = ({
   const { data: trend } = useHandicapTrend(connection?.id);
   const trend12 = useHandicapTrend12mo(connection?.id);
   const { data: history } = useHandicapHistory(connection?.id, 'all');
-  const { data: achievements } = useUserAchievements(userId);
   const { homeClub } = useProfileClubs(userId, viewerUserId ?? undefined);
   const { topTen } = useUserTopTenCourses(userId);
 
@@ -263,6 +261,7 @@ export const ProfileHero: React.FC<Props> = ({
       style={{
         position: 'relative',
         background: HERO_INK,
+        marginTop: HERO_TOP_OFFSET,
         padding: '18px 16px 16px',
         fontFamily: SANS,
         color: '#FFFFFF',
