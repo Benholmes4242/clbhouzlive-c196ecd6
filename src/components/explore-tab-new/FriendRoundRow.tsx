@@ -221,7 +221,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               lineHeight: 1,
             }}
           >
-            GROSS
+            {stableford != null ? `${stableford} PTS` : 'GROSS'}
           </div>
         </div>
       ) : null}
