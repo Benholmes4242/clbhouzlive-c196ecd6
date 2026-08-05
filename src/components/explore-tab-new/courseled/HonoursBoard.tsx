@@ -55,13 +55,13 @@ export function HonoursRow({
       ? t(
           isAce ? 'discover.row.ace' : 'discover.row.albatross',
           isAce
-            ? 'Hole in one! - the {{hole}}, par {{par}}'
-            : 'Albatross! - the {{hole}}, par {{par}}',
+            ? 'Hole in one - the {{hole}}, par {{par}}'
+            : 'Albatross - the {{hole}}, par {{par}}',
           { hole: formatOrdinal(e.holeNo), par },
         )
       : t(
           isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
-          isAce ? 'Hole in one!' : 'Albatross!',
+          isAce ? 'Hole in one' : 'Albatross',
         );
 
   const who = e.isOwn ? t('discover.wire.you', 'You') : e.actorName;

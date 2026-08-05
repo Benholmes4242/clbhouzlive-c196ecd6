@@ -147,21 +147,21 @@ export function AroundTheWorld({
       const isAce = e.kind === 'ace';
       if (!hole)
         return isAce
-          ? t('discover.row.aceNoHole', 'Hole in one!')
-          : t('discover.row.albatrossNoHole', 'Albatross!');
+          ? t('discover.row.aceNoHole', 'Hole in one')
+          : t('discover.row.albatrossNoHole', 'Albatross');
       if (compact)
         return t(isAce ? 'discover.row.compactAce' : 'discover.row.compactAlbatross', {
-          defaultValue: isAce ? 'Hole in one! - {{hole}}' : 'Albatross! - {{hole}}',
+          defaultValue: isAce ? 'Hole in one - {{hole}}' : 'Albatross - {{hole}}',
           hole,
         });
       if (par == null)
         return isAce
-          ? t('discover.row.aceNoHole', 'Hole in one!')
-          : t('discover.row.albatrossNoHole', 'Albatross!');
+          ? t('discover.row.aceNoHole', 'Hole in one')
+          : t('discover.row.albatrossNoHole', 'Albatross');
       return t(isAce ? 'discover.row.ace' : 'discover.row.albatross', {
         defaultValue: isAce
-          ? 'Hole in one! - the {{hole}}, par {{par}}'
-          : 'Albatross! - the {{hole}}, par {{par}}',
+          ? 'Hole in one - the {{hole}}, par {{par}}'
+          : 'Albatross - the {{hole}}, par {{par}}',
         hole,
         par,
       });
