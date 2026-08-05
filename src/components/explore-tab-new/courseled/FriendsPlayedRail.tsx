@@ -71,7 +71,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
 
       <div
         className="scrollbar-hide"
-        style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
+        style={{ display: 'flex', alignItems: 'flex-start', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
       >
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
