@@ -833,43 +833,49 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       </div>
                     </div>
                   ) : !sortTileDismissed ? (
-                    <div style={{ display: 'flex', gap: 8, margin: '12px 16px', alignItems: 'stretch' }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: '12px 16px',
+                    }}>
                       <button
                         onClick={() => setShowResetConfirm(true)}
                         style={{
                           flex: 1,
                           display: 'flex',
-                          padding: '10px 16px',
-                          background: '#FFFFFF',
-                          border: `1px solid ${AMBER_BORDER}`,
-                          borderRadius: 10,
-                          color: AMBER,
-                          fontSize: 13,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          minHeight: 44,
                           alignItems: 'center',
-                          justifyContent: 'center',
                           gap: 8,
+                          background: 'transparent',
+                          border: 0,
+                          padding: 0,
+                          minHeight: 44,
+                          cursor: 'pointer',
+                          color: INK,
+                          fontSize: 10,
+                          fontWeight: 800,
+                          letterSpacing: '0.14em',
+                          textTransform: 'uppercase',
                         }}
                       >
-                        <RotateCcw size={14} strokeWidth={2.25} />
+                        <RotateCcw size={13} strokeWidth={2.25} />
                         Sort by highest rated
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setSortTileDismissed(true); }}
                         aria-label="Dismiss"
                         style={{
-                          width: 44,
+                          width: 32,
+                          height: 44,
                           flexShrink: 0,
-                          borderRadius: 10,
-                          border: `1px solid ${AMBER_BORDER}`,
-                          background: '#FFFFFF',
-                          color: AMBER,
+                          border: 0,
+                          background: 'transparent',
+                          color: INK_SUBTLE,
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
+                          justifyContent: 'flex-end',
                           cursor: 'pointer',
+                          padding: 0,
                         }}
                       >
                         <X size={16} strokeWidth={2.25} />
