@@ -50,9 +50,11 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
     course_name,
     gross,
     net,
+    stableford,
     hcp_delta,
     feats,
   } = row;
+
 
   const relative = formatRelativeMonths(play_date);
 
