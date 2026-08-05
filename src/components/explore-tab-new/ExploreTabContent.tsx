@@ -225,6 +225,12 @@ export default function ExploreTabContent({
           onSeeAll={() => setFriendsSheet(true)}
         />
 
+        <OnTourThisWeek
+          onTournamentPress={handleTournament}
+          onMediaPress={handleTourMedia}
+          onTourHub={() => navigate('/tour')}
+        />
+
         <AroundTheWorld
           events={events}
           isLoading={wireLoading}
@@ -241,11 +247,6 @@ export default function ExploreTabContent({
           }
         />
 
-        <OnTourThisWeek
-          onTournamentPress={handleTournament}
-          onMediaPress={handleTourMedia}
-          onTourHub={() => navigate('/tour')}
-        />
 
         <MomentsOfTheWeek
           moments={momentList}
