@@ -137,8 +137,10 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
                   <span
                     style={{
-                      fontSize: 11.5,
-                      color: A.MUTE,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: A.INK,
+                      letterSpacing: '-0.005em',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
