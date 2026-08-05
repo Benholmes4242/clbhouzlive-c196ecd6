@@ -39,7 +39,7 @@ import { FilterChips } from '@/components/ui/FilterChips';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
-import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { ProfileSurfaceSkeleton } from '@/components/skeletons/ProfileSurfaceSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 // FloatingPageHeader removed (H3) - chrome now driven by ChromeIsland registry.
