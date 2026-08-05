@@ -52,6 +52,7 @@ function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
 
 export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
+  const featLabel = useRoundFeatLabel();
   const { data: rounds } = useFriendsLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
