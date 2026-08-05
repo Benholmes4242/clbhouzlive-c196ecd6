@@ -39,7 +39,8 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
-import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
+import { ProfileHero, HeroPill } from '@/components/profile/hero/ProfileHero';
+import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
@@ -75,7 +76,6 @@ import {
 // PostsTabContent imported above
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import AchievementsPane from '@/components/profile/AchievementsPane';
-import ProfileHandicapCard from '@/components/handicap/ProfileHandicapCard';
 import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
