@@ -511,7 +511,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     style={{
                       fontSize: 14,
                       fontWeight: 600,
-                      color: '#F8FAFC',
+                      color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -524,8 +524,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         marginTop: 2,
                         fontSize: 11.5,
-                        color: '#F8FAFC',
-                        opacity: 0.6,
+                        color: BODY,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -548,9 +547,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     minHeight: 48,
                     padding: '14px 12px',
                     borderRadius: 10,
-                    background: AMBER,
+                    background: INK,
                     border: 'none',
-                    color: 'rgba(255,255,255,0.95)',
+                    color: PANEL,
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: courseId ? 'pointer' : 'default',
@@ -569,9 +568,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     minHeight: 48,
                     padding: '14px 12px',
                     borderRadius: 10,
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '0.5px solid rgba(255,255,255,0.2)',
-                    color: '#F8FAFC',
+                    background: PANEL,
+                    border: `1px solid ${BORDER}`,
+                    color: INK,
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -581,6 +580,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 >
                   Go to profile
                 </button>
+              </div>
+
               </div>
             </div>
           </motion.div>
