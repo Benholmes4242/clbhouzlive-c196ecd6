@@ -720,6 +720,7 @@ const ProfilePageV2Content: React.FC = () => {
             viewerUserId={user?.id}
             displayName={displayName}
             avatarUrl={profile.profile_photo_url}
+            coverUrl={profile.header_photo_url ?? null}
             region={profile.location ?? null}
             isSelf={isSelf}
             indexValue={resolvedHcp.value ?? null}
@@ -743,10 +744,12 @@ const ProfilePageV2Content: React.FC = () => {
               )
             }
             onStatTap={(stat) => {
-              if (stat === 'rounds') {
+              // Addendum B: the index block and the ROUNDS cell share one
+              // destination - the profile's handicap surface. The legacy
+              // ?tab=stats id redirects here anyway, so we go straight to it.
+              if (stat === 'index' || stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
-                else if (profileUserId)
-                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
+                else if (profileUserId) navigate(`/handicap/${profileUserId}`);
                 return;
               }
               if (stat === 'courses' || stat === 'rated') {

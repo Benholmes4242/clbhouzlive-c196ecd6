@@ -18,6 +18,7 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
+import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -34,7 +35,12 @@ const RED = '#F87171';
 
 const MS_PER_DAY = 86_400_000;
 
-export type HeroStat = 'rounds' | 'courses' | 'rated' | 'trophies';
+export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'trophies';
+
+/** Addendum A: photograph under a heavy scrim. Flat wash, then vertical ramp. */
+const COVER_WASH = 'rgba(14,18,22,0.72)';
+const COVER_RAMP =
+  'linear-gradient(180deg, rgba(14,18,22,0.55) 0%, rgba(14,18,22,0.88) 100%)';
 
 interface Props {
   userId: string;
@@ -48,6 +54,8 @@ interface Props {
   roundsCount: number | null;
   coursesCount: number | null;
   ratedCount: number | null;
+  /** Member's own cover/banner photo (user_profiles.header_photo_url). */
+  coverUrl?: string | null;
   /** Right-hand control: EDIT pill (own) or the follow/friend set (other). */
   action?: React.ReactNode;
   onAvatarTap?: () => void;
@@ -158,6 +166,7 @@ export const ProfileHero: React.FC<Props> = ({
   roundsCount,
   coursesCount,
   ratedCount,
+  coverUrl,
   action,
   onAvatarTap,
   onStatTap,
@@ -169,6 +178,18 @@ export const ProfileHero: React.FC<Props> = ({
   const { data: history } = useHandicapHistory(connection?.id, 'all');
   const { data: achievements } = useUserAchievements(userId);
   const { homeClub } = useProfileClubs(userId, viewerUserId ?? undefined);
+  const { topTen } = useUserTopTenCourses(userId);
+
+  // Fallback chain: (1) own cover, (2) the #1 Top 10 course image,
+  // (3) flat INK - handled by the section background itself.
+  const topCourse = React.useMemo(
+    () => [...(topTen ?? [])].sort((a, b) => a.position - b.position)[0] ?? null,
+    [topTen],
+  );
+  const cover = coverUrl || topCourse?.thumbnail_image || null;
+  const [coverBroken, setCoverBroken] = React.useState(false);
+  React.useEffect(() => setCoverBroken(false), [cover]);
+  const showCover = !!cover && !coverBroken;
 
   const trophiesCount = React.useMemo(() => {
     if (!achievements) return null;
@@ -202,12 +223,39 @@ export const ProfileHero: React.FC<Props> = ({
   return (
     <section
       style={{
+        position: 'relative',
         background: HERO_INK,
         padding: '18px 16px 16px',
         fontFamily: SANS,
         color: '#FFFFFF',
+        isolation: 'isolate',
       }}
     >
+      {/* Cover photograph under a heavy scrim - decoration only, never a
+          control, and it never changes the height of the block. */}
+      {showCover && (
+        <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          <img
+            src={cover as string}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setCoverBroken(true)}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
+          <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
+        </div>
+      )}
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
       {/* 1a. Identity row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
@@ -283,7 +331,27 @@ export const ProfileHero: React.FC<Props> = ({
 
       {/* 1b. The index */}
       {shownIndex != null && (
-        <div style={{ marginTop: 18 }}>
+        <button
+          type="button"
+          onClick={tap('index')}
+          aria-label={t('hero.handicapIndex', 'Handicap index')}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginTop: 18,
+            padding: 0,
+            background: 'transparent',
+            border: 'none',
+            textAlign: 'left',
+            color: 'inherit',
+            fontFamily: SANS,
+            cursor: 'pointer',
+            transition: 'opacity 120ms ease',
+          }}
+          onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
+          onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
+          onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+        >
           <div
             style={{
               fontSize: 8.5,
@@ -332,7 +400,7 @@ export const ProfileHero: React.FC<Props> = ({
 
           {/* 1c. Sparkline */}
           <Sparkline points={series} />
-        </div>
+        </button>
       )}
 
       {/* 1d. Counter strip */}
@@ -365,6 +433,7 @@ export const ProfileHero: React.FC<Props> = ({
           value={trophiesCount}
           onTap={tap('trophies')}
         />
+      </div>
       </div>
     </section>
   );
