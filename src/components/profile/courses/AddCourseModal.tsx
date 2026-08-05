@@ -702,7 +702,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   top: '50%',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none',
-                  color: searchQuery ? AMBER : INK_SUBTLE,
+                  color: searchQuery ? INK : INK_SUBTLE,
                   transition: 'color 150ms',
                 }}
               />
