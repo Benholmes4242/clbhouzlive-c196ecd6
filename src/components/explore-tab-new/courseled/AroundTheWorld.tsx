@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PersonAvatar } from '@/components/shared/PersonAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -105,13 +106,18 @@ export function AroundTheWorld({
 
   /** Tier colour for the right-hand figure (BRIEF: green / ink / gold). */
   const toneFor = (kind: WireEvent['kind'] | 'rating'): string => {
-    if (kind === 'rating' || kind === 'ace' || kind === 'albatross') return GOLD_TEXT;
+    if (kind === 'ace' || kind === 'albatross') return GOLD_TEXT;
     if (kind === 'crown') return A.GREEN;
     return A.INK;
   };
 
-  const nameFor = (e: WireEvent): string =>
-    e.actorName?.trim() || t('discover.wire.you', 'You');
+  /**
+   * Actor name. NEVER falls back to "You" — a missing name returns '' and the
+   * row renders the feat wording alone (see the row renderer). Attribution is
+   * only ever "You" when the payload carries a user_id that strictly equals
+   * the signed-in member's id.
+   */
+  const nameFor = (e: WireEvent): string => e.actorName?.trim() ?? '';
 
   /** The detail line carries the feat wording — there are no badges here. */
   const detailFor = (e: WireEvent): string => {
@@ -204,7 +210,7 @@ export function AroundTheWorld({
             }> = g.events.map((e) => ({
               key: e.id,
               name: nameFor(e),
-              isOwn: e.isOwn,
+              isOwn: !!userId && !!e.userId && e.userId === userId,
               avatar: e.actorAvatar,
               userId: e.userId,
               detail: detailFor(e),
@@ -221,21 +227,21 @@ export function AroundTheWorld({
             if (rating) {
               rows.push({
                 key: `rating:${g.courseId}`,
-                name: rating.actorName?.trim() || t('discover.wire.you', 'You'),
-                isOwn: !!userId && rating.userId === userId,
+                name: rating.actorName?.trim() ?? '',
+                isOwn: !!userId && !!rating.userId && rating.userId === userId,
                 avatar: rating.actorAvatar,
                 userId: rating.userId,
                 detail: t('discover.row.rated', 'Rated this course'),
                 fig: rating.rating.toFixed(1),
                 figLabel: t('discover.row.labelRating', 'RATING'),
-                tone: toneFor('rating'),
+                tone: reviewLabelColor(rating.rating, 'light'),
                 onPress: rating.reviewId
                   ? () => {
                       analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
                       openReview({
                         user: {
                           id: rating.userId ?? '',
-                          name: rating.actorName?.trim() || t('discover.wire.you', 'You'),
+                          name: rating.actorName?.trim() || '',
                           avatar: rating.actorAvatar ?? undefined,
                         },
                         courseId: g.courseId,
@@ -325,38 +331,57 @@ export function AroundTheWorld({
                         transition: 'opacity 120ms ease',
                       }}
                     >
-                      <PersonAvatar
+                      <SquircleAvatar
                         size={30}
                         src={r.avatar}
-                        name={r.name}
+                        alt={r.name}
                         userId={r.userId}
+                        hairlineRing
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            letterSpacing: '-0.005em',
-                            color: r.isOwn ? A.AMBER_DEEP : A.INK,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {r.name}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 11.5,
-                            color: A.MUTE,
-                            marginTop: 1.5,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {r.detail}
-                        </div>
+                        {r.name ? (
+                          <>
+                            <div
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                letterSpacing: '-0.005em',
+                                color: r.isOwn ? A.AMBER_DEEP : A.INK,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {r.isOwn ? t('discover.wire.you', 'You') : r.name}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 11.5,
+                                color: A.MUTE,
+                                marginTop: 1.5,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {r.detail}
+                            </div>
+                          </>
+                        ) : (
+                          <div
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 700,
+                              letterSpacing: '-0.005em',
+                              color: A.INK,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {r.detail}
+                          </div>
+                        )}
                       </div>
                       {r.fig && (
                         <div style={{ flexShrink: 0, textAlign: 'center' }}>
