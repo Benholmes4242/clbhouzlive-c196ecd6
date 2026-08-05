@@ -1,0 +1,193 @@
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { CourseImageFallback } from './CourseImageFallback';
+import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { A, KICKER, SANS, SCRIM_STRONG } from './tokens';
+
+/**
+ * COURSE NEWS SHEET — the complete list of live courses behind Around the
+ * World's "See all {n} courses" action (BRIEF_COURSE_NEWS_SHEET + the CARD GRID
+ * amendment, option A).
+ *
+ * Content is a 2-column grid of mini course cards: image top (76px, through the
+ * CourseImageFallback chain) with the when-chip and the course name on the
+ * scrim, and beneath it a single line carrying the course's TOP event in the
+ * same wording grammar as the on-page cards. The whole card routes to the
+ * course page and closes the sheet. Odd counts leave the last card alone in the
+ * left column — the grid never stretches or pads.
+ */
+
+export interface CourseNewsEntry {
+  courseId: string;
+  courseName: string | null;
+  courseImage: string | null;
+  /** Most recent event time on the course — drives the when-chip. */
+  at: string;
+  /** Wording for the course's top event: actor + feat, already composed. */
+  topLine: string;
+}
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  entries: CourseNewsEntry[];
+  /** Human region label for the caption ("GB&I", "Worldwide"). */
+  regionLabel: string;
+  whenLabel: (iso: string) => string;
+  onCoursePress: (courseId: string) => void;
+}
+
+export function CourseNewsSheet({
+  open,
+  onClose,
+  entries,
+  regionLabel,
+  whenLabel,
+  onCoursePress,
+}: Props) {
+  const { t } = useTranslation('courses');
+  const ids = useMemo(() => entries.map((e) => e.courseId), [entries]);
+  const { data: meta } = useCourseCardMeta(open ? ids : []);
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy="courseled-news-title"
+      variant="light"
+      surfaceColor={A.CANVAS}
+      style={{
+        height: '75dvh',
+        maxHeight: '75dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        fontFamily: SANS,
+        background: A.CANVAS,
+      }}
+    >
+      <div
+        style={{
+          padding: '10px 16px 12px',
+          background: A.CANVAS,
+          borderBottom: `1px solid ${A.BORDER}`,
+        }}
+      >
+        <div style={{ ...KICKER, color: A.DIM, marginBottom: 5 }}>
+          {t('discover.kickerCourses', 'The courses')}
+        </div>
+        <div
+          id="courseled-news-title"
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: A.INK,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+          }}
+        >
+          {t('discover.aroundTheWorld', 'Around the world')}
+        </div>
+        <div style={{ fontSize: 11.5, color: A.MUTE, marginTop: 4 }}>
+          {`${regionLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 8,
+            alignItems: 'start',
+          }}
+        >
+          {entries.map((e) => {
+            const m = meta?.get(e.courseId);
+            return (
+              <button
+                key={e.courseId}
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onCoursePress(e.courseId);
+                }}
+                style={{
+                  background: A.PANEL,
+                  border: `1px solid ${A.BORDER}`,
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                  padding: 0,
+                  textAlign: 'left',
+                  fontFamily: SANS,
+                  cursor: 'pointer',
+                }}
+              >
+                <CourseImageFallback
+                  courseId={e.courseId}
+                  courseName={m?.name ?? e.courseName}
+                  imageUrl={m?.imageUrl ?? e.courseImage}
+                  initialsSize={20}
+                  style={{ height: 76 }}
+                >
+                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: 6,
+                      right: 6,
+                      fontSize: 7.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: '#FFFFFF',
+                      background: 'rgba(10,14,10,0.55)',
+                      borderRadius: 999,
+                      padding: '2.5px 6px',
+                    }}
+                  >
+                    {whenLabel(e.at)}
+                  </span>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 8,
+                      right: 8,
+                      bottom: 6,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: '#fff',
+                      letterSpacing: '-0.01em',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m?.name ?? e.courseName ?? t('discover.unknownCourse', 'Course')}
+                  </div>
+                </CourseImageFallback>
+
+                <div
+                  style={{
+                    padding: '7px 9px',
+                    fontSize: 10.5,
+                    color: A.MUTE,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {e.topLine}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <div aria-hidden style={{ height: 24 }} />
+      </div>
+    </BottomSheet>
+  );
+}
+
+export default CourseNewsSheet;
