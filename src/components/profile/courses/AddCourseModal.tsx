@@ -802,7 +802,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           style={{
                             flex: 1,
                             minHeight: 44,
-                            background: AMBER,
+                            background: DANGER,
                             color: '#FFFFFF',
                             border: 0,
                             borderRadius: 10,
