@@ -25,7 +25,6 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_
 const GOLD_TEXT = '#A87718';
 
 const PAGE = 5;
-const DOT = '\u00B7';
 
 interface CourseGroup {
   courseId: string;
