@@ -1158,6 +1158,17 @@
     "emptyRegion": "Nothing logged here in the last 90 days. Try another region.",
     "showMoreCourses": "Show {{count}} more courses",
     "ratedByMember": "Rated {{value}} by a member",
+    "row": {
+      "crown": "{{category}} here",
+      "eagle": "Eagle at the {{hole}}",
+      "eaglePar": "Eagle at the {{hole}}, par {{par}}",
+      "eagleNoHole": "Made an eagle",
+      "birdieHaul_one": "{{count}} birdie in one round",
+      "birdieHaul_other": "{{count}} birdies in one round",
+      "rated": "Rated this course",
+      "labelScore": "SCORE",
+      "labelRating": "RATING"
+    },
     "onTourThisWeek": "On tour this week",
     "onTourNext": "Next on tour",
     "tourHub": "Tour hub",

@@ -245,6 +245,8 @@ function eagleEvent(row: FeatRow, index: number, userId?: string): WireEvent | n
     actionKey: hole == null ? 'discover.wire.action.eagleUnknownHole' : 'discover.wire.action.eagle',
     actionParams: hole == null ? undefined : { hole: formatOrdinal(hole) },
     rarity: 1,
+    holeNo: hole,
+    holePar: row.hole_par ?? null,
   };
 }
 
