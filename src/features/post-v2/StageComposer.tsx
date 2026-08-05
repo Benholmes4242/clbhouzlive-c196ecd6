@@ -23,7 +23,7 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
-import { useStageComposer, type StageMediaItem } from './hooks/useStageComposer';
+import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -793,7 +793,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               Add photos or videos
             </div>
             <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: CT_DARK.dim }}>
-              Up to 5 · photos and clips
+              Up to {MAX_MEDIA} · photos and clips
             </div>
 
             <div style={{ marginTop: 22, width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
