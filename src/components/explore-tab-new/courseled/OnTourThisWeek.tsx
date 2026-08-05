@@ -165,7 +165,14 @@ export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: P
                       {match?.name ?? e.venueName}
                     </div>
                     <div
-                      style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.8)', marginTop: 1 }}
+                      style={{
+                        fontSize: 10.5,
+                        color: 'rgba(255,255,255,0.8)',
+                        marginTop: 1,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
                     >
                       {e.name}
                     </div>
