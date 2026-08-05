@@ -43,7 +43,9 @@ const Discover = () => {
   }, []);
 
   if (isRehydrating) {
-    return <DiscoverSkeleton />;
+    // The Explore tab hosts the SAME course-led body as /explore, so it gets
+    // the same silhouette; Watch and Friends keep the grid one.
+    return main === 'courses' ? <DiscoverCourseLedSkeleton /> : <DiscoverSkeleton />;
   }
 
   return (
