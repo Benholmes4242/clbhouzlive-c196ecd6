@@ -59,6 +59,8 @@ export interface WireEvent {
   holeNo?: number | null;
   holePar?: number | null;
   holeYards?: number | null;
+  /** Round this feat came from. Absent on older cache rows — row is then inert. */
+  scoreId?: string | null;
 }
 
 
