@@ -234,8 +234,9 @@ export default function ExploreTabContent({
           plus the island itself — Discover no longer sits under a hero. */}
       <div
         style={{
-          padding: '0 16px 12px',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+          padding: '0 16px 28px',
+          // +16px breathing room under the floating islands (spacing pass).
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
         }}
       >
         <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
