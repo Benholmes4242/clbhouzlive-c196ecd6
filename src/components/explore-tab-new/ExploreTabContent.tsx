@@ -253,7 +253,9 @@ export default function ExploreTabContent({
         </h1>
       </div>
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* ONE SECTION RHYTHM: 28px between a section's content and the next
+          section's eyebrow. Eyebrows own their own 10px to their content. */}
+      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsPlayedRail
           userId={userId}
           onCardPress={handleFriendCard}
