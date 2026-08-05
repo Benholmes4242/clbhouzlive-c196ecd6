@@ -653,61 +653,11 @@ const ProfilePageV2Content: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR, position: 'relative' }} immersiveStatusBar immersive>
-      {/* Hero Section - full-bleed immersive, extends behind notch */}
-      <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
-        {/* Hero Image Container - full-bleed behind notch */}
-        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
-          {heroUrl ? (
-            <img 
-              src={heroUrl} 
-              alt="Profile cover" 
-              className="w-full h-full object-cover object-center"
-            />
-          ) : (
-            <CoverPhotoFallback className="w-full h-full" />
-          )}
-          {/* Whole-cover tap target — owner only */}
-          {isSelf && (
-            <button
-              type="button"
-              onClick={() => setPhotoSheet('hero')}
-              className="absolute inset-0 z-[5] pointer-events-auto cursor-pointer"
-              style={{ background: 'transparent', border: 'none' }}
-              aria-label="Change cover photo"
-              disabled={isUploadingHero}
-            />
-          )}
-          {/* Cover photo camera chip — self-profile only */}
-          {isSelf && (
-            <button
-              onClick={() => setPhotoSheet('hero')}
-              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.97] z-10 pointer-events-auto transition-transform"
-              style={{
-                background: 'rgba(0, 0, 0, 0.45)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
-              aria-label="Change cover photo"
-              disabled={isUploadingHero}
-            >
-              {isUploadingHero ? (
-                <Loader2 className="w-4 h-4 text-white animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4 text-white" />
-              )}
-            </button>
-          )}
-        </div>
+      {/* Correction 1: the separate 35dvh full-brightness banner is DELETED.
+          The cover photograph now lives behind the dark hero block under the
+          double scrim, and the cover camera control moved into Edit Profile
+          (HeaderPhotoCard). The page loses ~340px of dead scroll. */}
 
-        {/* H3: header rendered globally by ChromeIsland. Profile pages
-            intentionally have no back button; bottom nav is the exit. */}
-
-
-
-        {/* 124px cover avatar deleted — identity now lives in the dark hero. */}
-
-      </div>
 
 
       {/* Dark hero block — BRIEF_PROFILE_HERO_AND_TOP10 §1. Replaces the
