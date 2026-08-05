@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "handicapIndex": "Handicap index",
+    "trendWindow": "12mo",
+    "rounds": "Rounds",
+    "courses": "Courses",
+    "rated": "Rated",
+    "trophies": "Trophies",
+    "edit": "Edit",
+    "follow": "Follow",
+    "following": "Following",
+    "addFriend": "Add friend",
+    "friends": "Friends",
+    "requested": "Requested",
+    "accept": "Accept"
+  },
+  "social": {
+    "followers": "{{count}} followers",
+    "friendsCount": "{{count}} friends"
+  },
+  "bio": {
+    "readMore": "Read more",
+    "readLess": "Read less"
+  },
+  "topTen": {
+    "kicker": "Your top 10",
+    "kickerOther": "Their top 10",
+    "subtitle": "The very best you've played",
+    "subtitleOther": "The very best they have played",
+    "manage": "Manage",
+    "rated": "Rated",
+    "emptyOwn": "Nothing here yet - add the courses you rate above all others.",
+    "emptyOther": "This golfer hasn't picked their top 10 yet."
+  }
+}

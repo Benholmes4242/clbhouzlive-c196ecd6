@@ -44,6 +44,7 @@ if (!i18n.isInitialized) {
         'tourhub',
         'handicap',
         'echo',
+        'profile',
       ],
       load: 'languageOnly',
       // React already escapes.

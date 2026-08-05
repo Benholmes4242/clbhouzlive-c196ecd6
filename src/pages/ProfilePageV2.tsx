@@ -39,7 +39,9 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
-import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
+import { useTranslation } from 'react-i18next';
+import { ProfileHero, HeroPill } from '@/components/profile/hero/ProfileHero';
+import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
@@ -75,7 +77,6 @@ import {
 // PostsTabContent imported above
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import AchievementsPane from '@/components/profile/AchievementsPane';
-import ProfileHandicapCard from '@/components/handicap/ProfileHandicapCard';
 import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
@@ -181,6 +182,7 @@ const ProfilePageV2Content: React.FC = () => {
   const isProfileDeleted = resolvedProfileId?.deleted === true;
   const profileNotFound = resolvedProfileId?.notFound === true;
   
+  const { t } = useTranslation('profile');
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
@@ -703,142 +705,68 @@ const ProfilePageV2Content: React.FC = () => {
 
 
 
-        {/* Avatar - squircle, left-aligned */}
-        <div
-          className="absolute left-5 z-20 pointer-events-auto"
-          style={{ bottom: '-62px' }}
-        >
-          <div
-            className="relative w-[124px] h-[124px] rounded-[34%]"
-            data-debug-id="profile-photo"
-          >
-            {/* Avatar-on-cover: solid bg ring for separation --
-                canon exception, no hairline. */}
-            <div className="clbhouz-squircle absolute inset-0 bg-background pointer-events-none" />
+        {/* 124px cover avatar deleted — identity now lives in the dark hero. */}
 
-            {/* Avatar image */}
-            <div
-              className="clbhouz-squircle absolute overflow-hidden pointer-events-none"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-              }}
-            >
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
+      </div>
+
+
+      {/* Dark hero block — BRIEF_PROFILE_HERO_AND_TOP10 §1. Replaces the
+          124px cover avatar, the name row, the white figure panel, the counts
+          line, the handicap trend panel and the trophies row. */}
+      {profile?.id && (
+        <div className="relative z-10 pointer-events-auto">
+          <ProfileHero
+            userId={profile.id}
+            viewerUserId={user?.id}
+            displayName={displayName}
+            avatarUrl={profile.profile_photo_url}
+            region={profile.location ?? null}
+            isSelf={isSelf}
+            indexValue={resolvedHcp.value ?? null}
+            roundsCount={shellRoundsCount}
+            coursesCount={shellCoursesPlayed ?? null}
+            ratedCount={reviewsCount ?? null}
+            onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
+            action={
+              isSelfView ? (
+                <HeroPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
+              ) : friendshipStatus === 'blocked' ? null : (
+                <HeroPill
+                  label={
+                    isFollowing
+                      ? t('hero.following', 'Following')
+                      : t('hero.follow', 'Follow')
+                  }
+                  onClick={toggleFollow}
+                  disabled={followBusy}
                 />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white"
-                  style={{
-                    background: getAvatarFallbackColor(avatarFallbackKey),
-                    fontSize: '48px',
-                    fontWeight: 600,
-                    letterSpacing: '0.01em',
-                    lineHeight: 1,
-                  }}
-                >
-                  {avatarInitials}
-                </div>
-              )}
-            </div>
-
-            {/* Camera badge — bottom right, Instagram style */}
-            {isSelf && !isUploadingAvatar && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.55)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  border: '2px solid white',
-                }}
-              >
-                <Camera className="w-3.5 h-3.5 text-white" />
-              </div>
-            )}
-
-            {/* Spinner badge — shows during upload */}
-            {isSelf && isUploadingAvatar && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.55)',
-                  border: '2px solid white',
-                }}
-              >
-                <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              </div>
-            )}
-
-            {/* Full-rect transparent tap target — matches cover-photo pattern.
-                inset:-14px extends beyond squircle corners + covers badge overhang. */}
-            {isSelf && !isUploadingAvatar && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPhotoSheet('avatar');
-                }}
-                className="absolute z-20 pointer-events-auto cursor-pointer"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="Change profile photo"
-              />
-            )}
-            {!isSelf && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAvatarLightboxOpen(true);
-                }}
-                className="absolute z-20 pointer-events-auto cursor-pointer"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="View profile photo"
-              />
-            )}
-          </div>
+              )
+            }
+            onStatTap={(stat) => {
+              if (stat === 'rounds') {
+                if (isSelf) navigate('/handicap');
+                else if (profileUserId)
+                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
+                return;
+              }
+              if (stat === 'courses' || stat === 'rated') {
+                handleTabChange('courses');
+                return;
+              }
+              if (stat === 'trophies') {
+                navigate(isSelf ? '/handicap?gam=trophies' : `/handicap/${profileUserId}?gam=trophies`);
+              }
+            }}
+          />
         </div>
+      )}
 
-      </div>
-
-      {/* Hero HCP pill removed — the handicap is stated ONCE, as the INDEX
-          figure in the primary figure row below, which also owns the tap
-          through to /handicap (or the snapshot sheet for other members). */}
-
-      {/* Identity Stack - adjusted for left-aligned avatar */}
-      <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
-        {/* Name */}
-        <div className="flex items-center gap-1.5">
-          <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
-            {displayName}
-          </h1>
-        </div>
-      </div>
 
       {/* Action Buttons - different for self vs other */}
       <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
         {isSelfView ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
-          <div className="flex items-center gap-3 w-full">
-            <button
-              onClick={() => navigate(editRoute)}
-              className="flex-1 h-11 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-              style={{
-                background: 'transparent',
-                border: `1px solid ${A.BORDER}`,
-                color: A.INK,
-                fontFamily: SANS,
-                fontSize: 11.5,
-                fontWeight: 800,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <Pencil className="w-4 h-4" />
-              Edit profile
-            </button>
+          <div className="flex items-center justify-end w-full">
             {/* Fix 3: Expanded self overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
               if (!open) (document.activeElement as HTMLElement)?.blur();
@@ -923,24 +851,6 @@ const ProfilePageV2Content: React.FC = () => {
 
             {/* Row 2 — Follow + Friend action + overflow menu */}
             <div className="flex items-center gap-2 w-full">
-            <button 
-              className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-              onClick={toggleFollow}
-              disabled={followBusy}
-            >
-              {followBusy ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : isFollowing ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  Following
-                </>
-              ) : (
-                'Follow'
-              )}
-            </button>
-            
             {viewerActorType !== 'business' && (
             <button 
               className={cn(
@@ -1054,40 +964,10 @@ const ProfilePageV2Content: React.FC = () => {
         )}
       </div>
 
-      {/* Primary figure row — the record, stated once. INDEX taps through to
-          the handicap surface (the hero pill is gone; one owner only). */}
-      {isPersonal && (
-        <div className="mt-4 px-4 relative z-10 pointer-events-auto">
-          <Panel>
-            <StatRow
-              size={26}
-              items={[
-                ...(resolvedHcp.value != null
-                  ? [{ label: 'INDEX', value: formatHandicap(resolvedHcp.value) }]
-                  : []),
-                ...(isSelf && shellRoundsCount != null
-                  ? [{ label: 'ROUNDS', value: formatNumber(shellRoundsCount) }]
-                  : []),
-                { label: 'COURSES', value: formatNumber(shellCoursesPlayed) },
-              ]}
-            />
-            {resolvedHcp.value != null && (
-              <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
-                <Action
-                  label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
-                  onClick={() => {
-                    if (isSelf) navigate('/handicap');
-                    else if (profileUserId)
-                      openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
-                  }}
-                />
-              </div>
-            )}
-          </Panel>
-        </div>
-      )}
-
-      {/* Social navigation — one quiet line, not four figures competing with the record */}
+      {/* The white INDEX/ROUNDS/COURSES panel and its "Open your handicap"
+          action are deleted — the dark hero owns both (§1e). The posts/reviews
+          figures are deleted too; followers and friends survive as social
+          actions on one quiet canvas line (§2). */}
       <div className="mt-3 px-4 relative z-10 pointer-events-auto">
         <div
           style={{
@@ -1096,17 +976,16 @@ const ProfilePageV2Content: React.FC = () => {
             flexWrap: 'wrap',
             gap: 6,
             fontFamily: SANS,
-            fontSize: 12.5,
-            color: A.MUTE,
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: A.BODY,
             fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {[
-            { key: 'posts', label: `${formatNumber(postsCount)} posts`, onTap: () => setActiveMiniNav('posts') },
-            { key: 'reviews', label: `${formatNumber(reviewsCount)} reviews`, onTap: () => setActiveMiniNav('posts') },
             {
               key: 'followers',
-              label: `${formatNumber(followersCount)} followers`,
+              label: t('social.followers', { count: followersCount, defaultValue: '{{count}} followers' }),
               onTap: () => {
                 setActiveMiniNav('followers');
                 navigate(`/profile/${username}/followers`);
@@ -1116,7 +995,7 @@ const ProfilePageV2Content: React.FC = () => {
               ? [
                   {
                     key: 'friends',
-                    label: `${formatNumber(friendsCount)} friends`,
+                    label: t('social.friendsCount', { count: friendsCount, defaultValue: '{{count}} friends' }),
                     onTap: () => {
                       setActiveMiniNav('friends');
                       navigate(`/profile/${username}/followers?tab=following&filter=friends`);
@@ -1136,9 +1015,9 @@ const ProfilePageV2Content: React.FC = () => {
                   minHeight: 32,
                   cursor: 'pointer',
                   fontFamily: SANS,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: A.INK,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: A.BODY,
                 }}
               >
                 {item.label}
@@ -1148,6 +1027,7 @@ const ProfilePageV2Content: React.FC = () => {
           ))}
         </div>
       </div>
+
 
       {/* White content sheet */}
       <div className="pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto">
@@ -1160,95 +1040,100 @@ const ProfilePageV2Content: React.FC = () => {
           />
         ) : (
         <>
-        {/* About section */}
-        {profile?.bio ? (
-          <section className="px-4 mb-4">
-            <div 
-              className={cn(
-                "text-base text-foreground leading-relaxed whitespace-pre-wrap",
-                !bioExpanded && "line-clamp-6"
-              )} 
-              style={{ overflowWrap: 'anywhere' }}
-            >
-              {profile.bio}
-            </div>
-            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
-              <button
-                onClick={() => setBioExpanded(v => !v)}
-                className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                style={{ color: '#64748B' }}
-              >
-                {bioExpanded ? 'Read less' : 'Read more'}
-                <ChevronDown className={cn("w-4 h-4 ml-1 transition-transform", bioExpanded && "rotate-180")} />
-              </button>
-            )}
-            
-            {/* Websites as pills - directly under bio */}
-            {websites.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {websites.map((website, index) => (
-                  <a
-                    key={index}
-                    href={ensureProtocol(website)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    {formatUrlForDisplay(website)}
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : isSelf ? (
-          <section className="px-4 mb-4">
-            <button
-              onClick={() => navigate(editRoute)}
-              className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
-              style={{ color: '#F7931E' }}
-            >
-              Add a bio
-            </button>
-            {/* Websites as pills even without bio */}
-            {websites.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {websites.map((website, index) => (
-                  <a
-                    key={index}
-                    href={ensureProtocol(website)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    {formatUrlForDisplay(website)}
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : websites.length > 0 ? (
-          <section className="px-4 mb-4">
-            <div className="flex flex-wrap gap-2">
+        {/* Bio + website chip — on canvas, no card (§3) */}
+        {(() => {
+          const websiteChips = websites.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
               {websites.map((website, index) => (
                 <a
                   key={index}
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] active:scale-[0.98]"
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${A.BORDER}`,
+                    fontFamily: SANS,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: A.INK,
+                  }}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}
                 </a>
               ))}
             </div>
-          </section>
-        ) : null}
+          );
+
+          if (profile?.bio) {
+            return (
+              <section className="px-4 mb-4">
+                <div
+                  className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-6')}
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: 12.5,
+                    lineHeight: 1.55,
+                    color: A.BODY,
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {profile.bio}
+                </div>
+                {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
+                  <button
+                    onClick={() => setBioExpanded(v => !v)}
+                    className="mt-1 min-h-[44px] flex items-center gap-1 active:scale-[0.97] transition-transform"
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: A.INK,
+                    }}
+                  >
+                    {bioExpanded ? t('bio.readLess', 'Read less') : t('bio.readMore', 'Read more')}
+                    <ChevronDown className={cn('w-3.5 h-3.5', bioExpanded && 'rotate-180')} />
+                  </button>
+                )}
+                {websiteChips}
+              </section>
+            );
+          }
+
+          if (isSelf) {
+            return (
+              <section className="px-4 mb-4">
+                <button
+                  onClick={() => navigate(editRoute)}
+                  className="min-h-[44px] flex items-center active:opacity-70 transition-opacity"
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: A.INK,
+                  }}
+                >
+                  Add a bio
+                </button>
+                {websiteChips}
+              </section>
+            );
+          }
+
+          if (websites.length > 0) {
+            return <section className="px-4 mb-4">{websiteChips}</section>;
+          }
+          return null;
+        })()}
+
 
         {/* Social handles row */}
         {(() => {
@@ -1292,24 +1177,17 @@ const ProfilePageV2Content: React.FC = () => {
         })()}
 
 
-        {/* Handicap summary card — shown on personal profiles (own + friends) */}
-        {isPersonal && profile?.id && user?.id && (
-          <ProfileHandicapCard
-            userId={profile.id}
-            viewerUserId={user.id}
-            isOwnProfile={isSelf}
-            displayName={displayName}
-          />
-        )}
+        {/* HANDICAP TREND panel + TROPHIES row deleted — the hero owns the
+            index, the 12-month trend and the trophies counter. */}
 
-        {/* Personal Top 10 Carousel */}
+
+        {/* Personal Top 10 — editorial rail (BRIEF_PROFILE_HERO_AND_TOP10 §4) */}
         {isPersonal && profile?.id && (
           <div className="mt-4 mb-2">
-            <FavouritesCarousel
+            <ProfileTopTenRail
               userId={profile.id}
               isOwnProfile={isSelf}
               onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
-              displayName={profile.display_name ?? profile.username ?? undefined}
               initialCourseId={deepLinkTopTen.current?.courseId ?? null}
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
@@ -1323,6 +1201,7 @@ const ProfilePageV2Content: React.FC = () => {
             )}
           </div>
         )}
+
 
         {/* Divider above Clubs section */}
         <div className="px-4 mb-3">
