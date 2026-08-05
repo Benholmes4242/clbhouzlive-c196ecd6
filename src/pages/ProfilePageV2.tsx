@@ -675,8 +675,9 @@ const ProfilePageV2Content: React.FC = () => {
             isSelf={isSelf}
             indexValue={resolvedHcp.value ?? null}
             roundsCount={shellRoundsCount}
-            coursesCount={shellCoursesPlayed ?? null}
             ratedCount={reviewsCount ?? null}
+            friendsCount={isPersonal ? friendsCount : null}
+            followersCount={followersCount}
             onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
             action={
               isSelfView ? (
@@ -770,12 +771,20 @@ const ProfilePageV2Content: React.FC = () => {
                 else if (profileUserId) navigate(`/handicap/${profileUserId}`);
                 return;
               }
-              if (stat === 'courses' || stat === 'rated') {
+              if (stat === 'rated') {
                 handleTabChange('courses');
                 return;
               }
-              if (stat === 'trophies') {
-                navigate(isSelf ? '/handicap?gam=trophies' : `/handicap/${profileUserId}?gam=trophies`);
+              // Round 3 §3: the deleted "N followers . N friends" line's
+              // destinations now live on the strip.
+              if (stat === 'followers') {
+                setActiveMiniNav('followers');
+                navigate(`/profile/${username}/followers`);
+                return;
+              }
+              if (stat === 'friends') {
+                setActiveMiniNav('friends');
+                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
               }
             }}
           />
