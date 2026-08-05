@@ -5,8 +5,8 @@
  *  - Manage: drag-to-reorder + chevrons + remove (preserves dnd-kit behavior)
  *  - Add Course: search played courses, add rated, prompt to rate unrated
  *
- * Canonical sheet language: SheetHeader with amber cut-line, CAPS eyebrows,
- * Geist throughout, plain tabular-num scores, podium-coloured rank badges.
+ * Current sheet language: 75dvh canvas sheet, no amber anywhere, CAPS eyebrows,
+ * Geist throughout, tabular-num scores, band-coloured ratings, uniform dim ranks.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -36,15 +36,16 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
-// ---- Canonical tokens ----
+// ---- Canonical tokens (post-flip: no amber on this sheet) ----
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
-const AMBER = '#F7931E';
-const AMBER_WASH = 'rgba(247,147,30,0.08)';
-const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const BORDER = 'rgba(15,23,42,0.07)';
+const BORDER = '#EDF0F3';
+const PANEL = '#FFFFFF';
+const TILE = '#F4F6F9';
+const DANGER = '#DC2626';
 const BG_SURFACE = '#F8FAFC';
 
 interface AddCourseModalProps {
@@ -66,13 +67,13 @@ interface CourseWithRating {
 }
 
 // Plain tabular score - canonical replacement for the retired SerifScore.
-const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
+const PlainScore: React.FC<{ value: number; size?: number; color?: string }> = ({ value, size = 13, color = INK }) => {
   const safe = Number.isFinite(value) ? value : 0;
   return (
     <span style={{
       fontSize: size,
       fontWeight: 800,
-      color: INK,
+      color,
       letterSpacing: '-0.01em',
       fontVariantNumeric: 'tabular-nums',
       fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
@@ -128,7 +129,6 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
   };
 
   const position = index + 1;
-  const isPodium = position <= 3;
   const ratingNum = typeof course.rating === 'number'
     ? course.rating
     : course.rating != null ? parseFloat(course.rating) : null;
@@ -142,24 +142,24 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       {...listeners}
       style={{
         ...dragStyle,
-        background: '#FFFFFF',
+        background: PANEL,
         border: `1px solid ${BORDER}`,
-        borderRadius: 14,
+        borderRadius: 16,
         padding: '12px 14px',
-        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
         marginBottom: 12,
         cursor: 'grab',
         touchAction: 'none',
       }}
     >
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        {/* Rank numeral — left of thumbnail */}
+        {/* Rank numeral — uniform dim tabular figures at every position */}
         <div style={{
           fontSize: 16,
           fontWeight: 900,
-          color: isPodium ? AMBER : INK_SUBTLE,
+          color: INK_SUBTLE,
           letterSpacing: '-0.03em',
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+          fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
           lineHeight: 1.3,
           flexShrink: 0,
           minWidth: 18,
@@ -167,7 +167,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           {position}
         </div>
 
-        {/* Thumbnail — left of name */}
+        {/* Thumbnail — 44px squircle */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -175,27 +175,27 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             loading="lazy"
             decoding="async"
             style={{
-              width: 30,
-              height: 30,
+              width: 44,
+              height: 44,
               objectFit: 'cover',
-              borderRadius: 7,
-              background: '#F1F5F9',
+              borderRadius: '34%',
+              background: TILE,
               flexShrink: 0,
               display: 'block',
             }}
           />
         ) : (
           <div style={{
-            width: 30,
-            height: 30,
-            borderRadius: 7,
-            background: '#F1F5F9',
+            width: 44,
+            height: 44,
+            borderRadius: '34%',
+            background: TILE,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <Trophy size={14} color={INK_SUBTLE} />
+            <Trophy size={16} color={INK_SUBTLE} />
           </div>
         )}
 
@@ -206,8 +206,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             <div style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 15,
-              fontWeight: 700,
+              fontSize: 13.5,
+              fontWeight: 800,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.3,
@@ -226,7 +226,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
                 cursor: isRemoving ? 'not-allowed' : 'pointer',
                 padding: 2,
                 flexShrink: 0,
-                color: '#DC2626',
+                color: INK_SUBTLE,
                 opacity: isRemoving ? 0.4 : 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -250,52 +250,53 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               </span>
               {ratingNum != null && (
                 <>
-                  <span style={{ color: '#CBD5E1' }}>·</span>
-                  <PlainScore value={ratingNum} size={13} />
+                  <span style={{ color: INK_SUBTLE }}>·</span>
+                  <PlainScore value={ratingNum} size={13} color={reviewLabelColor(ratingNum, 'light')} />
                 </>
               )}
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-              <button
-                onPointerDown={stopDrag}
-                onClick={() => onMoveUp(index)}
-                disabled={index === 0 || isReordering}
-                aria-label="Move up"
-                style={{
+              {(() => {
+                const upDisabled = index === 0 || isReordering;
+                const downDisabled = index === totalItems - 1 || isReordering;
+                const quiet = (disabled: boolean): React.CSSProperties => ({
                   border: 'none',
-                  background: '#F1F5F9',
-                  borderRadius: 7,
-                  cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+                  background: TILE,
+                  borderRadius: 10,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
                   padding: 5,
-                  color: INK_SOFT,
-                  opacity: index === 0 || isReordering ? 0.4 : 1,
+                  color: INK,
+                  opacity: disabled ? 0.35 : 1,
+                  pointerEvents: disabled ? 'none' : 'auto',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
-              >
-                <ChevronUp size={15} />
-              </button>
-              <button
-                onPointerDown={stopDrag}
-                onClick={() => onMoveDown(index)}
-                disabled={index === totalItems - 1 || isReordering}
-                aria-label="Move down"
-                style={{
-                  border: 'none',
-                  background: '#F1F5F9',
-                  borderRadius: 7,
-                  cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
-                  padding: 5,
-                  color: INK_SOFT,
-                  opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ChevronDown size={15} />
-              </button>
+                });
+                return (
+                  <>
+                    <button
+                      onPointerDown={stopDrag}
+                      onClick={() => onMoveUp(index)}
+                      disabled={upDisabled}
+                      aria-label="Move up"
+                      aria-disabled={upDisabled}
+                      style={quiet(upDisabled)}
+                    >
+                      <ChevronUp size={15} />
+                    </button>
+                    <button
+                      onPointerDown={stopDrag}
+                      onClick={() => onMoveDown(index)}
+                      disabled={downDisabled}
+                      aria-label="Move down"
+                      aria-disabled={downDisabled}
+                      style={quiet(downDisabled)}
+                    >
+                      <ChevronDown size={15} />
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -327,7 +328,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
     alignItems: 'flex-start',
     gap: 12,
     padding: '12px 16px',
-    background: '#FFFFFF',
+    background: PANEL,
     borderBottom: `1px solid ${BORDER}`,
     opacity: isAtLimit ? 0.4 : 1,
   }}>
@@ -342,7 +343,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
           height: 48,
           objectFit: 'cover',
           borderRadius: 10,
-          background: '#F1F5F9',
+          background: TILE,
           flexShrink: 0,
           display: 'block',
         }}
@@ -352,7 +353,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         width: 48,
         height: 48,
         borderRadius: 10,
-        background: '#F1F5F9',
+        background: TILE,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -391,8 +392,8 @@ const CourseRow: React.FC<CourseRowProps> = ({
         </span>
         {course.has_rating && course.rating_value != null && (
           <>
-            <span style={{ color: '#CBD5E1' }}>·</span>
-            <PlainScore value={course.rating_value} size={13} />
+            <span style={{ color: INK_SUBTLE }}>·</span>
+            <PlainScore value={course.rating_value} size={13} color={reviewLabelColor(course.rating_value, 'light')} />
           </>
         )}
       </div>
@@ -408,14 +409,14 @@ const CourseRow: React.FC<CourseRowProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         background: isAtLimit
-          ? '#F1F5F9'
+          ? TILE
           : isSecondary
-            ? 'rgba(15,23,42,0.04)'
-            : AMBER_WASH,
-        border: `1px solid ${isAtLimit ? BORDER : isSecondary ? BORDER : AMBER_BORDER}`,
+            ? TILE
+            : PANEL,
+        border: `1px solid ${BORDER}`,
         borderRadius: 10,
         cursor: isAtLimit ? 'not-allowed' : 'pointer',
-        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : AMBER,
+        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : INK,
         padding: 0,
         flexShrink: 0,
       }}
@@ -599,13 +600,22 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       onClose={onClose}
       zIndexBase={1400}
       ariaLabelledBy="add-course-title"
-      className="max-h-[80dvh]"
+      variant="light"
+      maxHeight="75dvh"
+      style={{
+        height: '75dvh',
+        maxHeight: '75dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: BG_SURFACE,
+      }}
     >
       {/* Flex column shell — header/status/tabs/search are natural height; scroll fills rest */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: 0,
         background: BG_SURFACE,
       }}>
         {/* Canonical Dispatch sheet header */}
@@ -627,8 +637,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             fontWeight: 600,
             color: INK_SUBTLE,
           }}>
-            <span style={{ color: AMBER, fontWeight: 700 }}>10 / 10 list complete</span>
-            <span style={{ color: '#CBD5E1' }}>·</span>
+            <span style={{ color: INK, fontWeight: 700 }}>10 / 10 list complete</span>
+            <span style={{ color: INK_SUBTLE }}>·</span>
             <span>Remove one to add another</span>
           </div>
         )}
@@ -638,7 +648,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           display: 'flex',
           gap: 24,
           padding: '0 16px',
-          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
+          borderBottom: `1px solid ${BORDER}`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -668,7 +678,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   display: 'inline-block',
                   paddingBottom: 8,
                   marginBottom: -1,
-                  borderBottom: isActive ? '2px solid #0F172A' : '2px solid transparent',
+                  borderBottom: isActive ? `2px solid ${INK}` : '2px solid transparent',
                 }}>
                   {label}
                 </span>
@@ -700,7 +710,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   top: '50%',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none',
-                  color: searchQuery ? AMBER : INK_SUBTLE,
+                  color: searchQuery ? INK : INK_SUBTLE,
                   transition: 'color 150ms',
                 }}
               />
@@ -716,15 +726,15 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   paddingRight: 16,
                   fontSize: 14,
                   borderRadius: 12,
-                  background: '#FFFFFF',
+                  background: PANEL,
                   border: `1px solid ${BORDER}`,
                   color: INK,
-                  caretColor: AMBER,
+                  caretColor: INK,
                   outline: 'none',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = AMBER;
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(247,147,30,0.10)';
+                  e.currentTarget.style.borderColor = INK;
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = BORDER;
@@ -763,8 +773,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       margin: '12px 16px',
                       padding: 16,
                       borderRadius: 12,
-                      border: `1px solid ${AMBER_BORDER}`,
-                      background: AMBER_WASH,
+                      border: `1px solid ${BORDER}`,
+                      background: PANEL,
                     }}>
                       <div style={{
                         display: 'flex',
@@ -772,7 +782,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         gap: 8,
                         marginBottom: 8,
                       }}>
-                        <div style={{ width: 3, height: 9, background: AMBER }} />
+                        <div style={{ width: 3, height: 9, background: INK }} />
                         <span style={{
                           fontSize: 10,
                           fontWeight: 800,
@@ -800,8 +810,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           style={{
                             flex: 1,
                             minHeight: 44,
-                            background: AMBER,
-                            color: '#FFFFFF',
+                            background: DANGER,
+                            color: PANEL,
                             border: 0,
                             borderRadius: 10,
                             fontSize: 13,
@@ -817,7 +827,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           style={{
                             flex: 1,
                             minHeight: 44,
-                            background: '#FFFFFF',
+                            background: PANEL,
                             color: INK,
                             border: `1px solid ${BORDER}`,
                             borderRadius: 10,
@@ -831,43 +841,49 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       </div>
                     </div>
                   ) : !sortTileDismissed ? (
-                    <div style={{ display: 'flex', gap: 8, margin: '12px 16px', alignItems: 'stretch' }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: '12px 16px',
+                    }}>
                       <button
                         onClick={() => setShowResetConfirm(true)}
                         style={{
                           flex: 1,
                           display: 'flex',
-                          padding: '10px 16px',
-                          background: '#FFFFFF',
-                          border: `1px solid ${AMBER_BORDER}`,
-                          borderRadius: 10,
-                          color: AMBER,
-                          fontSize: 13,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          minHeight: 44,
                           alignItems: 'center',
-                          justifyContent: 'center',
                           gap: 8,
+                          background: 'transparent',
+                          border: 0,
+                          padding: 0,
+                          minHeight: 44,
+                          cursor: 'pointer',
+                          color: INK,
+                          fontSize: 10,
+                          fontWeight: 800,
+                          letterSpacing: '0.14em',
+                          textTransform: 'uppercase',
                         }}
                       >
-                        <RotateCcw size={14} strokeWidth={2.25} />
+                        <RotateCcw size={13} strokeWidth={2.25} />
                         Sort by highest rated
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setSortTileDismissed(true); }}
                         aria-label="Dismiss"
                         style={{
-                          width: 44,
+                          width: 32,
+                          height: 44,
                           flexShrink: 0,
-                          borderRadius: 10,
-                          border: `1px solid ${AMBER_BORDER}`,
-                          background: '#FFFFFF',
-                          color: AMBER,
+                          border: 0,
+                          background: 'transparent',
+                          color: INK_SUBTLE,
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
+                          justifyContent: 'flex-end',
                           cursor: 'pointer',
+                          padding: 0,
                         }}
                       >
                         <X size={16} strokeWidth={2.25} />
