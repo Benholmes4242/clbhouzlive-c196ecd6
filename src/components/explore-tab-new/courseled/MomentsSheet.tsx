@@ -16,7 +16,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   moments: Moment[];
-  onTilePress: (m: Moment, index: number) => void;
+  onTilePress: (m: Moment) => void;
 }
 
 export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
@@ -77,7 +77,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
             <button
               key={m.key}
               type="button"
-              onClick={() => onTilePress(m, i)}
+              onClick={() => onTilePress(m)}
               style={{
                 position: 'relative',
                 padding: 0,

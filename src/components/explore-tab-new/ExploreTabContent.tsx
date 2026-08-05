@@ -99,6 +99,8 @@ export default function ExploreTabContent({
   const [honoursSheet, setHonoursSheet] = useState(false);
 
   const momentList = useMemo(() => moments ?? [], [moments]);
+  // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
+  const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
   const handleRegionChange = useCallback(
@@ -285,7 +287,8 @@ export default function ExploreTabContent({
 
 
         <MomentsOfTheWeek
-          moments={momentList}
+          moments={momentMosaic}
+          totalCount={momentList.length}
           onTilePress={handleMoment}
           onSeeAll={() => setMomentsSheet(true)}
         />

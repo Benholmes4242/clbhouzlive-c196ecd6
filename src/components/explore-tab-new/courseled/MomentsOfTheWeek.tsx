@@ -46,7 +46,7 @@ const SHORT = 106;
 
 interface Props {
   moments: Moment[];
-  onTilePress: (m: Moment, index: number) => void;
+  onTilePress: (m: Moment) => void;
   onSeeAll: () => void;
 }
 
@@ -75,7 +75,7 @@ export function MomentsOfTheWeek({ moments, onTilePress, onSeeAll }: Props) {
             <button
               key={m.key}
               type="button"
-              onClick={() => onTilePress(m, i)}
+              onClick={() => onTilePress(m)}
               style={{
                 position: 'relative',
                 padding: 0,
