@@ -227,7 +227,7 @@ export function AroundTheWorld({
           top && userId && top.userId && top.userId === userId
             ? t('discover.wire.you', 'You')
             : (top?.actorName?.trim() ?? '');
-        const feat = top ? detailFor(top) : '';
+        const feat = top ? detailFor(top, true) : '';
         const rating = ratings?.get(g.courseId);
         const useRating = !top?.figure && !!rating;
 
