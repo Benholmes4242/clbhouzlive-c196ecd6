@@ -95,5 +95,19 @@
       "most_eagles_all_time": "[Most eagles]",
       "most_birdies_all_time": "[Most birdies]"
     }
+  },
+  "business": {
+    "hero": {
+      "communityRating": "[Cømmúnïtý ráƭïñg]",
+      "ratings": "[{{count}} ráƭïñgs]",
+      "ratings_one": "[{{count}} ráƭïñg]",
+      "edit": "[Édïƭ]",
+      "follow": "[Følløw]",
+      "following": "[Følløwïñg]",
+      "manage": "[Máñágé]",
+      "verified": "[Vérïfïéd]",
+      "readMore": "[Réád møré]",
+      "readLess": "[Réád léss]"
+    }
   }
 }

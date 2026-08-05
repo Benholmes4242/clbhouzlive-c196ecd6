@@ -98,7 +98,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -115,8 +115,8 @@
   "connectGhost": {
     "eyebrow": "THIS COULD BE YOURS",
     "cta": "Connect your handicap",
-    "footnote": "TAKES 30 SECONDS \u00b7 WE NEVER POST ON YOUR BEHALF",
-    "slimCta": "Connect \u2192",
+    "footnote": "TAKES 30 SECONDS · WE NEVER POST ON YOUR BEHALF",
+    "slimCta": "Connect →",
     "dismissA11y": "Dismiss",
     "holes": {
       "headline": "See exactly where your shots go here",
@@ -142,7 +142,7 @@
   "verifiedAccounts": {
     "title": "Verified accounts",
     "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
-    "cta": "Contact support \u2192",
+    "cta": "Contact support →",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",
     "settingsRowSubtitle": "How verification works"
@@ -298,6 +298,18 @@
         "editor": "Editor",
         "analyst": "Analyst"
       }
+    },
+    "hero": {
+      "communityRating": "Community rating",
+      "ratings": "{{count}} ratings",
+      "ratings_one": "{{count}} rating",
+      "edit": "Edit",
+      "follow": "Follow",
+      "following": "Following",
+      "manage": "Manage",
+      "verified": "Verified",
+      "readMore": "Read more",
+      "readLess": "Read less"
     }
   },
   "handicap": {
@@ -434,14 +446,14 @@
     "count_one": "{{count}} comment",
     "count_other": "{{count}} comments",
     "emptyLine": "What's on your mind?",
-    "placeholder": "Add a comment\u2026",
-    "replyPlaceholder": "Reply to {{name}}\u2026",
+    "placeholder": "Add a comment…",
+    "replyPlaceholder": "Reply to {{name}}…",
     "replyingTo": "Replying to",
     "reply": "Reply",
     "viewMoreReplies_one": "View {{count}} more reply",
     "viewMoreReplies_other": "View {{count}} more replies",
     "viewEarlier": "VIEW EARLIER COMMENTS",
-    "loading": "Loading\u2026",
+    "loading": "Loading…",
     "edited": "edited",
     "business": "BUSINESS",
     "like": "Like",
