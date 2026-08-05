@@ -142,24 +142,24 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       {...listeners}
       style={{
         ...dragStyle,
-        background: '#FFFFFF',
+        background: PANEL,
         border: `1px solid ${BORDER}`,
-        borderRadius: 14,
+        borderRadius: 16,
         padding: '12px 14px',
-        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
         marginBottom: 12,
         cursor: 'grab',
         touchAction: 'none',
       }}
     >
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        {/* Rank numeral — left of thumbnail */}
+        {/* Rank numeral — uniform dim tabular figures at every position */}
         <div style={{
           fontSize: 16,
           fontWeight: 900,
-          color: isPodium ? AMBER : INK_SUBTLE,
+          color: INK_SUBTLE,
           letterSpacing: '-0.03em',
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+          fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
           lineHeight: 1.3,
           flexShrink: 0,
           minWidth: 18,
@@ -167,7 +167,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           {position}
         </div>
 
-        {/* Thumbnail — left of name */}
+        {/* Thumbnail — 44px squircle */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -175,27 +175,27 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             loading="lazy"
             decoding="async"
             style={{
-              width: 30,
-              height: 30,
+              width: 44,
+              height: 44,
               objectFit: 'cover',
-              borderRadius: 7,
-              background: '#F1F5F9',
+              borderRadius: '34%',
+              background: TILE,
               flexShrink: 0,
               display: 'block',
             }}
           />
         ) : (
           <div style={{
-            width: 30,
-            height: 30,
-            borderRadius: 7,
-            background: '#F1F5F9',
+            width: 44,
+            height: 44,
+            borderRadius: '34%',
+            background: TILE,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <Trophy size={14} color={INK_SUBTLE} />
+            <Trophy size={16} color={INK_SUBTLE} />
           </div>
         )}
 
@@ -206,8 +206,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             <div style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 15,
-              fontWeight: 700,
+              fontSize: 13.5,
+              fontWeight: 800,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.3,
@@ -226,7 +226,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
                 cursor: isRemoving ? 'not-allowed' : 'pointer',
                 padding: 2,
                 flexShrink: 0,
-                color: '#DC2626',
+                color: INK_SUBTLE,
                 opacity: isRemoving ? 0.4 : 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -250,52 +250,53 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               </span>
               {ratingNum != null && (
                 <>
-                  <span style={{ color: '#CBD5E1' }}>·</span>
-                  <PlainScore value={ratingNum} size={13} />
+                  <span style={{ color: INK_SUBTLE }}>·</span>
+                  <PlainScore value={ratingNum} size={13} color={reviewLabelColor(ratingNum, 'light')} />
                 </>
               )}
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-              <button
-                onPointerDown={stopDrag}
-                onClick={() => onMoveUp(index)}
-                disabled={index === 0 || isReordering}
-                aria-label="Move up"
-                style={{
+              {(() => {
+                const upDisabled = index === 0 || isReordering;
+                const downDisabled = index === totalItems - 1 || isReordering;
+                const quiet = (disabled: boolean): React.CSSProperties => ({
                   border: 'none',
-                  background: '#F1F5F9',
-                  borderRadius: 7,
-                  cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+                  background: TILE,
+                  borderRadius: 10,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
                   padding: 5,
-                  color: INK_SOFT,
-                  opacity: index === 0 || isReordering ? 0.4 : 1,
+                  color: INK,
+                  opacity: disabled ? 0.35 : 1,
+                  pointerEvents: disabled ? 'none' : 'auto',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
-              >
-                <ChevronUp size={15} />
-              </button>
-              <button
-                onPointerDown={stopDrag}
-                onClick={() => onMoveDown(index)}
-                disabled={index === totalItems - 1 || isReordering}
-                aria-label="Move down"
-                style={{
-                  border: 'none',
-                  background: '#F1F5F9',
-                  borderRadius: 7,
-                  cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
-                  padding: 5,
-                  color: INK_SOFT,
-                  opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ChevronDown size={15} />
-              </button>
+                });
+                return (
+                  <>
+                    <button
+                      onPointerDown={stopDrag}
+                      onClick={() => onMoveUp(index)}
+                      disabled={upDisabled}
+                      aria-label="Move up"
+                      aria-disabled={upDisabled}
+                      style={quiet(upDisabled)}
+                    >
+                      <ChevronUp size={15} />
+                    </button>
+                    <button
+                      onPointerDown={stopDrag}
+                      onClick={() => onMoveDown(index)}
+                      disabled={downDisabled}
+                      aria-label="Move down"
+                      aria-disabled={downDisabled}
+                      style={quiet(downDisabled)}
+                    >
+                      <ChevronDown size={15} />
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
