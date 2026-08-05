@@ -29,6 +29,9 @@ import {
 
 const RAIL_CAP = 10;
 
+/** Feats that render in gold on the glass badge. */
+const LEGENDARY_KEYS = new Set(['holes_in_one', 'albatrosses']);
+
 interface Props {
   userId: string | undefined;
   onCardPress: (row: FriendRoundRow) => void;
