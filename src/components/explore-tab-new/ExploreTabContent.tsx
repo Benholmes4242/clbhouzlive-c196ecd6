@@ -19,6 +19,7 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
+import { REGION_TABS } from './AlmanacSections';
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { MomentsSheet } from './courseled/MomentsSheet';
@@ -242,6 +243,10 @@ export default function ExploreTabContent({
             </div>
           }
           onCoursePress={(id) => goCourse(id, 'around_the_world')}
+          regionLabel={
+            REGION_TABS.find((r) => (r.slug ?? null) === (activeRegion ?? null))?.label ??
+            'Worldwide'
+          }
           onExpand={(revealed) =>
             analyticsEvents.track('discover_courses_expanded', { revealed })
           }
