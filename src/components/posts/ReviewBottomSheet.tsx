@@ -494,8 +494,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               style={{
                 flex: '0 0 auto',
                 padding: '10px 18px calc(env(safe-area-inset-bottom, 0px) + 14px)',
-                borderTop: '1px solid rgba(255,255,255,0.12)',
+                borderTop: `1px solid ${BORDER}`,
               }}
+
             >
               {/* Reviewer row */}
               <div
