@@ -49,6 +49,7 @@ import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 import { CT_DARK } from '@/features/_shared/composerTokens';
+import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface Props {
