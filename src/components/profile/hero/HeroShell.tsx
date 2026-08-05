@@ -11,6 +11,7 @@
  */
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { formatNumber } from '@/i18n/format';
 
 export const HERO_INK = A.INK;
 export const W_55 = 'rgba(255,255,255,0.55)';
@@ -99,7 +100,7 @@ export const HeroCell: React.FC<{
           ...FIGS,
         }}
       >
-        {value == null ? '\u2014' : value.toLocaleString()}
+        {value == null ? '\u2014' : formatNumber(value)}
       </div>
       <div
         style={{
