@@ -601,13 +601,22 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       onClose={onClose}
       zIndexBase={1400}
       ariaLabelledBy="add-course-title"
-      className="max-h-[80dvh]"
+      variant="light"
+      maxHeight="75dvh"
+      style={{
+        height: '75dvh',
+        maxHeight: '75dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: BG_SURFACE,
+      }}
     >
       {/* Flex column shell — header/status/tabs/search are natural height; scroll fills rest */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: 0,
         background: BG_SURFACE,
       }}>
         {/* Canonical Dispatch sheet header */}
