@@ -295,7 +295,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             >
               {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
               {rating != null && (
-                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} />
+                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} surface="light" />
               )}
 
               {/* Drag handle */}
@@ -305,7 +305,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     width: 32,
                     height: 4,
                     borderRadius: 2,
-                    background: 'rgba(255,255,255,0.35)',
+                    background: GRABBER,
                   }}
                 />
               </div>
@@ -313,13 +313,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Top row: eyebrow + course info (left) | verdict label (right) */}
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {/* Amber eyebrow */}
+                  {/* Ink eyebrow */}
                   <div
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.14em',
-                      color: AMBER,
+                      color: INK,
                       textTransform: 'uppercase',
                       display: 'flex',
                       alignItems: 'center',
@@ -347,7 +347,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       fontSize: 22,
                       fontWeight: 800,
                       lineHeight: 1.15,
-                      color: '#F8FAFC',
+                      color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -362,13 +362,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         marginTop: 5,
                         fontSize: 12.5,
-                        color: '#F8FAFC',
-                        opacity: 0.7,
+                        color: MUTE,
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: 4,
                       }}
                     >
+
                       <MapPin size={12} strokeWidth={2} />
                       <span
                         style={{
