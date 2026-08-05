@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import { useDiscoverWire } from './hooks/useDiscoverWire';
+import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -25,7 +25,8 @@ import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { MomentsSheet } from './courseled/MomentsSheet';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
-import { RarestLedger } from './courseled/RarestLedger';
+import { HonoursBoard, sortHonours } from './courseled/HonoursBoard';
+import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
 import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
@@ -47,7 +48,7 @@ import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
  *   3 On tour this week           facts rail (next-up fallback off-week)
  *   4 Moments of the week         mosaic     read-only viewer
  *   5 Most played this week       leaderboard
- *   6 Rarest of all               ledger     never windowed
+ *   6 The honours board          board      never windowed
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
@@ -95,6 +96,7 @@ export default function ExploreTabContent({
   const [friendsSheet, setFriendsSheet] = useState(false);
   const [momentsSheet, setMomentsSheet] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
+  const [honoursSheet, setHonoursSheet] = useState(false);
 
   const momentList = useMemo(() => moments ?? [], [moments]);
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
@@ -179,16 +181,24 @@ export default function ExploreTabContent({
     [goCourse],
   );
 
-  const handleRarest = useCallback(
-    (e: { courseId: string | null; kind: string; at: string }) => {
-      analyticsEvents.track('discover_rarest_tapped', {
+  const honours = useMemo(() => sortHonours(legendary), [legendary]);
+
+  const handleHonoursRow = useCallback(
+    (e: WireEvent) => {
+      analyticsEvents.track('discover_honours_row_tap', {
         kind: e.kind,
         year: new Date(e.at).getFullYear(),
+        course_id: e.courseId ?? null,
       });
-      if (e.courseId) navigate(`/courses/${e.courseId}`);
+      if (e.scoreId) opener.openByScore(e.scoreId, null, e.userId);
     },
-    [navigate],
+    [opener],
   );
+
+  const openHonoursSheet = useCallback(() => {
+    analyticsEvents.track('discover_honours_sheet_open', { total: honours.length });
+    setHonoursSheet(true);
+  }, [honours.length]);
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
@@ -265,7 +275,11 @@ export default function ExploreTabContent({
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
-        <RarestLedger events={legendary} onRowPress={handleRarest} />
+        <HonoursBoard
+          events={honours}
+          onRowPress={handleHonoursRow}
+          onSeeAll={honours.length > 5 ? openHonoursSheet : undefined}
+        />
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
             the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
@@ -297,6 +311,13 @@ export default function ExploreTabContent({
         onClose={() => setMostPlayedSheet(false)}
         rows={mostPlayedList}
         onRowPress={handleMostPlayed}
+      />
+
+      <HonoursBoardSheet
+        open={honoursSheet}
+        onClose={() => setHonoursSheet(false)}
+        events={honours}
+        onRowPress={handleHonoursRow}
       />
 
       <RoundDetailSheet

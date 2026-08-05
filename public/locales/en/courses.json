@@ -1209,7 +1209,12 @@
     "rarest": {
       "aceAt": "Hole in one, {{hole}}",
       "albatrossAt": "Albatross, {{hole}}"
-    }
+    },
+    "honoursTitle": "The honours board",
+    "honoursTitleSentence": "The honours board",
+    "honoursCaption": "Every ace and albatross in clbhouz history",
+    "honoursSeeAll": "See all {{count}}",
+    "honoursSheetCaption": "{{count}} entries · all time"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
