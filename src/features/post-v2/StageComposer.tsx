@@ -29,12 +29,14 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
+import { useRecentRoundCourses, formatRoundWhen } from './hooks/useRecentRoundCourses';
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { startPostUpload } from './lib/postUploadController';
 
 import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
 import MediaTray from './components/MediaTray';
+import SlideThumb from './components/SlideThumb';
 import CaptionField from './components/CaptionField';
 import CourseTagSheet from './components/CourseTagSheet';
 import ActorSheet from './components/ActorSheet';
@@ -71,6 +73,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
+  // Suggestion-first course tagging: the courses this member played most recently.
+  const recentCourses = useRecentRoundCourses(profile?.id ?? null).data ?? [];
   const queryClient = useQueryClient();
 
   const isEditMode = !!editPostId;
@@ -1108,7 +1112,8 @@ const LIGHT = {
   panel: '#FFFFFF',
   line: '#E9EDF2',
   ink: '#0E1216',
-  mute: '#8A9099',
+  mute: '#68707B',
+  dim: '#A2A9B2',
 } as const;
 
 const lightIconButtonStyle: React.CSSProperties = {
