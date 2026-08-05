@@ -99,6 +99,8 @@ export default function ExploreTabContent({
   const [honoursSheet, setHonoursSheet] = useState(false);
 
   const momentList = useMemo(() => moments ?? [], [moments]);
+  // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
+  const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
   const handleRegionChange = useCallback(
@@ -157,24 +159,45 @@ export default function ExploreTabContent({
   );
 
   // Moments open the shared fullscreen viewer READ-ONLY: Discover reports, it
-  // is not a second engagement surface.
+  // is not a second engagement surface. Both surfaces (mosaic + sheet) share
+  // this handler, so the tapped media's identity must travel with the post —
+  // otherwise every tile of a multi-media post opens the post's first media.
+  const momentPosts = useMemo(() => {
+    const seen = new Set<string>();
+    const posts = [] as typeof momentList[number]['post'][];
+    for (const m of momentList) {
+      if (seen.has(m.post.id)) continue;
+      seen.add(m.post.id);
+      posts.push(m.post);
+    }
+    return posts;
+  }, [momentList]);
+
   const handleMoment = useCallback(
-    (m: Moment, index: number) => {
+    (m: Moment) => {
       analyticsEvents.track('discover_moment_tapped', {
         course_id: m.courseId,
         post_id: m.post.id,
+        media_index: m.mediaIndex ?? 0,
       });
+      const index = Math.max(
+        0,
+        momentPosts.findIndex((p) => p.id === m.post.id),
+      );
       openWithOrigin({
-        posts: momentList.map((x) => x.post),
+        posts: momentPosts,
         index,
         originEl: null,
         posterUrl: m.thumbnail,
+        mediaIndex: m.mediaIndex ?? 0,
+        mediaId: m.mediaId ?? null,
         openedFrom: 'discover-moments',
         options: { readOnly: true },
       });
     },
-    [momentList],
+    [momentPosts],
   );
+
 
   const handleMostPlayed = useCallback(
     (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
@@ -264,7 +287,8 @@ export default function ExploreTabContent({
 
 
         <MomentsOfTheWeek
-          moments={momentList}
+          moments={momentMosaic}
+          totalCount={momentList.length}
           onTilePress={handleMoment}
           onSeeAll={() => setMomentsSheet(true)}
         />
