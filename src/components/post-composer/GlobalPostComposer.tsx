@@ -19,6 +19,7 @@ export function GlobalPostComposer() {
     editPostId,
     draftId,
     initialMedia,
+    awaitingMedia,
     closePostStudio,
   } = usePostStudioStore();
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export function GlobalPostComposer() {
       editPostId={editPostId}
       draftId={draftId}
       initialMedia={initialMedia}
+      awaitingMedia={awaitingMedia}
     />
   );
 }

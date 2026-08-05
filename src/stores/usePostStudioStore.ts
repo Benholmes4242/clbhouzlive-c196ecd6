@@ -7,6 +7,8 @@ import type { StudioActorType } from '@/components/post-composer/types';
 interface PostStudioStoreState {
   isOpen: boolean;
   initialMedia: File[];
+  /** True while the native picker is up: the composer opens dark and awaiting. */
+  awaitingMedia: boolean;
   initialActorType: StudioActorType;
   initialActorId: string | null;
   returnPath: string;
@@ -20,6 +22,8 @@ interface PostStudioStoreState {
   /** Open the studio (optionally with pre-selected media or actor) */
   openPostStudio: (opts?: {
     media?: File[];
+    /** Open page 1 in its awaiting-media state (picker about to be fired). */
+    awaitingMedia?: boolean;
     actorType?: StudioActorType;
     actorId?: string | null;
     returnPath?: string;
@@ -50,6 +54,7 @@ interface PostStudioStoreState {
 export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   isOpen: false,
   initialMedia: [],
+  awaitingMedia: false,
   initialActorType: 'personal',
   initialActorId: null,
   returnPath: '/',
@@ -61,6 +66,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: opts?.media ?? [],
+      awaitingMedia: opts?.awaitingMedia ?? false,
       initialActorType: opts?.actorType ?? 'personal',
       initialActorId: opts?.actorId ?? null,
       returnPath: opts?.returnPath ?? window.location.pathname,
@@ -73,6 +79,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: [],
+      awaitingMedia: false,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -85,6 +92,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: [],
+      awaitingMedia: false,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -97,6 +105,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: true,
       initialMedia: [],
+      awaitingMedia: false,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: opts.returnPath ?? window.location.pathname,
@@ -113,6 +122,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
     set({
       isOpen: false,
       initialMedia: [],
+      awaitingMedia: false,
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: '/',

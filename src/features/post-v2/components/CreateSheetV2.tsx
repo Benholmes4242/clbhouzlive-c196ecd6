@@ -48,6 +48,9 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
     // Close the sheet and fire the picker SYNCHRONOUSLY in the same tap —
     // never behind the close animation or a setTimeout (iOS swallows it).
     pendingRef.current = true;
+    // The dark wizard opens FIRST, in its awaiting state, so the OS source
+    // menu floats over the composer rather than the page behind it.
+    openPostStudio({ awaitingMedia: true, returnPath });
     onClose();
     inputRef.current?.click();
   };
