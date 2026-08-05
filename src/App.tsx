@@ -74,6 +74,7 @@ import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
 import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
+import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -526,7 +527,7 @@ function AppRoutes() {
         <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
-        <Route path="/explore" element={<Suspense fallback={<CoursesHubSkeleton />}><ExplorePage /></Suspense>} />
+        <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
