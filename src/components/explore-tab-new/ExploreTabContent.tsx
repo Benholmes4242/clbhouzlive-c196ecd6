@@ -204,16 +204,7 @@ export default function ExploreTabContent({
     [goCourse],
   );
 
-  const honours = useMemo(() => {
-    const s = sortHonours(legendary);
-    if (s.length) return s;
-    // TEMP-SCREENSHOT
-    return [
-      { id: 't1', kind: 'ace', at: '2026-06-02', courseName: 'Royal Birkdale Golf Club', actorName: 'Ben Carter', holeNo: 12, holePar: 3, scoreId: 'x', isOwn: false },
-      { id: 't2', kind: 'ace', at: '2025-08-11', courseName: 'The Honors Course', actorName: 'You', holeNo: 4, holePar: 3, scoreId: 'x', isOwn: true },
-      { id: 't3', kind: 'albatross', at: '2025-05-01', courseName: 'Royal Norwich', actorName: 'Alex Doyle', holeNo: 7, holePar: 5, scoreId: 'x', isOwn: false },
-    ] as never;
-  }, [legendary]);
+  const honours = useMemo(() => sortHonours(legendary), [legendary]);
 
   const handleHonoursRow = useCallback(
     (e: WireEvent) => {
