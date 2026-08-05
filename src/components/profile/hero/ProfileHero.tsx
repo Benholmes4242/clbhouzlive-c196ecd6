@@ -238,10 +238,11 @@ export const ProfileHero: React.FC<Props> = ({
               size={52}
               src={avatarUrl ?? undefined}
               alt={displayName}
-              name={displayName}
+              userId={userId}
               hideRing
               className="w-full h-full"
             />
+
           </div>
         </button>
 
