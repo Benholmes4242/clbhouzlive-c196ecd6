@@ -45,7 +45,6 @@ export interface FriendRoundRow {
 
   gross: number | null;
   net: number | null;
-  stableford: number | null;
   /** current handicap index minus hcp_at_time. Negative = handicap dropped (good). */
   hcp_delta: number | null;
   /** Up to two feats, rarest first. */
@@ -103,7 +102,7 @@ export function useFriendsLatestRounds(
       const { data: rounds } = await supabase
         .from('gam_round_stats' as never)
         .select(
-          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, stableford_points, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card',
+          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card',
         )
         .in('user_id', friendIds)
         .gte('play_date', windowStartIso)
@@ -119,7 +118,6 @@ export function useFriendsLatestRounds(
         course_name: string | null;
         course_id: string | null;
         hcp_at_time: number | null;
-        stableford_points: number | null;
         birdies: number | null;
         eagles: number | null;
         albatrosses: number | null;
@@ -246,7 +244,6 @@ export function useFriendsLatestRounds(
           gross: r.gross_score,
 
           net,
-          stableford: r.stableford_points,
           hcp_delta: hcpDelta,
           feats: featsForRound(r),
         };
