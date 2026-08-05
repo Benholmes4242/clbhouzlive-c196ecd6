@@ -6,7 +6,7 @@ import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const SLATE_50 = '#F8FAFC';
 const INK = '#0F172A';
-const AMBER = '#F7931E';
+const EYEBROW_INK = '#0E1216';
 const HAIRLINE = '#E2E8F0';
 
 interface Props {
@@ -49,7 +49,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: EYEBROW_INK,
             marginBottom: 4,
           }}
         >
