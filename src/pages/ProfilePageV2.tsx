@@ -1302,14 +1302,13 @@ const ProfilePageV2Content: React.FC = () => {
           />
         )}
 
-        {/* Personal Top 10 Carousel */}
+        {/* Personal Top 10 — editorial rail (BRIEF_PROFILE_HERO_AND_TOP10 §4) */}
         {isPersonal && profile?.id && (
           <div className="mt-4 mb-2">
-            <FavouritesCarousel
+            <ProfileTopTenRail
               userId={profile.id}
               isOwnProfile={isSelf}
               onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
-              displayName={profile.display_name ?? profile.username ?? undefined}
               initialCourseId={deepLinkTopTen.current?.courseId ?? null}
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
@@ -1323,6 +1322,7 @@ const ProfilePageV2Content: React.FC = () => {
             )}
           </div>
         )}
+
 
         {/* Divider above Clubs section */}
         <div className="px-4 mb-3">
