@@ -22,6 +22,13 @@ export interface Moment {
   mediaType: 'image' | 'video';
   /** Index of this tile's media within the post's mediaItems. */
   mediaIndex?: number;
+  /** Stable media id of this tile's media — authoritative for the viewer. */
+  mediaId?: string;
+  /**
+   * True for the single best tile of its course. The PAGE mosaic renders only
+   * these (one tile per course); the SHEET renders the full ranked list.
+   */
+  isCourseLead: boolean;
 }
 
 const DAY = 86_400_000;
