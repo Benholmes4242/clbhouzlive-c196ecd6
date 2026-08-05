@@ -112,7 +112,9 @@ export function MostPlayedLeaderboard({
                     <span
                       style={{
                         fontSize: 11,
-                        color: A.MUTE,
+                        fontWeight: 600,
+                        lineHeight: 1.35,
+                        color: A.BODY,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
