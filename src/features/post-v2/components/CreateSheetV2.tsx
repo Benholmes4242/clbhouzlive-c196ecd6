@@ -1,10 +1,20 @@
-// CreateSheetV2 - the Course review chooser. The Post path now lives in the
-// bottom-nav file picker, so this sheet only opens the review wizard.
+// CreateSheetV2 - the create chooser reached from the bottom-nav (+).
+// Two options: Post (fires the native media picker from THIS component so the
+// tap that opens the OS source menu is its own user activation) and Course
+// review (opens the review wizard). The hidden file input lives here on
+// purpose: it travels with the tap that fires it.
+//
+// Picker outcomes:
+//   files chosen -> openPostStudio({ media }) -> StageComposer lands on page 1
+//   cancelled    -> openPostStudio()          -> StageComposer lands on page 2
+// Cancellation is detected via the input's 'cancel' event, with a
+// window-focus + timeout fallback for WebViews that never fire it.
 
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Star, ImagePlus } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import BottomSheet from './BottomSheet';
 import CourseTagSheet from './CourseTagSheet';
 import { CT } from '@/features/_shared/composerTokens';
@@ -18,16 +28,63 @@ interface Props {
 export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
   const { profile } = useProfileData();
   const navigate = useNavigate();
+  const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   const [courseOpen, setCourseOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Guards a single picker session: whichever signal lands first wins.
+  const pendingRef = useRef(false);
+
+  const settle = useCallback((files: File[]) => {
+    if (!pendingRef.current) return;
+    pendingRef.current = false;
+    openPostStudio(files.length > 0 ? { media: files, returnPath } : { returnPath });
+  }, [openPostStudio, returnPath]);
 
   const handleReview = () => {
     setCourseOpen(true);
   };
 
+  const handlePost = () => {
+    // Close the sheet and fire the picker SYNCHRONOUSLY in the same tap —
+    // never behind the close animation or a setTimeout (iOS swallows it).
+    pendingRef.current = true;
+    onClose();
+    inputRef.current?.click();
+  };
+
+  // Cancel detection. 'cancel' is the correct signal (WebKit 16.4+); the
+  // focus fallback covers WebViews that don't fire it.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const onCancel = () => settle([]);
+    el.addEventListener('cancel', onCancel);
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const onFocus = () => {
+      if (!pendingRef.current) return;
+      if (timer) clearTimeout(timer);
+      // Give the change event a beat to land before assuming a cancel.
+      timer = setTimeout(() => settle([]), 900);
+    };
+    window.addEventListener('focus', onFocus);
+    return () => {
+      el.removeEventListener('cancel', onCancel);
+      window.removeEventListener('focus', onFocus);
+      if (timer) clearTimeout(timer);
+    };
+  }, [settle]);
+
   return (
     <>
       <BottomSheet open={open && !courseOpen} title="Create" onClose={onClose}>
         <div style={{ padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <OptionRow
+            glyph={<ImagePlus size={22} color={CT.ink} />}
+            title="Post"
+            subtitle="Share photos, video or words"
+            onClick={handlePost}
+          />
           <OptionRow
             glyph={<Star size={22} color={CT.amber} />}
             title="Course review"
@@ -54,6 +111,18 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
         }}
       />
 
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        hidden
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? []);
+          e.target.value = '';
+          settle(files);
+        }}
+      />
     </>
   );
 }
