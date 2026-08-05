@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Loader2, Pencil } from 'lucide-react';
+import { ChevronRight, ImagePlus, Loader2, Pencil } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -122,6 +122,15 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const stageAddInputRef = useRef<HTMLInputElement>(null);
+  // Empty-state inputs. The LIBRARY input is rendered AT the button (not hidden
+  // off in the header) because the iOS chooser menu anchors to the input's rect:
+  // sitting it mid-stage keeps that menu off the footer. The CAMERA input carries
+  // `capture`, which opens the camera directly with no OS source menu.
+  const emptyCameraInputRef = useRef<HTMLInputElement>(null);
+  const emptyLibraryInputRef = useRef<HTMLInputElement>(null);
+  // Page-2 caption element: focus is chained off the Next tap because autoFocus
+  // is unreliable in the WebView.
+  const captionElRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
   useEffect(() => {
@@ -275,16 +284,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
 
-  // The picker resolved with nothing (cancelled), or the member emptied the
-  // filmstrip: page 1 has no reason to exist, so fall through to the words page.
-  const awaiting = isFreshCreate && awaitingMedia && state.media.length === 0;
-  useEffect(() => {
-    if (!isFreshCreate) return;
-    if (page !== 1) return;
-    if (awaitingMedia) return;
-    if (state.media.length > 0) return;
-    setPage(2);
-  }, [isFreshCreate, page, awaitingMedia, state.media.length]);
+  // Page 1 with no media is no longer a dark void: it renders the designed empty
+  // state, which owns both pick paths and a words-only escape. So there is no
+  // auto-fallthrough to page 2 on picker cancel any more.
+  const emptyStage = state.media.length === 0;
 
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
@@ -584,6 +587,12 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   }
 
   const handleStageAdd = () => stageAddInputRef.current?.click();
+  // autoFocus is unreliable in the WebView, so the Next tap chains focus onto
+  // the caption itself - the tap is still the user activation the keyboard needs.
+  const focusCaption = () => {
+    if (isEditMode) return;
+    requestAnimationFrame(() => { try { captionElRef.current?.focus(); } catch { /* focus best-effort */ } });
+  };
   const handleStageAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (files.length) void handleAddFiles(files);
@@ -727,24 +736,33 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   
         {/* Close guard */}
         <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
-          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* One short job = content height. Grabber + title come from the sheet. */}
+          <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: LIGHT.mute }}>
+              Keep this post as a draft to finish later?
+            </div>
             {!isEditMode && (
-              <>
-                {state.media.length > 0 && (
-                  <div style={{ fontSize: 12, fontWeight: 500, color: CT_DARK.mute, marginBottom: 8, textAlign: 'center' }}>
-                    {t('closeGuard.mediaNotSaved', { count: state.media.length })}
-                  </div>
-                )}
-                <button onClick={saveAsDraft} disabled={savingDraft} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 600, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}>{savingDraft ? 'Saving' : 'Save draft'}</button>
-              </>
+              <button
+                onClick={saveAsDraft}
+                disabled={savingDraft}
+                style={{ height: 48, background: LIGHT.ink, color: '#FFFFFF', border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 800, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
+              >
+                {savingDraft ? 'Saving' : 'Save draft'}
+              </button>
             )}
-            <button onClick={() => { setSheet(null); reset(); onClose(); }} style={{ background: 'transparent', border: `1px solid ${CT_DARK.line}`, borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT_DARK.danger }}>Discard</button>
+            <button
+              onClick={() => { setSheet(null); reset(); onClose(); }}
+              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 14, fontWeight: 800, cursor: 'pointer', color: '#C0392B' }}
+            >
+              Discard
+            </button>
           </div>
         </BottomSheet>
     </>
   );
 
-  const courseNames = state.courses.map((c) => c.name).join(' · ');
+  // Suggestions still on offer: recent rounds minus anything already tagged.
+  const suggestedCourses = recentCourses.filter((c) => !state.courses.some((s) => s.id === c.id));
   const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
   const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
   const firstItem = state.media[0] ?? null;
@@ -766,11 +784,62 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
         <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-        {awaiting ? (
-          /* AWAITING MEDIA — a calm dark stage while the OS source menu floats above */
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: CT_DARK.bg }}>
-            <div style={{ width: '100%', aspectRatio: '4 / 5', maxHeight: '56vh', background: CT_DARK.elev, opacity: 0.6, flex: 'none' }} />
-            <div style={{ flex: 1, minHeight: 0 }} />
+        {emptyStage ? (
+          /* EMPTY STAGE — a designed block, not a dark void. Both inputs live
+             HERE so the OS chooser (library path only) anchors mid-stage. */
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', background: CT_DARK.bg }}>
+            <ImagePlus size={30} color={CT_DARK.dim} strokeWidth={1.6} />
+            <div style={{ marginTop: 14, fontSize: 16, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.015em' }}>
+              Add photos or videos
+            </div>
+            <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: CT_DARK.dim }}>
+              Up to 5 · photos and clips
+            </div>
+
+            <div style={{ marginTop: 22, width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => emptyCameraInputRef.current?.click()}
+                  style={emptyPrimaryButtonStyle}
+                >
+                  Take photo or video
+                </button>
+                <input
+                  ref={emptyCameraInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  capture="environment"
+                  onChange={handleStageAddFiles}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={anchoredInputStyle}
+                />
+              </div>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => emptyLibraryInputRef.current?.click()}
+                  style={emptySecondaryButtonStyle}
+                >
+                  Choose from library
+                </button>
+                <input
+                  ref={emptyLibraryInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handleStageAddFiles}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={anchoredInputStyle}
+                />
+              </div>
+              <button
+                onClick={() => setPage(2)}
+                style={{ background: 'transparent', border: 0, padding: '6px 0 0', fontSize: 12, fontWeight: 700, color: CT_DARK.mute, cursor: 'pointer' }}
+              >
+                Just write something
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -849,8 +918,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         {/* Next */}
         <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
           <button
-            onClick={() => setPage(2)}
-            disabled={awaiting}
+            onClick={() => { setPage(2); focusCaption(); }}
+            disabled={emptyStage}
             style={{
               width: '100%',
               padding: '15px 20px',
@@ -859,9 +928,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               fontSize: 15,
               fontWeight: 800,
               letterSpacing: '-0.01em',
-              background: awaiting ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
-              color: awaiting ? CT_DARK.dim : '#11131A',
-              cursor: awaiting ? 'default' : 'pointer',
+              background: emptyStage ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
+              color: emptyStage ? CT_DARK.dim : '#11131A',
+              cursor: emptyStage ? 'default' : 'pointer',
             }}
           >
             Next
@@ -931,59 +1000,57 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             minHeight={96}
             placeholder="What's on your mind"
             autoFocus={!isEditMode}
+            inputRef={(el) => { captionElRef.current = el; }}
           />
           <div style={{ fontSize: 11, color: LIGHT.dim, marginTop: 2 }}>@mention friends and businesses</div>
         </div>
 
         {/* Tag a course — suggestion-first, Search is the fallback */}
         <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
-          {state.courses.length > 0 ? (
-            <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 10 }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.courses[0].name}</div>
-                <button
-                  onClick={() => { openDetail('course'); setSheet('course'); }}
-                  style={{ marginTop: 2, padding: 0, border: 0, background: 'transparent', fontSize: 11.5, color: LIGHT.mute, cursor: 'pointer' }}
-                >
-                  {state.courses.length > 1 ? `${courseNames}` : 'Change course'}
-                </button>
-              </div>
+          <div style={{ padding: '14px 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink }}>Tag a course</span>
               <button
-                onClick={() => setCourses([])}
-                aria-label="Remove course"
-                style={{ marginLeft: 'auto', width: 26, height: 26, borderRadius: 999, border: 0, background: '#EEF1F5', color: LIGHT.mute, cursor: 'pointer', fontSize: 13, flex: 'none' }}
-              >×</button>
+                onClick={() => { openDetail('course'); setSheet('course'); }}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+              >
+                Search
+                <ChevronRight size={12} strokeWidth={2.5} />
+              </button>
             </div>
-          ) : (
-            <div style={{ padding: '14px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink }}>Tag a course</span>
-                <button
-                  onClick={() => { openDetail('course'); setSheet('course'); }}
-                  style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-                >
-                  Search
-                  <ChevronRight size={12} strokeWidth={2.5} />
-                </button>
+
+            {/* TAGGED = filled ink chip with a trailing ×. SUGGESTED = outlined
+                chip on the canvas with a leading +. Tapping converts in place. */}
+            {(state.courses.length > 0 || suggestedCourses.length > 0) && (
+              <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+                {state.courses.map((c) => (
+                  <button
+                    key={`tagged-${c.id}`}
+                    onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
+                    aria-label={`Untag ${c.name}`}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${LIGHT.ink}`, background: LIGHT.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: '#FFFFFF' }}
+                  >
+                    {c.name}
+                    <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
+                  </button>
+                ))}
+                {suggestedCourses.map((c) => (
+                  <button
+                    key={`suggested-${c.id}`}
+                    onClick={() => { openDetail('course'); setCourses([...state.courses, { id: c.id, name: c.name, country: c.country }]); }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
+                  >
+                    <span style={{ fontWeight: 800, color: LIGHT.mute }}>+</span>
+                    {c.name}
+                    <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
+                  </button>
+                ))}
               </div>
-              {recentCourses.length > 0 && (
-                <>
-                  <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                    {recentCourses.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => { openDetail('course'); setCourses([{ id: c.id, name: c.name, country: c.country }]); }}
-                        style={{ border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
-                      >
-                        {c.name} <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div style={{ fontSize: 10.5, color: LIGHT.dim, marginTop: 8 }}>From your recent rounds</div>
-                </>
-              )}
-            </div>
-          )}
+            )}
+            {suggestedCourses.length > 0 && (
+              <div style={{ fontSize: 10.5, color: LIGHT.dim, marginTop: 8 }}>From your recent rounds</div>
+            )}
+          </div>
         </div>
 
         {/* Detail rows — Drafts appears only when drafts exist */}
@@ -1044,6 +1111,41 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   );
 }
 
+
+// Empty-stage buttons: 44px, fully rounded.
+const emptyButtonBase: React.CSSProperties = {
+  width: '100%',
+  height: 44,
+  borderRadius: 999,
+  fontSize: 14,
+  fontWeight: 800,
+  letterSpacing: '-0.01em',
+  cursor: 'pointer',
+};
+
+const emptyPrimaryButtonStyle: React.CSSProperties = {
+  ...emptyButtonBase,
+  border: 0,
+  background: CT_DARK.ink,
+  color: '#11131A',
+};
+
+const emptySecondaryButtonStyle: React.CSSProperties = {
+  ...emptyButtonBase,
+  border: `1px solid ${CT_DARK.line}`,
+  background: 'rgba(248,250,252,0.06)',
+  color: CT_DARK.ink,
+};
+
+// The input sits exactly over its button so the iOS chooser menu anchors there.
+const anchoredInputStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+  opacity: 0,
+  pointerEvents: 'none',
+};
 
 const closeButtonStyle: React.CSSProperties = {
   width: 32,
