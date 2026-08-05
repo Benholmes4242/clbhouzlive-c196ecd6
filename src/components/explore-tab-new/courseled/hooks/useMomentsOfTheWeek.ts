@@ -38,11 +38,14 @@ const FRESH_HOT_MS = 2 * DAY; // <= 48h
 const FRESH_WARM_MS = 7 * DAY; // <= 7 days
 const BAND_HOT = 3;
 const BAND_WARM = 2;
-const BAND_COOL = 1; // <= 14 days (the fetch window)
+const BAND_COOL = 1; // <= 30 days (the fetch window)
 const COMMENT_WEIGHT = 2;
 const MAX_TILES_PER_POST = 3;
 /** PAGE mosaic cap: one tile per course. The SHEET is uncapped. */
 const MAX_TILES_PER_COURSE = 1;
+/** 30-day window, uncapped sheet: candidate ceiling sized for the whole pool. */
+const CANDIDATE_LIMIT = 500;
+const WINDOW_DAYS = 30;
 
 function freshnessBand(createdAt: string, now: number): number {
   const age = now - new Date(createdAt).getTime();
@@ -59,11 +62,11 @@ function streamThumb(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
 }
 
-export function useMomentsOfTheWeek(limit = 24) {
+export function useMomentsOfTheWeek() {
   return useQuery({
-    queryKey: ['courseled', 'moments', limit],
+    queryKey: ['courseled', 'moments', WINDOW_DAYS],
     queryFn: async (): Promise<Moment[]> => {
-      const since = new Date(Date.now() - 14 * DAY).toISOString();
+      const since = new Date(Date.now() - WINDOW_DAYS * DAY).toISOString();
       const { data, error } = await supabase
         .from('posts')
         .select(
@@ -74,7 +77,7 @@ export function useMomentsOfTheWeek(limit = 24) {
         .eq('status', 'published')
         .gte('created_at', since)
         .order('created_at', { ascending: false })
-        .limit(160);
+        .limit(CANDIDATE_LIMIT);
       if (error) throw error;
 
       type Row = {
@@ -136,9 +139,8 @@ export function useMomentsOfTheWeek(limit = 24) {
         isCourseLead: boolean;
       }> = [];
       for (const cand of ranked) {
-        if (picked.length >= limit) break;
         const mediaCount = cand.row.post_media?.length ?? 0;
-        const take = Math.min(MAX_TILES_PER_POST, mediaCount, limit - picked.length);
+        const take = Math.min(MAX_TILES_PER_POST, mediaCount);
         for (let i = 0; i < take; i += 1) {
           const used = perCourse.get(cand.courseId) ?? 0;
           picked.push({
