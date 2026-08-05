@@ -16,8 +16,6 @@ import type { RoundFeat } from '@/lib/gam/roundFeats';
  */
 
 const INK = '#0E1216';
-const CANVAS = '#F4F6F9';
-const GOLD = '#D8A93C';
 
 /** Geometry shared with the semantic delta chip. Do not restyle. */
 export const featChipBase: CSSProperties = {
@@ -34,7 +32,7 @@ export const featChipBase: CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-/** Badge geometry - round 3 spec. */
+/** Badge geometry - unchanged from the shipped spec. */
 const badgeBase: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -48,21 +46,38 @@ const badgeBase: CSSProperties = {
   padding: '3px 7px',
 };
 
-const STANDARD_STYLE: CSSProperties = {
+/** Three-tier tint map. Tier is derived here, never passed by callers. */
+const GOLD_STYLE: CSSProperties = {
+  color: '#A87718',
+  background: 'rgba(216,169,60,0.16)',
+  border: '1px solid rgba(216,169,60,0.38)',
+};
+
+const GREEN_STYLE: CSSProperties = {
+  color: '#0F8F4A',
+  background: 'rgba(15,143,74,0.10)',
+  border: '1px solid rgba(15,143,74,0.18)',
+};
+
+const INK_STYLE: CSSProperties = {
   color: INK,
-  background: CANVAS,
-  border: '1px solid rgba(14,18,22,0.14)',
+  background: 'rgba(14,18,22,0.06)',
+  border: '1px solid rgba(14,18,22,0.12)',
 };
 
-const LEGENDARY_STYLE: CSSProperties = {
-  color: GOLD,
-  background: CANVAS,
-  border: `1px solid ${GOLD}`,
-};
-
-function isLegendary(key: RoundFeat['key']): boolean {
-  return key === 'holes_in_one' || key === 'albatrosses';
+function tierStyle(key: RoundFeat['key']): CSSProperties {
+  switch (key) {
+    case 'holes_in_one':
+    case 'albatrosses':
+      return GOLD_STYLE;
+    case 'beat_par':
+    case 'clean_card':
+      return GREEN_STYLE;
+    default:
+      return INK_STYLE;
+  }
 }
+
 
 export function useRoundFeatLabel(): (f: RoundFeat) => string {
   const { t } = useTranslation('courses');
