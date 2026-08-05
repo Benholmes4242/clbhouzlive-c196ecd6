@@ -764,24 +764,7 @@ const ProfilePageV2Content: React.FC = () => {
       <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
         {isSelfView ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
-          <div className="flex items-center gap-3 w-full">
-            <button
-              onClick={() => navigate(editRoute)}
-              className="flex-1 h-11 rounded-full flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-              style={{
-                background: 'transparent',
-                border: `1px solid ${A.BORDER}`,
-                color: A.INK,
-                fontFamily: SANS,
-                fontSize: 11.5,
-                fontWeight: 800,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <Pencil className="w-4 h-4" />
-              Edit profile
-            </button>
+          <div className="flex items-center justify-end w-full">
             {/* Fix 3: Expanded self overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
               if (!open) (document.activeElement as HTMLElement)?.blur();
@@ -866,24 +849,6 @@ const ProfilePageV2Content: React.FC = () => {
 
             {/* Row 2 — Follow + Friend action + overflow menu */}
             <div className="flex items-center gap-2 w-full">
-            <button 
-              className="h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-              onClick={toggleFollow}
-              disabled={followBusy}
-            >
-              {followBusy ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : isFollowing ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  Following
-                </>
-              ) : (
-                'Follow'
-              )}
-            </button>
-            
             {viewerActorType !== 'business' && (
             <button 
               className={cn(
