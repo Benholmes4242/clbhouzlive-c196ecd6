@@ -29,9 +29,17 @@ import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/Revi
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
-const AMBER = '#F7931E';
+/* Light-mode surface tokens (Dispatch canvas set). */
+const CANVAS = '#F8FAFC';
+const PANEL = '#FFFFFF';
+const BORDER = '#EDF0F3';
+const INK = '#0E1216';
+const BODY = '#3A424C';
+const MUTE = '#68707B';
+const GRABBER = '#D6DBE1';
 const FONT_GEIST =
   "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
