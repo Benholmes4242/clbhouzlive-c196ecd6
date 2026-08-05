@@ -1,12 +1,14 @@
 // MediaTray - 82px filmstrip thumbnails with arrow-based reorder.
 // Arrow reorder (not long-press drag) is deliberate: drag is fragile in the
-// WebView. Enforces MAX_MEDIA=10 with a soft toast when exceeded.
+// WebView. Selection is LIGHT-BASED (unselected tiles dim) per the wizard
+// contract - no amber ring anywhere in this composer. Enforces MAX_MEDIA=10
+// with a soft toast when exceeded.
 
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
-import CroppedImage from './CroppedImage';
+import SlideThumb from './SlideThumb';
 import { CT_DARK } from '@/features/_shared/composerTokens';
 
 interface Props {
@@ -37,7 +39,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
   const canRight = activeIndex < media.length - 1;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto' }}>
         {media.map((m, i) => {
           const active = i === activeIndex;
@@ -52,38 +54,44 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                 height: TILE,
                 borderRadius: 14,
                 overflow: 'hidden',
-                boxShadow: active ? `0 0 0 2.5px ${CT_DARK.amber}` : `0 0 0 1px ${CT_DARK.line}`,
                 cursor: 'pointer',
                 background: CT_DARK.surface,
+                opacity: active ? 1 : 0.5,
+                transition: 'opacity 150ms ease',
               }}
             >
-              {m.type === 'video' ? (
-                <video src={m.previewUrl} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <SlideThumb item={m} />
+              {/* Active slide carries a bottom scrim with the album position;
+                  resting slides get a small numeral chip. */}
+              {active ? (
+                <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '40%', background: 'linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0))', display: 'flex', alignItems: 'flex-end', padding: 7 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                </span>
               ) : (
-                <CroppedImage item={m} />
+                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.35)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(i); }}
                 aria-label="Remove"
                 style={{
                   position: 'absolute',
-                  top: 4,
-                  right: 4,
+                  top: 5,
+                  right: 5,
                   width: 20,
                   height: 20,
                   borderRadius: 999,
-                  background: 'rgba(0,0,0,0.65)',
+                  background: 'rgba(0,0,0,0.5)',
                   color: '#fff',
                   border: 0,
-                  fontSize: 13,
+                  fontSize: 12,
                   lineHeight: 1,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  padding: 0,
                 }}
               >×</button>
-              <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: 11, fontWeight: 700, color: CT_DARK.ink, textShadow: '0 1px 3px rgba(0,0,0,0.6)', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</div>
             </div>
           );
         })}
@@ -98,7 +106,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
             border: `1px dashed ${CT_DARK.dim}`,
             background: 'transparent',
             color: CT_DARK.mute,
-            fontSize: 22,
+            fontSize: 26,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -108,28 +116,29 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
         <input ref={inputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleFiles} />
       </div>
 
-      {/* Reorder arrows + album order note */}
+      {/* Album-order note + reorder arrows */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button
-          onClick={() => canLeft && onReorder(activeIndex, activeIndex - 1)}
-          disabled={!canLeft}
-          aria-label="Move left"
-          style={arrowStyle(canLeft)}
-        >
-          <ChevronLeft size={16} color={canLeft ? CT_DARK.ink : CT_DARK.dim} />
-        </button>
-        <button
-          onClick={() => canRight && onReorder(activeIndex, activeIndex + 1)}
-          disabled={!canRight}
-          aria-label="Move right"
-          style={arrowStyle(canRight)}
-        >
-          <ChevronRight size={16} color={canRight ? CT_DARK.ink : CT_DARK.dim} />
-        </button>
-        <div style={{ fontSize: 11, color: CT_DARK.mute, letterSpacing: '0.02em' }}>
+        <div style={{ fontSize: 10.5, color: CT_DARK.dim, letterSpacing: '0.01em' }}>
           Tap a photo, then move it — this is the album order.
         </div>
-        <div style={{ marginLeft: 'auto', color: CT_DARK.mute, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>{media.length}/{MAX_MEDIA}</div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+          <button
+            onClick={() => canLeft && onReorder(activeIndex, activeIndex - 1)}
+            disabled={!canLeft}
+            aria-label="Move left"
+            style={arrowStyle(canLeft)}
+          >
+            <ChevronLeft size={14} color={canLeft ? CT_DARK.ink : CT_DARK.dim} />
+          </button>
+          <button
+            onClick={() => canRight && onReorder(activeIndex, activeIndex + 1)}
+            disabled={!canRight}
+            aria-label="Move right"
+            style={arrowStyle(canRight)}
+          >
+            <ChevronRight size={14} color={canRight ? CT_DARK.ink : CT_DARK.dim} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -137,8 +146,8 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
 
 function arrowStyle(enabled: boolean): React.CSSProperties {
   return {
-    width: 30,
-    height: 30,
+    width: 34,
+    height: 34,
     borderRadius: 999,
     background: 'rgba(248,250,252,0.08)',
     border: 0,
@@ -148,5 +157,6 @@ function arrowStyle(enabled: boolean): React.CSSProperties {
     cursor: enabled ? 'pointer' : 'not-allowed',
     flex: 'none',
     opacity: enabled ? 1 : 0.5,
+    padding: 0,
   };
 }

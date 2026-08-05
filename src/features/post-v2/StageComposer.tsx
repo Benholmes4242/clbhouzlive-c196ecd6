@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, Loader2, Pencil } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -29,12 +29,14 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
+import { useRecentRoundCourses, formatRoundWhen } from './hooks/useRecentRoundCourses';
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { startPostUpload } from './lib/postUploadController';
 
 import MediaStageV2 from './components/MediaStageV2';
 import FramePills from './components/FramePills';
 import MediaTray from './components/MediaTray';
+import SlideThumb from './components/SlideThumb';
 import CaptionField from './components/CaptionField';
 import CourseTagSheet from './components/CourseTagSheet';
 import ActorSheet from './components/ActorSheet';
@@ -54,13 +56,15 @@ interface Props {
   onPosted?: () => void;
   /** Files already chosen by the nav picker before the composer opened. */
   initialMedia?: File[];
+  /** True while the native picker is still up: page 1 shows its awaiting state. */
+  awaitingMedia?: boolean;
   /** Edit mode: existing post id (owner-scoped). */
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], awaitingMedia = false, editPostId, draftId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
@@ -69,6 +73,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
+  // Suggestion-first course tagging: the courses this member played most recently.
+  const recentCourses = useRecentRoundCourses(profile?.id ?? null).data ?? [];
   const queryClient = useQueryClient();
 
   const isEditMode = !!editPostId;
@@ -233,9 +239,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   }, [isEditMode, draftId, prefillCourse, hydrate]);
 
   // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
-  // Edit / draft / course-prefill entries and a cancelled picker land on
-  // page 2; media chosen through the picker jumps to page 1.
-  const [page, setPage] = useState<1 | 2>(initialMedia.length > 0 && !editPostId && !draftId ? 1 : 2);
+  // Tapping Post opens page 1 immediately in its AWAITING state while the OS
+  // source menu floats above it. Files chosen -> page 1 comes alive; picker
+  // cancelled -> page 2, caption-only. Edit / draft / course-prefill entries
+  // land straight on page 2.
+  const isFreshCreate = !editPostId && !draftId;
+  const [page, setPage] = useState<1 | 2>(
+    isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
+  );
 
   // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
@@ -263,6 +274,18 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       setPage(1);
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
+
+  // The picker resolved with nothing (cancelled), or the member emptied the
+  // filmstrip: page 1 has no reason to exist, so fall through to the words page.
+  const awaiting = isFreshCreate && awaitingMedia && state.media.length === 0;
+  useEffect(() => {
+    if (!isFreshCreate) return;
+    if (page !== 1) return;
+    if (awaitingMedia) return;
+    if (state.media.length > 0) return;
+    setPage(2);
+  }, [isFreshCreate, page, awaitingMedia, state.media.length]);
+
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
@@ -743,86 +766,108 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
         <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-        {/* Media preview — aspect follows the frame pill, capped at 56vh */}
-        <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden' }}>
-          <MediaStageV2
-            item={active}
-            index={state.activeIndex}
-            total={state.media.length}
-            onOpenAdjust={() => setSheet('adjust')}
-            onOpenCover={() => setSheet('cover')}
-            onRequestAdd={handleStageAdd}
-          />
-
-          {/* Edit chip — bottom-left glass pill */}
-          {active && !active.existingId && (
-            <button
-              onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
-              style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12 }}
-            >
-              Edit
-            </button>
-          )}
-        </div>
-
-        {/* Frame pills row (+ Add pill when there is exactly one slide) */}
-        {active && !active.existingId && (
-          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 12px', background: CT_DARK.bg }}>
-            <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
-            {state.media.length === 1 && (
-              <button
-                onClick={handleStageAdd}
-                style={{
-                  background: 'transparent',
-                  border: `1px dashed ${CT_DARK.dim}`,
-                  color: CT_DARK.mute,
-                  borderRadius: 999,
-                  padding: '5px 12px',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  flex: 'none',
-                }}
-              >+ Add</button>
-            )}
-          </div>
-        )}
-
-        {/* Filmstrip — only when there is more than one slide, centred in the gap */}
-        {state.media.length > 1 ? (
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
-            <MediaTray
-              media={state.media}
-              activeIndex={state.activeIndex}
-              onSelect={setActiveIndex}
-              onRemove={handleRemoveAt}
-              onReorder={reorder}
-              onAddFiles={handleAddFiles}
-            />
+        {awaiting ? (
+          /* AWAITING MEDIA — a calm dark stage while the OS source menu floats above */
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: CT_DARK.bg }}>
+            <div style={{ width: '100%', aspectRatio: '4 / 5', maxHeight: '56vh', background: CT_DARK.elev, opacity: 0.6, flex: 'none' }} />
+            <div style={{ flex: 1, minHeight: 0 }} />
           </div>
         ) : (
-          <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+          <>
+            {/* Media preview — aspect follows the frame pill, capped at 56vh */}
+            <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden', transition: 'aspect-ratio 200ms ease' }}>
+              <MediaStageV2
+                item={active}
+                index={state.activeIndex}
+                total={1}
+                onOpenAdjust={() => setSheet('adjust')}
+                onOpenCover={() => setSheet('cover')}
+                onRequestAdd={handleStageAdd}
+              />
+
+              {/* Slide counter — glass chip, top-right */}
+              {state.media.length > 1 && (
+                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: 'rgba(11,15,20,0.62)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', fontSize: 11, fontWeight: 800, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
+                  {state.activeIndex + 1}/{state.media.length}
+                </div>
+              )}
+
+              {/* Edit chip — bottom-left glass pill */}
+              {active && !active.existingId && (
+                <button
+                  onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
+                  style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 800, gap: 6 }}
+                >
+                  <Pencil size={13} />
+                  Edit
+                </button>
+              )}
+            </div>
+
+            {/* Frame pills row (+ Add pill when there is exactly one slide) */}
+            {active && !active.existingId && (
+              <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: CT_DARK.bg }}>
+                <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+                {state.media.length === 1 && (
+                  <button
+                    onClick={handleStageAdd}
+                    style={{
+                      marginLeft: 'auto',
+                      background: 'transparent',
+                      border: `1px dashed ${CT_DARK.dim}`,
+                      color: CT_DARK.mute,
+                      borderRadius: 999,
+                      padding: '8px 13px',
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      flex: 'none',
+                    }}
+                  >+ Add</button>
+                )}
+              </div>
+            )}
+
+            {/* Filmstrip — only when there is more than one slide, centred in the gap */}
+            {state.media.length > 1 ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
+                <MediaTray
+                  media={state.media}
+                  activeIndex={state.activeIndex}
+                  onSelect={setActiveIndex}
+                  onRemove={handleRemoveAt}
+                  onReorder={reorder}
+                  onAddFiles={handleAddFiles}
+                />
+              </div>
+            ) : (
+              <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+            )}
+          </>
         )}
 
         {/* Next */}
         <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
           <button
             onClick={() => setPage(2)}
+            disabled={awaiting}
             style={{
               width: '100%',
-              padding: '14px 20px',
+              padding: '15px 20px',
               borderRadius: 999,
               border: 'none',
               fontSize: 15,
-              fontWeight: 700,
-              background: CT_DARK.ink,
-              color: '#11131A',
-              cursor: 'pointer',
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              background: awaiting ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
+              color: awaiting ? CT_DARK.dim : '#11131A',
+              cursor: awaiting ? 'default' : 'pointer',
             }}
           >
             Next
           </button>
         </div>
+
 
         {sheets}
       </div>
@@ -851,77 +896,125 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* Thumbnail + caption */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, padding: 12, display: 'flex', gap: 12 }}>
-          {firstItem ? (
-            <button
-              onClick={() => setPage(1)}
-              aria-label="Edit media"
-              style={{ position: 'relative', width: 64, height: 80, borderRadius: 8, overflow: 'hidden', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', flex: 'none', cursor: 'pointer' }}
-            >
-              {firstItem.type === 'video' ? (
-                <video src={firstItem.previewUrl} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              ) : (
-                <img src={firstItem.previewUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              )}
-              {state.media.length > 1 && (
-                <span style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>
-                  {state.media.length}
-                </span>
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={handleStageAdd}
-              style={{ width: 64, height: 80, borderRadius: 8, border: `1px dashed ${LIGHT.mute}`, background: 'transparent', color: LIGHT.mute, fontSize: 11, fontWeight: 600, flex: 'none', cursor: 'pointer', lineHeight: 1.2 }}
-            >
-              + Add<br />photos
-            </button>
-          )}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
-            <CaptionField
-              value={state.caption}
-              onChange={handleSetCaption}
-              currentUserId={profile?.id ?? null}
-              variant="light"
-              minHeight={80}
-              placeholder="Say something about it"
-            />
-          </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
+        {/* Media strip — every slide, tap one to go back and edit it */}
+        {state.media.length > 0 && (
+          <>
+            <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
+              {state.media.map((m, i) => (
+                <button
+                  key={m.id}
+                  onClick={() => { setActiveIndex(i); setPage(1); }}
+                  aria-label={`Edit item ${i + 1}`}
+                  style={{ position: 'relative', width: 56, height: 70, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', cursor: 'pointer' }}
+                >
+                  <SlideThumb item={m} glyph={20} />
+                </button>
+              ))}
+              <button
+                onClick={handleStageAdd}
+                aria-label="Add photos or video"
+                style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${LIGHT.dim}`, background: 'transparent', color: LIGHT.mute, fontSize: 18, cursor: 'pointer' }}
+              >+</button>
+            </div>
+            <div style={{ padding: '6px 18px 0', fontSize: 10.5, color: LIGHT.dim }}>Tap a photo to go back and edit</div>
+          </>
+        )}
+
+        {/* Caption — bare on the canvas, cursor flashing on arrival */}
+        <div style={{ padding: '10px 16px 0' }}>
+          <CaptionField
+            value={state.caption}
+            onChange={handleSetCaption}
+            currentUserId={profile?.id ?? null}
+            variant="light"
+            minHeight={96}
+            placeholder="What's on your mind"
+            autoFocus={!isEditMode}
+          />
+          <div style={{ fontSize: 11, color: LIGHT.dim, marginTop: 2 }}>@mention friends and businesses</div>
         </div>
 
-        {/* Detail rows */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, overflow: 'hidden' }}>
-          <button onClick={() => { openDetail('course'); setSheet('course'); }} style={lightRowStyle(false)}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Tag a course</span>
-            <span style={{ fontSize: 13, color: courseNames ? LIGHT.ink : LIGHT.mute, maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {courseNames || 'None'}
-            </span>
-          </button>
-          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(true)}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Posting as</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Tag a course — suggestion-first, Search is the fallback */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+          {state.courses.length > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 10 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.courses[0].name}</div>
+                <button
+                  onClick={() => { openDetail('course'); setSheet('course'); }}
+                  style={{ marginTop: 2, padding: 0, border: 0, background: 'transparent', fontSize: 11.5, color: LIGHT.mute, cursor: 'pointer' }}
+                >
+                  {state.courses.length > 1 ? `${courseNames}` : 'Change course'}
+                </button>
+              </div>
+              <button
+                onClick={() => setCourses([])}
+                aria-label="Remove course"
+                style={{ marginLeft: 'auto', width: 26, height: 26, borderRadius: 999, border: 0, background: '#EEF1F5', color: LIGHT.mute, cursor: 'pointer', fontSize: 13, flex: 'none' }}
+              >×</button>
+            </div>
+          ) : (
+            <div style={{ padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink }}>Tag a course</span>
+                <button
+                  onClick={() => { openDetail('course'); setSheet('course'); }}
+                  style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                >
+                  Search
+                  <ChevronRight size={12} strokeWidth={2.5} />
+                </button>
+              </div>
+              {recentCourses.length > 0 && (
+                <>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+                    {recentCourses.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => { openDetail('course'); setCourses([{ id: c.id, name: c.name, country: c.country }]); }}
+                        style={{ border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
+                      >
+                        {c.name} <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: LIGHT.dim, marginTop: 8 }}>From your recent rounds</div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Detail rows — Drafts appears only when drafts exist */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
+          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(false)}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Posting as</span>
+            <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 13, color: LIGHT.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
               <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={LIGHT_HAIRLINE} />
             </span>
+            <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
           </button>
           {showScheduleRow && (
             <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Schedule for later</span>
-              <span style={{ fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Schedule for later</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
                 {state.scheduledAt ? state.scheduledAt.toLocaleString() : 'Off'}
               </span>
+              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
-          {!isEditMode && (
+          {!isEditMode && drafts.drafts.length > 0 && (
             <button onClick={() => setSheet('drafts')} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Drafts</span>
-              <span style={{ fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length || 'None'}</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Drafts</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
+              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
         </div>
       </div>
+
 
       {/* Share */}
       <div style={{ flex: 'none', background: LIGHT.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
@@ -1019,7 +1112,8 @@ const LIGHT = {
   panel: '#FFFFFF',
   line: '#E9EDF2',
   ink: '#0E1216',
-  mute: '#8A9099',
+  mute: '#68707B',
+  dim: '#A2A9B2',
 } as const;
 
 const lightIconButtonStyle: React.CSSProperties = {

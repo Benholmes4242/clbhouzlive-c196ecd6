@@ -16,6 +16,8 @@ interface Props {
   variant?: 'dark' | 'light';
   minHeight?: number;
   placeholder?: string;
+  /** Page 2 arrives with a flashing cursor. */
+  autoFocus?: boolean;
 }
 
 export default function CaptionField({
@@ -25,6 +27,7 @@ export default function CaptionField({
   variant = 'dark',
   minHeight = 80,
   placeholder = 'Say something about it',
+  autoFocus = false,
 }: Props) {
   const light = variant === 'light';
   return (
@@ -33,9 +36,10 @@ export default function CaptionField({
       onChange={onChange}
       placeholder={placeholder}
       currentUserId={currentUserId}
+      autoFocus={autoFocus}
       textStyle={{
-        fontSize: 16,
-        lineHeight: '24px',
+        fontSize: light ? 17 : 16,
+        lineHeight: light ? '25px' : '24px',
         color: light ? LIGHT_INK : CT_DARK.ink,
         caretColor: light ? LIGHT_INK : CT_DARK.amber,
         minHeight,
@@ -44,3 +48,4 @@ export default function CaptionField({
     />
   );
 }
+
