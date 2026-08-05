@@ -36,6 +36,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
 // ---- Canonical tokens (post-flip: no amber on this sheet) ----
 const INK = '#0F172A';
