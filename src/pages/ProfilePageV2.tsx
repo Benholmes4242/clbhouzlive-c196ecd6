@@ -746,7 +746,7 @@ const ProfilePageV2Content: React.FC = () => {
               if (stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
                 else if (profileUserId)
-                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hero_rounds' });
+                  openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
                 return;
               }
               if (stat === 'courses' || stat === 'rated') {
