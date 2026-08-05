@@ -38,11 +38,14 @@ const FRESH_HOT_MS = 2 * DAY; // <= 48h
 const FRESH_WARM_MS = 7 * DAY; // <= 7 days
 const BAND_HOT = 3;
 const BAND_WARM = 2;
-const BAND_COOL = 1; // <= 14 days (the fetch window)
+const BAND_COOL = 1; // <= 30 days (the fetch window)
 const COMMENT_WEIGHT = 2;
 const MAX_TILES_PER_POST = 3;
 /** PAGE mosaic cap: one tile per course. The SHEET is uncapped. */
 const MAX_TILES_PER_COURSE = 1;
+/** 30-day window, uncapped sheet: candidate ceiling sized for the whole pool. */
+const CANDIDATE_LIMIT = 500;
+const WINDOW_DAYS = 30;
 
 function freshnessBand(createdAt: string, now: number): number {
   const age = now - new Date(createdAt).getTime();
