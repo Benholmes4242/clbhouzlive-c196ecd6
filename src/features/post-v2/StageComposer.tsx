@@ -774,7 +774,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
           <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>×</button>
-          <div style={{ minWidth: 0, flex: 1 }}>
+          {/* Fixed 22px = the 16/800 title's line box, so the bar height and
+              position are identical with or without the title. */}
+          <div style={{ minWidth: 0, flex: 1, height: 22, display: 'flex', alignItems: 'center' }}>
+
             {/* Title is CONDITIONAL on page 1: the empty state has no other
                 context so it earns its place; with media present the
                 photograph is the context and the title is not rendered.
