@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import ExploreGridSkeleton from '@/components/explore-tab-new/ExploreGridSkeleton';
+import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 
 const ExploreTabContent = lazy(() => import('@/components/explore-tab-new/ExploreTabContent'));
 
@@ -16,7 +16,7 @@ const ExploreTabContent = lazy(() => import('@/components/explore-tab-new/Explor
 export default function ExplorePage() {
   return (
     <div>
-      <Suspense fallback={<ExploreGridSkeleton />}>
+      <Suspense fallback={<DiscoverCourseLedSkeleton />}>
         <ExploreTabContent />
       </Suspense>
     </div>
