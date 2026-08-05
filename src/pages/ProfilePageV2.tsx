@@ -1292,15 +1292,9 @@ const ProfilePageV2Content: React.FC = () => {
         })()}
 
 
-        {/* Handicap summary card — shown on personal profiles (own + friends) */}
-        {isPersonal && profile?.id && user?.id && (
-          <ProfileHandicapCard
-            userId={profile.id}
-            viewerUserId={user.id}
-            isOwnProfile={isSelf}
-            displayName={displayName}
-          />
-        )}
+        {/* HANDICAP TREND panel + TROPHIES row deleted — the hero owns the
+            index, the 12-month trend and the trophies counter. */}
+
 
         {/* Personal Top 10 — editorial rail (BRIEF_PROFILE_HERO_AND_TOP10 §4) */}
         {isPersonal && profile?.id && (
