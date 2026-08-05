@@ -1160,95 +1160,100 @@ const ProfilePageV2Content: React.FC = () => {
           />
         ) : (
         <>
-        {/* About section */}
-        {profile?.bio ? (
-          <section className="px-4 mb-4">
-            <div 
-              className={cn(
-                "text-base text-foreground leading-relaxed whitespace-pre-wrap",
-                !bioExpanded && "line-clamp-6"
-              )} 
-              style={{ overflowWrap: 'anywhere' }}
-            >
-              {profile.bio}
-            </div>
-            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
-              <button
-                onClick={() => setBioExpanded(v => !v)}
-                className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                style={{ color: '#64748B' }}
-              >
-                {bioExpanded ? 'Read less' : 'Read more'}
-                <ChevronDown className={cn("w-4 h-4 ml-1 transition-transform", bioExpanded && "rotate-180")} />
-              </button>
-            )}
-            
-            {/* Websites as pills - directly under bio */}
-            {websites.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {websites.map((website, index) => (
-                  <a
-                    key={index}
-                    href={ensureProtocol(website)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    {formatUrlForDisplay(website)}
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : isSelf ? (
-          <section className="px-4 mb-4">
-            <button
-              onClick={() => navigate(editRoute)}
-              className="text-sm font-medium italic min-h-[44px] flex items-center active:opacity-70 transition-opacity"
-              style={{ color: '#F7931E' }}
-            >
-              Add a bio
-            </button>
-            {/* Websites as pills even without bio */}
-            {websites.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {websites.map((website, index) => (
-                  <a
-                    key={index}
-                    href={ensureProtocol(website)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    {formatUrlForDisplay(website)}
-                  </a>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : websites.length > 0 ? (
-          <section className="px-4 mb-4">
-            <div className="flex flex-wrap gap-2">
+        {/* Bio + website chip — on canvas, no card (§3) */}
+        {(() => {
+          const websiteChips = websites.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
               {websites.map((website, index) => (
                 <a
                   key={index}
                   href={ensureProtocol(website)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-[#64748B] hover:text-foreground transition-colors active:scale-[0.98]"
-                  style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] active:scale-[0.98]"
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${A.BORDER}`,
+                    fontFamily: SANS,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: A.INK,
+                  }}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   {formatUrlForDisplay(website)}
                 </a>
               ))}
             </div>
-          </section>
-        ) : null}
+          );
+
+          if (profile?.bio) {
+            return (
+              <section className="px-4 mb-4">
+                <div
+                  className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-6')}
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: 12.5,
+                    lineHeight: 1.55,
+                    color: A.BODY,
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {profile.bio}
+                </div>
+                {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
+                  <button
+                    onClick={() => setBioExpanded(v => !v)}
+                    className="mt-1 min-h-[44px] flex items-center gap-1 active:scale-[0.97] transition-transform"
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: A.INK,
+                    }}
+                  >
+                    {bioExpanded ? t('bio.readLess', 'Read less') : t('bio.readMore', 'Read more')}
+                    <ChevronDown className={cn('w-3.5 h-3.5', bioExpanded && 'rotate-180')} />
+                  </button>
+                )}
+                {websiteChips}
+              </section>
+            );
+          }
+
+          if (isSelf) {
+            return (
+              <section className="px-4 mb-4">
+                <button
+                  onClick={() => navigate(editRoute)}
+                  className="min-h-[44px] flex items-center active:opacity-70 transition-opacity"
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: A.INK,
+                  }}
+                >
+                  Add a bio
+                </button>
+                {websiteChips}
+              </section>
+            );
+          }
+
+          if (websites.length > 0) {
+            return <section className="px-4 mb-4">{websiteChips}</section>;
+          }
+          return null;
+        })()}
+
 
         {/* Social handles row */}
         {(() => {
