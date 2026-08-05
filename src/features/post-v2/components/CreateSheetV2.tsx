@@ -1,16 +1,12 @@
 // CreateSheetV2 - the create chooser reached from the bottom-nav (+).
-// Two options: Post (fires the native media picker from THIS component so the
-// tap that opens the OS source menu is its own user activation) and Course
-// review (opens the review wizard). The hidden file input lives here on
-// purpose: it travels with the tap that fires it.
+// Two options: Post (opens the post wizard on page 1 in its designed empty
+// state) and Course review (opens the review wizard).
 //
-// Picker outcomes:
-//   files chosen -> openPostStudio({ media }) -> StageComposer lands on page 1
-//   cancelled    -> openPostStudio()          -> StageComposer lands on page 2
-// Cancellation is detected via the input's 'cancel' event, with a
-// window-focus + timeout fallback for WebViews that never fire it.
+// The mount-time OS picker is GONE by brief: page 1 owns both pick paths
+// ("Take photo or video" / "Choose from library"), so auto-firing an input here
+// stacked the iOS source menu on top of the very buttons that trigger it.
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, ImagePlus } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -30,53 +26,15 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
   const navigate = useNavigate();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   const [courseOpen, setCourseOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  // Guards a single picker session: whichever signal lands first wins.
-  const pendingRef = useRef(false);
-
-  const settle = useCallback((files: File[]) => {
-    if (!pendingRef.current) return;
-    pendingRef.current = false;
-    openPostStudio(files.length > 0 ? { media: files, returnPath } : { returnPath });
-  }, [openPostStudio, returnPath]);
-
   const handleReview = () => {
     setCourseOpen(true);
   };
 
   const handlePost = () => {
-    // Close the sheet and fire the picker SYNCHRONOUSLY in the same tap —
-    // never behind the close animation or a setTimeout (iOS swallows it).
-    pendingRef.current = true;
-    // The dark wizard opens FIRST, in its awaiting state, so the OS source
-    // menu floats over the composer rather than the page behind it.
+    // Open the wizard on page 1 in its empty state. No picker fires here.
     openPostStudio({ awaitingMedia: true, returnPath });
     onClose();
-    inputRef.current?.click();
   };
-
-  // Cancel detection. 'cancel' is the correct signal (WebKit 16.4+); the
-  // focus fallback covers WebViews that don't fire it.
-  useEffect(() => {
-    const el = inputRef.current;
-    if (!el) return;
-    const onCancel = () => settle([]);
-    el.addEventListener('cancel', onCancel);
-
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const onFocus = () => {
-      if (!pendingRef.current) return;
-      if (timer) clearTimeout(timer);
-      // Give the change event a beat to land before assuming a cancel.
-      timer = setTimeout(() => settle([]), 900);
-    };
-    window.addEventListener('focus', onFocus);
-    return () => {
-      el.removeEventListener('cancel', onCancel);
-      window.removeEventListener('focus', onFocus);
-      if (timer) clearTimeout(timer);
-    };
-  }, [settle]);
 
   return (
     <>
@@ -114,18 +72,6 @@ export default function CreateSheetV2({ open, onClose, returnPath }: Props) {
         }}
       />
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        hidden
-        onChange={(e) => {
-          const files = Array.from(e.target.files ?? []);
-          e.target.value = '';
-          settle(files);
-        }}
-      />
     </>
   );
 }
