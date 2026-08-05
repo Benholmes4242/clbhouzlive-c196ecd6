@@ -124,26 +124,34 @@ export function useMomentsOfTheWeek(limit = 24) {
             new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime(),
         );
 
-      // Fill tiles under the per-post and per-course caps.
+      // Fill tiles under the per-post cap. The per-course cap is NOT applied
+      // here: the sheet shows the full ranked list. Instead the first tile of
+      // each course is flagged `isCourseLead` and the PAGE mosaic renders only
+      // those (MAX_TILES_PER_COURSE = 1).
       const perCourse = new Map<string, number>();
-      const picked: Array<{ row: Row; courseId: string; mediaIndex: number }> = [];
+      const picked: Array<{
+        row: Row;
+        courseId: string;
+        mediaIndex: number;
+        isCourseLead: boolean;
+      }> = [];
       for (const cand of ranked) {
         if (picked.length >= limit) break;
-        const used = perCourse.get(cand.courseId) ?? 0;
-        if (used >= MAX_TILES_PER_COURSE) continue;
         const mediaCount = cand.row.post_media?.length ?? 0;
-        const take = Math.min(
-          MAX_TILES_PER_POST,
-          mediaCount,
-          MAX_TILES_PER_COURSE - used,
-          limit - picked.length,
-        );
+        const take = Math.min(MAX_TILES_PER_POST, mediaCount, limit - picked.length);
         for (let i = 0; i < take; i += 1) {
-          picked.push({ row: cand.row, courseId: cand.courseId, mediaIndex: i });
+          const used = perCourse.get(cand.courseId) ?? 0;
+          picked.push({
+            row: cand.row,
+            courseId: cand.courseId,
+            mediaIndex: i,
+            isCourseLead: used < MAX_TILES_PER_COURSE,
+          });
+          perCourse.set(cand.courseId, used + 1);
         }
-        perCourse.set(cand.courseId, used + take);
       }
       if (picked.length === 0) return [];
+
 
 
       // Course names and author identities, one round-trip each.
