@@ -600,35 +600,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   };
 
   // Edit-mode load hold: never show the empty create composer while the
-  // post is being fetched for editing.
+  // post is being fetched for editing. Shared with the /post-v2 route
+  // fallback so the two silhouettes cannot drift.
   if (isEditMode && !hydrated && (editable.isLoading || (editable.data && editable.data.canManage))) {
-    return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
-        {/* Header mirror */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 16px 13px', paddingTop: 'max(env(safe-area-inset-top), 16px)', background: CT_DARK.bg, borderBottom: `1px solid ${CT_DARK.line}`, flex: 'none' }}>
-          <button onClick={onClose} aria-label="Close" style={closeButtonStyle}>
-            {'\u2039'}
-          </button>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Edit post</div>
-          </div>
-        </div>
-        {/* Stage block */}
-        <div style={{ flex: '1 1 0', minHeight: 0, padding: 12 }}>
-          <div className="clb-shimmer-dark" style={{ width: '100%', height: '100%', borderRadius: 16, background: 'rgba(255,255,255,0.06)' }} />
-        </div>
-        {/* Tray thumbs + caption bars */}
-        <div style={{ flex: 'none', padding: '8px 12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
-            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
-            <div className="clb-shimmer-dark" style={{ width: 46, height: 46, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
-          </div>
-          <div className="clb-shimmer-dark" style={{ height: 14, width: '80%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
-          <div className="clb-shimmer-dark" style={{ height: 14, width: '55%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
-        </div>
-      </div>
-    );
+    return <StageLoadingShell title="Edit post" onClose={onClose} />;
   }
 
   // Edit target failed to load or does not exist.
