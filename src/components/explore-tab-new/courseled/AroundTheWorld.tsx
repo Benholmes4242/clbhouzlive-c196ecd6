@@ -184,19 +184,80 @@ export function AroundTheWorld({
             ? t('discover.wire.you', 'You')
             : (top?.actorName?.trim() ?? '');
         const feat = top ? detailFor(top) : '';
+        const rating = ratings?.get(g.courseId);
+        const useRating = !top?.figure && !!rating;
+
+        let figure: string | null = null;
+        let figureUnit: string | null = null;
+        let onPress: (() => void) | undefined;
+
+        if (useRating && rating) {
+          figure = rating.rating.toFixed(1);
+          figureUnit = t('discover.row.labelRating', 'RATING');
+          if (rating.reviewId) {
+            onPress = () => {
+              analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
+              openReview({
+                user: {
+                  id: rating.userId ?? '',
+                  name: rating.actorName?.trim() || '',
+                  avatar: rating.actorAvatar ?? undefined,
+                },
+                courseId: g.courseId,
+                courseName: g.courseName ?? '',
+                rating: rating.rating,
+                reviewId: rating.reviewId,
+                reviewText: rating.reviewText,
+              });
+            };
+          }
+        } else if (top) {
+          figure = top.figure ?? null;
+          figureUnit = top.figure ? figLabelFor(top) : null;
+          if (top.scoreId) {
+            const scoreId = top.scoreId;
+            const ownerId = top.userId;
+            onPress = () => {
+              analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
+              opener.openByScore(scoreId, null, ownerId);
+            };
+          }
+        }
+
+        const ratingLine =
+          useRating && rating
+            ? `${
+                userId && rating.userId && rating.userId === userId
+                  ? t('discover.wire.you', 'You')
+                  : (rating.actorName?.trim() ?? '')
+              }`
+            : '';
+
+        const line = useRating
+          ? ratingLine
+            ? `${ratingLine} \u00B7 ${t('discover.row.rated', 'Rated this course')}`
+            : t('discover.row.rated', 'Rated this course')
+          : actor
+            ? `${actor} \u00B7 ${feat}`
+            : feat;
+
         return {
           courseId: g.courseId,
           courseName: g.courseName,
           courseImage: g.courseImage,
           at: g.at,
-          topLine: actor ? `${actor} \u00B7 ${feat}` : feat,
+          topLine: line,
+          figure,
+          figureUnit,
+          onPress,
           rank: top ? notability(top) : 5,
         };
       })
       .sort((a, b) => a.rank - b.rank || (a.at < b.at ? 1 : -1))
       .map(({ rank: _rank, ...rest }) => rest);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups, userId, t]);
+  }, [groups, ratings, userId, t]);
+
 
   if (isLoading) {
     return (

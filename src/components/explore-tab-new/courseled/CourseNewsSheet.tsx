@@ -2,21 +2,26 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import { A, KICKER, SANS, SCRIM_STRONG } from './tokens';
+import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
  * COURSE NEWS SHEET — the complete list of live courses behind Around the
- * World's "See all {n} courses" action (BRIEF_COURSE_NEWS_SHEET + the CARD GRID
- * amendment, option A).
+ * World's "See all {n} courses" action (BRIEF_COURSE_NEWS_SHEET, the CARD GRID
+ * amendment, the refinements brief, and the top-left figure-chip amendment).
  *
  * Content is a 2-column grid of mini course cards: image top (76px, through the
- * CourseImageFallback chain) with the when-chip and the course name on the
- * scrim, and beneath it a single line carrying the course's TOP event in the
- * same wording grammar as the on-page cards. The whole card routes to the
- * course page and closes the sheet. Odd counts leave the last card alone in the
- * left column — the grid never stretches or pads.
+ * CourseImageFallback chain) carrying TWO glass chips on the top edge — the
+ * FIGURE chip top-left ("72 GROSS", "8.2 RATING", "4 BIRDIES") and the
+ * when-chip top-right — with the course name clean across the bottom scrim.
+ * Beneath the image, two clamped lines of the course's TOP event in the same
+ * wording grammar as the on-page cards.
+ *
+ * Taps: an entry that carries an opener (scorecard / review) opens that sheet
+ * STACKED ABOVE this one; otherwise the card routes to the course page and
+ * closes the sheet. Odd counts leave the last card alone in the left column.
  */
 
 export interface CourseNewsEntry {
@@ -27,6 +32,12 @@ export interface CourseNewsEntry {
   at: string;
   /** Wording for the course's top event: actor + feat, already composed. */
   topLine: string;
+  /** Figure for the top event ("72", "8.2", "4"). Figureless events: no chip. */
+  figure?: string | null;
+  /** Unit label beside the figure ("GROSS", "RATING", "BIRDIES"). */
+  figureUnit?: string | null;
+  /** Opens the scorecard / review sheet stacked above this one, when available. */
+  onPress?: () => void;
 }
 
 interface Props {
@@ -37,6 +48,14 @@ interface Props {
   regionLabel: string;
   whenLabel: (iso: string) => string;
   onCoursePress: (courseId: string) => void;
+}
+
+/** "3mo ago" -> "3MO", "Last week" -> "LAST WEEK" (used only when it fits). */
+function compactWhen(label: string): string {
+  return label
+    .replace(/\s*ago\s*$/i, '')
+    .replace(/\s+/g, '')
+    .toUpperCase();
 }
 
 export function CourseNewsSheet({
@@ -105,11 +124,22 @@ export function CourseNewsSheet({
         >
           {entries.map((e) => {
             const m = meta?.get(e.courseId);
+            const hasFigure = !!e.figure;
+            const when = whenLabel(e.at);
             return (
               <button
                 key={e.courseId}
                 type="button"
                 onClick={() => {
+                  analyticsEvents.track('discover_news_card_tap', {
+                    courseId: e.courseId,
+                    target: e.onPress ? 'detail' : 'course',
+                  });
+                  if (e.onPress) {
+                    // Stacked above this sheet — the news sheet stays open.
+                    e.onPress();
+                    return;
+                  }
                   onClose();
                   onCoursePress(e.courseId);
                 }}
@@ -132,6 +162,49 @@ export function CourseNewsSheet({
                   style={{ height: 76 }}
                 >
                   <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
+
+                  {/* FIGURE chip — top-left, wins the space on narrow cards. */}
+                  {hasFigure && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: 6,
+                        left: 6,
+                        display: 'inline-flex',
+                        alignItems: 'baseline',
+                        gap: 3,
+                        background: 'rgba(10,14,10,0.55)',
+                        backdropFilter: 'blur(6px)',
+                        WebkitBackdropFilter: 'blur(6px)',
+                        borderRadius: 999,
+                        padding: '3px 8px',
+                        maxWidth: 'calc(100% - 56px)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <span style={{ ...NUMF, fontSize: 12, color: '#FFFFFF', lineHeight: 1 }}>
+                        {e.figure}
+                      </span>
+                      {e.figureUnit && (
+                        <span
+                          style={{
+                            fontSize: 7.5,
+                            fontWeight: 800,
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            color: 'rgba(255,255,255,0.72)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {e.figureUnit}
+                        </span>
+                      )}
+                    </span>
+                  )}
+
+                  {/* WHEN chip — top-right, truncates when a figure chip is present. */}
                   <span
                     style={{
                       position: 'absolute',
@@ -143,12 +216,19 @@ export function CourseNewsSheet({
                       textTransform: 'uppercase',
                       color: '#FFFFFF',
                       background: 'rgba(10,14,10,0.55)',
+                      backdropFilter: 'blur(6px)',
+                      WebkitBackdropFilter: 'blur(6px)',
                       borderRadius: 999,
-                      padding: '2.5px 6px',
+                      padding: '3px 8px',
+                      maxWidth: hasFigure ? 46 : 88,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
-                    {whenLabel(e.at)}
+                    {hasFigure ? compactWhen(when) : when}
                   </span>
+
                   <div
                     style={{
                       position: 'absolute',
@@ -172,10 +252,13 @@ export function CourseNewsSheet({
                   style={{
                     padding: '7px 9px',
                     fontSize: 10.5,
+                    lineHeight: 1.32,
                     color: A.MUTE,
+                    minHeight: 42,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                   }}
                 >
                   {e.topLine}
