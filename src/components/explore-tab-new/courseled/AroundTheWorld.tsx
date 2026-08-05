@@ -132,36 +132,80 @@ export function AroundTheWorld({
    */
   const nameFor = (e: WireEvent): string => e.actorName?.trim() ?? '';
 
-  /** The detail line carries the feat wording — there are no badges here. */
-  const detailFor = (e: WireEvent): string => {
-    if (e.kind === 'eagle') {
-      const hole = e.actionParams?.hole;
-      if (!hole) return t('discover.row.eagleNoHole', 'Made an eagle');
-      if (e.holePar != null)
-        return t('discover.row.eaglePar', {
-          defaultValue: 'Eagle at the {{hole}}, par {{par}}',
+  /**
+   * The detail line carries the feat wording — there are no badges here.
+   * `compact` returns the shortened form the news sheet cards use (2-line
+   * clamp). Ordinals arrive already formatted on the payload; nothing is
+   * concatenated inside a locale string, and missing hole/par degrades to the
+   * short form rather than printing an empty bracket.
+   */
+  const detailFor = (e: WireEvent, compact = false): string => {
+    const hole = e.actionParams?.hole ? String(e.actionParams.hole) : '';
+    const par = e.holePar;
+
+    if (e.kind === 'ace' || e.kind === 'albatross') {
+      const isAce = e.kind === 'ace';
+      if (!hole)
+        return isAce
+          ? t('discover.row.aceNoHole', 'Hole in one!')
+          : t('discover.row.albatrossNoHole', 'Albatross!');
+      if (compact)
+        return t(isAce ? 'discover.row.compactAce' : 'discover.row.compactAlbatross', {
+          defaultValue: isAce ? 'Hole in one! - {{hole}}' : 'Albatross! - {{hole}}',
           hole,
-          par: e.holePar,
         });
-      return t('discover.row.eagle', { defaultValue: 'Eagle at the {{hole}}', hole });
+      if (par == null)
+        return isAce
+          ? t('discover.row.aceNoHole', 'Hole in one!')
+          : t('discover.row.albatrossNoHole', 'Albatross!');
+      return t(isAce ? 'discover.row.ace' : 'discover.row.albatross', {
+        defaultValue: isAce
+          ? 'Hole in one! - the {{hole}}, par {{par}}'
+          : 'Albatross! - the {{hole}}, par {{par}}',
+        hole,
+        par,
+      });
     }
+
+    if (e.kind === 'eagle') {
+      if (!hole) return t('discover.row.eagleNoHole', 'Eagle');
+      if (compact)
+        return t('discover.row.compactEagle', { defaultValue: 'Eagle - {{hole}}', hole });
+      if (par == null) return t('discover.row.eagle', 'Eagle');
+      return t('discover.row.eaglePar', {
+        defaultValue: 'Eagle - {{hole}} hole, par {{par}}',
+        hole,
+        par,
+      });
+    }
+
     if (e.kind === 'birdie_haul') {
-      return t('discover.row.birdieHaul', {
-        defaultValue: '{{count}} birdies in one round',
-        count: Number(e.actionParams?.count ?? 0),
-      });
+      const count = Number(e.actionParams?.count ?? 0);
+      return compact
+        ? t('discover.row.compactBirdieHaul', { defaultValue: 'Birdie haul - {{count}}', count })
+        : t('discover.row.birdieHaul', {
+            defaultValue: 'Birdie haul - {{count}} in a round',
+            count,
+          });
     }
-    if (e.kind === 'crown' && e.actionParams?.category) {
+
+    if (e.kind === 'crown') {
+      const slug = String(e.actionParams?.categorySlug ?? '');
+      if (!slug || slug === 'lowest_gross')
+        return t('discover.row.crownCourseRecord', 'New course record');
+      const category = String(e.actionParams?.category ?? slug.replace(/_/g, ' ')).toLowerCase();
       return t('discover.row.crown', {
-        defaultValue: '{{category}} here',
-        category: String(e.actionParams.category).toLowerCase(),
+        defaultValue: 'New {{category}} record',
+        category,
       });
     }
+
     return t(e.actionKey, {
       defaultValue: ACTION_DEFAULTS[e.actionKey] ?? '',
       ...(e.actionParams ?? {}),
     });
   };
+
 
   const figLabelFor = (e: WireEvent): string => {
     if (e.figureSubKey)
@@ -183,7 +227,7 @@ export function AroundTheWorld({
           top && userId && top.userId && top.userId === userId
             ? t('discover.wire.you', 'You')
             : (top?.actorName?.trim() ?? '');
-        const feat = top ? detailFor(top) : '';
+        const feat = top ? detailFor(top, true) : '';
         const rating = ratings?.get(g.courseId);
         const useRating = !top?.figure && !!rating;
 
