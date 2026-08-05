@@ -199,9 +199,9 @@ export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: P
                 }}
               >
                 {e.defendingChampion ? (
-                  <span style={{ fontSize: 11, color: A.MUTE }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {t('discover.defending', 'Defending')} {DOT}{' '}
-                    <span style={{ fontWeight: 700, color: A.INK }}>{e.defendingChampion}</span>
+                    <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
                   </span>
                 ) : (
                   <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
