@@ -50,9 +50,11 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
     course_name,
     gross,
     net,
+    stableford,
     hcp_delta,
     feats,
   } = row;
+
 
   const relative = formatRelativeMonths(play_date);
 
@@ -142,6 +144,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           >
             {relative}
           </div>
+          {hcpChip ? <span style={{ flexShrink: 0 }}>{hcpChip}</span> : null}
         </div>
 
         <div
@@ -156,7 +159,6 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
             minWidth: 0,
           }}
         >
-          
           <span
             style={{
               fontWeight: 600,
@@ -168,17 +170,9 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           >
             {course_name ?? ''}
           </span>
-          {net != null ? (
-            <span style={{ flexShrink: 0, fontSize: 11, color: 'rgba(15,23,42,0.30)' }}>
-              <span className="tabular-nums" style={{ fontWeight: 600 }}>
-                {net}
-              </span>{' '}
-              net
-            </span>
-          ) : null}
         </div>
 
-        {(hcpChip || feats.length > 0) && (
+        {feats.length > 0 && (
           <div
             style={{
               display: 'flex',
@@ -188,12 +182,12 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               marginTop: 2,
             }}
           >
-            {hcpChip}
             <RoundFeatChips feats={feats} />
           </div>
         )}
 
       </div>
+
 
       {gross != null ? (
         <div
@@ -227,7 +221,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               lineHeight: 1,
             }}
           >
-            GROSS
+            {stableford != null ? `${stableford} PTS` : 'GROSS'}
           </div>
         </div>
       ) : null}
