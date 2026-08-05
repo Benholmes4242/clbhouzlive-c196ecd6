@@ -762,86 +762,108 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
         <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-        {/* Media preview — aspect follows the frame pill, capped at 56vh */}
-        <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden' }}>
-          <MediaStageV2
-            item={active}
-            index={state.activeIndex}
-            total={state.media.length}
-            onOpenAdjust={() => setSheet('adjust')}
-            onOpenCover={() => setSheet('cover')}
-            onRequestAdd={handleStageAdd}
-          />
-
-          {/* Edit chip — bottom-left glass pill */}
-          {active && !active.existingId && (
-            <button
-              onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
-              style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12 }}
-            >
-              Edit
-            </button>
-          )}
-        </div>
-
-        {/* Frame pills row (+ Add pill when there is exactly one slide) */}
-        {active && !active.existingId && (
-          <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 12px', background: CT_DARK.bg }}>
-            <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
-            {state.media.length === 1 && (
-              <button
-                onClick={handleStageAdd}
-                style={{
-                  background: 'transparent',
-                  border: `1px dashed ${CT_DARK.dim}`,
-                  color: CT_DARK.mute,
-                  borderRadius: 999,
-                  padding: '5px 12px',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  flex: 'none',
-                }}
-              >+ Add</button>
-            )}
-          </div>
-        )}
-
-        {/* Filmstrip — only when there is more than one slide, centred in the gap */}
-        {state.media.length > 1 ? (
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
-            <MediaTray
-              media={state.media}
-              activeIndex={state.activeIndex}
-              onSelect={setActiveIndex}
-              onRemove={handleRemoveAt}
-              onReorder={reorder}
-              onAddFiles={handleAddFiles}
-            />
+        {awaiting ? (
+          /* AWAITING MEDIA — a calm dark stage while the OS source menu floats above */
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: CT_DARK.bg }}>
+            <div style={{ width: '100%', aspectRatio: '4 / 5', maxHeight: '56vh', background: CT_DARK.elev, opacity: 0.6, flex: 'none' }} />
+            <div style={{ flex: 1, minHeight: 0 }} />
           </div>
         ) : (
-          <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+          <>
+            {/* Media preview — aspect follows the frame pill, capped at 56vh */}
+            <div style={{ position: 'relative', width: '100%', aspectRatio: stageAspect, maxHeight: '56vh', flex: 'none', background: CT_DARK.surface, display: 'flex', overflow: 'hidden', transition: 'aspect-ratio 200ms ease' }}>
+              <MediaStageV2
+                item={active}
+                index={state.activeIndex}
+                total={1}
+                onOpenAdjust={() => setSheet('adjust')}
+                onOpenCover={() => setSheet('cover')}
+                onRequestAdd={handleStageAdd}
+              />
+
+              {/* Slide counter — glass chip, top-right */}
+              {state.media.length > 1 && (
+                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: 'rgba(11,15,20,0.62)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', fontSize: 11, fontWeight: 800, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
+                  {state.activeIndex + 1}/{state.media.length}
+                </div>
+              )}
+
+              {/* Edit chip — bottom-left glass pill */}
+              {active && !active.existingId && (
+                <button
+                  onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
+                  style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 800, gap: 6 }}
+                >
+                  <Pencil size={13} />
+                  Edit
+                </button>
+              )}
+            </div>
+
+            {/* Frame pills row (+ Add pill when there is exactly one slide) */}
+            {active && !active.existingId && (
+              <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: CT_DARK.bg }}>
+                <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
+                {state.media.length === 1 && (
+                  <button
+                    onClick={handleStageAdd}
+                    style={{
+                      marginLeft: 'auto',
+                      background: 'transparent',
+                      border: `1px dashed ${CT_DARK.dim}`,
+                      color: CT_DARK.mute,
+                      borderRadius: 999,
+                      padding: '8px 13px',
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      flex: 'none',
+                    }}
+                  >+ Add</button>
+                )}
+              </div>
+            )}
+
+            {/* Filmstrip — only when there is more than one slide, centred in the gap */}
+            {state.media.length > 1 ? (
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
+                <MediaTray
+                  media={state.media}
+                  activeIndex={state.activeIndex}
+                  onSelect={setActiveIndex}
+                  onRemove={handleRemoveAt}
+                  onReorder={reorder}
+                  onAddFiles={handleAddFiles}
+                />
+              </div>
+            ) : (
+              <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+            )}
+          </>
         )}
 
         {/* Next */}
         <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
           <button
             onClick={() => setPage(2)}
+            disabled={awaiting}
             style={{
               width: '100%',
-              padding: '14px 20px',
+              padding: '15px 20px',
               borderRadius: 999,
               border: 'none',
               fontSize: 15,
-              fontWeight: 700,
-              background: CT_DARK.ink,
-              color: '#11131A',
-              cursor: 'pointer',
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              background: awaiting ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
+              color: awaiting ? CT_DARK.dim : '#11131A',
+              cursor: awaiting ? 'default' : 'pointer',
             }}
           >
             Next
           </button>
         </div>
+
 
         {sheets}
       </div>
