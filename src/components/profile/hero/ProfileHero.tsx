@@ -141,8 +141,16 @@ const Cell: React.FC<{
   return (
     <button
       type="button"
-      onClick={onTap}
+      onClick={(e) => {
+        // Round 3 §3: FRIENDS/FOLLOWERS must never bubble into the hero or
+        // index handicap tap.
+        e.stopPropagation();
+        onTap?.();
+      }}
       disabled={inert}
+      onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
+      onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
+      onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
       style={{
         flex: 1,
         minWidth: 0,
@@ -152,8 +160,10 @@ const Cell: React.FC<{
         textAlign: 'center',
         cursor: inert ? 'default' : 'pointer',
         fontFamily: SANS,
+        transition: 'opacity 120ms ease',
       }}
     >
+
       <div
         style={{
           fontSize: 17,
