@@ -195,6 +195,10 @@ export const EVENT_LABELS: Record<string, string> = {
   feed_tab_changed: 'Feed tab changed',
   feed_tab_viewed: 'Feed tab viewed',
 
+  // Profile hero + Top 10 rail
+  profile_hero_stat_tap: 'Profile hero stat tapped',
+  profile_top10_card_tap: 'Profile Top 10 card tapped',
+
 };
 
 
