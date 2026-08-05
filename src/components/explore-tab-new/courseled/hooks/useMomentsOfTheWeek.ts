@@ -249,6 +249,8 @@ export function useMomentsOfTheWeek(limit = 24) {
           thumbnail: tile?.imageUrl ?? tile?.thumbnailUrl ?? null,
           mediaType: tile?.type === 'video' ? 'video' : 'image',
           mediaIndex,
+          mediaId: tile?.id,
+          isCourseLead,
         };
       });
     },
