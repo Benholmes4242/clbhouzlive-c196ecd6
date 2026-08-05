@@ -62,11 +62,11 @@ function streamThumb(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
 }
 
-export function useMomentsOfTheWeek(limit = 24) {
+export function useMomentsOfTheWeek() {
   return useQuery({
-    queryKey: ['courseled', 'moments', limit],
+    queryKey: ['courseled', 'moments', WINDOW_DAYS],
     queryFn: async (): Promise<Moment[]> => {
-      const since = new Date(Date.now() - 14 * DAY).toISOString();
+      const since = new Date(Date.now() - WINDOW_DAYS * DAY).toISOString();
       const { data, error } = await supabase
         .from('posts')
         .select(
@@ -77,7 +77,7 @@ export function useMomentsOfTheWeek(limit = 24) {
         .eq('status', 'published')
         .gte('created_at', since)
         .order('created_at', { ascending: false })
-        .limit(160);
+        .limit(CANDIDATE_LIMIT);
       if (error) throw error;
 
       type Row = {
