@@ -5,8 +5,8 @@
  *  - Manage: drag-to-reorder + chevrons + remove (preserves dnd-kit behavior)
  *  - Add Course: search played courses, add rated, prompt to rate unrated
  *
- * Canonical sheet language: SheetHeader with amber cut-line, CAPS eyebrows,
- * Geist throughout, plain tabular-num scores, podium-coloured rank badges.
+ * Current sheet language: 75dvh canvas sheet, no amber anywhere, CAPS eyebrows,
+ * Geist throughout, tabular-num scores, band-coloured ratings, uniform dim ranks.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -129,7 +129,6 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
   };
 
   const position = index + 1;
-  const isPodium = position <= 3;
   const ratingNum = typeof course.rating === 'number'
     ? course.rating
     : course.rating != null ? parseFloat(course.rating) : null;
