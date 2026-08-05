@@ -17,7 +17,7 @@
  * the tray's 46px thumbs above the caption lines.
  */
 import React from 'react';
-import { CT_DARK } from './lib/tokens';
+import { CT_DARK } from '@/features/_shared/composerTokens';
 
 const FILL = 'rgba(255,255,255,0.06)';
 
