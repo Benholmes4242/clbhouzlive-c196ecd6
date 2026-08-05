@@ -62,7 +62,8 @@ interface CourseAboutTabProps {
   onTabChange?: (tab: string) => void;
 }
 
-const formatDescription = (description: string) => {
+const formatDescription = (description: string | null | undefined) => {
+  if (!description) return null;
   return description
     .split('\n')
     .map((line, index, array) => (
@@ -196,6 +197,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         {(course.description || course.id) && (
           <Panel kicker={t('courseDetail.blocks.aboutThisPlace')}>
+            {course.description && (
             <div
               style={{
                 fontSize: 13.5,
@@ -213,6 +215,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             >
               {formatDescription(course.description)}
             </div>
+            )}
             {shouldShowReadMore && (
               <Action
                 label={showFullDescription ? t('courseDetail.about.showLess') : t('courseDetail.about.readMore')}
