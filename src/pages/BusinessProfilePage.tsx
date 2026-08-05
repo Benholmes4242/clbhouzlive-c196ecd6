@@ -642,110 +642,33 @@ const BusinessProfilePage: React.FC = () => {
 
         return (
           <>
-            {/* Primary row */}
-            <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
-              {isOwner ? (
-                <>
-                  <button
-                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: '#0F172A', color: '#ffffff' }}
-                    onClick={() => navigate(`/business/${business.id}/edit`)}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                    Edit profile
-                  </button>
-                  <button
-                    className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
-                    onClick={() => navigate('/businesses/manage')}
-                  >
-                    Manage
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{
-                      flex: 1.6,
-                      ...(isFollowing
-                        ? { background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }
-                        : { background: '#0F172A', color: '#ffffff' }),
-                    }}
-                    onClick={handleFollowToggle}
-                  >
-                    {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
-                  </button>
-                  <button
-                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
-                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
-                    disabled={isStartingDM}
-                    aria-label={`Message ${business.name}`}
-                  >
-                    {isStartingDM
-                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      : <MessageCircle className="w-3.5 h-3.5" />}
-                    Message
-                  </button>
-                  {promoted && (
-                    <OutlineBtn
-                      onClick={secDefs[promoted].onClick}
-                      icon={secDefs[promoted].icon}
-                      label={secDefs[promoted].label}
-                      className="flex-1"
-                    />
-                  )}
-                </>
-              )}
+            {/* Primary row - EDIT / FOLLOW / MANAGE / "..." now live in the
+                hero, so this row carries contact actions only (visitor). */}
+            {!isOwner && (
+              <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
+                <button
+                  className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
+                  onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+                  disabled={isStartingDM}
+                  aria-label={`Message ${business.name}`}
+                >
+                  {isStartingDM
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <MessageCircle className="w-3.5 h-3.5" />}
+                  Message
+                </button>
+                {promoted && (
+                  <OutlineBtn
+                    onClick={secDefs[promoted].onClick}
+                    icon={secDefs[promoted].icon}
+                    label={secDefs[promoted].label}
+                    className="flex-1"
+                  />
+                )}
+              </div>
+            )}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}` }}
-                    aria-label="More options"
-                  >
-                    <MoreHorizontal className="w-5 h-5 text-foreground" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {isOwner ? (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit business profile
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleShare}>
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share profile
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleCopyLink}>
-                        <Link2 className="h-4 w-4 mr-2" />
-                        Copy link
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem onClick={handleShare}>
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share profile
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleCopyLink}>
-                        <Link2 className="h-4 w-4 mr-2" />
-                        Copy link
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
-                        <Flag className="h-4 w-4 mr-2" />
-                        Report
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
 
             {/* Secondary row (visitor only, hidden when empty) */}
             {!isOwner && secondary.length > 0 && (
