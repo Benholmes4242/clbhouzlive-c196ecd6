@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, Loader2, Pencil } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
