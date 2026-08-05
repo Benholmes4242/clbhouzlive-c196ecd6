@@ -147,40 +147,41 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   >
                     {r.display_name}
                   </span>
-                  {r.feats.length > 0 && (
-                    <span style={{ display: 'inline-flex' }}>
-                      <RoundFeatChips feats={r.feats} maxChips={1} />
+                  {(r.feats.length > 0 ||
+                    (r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05)) && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                      {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
+                        <span
+                          style={{
+                            ...featChipBase,
+                            background:
+                              r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
+                            color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
+                          }}
+                        >
+                          {r.hcp_delta < 0 ? '\u2193' : '\u2191'}{' '}
+                          {Math.abs(r.hcp_delta).toFixed(1)}
+                        </span>
+                      )}
+                      {r.feats.length > 0 && <RoundFeatChips feats={r.feats} maxChips={1} />}
                     </span>
                   )}
                 </div>
 
                 {r.gross != null && (
-                  <div
+                  <span
                     style={{
+                      ...NUMF,
                       flexShrink: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      gap: 4,
+                      fontSize: 15,
+                      color: A.INK,
+                      lineHeight: 1.15,
                     }}
                   >
-                    <span style={{ ...NUMF, fontSize: 15, color: A.INK, lineHeight: 1 }}>
-                      {r.gross}
-                    </span>
-                    {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
-                      <span
-                        style={{
-                          ...featChipBase,
-                          background:
-                            r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
-                          color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
-                        }}
-                      >
-                        {r.hcp_delta < 0 ? '\u2193' : '\u2191'} {Math.abs(r.hcp_delta).toFixed(1)}
-                      </span>
-                    )}
-                  </div>
+                    {r.gross}
+                  </span>
                 )}
+
               </div>
 
             </button>
