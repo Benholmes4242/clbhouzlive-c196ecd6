@@ -234,8 +234,9 @@ export default function ExploreTabContent({
           plus the island itself — Discover no longer sits under a hero. */}
       <div
         style={{
-          padding: '0 16px 12px',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+          padding: '0 16px 28px',
+          // +16px breathing room under the floating islands (spacing pass).
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
         }}
       >
         <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
@@ -252,7 +253,9 @@ export default function ExploreTabContent({
         </h1>
       </div>
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* ONE SECTION RHYTHM: 28px between a section's content and the next
+          section's eyebrow. Eyebrows own their own 10px to their content. */}
+      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsPlayedRail
           userId={userId}
           onCardPress={handleFriendCard}
@@ -271,7 +274,9 @@ export default function ExploreTabContent({
           userId={userId}
           scopeKey={activeRegion ?? 'worldwide'}
           pills={
-            <div style={{ margin: '0 -14px 12px' }}>
+            // The pills belong to Around the World: 12px above (10 from the
+            // eyebrow + 2), 14px below so they sit closer to their cards.
+            <div style={{ margin: '2px -14px 14px' }}>
               <ScopePills region={activeRegion} onChange={handleRegionChange} />
             </div>
           }

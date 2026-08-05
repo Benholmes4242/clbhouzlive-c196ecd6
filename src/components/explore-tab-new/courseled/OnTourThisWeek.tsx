@@ -114,7 +114,7 @@ export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: P
 
       <div
         className="scrollbar-hide"
-        style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 2 }}
+        style={{ display: 'flex', gap: 10, overflowX: 'auto' }}
       >
         {events.map((e) => {
           const match = resolved?.get(e.venueName);

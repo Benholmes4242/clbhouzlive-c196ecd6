@@ -7,7 +7,7 @@ import { HONOURS_SHELL, GOLD_HAIR } from './HonoursBoard';
  * DISCOVER, COURSE-LED — loading silhouette.
  *
  * Every block below is measured off the shipped component it stands in for
- * (rail card 200x(88+52), tour card 272x(100 + stat row + meta line), world
+ * (rail card 224x(99+52), tour card 272x(100 + stat row + meta line), world
  * card image 128 over three 48px rows, mosaic 220 tall + 106 shorts, most
  * played rows 60, honours header + 58px rows), so the loaded page lands on
  * its own outline with no section boundary shifting.
@@ -58,15 +58,15 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
   return <Bar style={{ height: h, width: w }} />;
 }
 
-/** Section 2 — friends rail: 200px cards, 88px image, 52px body. */
+/** Section 2 — friends rail: 224px cards, 99px image, 52px body. */
 function FriendsRail() {
   return (
     <section>
       <EyebrowBar w={168} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
-          <div key={i} style={{ ...CARD_SHELL, width: 200, flexShrink: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 88, width: '100%' }} />
+          <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0 }}>
+            <Bar style={{ borderRadius: 0, height: 99, width: '100%' }} />
             <div
               style={{
                 padding: '9px 11px',
@@ -301,7 +301,7 @@ export default function DiscoverCourseLedSkeleton() {
       </div>
 
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsRail />
         <TourRail />
         <AroundTheWorldCard />

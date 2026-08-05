@@ -71,18 +71,22 @@ export function InkAction({
         alignItems: 'center',
         gap: 4,
         ...LABEL,
+        fontSize: 10,
         color: A.INK,
         background: 'transparent',
         border: 'none',
-        padding: 0,
+        // 44px tap target without disturbing the eyebrow baseline: the padding
+        // grows the hit box, the negative margin cancels the layout effect.
+        padding: '15px 0',
+        margin: '-15px 0',
         fontFamily: SANS,
         cursor: 'pointer',
       }}
     >
       {children}
       <svg
-        width="11"
-        height="11"
+        width="12"
+        height="12"
         viewBox="0 0 24 24"
         fill="none"
         stroke={A.INK}
