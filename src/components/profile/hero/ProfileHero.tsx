@@ -268,8 +268,10 @@ export const ProfileHero: React.FC<Props> = ({
       style={{
         position: 'relative',
         background: HERO_INK,
-        marginTop: HERO_TOP_OFFSET,
-        padding: '18px 16px 16px',
+        marginTop: 0,
+        paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
+        padding: '0 16px 16px',
+
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
