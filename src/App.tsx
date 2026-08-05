@@ -78,6 +78,7 @@ import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/Di
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import StageLoadingShell from '@/features/post-v2/StageLoadingShell';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 import { CollegeHubSkeleton } from '@/components/skeletons/CollegeHubSkeleton';
