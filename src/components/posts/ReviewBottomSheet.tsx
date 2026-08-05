@@ -463,8 +463,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     fontSize: 15,
                     lineHeight: 1.6,
-                    color: '#F8FAFC',
-                    opacity: 0.6,
+                    color: MUTE,
                     padding: '6px 0',
                   }}
                 >
@@ -479,14 +478,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     style={{
                       fontSize: 15,
                       lineHeight: 1.6,
-                      color: '#F8FAFC',
-                      opacity: 0.9,
+                      color: BODY,
                       margin: 0,
                       marginBottom: i === paragraphs.length - 1 ? 0 : 14,
                     }}
                   />
                 ))
               )}
+
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
