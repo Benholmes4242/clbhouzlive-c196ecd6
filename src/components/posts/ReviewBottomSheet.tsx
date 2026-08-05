@@ -385,8 +385,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
                 {/* Verdict label — tier word over the ghost numeral, top-right */}
                 {rating != null && (
-                  <ReviewVerdictLabel rating={rating} />
+                  <ReviewVerdictLabel rating={rating} surface="light" />
                 )}
+
               </div>
 
               {/* 2×2 breakdown grid */}
