@@ -299,7 +299,6 @@
     "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
     "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
     "beatFieldVoice": "{{who}} beat the field average on {{beat}} of {{scored}} holes scored so far."
-
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
@@ -1147,7 +1146,45 @@
     "nAllTime_one": "{{value}} all time",
     "nAllTime_other": "{{value}} all time",
     "rarestHole": "{{hole}}, par {{par}}",
-    "rarestHoleYards": "{{hole}}, par {{par}}, {{yards}} yds"
+    "rarestHoleYards": "{{hole}}, par {{par}}, {{yards}} yds",
+    "kickerCourses": "The courses",
+    "headlineCourses": "Where it's happening",
+    "seeAll": "See all",
+    "aMember": "A member",
+    "unknownCourse": "Course",
+    "friendsPlayed": "Where your friends played",
+    "aroundTheWorld": "Around the world",
+    "last90": "Last 90 days",
+    "emptyRegion": "Nothing logged here in the last 90 days. Try another region.",
+    "showMoreCourses": "Show {{count}} more courses",
+    "ratedByMember": "Rated {{value}} by a member",
+    "onTourThisWeek": "On tour this week",
+    "onTourNext": "Next on tour",
+    "tourHub": "Tour hub",
+    "par": "Par",
+    "yards": "Yards",
+    "purse": "Purse",
+    "defending": "Defending",
+    "nPhotos": "{{count}} photos",
+    "nPhotos_one": "{{count}} photo",
+    "momentsOfTheWeek": "Moments of the week",
+    "momentsOverline": "{{count}} courses",
+    "momentsOverline_one": "{{count}} course",
+    "mostPlayed": "Most played this week",
+    "trackedRounds": "Tracked rounds",
+    "when": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{count}} days ago",
+      "daysAgo_one": "{{count}} day ago",
+      "lastWeek": "Last week",
+      "weeksAgo": "{{count}}w ago",
+      "monthsAgo": "{{count}}mo ago"
+    },
+    "rarest": {
+      "aceAt": "Hole in one, {{hole}}",
+      "albatrossAt": "Albatross, {{hole}}"
+    }
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

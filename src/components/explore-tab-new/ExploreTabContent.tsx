@@ -1,16 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
-import { useNewsCourses, type NewsCourse } from './hooks/useNewsCourses';
+import { useDiscoverWire } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
-import { TheWire } from './wire/TheWire';
-import { RarestOfAll } from './wire/RarestOfAll';
-import { CoursesInTheNews } from './wire/CoursesInTheNews';
-import { YourCircle } from './wire/YourCircle';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
@@ -18,22 +13,43 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
+import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
+import { AroundTheWorld } from './courseled/AroundTheWorld';
+import { OnTourThisWeek } from './courseled/OnTourThisWeek';
+import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
+import { MomentsSheet } from './courseled/MomentsSheet';
+import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
+import { MostPlayedSheet } from './courseled/MostPlayedSheet';
+import { RarestLedger } from './courseled/RarestLedger';
+import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
+import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
+import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
 
 /**
- * Discover — the amateur circuit's news wire (BRIEF_DISCOVER_REBUILD).
+ * Discover, COURSE-LED (BRIEF_DISCOVER_REBUILT_COURSE_LED).
  *
- * Three sections and one control, down from thirteen sections and four
- * controls. Discover is the only surface that answers "what just happened":
- * Courses answers "where might I play", course detail "tell me about this
- * course", Handicap "how am I playing", Clubhouse "what are people saying".
+ * The page flips from person-led to course-led: every story is framed "at this
+ * course, this is what happened". The course card is the atom — image, dark
+ * scrim, name and region, a when-chip, event lines stacked beneath.
  *
- *   sticky   region scope pills - ONE control for the whole page
- *   headline kicker + "What's been happening"
- *   THE WIRE calendar-month panels over 90 days, paged inside each panel
- *   NEWS     horizontal course rail, after the FIRST month group
- *   RAREST   every ace and albatross, all time, never windowed
- *   CIRCLE   friends' latest rounds, 5 rows + sheet
+ * Vertical space is curated and capped; horizontal rails absorb volume, so a
+ * heavy week grows sideways rather than pushing the discovery feed off screen.
+ * Six sections, six different anatomies — rail, feed, facts, mosaic,
+ * leaderboard, ledger.
+ *
+ *   1 Where your friends played   rail       (hidden with no friend rounds)
+ *   2 Around the world            feed       region pills live here
+ *   3 On tour this week           facts rail (next-up fallback off-week)
+ *   4 Moments of the week         mosaic     read-only viewer
+ *   5 Most played this week       leaderboard
+ *   6 Rarest of all               ledger     never windowed
+ *
+ * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
+ * the brief and must not be reinstated.
  */
 
 interface ExploreTabContentProps {
@@ -72,11 +88,15 @@ export default function ExploreTabContent({
     userId,
     crownCategoryLabel,
   );
-  const {
-    courses: newsCourses,
-    isLoading: newsLoading,
-    hasCandidates: hasNewsCandidates,
-  } = useNewsCourses(events);
+  const { data: moments } = useMomentsOfTheWeek();
+  const { data: mostPlayed } = useMostPlayedThisWeek();
+
+  const [friendsSheet, setFriendsSheet] = useState(false);
+  const [momentsSheet, setMomentsSheet] = useState(false);
+  const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
+
+  const momentList = useMemo(() => moments ?? [], [moments]);
+  const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
   const handleRegionChange = useCallback(
     (slug: string | null) => {
@@ -91,54 +111,75 @@ export default function ExploreTabContent({
     [activeRegion, setRegion],
   );
 
-  // Wire rows and news cards ROUTE: a course page is a different surface with
-  // its own job. "View all" on the circle is a sheet - bounded set, same rows,
-  // coming straight back.
-  const handleWireRow = useCallback(
-    (e: WireEvent) => {
-      analyticsEvents.track('discover_wire_row_tapped', {
-        kind: e.kind,
-        course_id: e.courseId ?? null,
-        is_own: e.isOwn,
-      });
-      if (e.courseId) navigate(`/courses/${e.courseId}`);
-    },
-    [navigate],
-  );
-
-  const handleNewsCard = useCallback(
-    (c: NewsCourse) => {
-      analyticsEvents.track('discover_news_card_tapped', {
-        course_id: c.courseId,
-        why: c.why.kind,
-      });
-      navigate(`/courses/${c.courseId}`);
+  // Every course-led surface ROUTES to the course page: it is a different
+  // surface with its own job. Sheets are only for bounded sets.
+  const goCourse = useCallback(
+    (courseId: string, section: string) => {
+      analyticsEvents.track('discover_course_card_tapped', { course_id: courseId, section });
+      navigate(`/courses/${courseId}`);
     },
     [navigate],
   );
 
   const opener = useScorecardOpener();
-  const handleCircleRow = useCallback(
-    (scoreId: string | null, uid: string) => {
-      if (scoreId) opener.openByScore(scoreId, null, uid);
-      else opener.openProfile(uid);
+  const handleFriendCard = useCallback(
+    (r: FriendRoundRow) => {
+      analyticsEvents.track('discover_friend_round_tapped', {
+        course_id: r.course_id ?? null,
+        has_score: !!r.score_id,
+      });
+      if (r.score_id) opener.openByScore(r.score_id, r.connection_id, r.user_id);
+      else if (r.course_id) navigate(`/courses/${r.course_id}`);
+      else opener.openProfile(r.user_id);
     },
-    [opener],
+    [navigate, opener],
   );
 
-  // Month expansion answers whether the per-panel cap is set right; there is
-  // no infinite scroll left to measure a depth against.
-  const handleMonthExpand = useCallback(
-    (month: string, revealed: number) => {
-      analyticsEvents.track('discover_month_expanded', { month, revealed });
+  const handleTournament = useCallback(
+    (e: TourWeekEvent) => {
+      analyticsEvents.track('discover_tour_card_tapped', { tournament_id: e.id });
+      navigate(`/tour/tournament/${e.id}`);
     },
-    [],
+    [navigate],
   );
 
-  // Does the all-time panel earn its place? If nobody taps five feats it
-  // becomes a one-line summary rather than a panel.
-  const handleRarestRow = useCallback(
-    (e: WireEvent) => {
+  // The media chip deep-links straight to the course Media tab — GolfClubView
+  // already reads ?tab=media through asTabId, so no new plumbing is needed.
+  const handleTourMedia = useCallback(
+    (courseId: string) => {
+      analyticsEvents.track('discover_tour_media_tapped', { course_id: courseId });
+      navigate(`/courses/${courseId}?tab=media`);
+    },
+    [navigate],
+  );
+
+  // Moments open the shared fullscreen viewer READ-ONLY: Discover reports, it
+  // is not a second engagement surface.
+  const handleMoment = useCallback(
+    (m: Moment, index: number) => {
+      analyticsEvents.track('discover_moment_tapped', {
+        course_id: m.courseId,
+        post_id: m.post.id,
+      });
+      openWithOrigin({
+        posts: momentList.map((x) => x.post),
+        index,
+        originEl: null,
+        posterUrl: m.thumbnail,
+        openedFrom: 'discover-moments',
+        options: { readOnly: true },
+      });
+    },
+    [momentList],
+  );
+
+  const handleMostPlayed = useCallback(
+    (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
+    [goCourse],
+  );
+
+  const handleRarest = useCallback(
+    (e: { courseId: string | null; kind: string; at: string }) => {
       analyticsEvents.track('discover_rarest_tapped', {
         kind: e.kind,
         year: new Date(e.at).getFullYear(),
@@ -154,10 +195,16 @@ export default function ExploreTabContent({
 
       <GlassHeaderPlate visible={tabsStuck} />
       <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
-      <ScopePills region={activeRegion} onChange={handleRegionChange} />
 
-      <div style={{ padding: '18px 16px 12px' }}>
-        <div style={KICKER}>{t('discover.kicker', 'The amateur circuit')}</div>
+      {/* The chrome island floats over the page, so the header clears the notch
+          plus the island itself — Discover no longer sits under a hero. */}
+      <div
+        style={{
+          padding: '0 16px 12px',
+          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+        }}
+      >
+        <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
         <h1
           style={{
             margin: '7px 0 0',
@@ -167,47 +214,52 @@ export default function ExploreTabContent({
             letterSpacing: '-0.02em',
           }}
         >
-          {t('discover.headline', "What's been happening")}
+          {t('discover.headlineCourses', "Where it's happening")}
         </h1>
-        <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.45, color: A.MUTE }}>
-          {t(
-            'discover.sub',
-            'Eagles and birdie hauls from official WHS rounds, newest first.',
-          )}
-        </p>
       </div>
 
-      <div
-        style={{
-          padding: '0 14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-        }}
-      >
-        <TheWire
+      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <FriendsPlayedRail
+          userId={userId}
+          onCardPress={handleFriendCard}
+          onSeeAll={() => setFriendsSheet(true)}
+        />
+
+        <AroundTheWorld
           events={events}
           isLoading={wireLoading}
+          userId={userId}
           scopeKey={activeRegion ?? 'worldwide'}
-          onRowPress={handleWireRow}
-          onMonthExpand={handleMonthExpand}
-          newsSlot={
-            hasNewsCandidates ? (
-              <div style={{ padding: '6px 0 2px' }}>
-                <CoursesInTheNews
-                  courses={newsCourses}
-                  isLoading={newsLoading}
-                  onCardPress={handleNewsCard}
-                  onBrowseAll={() => navigate('/courses')}
-                />
-              </div>
-            ) : null
+          pills={
+            <div style={{ margin: '0 -14px 12px' }}>
+              <ScopePills region={activeRegion} onChange={handleRegionChange} />
+            </div>
+          }
+          onCoursePress={(id) => goCourse(id, 'around_the_world')}
+          onExpand={(revealed) =>
+            analyticsEvents.track('discover_courses_expanded', { revealed })
           }
         />
 
-        <RarestOfAll events={legendary} onRowPress={handleRarestRow} />
+        <OnTourThisWeek
+          onTournamentPress={handleTournament}
+          onMediaPress={handleTourMedia}
+          onTourHub={() => navigate('/tour')}
+        />
 
-        <YourCircle userId={userId} onRowPress={handleCircleRow} />
+        <MomentsOfTheWeek
+          moments={momentList}
+          onTilePress={handleMoment}
+          onSeeAll={() => setMomentsSheet(true)}
+        />
+
+        <MostPlayedLeaderboard
+          rows={mostPlayedList}
+          onRowPress={handleMostPlayed}
+          onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
+        />
+
+        <RarestLedger events={legendary} onRowPress={handleRarest} />
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
             the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
@@ -216,6 +268,30 @@ export default function ExploreTabContent({
           style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
         />
       </div>
+
+      <FriendsRoundsSeeAllSheet
+        open={friendsSheet}
+        onClose={() => setFriendsSheet(false)}
+        userId={userId}
+        onRowPress={(scoreId, uid) => {
+          if (scoreId) opener.openByScore(scoreId, null, uid);
+          else opener.openProfile(uid);
+        }}
+      />
+
+      <MomentsSheet
+        open={momentsSheet}
+        onClose={() => setMomentsSheet(false)}
+        moments={momentList}
+        onTilePress={handleMoment}
+      />
+
+      <MostPlayedSheet
+        open={mostPlayedSheet}
+        onClose={() => setMostPlayedSheet(false)}
+        rows={mostPlayedList}
+        onRowPress={handleMostPlayed}
+      />
 
       <RoundDetailSheet
         open={!!opener.target}

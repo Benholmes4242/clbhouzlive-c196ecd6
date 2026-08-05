@@ -40,6 +40,9 @@ export interface FriendRoundRow {
   profile_photo_url: string | null;
   play_date: string; // ISO date (YYYY-MM-DD)
   course_name: string | null;
+  /** Catalogue course id when the round is matched — drives course-led routing. */
+  course_id: string | null;
+
   gross: number | null;
   net: number | null;
   stableford: number | null;
@@ -239,7 +242,9 @@ export function useFriendsLatestRounds(
           profile_photo_url: profile?.profile_photo_url ?? null,
           play_date: r.play_date,
           course_name: r.course_name,
+          course_id: r.course_id ?? null,
           gross: r.gross_score,
+
           net,
           stableford: r.stableford_points,
           hcp_delta: hcpDelta,
