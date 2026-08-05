@@ -35,12 +35,20 @@ const RED = '#F87171';
 
 const MS_PER_DAY = 86_400_000;
 
-export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'trophies';
+export type HeroStat = 'index' | 'rounds' | 'rated' | 'friends' | 'followers';
 
-/** Addendum A: photograph under a heavy scrim. Flat wash, then vertical ramp. */
-const COVER_WASH = 'rgba(14,18,22,0.72)';
+/** Round 3 §2: scrim comes down a touch. Flat wash, then vertical ramp.
+ *  If the index or counters ever lose contrast on a bright cover, DEEPEN
+ *  these again - never lighten the text. */
+const COVER_WASH = 'rgba(14,18,22,0.58)';
 const COVER_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.55) 0%, rgba(14,18,22,0.88) 100%)';
+  'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
+
+/** Round 3 §1: the hero starts BENEATH the floating islands - safe-area inset
+ *  + island row (top offset 10 + ISLAND_H 44) + 8px - so both islands sit on
+ *  plain canvas rather than on the photograph. */
+const HERO_TOP_OFFSET =
+  'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)';
 
 interface Props {
   userId: string;
