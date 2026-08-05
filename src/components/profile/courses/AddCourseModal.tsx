@@ -410,14 +410,14 @@ const CourseRow: React.FC<CourseRowProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         background: isAtLimit
-          ? '#F1F5F9'
+          ? TILE
           : isSecondary
-            ? 'rgba(15,23,42,0.04)'
-            : AMBER_WASH,
-        border: `1px solid ${isAtLimit ? BORDER : isSecondary ? BORDER : AMBER_BORDER}`,
+            ? TILE
+            : PANEL,
+        border: `1px solid ${BORDER}`,
         borderRadius: 10,
         cursor: isAtLimit ? 'not-allowed' : 'pointer',
-        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : AMBER,
+        color: isAtLimit ? INK_SUBTLE : isSecondary ? INK_SOFT : INK,
         padding: 0,
         flexShrink: 0,
       }}
