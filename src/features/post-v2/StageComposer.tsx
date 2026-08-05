@@ -941,11 +941,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         >
           {state.media.length > 0 ? '\u2039' : '\u00d7'}
         </button>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: LIGHT.ink, letterSpacing: '-0.015em' }}>
-            {isEditMode ? 'Edit post' : 'New post'}
-          </div>
-        </div>
+        <div style={{ minWidth: 0, flex: 1 }} />
         <div style={{ fontSize: 12, fontWeight: 700, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
       </div>
 
