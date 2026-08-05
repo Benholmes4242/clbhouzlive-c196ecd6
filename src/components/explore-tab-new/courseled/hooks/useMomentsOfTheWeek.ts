@@ -20,9 +20,32 @@ export interface Moment {
   post: FeedPost;
   thumbnail: string | null;
   mediaType: 'image' | 'video';
+  /** Index of this tile's media within the post's mediaItems. */
+  mediaIndex?: number;
 }
 
 const DAY = 86_400_000;
+
+/* ---- Ranking constants (all tunable) ---- */
+const FRESH_HOT_MS = 2 * DAY; // <= 48h
+const FRESH_WARM_MS = 7 * DAY; // <= 7 days
+const BAND_HOT = 3;
+const BAND_WARM = 2;
+const BAND_COOL = 1; // <= 14 days (the fetch window)
+const COMMENT_WEIGHT = 2;
+const MAX_TILES_PER_POST = 3;
+const MAX_TILES_PER_COURSE = 4;
+
+function freshnessBand(createdAt: string, now: number): number {
+  const age = now - new Date(createdAt).getTime();
+  if (age <= FRESH_HOT_MS) return BAND_HOT;
+  if (age <= FRESH_WARM_MS) return BAND_WARM;
+  return BAND_COOL;
+}
+
+function engagement(likes: number, comments: number): number {
+  return 1 + Math.log(1 + likes + COMMENT_WEIGHT * comments);
+}
 
 function streamThumb(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
@@ -73,18 +96,47 @@ export function useMomentsOfTheWeek(limit = 24) {
 
       const rows = ((data ?? []) as unknown) as Row[];
 
-      // One moment per course, newest first.
-      const seenCourses = new Set<string>();
-      const picked: Array<{ row: Row; courseId: string }> = [];
-      for (const row of rows) {
-        const courseId = row.tagged_course_ids?.[0] ?? row.course_id ?? null;
-        if (!courseId || seenCourses.has(courseId)) continue;
-        if (!row.post_media || row.post_media.length === 0) continue;
-        seenCourses.add(courseId);
-        picked.push({ row, courseId });
+      // Rank candidates: freshness band x log engagement, newest as tiebreak.
+      const now = Date.now();
+      const ranked = rows
+        .map((row) => ({
+          row,
+          courseId: row.tagged_course_ids?.[0] ?? row.course_id ?? null,
+          score:
+            freshnessBand(row.created_at, now) *
+            engagement(row.like_count ?? 0, row.comment_count ?? 0),
+        }))
+        .filter(
+          (c): c is { row: Row; courseId: string; score: number } =>
+            !!c.courseId && !!c.row.post_media && c.row.post_media.length > 0,
+        )
+        .sort(
+          (a, b) =>
+            b.score - a.score ||
+            new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime(),
+        );
+
+      // Fill tiles under the per-post and per-course caps.
+      const perCourse = new Map<string, number>();
+      const picked: Array<{ row: Row; courseId: string; mediaIndex: number }> = [];
+      for (const cand of ranked) {
         if (picked.length >= limit) break;
+        const used = perCourse.get(cand.courseId) ?? 0;
+        if (used >= MAX_TILES_PER_COURSE) continue;
+        const mediaCount = cand.row.post_media?.length ?? 0;
+        const take = Math.min(
+          MAX_TILES_PER_POST,
+          mediaCount,
+          MAX_TILES_PER_COURSE - used,
+          limit - picked.length,
+        );
+        for (let i = 0; i < take; i += 1) {
+          picked.push({ row: cand.row, courseId: cand.courseId, mediaIndex: i });
+        }
+        perCourse.set(cand.courseId, used + take);
       }
       if (picked.length === 0) return [];
+
 
       // Course names and author identities, one round-trip each.
       const courseIds = picked.map((p) => p.courseId);
@@ -119,7 +171,7 @@ export function useMomentsOfTheWeek(limit = 24) {
         profileById.set(p.id, p);
       }
 
-      return picked.map(({ row, courseId }): Moment => {
+      return picked.map(({ row, courseId, mediaIndex }): Moment => {
         const media = [...(row.post_media ?? [])].sort(
           (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
         );
@@ -172,13 +224,15 @@ export function useMomentsOfTheWeek(limit = 24) {
           courseId,
           courseName: courseName.get(courseId) ?? undefined,
         };
+        const tile = mediaItems[mediaIndex] ?? mediaItems[0];
         return {
-          key: `${row.id}-${courseId}`,
+          key: `${row.id}-${courseId}-${mediaIndex}`,
           courseId,
           courseName: courseName.get(courseId) ?? null,
           post,
-          thumbnail: mediaItems[0]?.imageUrl ?? mediaItems[0]?.thumbnailUrl ?? null,
-          mediaType: mediaItems[0]?.type === 'video' ? 'video' : 'image',
+          thumbnail: tile?.imageUrl ?? tile?.thumbnailUrl ?? null,
+          mediaType: tile?.type === 'video' ? 'video' : 'image',
+          mediaIndex,
         };
       });
     },
