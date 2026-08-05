@@ -329,7 +329,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
     alignItems: 'flex-start',
     gap: 12,
     padding: '12px 16px',
-    background: '#FFFFFF',
+    background: PANEL,
     borderBottom: `1px solid ${BORDER}`,
     opacity: isAtLimit ? 0.4 : 1,
   }}>
@@ -344,7 +344,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
           height: 48,
           objectFit: 'cover',
           borderRadius: 10,
-          background: '#F1F5F9',
+          background: TILE,
           flexShrink: 0,
           display: 'block',
         }}
@@ -354,7 +354,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         width: 48,
         height: 48,
         borderRadius: 10,
-        background: '#F1F5F9',
+        background: TILE,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -393,8 +393,8 @@ const CourseRow: React.FC<CourseRowProps> = ({
         </span>
         {course.has_rating && course.rating_value != null && (
           <>
-            <span style={{ color: '#CBD5E1' }}>·</span>
-            <PlainScore value={course.rating_value} size={13} />
+            <span style={{ color: INK_SUBTLE }}>·</span>
+            <PlainScore value={course.rating_value} size={13} color={reviewLabelColor(course.rating_value, 'light')} />
           </>
         )}
       </div>
@@ -649,7 +649,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           display: 'flex',
           gap: 24,
           padding: '0 16px',
-          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
+          borderBottom: `1px solid ${BORDER}`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -679,7 +679,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   display: 'inline-block',
                   paddingBottom: 8,
                   marginBottom: -1,
-                  borderBottom: isActive ? '2px solid #0F172A' : '2px solid transparent',
+                  borderBottom: isActive ? `2px solid ${INK}` : '2px solid transparent',
                 }}>
                   {label}
                 </span>
@@ -727,7 +727,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   paddingRight: 16,
                   fontSize: 14,
                   borderRadius: 12,
-                  background: '#FFFFFF',
+                  background: PANEL,
                   border: `1px solid ${BORDER}`,
                   color: INK,
                   caretColor: INK,
@@ -812,7 +812,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                             flex: 1,
                             minHeight: 44,
                             background: DANGER,
-                            color: '#FFFFFF',
+                            color: PANEL,
                             border: 0,
                             borderRadius: 10,
                             fontSize: 13,
@@ -828,7 +828,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           style={{
                             flex: 1,
                             minHeight: 44,
-                            background: '#FFFFFF',
+                            background: PANEL,
                             color: INK,
                             border: `1px solid ${BORDER}`,
                             borderRadius: 10,
