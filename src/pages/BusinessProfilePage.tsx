@@ -8,8 +8,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
-  Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
-  Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
+  Phone, Globe, MoreHorizontal, Loader2,
+  Share2, Link2, Flag, Pencil, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
   Navigation, Calendar,
 } from 'lucide-react';
@@ -29,7 +29,6 @@ import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
 import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
@@ -38,7 +37,6 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { FilterChips } from '@/components/ui/FilterChips';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -57,7 +55,6 @@ import {
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
-import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -70,35 +67,6 @@ import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
 import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-/** One centred figure in the reach panel. Optional tap-through preserved. */
-const ReachCell: React.FC<{
-  label: string;
-  value: string;
-  sub?: string;
-  onClick?: () => void;
-}> = ({ label, value, sub, onClick }) => {
-  const Wrapper: React.ElementType = onClick ? 'button' : 'div';
-  return (
-    <Wrapper
-      {...(onClick ? { type: 'button', onClick } : {})}
-      style={{
-        textAlign: 'center',
-        minWidth: 0,
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        cursor: onClick ? 'pointer' : 'default',
-      }}
-    >
-      <div style={LABEL}>{label}</div>
-      <div style={{ ...NUM, fontSize: 22, color: A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>{value}</div>
-      {sub && <div style={{ ...LABEL, fontSize: 9, marginTop: 3 }}>{sub}</div>}
-    </Wrapper>
-  );
-};
-
-
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
@@ -195,16 +163,6 @@ const BusinessProfilePage: React.FC = () => {
   const toggleFollow = useToggleFollow();
   const { start: startConversation, isStarting: isStartingDM } = useStartConversation();
 
-  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
-    useBusinessImageUpload(business?.id);
-  const logoChooseInputRef = useRef<HTMLInputElement>(null);
-  const logoTakeInputRef = useRef<HTMLInputElement>(null);
-  const heroChooseInputRef = useRef<HTMLInputElement>(null);
-  const heroTakeInputRef = useRef<HTMLInputElement>(null);
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [photoSheet, setPhotoSheet] = useState<'cover' | 'logo' | null>(null);
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -294,38 +252,6 @@ const BusinessProfilePage: React.FC = () => {
     window.addEventListener('resize', checkClamped);
     return () => window.removeEventListener('resize', checkClamped);
   }, [business?.description]);
-
-  // ----- image upload -----
-  const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('logo');
-    setIsCropModalOpen(true);
-  };
-  const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('cover');
-    setIsCropModalOpen(true);
-  };
-  const handleCropComplete = (croppedFile: File) => {
-    setIsCropModalOpen(false);
-    if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
-    if (cropMode === 'logo') uploadLogo(croppedFile);
-    if (cropMode === 'cover') uploadCover(croppedFile);
-    setCropMode(null);
-  };
-  const handleCropCancel = (open: boolean) => {
-    if (!open) {
-      if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
-      setIsCropModalOpen(false);
-      setCropMode(null);
-    }
-  };
 
   // ----- actions -----
   const handleFollowToggle = () => {
@@ -766,37 +692,6 @@ const BusinessProfilePage: React.FC = () => {
       />
 
 
-      {/* Hidden file inputs (choose + take, for both logo and cover) */}
-      <input ref={logoChooseInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={logoTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={heroChooseInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
-      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleCoverFileSelected} className="hidden" />
-
-      {/* Unified photo action sheet */}
-      {isOwner && (
-        <PhotoActionSheet
-          open={photoSheet !== null}
-          onClose={() => setPhotoSheet(null)}
-          title={photoSheet === 'cover' ? 'Cover photo' : 'Business logo'}
-          hasPhoto={photoSheet === 'cover' ? !!business.cover_image_url : !!business.logo_url}
-          removeLabel={photoSheet === 'cover' ? 'Remove cover photo' : 'Remove logo'}
-          onChoose={() => (photoSheet === 'cover' ? heroChooseInputRef : logoChooseInputRef).current?.click()}
-          onTake={() => (photoSheet === 'cover' ? heroTakeInputRef : logoTakeInputRef).current?.click()}
-          onRemove={() => (photoSheet === 'cover' ? removeCover() : removeLogo())}
-        />
-      )}
-
-      {/* Crop modal */}
-      {isCropModalOpen && cropImageSrc && (
-        <ImageCropModal
-          open={isCropModalOpen}
-          onOpenChange={handleCropCancel}
-          imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1 / 1.05}
-          onCropComplete={handleCropComplete}
-          title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
-        />
-      )}
     </PageRoot>
   );
 };
