@@ -273,11 +273,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               flexDirection: 'column',
               overflow: 'hidden',
               borderRadius: '18px 18px 0 0',
-              background: 'rgba(24,28,24,0.62)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
-              borderTop: '1px solid rgba(255,255,255,0.18)',
-              color: '#F8FAFC',
+              background: CANVAS,
+              borderTop: `1px solid ${BORDER}`,
+              color: INK,
+
               fontFamily: FONT_GEIST,
               transform: 'translateZ(0)',
             }}
