@@ -182,7 +182,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               marginTop: 2,
             }}
           >
-            <RoundFeatChips feats={feats} />
+            <RoundFeatChips feats={feats} maxChips={1} />
           </div>
         )}
 

@@ -147,38 +147,48 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                     </span>
                   )}
                   {r.gross != null && (
-                    <span style={{ ...NUMF, fontSize: 15, color: A.INK, flexShrink: 0 }}>
-                      {r.gross}
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    marginTop: 4,
-                    overflow: 'hidden',
-                    minHeight: 14,
-                  }}
-                >
-                  {r.stableford != null && (
-                    <span
+                    <div
                       style={{
-                        ...NUMF,
-                        fontSize: 9.5,
-                        fontWeight: 800,
-                        letterSpacing: '0.07em',
-                        color: A.MUTE,
                         flexShrink: 0,
-                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: 1,
                       }}
                     >
-                      {r.stableford} PTS{r.feats.length > 0 ? ' ·' : ''}
-                    </span>
+                      <span style={{ ...NUMF, fontSize: 15, color: A.INK, lineHeight: 1 }}>
+                        {r.gross}
+                      </span>
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 8.5,
+                          fontWeight: 800,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                          color: A.DIM,
+                          lineHeight: 1,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {r.stableford != null ? `${r.stableford} PTS` : 'GROSS'}
+                      </span>
+                    </div>
                   )}
-                  <RoundFeatChips feats={r.feats} />
                 </div>
+                {r.feats.length > 0 && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      marginTop: 5,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <RoundFeatChips feats={r.feats} maxChips={1} />
+                  </div>
+                )}
               </div>
 
 
