@@ -680,7 +680,74 @@ const ProfilePageV2Content: React.FC = () => {
             onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
             action={
               isSelfView ? (
-                <HeroPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <HeroPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
+                  <DropdownMenu onOpenChange={(open) => {
+                    if (!open) (document.activeElement as HTMLElement)?.blur();
+                  }}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="More options"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          flexShrink: 0,
+                          borderRadius: 999,
+                          background: 'rgba(255,255,255,0.12)',
+                          border: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <MoreHorizontal size={15} strokeWidth={2.25} color="#FFFFFF" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52">
+                      <DropdownMenuItem onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
+                        } else {
+                          navigator.clipboard.writeText(window.location.href);
+                          toast.success('Copied to clipboard');
+                        }
+                      }}>
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('Copied to clipboard');
+                      }}>
+                        <Link2 className="w-4 h-4 mr-2" />
+                        Copy link
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate(editRoute)}>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Edit profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Settings
+                      </DropdownMenuItem>
+                      {myBusinesses && myBusinesses.length > 0 && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => {
+                            const biz = myBusinesses[0];
+                            navigate(`/business/${biz.business.slug || biz.business.id}`);
+                          }}>
+                            <Building2 className="w-4 h-4 mr-2" />
+                            Switch to business
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ) : friendshipStatus === 'blocked' ? null : (
                 <HeroPill
                   label={
@@ -693,6 +760,7 @@ const ProfilePageV2Content: React.FC = () => {
                 />
               )
             }
+
             onStatTap={(stat) => {
               // Addendum B: the index block and the ROUNDS cell share one
               // destination - the profile's handicap surface. The legacy
