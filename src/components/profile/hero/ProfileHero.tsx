@@ -231,10 +231,8 @@ export const ProfileHero: React.FC<Props> = ({
   React.useEffect(() => setCoverBroken(false), [cover]);
   const showCover = !!cover && !coverBroken;
 
-  const trophiesCount = React.useMemo(() => {
-    if (!achievements) return null;
-    return achievements.filter((b) => b.is_earned).length;
-  }, [achievements]);
+
+
 
   const series = React.useMemo(() => {
     if (!history || history.length < 2) return [];
