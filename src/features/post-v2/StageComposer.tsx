@@ -892,77 +892,125 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* Thumbnail + caption */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, padding: 12, display: 'flex', gap: 12 }}>
-          {firstItem ? (
-            <button
-              onClick={() => setPage(1)}
-              aria-label="Edit media"
-              style={{ position: 'relative', width: 64, height: 80, borderRadius: 8, overflow: 'hidden', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', flex: 'none', cursor: 'pointer' }}
-            >
-              {firstItem.type === 'video' ? (
-                <video src={firstItem.previewUrl} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              ) : (
-                <img src={firstItem.previewUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              )}
-              {state.media.length > 1 && (
-                <span style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>
-                  {state.media.length}
-                </span>
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={handleStageAdd}
-              style={{ width: 64, height: 80, borderRadius: 8, border: `1px dashed ${LIGHT.mute}`, background: 'transparent', color: LIGHT.mute, fontSize: 11, fontWeight: 600, flex: 'none', cursor: 'pointer', lineHeight: 1.2 }}
-            >
-              + Add<br />photos
-            </button>
-          )}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex' }}>
-            <CaptionField
-              value={state.caption}
-              onChange={handleSetCaption}
-              currentUserId={profile?.id ?? null}
-              variant="light"
-              minHeight={80}
-              placeholder="Say something about it"
-            />
-          </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
+        {/* Media strip — every slide, tap one to go back and edit it */}
+        {state.media.length > 0 && (
+          <>
+            <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
+              {state.media.map((m, i) => (
+                <button
+                  key={m.id}
+                  onClick={() => { setActiveIndex(i); setPage(1); }}
+                  aria-label={`Edit item ${i + 1}`}
+                  style={{ position: 'relative', width: 56, height: 70, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', cursor: 'pointer' }}
+                >
+                  <SlideThumb item={m} glyph={20} />
+                </button>
+              ))}
+              <button
+                onClick={handleStageAdd}
+                aria-label="Add photos or video"
+                style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${LIGHT.dim}`, background: 'transparent', color: LIGHT.mute, fontSize: 18, cursor: 'pointer' }}
+              >+</button>
+            </div>
+            <div style={{ padding: '6px 18px 0', fontSize: 10.5, color: LIGHT.dim }}>Tap a photo to go back and edit</div>
+          </>
+        )}
+
+        {/* Caption — bare on the canvas, cursor flashing on arrival */}
+        <div style={{ padding: '10px 16px 0' }}>
+          <CaptionField
+            value={state.caption}
+            onChange={handleSetCaption}
+            currentUserId={profile?.id ?? null}
+            variant="light"
+            minHeight={96}
+            placeholder="What's on your mind"
+            autoFocus={!isEditMode}
+          />
+          <div style={{ fontSize: 11, color: LIGHT.dim, marginTop: 2 }}>@mention friends and businesses</div>
         </div>
 
-        {/* Detail rows */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 14, overflow: 'hidden' }}>
-          <button onClick={() => { openDetail('course'); setSheet('course'); }} style={lightRowStyle(false)}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Tag a course</span>
-            <span style={{ fontSize: 13, color: courseNames ? LIGHT.ink : LIGHT.mute, maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {courseNames || 'None'}
-            </span>
-          </button>
-          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(true)}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Posting as</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Tag a course — suggestion-first, Search is the fallback */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+          {state.courses.length > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 10 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.courses[0].name}</div>
+                <button
+                  onClick={() => { openDetail('course'); setSheet('course'); }}
+                  style={{ marginTop: 2, padding: 0, border: 0, background: 'transparent', fontSize: 11.5, color: LIGHT.mute, cursor: 'pointer' }}
+                >
+                  {state.courses.length > 1 ? `${courseNames}` : 'Change course'}
+                </button>
+              </div>
+              <button
+                onClick={() => setCourses([])}
+                aria-label="Remove course"
+                style={{ marginLeft: 'auto', width: 26, height: 26, borderRadius: 999, border: 0, background: '#EEF1F5', color: LIGHT.mute, cursor: 'pointer', fontSize: 13, flex: 'none' }}
+              >×</button>
+            </div>
+          ) : (
+            <div style={{ padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink }}>Tag a course</span>
+                <button
+                  onClick={() => { openDetail('course'); setSheet('course'); }}
+                  style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                >
+                  Search
+                  <ChevronRight size={12} strokeWidth={2.5} />
+                </button>
+              </div>
+              {recentCourses.length > 0 && (
+                <>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+                    {recentCourses.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => { openDetail('course'); setCourses([{ id: c.id, name: c.name, country: c.country }]); }}
+                        style={{ border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
+                      >
+                        {c.name} <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: LIGHT.dim, marginTop: 8 }}>From your recent rounds</div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Detail rows — Drafts appears only when drafts exist */}
+        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
+          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(false)}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Posting as</span>
+            <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 13, color: LIGHT.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
               <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={LIGHT_HAIRLINE} />
             </span>
+            <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
           </button>
           {showScheduleRow && (
             <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Schedule for later</span>
-              <span style={{ fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Schedule for later</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
                 {state.scheduledAt ? state.scheduledAt.toLocaleString() : 'Off'}
               </span>
+              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
-          {!isEditMode && (
+          {!isEditMode && drafts.drafts.length > 0 && (
             <button onClick={() => setSheet('drafts')} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: LIGHT.ink }}>Drafts</span>
-              <span style={{ fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length || 'None'}</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Drafts</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
+              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
         </div>
       </div>
+
 
       {/* Share */}
       <div style={{ flex: 'none', background: LIGHT.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
