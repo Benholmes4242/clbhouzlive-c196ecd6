@@ -860,8 +860,10 @@ const ProfilePageV2Content: React.FC = () => {
             </div>
           </div>
           )
-        )}
+        }
       </div>
+      )}
+
 
       {/* The white INDEX/ROUNDS/COURSES panel and its "Open your handicap"
           action are deleted — the dark hero owns both (§1e). The posts/reviews
