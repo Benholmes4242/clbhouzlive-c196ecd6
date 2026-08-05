@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PersonAvatar } from '@/components/shared/PersonAvatar';
+
 import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDiscoverWire';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
-import { useFriendIdSet } from './hooks/useFriendIdSet';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
@@ -15,9 +16,9 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_
  * card is the course, the lines beneath are what happened there, newest first.
  * Five courses, then "Show N more courses" reveals the rest in place.
  *
- * PRIVACY: an actor is named only when the event is the viewer's own or the
- * actor is a friend. Everyone else reads "a member" — the course is the story,
- * not the stranger.
+ * NAMING: every actor is named — the "a member" anonymity rule is retired. The
+ * viewing member's own name renders in amber; everyone else in ink. Rows carry
+ * NO badges: the detail line carries the feat wording instead.
  */
 
 const PAGE = 5;
@@ -66,7 +67,6 @@ export function AroundTheWorld({
 }: Props) {
   const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
-  const { data: friendIds } = useFriendIdSet(userId);
 
   const groups = useMemo<CourseGroup[]>(() => {
     const byCourse = new Map<string, CourseGroup>();
@@ -94,10 +94,54 @@ export function AroundTheWorld({
   const { data: meta } = useCourseCardMeta(courseIds);
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
-  const actorLabel = (e: WireEvent): string => {
-    if (e.isOwn) return t('discover.wire.you', 'You');
-    if (e.userId && friendIds?.has(e.userId)) return e.actorName;
-    return t('discover.aMember', 'A member');
+  /** Tier colour for the right-hand figure (BRIEF: green / ink / gold). */
+  const toneFor = (kind: WireEvent['kind'] | 'rating'): string => {
+    if (kind === 'rating' || kind === 'ace' || kind === 'albatross') return GOLD_TEXT;
+    if (kind === 'crown') return A.GREEN;
+    return A.INK;
+  };
+
+  const nameFor = (e: WireEvent): string =>
+    e.actorName?.trim() || t('discover.wire.you', 'You');
+
+  /** The detail line carries the feat wording — there are no badges here. */
+  const detailFor = (e: WireEvent): string => {
+    if (e.kind === 'eagle') {
+      const hole = e.actionParams?.hole;
+      if (!hole) return t('discover.row.eagleNoHole', 'Made an eagle');
+      if (e.holePar != null)
+        return t('discover.row.eaglePar', {
+          defaultValue: 'Eagle at the {{hole}}, par {{par}}',
+          hole,
+          par: e.holePar,
+        });
+      return t('discover.row.eagle', { defaultValue: 'Eagle at the {{hole}}', hole });
+    }
+    if (e.kind === 'birdie_haul') {
+      return t('discover.row.birdieHaul', {
+        defaultValue: '{{count}} birdies in one round',
+        count: Number(e.actionParams?.count ?? 0),
+      });
+    }
+    if (e.kind === 'crown' && e.actionParams?.category) {
+      return t('discover.row.crown', {
+        defaultValue: '{{category}} here',
+        category: String(e.actionParams.category).toLowerCase(),
+      });
+    }
+    return t(e.actionKey, {
+      defaultValue: ACTION_DEFAULTS[e.actionKey] ?? '',
+      ...(e.actionParams ?? {}),
+    });
+  };
+
+  const figLabelFor = (e: WireEvent): string => {
+    if (e.figureSubKey)
+      return t(e.figureSubKey, {
+        defaultValue: UNIT_DEFAULTS[e.figureSubKey] ?? '',
+        ...(e.figureSubParams ?? {}),
+      }).toUpperCase();
+    return t('discover.row.labelScore', 'SCORE');
   };
 
   if (isLoading) {
@@ -136,23 +180,38 @@ export function AroundTheWorld({
           {shown.map((g) => {
             const m = meta?.get(g.courseId);
             const rating = ratings?.get(g.courseId);
-            const lines: Array<{ text: string; fig: string | null; tone?: string }> = g.events.map(
-              (e) => ({
-                text: `${actorLabel(e)} ${DOT} ${t(e.actionKey, {
-                  defaultValue: ACTION_DEFAULTS[e.actionKey] ?? '',
-                  ...(e.actionParams ?? {}),
-                })}`,
-                fig: e.figure ?? null,
-                tone: e.figureTone,
-              }),
-            );
+            const rows: Array<{
+              key: string;
+              name: string;
+              isOwn: boolean;
+              avatar: string | null;
+              userId: string | null;
+              detail: string;
+              fig: string | null;
+              figLabel: string;
+              tone: string;
+            }> = g.events.map((e) => ({
+              key: e.id,
+              name: nameFor(e),
+              isOwn: e.isOwn,
+              avatar: e.actorAvatar,
+              userId: e.userId,
+              detail: detailFor(e),
+              fig: e.figure ?? null,
+              figLabel: figLabelFor(e),
+              tone: toneFor(e.kind),
+            }));
             if (rating) {
-              lines.push({
-                text: t('discover.ratedByMember', {
-                  defaultValue: 'Rated {{value}} by a member',
-                  value: rating.rating.toFixed(1),
-                }),
+              rows.push({
+                key: `rating:${g.courseId}`,
+                name: rating.actorName?.trim() || t('discover.wire.you', 'You'),
+                isOwn: !!userId && rating.userId === userId,
+                avatar: rating.actorAvatar,
+                userId: rating.userId,
+                detail: t('discover.row.rated', 'Rated this course'),
                 fig: rating.rating.toFixed(1),
+                figLabel: t('discover.row.labelRating', 'RATING'),
+                tone: toneFor('rating'),
               });
             }
 
@@ -203,43 +262,69 @@ export function AroundTheWorld({
                   </div>
                 </CourseImageFallback>
 
-                <div style={{ padding: '3px 14px 5px' }}>
-                  {lines.map((l, i) => (
+                <div style={{ padding: '3px 16px 5px' }}>
+                  {rows.map((r, i) => (
                     <div
-                      key={i}
+                      key={r.key}
                       style={{
                         display: 'flex',
-                        alignItems: 'baseline',
-                        gap: 8,
+                        alignItems: 'center',
+                        gap: 10,
                         padding: '9px 0',
-                        borderBottom:
-                          i === lines.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
+                        borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
                       }}
                     >
-                      <span
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          fontSize: 13,
-                          color: A.INK,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {l.text}
-                      </span>
-                      {l.fig && (
-                        <span
+                      <PersonAvatar
+                        size={30}
+                        src={r.avatar}
+                        name={r.name}
+                        userId={r.userId}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
                           style={{
-                            ...NUMF,
-                            fontSize: 14.5,
-                            color: l.tone ?? A.INK,
-                            flexShrink: 0,
+                            fontSize: 13,
+                            fontWeight: 700,
+                            letterSpacing: '-0.005em',
+                            color: r.isOwn ? A.AMBER_DEEP : A.INK,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
                           }}
                         >
-                          {l.fig}
-                        </span>
+                          {r.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11.5,
+                            color: A.MUTE,
+                            marginTop: 1.5,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {r.detail}
+                        </div>
+                      </div>
+                      {r.fig && (
+                        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                          <div style={{ ...NUMF, fontSize: 17, color: r.tone, lineHeight: 1.05 }}>
+                            {r.fig}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 8,
+                              fontWeight: 800,
+                              letterSpacing: '0.13em',
+                              textTransform: 'uppercase',
+                              color: A.DIM,
+                              marginTop: 2,
+                            }}
+                          >
+                            {r.figLabel}
+                          </div>
+                        </div>
                       )}
                     </div>
                   ))}
