@@ -201,7 +201,12 @@ function crownEvent(row: FeatRow, index: number, userId?: string, categoryLabel?
   return {
     ...base,
     actionKey: 'discover.wire.action.crown',
-    actionParams: { category: categoryLabel ?? category.replace(/_/g, ' ') },
+    actionParams: {
+      category: categoryLabel ?? category.replace(/_/g, ' '),
+      // Slug kept alongside the label so a callsite can special-case
+      // lowest_gross ("New course record") without parsing English.
+      categorySlug: category,
+    },
     figure,
     figureTone,
     figureSubKey: CATEGORY_UNIT[category],
