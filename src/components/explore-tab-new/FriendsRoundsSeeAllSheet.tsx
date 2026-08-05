@@ -6,7 +6,7 @@ import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const SLATE_50 = '#F8FAFC';
 const INK = '#0F172A';
-const AMBER = '#F7931E';
+const INK = '#0E1216';
 const HAIRLINE = '#E2E8F0';
 
 interface Props {
