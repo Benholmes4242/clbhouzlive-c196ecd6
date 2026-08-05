@@ -1,5 +1,5 @@
 /**
- * ReviewBottomSheet — Glass bottom sheet (rebuild).
+ * ReviewBottomSheet — LIGHT bottom sheet (solid canvas).
  *
  * Single overlay used from both entry points:
  *   1. Clubhouse "Read review" card CTA
@@ -9,8 +9,10 @@
  * Stacking is centralized in @/lib/zLayers so this sheet always renders
  * above FullscreenFeedOverlay (see REVIEW_SHEET_Z > FS_OVERLAY_Z).
  *
- * One blur surface only (the panel). Scrim is a plain rgba dim.
+ * No blur anywhere: the panel is opaque #F8FAFC so the dark page beneath
+ * cannot muddy it. The scrim stays a plain rgba dim.
  */
+
 
 import React, { useCallback, useMemo } from 'react';
 import { formatMonthYearShort } from '@/i18n/format';
@@ -25,13 +27,21 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
-import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
+import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
-const AMBER = '#F7931E';
+/* Light-mode surface tokens (Dispatch canvas set). */
+const CANVAS = '#F8FAFC';
+const PANEL = '#FFFFFF';
+const BORDER = '#EDF0F3';
+const INK = '#0E1216';
+const BODY = '#3A424C';
+const MUTE = '#68707B';
+const GRABBER = '#D6DBE1';
 const FONT_GEIST =
   "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+
 
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
@@ -265,11 +275,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               flexDirection: 'column',
               overflow: 'hidden',
               borderRadius: '18px 18px 0 0',
-              background: 'rgba(24,28,24,0.62)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
-              borderTop: '1px solid rgba(255,255,255,0.18)',
-              color: '#F8FAFC',
+              background: CANVAS,
+              borderTop: `1px solid ${BORDER}`,
+              color: INK,
+
               fontFamily: FONT_GEIST,
               transform: 'translateZ(0)',
             }}
@@ -287,7 +296,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             >
               {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
               {rating != null && (
-                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} />
+                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} surface="light" />
               )}
 
               {/* Drag handle */}
@@ -297,7 +306,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     width: 32,
                     height: 4,
                     borderRadius: 2,
-                    background: 'rgba(255,255,255,0.35)',
+                    background: GRABBER,
                   }}
                 />
               </div>
@@ -305,13 +314,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               {/* Top row: eyebrow + course info (left) | verdict label (right) */}
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative', zIndex: 2 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {/* Amber eyebrow */}
+                  {/* Ink eyebrow */}
                   <div
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.14em',
-                      color: AMBER,
+                      color: INK,
                       textTransform: 'uppercase',
                       display: 'flex',
                       alignItems: 'center',
@@ -339,7 +348,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       fontSize: 22,
                       fontWeight: 800,
                       lineHeight: 1.15,
-                      color: '#F8FAFC',
+                      color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -354,13 +363,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         marginTop: 5,
                         fontSize: 12.5,
-                        color: '#F8FAFC',
-                        opacity: 0.7,
+                        color: MUTE,
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: 4,
                       }}
                     >
+
                       <MapPin size={12} strokeWidth={2} />
                       <span
                         style={{
@@ -377,8 +386,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
                 {/* Verdict label — tier word over the ghost numeral, top-right */}
                 {rating != null && (
-                  <ReviewVerdictLabel rating={rating} />
+                  <ReviewVerdictLabel rating={rating} surface="light" />
                 )}
+
               </div>
 
               {/* 2×2 breakdown grid */}
@@ -395,8 +405,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <div
                       key={key}
                       style={{
-                        background: 'rgba(255,255,255,0.08)',
-                        borderRadius: 10,
+                        background: PANEL,
+                        border: `1px solid ${BORDER}`,
+                        borderRadius: 14,
                         padding: '10px 12px',
                         minHeight: 52,
                         display: 'flex',
@@ -411,8 +422,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           fontSize: 10.5,
                           fontWeight: 600,
                           letterSpacing: '0.12em',
-                          color: '#F8FAFC',
-                          opacity: 0.6,
+                          color: MUTE,
                           textTransform: 'uppercase',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -425,7 +435,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         style={{
                           fontSize: 19,
                           fontWeight: 300,
-                          color: '#F8FAFC',
+                          color: reviewLabelColor(value, 'light'),
                           fontVariantNumeric: 'tabular-nums',
                           flexShrink: 0,
                         }}
@@ -433,6 +443,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         {value.toFixed(1)}
                       </span>
                     </div>
+
                   ))}
                 </div>
               )}
@@ -455,8 +466,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   style={{
                     fontSize: 15,
                     lineHeight: 1.6,
-                    color: '#F8FAFC',
-                    opacity: 0.6,
+                    color: MUTE,
                     padding: '6px 0',
                   }}
                 >
@@ -471,14 +481,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     style={{
                       fontSize: 15,
                       lineHeight: 1.6,
-                      color: '#F8FAFC',
-                      opacity: 0.9,
+                      color: BODY,
                       margin: 0,
                       marginBottom: i === paragraphs.length - 1 ? 0 : 14,
                     }}
                   />
                 ))
               )}
+
             </div>
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
@@ -486,8 +496,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               style={{
                 flex: '0 0 auto',
                 padding: '10px 18px calc(env(safe-area-inset-bottom, 0px) + 14px)',
-                borderTop: '1px solid rgba(255,255,255,0.12)',
+                borderTop: `1px solid ${BORDER}`,
               }}
+
             >
               {/* Reviewer row */}
               <div
@@ -511,7 +522,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     style={{
                       fontSize: 14,
                       fontWeight: 600,
-                      color: '#F8FAFC',
+                      color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -524,8 +535,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       style={{
                         marginTop: 2,
                         fontSize: 11.5,
-                        color: '#F8FAFC',
-                        opacity: 0.6,
+                        color: BODY,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -548,9 +558,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     minHeight: 48,
                     padding: '14px 12px',
                     borderRadius: 10,
-                    background: AMBER,
+                    background: INK,
                     border: 'none',
-                    color: 'rgba(255,255,255,0.95)',
+                    color: PANEL,
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: courseId ? 'pointer' : 'default',
@@ -569,9 +579,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     minHeight: 48,
                     padding: '14px 12px',
                     borderRadius: 10,
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '0.5px solid rgba(255,255,255,0.2)',
-                    color: '#F8FAFC',
+                    background: PANEL,
+                    border: `1px solid ${BORDER}`,
+                    color: INK,
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: 'pointer',
