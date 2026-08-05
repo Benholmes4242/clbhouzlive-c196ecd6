@@ -301,7 +301,7 @@ export default function DiscoverCourseLedSkeleton() {
       </div>
 
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsRail />
         <TourRail />
         <AroundTheWorldCard />
