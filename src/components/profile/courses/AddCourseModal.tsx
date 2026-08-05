@@ -629,8 +629,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             fontWeight: 600,
             color: INK_SUBTLE,
           }}>
-            <span style={{ color: AMBER, fontWeight: 700 }}>10 / 10 list complete</span>
-            <span style={{ color: '#CBD5E1' }}>·</span>
+            <span style={{ color: INK, fontWeight: 700 }}>10 / 10 list complete</span>
+            <span style={{ color: INK_SUBTLE }}>·</span>
             <span>Remove one to add another</span>
           </div>
         )}
