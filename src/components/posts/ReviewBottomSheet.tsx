@@ -1,5 +1,5 @@
 /**
- * ReviewBottomSheet — Glass bottom sheet (rebuild).
+ * ReviewBottomSheet — LIGHT bottom sheet (solid canvas).
  *
  * Single overlay used from both entry points:
  *   1. Clubhouse "Read review" card CTA
@@ -9,8 +9,10 @@
  * Stacking is centralized in @/lib/zLayers so this sheet always renders
  * above FullscreenFeedOverlay (see REVIEW_SHEET_Z > FS_OVERLAY_Z).
  *
- * One blur surface only (the panel). Scrim is a plain rgba dim.
+ * No blur anywhere: the panel is opaque #F8FAFC so the dark page beneath
+ * cannot muddy it. The scrim stays a plain rgba dim.
  */
+
 
 import React, { useCallback, useMemo } from 'react';
 import { formatMonthYearShort } from '@/i18n/format';
