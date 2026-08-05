@@ -299,6 +299,8 @@ export const ProfileHero: React.FC<Props> = ({
           />
           <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
           <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 60, background: COVER_TOP_GUARD }} />
+
         </div>
       )}
 
