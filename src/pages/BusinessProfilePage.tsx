@@ -66,7 +66,9 @@ import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallbac
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
-import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
+import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /** One centred figure in the reach panel. Optional tap-through preserved. */
@@ -160,7 +162,7 @@ const BusinessProfilePage: React.FC = () => {
       if (!business?.club_id) return [];
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, region, country')
+        .select('id, name, region, country, thumbnail_image')
         .eq('club_id', business.club_id)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -169,9 +171,15 @@ const BusinessProfilePage: React.FC = () => {
   });
   const courses = clubCourses ?? [];
 
-  // Reach-row ROUNDS figure. Same query key as the first course panel, so a
-  // single-course club issues ONE request for the stats.
-  const { data: firstCourseStats } = useCourseStatsDetail(courses[0]?.id, courses.length > 0);
+  // Hero ROUNDS figure: summed across EVERY course of the club, reusing the
+  // same `course-stats-detail` cache entries the course panels populate.
+  const clubRounds = useClubRoundsTracked(courses.map((c) => c.id));
+
+  // Cover fallback for a club with no cover of its own: its course hero image.
+  const clubCourseImage =
+    (courses.find((c) => (c as { thumbnail_image?: string | null }).thumbnail_image) as
+      | { thumbnail_image?: string | null }
+      | undefined)?.thumbnail_image ?? null;
 
 
   const { activeActor } = useActiveActor();
