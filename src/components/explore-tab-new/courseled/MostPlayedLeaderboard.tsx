@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
