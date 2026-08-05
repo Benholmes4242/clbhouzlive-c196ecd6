@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { logDiscoverPageMount, logDiscoverPageUnmount } from '@/utils/discoverTimeline';
@@ -43,7 +44,9 @@ const Discover = () => {
   }, []);
 
   if (isRehydrating) {
-    return <DiscoverSkeleton />;
+    // The Explore tab hosts the SAME course-led body as /explore, so it gets
+    // the same silhouette; Watch and Friends keep the grid one.
+    return main === 'courses' ? <DiscoverCourseLedSkeleton /> : <DiscoverSkeleton />;
   }
 
   return (

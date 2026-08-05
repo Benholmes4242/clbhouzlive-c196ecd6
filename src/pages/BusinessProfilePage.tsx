@@ -39,7 +39,7 @@ import { FilterChips } from '@/components/ui/FilterChips';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
-import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { ProfileSurfaceSkeleton } from '@/components/skeletons/ProfileSurfaceSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 // FloatingPageHeader removed (H3) - chrome now driven by ChromeIsland registry.
@@ -288,7 +288,9 @@ const BusinessProfilePage: React.FC = () => {
 
   // ----- early returns -----
   if (authLoading || isLoading) {
-    return <ProfileSkeleton />;
+    // Same skeleton as the personal profile, configured: hero + headline
+    // figure + four-cell strip, no Top 10 rail, three chip tabs.
+    return <ProfileSurfaceSkeleton headline counters={4} tabs={3} />;
   }
 
   // Sentinel string from useBusinessProfile - keep in sync.

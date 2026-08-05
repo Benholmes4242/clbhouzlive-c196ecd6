@@ -78,6 +78,7 @@ import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/Di
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import StageLoadingShell from '@/features/post-v2/StageLoadingShell';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 import { CollegeHubSkeleton } from '@/components/skeletons/CollegeHubSkeleton';
@@ -534,7 +535,7 @@ function AppRoutes() {
 
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
         <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
-        <Route path="/post-v2" element={<Suspense fallback={<GenericPageSkeleton />}><PostV2Page /></Suspense>} />
+        <Route path="/post-v2" element={<Suspense fallback={<StageLoadingShell />}><PostV2Page /></Suspense>} />
         
         {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
