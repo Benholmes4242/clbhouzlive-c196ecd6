@@ -271,6 +271,17 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
 
+  // The picker resolved with nothing (cancelled), or the member emptied the
+  // filmstrip: page 1 has no reason to exist, so fall through to the words page.
+  const awaiting = isFreshCreate && awaitingMedia && state.media.length === 0;
+  useEffect(() => {
+    if (!isFreshCreate) return;
+    if (page !== 1) return;
+    if (awaitingMedia) return;
+    if (state.media.length > 0) return;
+    setPage(2);
+  }, [isFreshCreate, page, awaitingMedia, state.media.length]);
+
 
   const [sheet, setSheet] = useState<null | 'course' | 'actor' | 'schedule' | 'drafts' | 'scheduled' | 'cover' | 'adjust' | 'close-guard' | 'more'>(null);
 
