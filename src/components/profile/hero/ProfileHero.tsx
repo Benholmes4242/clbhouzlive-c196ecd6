@@ -82,28 +82,47 @@ const Sparkline: React.FC<{ points: number[] }> = ({ points }) => {
   const d = coords.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
   const last = coords[coords.length - 1];
 
+  // Correction 2: preserveAspectRatio="none" stretched the end marker into a
+  // blob. The line keeps the stretch; the marker is a CSS-positioned dot laid
+  // over the svg's final point, so it stays perfectly round at any width.
   return (
-    <svg
-      width="100%"
-      height={H}
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      style={{ display: 'block', marginTop: 10 }}
-    >
-      <polyline
-        points={d}
-        fill="none"
-        stroke={W_35}
-        strokeWidth={1.5}
-        vectorEffect="non-scaling-stroke"
-        strokeLinejoin="round"
-        strokeLinecap="round"
+    <div style={{ position: 'relative', marginTop: 10, height: H }}>
+      <svg
+        width="100%"
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        style={{ display: 'block' }}
+      >
+        <polyline
+          points={d}
+          fill="none"
+          stroke={W_35}
+          strokeWidth={1.5}
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: `${last[0]}%`,
+          top: last[1],
+          width: 6,
+          height: 6,
+          marginLeft: -3,
+          marginTop: -3,
+          borderRadius: 999,
+          background: '#FFFFFF',
+        }}
       />
-      <circle cx={last[0]} cy={last[1]} r={3} fill="#FFFFFF" vectorEffect="non-scaling-stroke" />
-    </svg>
+    </div>
   );
 };
+
 
 const Cell: React.FC<{
   label: string;
