@@ -1,16 +1,23 @@
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { CourseImageFallback } from './CourseImageFallback';
+import { MomentTile } from './MomentTile';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 import { A, KICKER, SANS } from './tokens';
 
 /**
- * MOMENTS SHEET — the full week of member media, course-labelled (BRIEF,
- * section 4 "See all"). A three-column grid, one tile per course-moment; the
- * tile hands the shared fullscreen viewer the same read-only payload the
- * mosaic does.
+ * MOMENTS SHEET — the full month of member media, course-labelled (BRIEF,
+ * section 4 "See all"). A three-column grid, UNCAPPED: everything qualifying in
+ * the 30-day window (only the per-post camera-roll guard applies). The tile is
+ * the same component the mosaic renders, so video tiles carry the glyph.
+ *
+ * Z-ORDER: the shared fullscreen viewer sits at FS_OVERLAY_Z (200). A default
+ * BottomSheet base (1400) would paint OVER it, so this sheet is deliberately
+ * based below the viewer.
  */
+
+/** Below FS_OVERLAY_Z (200) so the read-only viewer opens ON TOP of the sheet. */
+const SHEET_Z_UNDER_VIEWER = 150;
 
 interface Props {
   open: boolean;
@@ -21,6 +28,7 @@ interface Props {
 
 export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
   const { t } = useTranslation('courses');
+  const courseCount = new Set(moments.map((m) => m.courseId)).size;
 
   return (
     <BottomSheet
@@ -29,6 +37,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
       ariaLabelledBy="courseled-moments-title"
       variant="light"
       surfaceColor={A.CANVAS}
+      zIndexBase={SHEET_Z_UNDER_VIEWER}
       style={{
         height: '82dvh',
         maxHeight: '82dvh',
@@ -48,7 +57,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
         <div style={{ ...KICKER, color: A.DIM, marginBottom: 5 }}>
           {t('discover.momentsOverline', {
             defaultValue: '{{count}} courses',
-            count: moments.length,
+            count: courseCount,
           })}
         </div>
         <div
@@ -61,7 +70,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
             lineHeight: 1.1,
           }}
         >
-          {t('discover.momentsOfTheWeek', 'Moments of the week')}
+          {t('discover.momentsOfTheMonth', 'Moments of the month')}
         </div>
       </div>
 
@@ -73,55 +82,18 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
             gap: 6,
           }}
         >
-          {moments.map((m, i) => (
-            <button
+          {moments.map((m) => (
+            <MomentTile
               key={m.key}
-              type="button"
-              onClick={() => onTilePress(m)}
-              style={{
-                position: 'relative',
-                padding: 0,
-                border: 'none',
-                borderRadius: 10,
-                overflow: 'hidden',
-                aspectRatio: '1 / 1',
-                cursor: 'pointer',
-              }}
-            >
-              <CourseImageFallback
-                courseId={m.courseId}
-                courseName={m.courseName}
-                imageUrl={m.thumbnail}
-                initialsSize={18}
-                style={{ position: 'absolute', inset: 0 }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) 50%)',
-                  }}
-                />
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: 6,
-                    right: 6,
-                    bottom: 5,
-                    fontSize: 9,
-                    fontWeight: 800,
-                    color: '#fff',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    textAlign: 'left',
-                  }}
-                >
-                  {m.courseName ?? t('discover.unknownCourse', 'Course')}
-                </span>
-              </CourseImageFallback>
-            </button>
+              moment={m}
+              onPress={onTilePress}
+              radius={10}
+              initialsSize={18}
+              labelSize={9}
+              labelInset={6}
+              scrimStop="50%"
+              style={{ aspectRatio: '1 / 1' }}
+            />
           ))}
         </div>
         <div aria-hidden style={{ height: 24 }} />
