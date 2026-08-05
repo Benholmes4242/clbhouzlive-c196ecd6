@@ -218,7 +218,7 @@ export function HonoursBoard({
             >
               {t('discover.honoursTitle', 'The honours board')}
             </div>
-            <div style={{ fontSize: 10.5, color: A.MUTE, marginTop: 5 }}>
+            <div style={{ fontSize: 10.5, fontWeight: 600, lineHeight: 1.35, color: A.BODY, marginTop: 5 }}>
               {t('discover.honoursCaption', 'Every ace and albatross in clbhouz history')}
             </div>
           </div>
