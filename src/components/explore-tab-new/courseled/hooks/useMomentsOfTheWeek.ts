@@ -41,7 +41,8 @@ const BAND_WARM = 2;
 const BAND_COOL = 1; // <= 14 days (the fetch window)
 const COMMENT_WEIGHT = 2;
 const MAX_TILES_PER_POST = 3;
-const MAX_TILES_PER_COURSE = 4;
+/** PAGE mosaic cap: one tile per course. The SHEET is uncapped. */
+const MAX_TILES_PER_COURSE = 1;
 
 function freshnessBand(createdAt: string, now: number): number {
   const age = now - new Date(createdAt).getTime();
