@@ -20,9 +20,32 @@ export interface Moment {
   post: FeedPost;
   thumbnail: string | null;
   mediaType: 'image' | 'video';
+  /** Index of this tile's media within the post's mediaItems. */
+  mediaIndex?: number;
 }
 
 const DAY = 86_400_000;
+
+/* ---- Ranking constants (all tunable) ---- */
+const FRESH_HOT_MS = 2 * DAY; // <= 48h
+const FRESH_WARM_MS = 7 * DAY; // <= 7 days
+const BAND_HOT = 3;
+const BAND_WARM = 2;
+const BAND_COOL = 1; // <= 14 days (the fetch window)
+const COMMENT_WEIGHT = 2;
+const MAX_TILES_PER_POST = 3;
+const MAX_TILES_PER_COURSE = 4;
+
+function freshnessBand(createdAt: string, now: number): number {
+  const age = now - new Date(createdAt).getTime();
+  if (age <= FRESH_HOT_MS) return BAND_HOT;
+  if (age <= FRESH_WARM_MS) return BAND_WARM;
+  return BAND_COOL;
+}
+
+function engagement(likes: number, comments: number): number {
+  return 1 + Math.log(1 + likes + COMMENT_WEIGHT * comments);
+}
 
 function streamThumb(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
