@@ -6,9 +6,9 @@
 export type RoundFeatKey =
   | 'holes_in_one'
   | 'albatrosses'
+  | 'beat_par'
   | 'eagles'
   | 'birdies'
-  | 'beat_par'
   | 'clean_card';
 
 export interface RoundFeat {
@@ -29,7 +29,11 @@ export interface RoundFeatStats {
   clean_card?: boolean | null;
 }
 
-/** Priority order is rarest first; capped at two per row. */
+/**
+ * Priority order (Ben, round 3): hole in one, albatross, under par, eagle,
+ * birdie haul, clean card. Capped at two per row; surfaces may show fewer via
+ * RoundFeatChips maxChips.
+ */
 export function deriveRoundFeats(r: RoundFeatStats | null | undefined): RoundFeat[] {
   if (!r) return [];
   const out: RoundFeat[] = [];
@@ -39,9 +43,9 @@ export function deriveRoundFeats(r: RoundFeatStats | null | undefined): RoundFea
   const birdies = Number(r.birdies ?? 0);
   if (aces >= 1) out.push({ key: 'holes_in_one', count: aces });
   if (albs >= 1) out.push({ key: 'albatrosses', count: albs });
+  if (r.beat_par === true) out.push({ key: 'beat_par', count: 1 });
   if (eagles >= 1) out.push({ key: 'eagles', count: eagles });
   if (birdies >= BIRDIE_HAUL_THRESHOLD) out.push({ key: 'birdies', count: birdies });
-  if (r.beat_par === true) out.push({ key: 'beat_par', count: 1 });
   if (r.clean_card === true) out.push({ key: 'clean_card', count: 1 });
   return out.slice(0, 2);
 }
