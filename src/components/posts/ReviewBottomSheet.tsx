@@ -581,8 +581,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   Go to profile
                 </button>
               </div>
-
-              </div>
             </div>
           </motion.div>
         </>
