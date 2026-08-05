@@ -13,6 +13,34 @@ import { Eyebrow, InkAction } from './tokens';
  * never becomes a second engagement surface.
  */
 
+function PlayGlyph() {
+  return (
+    <span
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 28,
+        height: 28,
+        borderRadius: 999,
+        background: 'rgba(10,14,10,0.5)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
+      <svg width={11} height={11} viewBox="0 0 24 24" fill="#fff">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </span>
+  );
+}
+
 const TALL = 220;
 const SHORT = 106;
 
@@ -93,6 +121,7 @@ export function MomentsOfTheWeek({ moments, onTilePress, onSeeAll }: Props) {
                 >
                   {m.courseName ?? t('discover.unknownCourse', 'Course')}
                 </span>
+                {m.mediaType === 'video' && <PlayGlyph />}
               </CourseImageFallback>
             </button>
           );

@@ -6,6 +6,7 @@ import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
@@ -197,7 +198,16 @@ export const FeedSlide = memo(function FeedSlide({
     // Video — engine-backed in fullscreen, poster-only otherwise.
     if (m?.type === 'video') {
       const posterSrc = m.thumbnailUrl || '';
-      const mHlsUrl = (m as any).hlsUrl || null;
+      // Shared-path hardening: any surface that mints its own MediaItem (and
+      // reads the null `hls_url` column instead of building from stream_id)
+      // used to land on the poster-only branch and never play. Derive the
+      // manifest from the Stream uid here so EVERY consumer — feed, course
+      // media grid, Discover moments — autoplays.
+      const mHlsUrl =
+        (m as any).hlsUrl ||
+        (!(m as any).isProcessing && (m as any).streamId
+          ? generateStreamHlsUrl((m as any).streamId)
+          : null);
       if (isFullscreen && !mHlsUrl) {
         // Legacy uploads without a Cloudflare Stream id can't drive the
         // fullscreen lane — surface loudly so bad rows are visible in DBG

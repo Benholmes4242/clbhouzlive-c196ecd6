@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 
 /**
@@ -18,6 +19,7 @@ export interface Moment {
   courseName: string | null;
   post: FeedPost;
   thumbnail: string | null;
+  mediaType: 'image' | 'video';
 }
 
 const DAY = 86_400_000;
@@ -129,7 +131,13 @@ export function useMomentsOfTheWeek(limit = 24) {
           return {
             id: m.id,
             type: isVideo ? 'video' : 'image',
-            hlsUrl: isVideo && ready ? m.hls_url ?? undefined : undefined,
+            // Manifest source of truth mirrors the canonical feedMapper: the
+            // hls_url column is null for Cloudflare Stream rows, so the URL is
+            // built from stream_id. Without this the fullscreen viewer gets no
+            // hlsUrl and falls back to the poster-only branch (never plays).
+            hlsUrl: isVideo && ready
+              ? (m.stream_id ? generateStreamHlsUrl(m.stream_id) : m.hls_url ?? undefined)
+              : undefined,
             imageUrl: isVideo ? undefined : m.media_url,
             thumbnailUrl: thumb,
             streamId: m.stream_id ?? undefined,
@@ -170,6 +178,7 @@ export function useMomentsOfTheWeek(limit = 24) {
           courseName: courseName.get(courseId) ?? null,
           post,
           thumbnail: mediaItems[0]?.imageUrl ?? mediaItems[0]?.thumbnailUrl ?? null,
+          mediaType: mediaItems[0]?.type === 'video' ? 'video' : 'image',
         };
       });
     },
