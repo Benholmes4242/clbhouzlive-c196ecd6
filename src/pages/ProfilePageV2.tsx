@@ -1054,40 +1054,10 @@ const ProfilePageV2Content: React.FC = () => {
         )}
       </div>
 
-      {/* Primary figure row — the record, stated once. INDEX taps through to
-          the handicap surface (the hero pill is gone; one owner only). */}
-      {isPersonal && (
-        <div className="mt-4 px-4 relative z-10 pointer-events-auto">
-          <Panel>
-            <StatRow
-              size={26}
-              items={[
-                ...(resolvedHcp.value != null
-                  ? [{ label: 'INDEX', value: formatHandicap(resolvedHcp.value) }]
-                  : []),
-                ...(isSelf && shellRoundsCount != null
-                  ? [{ label: 'ROUNDS', value: formatNumber(shellRoundsCount) }]
-                  : []),
-                { label: 'COURSES', value: formatNumber(shellCoursesPlayed) },
-              ]}
-            />
-            {resolvedHcp.value != null && (
-              <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
-                <Action
-                  label={isSelf ? 'Open your handicap' : `Open ${displayName}'s snapshot`}
-                  onClick={() => {
-                    if (isSelf) navigate('/handicap');
-                    else if (profileUserId)
-                      openHybridSheet({ targetUserId: profileUserId, source: 'profile_hcp_pill' });
-                  }}
-                />
-              </div>
-            )}
-          </Panel>
-        </div>
-      )}
-
-      {/* Social navigation — one quiet line, not four figures competing with the record */}
+      {/* The white INDEX/ROUNDS/COURSES panel and its "Open your handicap"
+          action are deleted — the dark hero owns both (§1e). The posts/reviews
+          figures are deleted too; followers and friends survive as social
+          actions on one quiet canvas line (§2). */}
       <div className="mt-3 px-4 relative z-10 pointer-events-auto">
         <div
           style={{
@@ -1096,17 +1066,16 @@ const ProfilePageV2Content: React.FC = () => {
             flexWrap: 'wrap',
             gap: 6,
             fontFamily: SANS,
-            fontSize: 12.5,
-            color: A.MUTE,
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: A.BODY,
             fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {[
-            { key: 'posts', label: `${formatNumber(postsCount)} posts`, onTap: () => setActiveMiniNav('posts') },
-            { key: 'reviews', label: `${formatNumber(reviewsCount)} reviews`, onTap: () => setActiveMiniNav('posts') },
             {
               key: 'followers',
-              label: `${formatNumber(followersCount)} followers`,
+              label: t('social.followers', { count: followersCount, defaultValue: '{{count}} followers' }),
               onTap: () => {
                 setActiveMiniNav('followers');
                 navigate(`/profile/${username}/followers`);
@@ -1116,7 +1085,7 @@ const ProfilePageV2Content: React.FC = () => {
               ? [
                   {
                     key: 'friends',
-                    label: `${formatNumber(friendsCount)} friends`,
+                    label: t('social.friendsCount', { count: friendsCount, defaultValue: '{{count}} friends' }),
                     onTap: () => {
                       setActiveMiniNav('friends');
                       navigate(`/profile/${username}/followers?tab=following&filter=friends`);
@@ -1136,9 +1105,9 @@ const ProfilePageV2Content: React.FC = () => {
                   minHeight: 32,
                   cursor: 'pointer',
                   fontFamily: SANS,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: A.INK,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: A.BODY,
                 }}
               >
                 {item.label}
@@ -1148,6 +1117,7 @@ const ProfilePageV2Content: React.FC = () => {
           ))}
         </div>
       </div>
+
 
       {/* White content sheet */}
       <div className="pt-4 pb-22 min-h-[60vh] relative z-10 pointer-events-auto">
