@@ -138,7 +138,7 @@ export default function ExploreTabContent({
   const handleTournament = useCallback(
     (e: TourWeekEvent) => {
       analyticsEvents.track('discover_tour_card_tapped', { tournament_id: e.id });
-      navigate(`/tour/tournament/${e.id}`);
+      navigate(`/tourhub/tournament/${e.id}`);
     },
     [navigate],
   );
