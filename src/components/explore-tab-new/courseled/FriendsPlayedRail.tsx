@@ -133,26 +133,54 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
                   >
                     {r.display_name}
                   </span>
+                  {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
+                    <span
+                      style={{
+                        ...featChipBase,
+                        flexShrink: 0,
+                        background:
+                          r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
+                        color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
+                      }}
+                    >
+                      {r.hcp_delta < 0 ? '↓' : '↑'} {Math.abs(r.hcp_delta).toFixed(1)}
+                    </span>
+                  )}
                   {r.gross != null && (
                     <span style={{ ...NUMF, fontSize: 15, color: A.INK, flexShrink: 0 }}>
                       {r.gross}
                     </span>
                   )}
                 </div>
-                {r.feats.length > 0 && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      marginTop: 4,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <RoundFeatChips feats={r.feats} />
-                  </div>
-                )}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    marginTop: 4,
+                    overflow: 'hidden',
+                    minHeight: 14,
+                  }}
+                >
+                  {r.stableford != null && (
+                    <span
+                      style={{
+                        ...NUMF,
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        letterSpacing: '0.07em',
+                        color: A.MUTE,
+                        flexShrink: 0,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.stableford} PTS{r.feats.length > 0 ? ' ·' : ''}
+                    </span>
+                  )}
+                  <RoundFeatChips feats={r.feats} />
+                </div>
               </div>
+
 
             </button>
           );
