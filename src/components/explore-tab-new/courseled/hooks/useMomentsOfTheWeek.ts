@@ -139,9 +139,8 @@ export function useMomentsOfTheWeek() {
         isCourseLead: boolean;
       }> = [];
       for (const cand of ranked) {
-        if (picked.length >= limit) break;
         const mediaCount = cand.row.post_media?.length ?? 0;
-        const take = Math.min(MAX_TILES_PER_POST, mediaCount, limit - picked.length);
+        const take = Math.min(MAX_TILES_PER_POST, mediaCount);
         for (let i = 0; i < take; i += 1) {
           const used = perCourse.get(cand.courseId) ?? 0;
           picked.push({
