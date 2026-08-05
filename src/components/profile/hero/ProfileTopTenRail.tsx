@@ -2,7 +2,7 @@
  * ProfileTopTenRail - BRIEF_PROFILE_HERO_AND_TOP10 section 4.
  *
  * Editorial replacement for FavouritesCarousel on the personal profile: a
- * horizontal rail of 150px cards on canvas, image over a course name and
+ * horizontal rail of 168px cards on canvas, image over a course name and
  * region, with a rank chip and (when rated) a rating chip on the image.
  *
  * Same data (useUserTopTenCourses) and the same deep-link contract
@@ -196,7 +196,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 navigate(`/courses/${course.course_id}`);
               }}
               style={{
-                width: 150,
+                width: 168,
                 flexShrink: 0,
                 background: 'transparent',
                 border: 'none',
@@ -210,7 +210,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 courseId={course.course_id}
                 courseName={course.name}
                 imageUrl={course.thumbnail_image}
-                style={{ height: 100, borderRadius: 14 }}
+                style={{ height: 112, borderRadius: 14 }}
               >
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
                 <span

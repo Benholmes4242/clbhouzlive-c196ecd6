@@ -43,11 +43,18 @@ const COVER_WASH = 'rgba(14,18,22,0.58)';
 const COVER_RAMP =
   'linear-gradient(180deg, rgba(14,18,22,0.42) 0%, rgba(14,18,22,0.80) 100%)';
 
-/** Round 3 §1: the hero starts BENEATH the floating islands - safe-area inset
- *  + island row (top offset 10 + ISLAND_H 44) + 8px - so both islands sit on
- *  plain canvas rather than on the photograph. */
-const HERO_TOP_OFFSET =
+/** Round 4 §1: the hero ARTWORK bleeds to the very top of the viewport (behind
+ *  the status bar and both floating islands); only the CONTENT is inset by
+ *  safe-area + island row (top offset 10 + ISLAND_H 44) + 8px. So the offset
+ *  moved from marginTop to paddingTop. */
+const HERO_CONTENT_INSET =
   'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)';
+
+/** Short top gradient so white status-bar text stays legible over a bright
+ *  cover; fades out by 60px. */
+const COVER_TOP_GUARD =
+  'linear-gradient(180deg, rgba(14,18,22,0.45) 0%, rgba(14,18,22,0) 60px)';
+
 
 interface Props {
   userId: string;
@@ -261,8 +268,11 @@ export const ProfileHero: React.FC<Props> = ({
       style={{
         position: 'relative',
         background: HERO_INK,
-        marginTop: HERO_TOP_OFFSET,
-        padding: '18px 16px 16px',
+        marginTop: 0,
+        padding: '0 16px 16px',
+        paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
+
+
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
@@ -289,6 +299,8 @@ export const ProfileHero: React.FC<Props> = ({
           />
           <div style={{ position: 'absolute', inset: 0, background: COVER_WASH }} />
           <div style={{ position: 'absolute', inset: 0, background: COVER_RAMP }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 60, background: COVER_TOP_GUARD }} />
+
         </div>
       )}
 
