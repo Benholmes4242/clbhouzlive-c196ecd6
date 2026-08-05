@@ -171,7 +171,7 @@ export function useMomentsOfTheWeek(limit = 24) {
         profileById.set(p.id, p);
       }
 
-      return picked.map(({ row, courseId }): Moment => {
+      return picked.map(({ row, courseId, mediaIndex }): Moment => {
         const media = [...(row.post_media ?? [])].sort(
           (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
         );
