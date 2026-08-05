@@ -721,12 +721,12 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   background: '#FFFFFF',
                   border: `1px solid ${BORDER}`,
                   color: INK,
-                  caretColor: AMBER,
+                  caretColor: INK,
                   outline: 'none',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = AMBER;
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(247,147,30,0.10)';
+                  e.currentTarget.style.borderColor = INK;
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = BORDER;
