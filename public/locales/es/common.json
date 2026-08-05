@@ -95,5 +95,19 @@
       "most_eagles_all_time": "Mas eagles",
       "most_birdies_all_time": "Mas birdies"
     }
+  },
+  "business": {
+    "hero": {
+      "communityRating": "Valoracion de la comunidad",
+      "ratings": "{{count}} valoraciones",
+      "ratings_one": "{{count}} valoracion",
+      "edit": "Editar",
+      "follow": "Seguir",
+      "following": "Siguiendo",
+      "manage": "Gestionar",
+      "verified": "Verificado",
+      "readMore": "Leer mas",
+      "readLess": "Leer menos"
+    }
   }
 }

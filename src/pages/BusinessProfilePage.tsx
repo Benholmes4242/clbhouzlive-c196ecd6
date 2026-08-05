@@ -8,8 +8,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
-  Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
-  Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
+  Phone, Globe, MoreHorizontal, Loader2,
+  Share2, Link2, Flag, Pencil, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
   Navigation, Calendar,
 } from 'lucide-react';
@@ -29,7 +29,6 @@ import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
 import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
@@ -38,7 +37,6 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { FilterChips } from '@/components/ui/FilterChips';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -57,7 +55,6 @@ import {
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
-import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -66,37 +63,10 @@ import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallbac
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
-import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
+import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-/** One centred figure in the reach panel. Optional tap-through preserved. */
-const ReachCell: React.FC<{
-  label: string;
-  value: string;
-  sub?: string;
-  onClick?: () => void;
-}> = ({ label, value, sub, onClick }) => {
-  const Wrapper: React.ElementType = onClick ? 'button' : 'div';
-  return (
-    <Wrapper
-      {...(onClick ? { type: 'button', onClick } : {})}
-      style={{
-        textAlign: 'center',
-        minWidth: 0,
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        cursor: onClick ? 'pointer' : 'default',
-      }}
-    >
-      <div style={LABEL}>{label}</div>
-      <div style={{ ...NUM, fontSize: 22, color: A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>{value}</div>
-      {sub && <div style={{ ...LABEL, fontSize: 9, marginTop: 3 }}>{sub}</div>}
-    </Wrapper>
-  );
-};
-
-
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
@@ -160,7 +130,7 @@ const BusinessProfilePage: React.FC = () => {
       if (!business?.club_id) return [];
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, region, country')
+        .select('id, name, region, country, thumbnail_image')
         .eq('club_id', business.club_id)
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -169,9 +139,15 @@ const BusinessProfilePage: React.FC = () => {
   });
   const courses = clubCourses ?? [];
 
-  // Reach-row ROUNDS figure. Same query key as the first course panel, so a
-  // single-course club issues ONE request for the stats.
-  const { data: firstCourseStats } = useCourseStatsDetail(courses[0]?.id, courses.length > 0);
+  // Hero ROUNDS figure: summed across EVERY course of the club, reusing the
+  // same `course-stats-detail` cache entries the course panels populate.
+  const clubRounds = useClubRoundsTracked(courses.map((c) => c.id));
+
+  // Cover fallback for a club with no cover of its own: its course hero image.
+  const clubCourseImage =
+    (courses.find((c) => (c as { thumbnail_image?: string | null }).thumbnail_image) as
+      | { thumbnail_image?: string | null }
+      | undefined)?.thumbnail_image ?? null;
 
 
   const { activeActor } = useActiveActor();
@@ -187,16 +163,6 @@ const BusinessProfilePage: React.FC = () => {
   const toggleFollow = useToggleFollow();
   const { start: startConversation, isStarting: isStartingDM } = useStartConversation();
 
-  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
-    useBusinessImageUpload(business?.id);
-  const logoChooseInputRef = useRef<HTMLInputElement>(null);
-  const logoTakeInputRef = useRef<HTMLInputElement>(null);
-  const heroChooseInputRef = useRef<HTMLInputElement>(null);
-  const heroTakeInputRef = useRef<HTMLInputElement>(null);
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
-  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [photoSheet, setPhotoSheet] = useState<'cover' | 'logo' | null>(null);
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -286,38 +252,6 @@ const BusinessProfilePage: React.FC = () => {
     window.addEventListener('resize', checkClamped);
     return () => window.removeEventListener('resize', checkClamped);
   }, [business?.description]);
-
-  // ----- image upload -----
-  const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('logo');
-    setIsCropModalOpen(true);
-  };
-  const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('cover');
-    setIsCropModalOpen(true);
-  };
-  const handleCropComplete = (croppedFile: File) => {
-    setIsCropModalOpen(false);
-    if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
-    if (cropMode === 'logo') uploadLogo(croppedFile);
-    if (cropMode === 'cover') uploadCover(croppedFile);
-    setCropMode(null);
-  };
-  const handleCropCancel = (open: boolean) => {
-    if (!open) {
-      if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
-      setIsCropModalOpen(false);
-      setCropMode(null);
-    }
-  };
 
   // ----- actions -----
   const handleFollowToggle = () => {
@@ -446,299 +380,135 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
-      {/* ----- Hero (full-bleed) ----- */}
-      <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
-        <div
-          className="relative w-full overflow-hidden"
-          style={{
-            minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
-            backgroundColor: '#0F172A',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-          }}
-        >
-          {/* Cover image layer - locked to 3:2 of full width so what the user
-              framed in the editor is exactly what shows. Content below may
-              extend past the image height over the dark background. */}
-          {heroUrl ? (
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                aspectRatio: '3 / 2',
-                backgroundImage: `url(${heroUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                zIndex: 0,
-              }}
-            />
-          ) : (
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                aspectRatio: '3 / 2',
-                background: 'linear-gradient(180deg,#1E4D38,#0F172A)',
-                zIndex: 0,
-              }}
-            />
-          )}
-          {/* Scrim over the cover image only */}
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              aspectRatio: '3 / 2',
-              background:
-                'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)',
-              zIndex: 1,
-              pointerEvents: 'none',
-            }}
-          />
-          {/* Whole-cover tap target - owner only */}
-          {isOwner && (
+      {/* ----- Hero (shared HeroShell, identical to the personal profile) ----- */}
+      <BusinessProfileHero
+        name={business.name}
+        logoUrl={business.logo_url}
+        coverUrl={heroUrl || clubCourseImage}
+        fallbackKey={avatarFallbackKey}
+        verified={business.is_verified}
+        category={business.category}
+        city={business.city}
+        region={business.region}
+        country={business.country}
+        isClub={!!business.club_id && courses.length > 0}
+        avgRating={reviewStats?.avgRating ?? null}
+        ratingsCount={reviewStats?.totalReviews ?? null}
+        roundsTracked={clubRounds}
+        followersCount={followersCount}
+        postsCount={postsCount}
+        onAvatarTap={() => setIsAvatarLightboxOpen(true)}
+        courseNavEnabled={courses.length === 1}
+        onStatTap={(stat) => {
+          if (stat === 'followers') {
+            navigate(`/business/${business.slug || business.id}/followers`);
+          } else if (stat === 'posts') {
+            setActiveTab('posts');
+          } else if (courses.length === 1) {
+            navigate(
+              stat === 'rated'
+                ? `/courses/${courses[0].id}?tab=reviews`
+                : `/courses/${courses[0].id}`,
+            );
+          }
+        }}
+        action={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {isOwner ? (
+              <HeroPill label={t('business.hero.edit', 'Edit')} onClick={() => navigate(`/business/${business.id}/edit`)} />
+            ) : (
+              <HeroPill
+                label={isFollowing ? t('business.hero.following', 'Following') : t('business.hero.follow', 'Follow')}
+                onClick={handleFollowToggle}
+              />
+            )}
+            {isOwner && (
+              <HeroGlassCircle label={t('business.hero.manage', 'Manage')} onClick={() => navigate('/businesses/manage')}>
+                <Pencil className="w-3.5 h-3.5 text-white" />
+              </HeroGlassCircle>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="More options"
+                  style={{
+                    width: 28, height: 28, flexShrink: 0, borderRadius: 999,
+                    background: 'rgba(255,255,255,0.12)', border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                  }}
+                >
+                  <MoreHorizontal className="w-4 h-4 text-white" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {isOwner ? (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit business profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Copy link
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Copy link
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
+                      <Flag className="h-4 w-4 mr-2" />
+                      Report
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        }
+      />
+
+      {/* ----- Bio on canvas (no card) ----- */}
+      {bioText && (
+        <div className="px-4 pt-4 relative z-10 pointer-events-auto">
+          <p
+            ref={bioRef}
+            className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-3')}
+            style={{ fontSize: 12.5, lineHeight: 1.55, color: '#3A424C', overflowWrap: 'anywhere' }}
+          >
+            {bioText}
+          </p>
+          {(isBioClamped || bioExpanded) && (
             <button
               type="button"
-              onClick={() => setPhotoSheet('cover')}
-              className="absolute inset-0 pointer-events-auto cursor-pointer"
-              style={{ zIndex: 5, background: 'transparent', border: 'none' }}
-              aria-label="Change cover photo"
-            />
-          )}
-          {isOwner && (
-            <button
-              onClick={() => setPhotoSheet('cover')}
-              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform pointer-events-auto"
+              onClick={() => setBioExpanded(v => !v)}
               style={{
-                zIndex: 10,
-                background: 'rgba(0,0,0,0.45)',
-                backdropFilter: 'blur(24px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+                marginTop: 6, background: 'transparent', border: 'none', padding: 0,
+                minHeight: 36, display: 'flex', alignItems: 'center',
+                fontSize: 10, fontWeight: 800, letterSpacing: '0.13em',
+                textTransform: 'uppercase', color: A.INK,
               }}
-              aria-label="Change cover photo"
             >
-              {uploadingCover ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
+              {bioExpanded
+                ? t('business.hero.readLess', 'Read less')
+                : t('business.hero.readMore', 'Read more')}
             </button>
           )}
         </div>
-
-
-
-        {/* H3: header rendered globally by ChromeIsland (business 3-seg back to '/clubhouse'). */}
-
-        {/* Avatar (squircle) - owner: tap to upload; visitor: tap to lightbox */}
-        {/* Canon exception: 2px bg-background die-cut ring over the cover photo - */}
-        {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
-        <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
-          <div
-            className="relative w-[124px] h-[124px] block rounded-[34%]"
-          >
-            <div className="clbhouz-squircle absolute inset-0 bg-background pointer-events-none" />
-            <div
-              className="clbhouz-squircle absolute overflow-hidden pointer-events-none"
-              style={{ inset: 2, boxShadow: '0 12px 30px rgba(15,15,15,0.22)' }}
-            >
-              {business.logo_url ? (
-                <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white"
-                  style={{
-                    background: getAvatarFallbackColor(avatarFallbackKey),
-                    fontSize: '48px',
-                    fontWeight: 600,
-                    letterSpacing: '0.01em',
-                    lineHeight: 1,
-                  }}
-                >
-                  {avatarInitials}
-                </div>
-              )}
-            </div>
-            {isOwner && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10 pointer-events-none"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
-              >
-                {uploadingLogo ? (
-                  <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Camera className="w-3.5 h-3.5 text-white" />
-                )}
-              </div>
-            )}
-
-            {/* Full-rect transparent tap target - matches cover-photo pattern. */}
-            {isOwner && !uploadingLogo && (
-              <button
-                type="button"
-                onClick={() => setPhotoSheet('logo')}
-                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="Change logo"
-              />
-            )}
-            {!isOwner && (
-              <button
-                type="button"
-                onClick={() => setIsAvatarLightboxOpen(true)}
-                className="absolute z-20 pointer-events-auto cursor-pointer rounded-[34%]"
-                style={{ inset: '-14px', background: 'transparent', border: 'none' }}
-                aria-label="View business logo"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* City pill (right of hero) */}
-        {business.city && (
-          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px) + 12px)' }}>
-            <span
-              className="px-3 py-1.5 rounded-full flex items-center gap-1.5"
-              style={{ background: A.PANEL, border: `0.5px solid ${A.BORDER}`, ...LABEL, color: A.MUTE }}
-            >
-              <MapPin className="w-3.5 h-3.5" />
-              {business.city}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* ----- Identity ----- */}
-      <div className="pt-[68px] px-4 text-left relative z-10 pointer-events-auto">
-        <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
-          {business.name}
-          {business.is_verified && (
-            <span className="inline-flex align-middle ml-1.5">
-              <VerifiedBadge size="lg" />
-            </span>
-          )}
-        </h1>
-
-
-        {subtitleText && (
-          <p className="mt-1" style={{ ...LABEL, color: A.MUTE }}>{subtitleText}</p>
-        )}
-
-        {/* Bio (expandable) */}
-        {bioText && (
-          <div className="mt-3">
-            <p
-              ref={bioRef}
-              className={cn(
-                'text-[15px] text-foreground leading-relaxed whitespace-pre-wrap',
-                !bioExpanded && 'line-clamp-3'
-              )}
-              style={{ overflowWrap: 'anywhere' }}
-            >
-              {bioText}
-            </p>
-            {(isBioClamped || bioExpanded) && (
-              <button
-                onClick={() => setBioExpanded(v => !v)}
-                className="text-[0.8125rem] font-semibold mt-1 min-h-[36px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                style={{ color: '#F7931E' }}
-              >
-                {bioExpanded ? 'Show less' : 'Show more'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Reach: figures for a club, a quiet line for everyone else. The
-            rating lives HERE and nowhere else on the page. */}
-        {(() => {
-          const followersOnClick = () =>
-            navigate(`/business/${business.slug || business.id}/followers`);
-          const postsOnClick = () => setActiveTab('posts');
-
-          const cells: React.ReactNode[] = [];
-          if (business.club_id) {
-            if (reviewStats && reviewStats.totalReviews > 0) {
-              cells.push(
-                <ReachCell
-                  key="rated"
-                  label={t('business.reach.rated')}
-                  value={reviewStats.avgRating.toFixed(1)}
-                  sub={t('business.reach.ratedFrom', { count: reviewStats.totalReviews })}
-                />,
-              );
-            }
-            const rounds = firstCourseStats?.rounds_tracked ?? null;
-            if (rounds != null && rounds > 0) {
-              cells.push(
-                <ReachCell
-                  key="rounds"
-                  label={t('business.reach.rounds')}
-                  value={rounds.toLocaleString()}
-                />,
-              );
-            }
-            cells.push(
-              <ReachCell
-                key="followers"
-                label={t('business.reach.followers')}
-                value={followersCount.toLocaleString()}
-                onClick={followersOnClick}
-              />,
-              <ReachCell
-                key="posts"
-                label={t('business.reach.posts')}
-                value={postsCount.toLocaleString()}
-                onClick={postsOnClick}
-              />,
-            );
-          }
-
-          if (business.club_id && cells.length > 2) {
-            return (
-              <Panel style={{ marginTop: 14 }}>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
-                  }}
-                >
-                  {cells}
-                </div>
-              </Panel>
-            );
-          }
-
-          return (
-            <div className="mt-3 flex items-center gap-1" style={{ ...LABEL, color: A.MUTE }}>
-              <button
-                type="button"
-                onClick={followersOnClick}
-                style={{ ...LABEL, color: A.MUTE, background: 'transparent', border: 'none', padding: 0 }}
-                className="active:opacity-70 transition-opacity"
-              >
-                {t('business.reach.followersLine', { count: followersCount })}
-              </button>
-              <span aria-hidden="true">.</span>
-              <button
-                type="button"
-                onClick={postsOnClick}
-                style={{ ...LABEL, color: A.MUTE, background: 'transparent', border: 'none', padding: 0 }}
-                className="active:opacity-70 transition-opacity"
-              >
-                {t('business.reach.postsLine', { count: postsCount })}
-              </button>
-            </div>
-          );
-        })()}
-
-      </div>
+      )}
 
       {/* ----- Action rows ----- */}
       {(() => {
@@ -806,110 +576,33 @@ const BusinessProfilePage: React.FC = () => {
 
         return (
           <>
-            {/* Primary row */}
-            <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
-              {isOwner ? (
-                <>
-                  <button
-                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: '#0F172A', color: '#ffffff' }}
-                    onClick={() => navigate(`/business/${business.id}/edit`)}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                    Edit profile
-                  </button>
-                  <button
-                    className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
-                    onClick={() => navigate('/businesses/manage')}
-                  >
-                    Manage
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{
-                      flex: 1.6,
-                      ...(isFollowing
-                        ? { background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }
-                        : { background: '#0F172A', color: '#ffffff' }),
-                    }}
-                    onClick={handleFollowToggle}
-                  >
-                    {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
-                  </button>
-                  <button
-                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
-                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
-                    disabled={isStartingDM}
-                    aria-label={`Message ${business.name}`}
-                  >
-                    {isStartingDM
-                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      : <MessageCircle className="w-3.5 h-3.5" />}
-                    Message
-                  </button>
-                  {promoted && (
-                    <OutlineBtn
-                      onClick={secDefs[promoted].onClick}
-                      icon={secDefs[promoted].icon}
-                      label={secDefs[promoted].label}
-                      className="flex-1"
-                    />
-                  )}
-                </>
-              )}
+            {/* Primary row - EDIT / FOLLOW / MANAGE / "..." now live in the
+                hero, so this row carries contact actions only (visitor). */}
+            {!isOwner && (
+              <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
+                <button
+                  className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
+                  onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+                  disabled={isStartingDM}
+                  aria-label={`Message ${business.name}`}
+                >
+                  {isStartingDM
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <MessageCircle className="w-3.5 h-3.5" />}
+                  Message
+                </button>
+                {promoted && (
+                  <OutlineBtn
+                    onClick={secDefs[promoted].onClick}
+                    icon={secDefs[promoted].icon}
+                    label={secDefs[promoted].label}
+                    className="flex-1"
+                  />
+                )}
+              </div>
+            )}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-                    style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}` }}
-                    aria-label="More options"
-                  >
-                    <MoreHorizontal className="w-5 h-5 text-foreground" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {isOwner ? (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit business profile
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleShare}>
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share profile
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleCopyLink}>
-                        <Link2 className="h-4 w-4 mr-2" />
-                        Copy link
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem onClick={handleShare}>
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share profile
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleCopyLink}>
-                        <Link2 className="h-4 w-4 mr-2" />
-                        Copy link
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
-                        <Flag className="h-4 w-4 mr-2" />
-                        Report
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
 
             {/* Secondary row (visitor only, hidden when empty) */}
             {!isOwner && secondary.length > 0 && (
@@ -999,37 +692,6 @@ const BusinessProfilePage: React.FC = () => {
       />
 
 
-      {/* Hidden file inputs (choose + take, for both logo and cover) */}
-      <input ref={logoChooseInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={logoTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={heroChooseInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
-      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleCoverFileSelected} className="hidden" />
-
-      {/* Unified photo action sheet */}
-      {isOwner && (
-        <PhotoActionSheet
-          open={photoSheet !== null}
-          onClose={() => setPhotoSheet(null)}
-          title={photoSheet === 'cover' ? 'Cover photo' : 'Business logo'}
-          hasPhoto={photoSheet === 'cover' ? !!business.cover_image_url : !!business.logo_url}
-          removeLabel={photoSheet === 'cover' ? 'Remove cover photo' : 'Remove logo'}
-          onChoose={() => (photoSheet === 'cover' ? heroChooseInputRef : logoChooseInputRef).current?.click()}
-          onTake={() => (photoSheet === 'cover' ? heroTakeInputRef : logoTakeInputRef).current?.click()}
-          onRemove={() => (photoSheet === 'cover' ? removeCover() : removeLogo())}
-        />
-      )}
-
-      {/* Crop modal */}
-      {isCropModalOpen && cropImageSrc && (
-        <ImageCropModal
-          open={isCropModalOpen}
-          onOpenChange={handleCropCancel}
-          imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1 / 1.05}
-          onCropComplete={handleCropComplete}
-          title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
-        />
-      )}
     </PageRoot>
   );
 };

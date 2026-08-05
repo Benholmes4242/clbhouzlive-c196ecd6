@@ -95,5 +95,18 @@
       "most_eagles_all_time": "이글 최다",
       "most_birdies_all_time": "버디 최다"
     }
+  },
+  "business": {
+    "hero": {
+      "communityRating": "커뮤니티 평점",
+      "ratings": "평가 {{count}}건",
+      "edit": "편집",
+      "follow": "팔로우",
+      "following": "팔로잉",
+      "manage": "관리",
+      "verified": "인증됨",
+      "readMore": "더 보기",
+      "readLess": "접기"
+    }
   }
 }

@@ -95,5 +95,18 @@
       "most_eagles_all_time": "イーグル最多",
       "most_birdies_all_time": "バーディー最多"
     }
+  },
+  "business": {
+    "hero": {
+      "communityRating": "コミュニティ評価",
+      "ratings": "{{count}} 件の評価",
+      "edit": "編集",
+      "follow": "フォロー",
+      "following": "フォロー中",
+      "manage": "管理",
+      "verified": "認証済み",
+      "readMore": "続きを読む",
+      "readLess": "閉じる"
+    }
   }
 }

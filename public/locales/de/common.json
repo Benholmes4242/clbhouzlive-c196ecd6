@@ -95,5 +95,19 @@
       "most_eagles_all_time": "Meiste Eagles",
       "most_birdies_all_time": "Meiste Birdies"
     }
+  },
+  "business": {
+    "hero": {
+      "communityRating": "Community-Bewertung",
+      "ratings": "{{count}} Bewertungen",
+      "ratings_one": "{{count}} Bewertung",
+      "edit": "Bearbeiten",
+      "follow": "Folgen",
+      "following": "Folgt",
+      "manage": "Verwalten",
+      "verified": "Verifiziert",
+      "readMore": "Mehr lesen",
+      "readLess": "Weniger lesen"
+    }
   }
 }
