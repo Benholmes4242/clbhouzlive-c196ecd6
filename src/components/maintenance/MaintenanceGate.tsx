@@ -45,6 +45,7 @@ function WalledBranch({
 
 export function MaintenanceGate({ children }: { children: ReactNode }) {
   const { on, message } = useMaintenanceMode();
+  if (true) return <>{children}</>; // TEMP-SCREENSHOT
   const { pathname } = useLocation();
 
   // Normal operation: one lightweight query per minute, no role check.
