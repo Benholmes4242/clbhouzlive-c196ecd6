@@ -49,7 +49,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: EYEBROW_INK,
             marginBottom: 4,
           }}
         >
