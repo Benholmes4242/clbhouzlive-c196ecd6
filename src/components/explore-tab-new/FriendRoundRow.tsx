@@ -144,7 +144,6 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           >
             {relative}
           </div>
-          {hcpChip ? <span style={{ flexShrink: 0 }}>{hcpChip}</span> : null}
         </div>
 
         <div
@@ -172,7 +171,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           </span>
         </div>
 
-        {feats.length > 0 && (
+        {(hcpChip || feats.length > 0) && (
           <div
             style={{
               display: 'flex',
@@ -182,6 +181,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               marginTop: 2,
             }}
           >
+            {hcpChip}
             <RoundFeatChips feats={feats} maxChips={1} />
           </div>
         )}
@@ -221,7 +221,9 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               lineHeight: 1,
             }}
           >
-            {stableford != null ? `${stableford} PTS` : 'GROSS'}
+            GROSS
+          </div>
+
           </div>
         </div>
       ) : null}
