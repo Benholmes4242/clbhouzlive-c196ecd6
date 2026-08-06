@@ -430,6 +430,8 @@ export function AroundTheWorld({
               });
             }
 
+            const showShortlist = !!onToggleShortlist && !!canShortlist?.(g.courseId);
+
             return (
               <button
                 key={g.courseId}
@@ -452,7 +454,23 @@ export function AroundTheWorld({
                 >
                   <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
                   <ImageChip>{relativeWhen(g.at, t)}</ImageChip>
-                  <div style={{ position: 'absolute', left: 14, right: 14, bottom: 10 }}>
+                  {showShortlist && (
+                    <ShortlistGlassAction
+                      shortlisted={!!isShortlisted?.(g.courseId)}
+                      onToggle={() => onToggleShortlist?.(g.courseId)}
+                      label={t('discover.shortlist.action', 'Add to your list')}
+                    />
+                  )}
+                  {/* Name keeps clear of the bottom-right glass action at 320dp. */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 14,
+                      right: showShortlist ? 46 : 14,
+                      bottom: 10,
+                    }}
+                  >
+
                     <div
                       style={{
                         fontSize: 16.5,
