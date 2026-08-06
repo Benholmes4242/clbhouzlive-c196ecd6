@@ -19,7 +19,6 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
