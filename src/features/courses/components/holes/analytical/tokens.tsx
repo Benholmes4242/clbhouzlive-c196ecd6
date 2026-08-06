@@ -30,6 +30,19 @@ export const A = {
   OVER: '#C8372B',
   UNDER: '#0F8F4A',
   TRACK: '#E9EDF1',
+  /**
+   * The ONLY internal rule permitted inside a panel, and only to separate a
+   * headline from its supporting figures, or a table body from its summary row.
+   */
+  HAIRLINE: 'rgba(14,18,22,0.08)',
+} as const;
+
+/** Neutral ink ramp for score-distribution bars. NEVER semantic colour. */
+export const RAMP = {
+  birdie: 'rgba(14,18,22,0.10)',
+  par: 'rgba(14,18,22,0.24)',
+  bogey: 'rgba(14,18,22,0.44)',
+  double: 'rgba(14,18,22,0.70)',
 } as const;
 
 export const SANS = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -67,6 +80,11 @@ export const CAPTION: React.CSSProperties = {
   letterSpacing: '0.01em',
   color: A.MUTE,
 };
+
+/** Horizontal rule; the only divider the analytical treatment allows. */
+export const Hairline: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
+  <div style={{ height: 1, background: A.HAIRLINE, ...style }} />
+);
 
 export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: A.INK };
 

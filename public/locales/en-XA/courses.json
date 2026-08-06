@@ -617,6 +617,42 @@
       "legends": "[~~Ĉĥáɱƥíőñš~~]",
       "course": "[~~Áƀőúţ~~]",
       "you": "You"
+    },
+    "card": {
+      "slopeLabel": "Slope rating",
+      "lengthLabel": "Length",
+      "courseRating": "Course rating",
+      "vsStandard": "vs standard {{standard}}",
+      "playsHarder": "Plays harder than an average course for a scratch golfer.",
+      "playsEasier": "Plays easier than an average course for a scratch golfer.",
+      "playsAverage": "Plays to average difficulty for a scratch golfer.",
+      "yardsUnit": "yards",
+      "ydsUnit": "yds",
+      "seeFullShort": "See the full card"
+    },
+    "plays": {
+      "legendField": "Field",
+      "legendYou": "You",
+      "toughestHole": "Toughest hole",
+      "easiestHole": "Easiest hole",
+      "holeN": "Hole {{hole}}"
+    },
+    "holes": {
+      "difficultyRank": "Difficulty rank",
+      "rankOf": "{{rank}} of {{total}}",
+      "yourGap": "Your gap"
+    },
+    "records": {
+      "youHold": "You hold this board",
+      "youBehind": "You {{value}} · {{gap}} behind",
+      "youAhead": "You {{value}} · {{gap}}",
+      "units": {
+        "gross": "Gross",
+        "rounds": "Rounds",
+        "points": "Points",
+        "birdies": "Birdies",
+        "diff": "Diff"
+      }
     }
   },
   "network": {
