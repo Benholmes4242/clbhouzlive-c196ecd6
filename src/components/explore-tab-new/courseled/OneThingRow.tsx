@@ -79,10 +79,10 @@ export function OneThingRow({ userId }: Props) {
   // spends no width restating them: line 1 is the course, line 2 the status.
   const status =
     shown.kind === 'rate'
-      ? t('discover.prompt.statusRate', 'Played recently \u00B7 not rated yet')
+      ? t('discover.prompt.statusRate', 'Played \u00B7 not rated yet')
       : shown.kind === 'finish'
-        ? t('discover.prompt.statusFinish', 'Rated \u00B7 category detail missing')
-        : t('discover.prompt.statusPhoto', 'Played recently \u00B7 add a photo?');
+        ? t('discover.prompt.statusFinish', 'Rated \u00B7 detail missing')
+        : t('discover.prompt.statusPhoto', 'Played \u00B7 add a photo?');
 
   const [actionKey, actionFallback] = ACTION_KEY[shown.kind];
 

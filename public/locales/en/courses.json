@@ -1241,9 +1241,9 @@
       "actionReview": "Like this review"
     },
     "prompt": {
-      "statusRate": "Played recently · not rated yet",
-      "statusFinish": "Rated · category detail missing",
-      "statusPhoto": "Played recently · add a photo?",
+      "statusRate": "Played · not rated yet",
+      "statusFinish": "Rated · detail missing",
+      "statusPhoto": "Played · add a photo?",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
