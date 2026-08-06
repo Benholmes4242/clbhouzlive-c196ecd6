@@ -13,6 +13,8 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
+import { ShortlistGlassAction } from './ShortlistGlassAction';
+
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
