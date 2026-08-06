@@ -12,10 +12,11 @@ import { Skeleton } from '@/components/ui/skeleton';
  * in the leaderboard / a legacy ?tab=stats redirect (friend).
  */
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 import { useQuery } from '@tanstack/react-query';
@@ -379,6 +380,20 @@ const HandicapPage: React.FC = () => {
   }, [searchParams, setSearchParams, activeTab]);
 
 
+  // Deep-link: ?score=<whs score id> opens the canonical scorecard sheet over
+  // the page (reaction notifications on a round land here). The param is
+  // stripped immediately so a back/forward does not re-open the sheet, and
+  // closing just drops the local state — no navigation.
+  const [deepLinkScoreId, setDeepLinkScoreId] = useState<string | null>(null);
+  useEffect(() => {
+    const scoreId = searchParams.get('score');
+    if (!scoreId) return;
+    setDeepLinkScoreId(scoreId);
+    const next = new URLSearchParams(searchParams);
+    next.delete('score');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
   // Defer the emit until after GamMount has mounted and subscribed. The
   // early-return `loading` / `!ownerUserId` branches above unmount the
@@ -554,6 +569,12 @@ const HandicapPage: React.FC = () => {
       </main>
       <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
       <CompareMount viewerUserId={user.id} />
+      <RoundDetailSheet
+        open={!!deepLinkScoreId}
+        onClose={() => setDeepLinkScoreId(null)}
+        scoreId={deepLinkScoreId}
+        profileUserId={ownerUserId}
+      />
     </PageRoot>
   );
 };

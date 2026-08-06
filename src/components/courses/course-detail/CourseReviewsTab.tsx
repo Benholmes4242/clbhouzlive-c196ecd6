@@ -28,6 +28,8 @@ import { AppSelect } from '@/components/ui/AppSelect';
 import { Button } from '@/components/ui/button';
 import type { ScoreTier } from '@/utils/getScoreTier';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+
 
 import { 
   SHOW_MOCK_REVIEWS, 
@@ -132,6 +134,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
+  // A deep link (?review=<id>) both highlights the row AND opens the review
+  // sheet on it. The param is stripped straight away (so back/forward does not
+  // re-open), so the id is parked here until the reviews query resolves.
+  const [pendingSheetReviewId, setPendingSheetReviewId] = useState<string | null>(null);
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const reviewIdFromUrl = searchParams.get('review') || searchParams.get('reviewId');
@@ -139,6 +146,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     
     if (reviewIdToHighlight) {
       setHighlightedReviewId(reviewIdToHighlight);
+      if (reviewIdFromUrl) setPendingSheetReviewId(reviewIdFromUrl);
       
       if (reviewIdFromUrl) {
         setSearchParams(prev => {
@@ -156,6 +164,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [location.search, location.pathname]);
+
 
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
     const fromLocationState = Boolean(location.state?.highlightMyReview);
@@ -264,6 +273,38 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
+
+  // Deep-linked review -> open the canonical ReviewBottomSheet on it, once the
+  // list has resolved. Cleared either way so it never re-fires.
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  useEffect(() => {
+    if (!pendingSheetReviewId || isLoading) return;
+    const target = reviews.find((r) => r.id === pendingSheetReviewId);
+    setPendingSheetReviewId(null);
+    if (!target) return;
+    const profile = target.user_profiles;
+    openReviewSheet({
+      user: {
+        id: target.user_id ?? '',
+        name: profile?.display_name || profile?.username || 'Anonymous',
+        username: profile?.username ?? undefined,
+        avatar: profile?.profile_photo_url ?? null,
+      },
+      courseId,
+      courseName: courseName ?? '',
+      rating: target.rating ?? 0,
+      reviewId: target.id,
+      reviewText: target.review ?? null,
+      breakdown: {
+        design: target.design_score ?? null,
+        conditions: target.condition_score ?? null,
+        clubhouse: target.clubhouse_score ?? null,
+        facilities: target.facilities_score ?? null,
+      },
+    });
+  }, [pendingSheetReviewId, isLoading, reviews, courseId, courseName, openReviewSheet]);
+
+
 
   // L6 - "Your tees" filter gating
   //   1) viewer has a remembered tee in localStorage 'tee-card:{courseId}' AND
