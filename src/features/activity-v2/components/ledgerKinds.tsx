@@ -100,6 +100,17 @@ export function resolveKind(row: {
     };
   }
 
+  // DISCOVER REACTIONS ------------------------------------------------
+  // Same shape as a post like: the actor's avatar, plus a thumb when the
+  // feed row carries one. Previously fell through to the generic default.
+  if (t === 'reaction') {
+    return {
+      left: 'actor',
+      right: row.target_course_image || row.target_poster_url ? 'thumb' : 'none',
+    };
+  }
+
+
   // COMMENTS / MENTIONS / TOP-TEN ------------------------------------
   if (
     t === 'comment' || t === 'comment_post' || t === 'comment_reply' ||
