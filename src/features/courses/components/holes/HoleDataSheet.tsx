@@ -17,17 +17,17 @@ import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
 import {
-  A, Panel, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
+  A, Panel, Hairline, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
 } from './analytical/tokens';
 
 interface HookCell {
   key: string;
-  emoji: string;
   label: string;
   value: string;
   tone?: string;
   note: string;
 }
+
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
