@@ -274,6 +274,38 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
 
+  // Deep-linked review -> open the canonical ReviewBottomSheet on it, once the
+  // list has resolved. Cleared either way so it never re-fires.
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  useEffect(() => {
+    if (!pendingSheetReviewId || isLoading) return;
+    const target = reviews.find((r) => r.id === pendingSheetReviewId);
+    setPendingSheetReviewId(null);
+    if (!target) return;
+    const profile = target.user_profiles;
+    openReviewSheet({
+      user: {
+        id: target.user_id ?? '',
+        name: profile?.display_name || profile?.username || 'Anonymous',
+        username: profile?.username ?? undefined,
+        avatar: profile?.profile_photo_url ?? null,
+      },
+      courseId,
+      courseName: courseName ?? '',
+      rating: target.rating ?? 0,
+      reviewId: target.id,
+      reviewText: target.review ?? null,
+      breakdown: {
+        design: target.design_score ?? null,
+        conditions: target.condition_score ?? null,
+        clubhouse: target.clubhouse_score ?? null,
+        facilities: target.facilities_score ?? null,
+      },
+    });
+  }, [pendingSheetReviewId, isLoading, reviews, courseId, courseName, openReviewSheet]);
+
+
+
   // L6 - "Your tees" filter gating
   //   1) viewer has a remembered tee in localStorage 'tee-card:{courseId}' AND
   //   2) that stored label matches a returned colour tee for this course AND
