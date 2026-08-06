@@ -11,8 +11,7 @@ import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { isNewSince } from './newSince';
-import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
+import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_SOFT } from './tokens';
 
 /**
  * Section 3 — ON TOUR THIS WEEK (BRIEF, section 3).
@@ -168,8 +167,9 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
               key={e.id}
               style={{
                 ...CARD_SHELL,
+                // No border and no new-since ink ring on tour cards.
                 border: 'none',
-                ...(isNewSince(e.startDate, lastSeen) ? NEW_CARD_RING : null),
+                boxShadow: 'none',
                 width: 272,
                 flexShrink: 0,
                 fontFamily: SANS,
