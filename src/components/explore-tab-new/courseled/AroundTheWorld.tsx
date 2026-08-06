@@ -48,9 +48,21 @@ interface Props {
   pills: React.ReactNode;
   onCoursePress: (courseId: string) => void;
   onExpand?: (revealed: number) => void;
-  /** Human region label for the sheet caption ('GB&I', 'Worldwide'). */
-  regionLabel?: string;
+  /** Human lens label for the sheet caption ('For you', 'Worldwide'). */
+  lensLabel?: string;
+  /** Copy for the current lens when its set is empty. */
+  emptyCopy?: string;
+  /**
+   * Relevance rank of a course for the active lens (0 = strongest signal).
+   * When supplied it wins over recency for group order.
+   */
+  priorityFor?: (courseId: string) => number;
+  /** Shortlist controls (BRIEF_DISCOVER_RELEVANCE part B). */
+  canShortlist?: (courseId: string) => boolean;
+  isShortlisted?: (courseId: string) => boolean;
+  onToggleShortlist?: (courseId: string) => void;
 }
+
 
 function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
