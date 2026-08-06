@@ -58,7 +58,14 @@ interface Props {
   onPress: (r: LatestReview) => void;
   height?: number;
   radius?: number;
+  /** Reaction control (BRIEF_DISCOVER_REACTIONS). Hidden by default. */
+  reactionHidden?: boolean;
+  reactionReadOnly?: boolean;
+  reactionCount?: number;
+  reacted?: boolean;
+  onToggleReaction?: () => void;
 }
+
 
 export function ReviewTile({
   review: r,
