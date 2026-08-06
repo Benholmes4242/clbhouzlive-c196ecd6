@@ -608,7 +608,15 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ];
   }, [played, t]);
 
+  /**
+   * The beads plot only birdie-or-better and double-or-worse (see
+   * beadForScore); par and bogey are unbeaded. With neither present the chart
+   * draws no beads at all, so the legend key would name nothing.
+   */
+  const hasBeads = split[0].n > 0 || split[3].n > 0;
+
   const out = holes.filter((h) => h.holeNo <= 9);
+
   const back = holes.filter((h) => h.holeNo > 9);
 
   /**
