@@ -452,11 +452,15 @@ export function AroundTheWorld({
                 figLabel: t('discover.row.labelRating', 'RATING'),
                 tone: reviewLabelColor(rating.rating, 'light'),
                 reactTo:
-                  rating.reviewId && (rating.reviewText ?? '').trim()
-                    ? { type: 'review', id: rating.reviewId }
-                    : undefined,
+                  // LIKEABLE whenever there is a review row to target, prose or
+                  // not. Deliberately BROADER than the tap rule below.
+                  rating.reviewId ? { type: 'review', id: rating.reviewId } : undefined,
 
-                onPress: rating.reviewId
+                // TAP opens the sheet ONLY when there is prose to read. A
+                // score-only rating is inert to tap while still being likeable
+                // — that asymmetry is intentional, not a bug to "fix".
+                onPress:
+                  rating.reviewId && (rating.reviewText ?? '').trim()
                   ? () => {
                       analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
                       openReview({
