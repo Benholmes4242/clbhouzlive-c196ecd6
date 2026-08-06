@@ -361,11 +361,10 @@ export function AroundTheWorld({
       {groups.length === 0 ? (
         <div style={{ ...CARD_SHELL, padding: '18px 16px' }}>
           <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.45, color: A.MUTE }}>
-            {t(
-              'discover.emptyRegion',
-              'Nothing logged here in the last 90 days. Try another region.',
-            )}
+            {emptyCopy ??
+              t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.')}
           </p>
+
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
