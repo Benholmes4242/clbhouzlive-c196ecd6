@@ -110,6 +110,48 @@ export default function ExploreTabContent({
   const [momentsSheet, setMomentsSheet] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
+  const [reviewsSheet, setReviewsSheet] = useState(false);
+
+  // LATEST REVIEWS (slot 3): one paginated query, media batched in the same
+  // read. No window — "latest" means latest.
+  const latestReviews = useLatestReviews();
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+
+  const handleReviewTile = useCallback(
+    (r: LatestReview) => {
+      analyticsEvents.track('discover_review_tile_tap', {
+        review_id: r.reviewId,
+        course_id: r.courseId,
+        has_media: !!r.mediaUrl,
+      });
+      openReviewSheet({
+        user: {
+          id: r.userId ?? '',
+          name: r.reviewerName,
+          username: r.reviewerUsername ?? undefined,
+          avatar: r.reviewerAvatar,
+        },
+        courseId: r.courseId,
+        courseName: r.courseName,
+        rating: r.rating,
+        reviewId: r.reviewId,
+        courseCountry: r.courseCountry,
+        courseRegion: r.courseRegion,
+        courseSubCountry: r.courseSubCountry,
+        reviewText: r.quote,
+        breakdown: r.breakdown,
+      });
+    },
+    [openReviewSheet],
+  );
+
+  const openReviewsSheet = useCallback(() => {
+    analyticsEvents.track('discover_reviews_sheet_open', {
+      total: latestReviews.total ?? latestReviews.reviews.length,
+    });
+    setReviewsSheet(true);
+  }, [latestReviews.total, latestReviews.reviews.length]);
+
 
   const momentList = useMemo(() => moments ?? [], [moments]);
   // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
