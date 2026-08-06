@@ -328,9 +328,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  minHeight: 26,
                   padding: '0 12px 11px',
                 }}
               >
+                {/* The tour badge over the image already names the tour, so the
+                    white area carries only the defending champion when idle. */}
+                {!peek && e.defendingChampion && (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
+                    {t('discover.defending', 'Defending')} {DOT}{' '}
+                    <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
+                  </span>
+                )}
+
 
 
 
