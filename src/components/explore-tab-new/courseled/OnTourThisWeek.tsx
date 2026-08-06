@@ -7,7 +7,8 @@ import { useCourseImageResolver } from '@/features/tourhub/hooks/useCourseImageR
 import { formatCurrencyUsdCompact, formatNumber } from '@/i18n/format';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
-import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_SOFT } from './tokens';
+import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
 
 /**
  * Section 3 — ON TOUR THIS WEEK (BRIEF, section 3).
@@ -32,6 +33,8 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_
 const DOT = '\u00B7';
 
 interface Props {
+  /** Last-seen stamp for the new-since markers; null marks nothing. */
+  lastSeen?: number | null;
   onTournamentPress: (e: TourWeekEvent) => void;
   onMediaPress: (courseId: string) => void;
   onTourHub: () => void;
@@ -77,7 +80,7 @@ function playDays(e: TourWeekEvent): string {
   return e.startDate === e.endDate ? fmt(start) : `${fmt(start)} \u2013 ${fmt(end)}`;
 }
 
-export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: Props) {
+export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
   const { data: events } = useTourThisWeek();
 
@@ -101,12 +104,20 @@ export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: P
   );
   const { data: mediaCounts } = useCourseMediaCounts(courseIds);
 
+  // NEW SINCE: a tournament is new when the WEEK changes, never per scoring
+  // update — the card's startDate is the only stamp compared here.
+  const newCount = countNewSince(events ?? [], (e) => e.startDate, lastSeen);
+  useReportNewCount('tour', newCount);
+
   if (!events || events.length === 0) return null;
   const anyThisWeek = events.some((e) => e.thisWeek);
 
   return (
     <section>
-      <Eyebrow aside={<InkAction onClick={onTourHub}>{t('discover.tourHub', 'Tour hub')}</InkAction>}>
+      <Eyebrow
+        dot={newCount > 0}
+        aside={<InkAction onClick={onTourHub}>{t('discover.tourHub', 'Tour hub')}</InkAction>}
+      >
         {anyThisWeek
           ? t('discover.onTourThisWeek', 'On tour this week')
           : t('discover.onTourNext', 'Next on tour')}
@@ -129,7 +140,13 @@ export function OnTourThisWeek({ onTournamentPress, onMediaPress, onTourHub }: P
           return (
             <div
               key={e.id}
-              style={{ ...CARD_SHELL, width: 272, flexShrink: 0, fontFamily: SANS }}
+              style={{
+                ...CARD_SHELL,
+                ...(isNewSince(e.startDate, lastSeen) ? NEW_CARD_RING : null),
+                width: 272,
+                flexShrink: 0,
+                fontFamily: SANS,
+              }}
             >
               <button
                 type="button"
