@@ -113,7 +113,8 @@
     "gross": "[~~ĜŘŐŠŠ~~]",
     "toPar": "[~~ŢŐ ƤÁŘ~~]",
     "viewProfile": "[~~Ṽíéŵ ƥřőƒíļé~~]",
-    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]"
+    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
+    "legendBeads": "[Dots: birdie+ red, double+ ink]"
   },
   "card": {
     "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",

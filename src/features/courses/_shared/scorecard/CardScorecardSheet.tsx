@@ -16,11 +16,30 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, LABEL, KICKER, TITLE, Panel, StatRow, Action,
+  A, SANS, FIGS, NUM, LABEL, KICKER, TITLE, Panel, StatRow, Action, Hairline,
   toParParts, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
+/**
+ * THE TWO SENTENCES are the best copy in the sheet and must read LIGHTER than
+ * the figures they explain: BODY 12/600, never a figure weight.
+ */
+const SENTENCE: React.CSSProperties = {
+  fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
+};
+
+/** Matches TrajectoryLine's field stroke exactly — one value, two places. */
+const FIELD_LINE_SWATCH = '#C3CAD2';
+
+/** One legend key: a swatch that matches the chart, then a 7.5/800 DIM label. */
+const LegendKey: React.FC<{ swatch: React.ReactNode; label: string }> = ({ swatch, label }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+    {swatch}
+    <span style={{ ...LABEL, fontSize: 7.5 }}>{label}</span>
+  </span>
+);
+
 /**
  * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
  * INK, even par is muted. One source of truth with the tour surfaces
@@ -237,6 +256,18 @@ const Legend: React.FC = () => {
 
 /* ------------------------------------------------------ round breakdown */
 
+/**
+ * THE BREAKDOWN BAR KEEPS ITS SEMANTIC COLOURS — deliberate, do not neutralise.
+ * This sheet pairs one round with a facsimile of a physical card, where RED
+ * ALREADY MEANS UNDER PAR in the card's red circles, so a red BIRDIE+ agrees
+ * with the card inches below it. The Course-tab hole rows had to surrender the
+ * bar's colour because they are a FIELD comparison and needed green/red to mark
+ * you against the field. Different jobs, different rules. Do not "harmonise".
+ *
+ * A zero band renders NO segment (never a zero-width sliver) and its cell shows
+ * 0 in DIM rather than the band colour — a colour there would claim a score
+ * that was not made.
+ */
 const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[] }> = ({ split }) => (
   <div>
     <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
@@ -248,12 +279,13 @@ const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[]
       {split.map((s) => (
         <div key={s.label} style={{ textAlign: 'center' }}>
           <div style={LABEL}>{s.label}</div>
-          <div style={{ ...NUM, fontSize: 18, color: s.tone, marginTop: 3 }}>{s.n}</div>
+          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.DIM, marginTop: 3 }}>{s.n}</div>
         </div>
       ))}
     </div>
   </div>
 );
+
 
 /* -------------------------------------------- loading and empty middles */
 
@@ -576,7 +608,15 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ];
   }, [played, t]);
 
+  /**
+   * The beads plot only birdie-or-better and double-or-worse (see
+   * beadForScore); par and bogey are unbeaded. With neither present the chart
+   * draws no beads at all, so the legend key would name nothing.
+   */
+  const hasBeads = split[0].n > 0 || split[3].n > 0;
+
   const out = holes.filter((h) => h.holeNo <= 9);
+
   const back = holes.filter((h) => h.holeNo > 9);
 
   /**
@@ -705,29 +745,61 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <Panel>
                 {statItems.length > 0 && <StatRow items={statItems} size={24} style={{ marginBottom: 20 }} />}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6, gap: 12 }}>
-                  <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
-                  {withField && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      {(isOwner || hasName) && (
-                        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{isOwner ? t('courses:scorecard.you') : firstName}</span>
-                      )}
-                      <span style={LABEL}>{t('courses:scorecard.fieldAvg')}</span>
-                    </span>
-                  )}
+                <Hairline style={{ margin: '18px 0 14px' }} />
 
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
+                  <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
                 </div>
 
-                <TrajectoryLine holes={holes} />
+                {/*
+                  LEGEND — the swatches must match what the chart actually draws.
+                  The round line is INK unless the round is the viewer's own, in
+                  which case it is AMBER (amber means the viewing member). The
+                  third key names the beads, which mark only the holes that
+                  swung the round: birdie or better in red (ace/albatross gold)
+                  and double or worse in over-par ink. Par and bogey carry no
+                  bead by design — see beadForScore.
+                */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
+                  {(isOwner || hasName) && (
+                    <LegendKey
+                      swatch={<i style={{ width: 12, height: 2, borderRadius: 1, background: isOwner ? A.AMBER : A.INK }} />}
+                      label={isOwner ? t('courses:scorecard.you') : firstName}
+                    />
+                  )}
+                  {withField && (
+                    <LegendKey
+                      swatch={<i style={{ width: 12, height: 1.6, borderRadius: 1, background: FIELD_LINE_SWATCH }} />}
+                      label={t('courses:scorecard.fieldAvg')}
+                    />
+                  )}
+                  {hasBeads && (
+                    <LegendKey
+                      swatch={
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_UNDER_LIGHT }} />
+                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_OVER_LIGHT }} />
+                        </span>
+                      }
+                      label={t('courses:scorecard.legendBeads')}
+                    />
+                  )}
+                </div>
+
+                <TrajectoryLine holes={holes} own={isOwner} />
 
                 {(captions.length > 0 || fieldCaption) && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
-                    {captions.length > 0 && <p style={CAPTION}>{captions.join(' ')}</p>}
-                    {fieldCaption && <p style={CAPTION}>{fieldCaption}</p>}
-                  </div>
+                  <>
+                    <Hairline style={{ margin: '14px 0' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {captions.length > 0 && <p style={SENTENCE}>{captions.join(' ')}</p>}
+                      {fieldCaption && <p style={SENTENCE}>{fieldCaption}</p>}
+                    </div>
+                  </>
                 )}
 
-                <div style={{ paddingTop: 12 }}>
+                <Hairline style={{ margin: '14px 0 0' }} />
+                <div style={{ paddingTop: 4 }}>
                   <Action
                     label={showCard
                       ? t('courses:scorecard.hideCard')
@@ -745,6 +817,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     }}
                   />
                 </div>
+
 
                 {showCard && (
                   <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -845,20 +918,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   {/* row 1 */}
                   <div
                     style={{
-                      fontSize: 14.5, fontWeight: 700, color: A.INK,
+                      fontSize: 13.5, fontWeight: 800, color: A.INK,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       alignSelf: 'end',
                     }}
                   >
+
                     {playerName}
                   </div>
                   {(identityStat || playerHcp != null) ? (
-                    <div style={{ ...NUM, fontSize: 20, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
+                    <div style={{ ...NUM, fontSize: 22, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
                       {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
                     </div>
                   ) : <span />}
 
-                  {/* row 2 */}
+                  {/* row 2 — the label is DIM; LABEL already carries A.DIM. */}
                   {(identityStat || playerHcp != null) ? (
                     <div style={LABEL}>
                       {identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}
@@ -870,17 +944,31 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
               </div>
 
+              {/* The footer actions belong to this panel, under a hairline. */}
+              {(onShareRound || onViewProfile || onViewCourse) && (
+                <>
+                  <Hairline style={{ margin: '16px 0 4px' }} />
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
+                    {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+                    {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
+                    {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
+                  </div>
+                </>
+              )}
             </Panel>
           )}
 
-          {/* FOOTER — quiet actions */}
-          {(onShareRound || onViewProfile || onViewCourse) && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap', paddingTop: 2 }}>
-              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-            </div>
+          {/* FOOTER — when there is no identity panel to host the actions. */}
+          {!showIdentity && (onShareRound || onViewProfile || onViewCourse) && (
+            <Panel>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
+                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
+                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
+              </div>
+            </Panel>
           )}
+
         </div>
       </div>
     </BottomSheet>
