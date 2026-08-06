@@ -158,9 +158,6 @@ export function ReviewTile({
           />
         </span>
 
-
-        {isVideo && <MomentPlayGlyph />}
-
         {/* BOTTOM BLOCK — course name, the quote, then reviewer and age. */}
         <div style={{ position: 'absolute', left: 9, right: 9, bottom: 9 }}>
           <div
