@@ -16,11 +16,30 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, LABEL, KICKER, TITLE, Panel, StatRow, Action,
+  A, SANS, FIGS, NUM, LABEL, KICKER, TITLE, Panel, StatRow, Action, Hairline,
   toParParts, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
+/**
+ * THE TWO SENTENCES are the best copy in the sheet and must read LIGHTER than
+ * the figures they explain: BODY 12/600, never a figure weight.
+ */
+const SENTENCE: React.CSSProperties = {
+  fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
+};
+
+/** Matches TrajectoryLine's field stroke exactly — one value, two places. */
+const FIELD_LINE_SWATCH = '#C3CAD2';
+
+/** One legend key: a swatch that matches the chart, then a 7.5/800 DIM label. */
+const LegendKey: React.FC<{ swatch: React.ReactNode; label: string }> = ({ swatch, label }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+    {swatch}
+    <span style={{ ...LABEL, fontSize: 7.5 }}>{label}</span>
+  </span>
+);
+
 /**
  * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
  * INK, even par is muted. One source of truth with the tour surfaces
