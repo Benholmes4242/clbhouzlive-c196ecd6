@@ -48,6 +48,13 @@ export function LatestReviews({
 
   const shown = reviews.slice(0, PAGE_CAP);
 
+  // REACTIONS — one read for the mosaic, keyed by review id.
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () => shown.map((r) => ({ type: 'review' as const, id: r.reviewId })),
+    [shown],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
   // NEW SINCE: the review's created_at, the stamp the section already sorts by.
   const newCount = countNewSince(shown, (r) => r.at, lastSeen);
   useReportNewCount('reviews', newCount);
@@ -69,18 +76,28 @@ export function LatestReviews({
       </Eyebrow>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {shown.map((r) => (
-          <ReviewTile
-            key={r.reviewId}
-            review={r}
-            isOwn={!!viewerId && r.userId === viewerId}
-            isNew={isNewSince(r.at, lastSeen)}
-            onPress={onTilePress}
-          />
-        ))}
+        {shown.map((r) => {
+          const st = reactions.stateFor('review', r.reviewId);
+          const own = !!viewerId && r.userId === viewerId;
+          return (
+            <ReviewTile
+              key={r.reviewId}
+              review={r}
+              isOwn={own}
+              isNew={isNewSince(r.at, lastSeen)}
+              onPress={onTilePress}
+              reactionHidden={!reactions.viewerId || reactions.unavailable}
+              reactionReadOnly={own}
+              reactionCount={st.count}
+              reacted={st.mine}
+              onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+            />
+          );
+        })}
       </div>
     </section>
   );
 }
+
 
 export default LatestReviews;
