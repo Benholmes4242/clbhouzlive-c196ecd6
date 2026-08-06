@@ -117,7 +117,7 @@ export function CourseNewsSheet({
           {t('discover.aroundTheWorld', 'Around the world')}
         </div>
         <div style={{ fontSize: 11.5, color: A.MUTE, marginTop: 4 }}>
-          {`${regionLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
+          {`${lensLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
         </div>
       </div>
 
