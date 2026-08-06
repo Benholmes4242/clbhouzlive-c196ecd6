@@ -927,12 +927,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     {playerName}
                   </div>
                   {(identityStat || playerHcp != null) ? (
-                    <div style={{ ...NUM, fontSize: 20, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
+                    <div style={{ ...NUM, fontSize: 22, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
                       {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
                     </div>
                   ) : <span />}
 
-                  {/* row 2 */}
+                  {/* row 2 — the label is DIM; LABEL already carries A.DIM. */}
                   {(identityStat || playerHcp != null) ? (
                     <div style={LABEL}>
                       {identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}
@@ -944,17 +944,31 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
               </div>
 
+              {/* The footer actions belong to this panel, under a hairline. */}
+              {(onShareRound || onViewProfile || onViewCourse) && (
+                <>
+                  <Hairline style={{ margin: '16px 0 4px' }} />
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
+                    {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+                    {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
+                    {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
+                  </div>
+                </>
+              )}
             </Panel>
           )}
 
-          {/* FOOTER — quiet actions */}
-          {(onShareRound || onViewProfile || onViewCourse) && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap', paddingTop: 2 }}>
-              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-            </div>
+          {/* FOOTER — when there is no identity panel to host the actions. */}
+          {!showIdentity && (onShareRound || onViewProfile || onViewCourse) && (
+            <Panel>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
+                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
+                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
+                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
+              </div>
+            </Panel>
           )}
+
         </div>
       </div>
     </BottomSheet>
