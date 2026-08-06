@@ -115,7 +115,8 @@
     "gross": "GROSS",
     "toPar": "TO PAR",
     "viewProfile": "View profile",
-    "viewCourse": "View course"
+    "viewCourse": "View course",
+    "legendBeads": "점: 버디 이상 빨강, 더블 이상 잉크"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

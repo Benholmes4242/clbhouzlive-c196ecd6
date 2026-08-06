@@ -121,7 +121,8 @@
     "gross": "GROSS",
     "toPar": "TO PAR",
     "viewProfile": "View profile",
-    "viewCourse": "View course"
+    "viewCourse": "View course",
+    "legendBeads": "Punkte: Birdie+ rot, Doppelbogey+ dunkel"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
