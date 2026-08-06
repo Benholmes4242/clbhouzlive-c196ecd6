@@ -769,7 +769,11 @@
     "live": "En directo",
     "latest": "Ultimo",
     "roundThru": "R{{round}} · hoyo {{thru}}",
-    "thruOnly": "Hoyo {{thru}}"
+    "thruOnly": "Hoyo {{thru}}",
+    "leader": "Líder",
+    "tiedLead": "Líderes empatados",
+    "chasing": "Persiguiendo",
+    "roundFinished": "R{{round}} · F"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

@@ -769,7 +769,11 @@
     "live": "Live",
     "latest": "Aktuell",
     "roundThru": "R{{round}} · bis Loch {{thru}}",
-    "thruOnly": "Bis Loch {{thru}}"
+    "thruOnly": "Bis Loch {{thru}}",
+    "leader": "Führend",
+    "tiedLead": "Geteilte Führung",
+    "chasing": "Verfolger",
+    "roundFinished": "R{{round}} · beendet"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

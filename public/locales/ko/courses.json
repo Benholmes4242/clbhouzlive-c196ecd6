@@ -722,7 +722,11 @@
     "live": "라이뭐",
     "latest": "최신",
     "roundThru": "R{{round}} · {{thru}}홀 진행",
-    "thruOnly": "{{thru}}홀 진행"
+    "thruOnly": "{{thru}}홀 진행",
+    "leader": "선두",
+    "tiedLead": "공동 선두",
+    "chasing": "추격",
+    "roundFinished": "R{{round}} · 종료"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",

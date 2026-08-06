@@ -84,7 +84,7 @@ function playDays(e: TourWeekEvent): string {
 }
 
 /** Live block and stat grid share one height so the rail stays level. */
-const STAT_BLOCK_H = 54;
+const STAT_BLOCK_H = 64;
 const LIVE_DOT = '#E5484D';
 const UNDER_PAR = '#0F8F4A';
 const OVER_PAR = '#C0392B';
@@ -255,10 +255,15 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     style={{
                       height: STAT_BLOCK_H,
                       boxSizing: 'border-box',
-                      padding: '10px 12px 8px',
+                      padding: '8px 12px 8px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <div style={{ ...LABEL, color: A.DIM }}>
+                      {peek.leaderTiedExtra > 0
+                        ? t('discover.tiedLead', 'Tied lead')
+                        : t('discover.leader', 'Leader')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1 }}>
                       <span
                         style={{
                           fontSize: 13,
@@ -271,9 +276,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                           minWidth: 0,
                         }}
                       >
-                        {peek.leaderTiedExtra > 0
-                          ? `${peek.leaderName} +${peek.leaderTiedExtra}`
-                          : peek.leaderName}
+                        {peek.leaderName}
                       </span>
                       <span
                         style={{
@@ -286,23 +289,27 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         {fmtScore(peek.leaderScore)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, marginTop: 2 }}>
-                      {peek.round != null && peek.thru != null
-                        ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
-                            round: peek.round,
-                            thru: peek.thru,
-                          })
-                        : peek.thru != null
-                          ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
-                          : e.tourLabel}
+                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.3 }}>
+                      {peek.round != null && peek.thru != null && peek.thru >= 18
+                        ? t('discover.roundFinished', 'R{{round}} \u00b7 F', { round: peek.round })
+                        : peek.round != null && peek.thru != null
+                          ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
+                              round: peek.round,
+                              thru: peek.thru,
+                            })
+                          : peek.thru != null
+                            ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
+                            : e.tourLabel}
                     </div>
                   </div>
+
                 ) : (
                   cells.length > 0 && (
                     <div
                       style={{
                         display: 'grid',
                         gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+                        alignContent: 'center',
                         height: STAT_BLOCK_H,
                         boxSizing: 'border-box',
                         padding: '10px 12px 8px',
@@ -328,12 +335,37 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 }}
               >
                 {peek && peek.chasingName ? (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {peek.chasingName} {DOT}{' '}
-                    <span style={{ ...NUMF, fontWeight: 700, color: A.BODY }}>
-                      {fmtScore(peek.chasingScore)}
-                    </span>
-                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ ...LABEL, color: A.DIM }}>
+                      {t('discover.chasing', 'Chasing')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 1 }}>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: A.INK,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          minWidth: 0,
+                        }}
+                      >
+                        {peek.chasingName}
+                      </span>
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: scoreColor(peek.chasingScore),
+                        }}
+                      >
+                        {fmtScore(peek.chasingScore)}
+                      </span>
+                    </div>
+                  </div>
+
                 ) : peek ? (
                   // Second place unresolved while live: omit rather than blank.
                   <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
