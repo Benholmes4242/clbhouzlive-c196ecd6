@@ -1,0 +1,183 @@
+import { useTranslation } from 'react-i18next';
+
+import { CourseImageFallback } from './CourseImageFallback';
+import { MomentPlayGlyph } from './MomentTile';
+import { SANS, FIGS } from './tokens';
+import type { LatestReview } from './hooks/useLatestReviews';
+
+/**
+ * REVIEW TILE — option D mosaic tile (BRIEF_LATEST_REVIEWS, section 3).
+ *
+ * The words are the content, so the tile is an image with a quote on it, not a
+ * statistic. Every tile is the SAME fixed height regardless of how the course
+ * name or quote wraps: short content leaves space, nothing stretches.
+ *
+ * Image chain: the review's own first photo -> the course image (via
+ * CourseImageFallback) -> the deterministic gradient. Video reviews use their
+ * poster and carry the same 28px glass play glyph the Moments tiles use.
+ *
+ * The score chip is WHITE, not band-coloured: band colours do not survive on
+ * photography. The band colour lives in the review sheet.
+ */
+
+export const REVIEW_TILE_HEIGHT = 172;
+
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.86) 0%, rgba(10,14,10,0.1) 60%)';
+/** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
+const AMBER_ON_DARK = '#FFB25E';
+
+function relativeAge(iso: string, t: (k: string, o?: any) => string): string {
+  const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
+  if (days <= 0) return t('discover.when.today', 'Today');
+  if (days === 1) return t('discover.when.yesterday', 'Yesterday');
+  if (days < 7) return t('discover.when.daysAgo', { defaultValue: '{{count}} days ago', count: days });
+  if (days < 14) return t('discover.when.lastWeek', 'Last week');
+  if (days < 60)
+    return t('discover.when.weeksAgo', { defaultValue: '{{count}}w ago', count: Math.floor(days / 7) });
+  return t('discover.when.monthsAgo', {
+    defaultValue: '{{count}}mo ago',
+    count: Math.max(1, Math.round(days / 30)),
+  });
+}
+
+function clamp(lines: number): React.CSSProperties {
+  return {
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: lines,
+    overflow: 'hidden',
+  } as React.CSSProperties;
+}
+
+interface Props {
+  review: LatestReview;
+  /** True when the reviewer is the viewing member (name renders amber). */
+  isOwn?: boolean;
+  onPress: (r: LatestReview) => void;
+  height?: number;
+  radius?: number;
+}
+
+export function ReviewTile({
+  review: r,
+  isOwn = false,
+  onPress,
+  height = REVIEW_TILE_HEIGHT,
+  radius = 14,
+}: Props) {
+  const { t } = useTranslation('courses');
+
+  const isVideo = r.mediaType === 'video';
+  const ownImage = isVideo ? r.posterUrl : r.mediaUrl;
+  const imageUrl = ownImage ?? r.courseImage ?? null;
+  const reviewer = r.reviewerName || t('discover.reviews.someone', 'A member');
+
+  return (
+    <button
+      type="button"
+      onClick={() => onPress(r)}
+      style={{
+        position: 'relative',
+        height,
+        padding: 0,
+        border: 'none',
+        borderRadius: radius,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        fontFamily: SANS,
+        textAlign: 'left',
+        display: 'block',
+        width: '100%',
+      }}
+    >
+      <CourseImageFallback
+        courseId={r.courseId}
+        courseName={r.courseName}
+        imageUrl={imageUrl}
+        initialsSize={28}
+        style={{ position: 'absolute', inset: 0 }}
+      >
+        <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
+
+        {/* SCORE CHIP — glass, white figure. */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 4,
+            padding: '3px 8px',
+            borderRadius: 999,
+            background: 'rgba(10,14,10,0.55)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+          }}
+        >
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', ...FIGS }}>
+            {r.rating.toFixed(1)}
+          </span>
+          <span
+            style={{
+              fontSize: 7,
+              fontWeight: 800,
+              letterSpacing: '0.13em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.72)',
+            }}
+          >
+            {t('discover.reviews.ratedChip', 'Rated')}
+          </span>
+        </span>
+
+        {isVideo && <MomentPlayGlyph />}
+
+        {/* BOTTOM BLOCK — course name, the quote, then reviewer and age. */}
+        <div style={{ position: 'absolute', left: 9, right: 9, bottom: 9 }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: '#fff',
+              letterSpacing: '-0.01em',
+              lineHeight: 1.2,
+              ...clamp(2),
+            }}
+          >
+            {r.courseName || t('discover.unknownCourse', 'Course')}
+          </div>
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.8)',
+              lineHeight: 1.3,
+              ...clamp(2),
+            }}
+          >
+            {r.quote}
+          </div>
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 9.5,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.65)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            <span style={{ color: isOwn ? AMBER_ON_DARK : 'inherit' }}>{reviewer}</span>
+            {' \u00b7 '}
+            <span style={FIGS}>{relativeAge(r.at, t)}</span>
+          </div>
+        </div>
+      </CourseImageFallback>
+    </button>
+  );
+}
+
+export default ReviewTile;

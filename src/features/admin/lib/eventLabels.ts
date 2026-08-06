@@ -11,6 +11,8 @@ export const EVENT_LABELS: Record<string, string> = {
   nav_tab_tap: 'Nav tab tapped',
   feed_tab_switch: 'Feed tab switched',
   nav_discover_opened: 'Discover opened from nav',
+  discover_review_tile_tap: 'Discover review tile tapped',
+  discover_reviews_sheet_open: 'Discover latest reviews sheet opened',
   watch_redirect_hit: 'Dormant Watch route redirected',
 
   // ─── Auth ─────────────────────────────────────────────────────
