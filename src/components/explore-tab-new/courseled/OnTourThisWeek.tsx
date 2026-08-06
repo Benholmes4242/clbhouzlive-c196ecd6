@@ -9,6 +9,7 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
 import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { isNewSince } from './newSince';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
@@ -86,15 +87,11 @@ function playDays(e: TourWeekEvent): string {
 /** Live block and stat grid share one height so the rail stays level. */
 const STAT_BLOCK_H = 74;
 const LIVE_DOT = '#E5484D';
-const UNDER_PAR = '#0F8F4A';
-const OVER_PAR = '#C0392B';
 
+/** Canonical tour convention: under par is RED, over par ink, level neutral. */
 function scoreColor(score: number | null | undefined): string {
-  if (score == null || score === 0) return A.INK;
-  return score < 0 ? UNDER_PAR : OVER_PAR;
+  return getScoreColor(score, 'light');
 }
-
-
 
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
@@ -288,30 +285,6 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                                 })
                               : peek.leaderName}
                           </div>
-                          {!isTied && (
-                            <div
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 600,
-                                color: A.BODY,
-                                lineHeight: 1.3,
-                                marginTop: 1,
-                              }}
-                            >
-                              {peek.round != null && peek.thru != null && peek.thru >= 18
-                                ? t('discover.roundFinished', 'R{{round}} \u00b7 F', {
-                                    round: peek.round,
-                                  })
-                                : peek.round != null && peek.thru != null
-                                  ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
-                                      round: peek.round,
-                                      thru: peek.thru,
-                                    })
-                                  : peek.thru != null
-                                    ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
-                                    : e.tourLabel}
-                            </div>
-                          )}
                         </div>
                         <span
                           style={{
@@ -355,23 +328,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  minHeight: 26,
                   padding: '0 12px 11px',
                 }}
               >
-                {peek ? (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {e.tourLabel}
-                  </span>
-                ) : e.defendingChampion ? (
+                {/* The tour badge over the image already names the tour, so the
+                    white area carries only the defending champion when idle. */}
+                {!peek && e.defendingChampion && (
                   <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {t('discover.defending', 'Defending')} {DOT}{' '}
                     <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
                   </span>
-                ) : (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {e.tourLabel}
-                  </span>
                 )}
+
 
 
 
