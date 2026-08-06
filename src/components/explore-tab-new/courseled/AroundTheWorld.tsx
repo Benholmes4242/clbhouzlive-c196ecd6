@@ -644,6 +644,24 @@ export function AroundTheWorld({
                           </div>
                         </div>
                       )}
+                      {r.reactTo && (() => {
+                        const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
+                        return (
+                          <ReactionAction
+                            hidden={!reactions.viewerId || reactions.unavailable}
+                            readOnly={r.isOwn}
+                            count={st.count}
+                            reacted={st.mine}
+                            onToggle={() => reactions.toggle(r.reactTo!.type, r.reactTo!.id)}
+                            label={
+                              r.reactTo.type === 'round'
+                                ? t('discover.reactions.action', 'Like this round')
+                                : t('discover.reactions.actionReview', 'Like this review')
+                            }
+                          />
+                        );
+                      })()}
+
                     </div>
                   ))}
                 </div>
