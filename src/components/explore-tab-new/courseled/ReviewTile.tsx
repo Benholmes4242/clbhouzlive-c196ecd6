@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { MomentPlayGlyph } from './MomentTile';
+import { ReactionAction } from './ReactionAction';
+
 import { SANS, FIGS, NEW_CARD_RING } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
