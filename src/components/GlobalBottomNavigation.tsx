@@ -8,7 +8,7 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import { warmChunk } from '@/routes/chunkLoaders';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { navigationTabs } from './bottom-navigation/navigationTabs';
-import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
+import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 
 import { useNavTheme } from '@/hooks/useNavTheme';
@@ -106,7 +106,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { shouldHideHeader } = useModalContext();
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
-  const { unseenCount: unseenFriendReviews } = useUnseenFriendReviews();
+  // The courses badge counts NEW SINCE the member last left Discover across the
+  // marked sections (friends, tour, reviews, world, moments) — not just friend
+  // reviews. It is derived from the data Discover already loaded: no extra
+  // query, and leaving Discover writes the stamp, which zeroes it.
+  const discoverNewCount = useDiscoverNewTotal();
   const { data: tournamentsCache } = useTournamentsCache();
   const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
   const isTourHubLive = liveTournamentCount > 0;
@@ -214,7 +218,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const lozengePad = condensed ? '10px 20px' : '11px 24px';
   const inactivePad = condensed ? '6px 12px' : '7px 16px';
 
-  const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
+  const badges = useMemo<Record<string, number>>(() => ({ courses: discoverNewCount }), [discoverNewCount]);
 
   // Motion tokens — only max-width + padding + icon size may animate on the
   // blurred pill. Never animate an explicit height/width on the pill itself.
