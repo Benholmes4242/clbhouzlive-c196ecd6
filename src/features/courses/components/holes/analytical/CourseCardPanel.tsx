@@ -114,7 +114,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
 
   if (!active) return null;
 
-  const summaryRow = (label: string, list: typeof holes, showAll = false) => (
+  const summaryRow = (label: string, list: typeof holes) => (
     <div
       key={label}
       style={{
@@ -143,7 +143,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
       <span style={{ fontSize: 13, fontWeight: 800, color: A.INK, textAlign: 'right', ...FIGS }}>
         {sum(list, 'par')}
       </span>
-      <span aria-hidden="true">{showAll ? '' : ''}</span>
+      <span aria-hidden="true" />
     </div>
   );
 
@@ -315,7 +315,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
 
           {out.length > 0 && summaryRow(t('courses:teeCard.out'), out)}
           {inn.length > 0 && summaryRow(t('courses:teeCard.in'), inn)}
-          {summaryRow(t('courses:teeCard.total'), holes, true)}
+          {summaryRow(t('courses:teeCard.total'), holes)}
         </div>
       </div>
     </>
