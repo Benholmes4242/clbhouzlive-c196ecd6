@@ -7,6 +7,9 @@ import { useCourseImageResolver } from '@/features/tourhub/hooks/useCourseImageR
 import { formatCurrencyUsdCompact, formatNumber } from '@/i18n/format';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
+import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
+import { fmtScore } from '@/features/tourhub/utils/fmtScore';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
 
@@ -104,6 +107,14 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
   );
   const { data: mediaCounts } = useCourseMediaCounts(courseIds);
 
+  // ONE read of sr_leaderboards for the live tournaments on screen.
+  const liveIds = useMemo(
+    () => (events ?? []).filter((e) => e.isLive).map((e) => e.id),
+    [events],
+  );
+  const { data: peeks } = useTourLivePeek(liveIds);
+  const reducedMotion = usePrefersReducedMotion();
+
   // NEW SINCE: a tournament is new when the WEEK changes, never per scoring
   // update — the card's startDate is the only stamp compared here.
   const newCount = countNewSince(events ?? [], (e) => e.startDate, lastSeen);
@@ -131,6 +142,11 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
           const match = resolved?.get(e.venueName);
           const courseId = match?.golfCourseId ?? null;
           const mediaCount = courseId ? mediaCounts?.get(courseId) ?? 0 : 0;
+          const rawPeek = e.isLive ? peeks?.get(e.id) ?? null : null;
+          // Older than 10 minutes and the sync has stalled: keep the scores,
+          // drop the LIVE claim for a neutral LATEST chip.
+          const peekFresh = isPeekFresh(rawPeek?.updatedAt);
+          const peek = rawPeek;
           const cells: Array<[string, string]> = [];
           if (e.par != null) cells.push([t('discover.par', 'Par'), formatNumber(e.par)]);
           if (e.yardage != null) cells.push([t('discover.yards', 'Yards'), formatNumber(e.yardage)]);
@@ -169,7 +185,32 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 >
                   <div style={{ position: 'absolute', inset: 0, background: SCRIM_SOFT }} />
                   <ImageChip side="left">{e.tourLabel}</ImageChip>
-                  <ImageChip>{playDays(e)}</ImageChip>
+                  {peek ? (
+                    <ImageChip>
+                      <span
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      >
+                        <span
+                          className="clbhouz-live-dot"
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            background: LIVE_DOT,
+                            animation:
+                              peekFresh && !reducedMotion
+                                ? 'clbhouzLiveDotPulse 2s ease-in-out infinite'
+                                : undefined,
+                          }}
+                        />
+                        {peekFresh
+                          ? t('discover.live', 'Live')
+                          : t('discover.latest', 'Latest')}
+                      </span>
+                    </ImageChip>
+                  ) : (
+                    <ImageChip>{playDays(e)}</ImageChip>
+                  )}
                   <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
                     <div
                       style={{
@@ -196,7 +237,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   </div>
                 </CourseImageFallback>
 
-                {live ? (
+                {peek ? (
                   <div
                     style={{
                       height: STAT_BLOCK_H,
@@ -273,14 +314,14 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   padding: '0 12px 11px',
                 }}
               >
-                {live && peek.chasingName ? (
+                {peek && peek.chasingName ? (
                   <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {peek.chasingName} {DOT}{' '}
                     <span style={{ ...NUMF, fontWeight: 700, color: A.BODY }}>
                       {fmtScore(peek.chasingScore)}
                     </span>
                   </span>
-                ) : live ? (
+                ) : peek ? (
                   // Second place unresolved while live: omit rather than blank.
                   <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
                 ) : e.defendingChampion ? (
