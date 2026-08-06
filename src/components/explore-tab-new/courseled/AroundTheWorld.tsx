@@ -12,6 +12,9 @@ import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDisc
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction } from './ReactionAction';
+
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
