@@ -709,9 +709,9 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "rate": "You recently played {{course}} but have not rated it yet.",
-      "finish": "Your {{course}} rating is missing the category detail.",
-      "photo": "You played {{course}} recently - add a photo from the round?",
+      "statusRate": "[Played recently · not rated yet]",
+      "statusFinish": "[Rated · category detail missing]",
+      "statusPhoto": "[Played recently · add a photo?]",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
