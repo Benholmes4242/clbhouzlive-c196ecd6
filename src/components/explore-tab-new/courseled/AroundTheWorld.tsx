@@ -12,6 +12,9 @@ import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDisc
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction } from './ReactionAction';
+
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
@@ -144,6 +147,22 @@ export function AroundTheWorld({
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const { data: meta } = useCourseCardMeta(courseIds);
   const { data: ratings } = useCourseLatestRatings(courseIds);
+
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
+  // rows react as 'round' on their score id; a rating row only carries a
+  // control when it holds a review body (a bare score is not an opinion).
+  const reactionTargets = useMemo<ReactionTarget[]>(() => {
+    const out: ReactionTarget[] = [];
+    for (const g of shown) {
+      for (const e of g.events) if (e.scoreId) out.push({ type: 'round', id: e.scoreId });
+      const rating = ratings?.get(g.courseId);
+      if (rating?.reviewId && (rating.reviewText ?? '').trim())
+        out.push({ type: 'review', id: rating.reviewId });
+    }
+    return out;
+  }, [shown, ratings]);
+  const reactions = useContentReactions(reactionTargets);
+
 
   /** Notability of a course's headline feat — drives the sheet's order. */
   const notability = (e: WireEvent): number => {
@@ -398,6 +417,7 @@ export function AroundTheWorld({
               tone: string;
               isNew: boolean;
               onPress?: () => void;
+              reactTo?: { type: 'round' | 'review'; id: string };
             }> = g.events.map((e) => ({
               key: e.id,
               isNew: isNewSince(e.at, lastSeen),
@@ -409,6 +429,7 @@ export function AroundTheWorld({
               fig: e.figure ?? null,
               figLabel: figLabelFor(e),
               tone: toneFor(e.kind),
+              reactTo: e.scoreId ? { type: 'round', id: e.scoreId } : undefined,
               onPress: e.scoreId
                 ? () => {
                     analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
@@ -416,6 +437,7 @@ export function AroundTheWorld({
                   }
                 : undefined,
             }));
+
             if (rating) {
               rows.push({
                 key: `rating:${g.courseId}`,
@@ -428,6 +450,11 @@ export function AroundTheWorld({
                 fig: rating.rating.toFixed(1),
                 figLabel: t('discover.row.labelRating', 'RATING'),
                 tone: reviewLabelColor(rating.rating, 'light'),
+                reactTo:
+                  rating.reviewId && (rating.reviewText ?? '').trim()
+                    ? { type: 'review', id: rating.reviewId }
+                    : undefined,
+
                 onPress: rating.reviewId
                   ? () => {
                       analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
@@ -617,6 +644,24 @@ export function AroundTheWorld({
                           </div>
                         </div>
                       )}
+                      {r.reactTo && (() => {
+                        const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
+                        return (
+                          <ReactionAction
+                            hidden={!reactions.viewerId || reactions.unavailable}
+                            readOnly={r.isOwn}
+                            count={st.count}
+                            reacted={st.mine}
+                            onToggle={() => reactions.toggle(r.reactTo!.type, r.reactTo!.id)}
+                            label={
+                              r.reactTo.type === 'round'
+                                ? t('discover.reactions.action', 'Like this round')
+                                : t('discover.reactions.actionReview', 'Like this review')
+                            }
+                          />
+                        );
+                      })()}
+
                     </div>
                   ))}
                 </div>

@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { MomentPlayGlyph } from './MomentTile';
+import { ReactionAction } from './ReactionAction';
+
 import { SANS, FIGS, NEW_CARD_RING } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -58,7 +60,14 @@ interface Props {
   onPress: (r: LatestReview) => void;
   height?: number;
   radius?: number;
+  /** Reaction control (BRIEF_DISCOVER_REACTIONS). Hidden by default. */
+  reactionHidden?: boolean;
+  reactionReadOnly?: boolean;
+  reactionCount?: number;
+  reacted?: boolean;
+  onToggleReaction?: () => void;
 }
+
 
 export function ReviewTile({
   review: r,
@@ -67,7 +76,13 @@ export function ReviewTile({
   onPress,
   height = REVIEW_TILE_HEIGHT,
   radius = 14,
+  reactionHidden = true,
+  reactionReadOnly = false,
+  reactionCount = 0,
+  reacted = false,
+  onToggleReaction,
 }: Props) {
+
   const { t } = useTranslation('courses');
 
   const isVideo = r.mediaType === 'video';
@@ -134,6 +149,20 @@ export function ReviewTile({
             {t('discover.reviews.ratedChip', 'Rated')}
           </span>
         </span>
+
+        {/* REACTION — glass corner, opposite the score chip. */}
+        <span style={{ position: 'absolute', top: 8, right: 10 }}>
+          <ReactionAction
+            tone="glass"
+            hidden={reactionHidden}
+            readOnly={reactionReadOnly}
+            count={reactionCount}
+            reacted={reacted}
+            onToggle={() => onToggleReaction?.()}
+            label={t('discover.reactions.actionReview', 'Like this review')}
+          />
+        </span>
+
 
         {isVideo && <MomentPlayGlyph />}
 

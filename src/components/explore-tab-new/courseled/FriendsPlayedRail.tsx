@@ -5,7 +5,10 @@ import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFrie
 import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+
 import {
   A,
   CARD_SHELL,
@@ -64,6 +67,18 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
     [rows],
   );
   const { data: meta } = useCourseCardMeta(courseIds);
+
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): one read for the whole rail, keyed by
+  // the round's whs_score id. A round with no score id carries no control.
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      rows
+        .filter((r) => !!r.score_id)
+        .map((r) => ({ type: 'round' as const, id: r.score_id as string })),
+    [rows],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
 
   // NEW SINCE: the rail already orders by play_date, so play_date is the
   // arrival stamp this section compares.
@@ -197,6 +212,22 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     {r.gross}
                   </span>
                 )}
+
+                {(() => {
+                  const st = reactions.stateFor('round', r.score_id);
+                  return (
+                    <ReactionAction
+                      hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+                      readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
+                      count={st.count}
+                      reacted={st.mine}
+                      onToggle={() => reactions.toggle('round', r.score_id)}
+                      label={t('discover.reactions.action', 'Like this round')}
+                    />
+                  );
+                })()}
+
+
 
               </div>
 

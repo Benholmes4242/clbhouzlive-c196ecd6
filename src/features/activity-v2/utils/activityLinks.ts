@@ -83,6 +83,23 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   }
 
 
+  // --- discover reactions ---------------------------------------------
+  // The trigger writes { actor_id, target_type, target_id } only. A round
+  // opens the recipient's rounds surface; a review opens the course review
+  // permalink when the row carries a course id, and is inert otherwise.
+  if (type === 'reaction') {
+    const targetType = data.target_type;
+    const targetId = data.target_id ?? entity_id ?? null;
+    if (targetType === 'round') return '/handicap';
+    if (targetType === 'review') {
+      const cid = data.course_id;
+      if (cid && targetId) return `/courses/${cid}?tab=reviews&review=${targetId}`;
+      if (cid) return `/courses/${cid}?tab=reviews`;
+      return '';
+    }
+  }
+
+
   // --- like ------------------------------------------------------------
   if (type === 'like' || type === 'like_post') {
     const postId = data.post_id ?? (entity_type === 'post' ? entity_id : null);

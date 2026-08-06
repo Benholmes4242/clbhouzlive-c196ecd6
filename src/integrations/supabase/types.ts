@@ -2772,6 +2772,30 @@ export type Database = {
           },
         ]
       }
+      content_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversation_members: {
         Row: {
           actor_id: string
@@ -21662,6 +21686,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      reaction_target_owner: {
+        Args: { p_target_id: string; p_target_type: string }
+        Returns: string
       }
       rebuild_euro_season_rankings: {
         Args: { p_year?: number }

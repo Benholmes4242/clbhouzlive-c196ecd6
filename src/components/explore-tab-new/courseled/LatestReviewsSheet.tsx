@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ReviewTile } from './ReviewTile';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -42,6 +44,14 @@ export function LatestReviewsSheet({
 }: Props) {
   const { t } = useTranslation('courses');
   const sentinel = useRef<HTMLDivElement | null>(null);
+
+  // REACTIONS — one read for the loaded page set, keyed by review id.
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () => reviews.map((r) => ({ type: 'review' as const, id: r.reviewId })),
+    [reviews],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
 
   useEffect(() => {
     if (!open || !hasNextPage || !onLoadMore) return;
@@ -105,15 +115,25 @@ export function LatestReviewsSheet({
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {reviews.map((r) => (
-            <ReviewTile
-              key={r.reviewId}
-              review={r}
-              isOwn={!!viewerId && r.userId === viewerId}
-              onPress={onTilePress}
-            />
-          ))}
+          {reviews.map((r) => {
+            const st = reactions.stateFor('review', r.reviewId);
+            const own = !!viewerId && r.userId === viewerId;
+            return (
+              <ReviewTile
+                key={r.reviewId}
+                review={r}
+                isOwn={own}
+                onPress={onTilePress}
+                reactionHidden={!reactions.viewerId || reactions.unavailable}
+                reactionReadOnly={own}
+                reactionCount={st.count}
+                reacted={st.mine}
+                onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+              />
+            );
+          })}
         </div>
+
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
       </div>
     </BottomSheet>
