@@ -18,7 +18,20 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, EmptyState, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import type { LegendCategory } from '@/lib/gam/types';
+import { A, EmptyState, FIGS, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
+
+/**
+ * Unit label rendered UNDER each value so a bare figure never has to explain
+ * itself (BRIEF_COURSE_TAB_ANALYTICAL_V2, section 5).
+ */
+const UNIT_KEY: Record<string, string> = {
+  lowest_gross_all_time: 'gross',
+  most_rounds_all_time: 'rounds',
+  best_stableford_all_time: 'points',
+  most_birdies_all_time: 'birdies',
+  best_score_diff_all_time: 'diff',
+};
 
 interface Props {
   courseId: string;
@@ -42,7 +55,7 @@ export const CourseRecordBook: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  const { isLoading, previewRows, unclaimedCount, hasAnyHolder } =
+  const { isLoading, previewRows, unclaimedCount, hasAnyHolder, viewerByCategory } =
     useCourseRecordSummary(courseId, user?.id ?? null);
 
   const openBoards = React.useCallback(() => {
@@ -69,6 +82,38 @@ export const CourseRecordBook: React.FC<Props> = ({
       </Panel>
     );
   }
+
+  /**
+   * One quiet line telling the viewer where they stand: they hold it, they are
+   * on the board with a gap, or nothing at all when they have no entry.
+   */
+  const viewerLine = (category: LegendCategory, isYou: boolean) => {
+    if (isYou) {
+      return (
+        <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP, marginTop: 3 }}>
+          {t('courseDetail.records.youHold')}
+        </div>
+      );
+    }
+    const standing = viewerByCategory.get(category);
+    if (!standing) return null;
+    return (
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 600,
+          color: A.BODY,
+          marginTop: 3,
+          ...FIGS,
+        }}
+      >
+        {t(standing.behind ? 'courseDetail.records.youBehind' : 'courseDetail.records.youAhead', {
+          value: formatLegendValueCompact(category, standing.row.value),
+          gap: standing.gap,
+        })}
+      </div>
+    );
+  };
 
   const footer =
     unclaimedCount > 0
@@ -143,9 +188,18 @@ export const CourseRecordBook: React.FC<Props> = ({
                       ? t('courseDetail.records.you')
                       : row.user_display_name ?? 'Golfer'}
                   </div>
+                  {/* Third line: where the viewing member stands on this board. */}
+                  {viewerLine(category as LegendCategory, isYou)}
                 </div>
-                <div style={{ ...NUM, fontSize: 15, color: tone, textAlign: 'right' }}>
-                  {formatLegendValueCompact(category, row.value)}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ ...NUM, fontSize: 15, color: tone }}>
+                    {formatLegendValueCompact(category, row.value)}
+                  </div>
+                  {UNIT_KEY[category] ? (
+                    <div style={{ ...LABEL, fontSize: 7.5, marginTop: 1 }}>
+                      {t(`courseDetail.records.units.${UNIT_KEY[category]}`)}
+                    </div>
+                  ) : null}
                 </div>
               </button>
             );
