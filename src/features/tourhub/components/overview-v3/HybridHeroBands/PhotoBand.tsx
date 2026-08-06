@@ -26,7 +26,6 @@ import {
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
   COURSE_SCRIMS,
-  AMBER,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
