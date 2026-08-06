@@ -74,7 +74,13 @@ export function ReviewTile({
   onPress,
   height = REVIEW_TILE_HEIGHT,
   radius = 14,
+  reactionHidden = true,
+  reactionReadOnly = false,
+  reactionCount = 0,
+  reacted = false,
+  onToggleReaction,
 }: Props) {
+
   const { t } = useTranslation('courses');
 
   const isVideo = r.mediaType === 'video';
