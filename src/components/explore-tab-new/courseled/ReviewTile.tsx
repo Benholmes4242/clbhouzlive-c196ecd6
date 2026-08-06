@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { MomentPlayGlyph } from './MomentTile';
 import { ReactionAction } from './ReactionAction';
 
 import { SANS, FIGS, NEW_CARD_RING } from './tokens';
@@ -158,9 +157,6 @@ export function ReviewTile({
             label={t('discover.reactions.actionReview', 'Like this review')}
           />
         </span>
-
-
-        {isVideo && <MomentPlayGlyph />}
 
         {/* BOTTOM BLOCK — course name, the quote, then reviewer and age. */}
         <div style={{ position: 'absolute', left: 9, right: 9, bottom: 9 }}>
