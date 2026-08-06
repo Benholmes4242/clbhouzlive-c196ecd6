@@ -27,6 +27,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
+import { OneThingRow } from './courseled/OneThingRow';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
 import { LatestReviews } from './courseled/LatestReviews';
 import { LatestReviewsSheet } from './courseled/LatestReviewsSheet';
@@ -405,6 +406,10 @@ export default function ExploreTabContent({
           {t('discover.headlineCourses', "Where it's happening")}
         </h1>
       </div>
+
+      {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
+          dismissible. Renders nothing when there is nothing to ask. */}
+      <OneThingRow userId={userId} />
 
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
