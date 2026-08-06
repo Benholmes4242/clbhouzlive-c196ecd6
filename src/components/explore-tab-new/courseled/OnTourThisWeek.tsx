@@ -196,21 +196,72 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   </div>
                 </CourseImageFallback>
 
-                {cells.length > 0 && (
+                {live ? (
                   <div
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+                      height: STAT_BLOCK_H,
+                      boxSizing: 'border-box',
                       padding: '10px 12px 8px',
                     }}
                   >
-                    {cells.map(([l, v]) => (
-                      <div key={l} style={{ textAlign: 'center' }}>
-                        <div style={LABEL}>{l}</div>
-                        <div style={{ ...NUMF, fontSize: 14.5, color: A.INK, marginTop: 2 }}>{v}</div>
-                      </div>
-                    ))}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 800,
+                          color: A.INK,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {peek.leaderTiedExtra > 0
+                          ? `${peek.leaderName} +${peek.leaderTiedExtra}`
+                          : peek.leaderName}
+                      </span>
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 17,
+                          fontWeight: 800,
+                          color: scoreColor(peek.leaderScore),
+                        }}
+                      >
+                        {fmtScore(peek.leaderScore)}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, marginTop: 2 }}>
+                      {peek.round != null && peek.thru != null
+                        ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
+                            round: peek.round,
+                            thru: peek.thru,
+                          })
+                        : peek.thru != null
+                          ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
+                          : e.tourLabel}
+                    </div>
                   </div>
+                ) : (
+                  cells.length > 0 && (
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+                        height: STAT_BLOCK_H,
+                        boxSizing: 'border-box',
+                        padding: '10px 12px 8px',
+                      }}
+                    >
+                      {cells.map(([l, v]) => (
+                        <div key={l} style={{ textAlign: 'center' }}>
+                          <div style={LABEL}>{l}</div>
+                          <div style={{ ...NUMF, fontSize: 14.5, color: A.INK, marginTop: 2 }}>{v}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )
                 )}
               </button>
 
@@ -222,7 +273,17 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   padding: '0 12px 11px',
                 }}
               >
-                {e.defendingChampion ? (
+                {live && peek.chasingName ? (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
+                    {peek.chasingName} {DOT}{' '}
+                    <span style={{ ...NUMF, fontWeight: 700, color: A.BODY }}>
+                      {fmtScore(peek.chasingScore)}
+                    </span>
+                  </span>
+                ) : live ? (
+                  // Second place unresolved while live: omit rather than blank.
+                  <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
+                ) : e.defendingChampion ? (
                   <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {t('discover.defending', 'Defending')} {DOT}{' '}
                     <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
@@ -230,6 +291,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 ) : (
                   <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
                 )}
+
 
                 {courseId && mediaCount > 0 && (
                   <button
