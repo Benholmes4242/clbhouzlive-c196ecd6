@@ -508,6 +508,20 @@ export default function ExploreTabContent({
         onRowPress={handleHonoursRow}
       />
 
+      <LatestReviewsSheet
+        open={reviewsSheet}
+        onClose={() => setReviewsSheet(false)}
+        reviews={latestReviews.reviews}
+        totalCount={latestReviews.total}
+        viewerId={userId}
+        onTilePress={handleReviewTile}
+        hasNextPage={latestReviews.hasNextPage}
+        isFetchingNextPage={latestReviews.isFetchingNextPage}
+        onLoadMore={() => void latestReviews.fetchNextPage()}
+      />
+
+
+
       <RoundDetailSheet
         open={!!opener.target}
         onClose={opener.close}
