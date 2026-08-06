@@ -1239,6 +1239,15 @@
     "reactions": {
       "action": "Like this round",
       "actionReview": "Like this review"
+    },
+    "prompt": {
+      "rate": "You played {{course}} - rate it?",
+      "finish": "Your {{course}} rating is missing the detail - finish it?",
+      "photo": "Add a photo from {{course}}?",
+      "actionRate": "RATE",
+      "actionFinish": "FINISH",
+      "actionPhoto": "ADD",
+      "dismiss": "Dismiss"
     }
   },
   "statBrowse": {
