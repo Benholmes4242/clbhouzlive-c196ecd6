@@ -68,7 +68,7 @@ export default function ExploreTabContent({
   const { user } = useSupabaseSession();
   const userId = user?.id;
 
-  const { region: activeRegion, setRegion } = useExploreRegion();
+  const { lens, setLens } = useExploreLens();
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
