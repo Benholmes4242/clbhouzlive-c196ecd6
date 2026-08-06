@@ -410,7 +410,7 @@ export default function ExploreTabContent({
         </h1>
       </div>
 
-      </div>
+
 
       {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
           dismissible. Renders nothing when there is nothing to ask. */}
