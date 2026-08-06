@@ -20,6 +20,8 @@ import type { EventState } from '@/features/tourhub/components/overview-v3/useTo
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { TourStatusBlock } from '../../_shared/TourStatusBlock';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
