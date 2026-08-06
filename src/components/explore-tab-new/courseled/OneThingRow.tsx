@@ -117,11 +117,11 @@ export function OneThingRow({ userId }: Props) {
         ...FIGS,
       }}
     >
-      {prompt.courseId && (
+      {shown.courseId && (
         <CourseImageFallback
-          courseId={prompt.courseId}
-          courseName={prompt.courseName}
-          imageUrl={prompt.thumbnail}
+          courseId={shown.courseId}
+          courseName={shown.courseName}
+          imageUrl={shown.thumbnail}
           initialsSize={12}
           style={{ width: 38, height: 38, borderRadius: '34%', flexShrink: 0 }}
         />
