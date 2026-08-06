@@ -84,7 +84,7 @@ function playDays(e: TourWeekEvent): string {
 }
 
 /** Live block and stat grid share one height so the rail stays level. */
-const STAT_BLOCK_H = 54;
+const STAT_BLOCK_H = 64;
 const LIVE_DOT = '#E5484D';
 const UNDER_PAR = '#0F8F4A';
 const OVER_PAR = '#C0392B';
