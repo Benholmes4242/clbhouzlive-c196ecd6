@@ -716,7 +716,11 @@
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
-    }
+    },
+    "live": "[Live]",
+    "latest": "[Latest]",
+    "roundThru": "[R{{round}} · thru {{thru}}]",
+    "thruOnly": "[Thru {{thru}}]"
   },
   "statBrowse": {
     "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",

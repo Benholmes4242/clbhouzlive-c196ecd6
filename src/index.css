@@ -4721,3 +4721,18 @@ em-emoji-picker input:focus {
   font-weight: 400 !important;
 }
 
+
+/* Discover ON TOUR live chip dot (BRIEF_DISCOVER_LIVE_TOUR, section 2).
+   Slow 2s opacity pulse; the component omits the animation entirely under
+   prefers-reduced-motion, and this guard is the belt to that braces. */
+@keyframes clbhouzLiveDotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clbhouz-live-dot {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

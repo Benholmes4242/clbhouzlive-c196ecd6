@@ -718,7 +718,11 @@
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
-    }
+    },
+    "live": "라이뭐",
+    "latest": "최신",
+    "roundThru": "R{{round}} · {{thru}}홀 진행",
+    "thruOnly": "{{thru}}홀 진행"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",

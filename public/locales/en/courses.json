@@ -1248,7 +1248,11 @@
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
-    }
+    },
+    "live": "Live",
+    "latest": "Latest",
+    "roundThru": "R{{round}} · thru {{thru}}",
+    "thruOnly": "Thru {{thru}}"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

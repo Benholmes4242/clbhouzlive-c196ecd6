@@ -718,7 +718,11 @@
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
-    }
+    },
+    "live": "ライブ",
+    "latest": "最新",
+    "roundThru": "R{{round}} · {{thru}}ホール終了",
+    "thruOnly": "{{thru}}ホール終了"
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",
