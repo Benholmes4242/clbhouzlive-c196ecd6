@@ -106,18 +106,16 @@ export default function ExploreTabContent({
   const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-  const handleRegionChange = useCallback(
-    (slug: string | null) => {
-      if (slug === activeRegion) return;
-      analyticsEvents.track('discover_scope_changed', {
-        from: activeRegion ?? 'worldwide',
-        to: slug ?? 'worldwide',
-      });
-      setRegion(slug);
+  const handleLensChange = useCallback(
+    (next: ExploreLens) => {
+      if (next === lens) return;
+      analyticsEvents.track('discover_lens_change', { lens: next });
+      setLens(next);
       scrollPageToTop('smooth');
     },
-    [activeRegion, setRegion],
+    [lens, setLens],
   );
+
 
   // Every course-led surface ROUTES to the course page: it is a different
   // surface with its own job. Sheets are only for bounded sets.
