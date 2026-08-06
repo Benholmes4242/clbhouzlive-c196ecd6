@@ -155,8 +155,9 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
           <>
             <Divider />
             <Cell
-              value={nearestMiss.split(' from')[0]}
-              label="from a crown"
+              value={nearestMiss.value}
+              label={nearestMiss.label}
+
               emphasize
               wide
             />
