@@ -83,6 +83,19 @@ function playDays(e: TourWeekEvent): string {
   return e.startDate === e.endDate ? fmt(start) : `${fmt(start)} \u2013 ${fmt(end)}`;
 }
 
+/** Live block and stat grid share one height so the rail stays level. */
+const STAT_BLOCK_H = 54;
+const LIVE_DOT = '#E5484D';
+const UNDER_PAR = '#0F8F4A';
+const OVER_PAR = '#C0392B';
+
+function scoreColor(score: number | null | undefined): string {
+  if (score == null || score === 0) return A.INK;
+  return score < 0 ? UNDER_PAR : OVER_PAR;
+}
+
+
+
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
   const { data: events } = useTourThisWeek();
