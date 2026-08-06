@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ReviewTile } from './ReviewTile';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
