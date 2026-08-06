@@ -43,6 +43,14 @@ export function LatestReviewsSheet({
   const { t } = useTranslation('courses');
   const sentinel = useRef<HTMLDivElement | null>(null);
 
+  // REACTIONS — one read for the loaded page set, keyed by review id.
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () => reviews.map((r) => ({ type: 'review' as const, id: r.reviewId })),
+    [reviews],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
+
   useEffect(() => {
     if (!open || !hasNextPage || !onLoadMore) return;
     const el = sentinel.current;
