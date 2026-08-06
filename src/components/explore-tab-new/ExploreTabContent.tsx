@@ -24,7 +24,7 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
-import { REGION_TABS } from './AlmanacSections';
+
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { MomentsSheet } from './courseled/MomentsSheet';
