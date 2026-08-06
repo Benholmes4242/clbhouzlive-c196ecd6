@@ -388,7 +388,10 @@ export default function ExploreTabContent({
           plus the island itself — Discover no longer sits under a hero. */}
       <div
         style={{
-          padding: '0 16px 28px',
+          // The header block owns NO trailing space: the prompt row owns the
+          // 16px above it and the 20px below it, and when the row is absent it
+          // collapses to a single 24px gap of its own.
+          padding: '0 16px 0',
           // +16px breathing room under the floating islands (spacing pass).
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
         }}
@@ -396,7 +399,7 @@ export default function ExploreTabContent({
         <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
         <h1
           style={{
-            margin: '7px 0 0',
+            margin: '4px 0 0',
             fontSize: 26,
             fontWeight: 800,
             color: A.INK,
@@ -405,6 +408,8 @@ export default function ExploreTabContent({
         >
           {t('discover.headlineCourses', "Where it's happening")}
         </h1>
+      </div>
+
       </div>
 
       {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
