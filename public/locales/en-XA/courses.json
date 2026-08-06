@@ -686,7 +686,22 @@
     },
     "hero": {
       "viewScorecard": "[~~ṽíéŵ šĉőŕéĉáŕð~~]"
-    }
+    },
+    "lens": {
+      "forYou": "For you",
+      "top100": "Top 100",
+      "played": "Played",
+      "worldwide": "Worldwide",
+      "ariaLabel": "Relevance",
+      "emptyForYou": "No news yet from courses you know. Rate a course or add one to your list to see more here.",
+      "emptyTop100": "No Top 100 news in the last 90 days.",
+      "emptyPlayed": "Nothing at your courses in the last 90 days."
+    },
+    "shortlist": {
+      "action": "Add to your list",
+      "failed": "Could not update your list"
+    },
+    "emptyPool": "Nothing logged anywhere in the last 90 days."
   },
   "statBrowse": {
     "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",
