@@ -718,29 +718,61 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <Panel>
                 {statItems.length > 0 && <StatRow items={statItems} size={24} style={{ marginBottom: 20 }} />}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6, gap: 12 }}>
-                  <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
-                  {withField && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      {(isOwner || hasName) && (
-                        <span style={{ ...LABEL, color: A.AMBER_DEEP }}>{isOwner ? t('courses:scorecard.you') : firstName}</span>
-                      )}
-                      <span style={LABEL}>{t('courses:scorecard.fieldAvg')}</span>
-                    </span>
-                  )}
+                <Hairline style={{ margin: '18px 0 14px' }} />
 
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
+                  <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
                 </div>
 
-                <TrajectoryLine holes={holes} />
+                {/*
+                  LEGEND — the swatches must match what the chart actually draws.
+                  The round line is INK unless the round is the viewer's own, in
+                  which case it is AMBER (amber means the viewing member). The
+                  third key names the beads, which mark only the holes that
+                  swung the round: birdie or better in red (ace/albatross gold)
+                  and double or worse in over-par ink. Par and bogey carry no
+                  bead by design — see beadForScore.
+                */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
+                  {(isOwner || hasName) && (
+                    <LegendKey
+                      swatch={<i style={{ width: 12, height: 2, borderRadius: 1, background: isOwner ? A.AMBER : A.INK }} />}
+                      label={isOwner ? t('courses:scorecard.you') : firstName}
+                    />
+                  )}
+                  {withField && (
+                    <LegendKey
+                      swatch={<i style={{ width: 12, height: 1.6, borderRadius: 1, background: FIELD_LINE_SWATCH }} />}
+                      label={t('courses:scorecard.fieldAvg')}
+                    />
+                  )}
+                  {hasBeads && (
+                    <LegendKey
+                      swatch={
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_UNDER_LIGHT }} />
+                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_OVER_LIGHT }} />
+                        </span>
+                      }
+                      label={t('courses:scorecard.legendBeads')}
+                    />
+                  )}
+                </div>
+
+                <TrajectoryLine holes={holes} own={isOwner} />
 
                 {(captions.length > 0 || fieldCaption) && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
-                    {captions.length > 0 && <p style={CAPTION}>{captions.join(' ')}</p>}
-                    {fieldCaption && <p style={CAPTION}>{fieldCaption}</p>}
-                  </div>
+                  <>
+                    <Hairline style={{ margin: '14px 0' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {captions.length > 0 && <p style={SENTENCE}>{captions.join(' ')}</p>}
+                      {fieldCaption && <p style={SENTENCE}>{fieldCaption}</p>}
+                    </div>
+                  </>
                 )}
 
-                <div style={{ paddingTop: 12 }}>
+                <Hairline style={{ margin: '14px 0 0' }} />
+                <div style={{ paddingTop: 4 }}>
                   <Action
                     label={showCard
                       ? t('courses:scorecard.hideCard')
@@ -758,6 +790,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     }}
                   />
                 </div>
+
 
                 {showCard && (
                   <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
