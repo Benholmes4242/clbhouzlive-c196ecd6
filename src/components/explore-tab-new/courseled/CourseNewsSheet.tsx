@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CourseImageFallback } from './CourseImageFallback';
+import { ShortlistGlassAction } from './ShortlistGlassAction';
+
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
@@ -44,10 +46,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   entries: CourseNewsEntry[];
-  /** Human region label for the caption ("GB&I", "Worldwide"). */
-  regionLabel: string;
+  /** Human lens label for the caption ("For you", "Worldwide"). */
+  lensLabel: string;
   whenLabel: (iso: string) => string;
   onCoursePress: (courseId: string) => void;
+  /** Shortlist controls (BRIEF_DISCOVER_RELEVANCE part B). */
+  canShortlist?: (courseId: string) => boolean;
+  isShortlisted?: (courseId: string) => boolean;
+  onToggleShortlist?: (courseId: string) => void;
 }
 
 /** "3mo ago" -> "3MO", "Last week" -> "LAST WEEK" (used only when it fits). */
@@ -62,10 +68,14 @@ export function CourseNewsSheet({
   open,
   onClose,
   entries,
-  regionLabel,
+  lensLabel,
   whenLabel,
   onCoursePress,
+  canShortlist,
+  isShortlisted,
+  onToggleShortlist,
 }: Props) {
+
   const { t } = useTranslation('courses');
   const ids = useMemo(() => entries.map((e) => e.courseId), [entries]);
   const { data: meta } = useCourseCardMeta(open ? ids : []);
@@ -109,7 +119,7 @@ export function CourseNewsSheet({
           {t('discover.aroundTheWorld', 'Around the world')}
         </div>
         <div style={{ fontSize: 11.5, color: A.MUTE, marginTop: 4 }}>
-          {`${regionLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
+          {`${lensLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
         </div>
       </div>
 
@@ -229,11 +239,22 @@ export function CourseNewsSheet({
                     {hasFigure ? compactWhen(when) : when}
                   </span>
 
+                  {/* SHORTLIST — bottom-right; figure chip owns top-left and the
+                      when chip top-right, so no collision at 320dp. */}
+                  {onToggleShortlist && canShortlist?.(e.courseId) && (
+                    <ShortlistGlassAction
+                      shortlisted={!!isShortlisted?.(e.courseId)}
+                      onToggle={() => onToggleShortlist(e.courseId)}
+                      label={t('discover.shortlist.action', 'Add to your list')}
+                      size={24}
+                    />
+                  )}
+
                   <div
                     style={{
                       position: 'absolute',
                       left: 8,
-                      right: 8,
+                      right: onToggleShortlist && canShortlist?.(e.courseId) ? 36 : 8,
                       bottom: 6,
                       fontSize: 11,
                       fontWeight: 800,
@@ -247,6 +268,7 @@ export function CourseNewsSheet({
                     {m?.name ?? e.courseName ?? t('discover.unknownCourse', 'Course')}
                   </div>
                 </CourseImageFallback>
+
 
                 <div
                   style={{

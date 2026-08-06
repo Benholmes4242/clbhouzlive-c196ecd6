@@ -7,6 +7,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from '@/lib/toast';
+import { setWantToPlayRequest } from '@/hooks/shortlist/wantToPlayMutation';
+
 
 export type CourseStatus = 'played' | 'want_to_play' | 'none';
 
@@ -72,37 +74,14 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     staleTime: 3 * 60 * 1000,
   });
 
-  // Toggle want to play status
+  // Toggle want to play status — shares THE single shortlist write path with
+  // Discover's card control (BRIEF_DISCOVER_RELEVANCE B2).
   const setWantToPlayMutation = useMutation({
     mutationFn: async (wantToPlay: boolean) => {
       if (!user?.id || !courseId) throw new Error('Not authenticated');
-
-      if (wantToPlay) {
-        // Remove any existing shortlist first
-        await supabase
-          .from('course_shortlists')
-          .delete()
-          .eq('course_id', courseId)
-          .eq('user_id', user.id);
-
-        // Add to want to play
-        const { error } = await supabase
-          .from('course_shortlists')
-          .insert({
-            user_id: user.id,
-            course_id: courseId,
-            list_key: 'want_to_play',
-          });
-        if (error && error.code !== '23505') throw error;
-      } else {
-        const { error } = await supabase
-          .from('course_shortlists')
-          .delete()
-          .eq('course_id', courseId)
-          .eq('user_id', user.id);
-        if (error) throw error;
-      }
+      await setWantToPlayRequest(user.id, courseId, wantToPlay);
     },
+
     onSuccess: (_, wantToPlay) => {
       toast.success(wantToPlay ? 'Added to bucket list' : 'Removed from bucket list');
       // Invalidate all related queries using predicate

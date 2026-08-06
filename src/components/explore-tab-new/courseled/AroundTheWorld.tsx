@@ -13,6 +13,8 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
+import { ShortlistGlassAction } from './ShortlistGlassAction';
+
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
@@ -48,9 +50,21 @@ interface Props {
   pills: React.ReactNode;
   onCoursePress: (courseId: string) => void;
   onExpand?: (revealed: number) => void;
-  /** Human region label for the sheet caption ('GB&I', 'Worldwide'). */
-  regionLabel?: string;
+  /** Human lens label for the sheet caption ('For you', 'Worldwide'). */
+  lensLabel?: string;
+  /** Copy for the current lens when its set is empty. */
+  emptyCopy?: string;
+  /**
+   * Relevance rank of a course for the active lens (0 = strongest signal).
+   * When supplied it wins over recency for group order.
+   */
+  priorityFor?: (courseId: string) => number;
+  /** Shortlist controls (BRIEF_DISCOVER_RELEVANCE part B). */
+  canShortlist?: (courseId: string) => boolean;
+  isShortlisted?: (courseId: string) => boolean;
+  onToggleShortlist?: (courseId: string) => void;
 }
+
 
 function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
@@ -74,7 +88,12 @@ export function AroundTheWorld({
   pills,
   onCoursePress,
   onExpand,
-  regionLabel,
+  lensLabel,
+  emptyCopy,
+  priorityFor,
+  canShortlist,
+  isShortlisted,
+  onToggleShortlist,
 }: Props) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -100,8 +119,16 @@ export function AroundTheWorld({
         });
       }
     }
-    return [...byCourse.values()].sort((a, b) => (a.at < b.at ? 1 : -1));
-  }, [events]);
+    // Relevance first when the lens supplies a rank, recency as the tie-break.
+    return [...byCourse.values()].sort((a, b) => {
+      if (priorityFor) {
+        const d = priorityFor(a.courseId) - priorityFor(b.courseId);
+        if (d !== 0) return d;
+      }
+      return a.at < b.at ? 1 : -1;
+    });
+  }, [events, priorityFor]);
+
 
   const shown = groups.slice(0, PAGE);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
@@ -297,10 +324,17 @@ export function AroundTheWorld({
           rank: top ? notability(top) : 5,
         };
       })
-      .sort((a, b) => a.rank - b.rank || (a.at < b.at ? 1 : -1))
+      .sort((a, b) => {
+        if (priorityFor) {
+          const d = priorityFor(a.courseId) - priorityFor(b.courseId);
+          if (d !== 0) return d;
+        }
+        return a.rank - b.rank || (a.at < b.at ? 1 : -1);
+      })
       .map(({ rank: _rank, ...rest }) => rest);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups, ratings, userId, t]);
+  }, [groups, ratings, userId, t, priorityFor]);
+
 
 
   if (isLoading) {
@@ -329,11 +363,10 @@ export function AroundTheWorld({
       {groups.length === 0 ? (
         <div style={{ ...CARD_SHELL, padding: '18px 16px' }}>
           <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.45, color: A.MUTE }}>
-            {t(
-              'discover.emptyRegion',
-              'Nothing logged here in the last 90 days. Try another region.',
-            )}
+            {emptyCopy ??
+              t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.')}
           </p>
+
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -399,6 +432,8 @@ export function AroundTheWorld({
               });
             }
 
+            const showShortlist = !!onToggleShortlist && !!canShortlist?.(g.courseId);
+
             return (
               <button
                 key={g.courseId}
@@ -421,7 +456,23 @@ export function AroundTheWorld({
                 >
                   <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
                   <ImageChip>{relativeWhen(g.at, t)}</ImageChip>
-                  <div style={{ position: 'absolute', left: 14, right: 14, bottom: 10 }}>
+                  {showShortlist && (
+                    <ShortlistGlassAction
+                      shortlisted={!!isShortlisted?.(g.courseId)}
+                      onToggle={() => onToggleShortlist?.(g.courseId)}
+                      label={t('discover.shortlist.action', 'Add to your list')}
+                    />
+                  )}
+                  {/* Name keeps clear of the bottom-right glass action at 320dp. */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 14,
+                      right: showShortlist ? 46 : 14,
+                      bottom: 10,
+                    }}
+                  >
+
                     <div
                       style={{
                         fontSize: 16.5,
@@ -581,9 +632,13 @@ export function AroundTheWorld({
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         entries={newsEntries}
-        regionLabel={regionLabel ?? t('discover.worldwide', 'Worldwide')}
+        lensLabel={lensLabel ?? t('discover.lens.worldwide', 'Worldwide')}
         whenLabel={(iso) => relativeWhen(iso, t)}
         onCoursePress={onCoursePress}
+        canShortlist={canShortlist}
+        isShortlisted={isShortlisted}
+        onToggleShortlist={onToggleShortlist}
+
       />
 
       <RoundDetailSheet

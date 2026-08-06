@@ -1,23 +1,43 @@
+import { useTranslation } from 'react-i18next';
+
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { REGION_TABS } from '../AlmanacSections';
+import type { ExploreLens } from '../hooks/useExploreLens';
 
 /**
- * ScopePills — ONE control for the whole page, replacing the four Discover
- * carried before (region scope, Recent/All-time, the Honours/Eagles/Birdies
- * tabs and the Toughest/Scoreable toggles). A wire is chronological by
- * definition, so there is no all-time lens here.
+ * ScopePills — the RELEVANCE lens for Around the World
+ * (BRIEF_DISCOVER_RELEVANCE A1). Geography is retired as a filter axis: at
+ * platform volume the question is not WHERE a course is but whether it means
+ * anything to this member. Same pill chrome, position and pin behaviour as the
+ * region pills it replaces.
  */
 
+export const LENS_ORDER: ExploreLens[] = ['for_you', 'top_100', 'played', 'worldwide'];
+
 interface Props {
-  region: string | null;
-  onChange: (slug: string | null) => void;
+  lens: ExploreLens;
+  onChange: (lens: ExploreLens) => void;
 }
 
-export function ScopePills({ region, onChange }: Props) {
+export function lensLabelKey(lens: ExploreLens): { key: string; fallback: string } {
+  switch (lens) {
+    case 'for_you':
+      return { key: 'discover.lens.forYou', fallback: 'For you' };
+    case 'top_100':
+      return { key: 'discover.lens.top100', fallback: 'Top 100' };
+    case 'played':
+      return { key: 'discover.lens.played', fallback: 'Played' };
+    case 'worldwide':
+    default:
+      return { key: 'discover.lens.worldwide', fallback: 'Worldwide' };
+  }
+}
+
+export function ScopePills({ lens, onChange }: Props) {
+  const { t } = useTranslation('courses');
   return (
     <div
       role="tablist"
-      aria-label="Region"
+      aria-label={t('discover.lens.ariaLabel', 'Relevance')}
       className="scrollbar-hide"
       style={{
         position: 'sticky',
@@ -33,15 +53,16 @@ export function ScopePills({ region, onChange }: Props) {
         overflowX: 'auto',
       }}
     >
-      {REGION_TABS.map((tab) => {
-        const active = (tab.slug ?? null) === region;
+      {LENS_ORDER.map((id) => {
+        const active = id === lens;
+        const { key, fallback } = lensLabelKey(id);
         return (
           <button
-            key={tab.slug ?? '__ww__'}
+            key={id}
             type="button"
             role="tab"
             aria-selected={active}
-            onClick={() => onChange(tab.slug)}
+            onClick={() => onChange(id)}
             style={{
               flex: 'none',
               border: `1px solid ${active ? A.INK : A.BORDER}`,
@@ -56,7 +77,7 @@ export function ScopePills({ region, onChange }: Props) {
               cursor: 'pointer',
             }}
           >
-            {tab.label}
+            {t(key, fallback)}
           </button>
         );
       })}

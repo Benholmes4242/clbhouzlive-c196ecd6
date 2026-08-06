@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useExploreRegion } from './hooks/useExploreRegion';
+import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
+import { useDiscoverLensSets } from './courseled/hooks/useDiscoverLensSets';
+import { useWantToPlayToggle } from '@/hooks/useWantToPlayToggle';
+import { lensLabelKey } from './wire/ScopePills';
+import { toast } from '@/lib/toast';
+
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
@@ -19,7 +24,7 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
-import { REGION_TABS } from './AlmanacSections';
+
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { MomentsSheet } from './courseled/MomentsSheet';
@@ -68,7 +73,7 @@ export default function ExploreTabContent({
   const { user } = useSupabaseSession();
   const userId = user?.id;
 
-  const { region: activeRegion, setRegion } = useExploreRegion();
+  const { lens, setLens } = useExploreLens();
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
@@ -85,11 +90,14 @@ export default function ExploreTabContent({
     return () => io.disconnect();
   }, []);
 
-  const { events, legendary, isLoading: wireLoading } = useDiscoverWire(
-    activeRegion,
+  // The pool is unchanged: ONE 90-day fetch, worldwide. The lenses are
+  // client-side filters and ordering over data already loaded.
+  const { events: pool, legendary, isLoading: wireLoading } = useDiscoverWire(
+    null,
     userId,
     crownCategoryLabel,
   );
+
   const { data: moments } = useMomentsOfTheWeek();
   const { data: mostPlayed } = useMostPlayedThisWeek();
 
@@ -103,18 +111,107 @@ export default function ExploreTabContent({
   const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-  const handleRegionChange = useCallback(
-    (slug: string | null) => {
-      if (slug === activeRegion) return;
-      analyticsEvents.track('discover_scope_changed', {
-        from: activeRegion ?? 'worldwide',
-        to: slug ?? 'worldwide',
-      });
-      setRegion(slug);
+  const handleLensChange = useCallback(
+    (next: ExploreLens) => {
+      if (next === lens) return;
+      analyticsEvents.track('discover_lens_change', { lens: next });
+      setLens(next);
       scrollPageToTop('smooth');
     },
-    [activeRegion, setRegion],
+    [lens, setLens],
   );
+
+  // === RELEVANCE LENSES (BRIEF_DISCOVER_RELEVANCE) =========================
+  // Membership sets are resolved ONCE for the whole pool — no per-card query.
+  const poolCourseIds = useMemo(
+    () => [...new Set(pool.map((e) => e.courseId).filter(Boolean))] as string[],
+    [pool],
+  );
+  const sets = useDiscoverLensSets(userId, poolCourseIds);
+  const { toggle: toggleWantToPlay, canShortlist: signedIn } = useWantToPlayToggle();
+
+  // Optimistic shortlist overlay: the lens and the glyph read through it, so a
+  // tap lands instantly and rolls back on failure.
+  const [shortlistOverlay, setShortlistOverlay] = useState<Record<string, boolean>>({});
+  const isShortlisted = useCallback(
+    (courseId: string) => shortlistOverlay[courseId] ?? sets.shortlist.has(courseId),
+    [shortlistOverlay, sets.shortlist],
+  );
+
+  const handleToggleShortlist = useCallback(
+    (courseId: string) => {
+      const next = !isShortlisted(courseId);
+      setShortlistOverlay((prev) => ({ ...prev, [courseId]: next }));
+      analyticsEvents.track('discover_shortlist_toggle', { course_id: courseId, added: next });
+      void toggleWantToPlay({ courseId, want: next }).catch(() => {
+        setShortlistOverlay((prev) => ({ ...prev, [courseId]: !next }));
+        toast.error(t('discover.shortlist.failed', 'Could not update your list'));
+      });
+    },
+    [isShortlisted, toggleWantToPlay, t],
+  );
+
+  // A played/rated course is never a want-to-play course, so the control is
+  // hidden there (same resolution the course page's status toggle applies).
+  const canShortlistCourse = useCallback(
+    (courseId: string) => signedIn && !sets.played.has(courseId),
+    [signedIn, sets.played],
+  );
+
+  /**
+   * RARITY FLOOR — WORLDWIDE only: a stranger's birdie haul at an unknown
+   * course is not news. Everything else (eagles, records, ratings, aces,
+   * albatrosses) survives. Tunable.
+   */
+  const WORLDWIDE_RARITY_FLOOR: string[] = ['birdie_haul'];
+
+  const events = useMemo(() => {
+    if (lens === 'worldwide') {
+      return pool.filter((e) => !WORLDWIDE_RARITY_FLOOR.includes(e.kind));
+    }
+    if (lens === 'played') {
+      return pool.filter((e) => !!e.courseId && sets.played.has(e.courseId));
+    }
+    if (lens === 'top_100') {
+      return pool.filter((e) => !!e.courseId && sets.top100.has(e.courseId));
+    }
+    // FOR YOU: shortlist + Top 100 + played. Proximity is omitted — no member
+    // coordinates exist without a new permission prompt.
+    return pool.filter(
+      (e) =>
+        !!e.courseId &&
+        (isShortlisted(e.courseId) || sets.top100.has(e.courseId) || sets.played.has(e.courseId)),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pool, lens, sets.played, sets.top100, isShortlisted]);
+
+  /** FOR YOU order: shortlist, then Top 100, then played, then the rest. */
+  const priorityFor = useCallback(
+    (courseId: string) => {
+      if (lens !== 'for_you') return 0;
+      if (isShortlisted(courseId)) return 0;
+      if (sets.top100.has(courseId)) return 1;
+      if (sets.played.has(courseId)) return 2;
+      return 3;
+    },
+    [lens, isShortlisted, sets.top100, sets.played],
+  );
+
+  const lensMeta = lensLabelKey(lens);
+  const lensLabel = t(lensMeta.key, lensMeta.fallback);
+  const lensEmptyCopy =
+    lens === 'for_you'
+      ? t(
+          'discover.lens.emptyForYou',
+          'No news yet from courses you know. Rate a course or add one to your list to see more here.',
+        )
+      : lens === 'top_100'
+        ? t('discover.lens.emptyTop100', 'No Top 100 news in the last 90 days.')
+        : lens === 'played'
+          ? t('discover.lens.emptyPlayed', 'Nothing at your courses in the last 90 days.')
+          : t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.');
+
+
 
   // Every course-led surface ROUTES to the course page: it is a different
   // surface with its own job. Sheets are only for bounded sets.
@@ -272,23 +369,26 @@ export default function ExploreTabContent({
           events={events}
           isLoading={wireLoading}
           userId={userId}
-          scopeKey={activeRegion ?? 'worldwide'}
+          scopeKey={lens}
           pills={
             // The pills belong to Around the World: 12px above (10 from the
             // eyebrow + 2), 14px below so they sit closer to their cards.
             <div style={{ margin: '2px -14px 14px' }}>
-              <ScopePills region={activeRegion} onChange={handleRegionChange} />
+              <ScopePills lens={lens} onChange={handleLensChange} />
             </div>
           }
           onCoursePress={(id) => goCourse(id, 'around_the_world')}
-          regionLabel={
-            REGION_TABS.find((r) => (r.slug ?? null) === (activeRegion ?? null))?.label ??
-            'Worldwide'
-          }
+          lensLabel={lensLabel}
+          emptyCopy={lensEmptyCopy}
+          priorityFor={priorityFor}
+          canShortlist={canShortlistCourse}
+          isShortlisted={isShortlisted}
+          onToggleShortlist={handleToggleShortlist}
           onExpand={(revealed) =>
             analyticsEvents.track('discover_courses_expanded', { revealed })
           }
         />
+
 
 
         <MomentsOfTheWeek
