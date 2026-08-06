@@ -149,15 +149,16 @@ export function AroundTheWorld({
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
   // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
-  // rows react as 'round' on their score id; a rating row only carries a
-  // control when it holds a review body (a bare score is not an opinion).
+  // rows react as 'round' on their score id; ANY rating row with a reviewId
+  // carries a control — a score with no prose is still likeable (the trigger
+  // wording says "liked your rating" in that case). Only a rating with no
+  // reviewId at all has nothing to target.
   const reactionTargets = useMemo<ReactionTarget[]>(() => {
     const out: ReactionTarget[] = [];
     for (const g of shown) {
       for (const e of g.events) if (e.scoreId) out.push({ type: 'round', id: e.scoreId });
       const rating = ratings?.get(g.courseId);
-      if (rating?.reviewId && (rating.reviewText ?? '').trim())
-        out.push({ type: 'review', id: rating.reviewId });
+      if (rating?.reviewId) out.push({ type: 'review', id: rating.reviewId });
     }
     return out;
   }, [shown, ratings]);
