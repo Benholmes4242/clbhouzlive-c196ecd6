@@ -69,36 +69,41 @@ export function OneThingRow({ userId }: Props) {
 
   // NOTHING TO ASK: the row collapses to the single 24px gap the page owes
   // between the title and the first section eyebrow — no orphaned space.
-  const FAKE = new URLSearchParams(window.location.search).has('fakeprompt');
-  if (FAKE && !dismissed) {
-    // TEMP MEASURE HOOK
-  } else if (!resolved || !prompt || dismissed) {
+  const fake = new URLSearchParams(window.location.search).has('fakeprompt');
+  const shown = fake
+    ? {
+        kind: 'rate' as DiscoverPromptKind,
+        courseId: 'fake',
+        courseName: 'Sundridge Park (West Course)',
+        thumbnail: null as string | null,
+      }
+    : prompt;
+
+  if (!shown || dismissed || (!fake && !resolved)) {
     return <div aria-hidden style={{ height: 24 }} />;
   }
 
-  const kind = prompt?.kind ?? 'rate';
-  const courseName = prompt?.courseName ?? 'Sundridge Park (West Course)';
-  const copy2 = kind;
   const copy =
-    (prompt ?? { kind }).kind === 'rate'
+    shown.kind === 'rate'
       ? t(
           'discover.prompt.rate',
           'You recently played {{course}} but have not rated it yet.',
-          { course: prompt.courseName },
+          { course: shown.courseName },
         )
-      : prompt.kind === 'finish'
+      : shown.kind === 'finish'
         ? t(
             'discover.prompt.finish',
             'Your {{course}} rating is missing the category detail.',
-            { course: prompt.courseName },
+            { course: shown.courseName },
           )
         : t(
             'discover.prompt.photo',
             'You played {{course}} recently - add a photo from the round?',
-            { course: prompt.courseName },
+            { course: shown.courseName },
           );
 
-  const [actionKey, actionFallback] = ACTION_KEY[prompt.kind];
+  const [actionKey, actionFallback] = ACTION_KEY[shown.kind];
+
 
   return (
     <div
