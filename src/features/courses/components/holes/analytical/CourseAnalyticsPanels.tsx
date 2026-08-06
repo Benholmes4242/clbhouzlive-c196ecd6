@@ -19,8 +19,36 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, KICKER, LABEL, NUM, Panel, StatRow, TITLE, toParParts } from './tokens';
-import { HoleColumnHeader, HoleRow, PREVIEW_COUNT } from './HoleRows';
+import { A, FIGS, Hairline, KICKER, LABEL, Panel, toParParts } from './tokens';
+import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
+
+/** Labelled figure cell used by the How-it-plays strip and the extremes row. */
+const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; sub?: string }> = ({
+  label,
+  value,
+  tone = A.INK,
+  sub,
+}) => (
+  <div style={{ textAlign: 'center', minWidth: 0 }}>
+    <div style={{ ...LABEL, fontSize: 8 }}>{label}</div>
+    <div
+      style={{
+        fontSize: 20,
+        fontWeight: 800,
+        letterSpacing: '-0.02em',
+        color: tone,
+        marginTop: 3,
+        whiteSpace: 'nowrap',
+        ...FIGS,
+      }}
+    >
+      {value}
+    </div>
+    {sub ? (
+      <div style={{ fontSize: 10.5, fontWeight: 600, color: A.BODY, marginTop: 2 }}>{sub}</div>
+    ) : null}
+  </div>
+);
 
 
 
@@ -79,7 +107,7 @@ const ShapeChart: React.FC<{
               width={barW}
               height={height}
               rx={2}
-              fill={h.hole_no === hardestHole ? A.INK : A.TRACK}
+              fill={h.hole_no === hardestHole ? A.BODY : A.TRACK}
             />
           );
         })}
@@ -175,30 +203,33 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const beastFig = toParParts(stats.hardest.avg_to_par);
   const bestFig = toParParts(stats.easiest.avg_to_par);
 
+  const scale = buildHoleScale(holes, myByHole);
+
+  // Extremes are LABELLED, never carried by an emoji.
   const extremes = [
     beastFig
       ? {
           key: 'beast',
-          emoji: '\u{1F624}',
-          label: t('courses:courseDetail.plays.beastLabel', { hole: stats.hardest.hole_no }),
+          label: t('courses:courseDetail.plays.toughestHole'),
+          hole: stats.hardest.hole_no,
           text: beastFig.text,
-          tone: A.RED,
+          tone: beastFig.tone,
         }
       : null,
     bestFig
       ? {
           key: 'best',
-          emoji: '\u{1F3AF}',
-          label: t('courses:courseDetail.plays.bestLabel', { hole: stats.easiest.hole_no }),
+          label: t('courses:courseDetail.plays.easiestHole'),
+          hole: stats.easiest.hole_no,
           text: bestFig.text,
-          tone: A.GREEN,
+          tone: bestFig.tone,
         }
       : null,
   ].filter((c): c is NonNullable<typeof c> => c != null);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
-      {/* Block 2 - How it plays */}
+      {/* Block 2 - How it plays: the chart leads, the figures support it. */}
       <Panel
         kicker={t('courses:courseDetail.blocks.howItPlays')}
         aside={t('courses:courseDetail.plays.rounds', {
@@ -206,43 +237,6 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           rounds: formatNumber(totalRounds),
         })}
       >
-        <StatRow
-          style={{ marginBottom: 22 }}
-          items={[
-            ...(field
-              ? [{ label: t('courses:courseDetail.plays.fieldAvg'), value: field.text, tone: field.tone }]
-              : []),
-            ...(hasYou && you
-              ? [{ label: t('courses:courseDetail.plays.yourAvg'), value: you.text, tone: A.AMBER }]
-              : []),
-            hasYou
-              ? {
-                  label: t('courses:courseDetail.plays.youBeat'),
-                  value: `${stats.beat}/${stats.withYou}`,
-                }
-              : {
-                  label: t('courses:courseDetail.plays.hardestHole'),
-                  value: stats.hardest.hole_no,
-                },
-          ]}
-        />
-
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 8,
-            gap: 8,
-          }}
-        >
-          <span style={TITLE}>{t('courses:holes.shapeOfCourse')}</span>
-          <span style={LABEL}>
-            {hasYou
-              ? t('courses:courseDetail.plays.fieldVsYou')
-              : t('courses:courseDetail.plays.fieldOnly')}
-          </span>
-        </div>
         <ShapeChart
           holes={holes}
           myByHole={myByHole}
@@ -250,25 +244,81 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           hasYou={hasYou}
         />
 
+        {/* Legend: what the bars are, and what the line is. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <i style={{ width: 10, height: 6, borderRadius: 2, background: A.TRACK }} />
+            <span style={{ ...LABEL, fontSize: 8 }}>
+              {t('courses:courseDetail.plays.legendField')}
+            </span>
+          </span>
+          {hasYou && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <i style={{ width: 12, height: 2, borderRadius: 1, background: A.AMBER }} />
+              <span style={{ ...LABEL, fontSize: 8 }}>
+                {t('courses:courseDetail.plays.legendYou')}
+              </span>
+            </span>
+          )}
+        </div>
+
+        <Hairline style={{ margin: '14px 0 12px' }} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+          <Figure
+            label={t('courses:courseDetail.plays.fieldAvg')}
+            value={field ? field.text : '\u2014'}
+            tone={field ? field.tone : A.INK}
+          />
+          {hasYou && you ? (
+            <Figure
+              label={t('courses:courseDetail.plays.yourAvg')}
+              value={you.text}
+              tone={A.AMBER_DEEP}
+            />
+          ) : (
+            <Figure
+              label={t('courses:courseDetail.plays.toughestHole')}
+              value={stats.hardest.hole_no}
+            />
+          )}
+          {hasYou ? (
+            <Figure
+              label={t('courses:courseDetail.plays.youBeat')}
+              value={`${stats.beat}/${stats.withYou}`}
+            />
+          ) : (
+            <Figure
+              label={t('courses:courseDetail.plays.easiestHole')}
+              value={stats.easiest.hole_no}
+            />
+          )}
+        </div>
+
         {extremes.length > 0 && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${extremes.length}, minmax(0, 1fr))`,
-              gap: 14,
-              marginTop: 22,
-            }}
-          >
-            {extremes.map((c) => (
-              <div key={c.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                <div style={{ fontSize: 17, lineHeight: 1, marginBottom: 5 }} aria-hidden="true">
-                  {c.emoji}
-                </div>
-                <div style={LABEL}>{c.label}</div>
-                <div style={{ ...NUM, fontSize: 16, color: c.tone, marginTop: 3 }}>{c.text}</div>
-              </div>
-            ))}
-          </div>
+          <>
+            <Hairline style={{ margin: '12px 0' }} />
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${extremes.length}, minmax(0, 1fr))`,
+                gap: 14,
+              }}
+            >
+              {extremes.map((c) => (
+                <Figure
+                  key={c.key}
+                  label={c.label}
+                  value={
+                    <>
+                      {t('courses:courseDetail.plays.holeN', { hole: c.hole })}
+                      <span style={{ color: c.tone, marginLeft: 6 }}>{c.text}</span>
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </>
         )}
       </Panel>
 
@@ -279,14 +329,17 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         footer={t('courses:holes.preview.seeAll', { count: holes.length })}
         onOpen={() => setHolesSheetOpen(true)}
       >
-        <HoleColumnHeader />
-        {holes.slice(0, PREVIEW_COUNT).map((h) => (
-          <HoleRow
+        <HoleRampLegend hasYou={hasYou} />
+        {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
+          <HoleRowV2
             key={h.hole_no}
             row={h}
             mine={myByHole.get(h.hole_no) ?? null}
+            scale={scale}
+            totalHoles={holes.length}
             open={openHoles.has(h.hole_no)}
             onToggle={() => toggle(h.hole_no, 'preview')}
+            last={i === arr.length - 1}
           />
         ))}
       </Panel>
@@ -323,14 +376,17 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           </div>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 28px' }}>
-          <HoleColumnHeader />
-          {holes.map((h) => (
-            <HoleRow
+          <HoleRampLegend hasYou={hasYou} />
+          {holes.map((h, i, arr) => (
+            <HoleRowV2
               key={h.hole_no}
               row={h}
               mine={myByHole.get(h.hole_no) ?? null}
+              scale={scale}
+              totalHoles={holes.length}
               open={openHoles.has(h.hole_no)}
               onToggle={() => toggle(h.hole_no, 'sheet')}
+              last={i === arr.length - 1}
             />
           ))}
         </div>
