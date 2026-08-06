@@ -255,10 +255,15 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     style={{
                       height: STAT_BLOCK_H,
                       boxSizing: 'border-box',
-                      padding: '10px 12px 8px',
+                      padding: '8px 12px 8px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <div style={{ ...LABEL, color: A.DIM }}>
+                      {peek.leaderTiedExtra > 0
+                        ? t('discover.tiedLead', 'Tied lead')
+                        : t('discover.leader', 'Leader')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1 }}>
                       <span
                         style={{
                           fontSize: 13,
@@ -271,9 +276,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                           minWidth: 0,
                         }}
                       >
-                        {peek.leaderTiedExtra > 0
-                          ? `${peek.leaderName} +${peek.leaderTiedExtra}`
-                          : peek.leaderName}
+                        {peek.leaderName}
                       </span>
                       <span
                         style={{
@@ -286,17 +289,20 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         {fmtScore(peek.leaderScore)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, marginTop: 2 }}>
-                      {peek.round != null && peek.thru != null
-                        ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
-                            round: peek.round,
-                            thru: peek.thru,
-                          })
-                        : peek.thru != null
-                          ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
-                          : e.tourLabel}
+                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.3 }}>
+                      {peek.round != null && peek.thru != null && peek.thru >= 18
+                        ? t('discover.roundFinished', 'R{{round}} \u00b7 F', { round: peek.round })
+                        : peek.round != null && peek.thru != null
+                          ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
+                              round: peek.round,
+                              thru: peek.thru,
+                            })
+                          : peek.thru != null
+                            ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
+                            : e.tourLabel}
                     </div>
                   </div>
+
                 ) : (
                   cells.length > 0 && (
                     <div
