@@ -67,22 +67,30 @@ export function OneThingRow({ userId }: Props) {
     setDismissed(true);
   }, [prompt]);
 
-  if (!resolved || !prompt || dismissed) return null;
+  // NOTHING TO ASK: the row collapses to the single 24px gap the page owes
+  // between the title and the first section eyebrow — no orphaned space.
+  if (!resolved || !prompt || dismissed) {
+    return <div aria-hidden style={{ height: 24 }} />;
+  }
 
   const copy =
     prompt.kind === 'rate'
-      ? t('discover.prompt.rate', 'You played {{course}} - rate it?', {
-          course: prompt.courseName,
-        })
+      ? t(
+          'discover.prompt.rate',
+          'You recently played {{course}} but have not rated it yet.',
+          { course: prompt.courseName },
+        )
       : prompt.kind === 'finish'
         ? t(
             'discover.prompt.finish',
-            'Your {{course}} rating is missing the detail - finish it?',
+            'Your {{course}} rating is missing the category detail.',
             { course: prompt.courseName },
           )
-        : t('discover.prompt.photo', 'Add a photo from {{course}}?', {
-            course: prompt.courseName,
-          });
+        : t(
+            'discover.prompt.photo',
+            'You played {{course}} recently - add a photo from the round?',
+            { course: prompt.courseName },
+          );
 
   const [actionKey, actionFallback] = ACTION_KEY[prompt.kind];
 
@@ -103,25 +111,31 @@ export function OneThingRow({ userId }: Props) {
           courseId={prompt.courseId}
           courseName={prompt.courseName}
           imageUrl={prompt.thumbnail}
-          initialsSize={11}
-          style={{ width: 34, height: 34, borderRadius: '34%', flexShrink: 0 }}
+          initialsSize={12}
+          style={{ width: 38, height: 38, borderRadius: '34%', flexShrink: 0 }}
         />
       )}
 
+      {/* TWO LINES, clamped. A fixed two-line min-height keeps the row's height
+          identical whether the course name is short or long. */}
       <div
         style={{
           flex: 1,
           minWidth: 0,
           fontSize: 12.5,
           fontWeight: 600,
+          lineHeight: 1.35,
+          minHeight: 34,
           color: A.BODY,
-          whiteSpace: 'nowrap',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
           overflow: 'hidden',
-          textOverflow: 'ellipsis',
         }}
       >
         {copy}
       </div>
+
 
       <button
         type="button"
