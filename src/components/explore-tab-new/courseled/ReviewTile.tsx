@@ -26,7 +26,7 @@ const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.86) 0%, rgba(10,14,10,0.1) 
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
 
-function relativeAge(iso: string, t: (k: string, o?: Record<string, unknown>) => string): string {
+function relativeAge(iso: string, t: (k: string, o?: any) => string): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days <= 0) return t('discover.when.today', 'Today');
   if (days === 1) return t('discover.when.yesterday', 'Yesterday');
