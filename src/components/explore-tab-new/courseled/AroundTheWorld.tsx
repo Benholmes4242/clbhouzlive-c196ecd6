@@ -630,8 +630,10 @@ export function AroundTheWorld({
                           </div>
                         )}
                       </div>
+                      {/* FIGURE BLOCK — fixed min-width so 72 / 6 / 8.9 all sit
+                          on one axis regardless of digit count. */}
                       {r.fig && (
-                        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                        <div style={{ flexShrink: 0, textAlign: 'center', minWidth: 46 }}>
                           <div style={{ ...NUMF, fontSize: 17, color: r.tone, lineHeight: 1.05 }}>
                             {r.fig}
                           </div>
@@ -649,23 +651,30 @@ export function AroundTheWorld({
                           </div>
                         </div>
                       )}
-                      {r.reactTo && (() => {
-                        const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
-                        return (
-                          <ReactionAction
-                            hidden={!reactions.viewerId || reactions.unavailable}
-                            readOnly={r.isOwn}
-                            count={st.count}
-                            reacted={st.mine}
-                            onToggle={() => reactions.toggle(r.reactTo!.type, r.reactTo!.id)}
-                            label={
-                              r.reactTo.type === 'round'
-                                ? t('discover.reactions.action', 'Like this round')
-                                : t('discover.reactions.actionReview', 'Like this review')
-                            }
-                          />
-                        );
-                      })()}
+                      {/* TRAILING SLOT — reserved on EVERY row, control or not. */}
+                      <ReactionSlot>
+                        {r.reactTo
+                          ? (() => {
+                              const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
+                              return (
+                                <ReactionAction
+                                  hidden={!reactions.viewerId || reactions.unavailable}
+                                  readOnly={r.isOwn}
+                                  count={st.count}
+                                  reacted={st.mine}
+                                  onToggle={() =>
+                                    reactions.toggle(r.reactTo!.type, r.reactTo!.id)
+                                  }
+                                  label={
+                                    r.reactTo.type === 'round'
+                                      ? t('discover.reactions.action', 'Like this round')
+                                      : t('discover.reactions.actionReview', 'Like this review')
+                                  }
+                                />
+                              );
+                            })()
+                          : null}
+                      </ReactionSlot>
 
                     </div>
                   ))}
