@@ -1103,7 +1103,7 @@ const ExpandedCard: React.FC<{
   if (viewerHasPlayed && mine != null && diff != null) {
     const magnitude = Math.abs(diff).toFixed(2);
     sentence += youBeats
-      ? ` You beat the field by ${magnitude} on it. \u{1F4AA}`
+      ? ` You beat the field by ${magnitude} on it.`
       : ` You trail the field by ${magnitude} on it.`;
   }
 
