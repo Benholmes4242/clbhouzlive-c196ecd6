@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CourseImageFallback } from './CourseImageFallback';
+import { ShortlistGlassAction } from './ShortlistGlassAction';
+
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
