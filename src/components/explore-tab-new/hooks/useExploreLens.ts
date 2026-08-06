@@ -1,0 +1,46 @@
+import { useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+/**
+ * useExploreLens — RELEVANCE lens for Around the World (BRIEF_DISCOVER_RELEVANCE).
+ *
+ * Replaces the geographic region scope as the ONE state owner for that section.
+ * URL-backed (?lens=), replace-history so pill taps don't pollute the back stack.
+ *
+ * LEGACY: any deep link or stored preference still carrying ?region=gbi|usa|
+ * europe|row (or the older uk-ireland / continental-europe / rest-of-world
+ * slugs) resolves to WORLDWIDE rather than erroring.
+ */
+export type ExploreLens = 'for_you' | 'top_100' | 'played' | 'worldwide';
+
+const LENSES: ExploreLens[] = ['for_you', 'top_100', 'played', 'worldwide'];
+
+export const DEFAULT_LENS: ExploreLens = 'for_you';
+
+export function useExploreLens() {
+  const [params, setParams] = useSearchParams();
+
+  const raw = params.get('lens');
+  const legacyRegion = params.get('region');
+
+  let lens: ExploreLens = DEFAULT_LENS;
+  if (raw && LENSES.includes(raw as ExploreLens)) {
+    lens = raw as ExploreLens;
+  } else if (legacyRegion) {
+    // Retired geography axis — never error, just show everything.
+    lens = 'worldwide';
+  }
+
+  const setLens = useCallback(
+    (next: ExploreLens) => {
+      const newParams = new URLSearchParams(params);
+      newParams.delete('region');
+      if (next === DEFAULT_LENS) newParams.delete('lens');
+      else newParams.set('lens', next);
+      setParams(newParams, { replace: true });
+    },
+    [params, setParams],
+  );
+
+  return { lens, setLens };
+}
