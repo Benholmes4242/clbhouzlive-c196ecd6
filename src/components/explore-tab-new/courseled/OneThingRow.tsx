@@ -69,12 +69,18 @@ export function OneThingRow({ userId }: Props) {
 
   // NOTHING TO ASK: the row collapses to the single 24px gap the page owes
   // between the title and the first section eyebrow — no orphaned space.
-  if (!resolved || !prompt || dismissed) {
+  const FAKE = new URLSearchParams(window.location.search).has('fakeprompt');
+  if (FAKE && !dismissed) {
+    // TEMP MEASURE HOOK
+  } else if (!resolved || !prompt || dismissed) {
     return <div aria-hidden style={{ height: 24 }} />;
   }
 
+  const kind = prompt?.kind ?? 'rate';
+  const courseName = prompt?.courseName ?? 'Sundridge Park (West Course)';
+  const copy2 = kind;
   const copy =
-    prompt.kind === 'rate'
+    (prompt ?? { kind }).kind === 'rate'
       ? t(
           'discover.prompt.rate',
           'You recently played {{course}} but have not rated it yet.',
