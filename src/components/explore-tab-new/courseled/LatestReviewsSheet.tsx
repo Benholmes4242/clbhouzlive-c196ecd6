@@ -105,15 +105,25 @@ export function LatestReviewsSheet({
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {reviews.map((r) => (
-            <ReviewTile
-              key={r.reviewId}
-              review={r}
-              isOwn={!!viewerId && r.userId === viewerId}
-              onPress={onTilePress}
-            />
-          ))}
+          {reviews.map((r) => {
+            const st = reactions.stateFor('review', r.reviewId);
+            const own = !!viewerId && r.userId === viewerId;
+            return (
+              <ReviewTile
+                key={r.reviewId}
+                review={r}
+                isOwn={own}
+                onPress={onTilePress}
+                reactionHidden={!reactions.viewerId || reactions.unavailable}
+                reactionReadOnly={own}
+                reactionCount={st.count}
+                reacted={st.mine}
+                onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+              />
+            );
+          })}
         </div>
+
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
       </div>
     </BottomSheet>
