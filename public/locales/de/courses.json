@@ -765,7 +765,11 @@
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
-    }
+    },
+    "live": "Live",
+    "latest": "Aktuell",
+    "roundThru": "R{{round}} · bis Loch {{thru}}",
+    "thruOnly": "Bis Loch {{thru}}"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",
