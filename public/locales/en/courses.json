@@ -877,7 +877,17 @@
       "seeFull": "See the full course card",
       "sheetTitle": "{{tee}} tees",
       "yards_one": "{{yards}} yd",
-      "yards_other": "{{yards}} yds"
+      "yards_other": "{{yards}} yds",
+      "slopeLabel": "Slope rating",
+      "lengthLabel": "Length",
+      "courseRating": "Course rating",
+      "vsStandard": "vs standard {{standard}}",
+      "playsHarder": "Plays harder than an average course for a scratch golfer.",
+      "playsEasier": "Plays easier than an average course for a scratch golfer.",
+      "playsAverage": "Plays to average difficulty for a scratch golfer.",
+      "yardsUnit": "yards",
+      "ydsUnit": "yds",
+      "seeFullShort": "See the full card"
     },
     "plays": {
       "fieldAvg": "Field avg",
@@ -889,7 +899,12 @@
       "rounds_one": "{{rounds}} round",
       "rounds_other": "{{rounds}} rounds",
       "beastLabel": "Beast · hole {{hole}}",
-      "bestLabel": "Easiest · hole {{hole}}"
+      "bestLabel": "Easiest · hole {{hole}}",
+      "legendField": "Field",
+      "legendYou": "You",
+      "toughestHole": "Toughest hole",
+      "easiestHole": "Easiest hole",
+      "holeN": "Hole {{hole}}"
     },
     "holes": {
       "tapHint": "Tap a hole for detail",
@@ -902,14 +917,27 @@
       "sheetTitle": "How the field scores",
       "sheetSub_one": "From {{rounds}} round with hole-by-hole detail",
       "sheetSub_other": "From {{rounds}} rounds with hole-by-hole detail",
-      "yards": "Yards"
+      "yards": "Yards",
+      "difficultyRank": "Difficulty rank",
+      "rankOf": "{{rank}} of {{total}}",
+      "yourGap": "Your gap"
     },
     "records": {
       "kicker": "THE RECORD BOOK",
       "seeAll": "See all boards",
       "seeAllUnclaimed": "See all boards — {{count}} unclaimed",
       "you": "You",
-      "empty": "No boards claimed at {{courseName}} yet. Every record here is up for grabs."
+      "empty": "No boards claimed at {{courseName}} yet. Every record here is up for grabs.",
+      "youHold": "You hold this board",
+      "youBehind": "You {{value}} · {{gap}} behind",
+      "youAhead": "You {{value}} · {{gap}}",
+      "units": {
+        "gross": "Gross",
+        "rounds": "Rounds",
+        "points": "Points",
+        "birdies": "Birdies",
+        "diff": "Diff"
+      }
     },
     "rating": {
       "kicker": "COMMUNITY RATING",
