@@ -145,6 +145,22 @@ export function AroundTheWorld({
   const { data: meta } = useCourseCardMeta(courseIds);
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
+  // rows react as 'round' on their score id; a rating row only carries a
+  // control when it holds a review body (a bare score is not an opinion).
+  const reactionTargets = useMemo<ReactionTarget[]>(() => {
+    const out: ReactionTarget[] = [];
+    for (const g of shown) {
+      for (const e of g.events) if (e.scoreId) out.push({ type: 'round', id: e.scoreId });
+      const rating = ratings?.get(g.courseId);
+      if (rating?.reviewId && (rating.reviewText ?? '').trim())
+        out.push({ type: 'review', id: rating.reviewId });
+    }
+    return out;
+  }, [shown, ratings]);
+  const reactions = useContentReactions(reactionTargets);
+
+
   /** Notability of a course's headline feat — drives the sheet's order. */
   const notability = (e: WireEvent): number => {
     if (e.kind === 'ace' || e.kind === 'albatross') return 0;
