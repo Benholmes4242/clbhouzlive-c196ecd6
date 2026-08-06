@@ -5,18 +5,23 @@ import {
   useCourseScoringBreakdown,
   type ScoringBreakdownHole,
 } from './useCourseScoringBreakdown';
-import { A, Panel, LABEL, NUM, SANS, StatRow, FIGS } from './analytical/tokens';
+import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS } from './analytical/tokens';
 import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
 
 /**
  * "Where your shots go" in the analytical treatment
- * (BRIEF_COURSE_YOU_TAB_TREATMENT s6-s11).
+ * (BRIEF_COURSE_YOU_TAB_ANALYTICAL_V2 s2-s5).
  *
- *   - four flat panels, no internal dividers, no tinted chips or cards
- *   - the three percentage rings become ONE stacked bar plus three figures
- *   - every damaging-hole bar is OVER; length alone ranks them
- *   - the worst third is inked, unless the spread is below the noise floor
- *   - the coaching sentences are untouched, restyled to CAPTION weight
+ *   - the average-round panel is headline PLUS reference: a lone "+8.5" with
+ *     no field figure beside it reads as an alarm even when it is several
+ *     shots better than everyone else
+ *   - the field reference is only drawn when both sides are commensurable:
+ *     identical derivation (sum of per-hole averages to par) over the SAME
+ *     set of hole numbers
+ *   - damaging rows are tightened; the unit moves into the column header
+ *   - "what's costing you" is headline-led on doubles a round
+ *   - the thirds bars use a neutral ink ladder assigned by rank, never colour
  */
 
 const OVER = '#C8372B';
@@ -30,16 +35,36 @@ const CAPTION: React.CSSProperties = {
   margin: '12px 0 0',
 };
 
-const DAMAGE_GRID = '30px 1fr 56px';
+const DAMAGE_GRID = '30px 1fr 52px';
 
 /** Noise floor shared with the s3 caption logic - do not change. */
 const THIRDS_NOISE_FLOOR = 1.5;
+
+/** Neutral ink ladder for the thirds bars, worst first. Never semantic colour. */
+const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
+
+/** Below this, viewer and field are level - no direction claimed either way. */
+const REFERENCE_NOISE_FLOOR = 0.5;
 
 function listGrammar(items: string[]): string {
   if (items.length === 0) return '';
   if (items.length === 1) return items[0];
   if (items.length === 2) return `${items[0]} and ${items[1]}`;
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
+function signed(v: number, digits = 1): string {
+  const f = Math.pow(10, digits);
+  const r = Math.round(v * f) / f;
+  if (r > 0) return `+${r.toFixed(digits)}`;
+  if (r < 0) return `\u2212${Math.abs(r).toFixed(digits)}`;
+  return 'E';
+}
+
+function toneFor(v: number, digits = 1): string {
+  const f = Math.pow(10, digits);
+  const r = Math.round(v * f) / f;
+  return r > 0 ? OVER : r < 0 ? UNDER : A.INK;
 }
 
 interface Props {
@@ -49,19 +74,51 @@ interface Props {
 export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { t } = useTranslation(['courses']);
   const { data, isLoading } = useCourseScoringBreakdown(golfCourseId);
+  // Already loaded by the Course tab - React Query serves this from cache.
+  const { data: analysis } = useCourseHoleAnalysis(golfCourseId);
 
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
     if ((data.rounds ?? 0) < 1) return null;
     const holes = data.holes.filter((h) => (h.rounds_played ?? 0) > 0);
     if (holes.length === 0) return null;
-    return { rounds: data.rounds, total: Number(data.total_over_par) || 0, holes };
+    return {
+      rounds: data.rounds,
+      total: Number(data.total_over_par) || 0,
+      avgGross: data.avg_gross == null ? null : Number(data.avg_gross),
+      holes,
+    };
   }, [data]);
+
+  /**
+   * Field reference. Both sides are "sum of per-hole average to par" - the
+   * SAME derivation - and both are restricted to the hole numbers present in
+   * both populations, so the two figures are commensurable. If the field
+   * analysis does not cover every hole the member has played, we draw nothing
+   * rather than compare an 18-hole figure with a 14-hole one.
+   */
+  const reference = useMemo(() => {
+    if (!parsed) return null;
+    const fieldHoles = analysis?.available ? analysis.holes ?? [] : [];
+    if (fieldHoles.length === 0) return null;
+    const fieldByHole = new Map(fieldHoles.map((h) => [h.hole_no, h]));
+    const shared = parsed.holes.filter((h) => fieldByHole.has(h.hole_no));
+    if (shared.length !== parsed.holes.length) return null;
+    let you = 0;
+    let field = 0;
+    for (const h of shared) {
+      const f = fieldByHole.get(h.hole_no);
+      if (f?.avg_to_par == null) return null;
+      you += h.shots_over_par || 0;
+      field += f.avg_to_par;
+    }
+    return { you, field, gap: field - you, holes: shared.length, rounds: analysis?.total_rounds ?? 0 };
+  }, [parsed, analysis]);
 
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
-        <Panel><Skeleton className="h-[64px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[150px] w-full" /></Panel>
         <Panel><Skeleton className="h-[190px] w-full" /></Panel>
         <Panel><Skeleton className="h-[150px] w-full" /></Panel>
       </div>
@@ -70,7 +127,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   if (!parsed) return null;
 
-  const { rounds, total, holes } = parsed;
+  const { rounds, total, avgGross, holes } = parsed;
   const hasInterpretation = rounds >= 5;
 
   // Stratum 1: top 5 by shots_over_par desc
@@ -120,9 +177,23 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   /** Same threshold the caption uses: below it, ink nothing. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
 
+  /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
+  const thirdRank = [0, 1, 2]
+    .slice()
+    .sort((a, b) => thirdSums[b] - thirdSums[a])
+    .reduce<Record<number, number>>((acc, idx, rank) => {
+      acc[idx] = rank;
+      return acc;
+    }, {});
+
   // Sentences
   const s1Holes = damaging.slice(0, 3);
   const s1Sum = +s1Holes.reduce((s, h) => s + h.shots_over_par, 0).toFixed(1);
+  /**
+   * Share denominator: the member's OWN total shots over par at this course
+   * (total_over_par, the sum of every played hole's average to par). Never the
+   * field total - "x% of everything you drop here" is a share of the viewer.
+   */
   const s1Share = total > 0 ? Math.round((s1Sum / total) * 100) : 0;
   const s1HoleLabels = s1Holes.map((h) => String(h.hole_no));
   const s1Sentence = t('courses:holes.scoringBreakdown.s1Sentence', {
@@ -175,19 +246,26 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   // Headline: round before branching so -0.04 never renders "-0.0".
   const roundedTotal = Math.round(total * 10) / 10;
-  const headlineTone = roundedTotal > 0 ? OVER : roundedTotal < 0 ? UNDER : A.INK;
-  const headlineText =
-    roundedTotal > 0
-      ? `+${roundedTotal.toFixed(1)}`
-      : roundedTotal < 0
-        ? `\u2212${Math.abs(roundedTotal).toFixed(1)}`
-        : 'E';
+  const headlineTone = toneFor(total);
+  const headlineText = signed(total);
   const headlineLabel =
     roundedTotal > 0
       ? t('courses:courseDetail.you.shotsOverPar')
       : roundedTotal < 0
         ? t('courses:courseDetail.you.shotsUnderPar')
         : t('courses:courseDetail.you.levelPar');
+
+  /** Both caption variants; the level variant claims no direction. */
+  const referenceCaption = (() => {
+    if (!reference) return null;
+    const gap = Math.round(reference.gap * 10) / 10;
+    if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
+      return t('courses:courseDetail.you.refLevel');
+    }
+    return gap > 0
+      ? t('courses:courseDetail.you.refBetter', { n: gap.toFixed(1) })
+      : t('courses:courseDetail.you.refWorse', { n: Math.abs(gap).toFixed(1) });
+  })();
 
   const split = [
     { key: 'par', label: t('courses:courseDetail.you.parOrBetter'), pct: pctPar, holes: sumPar, tone: UNDER },
@@ -197,7 +275,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS, ...FIGS }}>
-      {/* An average round here */}
+      {/* An average round here - headline PLUS reference */}
       <Panel
         title={t('courses:courseDetail.you.avgRound')}
         aside={t('courses:courseDetail.you.roundsCount', { count: rounds })}
@@ -206,9 +284,50 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           <div style={{ ...NUM, fontSize: 44, lineHeight: 1, color: headlineTone }}>{headlineText}</div>
           <div style={{ ...LABEL, marginTop: 8 }}>{headlineLabel}</div>
         </div>
+
+        {reference && (
+          <>
+            <Hairline style={{ margin: '16px 0 14px' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              <div style={{ textAlign: 'center', minWidth: 0 }}>
+                <div style={LABEL}>{t('courses:courseDetail.you.yours')}</div>
+                <div style={{ ...NUM, fontSize: 20, color: toneFor(reference.you), marginTop: 4 }}>
+                  {signed(reference.you)}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', minWidth: 0 }}>
+                <div style={LABEL}>{t('courses:courseDetail.you.fieldHere')}</div>
+                <div style={{ ...NUM, fontSize: 20, color: toneFor(reference.field), marginTop: 4 }}>
+                  {signed(reference.field)}
+                </div>
+              </div>
+            </div>
+            {referenceCaption && <Caption>{referenceCaption}</Caption>}
+          </>
+        )}
+
+        <Hairline style={{ margin: '16px 0 14px' }} />
+        <StatRow
+          size={17}
+          items={[
+            ...(avgGross != null
+              ? [{ label: t('courses:courseDetail.you.avgGross'), value: avgGross.toFixed(1) }]
+              : []),
+            {
+              label: t('courses:courseDetail.you.parOrBetterShort'),
+              value: `${pctPar}%`,
+            },
+            {
+              label: t('courses:courseDetail.you.doublesARound'),
+              value: (+doublesPerRound.toFixed(1)).toFixed(1),
+              tone: OVER,
+            },
+            { label: t('courses:courseDetail.you.roundsLabel'), value: String(rounds) },
+          ]}
+        />
       </Panel>
 
-      {/* Your most damaging holes */}
+      {/* Your most damaging holes - tightened rows, unit in the header */}
       <Panel
         title={t('courses:courseDetail.you.damagingHoles')}
         aside={t('courses:courseDetail.you.byShotsLost')}
@@ -219,11 +338,12 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             gridTemplateColumns: DAMAGE_GRID,
             gap: 11,
             alignItems: 'baseline',
+            paddingBottom: 4,
           }}
         >
           <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.you.colHole')}</span>
           <span style={LABEL}>{t('courses:holes.scoringBreakdown.s1Sub')}</span>
-          <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCost')}</span>
+          <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
         </div>
         {damaging.map((h) => {
           const barW = Math.max(4, Math.min(100, (h.shots_over_par / top1) * 100));
@@ -235,12 +355,12 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 gridTemplateColumns: DAMAGE_GRID,
                 gap: 11,
                 alignItems: 'center',
-                padding: '9px 0',
+                padding: '7px 0',
               }}
             >
-              <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
+              <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
               <span style={{ minWidth: 0 }}>
-                <span style={{ ...LABEL, display: 'block' }}>
+                <span style={{ ...LABEL, fontSize: 8, display: 'block' }}>
                   {t('courses:holes.scoringBreakdown.parYouAvg', {
                     par: h.par,
                     avg: h.avg_score.toFixed(2),
@@ -249,30 +369,25 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 <span
                   style={{
                     display: 'block',
-                    height: 5,
-                    borderRadius: 3,
+                    height: 4,
+                    borderRadius: 2,
                     background: A.TRACK,
-                    marginTop: 6,
+                    marginTop: 5,
                   }}
                 >
                   <span
                     style={{
                       display: 'block',
-                      height: 5,
-                      borderRadius: 3,
+                      height: 4,
+                      borderRadius: 2,
                       width: `${barW}%`,
                       background: OVER,
                     }}
                   />
                 </span>
               </span>
-              <span style={{ textAlign: 'right' }}>
-                <span style={{ ...NUM, fontSize: 14, color: OVER, display: 'block' }}>
-                  +{h.shots_over_par.toFixed(1)}
-                </span>
-                <span style={{ ...LABEL, fontSize: 8, display: 'block', marginTop: 2 }}>
-                  {t('courses:courseDetail.you.aRound')}
-                </span>
+              <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>
+                +{h.shots_over_par.toFixed(1)}
               </span>
             </div>
           );
@@ -284,11 +399,20 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         )}
       </Panel>
 
-      {/* What's costing you the shots - one distribution, one bar */}
+      {/* What's costing you the shots - headline led on doubles a round */}
       <Panel
         title={t('courses:courseDetail.you.costingShots')}
         aside={t('courses:courseDetail.you.everyHole')}
       >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ ...NUM, fontSize: 40, lineHeight: 1, color: sumDbl > 0 ? OVER : A.INK }}>
+            {(+doublesPerRound.toFixed(1)).toFixed(1)}
+          </div>
+          <div style={{ ...LABEL, marginTop: 8 }}>{t('courses:courseDetail.you.doublesARound')}</div>
+        </div>
+
+        <Hairline style={{ margin: '16px 0 14px' }} />
+
         <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
           {split
             .filter((s) => s.pct > 0)
@@ -333,7 +457,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         {hasInterpretation && <Caption>{s2Sentence}</Caption>}
       </Panel>
 
-      {/* How your round unfolds - the worst third is inked */}
+      {/* How your round unfolds - neutral ink ladder by rank */}
       {hasInterpretation && (
         <Panel
           title={t('courses:courseDetail.you.roundUnfolds')}
@@ -349,6 +473,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           >
             {thirdSums.map((v, i) => {
               const isWorst = !thirdsEven && i === worstIdx;
+              const shade = thirdsEven ? THIRD_LADDER[2] : THIRD_LADDER[thirdRank[i]];
               return (
                 <div key={i} style={{ textAlign: 'center', minWidth: 0 }}>
                   <div
@@ -360,7 +485,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     style={{
                       height: Math.max(10, (v / maxThird) * 62),
                       borderRadius: 4,
-                      background: isWorst ? A.INK : A.TRACK,
+                      background: shade,
                     }}
                   />
                   <div style={{ ...LABEL, marginTop: 7 }}>{thirdLabels[i]}</div>

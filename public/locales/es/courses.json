@@ -662,6 +662,18 @@
         "birdies": "Birdies",
         "diff": "Diff"
       }
+    },
+    "you": {
+      "oneToGoHole": "One to go · hole {{n}}",
+      "fieldHere": "The field here",
+      "refBetter": "You play this course {{n}} shots better than the field average here.",
+      "refWorse": "You play this course {{n}} shots worse than the field average here.",
+      "refLevel": "You play this course level with the field average here.",
+      "avgGross": "Avg gross",
+      "parOrBetterShort": "Par or better",
+      "doublesARound": "Doubles a round",
+      "roundsLabel": "Rounds",
+      "colCostARound": "Cost a round"
     }
   },
   "network": {
