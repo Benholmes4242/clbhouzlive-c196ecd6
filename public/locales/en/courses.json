@@ -1235,6 +1235,10 @@
       "ratedChip": "Rated",
       "someone": "A member",
       "sheetCaption": "{{count}} reviews"
+    },
+    "reactions": {
+      "action": "Like this round",
+      "actionReview": "Like this review"
     }
   },
   "statBrowse": {
