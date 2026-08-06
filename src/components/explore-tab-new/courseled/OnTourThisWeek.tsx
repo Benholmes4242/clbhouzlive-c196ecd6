@@ -168,6 +168,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
               key={e.id}
               style={{
                 ...CARD_SHELL,
+                border: 'none',
                 ...(isNewSince(e.startDate, lastSeen) ? NEW_CARD_RING : null),
                 width: 272,
                 flexShrink: 0,
@@ -256,7 +257,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         style={{
                           height: STAT_BLOCK_H,
                           boxSizing: 'border-box',
-                          padding: '9px 12px',
+                          padding: '7px 11px',
                           display: 'flex',
                           alignItems: 'center',
                           gap: 8,
@@ -310,7 +311,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         alignContent: 'center',
                         height: STAT_BLOCK_H,
                         boxSizing: 'border-box',
-                        padding: '10px 12px 8px',
+                        padding: '7px 11px',
                       }}
                     >
                       {cells.map(([l, v]) => (
@@ -329,8 +330,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  minHeight: 26,
-                  padding: '0 12px 11px',
+                  minHeight: 18,
+                  padding: '0 11px 9px',
                 }}
               >
                 {/* The tour badge over the image already names the tour, so the
