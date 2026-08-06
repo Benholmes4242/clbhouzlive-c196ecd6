@@ -322,10 +322,17 @@ export function AroundTheWorld({
           rank: top ? notability(top) : 5,
         };
       })
-      .sort((a, b) => a.rank - b.rank || (a.at < b.at ? 1 : -1))
+      .sort((a, b) => {
+        if (priorityFor) {
+          const d = priorityFor(a.courseId) - priorityFor(b.courseId);
+          if (d !== 0) return d;
+        }
+        return a.rank - b.rank || (a.at < b.at ? 1 : -1);
+      })
       .map(({ rank: _rank, ...rest }) => rest);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups, ratings, userId, t]);
+  }, [groups, ratings, userId, t, priorityFor]);
+
 
 
   if (isLoading) {
