@@ -48,7 +48,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
 
   // Normal operation: one lightweight query per minute, no role check.
-  if (!on || true) return <>{children}</>;
+  if (!on) return <>{children}</>;
 
   // Sign-in must stay reachable or admins cannot get in.
   if (isAuthRoute(pathname)) return <>{children}</>;

@@ -44,12 +44,6 @@ interface Row {
 }
 
 export function useTourLivePeek(tournamentIds: string[]) {
-  // TEMP-SCREENSHOT
-  if (typeof window !== 'undefined' && window.location.search.includes('fakelive')) {
-    const m = new Map<string, LivePeek>();
-    tournamentIds.forEach((id, i) => m.set(id, i === 0 ? { leaderName: 'Davis Thompson', leaderTiedExtra: 0, leaderScore: -6, round: 1, thru: 14, chasingName: null, chasingScore: null, updatedAt: new Date().toISOString() } : { leaderName: 'Beau Hossler', leaderTiedExtra: 2, leaderScore: -6, round: 1, thru: 11, chasingName: null, chasingScore: null, updatedAt: new Date().toISOString() }));
-    return { data: m } as any;
-  }
   const ids = Array.from(new Set(tournamentIds.filter(Boolean))).sort();
 
   return useQuery({
