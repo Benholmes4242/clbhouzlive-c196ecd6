@@ -412,6 +412,18 @@ export default function ExploreTabContent({
           onTourHub={() => navigate('/tourhub')}
         />
 
+        {/* Slot 3, deliberately: this mosaic and the Moments mosaic read alike,
+            so Around the world sits between them. Never adjacent to Moments. */}
+        <LatestReviews
+          reviews={latestReviews.reviews}
+          totalCount={latestReviews.total}
+          viewerId={userId}
+          onTilePress={handleReviewTile}
+          onSeeAll={openReviewsSheet}
+        />
+
+
+
         <AroundTheWorld
           events={events}
           isLoading={wireLoading}
