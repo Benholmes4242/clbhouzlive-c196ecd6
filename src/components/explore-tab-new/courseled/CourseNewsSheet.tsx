@@ -237,11 +237,22 @@ export function CourseNewsSheet({
                     {hasFigure ? compactWhen(when) : when}
                   </span>
 
+                  {/* SHORTLIST — bottom-right; figure chip owns top-left and the
+                      when chip top-right, so no collision at 320dp. */}
+                  {onToggleShortlist && canShortlist?.(e.courseId) && (
+                    <ShortlistGlassAction
+                      shortlisted={!!isShortlisted?.(e.courseId)}
+                      onToggle={() => onToggleShortlist(e.courseId)}
+                      label={t('discover.shortlist.action', 'Add to your list')}
+                      size={24}
+                    />
+                  )}
+
                   <div
                     style={{
                       position: 'absolute',
                       left: 8,
-                      right: 8,
+                      right: onToggleShortlist && canShortlist?.(e.courseId) ? 36 : 8,
                       bottom: 6,
                       fontSize: 11,
                       fontWeight: 800,
@@ -255,6 +266,7 @@ export function CourseNewsSheet({
                     {m?.name ?? e.courseName ?? t('discover.unknownCourse', 'Course')}
                   </div>
                 </CourseImageFallback>
+
 
                 <div
                   style={{
