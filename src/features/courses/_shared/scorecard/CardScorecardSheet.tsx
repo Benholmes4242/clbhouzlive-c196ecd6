@@ -918,11 +918,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   {/* row 1 */}
                   <div
                     style={{
-                      fontSize: 14.5, fontWeight: 700, color: A.INK,
+                      fontSize: 13.5, fontWeight: 800, color: A.INK,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       alignSelf: 'end',
                     }}
                   >
+
                     {playerName}
                   </div>
                   {(identityStat || playerHcp != null) ? (
