@@ -10,7 +10,7 @@ import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
 import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { isNewSince } from './newSince';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
 
 /**
@@ -84,7 +84,7 @@ function playDays(e: TourWeekEvent): string {
 }
 
 /** Live block and stat grid share one height so the rail stays level. */
-const STAT_BLOCK_H = 64;
+const STAT_BLOCK_H = 74;
 const LIVE_DOT = '#E5484D';
 const UNDER_PAR = '#0F8F4A';
 const OVER_PAR = '#C0392B';
@@ -130,8 +130,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
 
   // NEW SINCE: a tournament is new when the WEEK changes, never per scoring
   // update — the card's startDate is the only stamp compared here.
-  const newCount = countNewSince(events ?? [], (e) => e.startDate, lastSeen);
-  useReportNewCount('tour', newCount);
+  // A moving leaderboard is a state, not an event: this section neither shows
+  // an eyebrow dot nor feeds the tab badge.
 
   if (!events || events.length === 0) return null;
   const anyThisWeek = events.some((e) => e.thisWeek);
@@ -139,7 +139,6 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
   return (
     <section>
       <Eyebrow
-        dot={newCount > 0}
         aside={<InkAction onClick={onTourHub}>{t('discover.tourHub', 'Tour hub')}</InkAction>}
       >
         {anyThisWeek
