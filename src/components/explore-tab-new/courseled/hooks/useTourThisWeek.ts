@@ -129,18 +129,16 @@ export function useTourThisWeek(limit = 8) {
     },
     // Cadence follows liveness: a moving leaderboard needs a minute-fresh read,
     // an off-week rail does not (and must never poll on a timer).
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
-  });
-
-  const anyLive = (query.data ?? []).some((e) => e.isLive);
-
-  return useQuery({
-    queryKey: ['courseled', 'tour-this-week', limit],
-    queryFn: async () => query.data ?? [],
-    enabled: false,
     staleTime: anyLive ? 60_000 : 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: anyLive,
   });
+
+  const live = (query.data ?? []).some((e) => e.isLive);
+  useEffect(() => {
+    setAnyLive((prev) => (prev === live ? prev : live));
+  }, [live]);
+
+  return query;
 }
+
