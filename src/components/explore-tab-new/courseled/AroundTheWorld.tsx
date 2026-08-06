@@ -368,7 +368,7 @@ export function AroundTheWorld({
 
   if (isLoading) {
     return (
-      <section key={scopeKey}>
+      <section>
         <Eyebrow>{t('discover.aroundTheWorld', 'Around the world')}</Eyebrow>
         {pills}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

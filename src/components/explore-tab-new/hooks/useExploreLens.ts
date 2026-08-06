@@ -11,11 +11,11 @@ import { useSearchParams } from 'react-router-dom';
  * europe|row (or the older uk-ireland / continental-europe / rest-of-world
  * slugs) resolves to WORLDWIDE rather than erroring.
  */
-export type ExploreLens = 'for_you' | 'top_100' | 'played' | 'worldwide';
+export type ExploreLens = 'suggested' | 'top_100' | 'played' | 'worldwide';
 
-const LENSES: ExploreLens[] = ['for_you', 'top_100', 'played', 'worldwide'];
+const LENSES: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
 
-export const DEFAULT_LENS: ExploreLens = 'for_you';
+export const DEFAULT_LENS: ExploreLens = 'suggested';
 
 export function useExploreLens() {
   const [params, setParams] = useSearchParams();
@@ -24,7 +24,10 @@ export function useExploreLens() {
   const legacyRegion = params.get('region');
 
   let lens: ExploreLens = DEFAULT_LENS;
-  if (raw && LENSES.includes(raw as ExploreLens)) {
+  if (raw === 'for_you') {
+    // Legacy label value: FOR YOU was renamed SUGGESTED. Map silently.
+    lens = 'suggested';
+  } else if (raw && LENSES.includes(raw as ExploreLens)) {
     lens = raw as ExploreLens;
   } else if (legacyRegion) {
     // Retired geography axis — never error, just show everything.

@@ -11,7 +11,7 @@ import type { ExploreLens } from '../hooks/useExploreLens';
  * region pills it replaces.
  */
 
-export const LENS_ORDER: ExploreLens[] = ['for_you', 'top_100', 'played', 'worldwide'];
+export const LENS_ORDER: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
 
 interface Props {
   lens: ExploreLens;
@@ -20,8 +20,8 @@ interface Props {
 
 export function lensLabelKey(lens: ExploreLens): { key: string; fallback: string } {
   switch (lens) {
-    case 'for_you':
-      return { key: 'discover.lens.forYou', fallback: 'For you' };
+    case 'suggested':
+      return { key: 'discover.lens.suggested', fallback: 'Suggested' };
     case 'top_100':
       return { key: 'discover.lens.top100', fallback: 'Top 100' };
     case 'played':

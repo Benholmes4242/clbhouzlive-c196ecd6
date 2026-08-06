@@ -19,7 +19,6 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { scrollPageToTop } from '@/lib/getScrollParent';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
@@ -172,8 +171,9 @@ export default function ExploreTabContent({
     (next: ExploreLens) => {
       if (next === lens) return;
       analyticsEvents.track('discover_lens_change', { lens: next });
+      // NO scroll: the lens is a client-side filter over an already-fetched
+      // pool, so the cards change under the member's scroll position.
       setLens(next);
-      scrollPageToTop('smooth');
     },
     [lens, setLens],
   );
@@ -245,7 +245,7 @@ export default function ExploreTabContent({
   /** FOR YOU order: shortlist, then Top 100, then played, then the rest. */
   const priorityFor = useCallback(
     (courseId: string) => {
-      if (lens !== 'for_you') return 0;
+      if (lens !== 'suggested') return 0;
       if (isShortlisted(courseId)) return 0;
       if (sets.top100.has(courseId)) return 1;
       if (sets.played.has(courseId)) return 2;
@@ -257,9 +257,9 @@ export default function ExploreTabContent({
   const lensMeta = lensLabelKey(lens);
   const lensLabel = t(lensMeta.key, lensMeta.fallback);
   const lensEmptyCopy =
-    lens === 'for_you'
+    lens === 'suggested'
       ? t(
-          'discover.lens.emptyForYou',
+          'discover.lens.emptySuggested',
           'No news yet from courses you know. Rate a course or add one to your list to see more here.',
         )
       : lens === 'top_100'
