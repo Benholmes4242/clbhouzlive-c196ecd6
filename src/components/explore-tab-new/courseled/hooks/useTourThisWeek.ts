@@ -64,8 +64,13 @@ const TOUR_LABEL: Record<string, string> = {
 };
 
 export function useTourThisWeek(limit = 8) {
+  // Liveness is discovered FROM the data, so it is held in state and fed back
+  // into the options on the next render (no second query, no duplicate key).
+  const [anyLive, setAnyLive] = useState(false);
+
   const query = useQuery({
     queryKey: ['courseled', 'tour-this-week', limit],
+
     queryFn: async (): Promise<TourWeekEvent[]> => {
       const today = new Date().toISOString().slice(0, 10);
       const horizon = new Date(Date.now() + 45 * DAY).toISOString().slice(0, 10);
