@@ -1252,7 +1252,11 @@
     "live": "Live",
     "latest": "Latest",
     "roundThru": "R{{round}} · thru {{thru}}",
-    "thruOnly": "Thru {{thru}}"
+    "thruOnly": "Thru {{thru}}",
+    "leader": "Leader",
+    "tiedLead": "Tied lead",
+    "chasing": "Chasing",
+    "roundFinished": "R{{round}} · F"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
