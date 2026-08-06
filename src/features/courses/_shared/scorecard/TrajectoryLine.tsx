@@ -34,9 +34,16 @@ export interface TrajectoryHole {
 interface Props {
   holes: TrajectoryHole[];
   height?: number;
+  /**
+   * AMBER MEANS THE VIEWING MEMBER. This sheet opens over other members'
+   * rounds as often as the viewer's own, so the round line is INK by default
+   * and only goes amber when the round belongs to the viewer.
+   */
+  own?: boolean;
 }
 
-export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
+export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = false }) => {
+
   const plottable = holes.filter(
     (h) => h.par != null && h.strokes != null && (h.strokes as number) > 0,
   );
