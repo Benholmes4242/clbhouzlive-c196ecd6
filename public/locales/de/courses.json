@@ -772,8 +772,9 @@
     "thruOnly": "Bis Loch {{thru}}",
     "leader": "Führend",
     "tiedLead": "Geteilte Führung",
-    "chasing": "Verfolger",
-    "roundFinished": "R{{round}} · beendet"
+    "roundFinished": "R{{round}} · beendet",
+    "playersTied": "{{count}} Spieler gleichauf",
+    "playersTied_one": "{{count}} Spieler gleichauf"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

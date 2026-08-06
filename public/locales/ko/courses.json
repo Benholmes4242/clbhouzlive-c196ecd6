@@ -725,8 +725,9 @@
     "thruOnly": "{{thru}}홀 진행",
     "leader": "선두",
     "tiedLead": "공동 선두",
-    "chasing": "추격",
-    "roundFinished": "R{{round}} · 종료"
+    "roundFinished": "R{{round}} · 종료",
+    "playersTied": "{{count}}명 공동",
+    "playersTied_one": "{{count}}명 공동"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",

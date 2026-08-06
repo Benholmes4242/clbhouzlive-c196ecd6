@@ -10,7 +10,7 @@ import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
 import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { isNewSince } from './newSince';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NUMF, SANS, SCRIM_SOFT } from './tokens';
 
 /**
@@ -84,7 +84,7 @@ function playDays(e: TourWeekEvent): string {
 }
 
 /** Live block and stat grid share one height so the rail stays level. */
-const STAT_BLOCK_H = 64;
+const STAT_BLOCK_H = 74;
 const LIVE_DOT = '#E5484D';
 const UNDER_PAR = '#0F8F4A';
 const OVER_PAR = '#C0392B';
@@ -130,8 +130,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
 
   // NEW SINCE: a tournament is new when the WEEK changes, never per scoring
   // update — the card's startDate is the only stamp compared here.
-  const newCount = countNewSince(events ?? [], (e) => e.startDate, lastSeen);
-  useReportNewCount('tour', newCount);
+  // A moving leaderboard is a state, not an event: this section neither shows
+  // an eyebrow dot nor feeds the tab badge.
 
   if (!events || events.length === 0) return null;
   const anyThisWeek = events.some((e) => e.thisWeek);
@@ -139,7 +139,6 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
   return (
     <section>
       <Eyebrow
-        dot={newCount > 0}
         aside={<InkAction onClick={onTourHub}>{t('discover.tourHub', 'Tour hub')}</InkAction>}
       >
         {anyThisWeek
@@ -251,58 +250,83 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 </CourseImageFallback>
 
                 {peek ? (
-                  <div
-                    style={{
-                      height: STAT_BLOCK_H,
-                      boxSizing: 'border-box',
-                      padding: '8px 12px 8px',
-                    }}
-                  >
-                    <div style={{ ...LABEL, color: A.DIM }}>
-                      {peek.leaderTiedExtra > 0
-                        ? t('discover.tiedLead', 'Tied lead')
-                        : t('discover.leader', 'Leader')}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1 }}>
-                      <span
+                  (() => {
+                    const tiedCount = peek.leaderTiedExtra + 1;
+                    const isTied = tiedCount > 1;
+                    return (
+                      <div
                         style={{
-                          fontSize: 13,
-                          fontWeight: 800,
-                          color: A.INK,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          flex: 1,
-                          minWidth: 0,
+                          height: STAT_BLOCK_H,
+                          boxSizing: 'border-box',
+                          padding: '9px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
                         }}
                       >
-                        {peek.leaderName}
-                      </span>
-                      <span
-                        style={{
-                          ...NUMF,
-                          fontSize: 17,
-                          fontWeight: 800,
-                          color: scoreColor(peek.leaderScore),
-                        }}
-                      >
-                        {fmtScore(peek.leaderScore)}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.3 }}>
-                      {peek.round != null && peek.thru != null && peek.thru >= 18
-                        ? t('discover.roundFinished', 'R{{round}} \u00b7 F', { round: peek.round })
-                        : peek.round != null && peek.thru != null
-                          ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
-                              round: peek.round,
-                              thru: peek.thru,
-                            })
-                          : peek.thru != null
-                            ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
-                            : e.tourLabel}
-                    </div>
-                  </div>
-
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ ...LABEL, fontSize: 8.5, color: A.INK }}>
+                            {isTied
+                              ? t('discover.tiedLead', 'Tied lead')
+                              : t('discover.leader', 'Leader')}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 800,
+                              color: A.INK,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              marginTop: 2,
+                            }}
+                          >
+                            {isTied
+                              ? t('discover.playersTied', {
+                                  defaultValue: '{{count}} players tied',
+                                  count: tiedCount,
+                                })
+                              : peek.leaderName}
+                          </div>
+                          {!isTied && (
+                            <div
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: A.BODY,
+                                lineHeight: 1.3,
+                                marginTop: 1,
+                              }}
+                            >
+                              {peek.round != null && peek.thru != null && peek.thru >= 18
+                                ? t('discover.roundFinished', 'R{{round}} \u00b7 F', {
+                                    round: peek.round,
+                                  })
+                                : peek.round != null && peek.thru != null
+                                  ? t('discover.roundThru', 'R{{round}} \u00b7 thru {{thru}}', {
+                                      round: peek.round,
+                                      thru: peek.thru,
+                                    })
+                                  : peek.thru != null
+                                    ? t('discover.thruOnly', 'Thru {{thru}}', { thru: peek.thru })
+                                    : e.tourLabel}
+                            </div>
+                          )}
+                        </div>
+                        <span
+                          style={{
+                            ...NUMF,
+                            fontSize: 22,
+                            fontWeight: 800,
+                            lineHeight: 1,
+                            color: scoreColor(peek.leaderScore),
+                          }}
+                        >
+                          {fmtScore(peek.leaderScore)}
+                        </span>
+                      </div>
+                    );
+                  })()
                 ) : (
                   cells.length > 0 && (
                     <div
@@ -334,49 +358,21 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   padding: '0 12px 11px',
                 }}
               >
-                {peek && peek.chasingName ? (
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ ...LABEL, color: A.DIM }}>
-                      {t('discover.chasing', 'Chasing')}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 1 }}>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: A.INK,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          minWidth: 0,
-                        }}
-                      >
-                        {peek.chasingName}
-                      </span>
-                      <span
-                        style={{
-                          ...NUMF,
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: scoreColor(peek.chasingScore),
-                        }}
-                      >
-                        {fmtScore(peek.chasingScore)}
-                      </span>
-                    </div>
-                  </div>
-
-                ) : peek ? (
-                  // Second place unresolved while live: omit rather than blank.
-                  <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
+                {peek ? (
+                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
+                    {e.tourLabel}
+                  </span>
                 ) : e.defendingChampion ? (
                   <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {t('discover.defending', 'Defending')} {DOT}{' '}
                     <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
                   </span>
                 ) : (
-                  <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
+                    {e.tourLabel}
+                  </span>
                 )}
+
 
 
                 {courseId && mediaCount > 0 && (

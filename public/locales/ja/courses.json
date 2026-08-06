@@ -725,8 +725,9 @@
     "thruOnly": "{{thru}}ホール終了",
     "leader": "首位",
     "tiedLead": "首位タイ",
-    "chasing": "追う選手",
-    "roundFinished": "R{{round}} · 終了"
+    "roundFinished": "R{{round}} · 終了",
+    "playersTied": "{{count}}人がタイ",
+    "playersTied_one": "{{count}}人がタイ"
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",

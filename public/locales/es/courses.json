@@ -772,8 +772,9 @@
     "thruOnly": "Hoyo {{thru}}",
     "leader": "Líder",
     "tiedLead": "Líderes empatados",
-    "chasing": "Persiguiendo",
-    "roundFinished": "R{{round}} · F"
+    "roundFinished": "R{{round}} · F",
+    "playersTied": "{{count}} jugadores empatados",
+    "playersTied_one": "{{count}} jugadores empatados"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

@@ -1255,8 +1255,9 @@
     "thruOnly": "Thru {{thru}}",
     "leader": "Leader",
     "tiedLead": "Tied lead",
-    "chasing": "Chasing",
-    "roundFinished": "R{{round}} · F"
+    "roundFinished": "R{{round}} · F",
+    "playersTied": "{{count}} players tied",
+    "playersTied_one": "{{count}} players tied"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
