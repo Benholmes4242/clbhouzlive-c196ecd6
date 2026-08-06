@@ -254,7 +254,15 @@
       "lowRound": "Low round",
       "moversToday": "Movers today",
       "nShare_one": "{{count}} player",
-      "nShare_other": "{{count}} players"
+      "nShare_other": "{{count}} players",
+      "fieldAverageToday": "Field average today",
+      "fromNRoundsIn": "from {{n}} rounds in",
+      "lowRoundLabel": "Low round",
+      "byLabel": "By",
+      "roundsInLabel": "Rounds in",
+      "groupsLabel": "Groups",
+      "awaitingPlayers": "{{range}} awaiting players",
+      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -425,6 +433,10 @@
       "clubhouseRating": "Clubhouse",
       "reviews": "Reviews",
       "top100": "Top 100"
+    },
+    "status": {
+      "finished": "FINISHED",
+      "thru": "THRU {{n}}"
     }
   },
   "empty": {
@@ -599,7 +611,6 @@
       "sub": "{{groups}} groups . {{players}} players . round {{round}}",
       "searchPlaceholder": "Find a player",
       "noMatch": "No player in this round's draw matches that name."
-
     },
     "teeTimesBand": {
       "title": "Tee times",

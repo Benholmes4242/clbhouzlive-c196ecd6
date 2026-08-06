@@ -214,7 +214,15 @@
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
-      "backToLine2": "featured"
+      "backToLine2": "featured",
+      "fieldAverageToday": "本日の平均スコア",
+      "fromNRoundsIn": "{{n}}ラウンドから",
+      "lowRoundLabel": "ベストラウンド",
+      "byLabel": "選手",
+      "roundsInLabel": "ラウンド数",
+      "groupsLabel": "組数",
+      "awaitingPlayers": "{{range}} は集計待ち",
+      "shapeCaption": "{{hard}}番が最も難しく、{{easy}}番が最も易しい。"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -355,6 +363,10 @@
     "hybridHero": {
       "majorChampionship": "MAJOR CHAMPIONSHIP",
       "teamFallback": "Team"
+    },
+    "status": {
+      "finished": "終了",
+      "thru": "{{n}}ホール"
     }
   },
   "empty": {
