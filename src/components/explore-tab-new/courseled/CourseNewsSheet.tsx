@@ -44,10 +44,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   entries: CourseNewsEntry[];
-  /** Human region label for the caption ("GB&I", "Worldwide"). */
-  regionLabel: string;
+  /** Human lens label for the caption ("For you", "Worldwide"). */
+  lensLabel: string;
   whenLabel: (iso: string) => string;
   onCoursePress: (courseId: string) => void;
+  /** Shortlist controls (BRIEF_DISCOVER_RELEVANCE part B). */
+  canShortlist?: (courseId: string) => boolean;
+  isShortlisted?: (courseId: string) => boolean;
+  onToggleShortlist?: (courseId: string) => void;
 }
 
 /** "3mo ago" -> "3MO", "Last week" -> "LAST WEEK" (used only when it fits). */
@@ -62,10 +66,14 @@ export function CourseNewsSheet({
   open,
   onClose,
   entries,
-  regionLabel,
+  lensLabel,
   whenLabel,
   onCoursePress,
+  canShortlist,
+  isShortlisted,
+  onToggleShortlist,
 }: Props) {
+
   const { t } = useTranslation('courses');
   const ids = useMemo(() => entries.map((e) => e.courseId), [entries]);
   const { data: meta } = useCourseCardMeta(open ? ids : []);
