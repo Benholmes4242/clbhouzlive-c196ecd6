@@ -632,9 +632,13 @@ export function AroundTheWorld({
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         entries={newsEntries}
-        regionLabel={regionLabel ?? t('discover.worldwide', 'Worldwide')}
+        lensLabel={lensLabel ?? t('discover.lens.worldwide', 'Worldwide')}
         whenLabel={(iso) => relativeWhen(iso, t)}
         onCoursePress={onCoursePress}
+        canShortlist={canShortlist}
+        isShortlisted={isShortlisted}
+        onToggleShortlist={onToggleShortlist}
+
       />
 
       <RoundDetailSheet
