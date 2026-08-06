@@ -148,6 +148,20 @@ export function ReviewTile({
           </span>
         </span>
 
+        {/* REACTION — glass corner, opposite the score chip. */}
+        <span style={{ position: 'absolute', top: 8, right: 10 }}>
+          <ReactionAction
+            tone="glass"
+            hidden={reactionHidden}
+            readOnly={reactionReadOnly}
+            count={reactionCount}
+            reacted={reacted}
+            onToggle={() => onToggleReaction?.()}
+            label={t('discover.reactions.actionReview', 'Like this review')}
+          />
+        </span>
+
+
         {isVideo && <MomentPlayGlyph />}
 
         {/* BOTTOM BLOCK — course name, the quote, then reviewer and age. */}
