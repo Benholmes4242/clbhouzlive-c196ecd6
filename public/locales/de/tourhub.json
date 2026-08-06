@@ -218,7 +218,15 @@
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
-      "backToLine2": "featured"
+      "backToLine2": "featured",
+      "fieldAverageToday": "Felddurchschnitt heute",
+      "fromNRoundsIn": "aus {{n}} Runden",
+      "lowRoundLabel": "Beste Runde",
+      "byLabel": "Von",
+      "roundsInLabel": "Runden",
+      "groupsLabel": "Gruppen",
+      "awaitingPlayers": "{{range}} noch offen",
+      "shapeCaption": "Loch {{hard}} spielt am schwersten, Loch {{easy}} am leichtesten."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -359,6 +367,10 @@
     "hybridHero": {
       "majorChampionship": "MAJOR CHAMPIONSHIP",
       "teamFallback": "Team"
+    },
+    "status": {
+      "finished": "BEENDET",
+      "thru": "BIS {{n}}"
     }
   },
   "empty": {

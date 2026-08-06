@@ -214,7 +214,15 @@
       "holeLabelSep": "[~~ · HÓLÉ {{hole}}~~]",
       "backToFeaturedAria": "[~~Báçk tó féátúréd~~]",
       "backToLine1": "[~~Báçk tó~~]",
-      "backToLine2": "[~~féátúréd~~]"
+      "backToLine2": "[~~féátúréd~~]",
+      "fieldAverageToday": "Field average today",
+      "fromNRoundsIn": "from {{n}} rounds in",
+      "lowRoundLabel": "Low round",
+      "byLabel": "By",
+      "roundsInLabel": "Rounds in",
+      "groupsLabel": "Groups",
+      "awaitingPlayers": "{{range}} awaiting players",
+      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest."
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
@@ -355,6 +363,10 @@
     "hybridHero": {
       "majorChampionship": "[!! MÁJÓR CHÁMPÍÓNSHÍP !!]",
       "teamFallback": "[!! Téám !!]"
+    },
+    "status": {
+      "finished": "FINISHED",
+      "thru": "THRU {{n}}"
     }
   },
   "empty": {

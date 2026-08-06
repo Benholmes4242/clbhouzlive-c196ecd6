@@ -19,12 +19,14 @@ import { tiVerdict, verdictFromResult, formatTiPosition, formatTiScore, type TiV
 import type { EventState } from '@/features/tourhub/components/overview-v3/useTournamentPulse';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { TourStatusBlock } from '../../_shared/TourStatusBlock';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 // ---- Design tokens (per approved TIRedesign) ----
 const INK = '#0E1013';
@@ -85,36 +87,6 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
       {v.kind === 'win' && <span style={{ fontSize: big ? 14 : 12 }}>🏆</span>}
       {v.kind === 'win' ? t('overview.tiPicks.verdict.won') : v.label}
       {v.score != null && <span style={{ fontWeight: 700, opacity: 0.75 }}>{v.score}</span>}
-    </span>
-  );
-}
-
-function NeutralLiveChip({ live, t, showThru = true }: { live: PickLiveState; t: TFunction; showThru?: boolean }) {
-  if (live.position == null) return null;
-  const pos = formatTiPosition(live.position, !!live.positionTied);
-  const score = formatTiScore(live.score);
-  const thru = live.thru;
-  const parts: string[] = [pos];
-  if (score != null) parts.push(score);
-  if (showThru && thru != null) {
-    parts.push(thru >= 18 ? t('overview.tiPicks.live.finished') : t('overview.tiPicks.live.thru', { n: thru }));
-  }
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '3px 9px',
-        borderRadius: 999,
-        background: NEUTRAL_BG,
-        color: INK_60,
-        fontSize: 11,
-        fontWeight: 800,
-        letterSpacing: 0.4,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {parts.join(' · ')}
     </span>
   );
 }
@@ -361,7 +333,17 @@ function CardStateSlot({
   if (state === 'live' && live) {
     const cutV = tiVerdict(live);
     if (cutV.kind === 'mc') return <VerdictChip v={cutV} t={t} />;
-    if (live.position != null) return <NeutralLiveChip live={live} t={t} />;
+    if (live.position != null)
+      return (
+        <TourStatusBlock
+          score={live.score}
+          position={live.position}
+          positionTied={live.positionTied}
+          thru={live.thru}
+          status={live.status}
+          align="left"
+        />
+      );
   }
   // Pre-tournament (upcoming) or live-with-no-row → course fit
   return <CourseFitLine score={pick.courseFitScore} t={t} />;
@@ -571,7 +553,7 @@ function CaseSheet({
               borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 800, color: AMBER_DEEP, minWidth: 22, letterSpacing: '0.06em' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
               {String(i + 1).padStart(2, '0')}
             </div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
@@ -680,20 +662,38 @@ function VerdictBanner({
   // In progress → neutral banner (only when we have a row)
   if (!settled) {
     if (!live || live.position == null) return null;
-    const pos = formatTiPosition(live.position, !!live.positionTied);
-    const score = formatTiScore(live.score);
-    const thru = live.thru;
-    const rightParts: string[] = [pos];
-    if (score != null) rightParts.push(score);
-    if (thru != null) rightParts.push(thru >= 18 ? t('overview.tiPicks.live.finished') : t('overview.tiPicks.live.thru', { n: thru }));
     return (
-      <BannerRow
-        left={t('overview.tiPicks.case.onCourse')}
-        leftColor={INK_60}
-        right={rightParts.join(' · ')}
-        rightColor={INK}
-        background={NEUTRAL_BG}
-      />
+      <div
+        style={{
+          marginTop: 14,
+          paddingBottom: 12,
+          borderBottom: `1px solid ${HAIR}`,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 7.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: A.DIM,
+          }}
+        >
+          {t('overview.tiPicks.case.onCourse')}
+        </span>
+        <TourStatusBlock
+          score={live.score}
+          position={live.position}
+          positionTied={live.positionTied}
+          thru={live.thru}
+          status={live.status}
+          align="right"
+        />
+      </div>
     );
   }
 
@@ -957,7 +957,7 @@ function AllPicksSheet({
   return (
     <SheetShell onClose={onClose} header={header}>
       <div style={{ marginTop: 4 }}>
-        {ordered.map((p) => {
+        {ordered.map((p, i) => {
           const live = liveMap?.[p.playerId];
           const v = settled ? tiVerdict(live) : { kind: 'none' as const, label: null, score: null };
           return (
@@ -966,21 +966,18 @@ function AllPicksSheet({
               role="button"
               onClick={() => onPick(p)}
               style={{
-                background: '#FFFFFF',
-                border: `1px solid ${HAIR}`,
-                borderRadius: 16,
-                padding: '13px 14px',
-                marginBottom: 10,
+                padding: '12px 0',
+                borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
                 cursor: 'pointer',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span
                   style={{
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: 800,
-                    color: INK_45,
-                    fontVariantNumeric: 'tabular-nums',
+                    color: INK,
+                    fontVariantNumeric: 'tabular-nums lining',
                     minWidth: 14,
                     textAlign: 'right',
                   }}
@@ -995,19 +992,23 @@ function AllPicksSheet({
                   }}
                   style={{ flexShrink: 0, cursor: 'pointer' }}
                 >
-                  <PlayerAvatar
-                    playerId={p.playerId}
-                    playerName={p.playerName}
-                    tourCode={tourCode}
-                    photoUrl={p.photoUrl}
-                    size="md"
+                  <SquircleAvatar
+                    size={34}
+                    srcCandidates={
+                      p.photoUrl
+                        ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
+                        : getPlayerHeadshotCandidates(p.playerName, tourCode)
+                    }
+                    alt={p.playerName}
+                    userId={p.playerId}
+                    hairlineRing
                     ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: 800,
                       color: INK,
                       letterSpacing: '-0.02em',
@@ -1051,7 +1052,14 @@ function AllPicksSheet({
                     tiVerdict(live).kind === 'mc' ? (
                       <VerdictChip v={tiVerdict(live)} t={t} />
                     ) : live.position != null ? (
-                      <NeutralLiveChip live={live} t={t} showThru={false} />
+                      <TourStatusBlock
+                        score={live.score}
+                        position={live.position}
+                        positionTied={live.positionTied}
+                        thru={live.thru}
+                        status={live.status}
+                        align="right"
+                      />
                     ) : null
                   ) : null}
                   <span style={{ fontSize: 14, fontWeight: 700, color: INK_45 }}>›</span>
@@ -1060,12 +1068,12 @@ function AllPicksSheet({
               {(p.pulledQuote || p.reasons?.[0]) && (
                 <div
                   style={{
-                    marginTop: 9,
+                    marginTop: 7,
                     paddingLeft: 26,
-                    fontSize: 12.5,
-                    fontWeight: 500,
-                    color: INK_60,
-                    lineHeight: 1.4,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: A.BODY,
+                    lineHeight: 1.45,
                   }}
                 >
                   “{p.pulledQuote || p.reasons?.[0]}”
@@ -1077,11 +1085,13 @@ function AllPicksSheet({
 
         <div
           style={{
-            marginTop: 6,
-            fontSize: 10.5,
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: `1px solid ${HAIR}`,
+            fontSize: 12,
             fontWeight: 600,
-            color: INK_45,
-            lineHeight: 1.55,
+            color: A.BODY,
+            lineHeight: 1.5,
           }}
         >
           {t('overview.tiPicks.board.methodology')}

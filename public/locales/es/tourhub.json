@@ -218,7 +218,15 @@
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
-      "backToLine2": "featured"
+      "backToLine2": "featured",
+      "fieldAverageToday": "Promedio del campo hoy",
+      "fromNRoundsIn": "de {{n}} rondas",
+      "lowRoundLabel": "Mejor ronda",
+      "byLabel": "Por",
+      "roundsInLabel": "Rondas",
+      "groupsLabel": "Grupos",
+      "awaitingPlayers": "{{range}} pendientes",
+      "shapeCaption": "El hoyo {{hard}} es el mas dificil, el {{easy}} el mas facil."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -359,6 +367,10 @@
     "hybridHero": {
       "majorChampionship": "MAJOR CHAMPIONSHIP",
       "teamFallback": "Team"
+    },
+    "status": {
+      "finished": "FINALIZADO",
+      "thru": "HASTA {{n}}"
     }
   },
   "empty": {

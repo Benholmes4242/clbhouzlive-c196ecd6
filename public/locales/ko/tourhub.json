@@ -214,7 +214,15 @@
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
-      "backToLine2": "featured"
+      "backToLine2": "featured",
+      "fieldAverageToday": "오늘 필드 평균",
+      "fromNRoundsIn": "{{n}} 라운드 기준",
+      "lowRoundLabel": "베스트 라운드",
+      "byLabel": "선수",
+      "roundsInLabel": "라운드",
+      "groupsLabel": "그룹",
+      "awaitingPlayers": "{{range}} 집계 대기",
+      "shapeCaption": "{{hard}}번 홀이 가장 어렵고 {{easy}}번 홀이 가장 쉽습니다."
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -355,6 +363,10 @@
     "hybridHero": {
       "majorChampionship": "MAJOR CHAMPIONSHIP",
       "teamFallback": "Team"
+    },
+    "status": {
+      "finished": "종료",
+      "thru": "{{n}}홀"
     }
   },
   "empty": {

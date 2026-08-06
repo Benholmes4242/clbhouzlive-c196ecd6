@@ -35,15 +35,8 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import {
-  fieldAverageToday,
-  lowRoundToday,
-  topMoverToday,
-  formatToParAvg,
-  formatToPar,
-  shortPlayerName,
-} from '../data/liveRoundStats';
+import { LiveFieldPanel } from './LiveFieldPanel';
+import { formatToPar } from '../data/liveRoundStats';
 
 
 interface Props {
@@ -138,107 +131,6 @@ function teeKey(g: TeeGroup): string {
     .sort()
     .join('|');
   return `${g.teeTime}|${names}`;
-}
-
-/**
- * LiveStatBand — the day's three numbers, derived from the leaderboard the
- * rail already has loaded (no extra network):
- *   FIELD TODAY  average round-to-par of completed rounds, gated at 20 in
- *   LOW ROUND    lowest completed round-to-par + who owns it
- *   MOVERS       biggest places-gained delta today
- * Any stat that cannot be computed is omitted; the whole band self-hides
- * when none can.
- */
-function LiveStatBand({
-  entries,
-  round,
-  tournamentId,
-}: {
-  entries: any[];
-  round: number;
-  tournamentId: string;
-}) {
-  const { t } = useTranslation('tourhub');
-  const field = useMemo(() => fieldAverageToday(entries as any, round), [entries, round]);
-  const low = useMemo(() => lowRoundToday(entries as any, round), [entries, round]);
-  const mover = useMemo(() => topMoverToday(entries as any, round), [entries, round]);
-
-  useEffect(() => {
-    if (!field || !tournamentId) return;
-    analyticsEvents.track('tour_field_average_shown', {
-      tournament_id: tournamentId,
-      round,
-      completed_count: field.count,
-    });
-  }, [field, tournamentId, round]);
-
-  if (!field && !low && !mover) return null;
-
-  return (
-    <div style={{ padding: `0 ${SPACE.pagePadX}px 10px` }}>
-      <div
-        style={{
-          background: A.PANEL,
-          border: `1px solid ${A.BORDER}`,
-          borderRadius: 16,
-          padding: '10px 12px',
-          display: 'flex',
-          alignItems: 'flex-start',
-        }}
-      >
-        {field && (
-          <StatCell
-            label={t('tour.fieldToday')}
-            value={formatToParAvg(field.avg)}
-            sub={t('tour.fromNIn', { n: field.count })}
-          />
-        )}
-        {low && (
-          <StatCell
-            label={t('overview.onTheCourse.lowRound')}
-            value={formatToPar(low.toPar)}
-            sub={
-              low.tied > 1
-                ? t('overview.onTheCourse.nShare', { count: low.tied })
-                : shortPlayerName(low.playerName)
-            }
-          />
-        )}
-        {mover && (
-          <StatCell
-            label={t('overview.onTheCourse.moversToday')}
-            value={`+${mover.places}`}
-            sub={shortPlayerName(mover.playerName)}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StatCell({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-      <span style={{ fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em', ...FIGS }}>
-        {value}
-      </span>
-      <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
-      {sub ? (
-        <span
-          style={{
-            ...LABEL,
-            color: A.MUTE,
-            maxWidth: '100%',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {sub}
-        </span>
-      ) : null}
-    </div>
-  );
 }
 
 /**
@@ -339,10 +231,12 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
       <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} rightMeta={rightMeta}>
-        <LiveStatBand
+        <LiveFieldPanel
           entries={(leaderboardQuery.data ?? []) as any[]}
           round={round}
           tournamentId={tournamentId ?? ''}
+          groupCount={totalKnown ?? featuredCount}
+          live={live}
         />
         <CutWatchLine tournamentId={tournamentId} />
         <div
