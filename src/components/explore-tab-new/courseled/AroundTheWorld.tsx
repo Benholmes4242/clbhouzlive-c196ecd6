@@ -417,6 +417,7 @@ export function AroundTheWorld({
               tone: string;
               isNew: boolean;
               onPress?: () => void;
+              reactTo?: { type: 'round' | 'review'; id: string };
             }> = g.events.map((e) => ({
               key: e.id,
               isNew: isNewSince(e.at, lastSeen),
@@ -428,6 +429,7 @@ export function AroundTheWorld({
               fig: e.figure ?? null,
               figLabel: figLabelFor(e),
               tone: toneFor(e.kind),
+              reactTo: e.scoreId ? { type: 'round', id: e.scoreId } : undefined,
               onPress: e.scoreId
                 ? () => {
                     analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
@@ -435,6 +437,7 @@ export function AroundTheWorld({
                   }
                 : undefined,
             }));
+
             if (rating) {
               rows.push({
                 key: `rating:${g.courseId}`,
