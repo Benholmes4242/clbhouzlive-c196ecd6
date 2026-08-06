@@ -369,23 +369,26 @@ export default function ExploreTabContent({
           events={events}
           isLoading={wireLoading}
           userId={userId}
-          scopeKey={activeRegion ?? 'worldwide'}
+          scopeKey={lens}
           pills={
             // The pills belong to Around the World: 12px above (10 from the
             // eyebrow + 2), 14px below so they sit closer to their cards.
             <div style={{ margin: '2px -14px 14px' }}>
-              <ScopePills region={activeRegion} onChange={handleRegionChange} />
+              <ScopePills lens={lens} onChange={handleLensChange} />
             </div>
           }
           onCoursePress={(id) => goCourse(id, 'around_the_world')}
-          regionLabel={
-            REGION_TABS.find((r) => (r.slug ?? null) === (activeRegion ?? null))?.label ??
-            'Worldwide'
-          }
+          lensLabel={lensLabel}
+          emptyCopy={lensEmptyCopy}
+          priorityFor={priorityFor}
+          canShortlist={canShortlistCourse}
+          isShortlisted={isShortlisted}
+          onToggleShortlist={handleToggleShortlist}
           onExpand={(revealed) =>
             analyticsEvents.track('discover_courses_expanded', { revealed })
           }
         />
+
 
 
         <MomentsOfTheWeek
