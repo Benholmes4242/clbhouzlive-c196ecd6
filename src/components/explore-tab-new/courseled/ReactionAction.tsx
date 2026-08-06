@@ -131,4 +131,34 @@ export function ReactionAction({
   );
 }
 
+/**
+ * REACTION SLOT — the fixed-width trailing column every row in a section
+ * reserves, whether or not it renders a control.
+ *
+ * Rows with the heart used to eat horizontal space that rows without it kept,
+ * so figures went ragged down a card. The slot is always present: an empty one
+ * renders nothing but still occupies its width, so the figure axis is identical
+ * on every row.
+ *
+ * WIDTH: 42px — the 15px glyph + 4px gap + a three-digit count at 11.5px/800
+ * tabular (~22px), which is the widest realistic count on these surfaces.
+ */
+export const REACTION_SLOT_W = 42;
+
+export function ReactionSlot({ children }: { children?: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        width: REACTION_SLOT_W,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default ReactionAction;

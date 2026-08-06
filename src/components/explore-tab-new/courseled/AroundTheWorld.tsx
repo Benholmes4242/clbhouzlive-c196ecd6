@@ -13,7 +13,7 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
-import { ReactionAction } from './ReactionAction';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
@@ -149,15 +149,16 @@ export function AroundTheWorld({
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
   // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
-  // rows react as 'round' on their score id; a rating row only carries a
-  // control when it holds a review body (a bare score is not an opinion).
+  // rows react as 'round' on their score id; ANY rating row with a reviewId
+  // carries a control — a score with no prose is still likeable (the trigger
+  // wording says "liked your rating" in that case). Only a rating with no
+  // reviewId at all has nothing to target.
   const reactionTargets = useMemo<ReactionTarget[]>(() => {
     const out: ReactionTarget[] = [];
     for (const g of shown) {
       for (const e of g.events) if (e.scoreId) out.push({ type: 'round', id: e.scoreId });
       const rating = ratings?.get(g.courseId);
-      if (rating?.reviewId && (rating.reviewText ?? '').trim())
-        out.push({ type: 'review', id: rating.reviewId });
+      if (rating?.reviewId) out.push({ type: 'review', id: rating.reviewId });
     }
     return out;
   }, [shown, ratings]);
@@ -451,11 +452,15 @@ export function AroundTheWorld({
                 figLabel: t('discover.row.labelRating', 'RATING'),
                 tone: reviewLabelColor(rating.rating, 'light'),
                 reactTo:
-                  rating.reviewId && (rating.reviewText ?? '').trim()
-                    ? { type: 'review', id: rating.reviewId }
-                    : undefined,
+                  // LIKEABLE whenever there is a review row to target, prose or
+                  // not. Deliberately BROADER than the tap rule below.
+                  rating.reviewId ? { type: 'review', id: rating.reviewId } : undefined,
 
-                onPress: rating.reviewId
+                // TAP opens the sheet ONLY when there is prose to read. A
+                // score-only rating is inert to tap while still being likeable
+                // — that asymmetry is intentional, not a bug to "fix".
+                onPress:
+                  rating.reviewId && (rating.reviewText ?? '').trim()
                   ? () => {
                       analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
                       openReview({
@@ -625,8 +630,10 @@ export function AroundTheWorld({
                           </div>
                         )}
                       </div>
+                      {/* FIGURE BLOCK — fixed min-width so 72 / 6 / 8.9 all sit
+                          on one axis regardless of digit count. */}
                       {r.fig && (
-                        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                        <div style={{ flexShrink: 0, textAlign: 'center', minWidth: 46 }}>
                           <div style={{ ...NUMF, fontSize: 17, color: r.tone, lineHeight: 1.05 }}>
                             {r.fig}
                           </div>
@@ -644,23 +651,30 @@ export function AroundTheWorld({
                           </div>
                         </div>
                       )}
-                      {r.reactTo && (() => {
-                        const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
-                        return (
-                          <ReactionAction
-                            hidden={!reactions.viewerId || reactions.unavailable}
-                            readOnly={r.isOwn}
-                            count={st.count}
-                            reacted={st.mine}
-                            onToggle={() => reactions.toggle(r.reactTo!.type, r.reactTo!.id)}
-                            label={
-                              r.reactTo.type === 'round'
-                                ? t('discover.reactions.action', 'Like this round')
-                                : t('discover.reactions.actionReview', 'Like this review')
-                            }
-                          />
-                        );
-                      })()}
+                      {/* TRAILING SLOT — reserved on EVERY row, control or not. */}
+                      <ReactionSlot>
+                        {r.reactTo
+                          ? (() => {
+                              const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
+                              return (
+                                <ReactionAction
+                                  hidden={!reactions.viewerId || reactions.unavailable}
+                                  readOnly={r.isOwn}
+                                  count={st.count}
+                                  reacted={st.mine}
+                                  onToggle={() =>
+                                    reactions.toggle(r.reactTo!.type, r.reactTo!.id)
+                                  }
+                                  label={
+                                    r.reactTo.type === 'round'
+                                      ? t('discover.reactions.action', 'Like this round')
+                                      : t('discover.reactions.actionReview', 'Like this review')
+                                  }
+                                />
+                              );
+                            })()
+                          : null}
+                      </ReactionSlot>
 
                     </div>
                   ))}

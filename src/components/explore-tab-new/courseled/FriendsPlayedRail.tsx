@@ -6,7 +6,7 @@ import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
-import { ReactionAction } from './ReactionAction';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 
 import {
@@ -199,11 +199,15 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   )}
                 </div>
 
+                {/* GROSS — fixed min-width so two- and three-digit scores share
+                    one right-hand axis down the card. */}
                 {r.gross != null && (
                   <span
                     style={{
                       ...NUMF,
                       flexShrink: 0,
+                      minWidth: 26,
+                      textAlign: 'right',
                       fontSize: 15,
                       color: A.INK,
                       lineHeight: 1.15,
@@ -213,19 +217,22 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   </span>
                 )}
 
-                {(() => {
-                  const st = reactions.stateFor('round', r.score_id);
-                  return (
-                    <ReactionAction
-                      hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
-                      readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
-                      count={st.count}
-                      reacted={st.mine}
-                      onToggle={() => reactions.toggle('round', r.score_id)}
-                      label={t('discover.reactions.action', 'Like this round')}
-                    />
-                  );
-                })()}
+                {/* TRAILING SLOT — reserved on EVERY row, control or not. */}
+                <ReactionSlot>
+                  {(() => {
+                    const st = reactions.stateFor('round', r.score_id);
+                    return (
+                      <ReactionAction
+                        hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+                        readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
+                        count={st.count}
+                        reacted={st.mine}
+                        onToggle={() => reactions.toggle('round', r.score_id)}
+                        label={t('discover.reactions.action', 'Like this round')}
+                      />
+                    );
+                  })()}
+                </ReactionSlot>
 
 
 
