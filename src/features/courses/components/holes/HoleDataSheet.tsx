@@ -725,8 +725,9 @@ const StoryTiles: React.FC<{
     );
   }
 
-  // Personal scope (the You tab): one Panel, two centred cells, figures pulled
-  // out of the prose. BRIEF_COURSE_YOU_TAB_TREATMENT s5.
+  // Personal scope (the You tab): one Panel, two full-width rows separated by a
+  // hairline. No emoji - BRIEF_COURSE_YOU_TAB_ANALYTICAL_V2 s1. The sentences
+  // and their noise-floor logic are untouched; only the container changed.
   if (scope === 'personal') {
     const hooks: HookCell[] = [];
 
@@ -737,10 +738,10 @@ const StoryTiles: React.FC<{
       const parts = toParParts(nemesis.avg_to_par, 2);
       hooks.push({
         key: 'battle',
-        emoji: '🥊',
         label: t('courses:courseDetail.you.yourBattle', { n: nemesis.hole_no }),
         value: parts?.text ?? '',
-        tone: parts?.tone,
+        // Shots lost - red, regardless of sign formatting.
+        tone: A.RED,
         note: youBeats
           ? t('courses:holes.battle.youBeat')
           : t('courses:holes.battle.fieldBeats', { field: fieldStr }),
@@ -750,24 +751,21 @@ const StoryTiles: React.FC<{
     if (birdiedCount === totalHoles) {
       hooks.push({
         key: 'full',
-        emoji: '🏆',
-        label: 'Full house',
+        label: t('courses:courseDetail.you.fullHouse'),
         value: `${birdiedCount}/${totalHoles}`,
         note: "You've birdied every hole on this course.",
       });
     } else if (birdiedCount === totalHoles - 1 && missingBirdieHole) {
       hooks.push({
         key: 'onetogo',
-        emoji: '⛳',
-        label: 'One to go',
+        label: t('courses:courseDetail.you.oneToGoHole', { n: missingBirdieHole }),
         value: `${birdiedCount}/${totalHoles}`,
         note: `Only the ${ord(missingBirdieHole)} has never given you a birdie.`,
       });
     } else if (totalHoles > 0) {
       hooks.push({
         key: 'map',
-        emoji: '⛳',
-        label: 'Birdie map',
+        label: t('courses:courseDetail.you.birdieMap'),
         value: `${birdiedCount}/${totalHoles}`,
         note: `${totalHoles - birdiedCount} holes still waiting for your first birdie.`,
       });
@@ -777,25 +775,36 @@ const StoryTiles: React.FC<{
 
     return (
       <Panel style={{ scrollMarginTop: STICKY_SAFE }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${hooks.length}, minmax(0, 1fr))`,
-            gap: 16,
-          }}
-        >
-          {hooks.map((h) => (
-            <div key={h.key} style={{ textAlign: 'center', minWidth: 0 }}>
-              <div style={{ fontSize: 17, lineHeight: 1, marginBottom: 6 }} aria-hidden>{h.emoji}</div>
-              <div style={LABEL_A}>{h.label}</div>
-              <div style={{ ...NUM_A, fontSize: 17, color: h.tone ?? A.INK, marginTop: 3 }}>{h.value}</div>
-              <div style={{ fontSize: 11.5, lineHeight: 1.45, color: A.MUTE, marginTop: 5 }}>{h.note}</div>
+        {hooks.map((h, i) => (
+          <React.Fragment key={h.key}>
+            {i > 0 && <Hairline style={{ margin: '12px 0' }} />}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: A.DIM,
+                  }}
+                >
+                  {h.label}
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.BODY, marginTop: 5 }}>
+                  {h.note}
+                </div>
+              </div>
+              <div style={{ ...NUM_A, fontSize: 20, color: h.tone ?? A.INK, whiteSpace: 'nowrap' }}>
+                {h.value}
+              </div>
             </div>
-          ))}
-        </div>
+          </React.Fragment>
+        ))}
       </Panel>
     );
   }
+
 
   const tiles: React.ReactNode[] = [...communityTiles];
 
