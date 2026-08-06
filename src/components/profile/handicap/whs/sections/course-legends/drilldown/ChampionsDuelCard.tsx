@@ -184,9 +184,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             movementLabel={t('champions.col30d')}
             unitLabel={unitLabel || categoryLabel}
           />
-          {topRows.map((r) => (
+          {topRows.map((r, i) => (
             <BoardRow
               key={`${r.rank}-${r.name}`}
+              rule={i > 0}
               row={{
                 rank: r.rank,
                 name: r.name,

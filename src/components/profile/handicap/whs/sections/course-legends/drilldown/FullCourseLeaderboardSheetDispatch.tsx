@@ -206,9 +206,10 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
               movementLabel={t('champions.col30d')}
               unitLabel={category.unit || category.short}
             />
-            {rows.map((r) => (
+            {rows.map((r, i) => (
               <BoardRow
                 key={`${r.rank}-${r.attained_at}-${r.name}`}
+                rule={i > 0}
                 rowRef={r.isSelf && r.rank !== 1 ? selfRowRef : undefined}
                 row={{
                   rank: r.rank,
