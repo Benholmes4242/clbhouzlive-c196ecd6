@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { MomentPlayGlyph } from './MomentTile';
-import { SANS, FIGS } from './tokens';
+import { SANS, FIGS, NEW_CARD_RING } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
 /**
@@ -53,6 +53,8 @@ interface Props {
   review: LatestReview;
   /** True when the reviewer is the viewing member (name renders amber). */
   isOwn?: boolean;
+  /** True when the review arrived since the member last left Discover. */
+  isNew?: boolean;
   onPress: (r: LatestReview) => void;
   height?: number;
   radius?: number;
@@ -61,6 +63,7 @@ interface Props {
 export function ReviewTile({
   review: r,
   isOwn = false,
+  isNew = false,
   onPress,
   height = REVIEW_TILE_HEIGHT,
   radius = 14,
@@ -77,6 +80,7 @@ export function ReviewTile({
       type="button"
       onClick={() => onPress(r)}
       style={{
+        ...(isNew ? NEW_CARD_RING : null),
         position: 'relative',
         height,
         padding: 0,

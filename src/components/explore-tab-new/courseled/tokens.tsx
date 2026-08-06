@@ -29,12 +29,53 @@ export const CARD_SHELL: React.CSSProperties = {
   overflow: 'hidden',
 };
 
+/**
+ * NEW-SINCE MARKERS (BRIEF_DISCOVER_NEW_SINCE, section 3) — all quiet, all ink.
+ * A dot is a nudge, not an alarm: no counts, no colour, no "NEW" labels, and
+ * never amber (amber means the viewing member and nothing else).
+ */
+
+/** 6px ink dot after a section eyebrow when that section holds anything new. */
+export function NewDot() {
+  return (
+    <span
+      aria-hidden
+      style={{
+        display: 'inline-block',
+        width: 6,
+        height: 6,
+        borderRadius: 999,
+        background: A.INK,
+        marginLeft: 6,
+        verticalAlign: 'middle',
+      }}
+    />
+  );
+}
+
+/** 1.5px ink ring on a new card/tile. Inset so it survives overflow: hidden. */
+export const NEW_CARD_RING: React.CSSProperties = {
+  boxShadow: `inset 0 0 0 1.5px ${A.INK}`,
+};
+
+/** 3px ink bar at a new world row's left edge, inside the card padding. */
+export const NEW_ROW_BAR: React.CSSProperties = {
+  width: 3,
+  alignSelf: 'stretch',
+  borderRadius: 999,
+  background: A.INK,
+  flexShrink: 0,
+};
+
 export function Eyebrow({
   children,
   aside,
+  dot = false,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
+  /** True when this section contains anything new since the last visit. */
+  dot?: boolean;
 }) {
   return (
     <div
@@ -45,7 +86,10 @@ export function Eyebrow({
         marginBottom: 10,
       }}
     >
-      <span style={KICKER}>{children}</span>
+      <span style={KICKER}>
+        {children}
+        {dot ? <NewDot /> : null}
+      </span>
       {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
     </div>
   );

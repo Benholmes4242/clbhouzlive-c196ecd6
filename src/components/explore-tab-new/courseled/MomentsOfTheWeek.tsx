@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import { MomentTile } from './MomentTile';
 import { useMomentsOfTheWeek, type Moment } from './hooks/useMomentsOfTheWeek';
-import { Eyebrow, InkAction } from './tokens';
+import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { Eyebrow, InkAction, NEW_CARD_RING } from './tokens';
 
 /**
  * Section 4 — MOMENTS OF THE MONTH (BRIEF, section 4).
@@ -22,10 +23,23 @@ interface Props {
   totalCount?: number;
   onTilePress: (m: Moment) => void;
   onSeeAll: () => void;
+  /** Last-seen stamp for the new-since markers; null marks nothing. */
+  lastSeen?: number | null;
 }
 
-export function MomentsOfTheWeek({ moments, totalCount, onTilePress, onSeeAll }: Props) {
+export function MomentsOfTheWeek({
+  moments,
+  totalCount,
+  onTilePress,
+  onSeeAll,
+  lastSeen = null,
+}: Props) {
   const { t } = useTranslation('courses');
+
+  // NEW SINCE: the post's created_at, the stamp the mosaic already ranks on.
+  const newCount = countNewSince(moments, (m) => m.post.createdAt, lastSeen);
+  useReportNewCount('moments', newCount);
+
   if (moments.length === 0) return null;
 
   const shown = moments.slice(0, 5);
@@ -33,6 +47,7 @@ export function MomentsOfTheWeek({ moments, totalCount, onTilePress, onSeeAll }:
   return (
     <section>
       <Eyebrow
+        dot={newCount > 0}
         aside={
           (totalCount ?? moments.length) > shown.length ? (
             <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>
@@ -55,7 +70,11 @@ export function MomentsOfTheWeek({ moments, totalCount, onTilePress, onSeeAll }:
               labelSize={10}
               labelInset={8}
               scrimStop="45%"
-              style={{ height: tall ? TALL : SHORT, gridRow: tall ? 'span 2' : 'auto' }}
+              style={{
+                height: tall ? TALL : SHORT,
+                gridRow: tall ? 'span 2' : 'auto',
+                ...(isNewSince(m.post.createdAt, lastSeen) ? NEW_CARD_RING : null),
+              }}
             />
           );
         })}

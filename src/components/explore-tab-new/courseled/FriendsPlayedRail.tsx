@@ -5,10 +5,12 @@ import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFrie
 import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import {
   A,
   CARD_SHELL,
   Eyebrow,
+  NEW_CARD_RING,
   ImageChip,
   InkAction,
   NUMF,
@@ -31,6 +33,8 @@ const RAIL_CAP = 10;
 
 interface Props {
   userId: string | undefined;
+  /** Last-seen stamp for the new-since markers; null marks nothing. */
+  lastSeen?: number | null;
   onCardPress: (row: FriendRoundRow) => void;
   onSeeAll: () => void;
 }
@@ -47,7 +51,7 @@ function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
   return t('discover.when.weeksAgo', { defaultValue: '{{count}}w ago', count: Math.floor(days / 7) });
 }
 
-export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
+export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
   const { data: rounds } = useFriendsLatestRounds(userId, {
     limit: RAIL_CAP,
@@ -61,11 +65,19 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
   );
   const { data: meta } = useCourseCardMeta(courseIds);
 
+  // NEW SINCE: the rail already orders by play_date, so play_date is the
+  // arrival stamp this section compares.
+  const newCount = countNewSince(rows, (r) => r.play_date, lastSeen);
+  useReportNewCount('friends', newCount);
+
   if (rows.length === 0) return null;
 
   return (
     <section>
-      <Eyebrow aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}>
+      <Eyebrow
+        dot={newCount > 0}
+        aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}
+      >
         {t('discover.friendsPlayed', 'Where your friends played')}
       </Eyebrow>
 
@@ -76,6 +88,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
+          const isNew = isNewSince(r.play_date, lastSeen);
           return (
             <button
               key={r.round_id}
@@ -83,6 +96,7 @@ export function FriendsPlayedRail({ userId, onCardPress, onSeeAll }: Props) {
               onClick={() => onCardPress(r)}
               style={{
                 ...CARD_SHELL,
+                ...(isNew ? NEW_CARD_RING : null),
                 width: 224,
                 flexShrink: 0,
                 padding: 0,

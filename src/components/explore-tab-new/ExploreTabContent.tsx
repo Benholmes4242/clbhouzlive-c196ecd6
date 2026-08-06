@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import {
+  useDiscoverLastSeen,
+  useMarkDiscoverSeenOnExit,
+} from '@/hooks/useDiscoverLastSeen';
 import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
 import { useDiscoverLensSets } from './courseled/hooks/useDiscoverLensSets';
 import { useWantToPlayToggle } from '@/hooks/useWantToPlayToggle';
@@ -77,6 +81,11 @@ export default function ExploreTabContent({
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id;
+
+  // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
+  // written back only on EXIT so markers survive scrolling and tapping.
+  const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
+  useMarkDiscoverSeenOnExit(markSeen);
 
   const { lens, setLens } = useExploreLens();
 
@@ -402,11 +411,13 @@ export default function ExploreTabContent({
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsPlayedRail
           userId={userId}
+          lastSeen={lastSeen}
           onCardPress={handleFriendCard}
           onSeeAll={() => setFriendsSheet(true)}
         />
 
         <OnTourThisWeek
+          lastSeen={lastSeen}
           onTournamentPress={handleTournament}
           onMediaPress={handleTourMedia}
           onTourHub={() => navigate('/tourhub')}
@@ -418,6 +429,7 @@ export default function ExploreTabContent({
           reviews={latestReviews.reviews}
           totalCount={latestReviews.total}
           viewerId={userId}
+          lastSeen={lastSeen}
           onTilePress={handleReviewTile}
           onSeeAll={openReviewsSheet}
         />
@@ -428,6 +440,7 @@ export default function ExploreTabContent({
           events={events}
           isLoading={wireLoading}
           userId={userId}
+          lastSeen={lastSeen}
           scopeKey={lens}
           pills={
             // The pills belong to Around the World: 12px above (10 from the
@@ -453,6 +466,7 @@ export default function ExploreTabContent({
         <MomentsOfTheWeek
           moments={momentMosaic}
           totalCount={momentList.length}
+          lastSeen={lastSeen}
           onTilePress={handleMoment}
           onSeeAll={() => setMomentsSheet(true)}
         />

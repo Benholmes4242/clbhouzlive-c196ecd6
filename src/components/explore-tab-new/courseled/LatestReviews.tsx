@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { ReviewTile } from './ReviewTile';
+import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { Eyebrow, InkAction } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -28,18 +29,33 @@ interface Props {
   viewerId?: string;
   onTilePress: (r: LatestReview) => void;
   onSeeAll: () => void;
+  /** Last-seen stamp for the new-since markers; null marks nothing. */
+  lastSeen?: number | null;
 }
 
-export function LatestReviews({ reviews, totalCount, viewerId, onTilePress, onSeeAll }: Props) {
+export function LatestReviews({
+  reviews,
+  totalCount,
+  viewerId,
+  onTilePress,
+  onSeeAll,
+  lastSeen = null,
+}: Props) {
   const { t } = useTranslation('courses');
-  if (reviews.length === 0) return null;
 
   const shown = reviews.slice(0, PAGE_CAP);
+
+  // NEW SINCE: the review's created_at, the stamp the section already sorts by.
+  const newCount = countNewSince(shown, (r) => r.at, lastSeen);
+  useReportNewCount('reviews', newCount);
+
+  if (reviews.length === 0) return null;
   const total = totalCount ?? reviews.length;
 
   return (
     <section>
       <Eyebrow
+        dot={newCount > 0}
         aside={
           total > shown.length ? (
             <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>
@@ -55,6 +71,7 @@ export function LatestReviews({ reviews, totalCount, viewerId, onTilePress, onSe
             key={r.reviewId}
             review={r}
             isOwn={!!viewerId && r.userId === viewerId}
+            isNew={isNewSince(r.at, lastSeen)}
             onPress={onTilePress}
           />
         ))}
