@@ -450,6 +450,11 @@ export function AroundTheWorld({
                 fig: rating.rating.toFixed(1),
                 figLabel: t('discover.row.labelRating', 'RATING'),
                 tone: reviewLabelColor(rating.rating, 'light'),
+                reactTo:
+                  rating.reviewId && (rating.reviewText ?? '').trim()
+                    ? { type: 'review', id: rating.reviewId }
+                    : undefined,
+
                 onPress: rating.reviewId
                   ? () => {
                       analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
