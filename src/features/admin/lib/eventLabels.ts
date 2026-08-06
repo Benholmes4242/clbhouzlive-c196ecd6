@@ -91,9 +91,6 @@ export const EVENT_LABELS: Record<string, string> = {
   gender_prompt_shown: 'Gender prompt shown',
   gender_prompt_answered: 'Gender prompt answered',
   gender_prompt_skipped: 'Gender prompt skipped',
-  tour_follow_prompt_shown: 'Tour follow prompt shown',
-  tour_follow_prompt_answered: 'Tour follow prompt answered',
-  tour_follow_prompt_skipped: 'Tour follow prompt skipped',
 
   streaks_section_viewed: 'Streaks section viewed',
   all_streaks_open: 'All streaks opened',
