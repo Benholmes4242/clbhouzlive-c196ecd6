@@ -309,6 +309,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       style={{
                         display: 'grid',
                         gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+                        alignContent: 'center',
                         height: STAT_BLOCK_H,
                         boxSizing: 'border-box',
                         padding: '10px 12px 8px',
