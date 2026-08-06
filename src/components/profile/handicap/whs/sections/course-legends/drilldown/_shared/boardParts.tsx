@@ -88,10 +88,12 @@ export interface BoardRowData {
   delta?: number | null;
 }
 
-export const BoardRow: React.FC<{ row: BoardRowData; rowRef?: React.Ref<HTMLDivElement> }> = ({
-  row,
-  rowRef,
-}) => {
+export const BoardRow: React.FC<{
+  row: BoardRowData;
+  rowRef?: React.Ref<HTMLDivElement>;
+  /** Hairline above the row. Callers pass false for the first row of a board. */
+  rule?: boolean;
+}> = ({ row, rowRef, rule = true }) => {
   const tone = row.isSelf ? A.AMBER : A.INK;
   return (
     <div
@@ -103,14 +105,15 @@ export const BoardRow: React.FC<{ row: BoardRowData; rowRef?: React.Ref<HTMLDivE
         alignItems: 'center',
         padding: '9px 0',
         fontFamily: SANS,
+        borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
       }}
     >
       <span style={{ ...NUM, fontSize: 12.5, color: A.DIM, textAlign: 'center' }}>{row.rank}</span>
       <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
       <span
         style={{
-          fontSize: 14,
-          fontWeight: 700,
+          fontSize: 13,
+          fontWeight: 800,
           color: tone,
           letterSpacing: '-0.01em',
           minWidth: 0,
