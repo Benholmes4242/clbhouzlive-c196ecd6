@@ -86,7 +86,12 @@ export function AroundTheWorld({
   pills,
   onCoursePress,
   onExpand,
-  regionLabel,
+  lensLabel,
+  emptyCopy,
+  priorityFor,
+  canShortlist,
+  isShortlisted,
+  onToggleShortlist,
 }: Props) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -112,8 +117,16 @@ export function AroundTheWorld({
         });
       }
     }
-    return [...byCourse.values()].sort((a, b) => (a.at < b.at ? 1 : -1));
-  }, [events]);
+    // Relevance first when the lens supplies a rank, recency as the tie-break.
+    return [...byCourse.values()].sort((a, b) => {
+      if (priorityFor) {
+        const d = priorityFor(a.courseId) - priorityFor(b.courseId);
+        if (d !== 0) return d;
+      }
+      return a.at < b.at ? 1 : -1;
+    });
+  }, [events, priorityFor]);
+
 
   const shown = groups.slice(0, PAGE);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
