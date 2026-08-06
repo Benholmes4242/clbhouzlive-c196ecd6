@@ -15,7 +15,8 @@ import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
 import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
-import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
  * Section 2 — AROUND THE WORLD (BRIEF, section 2).
@@ -63,6 +64,8 @@ interface Props {
   canShortlist?: (courseId: string) => boolean;
   isShortlisted?: (courseId: string) => boolean;
   onToggleShortlist?: (courseId: string) => void;
+  /** Last-seen stamp for the new-since markers; null marks nothing. */
+  lastSeen?: number | null;
 }
 
 
@@ -94,6 +97,7 @@ export function AroundTheWorld({
   canShortlist,
   isShortlisted,
   onToggleShortlist,
+  lastSeen = null,
 }: Props) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -129,6 +133,12 @@ export function AroundTheWorld({
     });
   }, [events, priorityFor]);
 
+
+  // NEW SINCE: the event stamp the section already sorts by (play_date today;
+  // an arrival stamp would be inherited automatically). A group is new when any
+  // of its events is.
+  const newGroupCount = countNewSince(groups, (g) => g.at, lastSeen);
+  useReportNewCount('world', newGroupCount);
 
   const shown = groups.slice(0, PAGE);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
@@ -354,7 +364,10 @@ export function AroundTheWorld({
   return (
     <>
     <section>
-      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
+      <Eyebrow
+        dot={newGroupCount > 0}
+        aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
+      >
         {t('discover.aroundTheWorld', 'Around the world')}
       </Eyebrow>
 
@@ -383,9 +396,11 @@ export function AroundTheWorld({
               fig: string | null;
               figLabel: string;
               tone: string;
+              isNew: boolean;
               onPress?: () => void;
             }> = g.events.map((e) => ({
               key: e.id,
+              isNew: isNewSince(e.at, lastSeen),
               name: nameFor(e),
               isOwn: !!userId && !!e.userId && e.userId === userId,
               avatar: e.actorAvatar,
@@ -404,6 +419,7 @@ export function AroundTheWorld({
             if (rating) {
               rows.push({
                 key: `rating:${g.courseId}`,
+                isNew: false,
                 name: rating.actorName?.trim() ?? '',
                 isOwn: !!userId && !!rating.userId && rating.userId === userId,
                 avatar: rating.actorAvatar,
@@ -441,6 +457,7 @@ export function AroundTheWorld({
                 onClick={() => onCoursePress(g.courseId)}
                 style={{
                   ...CARD_SHELL,
+                  ...(isNewSince(g.at, lastSeen) ? NEW_CARD_RING : null),
                   padding: 0,
                   textAlign: 'left',
                   fontFamily: SANS,
@@ -526,6 +543,7 @@ export function AroundTheWorld({
                         transition: 'opacity 120ms ease',
                       }}
                     >
+                      {r.isNew && <span aria-hidden style={NEW_ROW_BAR} />}
                       <SquircleAvatar
                         size={30}
                         src={r.avatar}
