@@ -26,11 +26,20 @@ import {
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
   COURSE_SCRIMS,
-  AMBER,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
+import { getScoreColor } from '../../../_shared/scoreColor';
+
 import { type HeroState } from '../HybridHero.utils';
+
+/** Score chip colour: canonical to-par grammar on dark (red under par). */
+function momentScoreColour(s: string): string {
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'dark', 'standard');
+  return getScoreColor(0, 'dark', 'standard');
+}
+
 
 export interface PhotoBandProps {
   title: string;
@@ -461,7 +470,7 @@ export function PhotoBand({
                       ...NUMERIC_STYLE,
                       fontSize: 13,
                       fontWeight: 800,
-                      color: AMBER,
+                      color: momentScoreColour(momentScore),
                     }}
                   >
                     {momentScore}
