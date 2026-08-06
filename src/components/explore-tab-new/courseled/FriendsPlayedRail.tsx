@@ -68,6 +68,18 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
   );
   const { data: meta } = useCourseCardMeta(courseIds);
 
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): one read for the whole rail, keyed by
+  // the round's whs_score id. A round with no score id carries no control.
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      rows
+        .filter((r) => !!r.score_id)
+        .map((r) => ({ type: 'round' as const, id: r.score_id as string })),
+    [rows],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
+
   // NEW SINCE: the rail already orders by play_date, so play_date is the
   // arrival stamp this section compares.
   const newCount = countNewSince(rows, (r) => r.play_date, lastSeen);
