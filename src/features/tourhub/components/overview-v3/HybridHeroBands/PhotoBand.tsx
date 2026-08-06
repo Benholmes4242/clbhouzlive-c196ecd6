@@ -30,6 +30,14 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT } from '../../../_shared/tokens';
+import { getScoreColor } from '../../../_shared/scoreColor';
+
+/** Score chip colour: canonical to-par grammar on dark (red under par). */
+function momentScoreColour(s: string): string {
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'dark', 'standard');
+  return getScoreColor(0, 'dark', 'standard');
+}
 import { type HeroState } from '../HybridHero.utils';
 
 export interface PhotoBandProps {
@@ -461,7 +469,7 @@ export function PhotoBand({
                       ...NUMERIC_STYLE,
                       fontSize: 13,
                       fontWeight: 800,
-                      color: AMBER,
+                      color: momentScoreColour(momentScore),
                     }}
                   >
                     {momentScore}
