@@ -213,6 +213,22 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   </span>
                 )}
 
+                {(() => {
+                  const st = reactions.stateFor('round', r.score_id);
+                  return (
+                    <ReactionAction
+                      hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+                      readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
+                      count={st.count}
+                      reacted={st.mine}
+                      onToggle={() => reactions.toggle('round', r.score_id)}
+                      label={t('discover.reactions.action', 'Like this round')}
+                    />
+                  );
+                })()}
+
+
+
               </div>
 
             </button>
