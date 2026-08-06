@@ -118,7 +118,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = fal
             d={path(field)}
             fill="none"
             stroke={FIELD_LINE}
-            strokeWidth={2}
+            strokeWidth={1.6}
             strokeLinejoin="round"
             strokeLinecap="round"
           />
@@ -127,11 +127,12 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = fal
         <path
           d={path(you)}
           fill="none"
-          stroke={A.AMBER}
-          strokeWidth={2.5}
+          stroke={own ? A.AMBER : A.INK}
+          strokeWidth={2}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
+
 
         {beads.map((b) => (
           <circle
