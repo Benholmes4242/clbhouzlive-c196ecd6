@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useExploreRegion } from './hooks/useExploreRegion';
+import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
+import { useDiscoverLensSets } from './courseled/hooks/useDiscoverLensSets';
+import { useWantToPlayToggle } from '@/hooks/useWantToPlayToggle';
+import { lensLabelKey } from './wire/ScopePills';
+import { toast } from '@/lib/toast';
+
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
