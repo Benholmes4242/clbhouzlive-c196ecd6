@@ -1,19 +1,4 @@
 {
-  "followPrompt": {
-    "eyebrow": "YOUR TOUR",
-    "title": "Which tour do you follow most?",
-    "body": "We will open the Tour Hub here first. You can switch any time.",
-    "save": "Save",
-    "skip": "Skip",
-    "tours": {
-      "pga": "PGA",
-      "lpga": "LPGA",
-      "euro": "DP World",
-      "liv": "LIV",
-      "champ": "Champions",
-      "pgad": "Korn Ferry"
-    }
-  },
   "status": {
     "live": "LIVE",
     "upcoming": "UPCOMING",
