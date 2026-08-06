@@ -134,6 +134,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
+  // A deep link (?review=<id>) both highlights the row AND opens the review
+  // sheet on it. The param is stripped straight away (so back/forward does not
+  // re-open), so the id is parked here until the reviews query resolves.
+  const [pendingSheetReviewId, setPendingSheetReviewId] = useState<string | null>(null);
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const reviewIdFromUrl = searchParams.get('review') || searchParams.get('reviewId');
@@ -141,6 +146,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     
     if (reviewIdToHighlight) {
       setHighlightedReviewId(reviewIdToHighlight);
+      if (reviewIdFromUrl) setPendingSheetReviewId(reviewIdFromUrl);
       
       if (reviewIdFromUrl) {
         setSearchParams(prev => {
@@ -158,6 +164,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [location.search, location.pathname]);
+
 
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
     const fromLocationState = Boolean(location.state?.highlightMyReview);
