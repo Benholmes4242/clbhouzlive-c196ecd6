@@ -168,8 +168,9 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
               key={e.id}
               style={{
                 ...CARD_SHELL,
+                // No border and no new-since ink ring on tour cards.
                 border: 'none',
-                ...(isNewSince(e.startDate, lastSeen) ? NEW_CARD_RING : null),
+                boxShadow: 'none',
                 width: 272,
                 flexShrink: 0,
                 fontFamily: SANS,
