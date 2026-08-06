@@ -392,8 +392,12 @@ export default function ExploreTabContent({
           // 16px above it and the 20px below it, and when the row is absent it
           // collapses to a single 24px gap of its own.
           padding: '0 16px 0',
-          // +16px breathing room under the floating islands (spacing pass).
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 68px)',
+          // ISLANDS -> EYEBROW = exactly 16px. The island is fixed at
+          // sat + 10px and is 44px tall, so its bottom edge is sat + 54px.
+          // The old max(sat,47) + 68 formula gave 14px on a notch and 61px
+          // without one; sat + 70 gives 16px everywhere.
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+
         }}
       >
         <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
