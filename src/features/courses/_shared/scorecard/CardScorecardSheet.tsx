@@ -237,6 +237,18 @@ const Legend: React.FC = () => {
 
 /* ------------------------------------------------------ round breakdown */
 
+/**
+ * THE BREAKDOWN BAR KEEPS ITS SEMANTIC COLOURS — deliberate, do not neutralise.
+ * This sheet pairs one round with a facsimile of a physical card, where RED
+ * ALREADY MEANS UNDER PAR in the card's red circles, so a red BIRDIE+ agrees
+ * with the card inches below it. The Course-tab hole rows had to surrender the
+ * bar's colour because they are a FIELD comparison and needed green/red to mark
+ * you against the field. Different jobs, different rules. Do not "harmonise".
+ *
+ * A zero band renders NO segment (never a zero-width sliver) and its cell shows
+ * 0 in DIM rather than the band colour — a colour there would claim a score
+ * that was not made.
+ */
 const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[] }> = ({ split }) => (
   <div>
     <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
@@ -248,12 +260,13 @@ const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[]
       {split.map((s) => (
         <div key={s.label} style={{ textAlign: 'center' }}>
           <div style={LABEL}>{s.label}</div>
-          <div style={{ ...NUM, fontSize: 18, color: s.tone, marginTop: 3 }}>{s.n}</div>
+          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.DIM, marginTop: 3 }}>{s.n}</div>
         </div>
       ))}
     </div>
   </div>
 );
+
 
 /* -------------------------------------------- loading and empty middles */
 
