@@ -85,11 +85,14 @@ export default function ExploreTabContent({
     return () => io.disconnect();
   }, []);
 
-  const { events, legendary, isLoading: wireLoading } = useDiscoverWire(
-    activeRegion,
+  // The pool is unchanged: ONE 90-day fetch, worldwide. The lenses are
+  // client-side filters and ordering over data already loaded.
+  const { events: pool, legendary, isLoading: wireLoading } = useDiscoverWire(
+    null,
     userId,
     crownCategoryLabel,
   );
+
   const { data: moments } = useMomentsOfTheWeek();
   const { data: mostPlayed } = useMostPlayedThisWeek();
 
