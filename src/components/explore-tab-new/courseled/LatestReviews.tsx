@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ReviewTile } from './ReviewTile';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { Eyebrow, InkAction } from './tokens';
+
 import type { LatestReview } from './hooks/useLatestReviews';
 
 /**
