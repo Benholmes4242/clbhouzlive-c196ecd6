@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Swords, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
@@ -41,6 +41,19 @@ function initials(name: string | null | undefined): string {
   );
 }
 
+/**
+ * Local form of the last exchange: the board only, scoped to this course.
+ * The RPC returns "Most Eagles at Course Name - they took it"; the course is
+ * already the page, and who took it is not the point of the line.
+ */
+function localReason(desc: string | null | undefined): string | null {
+  if (!desc) return null;
+  const board = desc.split(' at ')[0].split(' - ')[0].trim();
+  if (!board) return null;
+  const sentence = board.charAt(0).toUpperCase() + board.slice(1).toLowerCase();
+  return `${sentence} here`;
+}
+
 export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = false }) => {
   const navigate = useNavigate();
 
@@ -62,6 +75,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
   if (!userId || !data || !data.rival_user_id) return null;
 
   const name = data.rival_name ?? 'Rival';
+  const reason = localReason(data.last_event_desc);
 
   return (
     <button
@@ -83,7 +97,6 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         cursor: 'pointer',
       }}
     >
-      <Swords size={12} strokeWidth={2.4} color={A.AMBER_DEEP} style={{ flexShrink: 0 }} />
       <SquircleAvatar
         size={26}
         srcCandidates={data.rival_avatar ? [data.rival_avatar] : []}
@@ -106,16 +119,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         >
           {name}
         </span>
-        <span
-          style={{
-            ...KICKER,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Your rival here
-        </span>
-
-        {data.last_event_desc ? (
+        {reason ? (
           <span
             style={{
               fontSize: 11.5,
@@ -127,7 +131,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
               minWidth: 0,
             }}
           >
-            {data.last_event_desc}
+            {reason}
           </span>
         ) : null}
       </div>
