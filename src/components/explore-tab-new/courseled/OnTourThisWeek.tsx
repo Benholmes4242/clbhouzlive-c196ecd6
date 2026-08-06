@@ -335,12 +335,37 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 }}
               >
                 {peek && peek.chasingName ? (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {peek.chasingName} {DOT}{' '}
-                    <span style={{ ...NUMF, fontWeight: 700, color: A.BODY }}>
-                      {fmtScore(peek.chasingScore)}
-                    </span>
-                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ ...LABEL, color: A.DIM }}>
+                      {t('discover.chasing', 'Chasing')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 1 }}>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: A.INK,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          minWidth: 0,
+                        }}
+                      >
+                        {peek.chasingName}
+                      </span>
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: scoreColor(peek.chasingScore),
+                        }}
+                      >
+                        {fmtScore(peek.chasingScore)}
+                      </span>
+                    </div>
+                  </div>
+
                 ) : peek ? (
                   // Second place unresolved while live: omit rather than blank.
                   <span style={{ fontSize: 11, color: A.DIM }}>{e.tourLabel}</span>
