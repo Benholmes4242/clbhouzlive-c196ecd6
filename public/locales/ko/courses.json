@@ -703,7 +703,13 @@
       "action": "Add to your list",
       "failed": "Could not update your list"
     },
-    "emptyPool": "Nothing logged anywhere in the last 90 days."
+    "emptyPool": "Nothing logged anywhere in the last 90 days.",
+    "latestReviews": "Latest reviews",
+    "reviews": {
+      "ratedChip": "Rated",
+      "someone": "A member",
+      "sheetCaption": "{{count}} reviews"
+    }
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",
