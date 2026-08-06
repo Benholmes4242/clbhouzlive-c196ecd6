@@ -6,7 +6,7 @@ import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
-import { ReactionAction } from './ReactionAction';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 
 import {
