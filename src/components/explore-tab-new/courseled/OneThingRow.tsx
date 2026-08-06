@@ -75,24 +75,14 @@ export function OneThingRow({ userId }: Props) {
     return <div aria-hidden style={{ height: 24 }} />;
   }
 
-  const copy =
+  // The row already shows a thumbnail and names the action, so the sentence
+  // spends no width restating them: line 1 is the course, line 2 the status.
+  const status =
     shown.kind === 'rate'
-      ? t(
-          'discover.prompt.rate',
-          'You recently played {{course}} but have not rated it yet.',
-          { course: shown.courseName },
-        )
+      ? t('discover.prompt.statusRate', 'Played \u00B7 not rated yet')
       : shown.kind === 'finish'
-        ? t(
-            'discover.prompt.finish',
-            'Your {{course}} rating is missing the category detail.',
-            { course: shown.courseName },
-          )
-        : t(
-            'discover.prompt.photo',
-            'You played {{course}} recently - add a photo from the round?',
-            { course: shown.courseName },
-          );
+        ? t('discover.prompt.statusFinish', 'Rated \u00B7 detail missing')
+        : t('discover.prompt.statusPhoto', 'Played \u00B7 add a photo?');
 
   const [actionKey, actionFallback] = ACTION_KEY[shown.kind];
 
@@ -119,25 +109,35 @@ export function OneThingRow({ userId }: Props) {
         />
       )}
 
-      {/* TWO LINES, clamped. A fixed two-line min-height keeps the row's height
-          identical whether the course name is short or long. */}
-      <div
-        style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: 12.5,
-          fontWeight: 600,
-          lineHeight: 1.35,
-          minHeight: 34,
-          color: A.BODY,
-          display: '-webkit-box',
-          WebkitBoxOrient: 'vertical',
-          WebkitLineClamp: 2,
-          overflow: 'hidden',
-        }}
-      >
-        {copy}
+      {/* TWO single-line children: the course name is the only thing allowed to
+          ellipsize; the status always reads in full. */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            lineHeight: 1.3,
+            color: A.INK,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {shown.courseName}
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            lineHeight: 1.35,
+            color: A.BODY,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {status}
+        </div>
       </div>
+
 
 
       <button
