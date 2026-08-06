@@ -14729,6 +14729,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_surface_last_seen: {
+        Row: {
+          last_seen_at: string
+          surface_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          last_seen_at?: string
+          surface_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          last_seen_at?: string
+          surface_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_top_ten_courses: {
         Row: {
           course_id: string
@@ -21322,6 +21343,10 @@ export type Database = {
         Returns: undefined
       }
       mark_message_read: { Args: { p_message_id: string }; Returns: undefined }
+      mark_surface_seen: {
+        Args: { p_seen_at?: string; p_surface_key: string }
+        Returns: string
+      }
       mark_today_visited: { Args: never; Returns: undefined }
       match_tour_rankings_players: { Args: never; Returns: undefined }
       match_whs_course_to_golf_course: {
