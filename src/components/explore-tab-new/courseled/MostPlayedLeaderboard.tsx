@@ -18,6 +18,8 @@ import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkel
 interface Props {
   rows: MostPlayedRow[];
   limit?: number;
+  /** TRUE while the rounds aggregate has not settled — shell holds the slot. */
+  isPending?: boolean;
   onRowPress: (row: MostPlayedRow) => void;
   onSeeAll?: () => void;
   showEyebrow?: boolean;
@@ -26,15 +28,23 @@ interface Props {
 export function MostPlayedLeaderboard({
   rows,
   limit = 5,
+  isPending = false,
   onRowPress,
   onSeeAll,
   showEyebrow = true,
 }: Props) {
   const { t } = useTranslation('courses');
   const shown = rows.slice(0, limit);
-  const { data: meta } = useCourseCardMeta(shown.map((r) => r.courseId));
+  const metaQuery = useCourseCardMeta(shown.map((r) => r.courseId));
+  const meta = metaQuery.data;
+  // DECORATION ONLY (layer 2b): the row already holds its own course_name from
+  // gam_round_stats, so only the THUMBNAIL waits — the shimmer sits in that slot
+  // while the rest of the row reads straight away.
+  const thumbPending = shown.length > 0 && metaQuery.isPending;
 
+  if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
+
 
   return (
     <section>
