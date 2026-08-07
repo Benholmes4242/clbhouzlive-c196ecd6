@@ -189,6 +189,8 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
 
         ))}
       </div>
+      )}
+
       <div style={CARD_SHELL}>
         <Bar style={{ borderRadius: 0, height: 128, width: '100%' }} />
         <div style={{ padding: '3px 16px 5px' }}>
