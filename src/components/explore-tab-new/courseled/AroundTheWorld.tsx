@@ -665,10 +665,10 @@ export function AroundTheWorld({
            * function of position. Everything the masonry walk needs is decided
            * here — the placement step never touches the DOM.
            */
-          const tiles = shown.map((g, i) => {
+          const tiles = slots.list.map(({ g, top, key: slotKey }, i) => {
             const m = meta?.get(g.courseId);
             const rating = ratings?.get(g.courseId);
-            const top = headlineOf(g.events);
+
             const photo = ATW_PHOTO_HEIGHTS[Math.min(i, ATW_PHOTO_HEIGHTS.length - 1)];
             const tall = photo >= TALL;
 
