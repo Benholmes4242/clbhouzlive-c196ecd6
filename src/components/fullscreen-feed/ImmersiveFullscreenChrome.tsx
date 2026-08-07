@@ -233,6 +233,15 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // position map (which lags horizontal swipes in fullscreen).
   const carouselSlide = activePagerIdx ?? carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
+  // MUTE GATE — audio control only exists over media that has audio.
+  // The slide index is clamped into range before indexing: activePagerIdx is a
+  // horizontal position within ONE post's carousel, so a stale value from the
+  // outgoing post could otherwise resolve to undefined on a new single-media
+  // post and hide the speaker on an actual video.
+  const activeSlide = mediaCount > 0 && carouselSlide < mediaCount ? carouselSlide : 0;
+  const activeMediaIsVideo =
+    mediaCount > 0 && activePost?.mediaItems?.[activeSlide]?.type === 'video';
+
 
 
   if (feedEnded) {
@@ -575,10 +584,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       </div>
 
       {/* Bottom-RIGHT — vertical action rail (no avatar).
-          ONE wrapper, always mounted: mute is never suppressed (read-only /
-          gallery opens still need audio control on videos). Only the
-          engagement buttons below it are gated on !readOnly, so normal-mode
-          layout is pixel-identical to before. */}
+          ONE wrapper, always mounted. Mute is exempt from the !readOnly gate
+          (read-only / gallery opens still need audio control on videos) but is
+          gated on the active slide BEING a video — a photograph has no audio to
+          control. Only the engagement buttons below it are gated on !readOnly.
+          The column is bottom-anchored, so dropping mute (its first child)
+          shortens it from the top and the buttons beneath do not move. */}
       <div
         style={{
           position: 'fixed',
@@ -590,16 +601,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           fontFamily: 'Geist, system-ui, sans-serif',
         }}
       >
-        <RailButton
-          onClick={handleMuteTap}
-          ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
-        >
-          {isAudioMuted ? (
-            <VolumeX size={32} stroke="#fff" strokeWidth={2} />
-          ) : (
-            <Volume2 size={32} stroke="#fff" strokeWidth={2} />
-          )}
-        </RailButton>
+        {activeMediaIsVideo && (
+          <RailButton
+            onClick={handleMuteTap}
+            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
+          >
+            {isAudioMuted ? (
+              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
+            ) : (
+              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
+            )}
+          </RailButton>
+        )}
 
         {!readOnly && (
           <>
