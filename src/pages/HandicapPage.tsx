@@ -504,6 +504,25 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/handicap" replace />;
   }
 
+  /**
+   * A MEMBER'S HANDICAP PAGE IS PRIVATE TO THEM.
+   * The route survives because delivered pushes and gam_notification_outbox
+   * rows carry stored /handicap/{userId} destinations that cannot be
+   * rewritten retrospectively - the same reason /handicap/rivalry/:id was
+   * kept. So it redirects instead of 404ing. "Is this me" is the signed-in
+   * session id from useSupabaseSession, compared above; anything else is
+   * another member and lands on compare against them, sheet already open.
+   * `replace` keeps the member off a back-button bounce.
+   */
+  if (friendId) {
+    return (
+      <Navigate
+        to={`/handicap?subtab=circle&compare=${encodeURIComponent(friendId)}`}
+        replace
+      />
+    );
+  }
+
   if (!ownerUserId) {
     return <Navigate to="/auth" replace />;
   }
