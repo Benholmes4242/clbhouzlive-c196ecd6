@@ -61,11 +61,13 @@ export function formatValue(
   if (raw == null || raw === '') return '-';
   const n = Number(raw);
   if (!Number.isFinite(n)) return '-';
+  // Negatives take a true minus U+2212, never a hyphen, so columns align.
+  const minus = (s: string) => s.replace('-', '\u2212');
   if (decimals != null) {
     const sign = format === 'delta_low_better' && n > 0 ? '+' : '';
-    return `${sign}${n.toFixed(decimals)}`;
+    return minus(`${sign}${n.toFixed(decimals)}`);
   }
-  return String(Math.round(n));
+  return minus(String(Math.round(n)));
 }
 
 export type Winner = 'me' | 'them' | 'tie';
@@ -96,9 +98,10 @@ export function whoLeads(
   const m = me as number | null | undefined;
   const t = them as number | null | undefined;
 
-  if (m == null && t == null) return { winner: 'tie', diff: 0 };
-  if (m == null) return { winner: 'them', diff: 0 };
-  if (t == null) return { winner: 'me', diff: 0 };
+  // A NULL IS NOT A SCORE. No figure means nobody leads: a member with no
+  // best gross has not been beaten by one with 65, they simply have not
+  // posted one. The bar goes neutral for the same reason.
+  if (m == null || t == null) return { winner: 'tie', diff: 0 };
 
   // Nobody leads at zero aces.
   if (m === 0 && t === 0) return { winner: 'tie', diff: 0 };

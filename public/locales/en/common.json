@@ -441,10 +441,15 @@
         "roundsUnderPar": "Rounds under par",
         "roundsUnder80": "Rounds under 80",
         "bestStableford": "Best stableford",
-        "top100Played": "Top 100 played"
+        "top100Played": "Top 100 played",
+        "grossWins": "Gross wins",
+        "bestMarginPts": "Best margin (pts)"
       },
       "career": "CAREER",
-      "careerFooter": "Every round each of you has posted, at any course - not just the ones you played together"
+      "careerFooter": "Every round each of you has posted, at any course - not just the ones you played together",
+      "youLeadByWithTies": "You lead by {{n}}, {{ties}} tied",
+      "theyLeadByWithTies": "{{name}} leads by {{n}}, {{ties}} tied",
+      "levelAtWithTies": "Level at {{n}}, {{ties}} tied"
     },
     "legends": {
       "window90d": "90 days",
