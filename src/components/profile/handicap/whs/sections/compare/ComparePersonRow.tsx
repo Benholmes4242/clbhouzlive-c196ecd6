@@ -17,7 +17,12 @@ import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 
 export interface ComparePerson {
   userId: string;
-  name: string;
+  /**
+   * NULL MEANS UNRESOLVED, NOT ABSENT. A clbhouz member's name comes from
+   * user_profiles; while that read is in flight the row and the sheet hold a
+   * shell rather than substituting a placeholder or a UI string.
+   */
+  name: string | null;
   avatarUrl: string | null;
   /** Handicap index, when known. */
   index: number | null;
@@ -83,7 +88,7 @@ export const ComparePersonRow: React.FC<Props> = ({
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span>{getInitialsFromName(person.name) || '?'}</span>
+          <span>{person.name ? getInitialsFromName(person.name) || '?' : ''}</span>
         )}
         {/* Canonical traced hairline ring - dark surface token. */}
         <div
@@ -110,7 +115,18 @@ export const ComparePersonRow: React.FC<Props> = ({
             textOverflow: 'ellipsis',
           }}
         >
-          {person.name}
+          {person.name ?? (
+            <span
+              aria-hidden
+              style={{
+                display: 'inline-block',
+                width: 116,
+                height: 11,
+                borderRadius: 4,
+                background: CHART.PANEL_2,
+              }}
+            />
+          )}
         </div>
         {person.contextLine && (
           <div
