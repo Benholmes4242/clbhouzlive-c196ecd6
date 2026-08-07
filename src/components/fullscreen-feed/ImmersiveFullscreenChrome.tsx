@@ -584,10 +584,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       </div>
 
       {/* Bottom-RIGHT — vertical action rail (no avatar).
-          ONE wrapper, always mounted: mute is never suppressed (read-only /
-          gallery opens still need audio control on videos). Only the
-          engagement buttons below it are gated on !readOnly, so normal-mode
-          layout is pixel-identical to before. */}
+          ONE wrapper, always mounted. Mute is exempt from the !readOnly gate
+          (read-only / gallery opens still need audio control on videos) but is
+          gated on the active slide BEING a video — a photograph has no audio to
+          control. Only the engagement buttons below it are gated on !readOnly.
+          The column is bottom-anchored, so dropping mute (its first child)
+          shortens it from the top and the buttons beneath do not move. */}
       <div
         style={{
           position: 'fixed',
@@ -599,16 +601,18 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           fontFamily: 'Geist, system-ui, sans-serif',
         }}
       >
-        <RailButton
-          onClick={handleMuteTap}
-          ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
-        >
-          {isAudioMuted ? (
-            <VolumeX size={32} stroke="#fff" strokeWidth={2} />
-          ) : (
-            <Volume2 size={32} stroke="#fff" strokeWidth={2} />
-          )}
-        </RailButton>
+        {activeMediaIsVideo && (
+          <RailButton
+            onClick={handleMuteTap}
+            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
+          >
+            {isAudioMuted ? (
+              <VolumeX size={32} stroke="#fff" strokeWidth={2} />
+            ) : (
+              <Volume2 size={32} stroke="#fff" strokeWidth={2} />
+            )}
+          </RailButton>
+        )}
 
         {!readOnly && (
           <>
