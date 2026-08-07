@@ -299,6 +299,59 @@ function birdieHaulEvent(row: FeatRow, index: number, userId?: string): WireEven
   };
 }
 
+/**
+ * ROUND-LEVEL FEATS (BRIEF_ATW_MASONRY §5) — under par, bogey-free, 45+
+ * Stableford. One rail, discriminated by `feat_type`. Unknown feat_types are
+ * skipped rather than guessed at, so a server-side addition cannot render a
+ * blank tile here before the client knows how to word it.
+ *
+ * TO-PAR figures carry a TRUE MINUS (U+2212) so they align with tabular
+ * figures in the tile chip.
+ */
+function roundFeatEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
+  const at = whenOf(row);
+  if (!at) return null;
+  const type = (row.feat_type ?? '').toLowerCase();
+  const value = numeric(row.feat_value ?? row.value);
+
+  if (type === 'under_par') {
+    if (value == null || value >= 0) return null;
+    const n = Math.round(Math.abs(value));
+    return {
+      ...baseEvent(row, 'under_par', at, index, userId),
+      actionKey: 'discover.wire.action.underPar',
+      figure: `\u2212${formatNumber(n)}`,
+      figureSubKey: 'discover.wire.unit.toPar',
+      rarity: 2,
+    };
+  }
+
+  if (type === 'bogey_free') {
+    return {
+      ...baseEvent(row, 'bogey_free', at, index, userId),
+      actionKey: 'discover.wire.action.bogeyFree',
+      figure: formatNumber(0),
+      figureSubKey: 'discover.wire.unit.bogeys',
+      rarity: 2,
+    };
+  }
+
+  if (type === 'stableford') {
+    if (value == null || value <= 0) return null;
+    const points = Math.round(value);
+    return {
+      ...baseEvent(row, 'stableford', at, index, userId),
+      actionKey: 'discover.wire.action.stableford',
+      actionParams: { points },
+      figure: formatNumber(points),
+      figureSubKey: 'discover.wire.unit.points',
+      rarity: 2,
+    };
+  }
+
+  return null;
+}
+
 export interface DiscoverWireResult {
   /** Inside the 90-day horizon, newest first. Legendary events excluded. */
   events: WireEvent[];
