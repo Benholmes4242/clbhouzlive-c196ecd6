@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 export interface ScorecardTarget {
   scoreId: string;

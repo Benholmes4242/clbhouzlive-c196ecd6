@@ -30,6 +30,7 @@ import { ProfileGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, SANS, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 

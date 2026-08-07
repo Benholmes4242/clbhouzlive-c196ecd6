@@ -21,6 +21,7 @@ import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
