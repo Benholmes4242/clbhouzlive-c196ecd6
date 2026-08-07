@@ -282,6 +282,33 @@ export function LiveFieldPanel({
   const { data: holeRows } = useTournamentHoleAverages(tournamentId || undefined, round, { live });
   const rows = holeRows ?? [];
 
+  /**
+   * Surnames of everyone on the low round — one name when outright, all of
+   * them when shared. Read off the same completed-round figures lowRoundToday
+   * used, so the set can never disagree with the figure above it.
+   */
+  const holders = useMemo(() => {
+    if (!low) return [] as string[];
+    const key = ['round_1', 'round_2', 'round_3', 'round_4'][round - 1];
+    if (!key) return [] as string[];
+    const names: string[] = [];
+    for (const e of entries as any[]) {
+      const v = e?.[key];
+      if (v == null || Number(v) !== low.toPar) continue;
+      if (e?.thru != null && e.thru < 18) continue;
+      const full = (e?.player?.full_name ?? '').trim();
+      if (!full) continue;
+      const parts = full.split(/\s+/);
+      names.push(parts[parts.length - 1]);
+    }
+    if (names.length === 0 && low.playerName) {
+      const parts = low.playerName.trim().split(/\s+/);
+      names.push(parts[parts.length - 1]);
+    }
+    return names;
+  }, [entries, round, low]);
+
+
   useEffect(() => {
     if (!field || !tournamentId) return;
     analyticsEvents.track('tour_field_average_shown', {
