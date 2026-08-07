@@ -1,6 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +10,6 @@ interface HeaderPhotoCardProps {
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
   onRemove?: () => void;
-  variant?: 'card' | 'bare';
 }
 
 /**
@@ -30,7 +28,6 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   previewUrl,
   onFileChange,
   onRemove,
-  variant = 'card',
 }) => {
   const { t } = useTranslation('profile');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,13 +37,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
 
   const displayUrl = previewUrl || currentUrl;
 
-  const handleClick = () => {
-    if (variant === 'bare') {
-      setSheetOpen(true);
-    } else {
-      inputRef.current?.click();
-    }
-  };
+  const handleClick = () => setSheetOpen(true);
 
   const triggerPicker = () => inputRef.current?.click();
   const triggerCapture = () => {
@@ -106,157 +97,77 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
     />
   );
 
-  if (variant === 'bare') {
-    return (
-      <>
-        <button
-          type="button"
-          onClick={handleClick}
-          aria-label={displayUrl ? 'Edit cover' : 'Add cover'}
-          style={{
-            position: 'relative',
-            display: 'block',
-            width: '100%',
-            aspectRatio: HEADER_ASPECT_CSS,
-            background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
-            overflow: 'hidden',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-          }}
-        >
-          {displayUrl ? (
-            <img
-              src={displayUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          ) : null}
-          <span
-            style={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'rgba(0,0,0,0.45)',
-              color: '#fff',
-              fontFamily: 'Geist, -apple-system, sans-serif',
-              fontSize: 12.5,
-              fontWeight: 500,
-              padding: '7px 11px',
-              borderRadius: 9,
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
-          >
-            <Camera size={13} strokeWidth={2.25} />
-            {displayUrl ? 'Edit cover' : 'Add cover'}
-          </span>
-        </button>
-        <p
-          style={{
-            margin: '8px 16px 0',
-            fontFamily: 'Geist, -apple-system, sans-serif',
-            fontSize: 11.5,
-            fontWeight: 500,
-            color: 'hsl(var(--muted-foreground))',
-          }}
-        >
-          {t('hero.coverGuidance')}
-        </p>
-        {fileInput}
-        {cropper}
-        <PhotoActionSheet
-          open={sheetOpen}
-          onClose={() => setSheetOpen(false)}
-          title="Cover photo"
-          hasPhoto={Boolean(displayUrl)}
-          removeLabel="Remove cover"
-          onChoose={triggerPicker}
-          onTake={triggerCapture}
-          onRemove={onRemove}
-        />
-      </>
-    );
-  }
-
-
-  return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Header Photo</h3>
-          <p className="text-xs text-muted-foreground">
-            Appears at the top of your profile
-          </p>
-        </div>
-        {displayUrl && (
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleClick}
-              className="text-sm font-medium text-[hsl(36,77%,49%)] hover:text-[hsl(36,77%,49%)]/80 transition-colors"
-            >
-              Change
-            </button>
-            {onRemove && (
-              <button
-                type="button"
-                onClick={onRemove}
-                className="text-sm text-destructive hover:text-destructive/80 transition-colors active:opacity-70"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
+return (
+    <>
       <button
         type="button"
         onClick={handleClick}
-        style={{ aspectRatio: HEADER_ASPECT_CSS }}
-        className={cn(
-          "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "flex flex-col items-center justify-center",
-          "group",
-          displayUrl
-            ? "border-transparent"
-            : "border-border hover:border-[hsl(38,92%,50%)]/50 hover:bg-[hsl(38,92%,50%)]/5"
-        )}
+        aria-label={displayUrl ? 'Edit cover' : 'Add cover'}
+        style={{
+          position: 'relative',
+          display: 'block',
+          width: '100%',
+          aspectRatio: HEADER_ASPECT_CSS,
+          background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
+          overflow: 'hidden',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+        }}
       >
         {displayUrl ? (
-          <>
-            <img
-              src={displayUrl}
-              alt="Header preview"
-              className="h-full w-full object-cover object-center rounded-xl"
-            />
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
-              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
-                <Camera className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-[hsl(38,92%,50%)]/20 transition-colors">
-              <Camera className="w-8 h-8 text-[hsl(38,92%,50%)]" />
-            </div>
-            <p className="text-sm font-medium text-foreground mb-1">
-              Upload header photo
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('hero.coverGuidance')}
-            </p>
-          </div>
-        )}
+          <img
+            src={displayUrl}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : null}
+        <span
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(0,0,0,0.45)',
+            color: '#fff',
+            fontFamily: 'Geist, -apple-system, sans-serif',
+            fontSize: 12.5,
+            fontWeight: 500,
+            padding: '7px 11px',
+            borderRadius: 9,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >
+          <Camera size={13} strokeWidth={2.25} />
+          {displayUrl ? 'Edit cover' : 'Add cover'}
+        </span>
       </button>
-
+      <p
+        style={{
+          margin: '8px 16px 0',
+          fontFamily: 'Geist, -apple-system, sans-serif',
+          fontSize: 11.5,
+          fontWeight: 500,
+          color: 'hsl(var(--muted-foreground))',
+        }}
+      >
+        {t('hero.coverGuidance')}
+      </p>
       {fileInput}
       {cropper}
-    </div>
+      <PhotoActionSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        title="Cover photo"
+        hasPhoto={Boolean(displayUrl)}
+        removeLabel="Remove cover"
+        onChoose={triggerPicker}
+        onTake={triggerCapture}
+        onRemove={onRemove}
+      />
+    </>
   );
 };
