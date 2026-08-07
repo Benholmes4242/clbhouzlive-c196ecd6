@@ -8,6 +8,7 @@ import { formatCurrencyUsdCompact, formatNumber } from '@/i18n/format';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
 import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
+import { TourRail as TourRailShell } from './DiscoverCourseLedSkeleton';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
