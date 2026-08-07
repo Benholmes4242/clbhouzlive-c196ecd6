@@ -807,7 +807,7 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "Played · not rated yet",
+      "statusRate": "Jugado recientemente · sin puntuar",
       "statusFinish": "Rated · detail missing",
       "statusPhoto": "Played · add a photo?",
       "actionRate": "RATE",
@@ -816,7 +816,7 @@
       "dismiss": "Dismiss"
     },
     "live": "En directo",
-    "latest": "Ultimo",
+    "latest": "En directo",
     "roundThru": "R{{round}} · hoyo {{thru}}",
     "thruOnly": "Hoyo {{thru}}",
     "leader": "Líder",
