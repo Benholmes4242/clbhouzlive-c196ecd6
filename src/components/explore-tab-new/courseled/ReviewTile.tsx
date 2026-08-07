@@ -190,10 +190,10 @@ export function ReviewTile({
 
           <div
             style={{
-              marginTop: 4,
+              marginTop: 6,
               fontSize: 9.5,
               fontWeight: 700,
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.62)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
