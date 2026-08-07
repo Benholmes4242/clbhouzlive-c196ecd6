@@ -29,11 +29,14 @@ import { formatNumber, formatOrdinal } from '@/i18n/format';
 /**
  * WIRE KINDS.
  *
- * `under_par`, `bogey_free` and `stableford` are the three ROUND-LEVEL kinds
- * added for BRIEF_ATW_MASONRY. They are produced server-side by
- * `refresh_discover_feats` into the `feats:<region>:round_feats` rail; until
- * that migration lands the rail read simply returns an empty payload and no
- * events of these kinds exist. Nothing else in the client changes shape.
+ * `under_par` and `bogey_free` are the two ROUND-LEVEL kinds added for
+ * BRIEF_ATW_MASONRY (as corrected). Each has its OWN rail —
+ * `feats:<region>:under_par` and `feats:<region>:bogey_free` — produced
+ * server-side by `refresh_discover_feats`; until that migration lands the rail
+ * reads return empty payloads and no events of these kinds exist.
+ *
+ * 45+ Stableford is deliberately ABSENT: its source column carries two
+ * different metrics and cannot be trusted. Do not reintroduce it.
  */
 export type WireKind =
   | 'crown'
@@ -42,8 +45,7 @@ export type WireKind =
   | 'eagle'
   | 'birdie_haul'
   | 'under_par'
-  | 'bogey_free'
-  | 'stableford';
+  | 'bogey_free';
 
 export interface WireEvent {
   id: string;
@@ -93,7 +95,6 @@ export const ACTION_DEFAULTS: Record<string, string> = {
   'discover.wire.action.birdieHaul': 'Made {{count}} birdies',
   'discover.wire.action.underPar': 'Went round under par',
   'discover.wire.action.bogeyFree': 'Went round bogey-free',
-  'discover.wire.action.stableford': 'Made {{points}} Stableford points',
 };
 
 export const UNIT_DEFAULTS: Record<string, string> = {
@@ -300,56 +301,38 @@ function birdieHaulEvent(row: FeatRow, index: number, userId?: string): WireEven
 }
 
 /**
- * ROUND-LEVEL FEATS (BRIEF_ATW_MASONRY §5) — under par, bogey-free, 45+
- * Stableford. One rail, discriminated by `feat_type`. Unknown feat_types are
- * skipped rather than guessed at, so a server-side addition cannot render a
- * blank tile here before the client knows how to word it.
+ * ROUND-LEVEL FEATS (BRIEF_ATW_MASONRY §5, as corrected) — under par and
+ * bogey-free, each from its own rail. 45+ Stableford is removed: its source
+ * column carries two different metrics and cannot be trusted.
  *
  * TO-PAR figures carry a TRUE MINUS (U+2212) so they align with tabular
  * figures in the tile chip.
  */
-function roundFeatEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
+function underParEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
   const at = whenOf(row);
   if (!at) return null;
-  const type = (row.feat_type ?? '').toLowerCase();
   const value = numeric(row.feat_value ?? row.value);
+  if (value == null || value >= 0) return null;
+  const n = Math.round(Math.abs(value));
+  return {
+    ...baseEvent(row, 'under_par', at, index, userId),
+    actionKey: 'discover.wire.action.underPar',
+    figure: `\u2212${formatNumber(n)}`,
+    figureSubKey: 'discover.wire.unit.toPar',
+    rarity: 2,
+  };
+}
 
-  if (type === 'under_par') {
-    if (value == null || value >= 0) return null;
-    const n = Math.round(Math.abs(value));
-    return {
-      ...baseEvent(row, 'under_par', at, index, userId),
-      actionKey: 'discover.wire.action.underPar',
-      figure: `\u2212${formatNumber(n)}`,
-      figureSubKey: 'discover.wire.unit.toPar',
-      rarity: 2,
-    };
-  }
-
-  if (type === 'bogey_free') {
-    return {
-      ...baseEvent(row, 'bogey_free', at, index, userId),
-      actionKey: 'discover.wire.action.bogeyFree',
-      figure: formatNumber(0),
-      figureSubKey: 'discover.wire.unit.bogeys',
-      rarity: 2,
-    };
-  }
-
-  if (type === 'stableford') {
-    if (value == null || value <= 0) return null;
-    const points = Math.round(value);
-    return {
-      ...baseEvent(row, 'stableford', at, index, userId),
-      actionKey: 'discover.wire.action.stableford',
-      actionParams: { points },
-      figure: formatNumber(points),
-      figureSubKey: 'discover.wire.unit.points',
-      rarity: 2,
-    };
-  }
-
-  return null;
+function bogeyFreeEvent(row: FeatRow, index: number, userId?: string): WireEvent | null {
+  const at = whenOf(row);
+  if (!at) return null;
+  return {
+    ...baseEvent(row, 'bogey_free', at, index, userId),
+    actionKey: 'discover.wire.action.bogeyFree',
+    figure: formatNumber(0),
+    figureSubKey: 'discover.wire.unit.bogeys',
+    rarity: 2,
+  };
 }
 
 export interface DiscoverWireResult {
@@ -388,15 +371,16 @@ export function useDiscoverWire(
   const legendaryRail = useRegionFeats(region, 'legendary', 'latest', live);
   const eagles = useRegionFeats(region, 'eagles', 'latest', live);
   const hauls = useRegionFeats(region, 'birdie_hauls', 'latest', live);
-  // Empty payload until `refresh_discover_feats` starts writing this rail.
-  const roundFeats = useRegionFeats(region, 'round_feats', 'latest', live);
+  // Empty payloads until `refresh_discover_feats` starts writing these rails.
+  const bogeyFree = useRegionFeats(region, 'bogey_free', 'latest', live);
+  const underPar = useRegionFeats(region, 'under_par', 'latest', live);
 
   const isLoading =
     records.isLoading || legendaryRail.isLoading || eagles.isLoading || hauls.isLoading ||
-    roundFeats.isLoading;
+    bogeyFree.isLoading || underPar.isLoading;
   const isPending =
     records.isPending || legendaryRail.isPending || eagles.isPending || hauls.isPending ||
-    roundFeats.isPending;
+    bogeyFree.isPending || underPar.isPending;
 
   // The records rail is NOT windowed server-side (191 rows against 190 all
   // time), so the horizon is applied here or the month groups grow without
@@ -415,14 +399,26 @@ export function useDiscoverWire(
       const e = birdieHaulEvent(row, i, userId);
       if (e) out.push(e);
     });
-    (roundFeats.data ?? []).forEach((row, i) => {
-      const e = roundFeatEvent(row, i, userId);
+    (bogeyFree.data ?? []).forEach((row, i) => {
+      const e = bogeyFreeEvent(row, i, userId);
+      if (e) out.push(e);
+    });
+    (underPar.data ?? []).forEach((row, i) => {
+      const e = underParEvent(row, i, userId);
       if (e) out.push(e);
     });
     return out
       .filter((e) => withinHorizon(e.at))
       .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
-  }, [records.data, eagles.data, hauls.data, roundFeats.data, userId, categoryLabel]);
+  }, [
+    records.data,
+    eagles.data,
+    hauls.data,
+    bogeyFree.data,
+    underPar.data,
+    userId,
+    categoryLabel,
+  ]);
 
   // Deliberately not windowed: history is the point of the panel.
   const legendary = useMemo(() => {

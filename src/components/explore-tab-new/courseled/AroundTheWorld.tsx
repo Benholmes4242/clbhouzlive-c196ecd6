@@ -106,8 +106,11 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  * PRECEDENCE, which is also the notability order that drives tile size
  * (BRIEF_ATW_MASONRY §5). Lower is more notable.
  *
- *   0 hole in one   1 albatross      2 new course record   3 45+ stableford
- *   4 under par     5 bogey-free     6 birdie haul, 5+     7 anything else
+ *   0 hole in one   1 albatross   2 new course record   3 bogey-free
+ *   4 under par     5 birdie haul, 5+   6 anything else
+ *
+ * Bogey-free outranks under par: a bogey-free round is a strict subset of
+ * under-or-level par, so it is the rarer, more specific claim.
  *
  * Eagles no longer reach this section, so they fall to the tail rather than
  * being given a rung of their own.
@@ -120,16 +123,14 @@ function notability(e: WireEvent | undefined): number {
       return 1;
     case 'crown':
       return 2;
-    case 'stableford':
+    case 'bogey_free':
       return 3;
     case 'under_par':
       return 4;
-    case 'bogey_free':
-      return 5;
     case 'birdie_haul':
-      return 6;
+      return 5;
     default:
-      return 7;
+      return 6;
   }
 }
 
@@ -144,8 +145,7 @@ function headlineOf(events: WireEvent[]): WireEvent | undefined {
 function chipTierFor(kind: WireEvent['kind'] | 'rating'): ChipTier {
   if (kind === 'ace' || kind === 'albatross') return 'gold';
   if (kind === 'rating') return 'rating';
-  if (kind === 'crown' || kind === 'stableford' || kind === 'under_par' || kind === 'bogey_free')
-    return 'green';
+  if (kind === 'crown' || kind === 'bogey_free' || kind === 'under_par') return 'green';
   return 'ink';
 }
 
@@ -382,14 +382,6 @@ export function AroundTheWorld({
     if (e.kind === 'under_par') return t('discover.row.underPar', 'Round under par');
 
     if (e.kind === 'bogey_free') return t('discover.row.bogeyFree', 'Bogey-free round');
-
-    if (e.kind === 'stableford') {
-      const points = Number(e.actionParams?.points ?? 0);
-      return t('discover.row.stableford', {
-        defaultValue: 'Stableford - {{points}} points',
-        points,
-      });
-    }
 
 
     if (e.kind === 'crown') {

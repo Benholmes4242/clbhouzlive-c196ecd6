@@ -3,11 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { slugToCacheRegion } from '../regionScope';
 
 /**
- * `round_feats` carries the round-level kinds (under par, bogey-free, 45+
- * Stableford) added for BRIEF_ATW_MASONRY, at `feats:<region>:round_feats`.
+ * `bogey_free` and `under_par` are the round-level tiers added for
+ * BRIEF_ATW_MASONRY (as corrected). Each kind has its OWN tier and rail —
+ * `feats:<region>:bogey_free`, `feats:<region>:under_par`. There is no
+ * `scoring` tier and no Stableford tier.
  * `eagles` is RETAINED — see the report; it still has a reader.
  */
-export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records' | 'round_feats';
+export type FeatTier =
+  | 'legendary'
+  | 'eagles'
+  | 'birdie_hauls'
+  | 'records'
+  | 'bogey_free'
+  | 'under_par';
 
 export interface FeatRow {
   course_name: string;
