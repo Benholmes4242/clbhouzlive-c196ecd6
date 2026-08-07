@@ -218,6 +218,8 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
+        minHeight: HERO_MIN_HEIGHT,
+
       }}
     >
       {/* Cover photograph under a heavy scrim - decoration only, never a
