@@ -62,7 +62,32 @@ export function MomentsOfTheWeek({
   if (moments.length === 0) return null;
 
 
-  const shown = moments.slice(0, 5);
+  const shown = moments.slice(0, PAGE_CAP);
+
+  // CHUNK IN RANK ORDER. Blocks of exactly three; a remainder of one or two is
+  // never a short block, it becomes the trailing full-width tile or pair row.
+  const blockCount = Math.floor(shown.length / 3);
+  const blocks: Moment[][] = [];
+  for (let i = 0; i < blockCount; i += 1) blocks.push(shown.slice(i * 3, i * 3 + 3));
+  const trailing = shown.slice(blockCount * 3);
+
+  const tile = (m: Moment, height: number, extra?: React.CSSProperties) => (
+    <MomentTile
+      key={m.key}
+      moment={m}
+      onPress={onTilePress}
+      radius={14}
+      initialsSize={height === TALL ? 30 : 20}
+      labelSize={10}
+      labelInset={8}
+      scrimStop="45%"
+      style={{
+        height,
+        ...extra,
+        ...(isNewSince(m.post.createdAt, lastSeen) ? NEW_CARD_RING : null),
+      }}
+    />
+  );
 
   return (
     <section>
@@ -77,27 +102,34 @@ export function MomentsOfTheWeek({
         {t('discover.momentsOfTheMonth', 'Moments of the month')}
       </Eyebrow>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {shown.map((m, i) => {
-          const tall = i === 0;
+      <div style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+        {blocks.map((block, bi) => {
+          // ALTERNATION COUNTS BLOCKS ONLY — trailing rows take no turn.
+          const tallLeft = bi % 2 === 0;
+          const [lead, a, b] = block;
           return (
-            <MomentTile
-              key={m.key}
-              moment={m}
-              onPress={onTilePress}
-              radius={14}
-              initialsSize={tall ? 30 : 20}
-              labelSize={10}
-              labelInset={8}
-              scrimStop="45%"
-              style={{
-                height: tall ? TALL : SHORT,
-                gridRow: tall ? 'span 2' : 'auto',
-                ...(isNewSince(m.post.createdAt, lastSeen) ? NEW_CARD_RING : null),
-              }}
-            />
+            <div
+              key={lead.key}
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: GAP }}
+            >
+              {tile(lead, TALL, {
+                gridColumn: tallLeft ? 1 : 2,
+                gridRow: '1 / span 2',
+              })}
+              {tile(a, SHORT, { gridColumn: tallLeft ? 2 : 1, gridRow: 1 })}
+              {tile(b, SHORT, { gridColumn: tallLeft ? 2 : 1, gridRow: 2 })}
+            </div>
           );
         })}
+
+        {/* A LEFTOVER SINGLE TILE ALWAYS GOES FULL WIDTH. */}
+        {trailing.length === 1 && <div>{tile(trailing[0], SHORT)}</div>}
+
+        {trailing.length === 2 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: GAP }}>
+            {trailing.map((m) => tile(m, SHORT))}
+          </div>
+        )}
       </div>
     </section>
   );
