@@ -13,7 +13,7 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { ratingTextColor } from '@/lib/ratingTier';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
@@ -344,7 +344,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         style={{
           fontSize: 15,
           fontWeight: 800,
-          color: ratingTextColor(row.target_review_rating),
+          color: reviewLabelColor(row.target_review_rating, 'light'),
           fontFamily: GEIST,
         }}
       >
