@@ -424,11 +424,9 @@ function buildFooter(
             label: 'View profile',
             onClick: h.handleViewProfile,
           },
-          {
-            variant: 'secondary',
-            label: 'Handicap',
-            onClick: h.handleSeeHandicap,
-          },
+          // The 'Handicap' action is gone: no path may open another member's
+          // handicap page. Order of the survivors is unchanged.
+
           {
             variant: 'primary',
             label: 'See rivalry',
