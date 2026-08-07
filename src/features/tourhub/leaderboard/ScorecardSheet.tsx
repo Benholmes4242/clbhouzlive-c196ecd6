@@ -158,7 +158,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       coursePar={coursePar}
       courseSlope={null}
       holes={roundHoles}
-      loading={scLoading || fieldLoading}
+      loading={scLoading}
       surface="tour"
 
       heroMuted={demoted}
