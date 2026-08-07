@@ -93,6 +93,7 @@ export function MostPlayedLeaderboard({
                 courseName={name}
                 imageUrl={m?.imageUrl}
                 initialsSize={13}
+                pending={thumbPending}
                 style={{ width: 40, height: 40, borderRadius: 11, flexShrink: 0 }}
               />
               <span style={{ flex: 1, minWidth: 0 }}>
