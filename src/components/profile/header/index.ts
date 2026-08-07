@@ -1,5 +1,4 @@
 // Profile Header Components - Modular components for cinematic profile
-export { default as ProfileHeroShell } from './ProfileHeroShell';
 export { default as ProfileHeaderCard } from './ProfileHeaderCard';
 export { default as ProfileStatsRow } from './ProfileStatsRow';
 export { default as ProfileActionsRow } from './ProfileActionsRow';

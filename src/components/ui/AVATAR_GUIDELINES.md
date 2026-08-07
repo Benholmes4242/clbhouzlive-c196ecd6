@@ -163,5 +163,5 @@ See `src/components/ui/SquircleAvatar.tsx` for the implementation details.
 - 3 duplicate `FALLBACK_PALETTE` / `getAvatarFallbackColor` copies consolidated
   into `src/lib/avatarFallback.ts`.
 - New `CoverPhotoFallback` component unifies the empty cover-photo state
-  across `ProfilePageV2`, `ProfileHeroShell`, and `CinematicProfileHeader`.
+  across `ProfilePageV2` and `CinematicProfileHeader`.
 

@@ -218,7 +218,15 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
-        minHeight: HERO_MIN_HEIGHT,
+        /* The floor exists to make the crop knowable and to stop a cover
+           reflowing mid-render. Both need a photograph, so with no cover and
+           no fallback the block returns to CONTENT height rather than paying
+           127px of flat ink. Gated on the resolved URL, NOT on `showCover`:
+           `coverBroken` is set by onError after first paint, so gating on it
+           would collapse the block post-paint - a worse jump than the one the
+           floor removes. A URL that 404s keeps the floor and shows ink. */
+        minHeight: coverUrl ? HERO_MIN_HEIGHT : undefined,
+
 
       }}
     >

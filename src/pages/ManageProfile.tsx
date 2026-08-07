@@ -430,7 +430,6 @@ function ProfileTabBody({
         <ManageCard padding={0} style={{ overflow: 'visible' }}>
           <div style={{ position: 'relative', borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: 'hidden' }}>
             <HeaderPhotoCard
-              variant="bare"
               currentUrl={form.headerPhotoUrl}
               onFileChange={(file) => {
                 setField('headerPhotoBlob', file);

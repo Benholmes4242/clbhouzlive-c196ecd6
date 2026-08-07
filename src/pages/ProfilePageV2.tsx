@@ -289,14 +289,10 @@ const ProfilePageV2Content: React.FC = () => {
 
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const avatarTakeInputRef = useRef<HTMLInputElement>(null);
-  const heroFileInputRef = useRef<HTMLInputElement>(null);
-  const heroTakeInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [cropMode, setCropMode] = useState<'avatar' | 'hero' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [photoSheet, setPhotoSheet] = useState<'avatar' | 'hero' | null>(null);
+  const [photoSheet, setPhotoSheet] = useState<'avatar' | null>(null);
   const queryClient = useQueryClient();
 
   const profileTypeInfo = getProfileType(profile?.user_type);
@@ -374,18 +370,8 @@ const ProfilePageV2Content: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('avatar');
     setIsCropModalOpen(true);
     if (avatarFileInputRef.current) avatarFileInputRef.current.value = '';
-  };
-
-  const handleHeroFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropMode('hero');
-    setIsCropModalOpen(true);
-    if (heroFileInputRef.current) heroFileInputRef.current.value = '';
   };
 
   const handleAvatarUpload = async (croppedFile: File) => {
@@ -413,31 +399,6 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
-  const handleHeroUpload = async (croppedFile: File) => {
-    if (!user?.id) return;
-    setIsUploadingHero(true);
-    try {
-      const fileExt = croppedFile.name.split('.').pop() || 'jpg';
-      const fileName = `${user.id}/header-${Date.now()}.${fileExt}`;
-      const result = await uploadToR2Only(croppedFile, 'clbhouz-profile-images', fileName);
-      if (!result.success) throw new Error(result.error || 'Upload failed');
-      const { error: updateError } = await supabase.from('user_profiles').update({ header_photo_url: result.publicUrl }).eq('id', user.id);
-      if (updateError) {
-        console.error('[ProfilePage] Cover DB update failed:', updateError);
-        toast.error('Failed to save cover photo. Please try again.');
-        return;
-      }
-      queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-      toast.success('Cover photo updated');
-    } catch (err) {
-      console.error('[ProfilePage] Cover upload error:', err);
-      toast.error('Failed to update cover photo');
-    } finally {
-      setIsUploadingHero(false);
-    }
-  };
-
   const handleAvatarRemove = async () => {
     if (!user?.id) return;
     const { error } = await supabase.from('user_profiles').update({ profile_photo_url: null }).eq('id', user.id);
@@ -446,24 +407,13 @@ const ProfilePageV2Content: React.FC = () => {
     queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
     toast.success('Profile photo removed');
   };
-  const handleHeroRemove = async () => {
-    if (!user?.id) return;
-    const { error } = await supabase.from('user_profiles').update({ header_photo_url: null }).eq('id', user.id);
-    if (error) { toast.error('Failed to remove cover photo'); return; }
-    queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
-    queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-    toast.success('Cover photo removed');
-  };
-
   const handleCropComplete = (croppedFile: File) => {
     setIsCropModalOpen(false);
     if (cropImageSrc) {
       URL.revokeObjectURL(cropImageSrc);
       setCropImageSrc(null);
     }
-    if (cropMode === 'avatar') handleAvatarUpload(croppedFile);
-    if (cropMode === 'hero') handleHeroUpload(croppedFile);
-    setCropMode(null);
+    handleAvatarUpload(croppedFile);
   };
 
   const handleCropCancel = (open: boolean) => {
@@ -1230,20 +1180,18 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Hidden file inputs for inline photo upload (choose + take) */}
       <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />
       <input ref={avatarTakeInputRef} type="file" accept="image/*" capture="user" onChange={handleAvatarFileSelected} className="hidden" />
-      <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleHeroFileSelected} className="hidden" />
-      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleHeroFileSelected} className="hidden" />
 
       {/* Unified photo action sheet — owner only */}
       {isSelf && (
         <PhotoActionSheet
           open={photoSheet !== null}
           onClose={() => setPhotoSheet(null)}
-          title={photoSheet === 'hero' ? 'Cover photo' : 'Profile photo'}
-          hasPhoto={photoSheet === 'hero' ? !!profile?.header_photo_url : !!profile?.profile_photo_url}
-          removeLabel={photoSheet === 'hero' ? 'Remove cover photo' : 'Remove profile photo'}
-          onChoose={() => (photoSheet === 'hero' ? heroFileInputRef : avatarFileInputRef).current?.click()}
-          onTake={() => (photoSheet === 'hero' ? heroTakeInputRef : avatarTakeInputRef).current?.click()}
-          onRemove={() => (photoSheet === 'hero' ? handleHeroRemove() : handleAvatarRemove())}
+          title="Profile photo"
+          hasPhoto={!!profile?.profile_photo_url}
+          removeLabel="Remove profile photo"
+          onChoose={() => avatarFileInputRef.current?.click()}
+          onTake={() => avatarTakeInputRef.current?.click()}
+          onRemove={handleAvatarRemove}
         />
       )}
 
@@ -1253,9 +1201,9 @@ const ProfilePageV2Content: React.FC = () => {
           open={isCropModalOpen}
           onOpenChange={handleCropCancel}
           imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'hero' ? window.innerWidth / (window.innerHeight * 0.35) : 1 / 1.05}
+          aspectRatio={1 / 1.05}
           onCropComplete={handleCropComplete}
-          title={cropMode === 'hero' ? 'Crop Cover Photo' : 'Crop Profile Photo'}
+          title="Crop Profile Photo"
         />
       )}
       <ScrollToTopGlass />

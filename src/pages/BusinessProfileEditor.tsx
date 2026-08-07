@@ -741,7 +741,6 @@ export default function BusinessProfileEditor() {
               }}
             >
               <HeaderPhotoCard
-                variant="bare"
                 currentUrl={effectiveCoverUrl}
                 onFileChange={(file) => { if (file) onCoverFile(file); }}
                 onRemove={onCoverRemove}

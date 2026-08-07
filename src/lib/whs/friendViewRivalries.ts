@@ -92,7 +92,6 @@ async function hydrateRivalries(
       rival_thumbnail_url: match?.friend_thumbnail_url ?? null,
       rival_is_clbhouz_user: !!match?.is_clbhouz_user,
       rival_friend_connection_id: match?.friend_connection_id ?? null,
-      rival_header_photo_url: profile?.header_photo_url ?? null,
       rival_profile_photo_url: profile?.profile_photo_url ?? null,
       rival_mobile_crop_x: profile?.mobile_crop_x ?? null,
       rival_mobile_crop_y: profile?.mobile_crop_y ?? null,
