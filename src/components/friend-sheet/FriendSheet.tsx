@@ -316,10 +316,14 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
             {headerProps && state && (
               <>
+                {/* The header used to tap through to the member's handicap
+                    page - an ELEVENTH callsite the brief did not list. It now
+                    goes to their profile, the other thing the header names. */}
                 <SheetHeader
                   {...headerProps}
-                  onClick={isClbhouzUser ? handleSeeHandicap : null}
+                  onClick={isClbhouzUser ? handleViewProfile : null}
                 />
+
 
                 {/* ─── UNSYNCED states: single hero pitch card ─────────────── */}
                 {state.kind === 'whs_only' && (
