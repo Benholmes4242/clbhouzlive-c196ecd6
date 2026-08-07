@@ -288,44 +288,25 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   minWidth: CARD_MIN_W,
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
-                  background: V4.surface,
-                  border: `1px solid ${AMBER}`,
-                  boxShadow: V4.cardShadow,
-                  borderRadius: 14,
-                  padding: '12px 12px 10px',
-                  position: 'relative',
                 }}
               >
+                <FeaturedLabel text={t('overview.onTheCourse.featuredGroupLabel')} />
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    marginBottom: 8,
+                    background: V4.surface,
+                    border: `0.5px solid ${V4.cardBorder}`,
+                    boxShadow: V4.cardShadow,
+                    borderRadius: 14,
+                    padding: '12px 12px 10px',
+                    position: 'relative',
                   }}
                 >
-                  <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    {time ? `TEE ${time}` : ''}
-                    {time && thru != null ? ' · ' : ''}
-                    {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 8,
-                      fontWeight: 900,
-                      letterSpacing: '0.12em',
-                      color: '#fff',
-                      background: AMBER,
-                      padding: '2px 5px',
-                      borderRadius: 5,
-                      textTransform: 'uppercase',
-                      lineHeight: 1,
-                    }}
-                  >
-                    ★ {t('overview.onTheCourse.featuredChip')}
-                  </span>
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                  {time ? `TEE ${time}` : ''}
+                  {time && thru != null ? ' · ' : ''}
+                  {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
                 </div>
+
                 {(g.players ?? []).slice(0, 3).map((p, pi) => {
                   const name = p.full_name || p.name || '';
                   const status = (p.status || '').toUpperCase();
