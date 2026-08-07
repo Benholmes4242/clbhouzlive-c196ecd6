@@ -131,7 +131,27 @@ export interface RegionFeatsOptions {
    * app-wide `refetchOnWindowFocus: false` in App.tsx, set per query.
    */
   refetchOnWindowFocus?: boolean;
+  /**
+   * Per-call freshness threshold. The DEFAULT matches the real cadence of the
+   * source: `refresh_discover_feats` rebuilds `discover_rail_cache` every TEN
+   * MINUTES, so a shorter threshold buys identical data twice.
+   *
+   * Callers whose rail changes on a different clock pass their own — the
+   * honours board (`legendary`) is all-time and takes an hour. Every rail has
+   * its OWN query key (`tier` is part of it), so a per-call value genuinely
+   * separates them rather than fighting a shared cache entry.
+   *
+   * NOTHING HERE POLLS. This governs refetching only when something asks:
+   * mount, or focus where `refetchOnWindowFocus` is set.
+   */
+  staleTime?: number;
 }
+
+/** The rail-cache rebuild interval. */
+export const RAIL_CACHE_STALE_MS = 10 * 60 * 1000;
+
+/** All-time records change a few times a year, not every ten minutes. */
+export const ALLTIME_RAIL_STALE_MS = 60 * 60 * 1000;
 
 export function useRegionFeats(
   region: string | null,
@@ -153,7 +173,7 @@ export function useRegionFeats(
 
   return useQuery<FeatRow[]>({
     queryKey: ['discover-rail-cache', tier, cacheRegion, mode, railKey],
-    staleTime: 5 * 60 * 1000,
+    staleTime: options.staleTime ?? RAIL_CACHE_STALE_MS,
     refetchOnWindowFocus: options.refetchOnWindowFocus ?? false,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -188,7 +208,8 @@ export function useRegionLegendaryLeaders(region: string | null) {
   const railKey = `legendary_leaders:${cacheRegion}`;
   return useQuery<LegendaryLeaderRow[]>({
     queryKey: ['discover-rail-cache', 'legendary_leaders', cacheRegion, railKey],
-    staleTime: 5 * 60 * 1000,
+    // All-time aces and albatrosses.
+    staleTime: ALLTIME_RAIL_STALE_MS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discover_rail_cache')
@@ -221,7 +242,8 @@ export function useRegionEagleLeaders(region: string | null) {
   const railKey = `eagle_leaders:${cacheRegion}`;
   return useQuery<EagleLeaderRow[]>({
     queryKey: ['discover-rail-cache', 'eagle_leaders', cacheRegion, railKey],
-    staleTime: 5 * 60 * 1000,
+    // All-time eagle counts.
+    staleTime: ALLTIME_RAIL_STALE_MS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('discover_rail_cache')

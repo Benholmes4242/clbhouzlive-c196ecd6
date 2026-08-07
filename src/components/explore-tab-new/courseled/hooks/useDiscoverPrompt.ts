@@ -13,6 +13,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 
@@ -35,7 +36,7 @@ interface MissingDetailRow {
 /** Ratings that exist but carry no category breakdown, newest first. */
 function useRatingsMissingDetail(userId: string | undefined, enabled: boolean) {
   return useQuery({
-    queryKey: ['discover-prompt', 'missing-detail', userId],
+    queryKey: [...DISCOVER_PROMPT_KEY, 'missing-detail', userId],
     enabled: !!userId && enabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<MissingDetailRow[]> => {
@@ -66,7 +67,7 @@ function useRatingsMissingDetail(userId: string | undefined, enabled: boolean) {
 /** Course ids the member has already posted about (any media / any post). */
 function usePostedCourseIds(userId: string | undefined, enabled: boolean) {
   return useQuery({
-    queryKey: ['discover-prompt', 'posted-courses', userId],
+    queryKey: [...DISCOVER_PROMPT_KEY, 'posted-courses', userId],
     enabled: !!userId && enabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<Set<string>> => {

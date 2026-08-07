@@ -1,4 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
+import {
+  DISCOVER_PROMPT_KEY,
+  LATEST_REVIEWS_KEY,
+} from '@/components/explore-tab-new/courseled/discoverQueryKeys';
 import { FEED_QUERY_KEYS } from '@/lib/feedQueryKeys';
 
 
@@ -92,6 +96,15 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
 
   // ── Profile > Courses avg (key variant used by useUserCoursesData) ──
   queryClient.invalidateQueries({ queryKey: ['user-average-rating'], exact: false });
+
+  // ── Discover → Latest reviews ──
+  // Its source is course_ratings, so every rating write reaches it. ONE
+  // section: never a sweep of ['courseled'], which would refetch six.
+  queryClient.invalidateQueries({ queryKey: LATEST_REVIEWS_KEY });
+
+  // ── Discover → the prompt row ──
+  // It recommends rating a course; it must stop recommending one just rated.
+  queryClient.invalidateQueries({ queryKey: DISCOVER_PROMPT_KEY });
 
   // ── review-v2 composer's own queries (stale re-edit in-session) ──
   queryClient.invalidateQueries({ queryKey: ['rv2-existing'], exact: false });
