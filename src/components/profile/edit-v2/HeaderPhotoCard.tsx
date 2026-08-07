@@ -3,6 +3,7 @@ import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
+import { useTranslation } from 'react-i18next';
 
 
 interface HeaderPhotoCardProps {
@@ -13,8 +14,16 @@ interface HeaderPhotoCardProps {
   variant?: 'card' | 'bare';
 }
 
-// Matches profile hero: 3:2 (width-based). Crop and display are pixel-matched.
-const HEADER_ASPECT_RATIO = 3 / 2;
+/**
+ * 1:1. The profile hero block is now pinned to one height (HERO_MIN_HEIGHT in
+ * HeroShell), whose aspect is ~1.006 on a notched device - so a square crop is
+ * what the member actually gets. ONE constant serves personal AND business;
+ * both surfaces mount this card. Never fork it.
+ *
+ * Stored covers are NOT re-cropped: they keep composing under objectFit cover.
+ */
+const HEADER_ASPECT_RATIO = 1 / 1;
+const HEADER_ASPECT_CSS = '1 / 1';
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
@@ -23,6 +32,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   onRemove,
   variant = 'card',
 }) => {
+  const { t } = useTranslation('profile');
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -107,7 +117,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             position: 'relative',
             display: 'block',
             width: '100%',
-            aspectRatio: '3 / 2',
+            aspectRatio: HEADER_ASPECT_CSS,
             background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
             overflow: 'hidden',
             border: 'none',
@@ -145,6 +155,17 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             {displayUrl ? 'Edit cover' : 'Add cover'}
           </span>
         </button>
+        <p
+          style={{
+            margin: '8px 16px 0',
+            fontFamily: 'Geist, -apple-system, sans-serif',
+            fontSize: 11.5,
+            fontWeight: 500,
+            color: 'hsl(var(--muted-foreground))',
+          }}
+        >
+          {t('hero.coverGuidance')}
+        </p>
         {fileInput}
         {cropper}
         <PhotoActionSheet
@@ -196,7 +217,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
       <button
         type="button"
         onClick={handleClick}
-        style={{ aspectRatio: '3 / 2' }}
+        style={{ aspectRatio: HEADER_ASPECT_CSS }}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
           "flex flex-col items-center justify-center",
@@ -228,7 +249,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1500x1000px, 3:2 - JPG, PNG or WebP
+              {t('hero.coverGuidance')}
             </p>
           </div>
         )}
