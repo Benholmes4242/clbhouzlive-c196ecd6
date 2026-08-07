@@ -8,6 +8,7 @@ import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import {
   A,
