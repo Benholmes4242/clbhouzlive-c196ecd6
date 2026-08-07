@@ -98,11 +98,18 @@ export function TourRail() {
         {[0, 1].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 272, flexShrink: 0 }}>
             <Bar style={{ borderRadius: 0, height: 100, width: '100%' }} />
+            {/* Stat block: the live card pins this at STAT_BLOCK_H = 56 with
+                7px/11px padding (OnTourThisWeek.tsx:88), and the meta line
+                below runs minHeight 18 + 9px bottom padding. The shell was
+                drifting 1px tall (57) and 8px short beneath — corrected. */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                padding: '10px 12px 20px',
+                alignContent: 'center',
+                height: 56,
+                boxSizing: 'border-box',
+                padding: '7px 11px',
               }}
             >
               {[0, 1, 2].map((c) => (
@@ -120,7 +127,14 @@ export function TourRail() {
                 </div>
               ))}
             </div>
-            <div style={{ padding: '0 12px 15px' }}>
+            <div
+              style={{
+                minHeight: 18,
+                padding: '0 11px 9px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               <TextBar w={150} h={11} />
             </div>
           </div>
@@ -130,11 +144,34 @@ export function TourRail() {
   );
 }
 
+/**
+ * Slot 3 — LATEST REVIEWS mosaic. Measured off the live section:
+ * two-column grid with an 8px gap (LatestReviews.tsx:78), six tiles
+ * (PAGE_CAP, LatestReviews.tsx:26), each REVIEW_TILE_HEIGHT = 172 at radius 14
+ * (ReviewTile.tsx:24 and its default `radius`).
+ */
+export function ReviewsMosaic() {
+  return (
+    <section>
+      <EyebrowBar w={126} aside />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Bar key={i} style={{ height: 172, borderRadius: 14 }} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /** Section 4 — around the world: pill row, then one card (128px image + 3 rows). */
-export function AroundTheWorldCard() {
+export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) {
   return (
     <section>
       <EyebrowBar w={132} aside />
+      {pills !== undefined ? (
+        pills
+      ) : (
+
       <div
         style={{
           margin: '0 -14px 12px',
