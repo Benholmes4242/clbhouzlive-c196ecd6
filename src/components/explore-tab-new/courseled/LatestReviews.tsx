@@ -5,6 +5,7 @@ import { ReviewTile } from './ReviewTile';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { Eyebrow, InkAction } from './tokens';
+import { ReviewsMosaic as ReviewsMosaicShell } from './DiscoverCourseLedSkeleton';
 
 import type { LatestReview } from './hooks/useLatestReviews';
 
