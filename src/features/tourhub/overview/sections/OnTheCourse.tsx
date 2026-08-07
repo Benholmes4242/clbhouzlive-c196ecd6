@@ -374,6 +374,10 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 minWidth: 122,
                 flexShrink: 0,
                 scrollSnapAlign: 'start',
+                // Reserve the FEATURED GROUP kicker's space so the rail keeps
+                // one height and every tile top-aligns.
+                marginTop: FEATURED_LABEL_BLOCK,
+
                 background: V4.surface,
                 border: `1px dashed #CBD5E1`,
                 borderRadius: 16,
