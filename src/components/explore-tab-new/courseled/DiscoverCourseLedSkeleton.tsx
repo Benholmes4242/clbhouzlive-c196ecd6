@@ -1,7 +1,7 @@
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CARD_SHELL } from './tokens';
-import { HONOURS_SHELL, GOLD_HAIR } from './HonoursBoard';
+import { HONOURS_SHELL, GOLD_HAIR } from './honoursTokens';
 
 /**
  * DISCOVER, COURSE-LED — loading silhouette.
