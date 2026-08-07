@@ -451,11 +451,10 @@ function buildFooter(
             label: 'View profile',
             onClick: h.handleViewProfile,
           },
-          {
-            variant: 'primary',
-            label: 'See full handicap',
-            onClick: h.handleSeeHandicap,
-          },
+          // NO HANDICAP ACTION. Another member's handicap page is private to
+          // them, so this state keeps only Message and View profile; the gap
+          // is deliberately not refilled.
+
         ],
       };
     case 'clbhouz_not_synced':
