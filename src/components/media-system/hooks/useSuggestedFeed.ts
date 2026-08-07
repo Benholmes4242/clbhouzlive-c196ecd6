@@ -77,6 +77,11 @@ export function useSuggestedFeed(userId: string | undefined) {
       return { posts, nextCursor, rawRowCount };
     },
     getNextPageParam: (lastPage) => {
+      // Never trust the restored/seeded shape: a page written by another build
+      // (or by a prefetcher using a different page shape) may not carry
+      // rawRowCount at all. Stop rather than assume.
+      if (!lastPage || typeof lastPage !== 'object') return undefined;
+      if (typeof (lastPage as any).rawRowCount !== 'number') return undefined;
       // Terminate ONLY when the RPC itself returned zero candidates,
       // not when client-side filtering removed them all.
       if (lastPage.rawRowCount === 0) return undefined;
@@ -92,7 +97,7 @@ export function useSuggestedFeed(userId: string | undefined) {
   });
 
   const allPosts = useMemo(
-    () => deduplicatePosts(query.data?.pages.flatMap((page) => page.posts) ?? []),
+    () => deduplicatePosts(query.data?.pages?.flatMap((page) => page.posts) ?? []),
     [query.data]
   );
 

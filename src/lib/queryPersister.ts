@@ -2,6 +2,35 @@ import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persi
 import { get, set, del } from 'idb-keyval';
 
 
+/** True when `data` is a valid react-query infinite-query payload. */
+function isInfiniteShape(data: unknown): boolean {
+  return (
+    !!data &&
+    typeof data === 'object' &&
+    Array.isArray((data as any).pages) &&
+    Array.isArray((data as any).pageParams)
+  );
+}
+
+/**
+ * Keys whose consumers are useInfiniteQuery. A persisted entry under one of
+ * these MUST carry { pages, pageParams } or react-query's internal
+ * getNextPageParam reads `data.pages.length` off a plain object and throws
+ * during getOptimisticResult — i.e. a white screen at hydrate, before any
+ * fetch. Restoring nothing costs one refetch; restoring the wrong shape costs
+ * the whole app.
+ */
+const INFINITE_KEY_PREFIXES = [
+  'media-feed',
+  'friends-feed',
+  'watch-feed',
+  'videos-feed',
+  'community-feed-base',
+  'longform-videos-base',
+  'clubhouse-explore-shorts',
+  'golf-courses-infinite',
+];
+
 /**
  * Persisted query cache — IndexedDB backed, throttled, first-page-only.
  *
@@ -27,12 +56,7 @@ export const queryPersister = createAsyncStoragePersister({
       const queries = clone?.clientState?.queries ?? [];
       for (const q of queries) {
         const data = q?.state?.data;
-        if (
-          data &&
-          typeof data === 'object' &&
-          Array.isArray((data as any).pages) &&
-          Array.isArray((data as any).pageParams)
-        ) {
+        if (isInfiniteShape(data)) {
           (data as any).pages = (data as any).pages.slice(0, 1);
           (data as any).pageParams = (data as any).pageParams.slice(0, 1);
         }
@@ -42,8 +66,33 @@ export const queryPersister = createAsyncStoragePersister({
       return JSON.stringify(client);
     }
   },
-  deserialize: (str) => JSON.parse(str),
+  // Restore-side shape gate. The same infinite test that governs serialize now
+  // governs hydrate: any entry under an infinite key that is not
+  // { pages, pageParams } is DROPPED rather than handed to the observer.
+  deserialize: (str) => {
+    const client = JSON.parse(str);
+    try {
+      const queries = client?.clientState?.queries;
+      if (!Array.isArray(queries)) return client;
+      client.clientState.queries = queries.filter((q: any) => {
+        const root = q?.queryKey?.[0];
+        if (typeof root !== 'string') return true;
+        if (!INFINITE_KEY_PREFIXES.some((p) => root.startsWith(p))) return true;
+        const data = q?.state?.data;
+        if (data == null) return true; // nothing to misread
+        if (isInfiniteShape(data)) return true;
+        if (import.meta.env.DEV) {
+          console.warn('[queryPersister] dropping non-infinite restored entry:', q.queryKey);
+        }
+        return false;
+      });
+    } catch {
+      /* fall through with whatever parsed */
+    }
+    return client;
+  },
 });
+
 
 /**
  * Allowlist: nothing persists unless its queryKey[0] starts with one of these.
