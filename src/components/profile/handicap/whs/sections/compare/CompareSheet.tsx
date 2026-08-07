@@ -30,6 +30,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useFriendLeaderboard, useSharedRounds, useSharedRoundCounts, useWhsConnection } from '@/lib/whs/hooks';
 import { useEntityPickerSearch } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { useCompareIdentities } from './useCompareIdentities';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { formatRelativeAgo } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -71,6 +72,28 @@ export const CompareSheet: React.FC<Props> = ({
     [leaderboard],
   );
 
+  /**
+   * IDENTITY. Every displayed name and photo for a clbhouz member comes from
+   * user_profiles through useCompareIdentities - never from the leaderboard's
+   * friend_name / friend_thumbnail_url, which are England Golf fields and
+   * surname-first. One batched read covers the whole visible list.
+   */
+  const recentRows = React.useMemo(
+    () =>
+      (leaderboard ?? [])
+        .filter((e) => !e.is_self && !!e.friend_user_id && e.is_clbhouz_user)
+        .sort((a, b) =>
+          (b.last_round_played_at ?? '').localeCompare(a.last_round_played_at ?? ''),
+        )
+        .slice(0, RECENT_LIMIT),
+    [leaderboard],
+  );
+
+  const { data: identities } = useCompareIdentities(
+    recentRows.map((e) => e.friend_user_id as string),
+    open,
+  );
+
   /** The six most recently played with, self excluded, clbhouz members only. */
   const recent = React.useMemo<ComparePerson[]>(() => {
     const rows = (leaderboard ?? [])
@@ -79,10 +102,15 @@ export const CompareSheet: React.FC<Props> = ({
         (b.last_round_played_at ?? '').localeCompare(a.last_round_played_at ?? ''),
       )
       .slice(0, RECENT_LIMIT);
-    return rows.map((e) => ({
+    return rows.map((e) => {
+      const id = identities?.[e.friend_user_id as string];
+      return {
       userId: e.friend_user_id as string,
-      name: e.friend_name,
-      avatarUrl: pickAvatarSrc(e.friend_thumbnail_url, e.friend_profile_photo_url),
+      // A resolved clbhouz member is named by their profile. These rows are all
+      // clbhouz members (is_clbhouz_user + friend_user_id), so an unresolved one
+      // holds a shell rather than falling back to the England Golf name.
+      name: id?.name ?? null,
+      avatarUrl: id?.avatarUrl ?? e.friend_profile_photo_url ?? null,
       index: e.friend_handicap_index,
       contextLine:
         [
@@ -93,8 +121,9 @@ export const CompareSheet: React.FC<Props> = ({
         ]
           .filter(Boolean)
           .join(' . ') || null,
-    }));
-  }, [leaderboard]);
+      };
+    });
+  }, [leaderboard, identities]);
 
   const searching = debouncedQuery.trim().length > 0;
   const { people } = useEntityPickerSearch({
@@ -132,21 +161,53 @@ export const CompareSheet: React.FC<Props> = ({
     open && !target,
   );
 
-  // Deep link / friend-view pre-selection. Resolved against the leaderboard
-  // when possible so the name and index arrive without another query.
+  /**
+   * Deep link / friend-view pre-selection, through THE SAME resolver.
+   *
+   * `recent` is only six rows, so most deep links miss it; the id is then read
+   * from user_profiles directly. WHILE IT IS IN FLIGHT THE TARGET CARRIES NO
+   * NAME - not the sheet's title, not "Player", nothing. A fabricated identity
+   * over a stranger's genuine record is a mis-attribution, and the old code
+   * named people after this sheet's own heading.
+   *
+   * ON A FAILED OR EMPTY LOOKUP the sheet falls back to its ENTRY STATE so the
+   * member picks someone real.
+   */
+  const { data: deepIdentities, isFetched: deepFetched } = useCompareIdentities(
+    initialTargetUserId ? [initialTargetUserId] : [],
+    open && !!initialTargetUserId,
+  );
+
   React.useEffect(() => {
     if (!open || !initialTargetUserId) return;
     const hit = recent.find((p) => p.userId === initialTargetUserId);
-    setTarget(
-      hit ?? {
-        userId: initialTargetUserId,
-        name: t('handicap.compare.title'),
-        avatarUrl: null,
-        index: null,
-        contextLine: null,
-      },
-    );
-  }, [open, initialTargetUserId, recent, t]);
+    if (hit?.name) {
+      setTarget(hit);
+      return;
+    }
+    const resolved = deepIdentities?.[initialTargetUserId];
+    if (resolved) {
+      setTarget({
+        userId: resolved.userId,
+        name: resolved.name,
+        avatarUrl: resolved.avatarUrl,
+        index: hit?.index ?? null,
+        contextLine: hit?.contextLine ?? null,
+      });
+      return;
+    }
+    if (deepFetched) {
+      setTarget(null); // Unidentifiable - show the entry state, not a comparison.
+      return;
+    }
+    setTarget({
+      userId: initialTargetUserId,
+      name: null,
+      avatarUrl: null,
+      index: null,
+      contextLine: null,
+    });
+  }, [open, initialTargetUserId, recent, deepIdentities, deepFetched]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -169,7 +230,7 @@ export const CompareSheet: React.FC<Props> = ({
     viewerUserId,
     connection?.id,
     target?.userId,
-    target?.name,
+    target?.name ?? undefined,
   );
 
   const sharedCount = shared?.shared_rounds_count ?? 0;
@@ -340,6 +401,11 @@ export const CompareSheet: React.FC<Props> = ({
     const themGross = rounds.map((r) => r.rival_gross).filter((n) => n != null);
     const margins = rounds.map((r) => r.user_stableford - r.rival_stableford);
     return {
+      // GROSS LEADS. fetchSharedRounds already computes gross_record and it was
+      // fetched and discarded; gross is the figure members argue about.
+      grossWins: shared?.gross_record.wins ?? 0,
+      grossLosses: shared?.gross_record.losses ?? 0,
+      grossTies: shared?.gross_record.ties ?? 0,
       wins: shared?.stableford_record.wins ?? 0,
       losses: shared?.stableford_record.losses ?? 0,
       meAvgSt: mean(meSt as number[]),
@@ -375,7 +441,7 @@ export const CompareSheet: React.FC<Props> = ({
   };
 
   const avatar = (
-    name: string,
+    name: string | null,
     src: string | null,
     seed: string,
     frameAmber: boolean,
@@ -403,9 +469,11 @@ export const CompareSheet: React.FC<Props> = ({
           alt=""
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
-      ) : (
+      ) : name ? (
+        // Initials NEVER come from a UI string, and an unresolved name renders
+        // no letters at all rather than inventing them.
         <span>{getInitialsFromName(name) || '?'}</span>
-      )}
+      ) : null}
       <div
         aria-hidden
         style={{
@@ -419,17 +487,40 @@ export const CompareSheet: React.FC<Props> = ({
     </div>
   );
 
+  /**
+   * The standing line, from the GROSS record.
+   *
+   * LEADER-FIRST: the record was always built viewer-first, so an opponent lead
+   * read "Danny leads by 2-4" - the leader's own figure second, as though they
+   * were losing. The record is now built from the leader's perspective.
+   *
+   * TIES RENDER WHEN THERE ARE ANY, and are omitted entirely when there are
+   * none - never a trailing "-0". Without them a record of 2-4 did not
+   * reconcile with the "7 rounds played" stated two rows below. An all-ties
+   * record is the LEVEL branch.
+   */
   const standingLine = (): string => {
     if (!h2h) return t('handicap.compare.noShared');
-    const { wins, losses } = h2h;
-    const record = `${wins}-${losses}`;
-    if (wins > losses) return t('handicap.compare.youLeadBy', { n: record });
-    if (losses > wins)
-      return t('handicap.compare.theyLeadBy', {
-        name: target?.name ?? '',
-        n: record,
-      });
-    return t('handicap.compare.levelAt', { n: record });
+    const { grossWins: wins, grossLosses: losses, grossTies: ties } = h2h;
+    const hasTies = ties > 0;
+    if (wins > losses) {
+      const n = `${wins}-${losses}`;
+      return hasTies
+        ? t('handicap.compare.youLeadByWithTies', { n, ties })
+        : t('handicap.compare.youLeadBy', { n });
+    }
+    if (losses > wins) {
+      // Leader's figure first.
+      const n = `${losses}-${wins}`;
+      const name = target?.name ?? '';
+      return hasTies
+        ? t('handicap.compare.theyLeadByWithTies', { name, n, ties })
+        : t('handicap.compare.theyLeadBy', { name, n });
+    }
+    const n = `${wins}-${losses}`;
+    return hasTies
+      ? t('handicap.compare.levelAtWithTies', { n, ties })
+      : t('handicap.compare.levelAt', { n });
   };
 
   return (
@@ -495,9 +586,24 @@ export const CompareSheet: React.FC<Props> = ({
                 letterSpacing: '-0.01em',
               }}
             >
-              {target
-                ? t('handicap.compare.youAnd', { name: target.name })
-                : t('handicap.compare.title')}
+              {!target ? (
+                t('handicap.compare.title')
+              ) : target.name ? (
+                t('handicap.compare.youAnd', { name: target.name })
+              ) : (
+                // Identity in flight: a shell, never a placeholder name.
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'inline-block',
+                    width: 148,
+                    height: 14,
+                    borderRadius: 4,
+                    background: CHART.PANEL_2,
+                    verticalAlign: 'middle',
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -521,7 +627,13 @@ export const CompareSheet: React.FC<Props> = ({
       </div>
 
       {/* Scroller */}
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      {/* `no-scrollbar` is the app's existing utility (src/index.css) used by the
+          other analytical sheets; it hides the bar without touching keyboard or
+          assistive scrolling. */}
+      <div
+        className="no-scrollbar"
+        style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}
+      >
         {!target && (
           <>
             {/* Search */}
@@ -637,7 +749,9 @@ export const CompareSheet: React.FC<Props> = ({
                       letterSpacing: '-0.005em',
                     }}
                   >
-                    {standingLine()}
+                    {target.name || h2h == null || h2h.grossLosses <= h2h.grossWins
+                      ? standingLine()
+                      : ''}
                   </div>
                 </div>
               </div>
@@ -650,23 +764,26 @@ export const CompareSheet: React.FC<Props> = ({
                   background: CHART.PANEL,
                   border: `1px solid ${CHART.BORDER}`,
                   borderRadius: 16,
-                  padding: '4px 14px 12px',
+                  // Rows carry 11px of their own vertical padding, so 4px here
+                  // puts the first and last row 15px from each panel edge.
+                  padding: '4px 14px 4px',
                 }}
               >
                 {isSharedMode && h2h ? (
                   <>
+                    {/* GROSS LEADS. Stableford stays, but is no longer the
+                        headline. */}
+                    <CompareStatRow
+                      label={t('handicap.compare.stat.grossWins')}
+                      meValue={h2h.grossWins}
+                      themValue={h2h.grossLosses}
+                      format="count"
+                    />
                     <CompareStatRow
                       label={t('handicap.compare.stat.stablefordWins')}
                       meValue={h2h.wins}
                       themValue={h2h.losses}
                       format="count"
-                    />
-                    <CompareStatRow
-                      label={t('handicap.compare.stat.avgStableford')}
-                      meValue={h2h.meAvgSt}
-                      themValue={h2h.themAvgSt}
-                      format="high_better"
-                      decimals={1}
                     />
                     <CompareStatRow
                       label={t('handicap.compare.stat.avgGross')}
@@ -676,13 +793,22 @@ export const CompareSheet: React.FC<Props> = ({
                       decimals={1}
                     />
                     <CompareStatRow
+                      label={t('handicap.compare.stat.avgStableford')}
+                      meValue={h2h.meAvgSt}
+                      themValue={h2h.themAvgSt}
+                      format="high_better"
+                      decimals={1}
+                    />
+                    <CompareStatRow
                       label={t('handicap.compare.stat.bestGross')}
                       meValue={h2h.meBestGross}
                       themValue={h2h.themBestGross}
                       format="low_better"
                     />
+                    {/* Best margin is computed from STABLEFORD POINTS, so with
+                        gross leading the panel the label must carry the unit. */}
                     <CompareStatRow
-                      label={t('handicap.compare.stat.bestMargin')}
+                      label={t('handicap.compare.stat.bestMarginPts')}
                       meValue={h2h.meBestMargin}
                       themValue={h2h.themBestMargin}
                       format="high_better"
@@ -751,7 +877,7 @@ export const CompareSheet: React.FC<Props> = ({
                   would be taken for a head-to-head figure, which it is not. */}
               {isSharedMode && careerAvailable && careerRows.length > 0 && (
                 <>
-                  <div style={{ ...LABEL_STYLE, marginTop: 22, color: CHART.MUTE }}>
+                  <div style={{ ...LABEL_STYLE, marginTop: 18, color: CHART.MUTE }}>
                     {t('handicap.compare.career')}
                   </div>
                   <div
@@ -760,7 +886,9 @@ export const CompareSheet: React.FC<Props> = ({
                       background: CHART.PANEL,
                       border: `1px solid ${CHART.BORDER}`,
                       borderRadius: 16,
-                      padding: '4px 14px 12px',
+                      // Rows carry 11px of their own vertical padding, so 4px here
+                  // puts the first and last row 15px from each panel edge.
+                  padding: '4px 14px 4px',
                     }}
                   >
                     {renderCareerRows(careerRows)}
