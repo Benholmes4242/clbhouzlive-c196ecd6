@@ -252,6 +252,7 @@ export function useMomentsOfTheWeek() {
           post,
           thumbnail: tile?.imageUrl ?? tile?.thumbnailUrl ?? null,
           mediaType: tile?.type === 'video' ? 'video' : 'image',
+          durationSeconds: tile?.type === 'video' ? tile?.duration : undefined,
           mediaIndex,
           mediaId: tile?.id,
           isCourseLead,
