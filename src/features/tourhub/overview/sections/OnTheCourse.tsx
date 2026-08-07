@@ -34,7 +34,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
-import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { LiveFieldPanel } from './LiveFieldPanel';
 import { formatToPar } from '../data/liveRoundStats';
 
