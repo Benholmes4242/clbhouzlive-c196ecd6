@@ -26,7 +26,24 @@ import { formatNumber, formatOrdinal } from '@/i18n/format';
  * rather than a raw key.
  */
 
-export type WireKind = 'crown' | 'ace' | 'albatross' | 'eagle' | 'birdie_haul';
+/**
+ * WIRE KINDS.
+ *
+ * `under_par`, `bogey_free` and `stableford` are the three ROUND-LEVEL kinds
+ * added for BRIEF_ATW_MASONRY. They are produced server-side by
+ * `refresh_discover_feats` into the `feats:<region>:round_feats` rail; until
+ * that migration lands the rail read simply returns an empty payload and no
+ * events of these kinds exist. Nothing else in the client changes shape.
+ */
+export type WireKind =
+  | 'crown'
+  | 'ace'
+  | 'albatross'
+  | 'eagle'
+  | 'birdie_haul'
+  | 'under_par'
+  | 'bogey_free'
+  | 'stableford';
 
 export interface WireEvent {
   id: string;
