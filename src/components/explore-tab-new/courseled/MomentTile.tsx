@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+
 import { CourseImageFallback } from './CourseImageFallback';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 
