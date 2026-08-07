@@ -14,7 +14,7 @@ import type { LatestReview } from './hooks/useLatestReviews';
  *
  * Every other section on the page reports a statistic. This is the only place
  * carrying an OPINION, so the words are treated as content: a two-column mosaic
- * of six fixed-height tiles, each one a quote on the review's own photography.
+ * of four fixed-height photo tiles, one per review.
  *
  * Placed between "On tour this week" and "Around the world" on purpose — the
  * reviews mosaic and the Moments mosaic read alike, so Around the world sits
@@ -24,11 +24,11 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * panel), so the page's 28px section rhythm collapses cleanly.
  */
 
-const PAGE_CAP = 6;
+const PAGE_CAP = 4;
 
 interface Props {
   reviews: LatestReview[];
-  /** Total qualifying reviews behind the sheet (the mosaic is capped at six). */
+  /** Total qualifying reviews behind the sheet (the mosaic is capped at four). */
   totalCount?: number | null;
   /** TRUE while the reviews query has not settled — the shell holds the slot. */
   isPending?: boolean;

@@ -44,11 +44,11 @@ describe('LatestReviews mosaic', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('caps the page at six tiles of identical height', () => {
+  it('caps the page at four tiles of identical height', () => {
     const reviews = Array.from({ length: 9 }, (_, i) => make(i));
     render(<LatestReviews reviews={reviews} totalCount={9} onTilePress={() => {}} onSeeAll={() => {}} />);
     const tiles = screen.getAllByRole('button').filter((b) => b.style.height);
-    expect(tiles).toHaveLength(6);
+    expect(tiles).toHaveLength(4);
     for (const tile of tiles) expect(tile.style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
   });
 
