@@ -4,6 +4,7 @@ import { MomentTile } from './MomentTile';
 import { useMomentsOfTheWeek, type Moment } from './hooks/useMomentsOfTheWeek';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { Eyebrow, InkAction, NEW_CARD_RING } from './tokens';
+import { MomentsMosaic as MomentsMosaicShell } from './DiscoverCourseLedSkeleton';
 
 /**
  * Section 4 — MOMENTS OF THE MONTH (BRIEF, section 4).

@@ -5,6 +5,7 @@ import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 import { formatNumber } from '@/i18n/format';
+import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
  * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
