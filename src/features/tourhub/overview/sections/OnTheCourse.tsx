@@ -406,6 +406,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 style={{
                   minWidth: 34,
                   flexShrink: 0,
+                  marginTop: FEATURED_LABEL_BLOCK,
+                  alignSelf: 'stretch',
+
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -441,6 +444,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                         minWidth: CARD_MIN_W,
                         flexShrink: 0,
                         scrollSnapAlign: 'start',
+                        marginTop: FEATURED_LABEL_BLOCK,
+
                         background: V4.surface,
                         border: `0.5px solid ${V4.cardBorder}`,
                         borderRadius: 14,
@@ -470,6 +475,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       minWidth: CARD_MIN_W,
                       flexShrink: 0,
                       scrollSnapAlign: 'start',
+                      marginTop: FEATURED_LABEL_BLOCK,
+
                       background: V4.surface,
                       border: `0.5px solid ${V4.cardBorder}`,
                       boxShadow: V4.cardShadow,
