@@ -165,7 +165,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
         handleMessage,
         handleViewProfile,
         handleSeeRivalry,
-        handleSeeHandicap,
+        
         handleInvite,
         handleNudgeSync,
       }, friendFirstName)
