@@ -7,6 +7,7 @@
 //     transparency + Median status-bar style push
 //   • edge-to-edge chrome sitting directly on the blurred backdrop
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
