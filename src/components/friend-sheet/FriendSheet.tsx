@@ -114,11 +114,10 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/handicap?subtab=circle&compare=${encodeURIComponent(targetUserId)}`);
   };
 
-  const handleSeeHandicap = () => {
-    if (!targetUserId) return;
-    onClose();
-    navigate(`/handicap/${targetUserId}`);
-  };
+  // handleSeeHandicap is GONE. Another member's handicap page is private to
+  // them; every tap that used to lead there now resolves to compare, the
+  // nudge or an invite (see useMemberTapResolver).
+
   const handleInvite = async () => {
     if (state?.kind !== 'whs_only') return;
     const passportId = state.entry.friend_passport_id;
