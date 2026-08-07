@@ -233,6 +233,15 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // position map (which lags horizontal swipes in fullscreen).
   const carouselSlide = activePagerIdx ?? carouselPositions.get(activeIndex) ?? 0;
   const mediaCount = activePost?.mediaItems?.length ?? 0;
+  // MUTE GATE — audio control only exists over media that has audio.
+  // The slide index is clamped into range before indexing: activePagerIdx is a
+  // horizontal position within ONE post's carousel, so a stale value from the
+  // outgoing post could otherwise resolve to undefined on a new single-media
+  // post and hide the speaker on an actual video.
+  const activeSlide = mediaCount > 0 && carouselSlide < mediaCount ? carouselSlide : 0;
+  const activeMediaIsVideo =
+    mediaCount > 0 && activePost?.mediaItems?.[activeSlide]?.type === 'video';
+
 
 
   if (feedEnded) {
