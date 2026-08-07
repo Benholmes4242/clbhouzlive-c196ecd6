@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowUp, ArrowDown, Flame } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
 import { Sparkline, indexTone, toneColor } from '../../charts';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';

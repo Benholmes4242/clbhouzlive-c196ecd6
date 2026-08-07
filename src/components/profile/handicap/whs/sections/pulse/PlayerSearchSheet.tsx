@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, ChevronRight, X, Swords, Pin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import GamSheet from '@/components/profile/handicap/gam/_shared/GamSheet';
 import { Skeleton, EmptyStub, RetryStub } from '@/components/profile/handicap/gam/_shared/GamAtoms';
 import SectionHeader from '@/components/ui/SectionHeader';
