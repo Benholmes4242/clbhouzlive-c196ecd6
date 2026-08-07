@@ -423,7 +423,7 @@ const ProfilePageV2Content: React.FC = () => {
         setCropImageSrc(null);
       }
       setIsCropModalOpen(false);
-      setCropMode(null);
+
     }
   };
 
