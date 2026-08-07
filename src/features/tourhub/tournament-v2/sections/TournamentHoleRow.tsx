@@ -54,15 +54,14 @@ export interface TourHoleScale {
  * flooring the domain at zero would pin every one of them to the left edge.
  */
 export function buildTourHoleScale(holes: ReadonlyArray<TournamentHole>): TourHoleScale {
-  const values = holes
-    .map((h) => h.avg_to_par)
-    .filter((v): v is number => Number.isFinite(v));
+  const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
+  const values = played.map((h) => h.avg_to_par);
   const rawMin = values.length ? Math.min(...values) : 0;
   const rawMax = values.length ? Math.max(...values) : 0.1;
   // Guarantee a usable span so a field that plays dead level cannot divide by ~0.
   const min = Math.min(rawMin, rawMax - 0.2);
   const max = Math.max(rawMax, min + 0.2);
-  return { min, max, rankByHole: rankHolesByDifficulty(values.length ? holes.filter((h) => Number.isFinite(h.avg_to_par)) : []) };
+  return { min, max, rankByHole: rankHolesByDifficulty(played) };
 }
 
 /**
