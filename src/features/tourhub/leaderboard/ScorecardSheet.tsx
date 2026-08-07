@@ -95,45 +95,15 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
     );
   }, [availableRounds]);
 
-  // The field for a pro round is the tournament field for THAT round. The
-  // function gates on a minimum player count and omits holes below it, so the
-  // grey line simply stops where the data stops.
-  const { data: fieldRows = [], isLoading: fieldLoading } = useQuery({
-    queryKey: ['tournament-hole-averages', tournamentId, selectedRound],
-    enabled: !!tournamentId && selectedRound != null,
-    staleTime: 60_000,
-    queryFn: async (): Promise<{ hole_number: number; field_avg: number }[]> => {
-      if (!tournamentId || selectedRound == null) return [];
-      const { data, error } = await supabase.rpc('get_tournament_hole_averages', {
-        p_tournament_id: tournamentId,
-        p_round_number: selectedRound,
-      });
-      if (error) {
-        console.error('[scorecard] field averages failed', { tournamentId, selectedRound, error });
-        return [];
-      }
-      return (data ?? []) as { hole_number: number; field_avg: number }[];
-    },
-  });
-
-  const fieldByHole = useMemo(() => {
-    const m = new Map<number, number>();
-    for (const r of fieldRows) {
-      if (r.field_avg != null) m.set(r.hole_number, Number(r.field_avg));
-    }
-    return m;
-  }, [fieldRows]);
-
   const roundHoles = useMemo(() => {
-    if (selectedRound == null) return [] as Array<{ holeNo: number; par: number | null; strokes: number | null; fieldAvg?: number | null }>;
+    if (selectedRound == null) return [] as Array<{ holeNo: number; par: number | null; strokes: number | null }>;
     const rows = scRows.filter((r) => r.round_number === selectedRound);
     return rows.map((r) => ({
       holeNo: r.hole_number,
       par: r.par,
       strokes: r.strokes != null && r.strokes > 0 ? r.strokes : null,
-      fieldAvg: fieldByHole.get(r.hole_number) ?? null,
     }));
-  }, [scRows, selectedRound, fieldByHole]);
+  }, [scRows, selectedRound]);
 
   if (!target) {
     return (
@@ -188,7 +158,7 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       coursePar={coursePar}
       courseSlope={null}
       holes={roundHoles}
-      loading={scLoading || fieldLoading}
+      loading={scLoading}
       surface="tour"
 
       heroMuted={demoted}
