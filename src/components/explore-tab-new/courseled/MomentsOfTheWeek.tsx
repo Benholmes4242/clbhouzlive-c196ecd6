@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MomentTile } from './MomentTile';
@@ -71,7 +72,7 @@ export function MomentsOfTheWeek({
   for (let i = 0; i < blockCount; i += 1) blocks.push(shown.slice(i * 3, i * 3 + 3));
   const trailing = shown.slice(blockCount * 3);
 
-  const tile = (m: Moment, height: number, extra?: React.CSSProperties) => (
+  const tile = (m: Moment, height: number, extra?: CSSProperties) => (
     <MomentTile
       key={m.key}
       moment={m}
