@@ -13,7 +13,7 @@ export interface ScorecardTarget {
  * (leaderboards with no score_id) navigate to the holder's profile.
  */
 export function useScorecardOpener() {
-  const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const [target, setTarget] = useState<ScorecardTarget | null>(null);
 
   const openByScore = useCallback(
@@ -34,9 +34,12 @@ export function useScorecardOpener() {
 
   const openProfile = useCallback(
     (userId: string | null | undefined) => {
-      if (userId) navigate(`/handicap/${userId}`);
+      // Discover rows are almost never the viewer's own. The resolver keeps
+      // self on their own page and sends everyone else to compare/nudge/invite
+      // rather than to a stranger's handicap page.
+      if (userId) void resolve({ targetUserId: userId });
     },
-    [navigate],
+    [resolve],
   );
 
   const close = useCallback(() => setTarget(null), []);

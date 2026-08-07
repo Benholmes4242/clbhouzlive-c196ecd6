@@ -98,7 +98,7 @@ const PlayerRow: React.FC<{ p: PlayerSearchResult; onTap: () => void }> = ({ p, 
 };
 
 export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
-  const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const [value, setValue] = useState('');
   const [debounced, setDebounced] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -123,7 +123,9 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
   const handleSelect = (id: string) => {
     onClose();
-    navigate(`/handicap/${id}`);
+    // Search can surface the viewer themselves; the resolver sends self to
+    // their own page and everyone else to compare/nudge.
+    void resolve({ targetUserId: id });
   };
 
   return (

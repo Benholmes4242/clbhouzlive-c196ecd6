@@ -316,7 +316,9 @@ const ProfilePageV2Content: React.FC = () => {
       navigate('/handicap', { replace: true });
     } else if (profile?.id) {
       analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
-      navigate(`/handicap/${profile.id}`, { replace: true });
+      // A legacy ?tab=stats link on someone else's profile can no longer land
+      // on their handicap page. Compare answers the same question.
+      navigate(compareRouteFor(profile.id), { replace: true });
     }
   }, [activeSection, isSelf, profile?.id, navigate]);
 
@@ -768,7 +770,7 @@ const ProfilePageV2Content: React.FC = () => {
               // ?tab=stats id redirects here anyway, so we go straight to it.
               if (stat === 'index' || stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
-                else if (profileUserId) navigate(`/handicap/${profileUserId}`);
+                else if (profileUserId) void resolve({ targetUserId: profileUserId });
                 return;
               }
               if (stat === 'rated') {

@@ -37,7 +37,7 @@ const ZONE_LABEL: React.CSSProperties = {
 };
 
 export const PulseCard: React.FC<Props> = ({ friend }) => {
-  const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   // Direction is decided in exactly one place on this surface.
   const s = friend.hcp_series;
   const deltaTone =
@@ -58,7 +58,9 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
 
   return (
     <div
-      onClick={() => navigate(`/handicap/${friend.user_id}`)}
+      // Another member's handicap page is private to them: the tap resolves
+      // to compare, the nudge or an invite. void - the row is fire-and-forget.
+      onClick={() => { void resolve({ targetUserId: friend.user_id }); }}
       style={{
         position: 'relative',
         width: 132,

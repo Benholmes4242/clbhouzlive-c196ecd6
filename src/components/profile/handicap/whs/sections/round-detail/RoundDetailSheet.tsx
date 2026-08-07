@@ -131,8 +131,11 @@ export const RoundDetailSheet: React.FC<Props> = ({
         hasWhsConnection: !!whsConn,
       }).value;
 
+  // A round can be the viewer's own or another member's. Own rounds still
+  // open the owner's handicap page; another member's identity resolves to
+  // compare, the nudge or an invite - never to their handicap page.
   const onViewProfile = profileUserId
-    ? () => { onClose(); navigate(`/handicap/${profileUserId}`); }
+    ? () => { onClose(); void resolve({ targetUserId: profileUserId }); }
     : undefined;
   const onViewCourse = courseIdQuery.data
     ? () => { onClose(); navigate(`/courses/${courseIdQuery.data}`); }
