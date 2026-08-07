@@ -797,7 +797,7 @@ export function AroundTheWorld({
                           textAlign: 'left',
                           fontFamily: SANS,
                           cursor: 'pointer',
-                          opacity: pressed === g.courseId ? 0.72 : 1,
+                          opacity: pressed === tt.slotKey ? 0.72 : 1,
                           transition: 'opacity 120ms ease',
                         }}
                       >
