@@ -41,7 +41,9 @@ describe('MomentsSheet grouped', () => {
     render(
       <MomentsSheet open onClose={() => {}} onTilePress={() => {}} moments={[mk('c1', 'Solo Links', 0, true)]} />,
     );
-    expect(screen.getByText('Solo Links')).toBeTruthy();
+    const head = screen.getByText('Solo Links') as HTMLElement;
+    expect(head.style.textOverflow).toBe('ellipsis');
+    expect(head.style.whiteSpace).toBe('nowrap');
     expect(screen.getByText('1 moment')).toBeTruthy();
     expect(heights()).toEqual(['132px']);
   });
@@ -83,6 +85,10 @@ describe('MomentsSheet grouped', () => {
     );
     expect(screen.getByText('5 moments')).toBeTruthy();
     expect(heights()).toEqual(['168px', '81px', '81px', '1 / 1', '1 / 1']);
+    // all-video group: every glyph renders, lead included
+    expect(document.querySelectorAll('svg path[d="M8 5v14l11-7z"]')).toHaveLength(5);
+    // no scrim divs when unlabelled
+    expect(document.querySelectorAll('div[style*="linear-gradient(0deg, rgba(10,14,10,0.6)"]')).toHaveLength(0);
   });
 
   it('groups in first-appearance order, one header each, no tile labels', () => {
