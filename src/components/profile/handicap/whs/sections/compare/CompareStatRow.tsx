@@ -8,6 +8,12 @@
  * viewing member's own side). There is no live round and no course difficulty
  * on this surface, so amber carries no other meaning here.
  *
+ * A NULL IS NOT A SCORE. When either side is null the bar renders neutral -
+ * no split, no advantage - matching the both-zero case, and whoLeads() awards
+ * no amber. Treating null as 0 on a low_better row handed the whole bar to the
+ * side with no data, which is the one disagreement between bar and figure this
+ * component's contract forbids.
+ *
  * POLARITY IS CARRIED BY `format`, never hardcoded per row. Gross, scoring
  * average and index are low_better; stableford, birdies, rounds are
  * high_better/count. A row where both sides are zero renders both figures INK
@@ -49,11 +55,12 @@ export const CompareStatRow: React.FC<Props> = ({
 
   // Two-segment bar. For low_better the SMALLER figure earns the longer
   // segment, so the bar and the amber figure never disagree.
+  const hasBoth = meValue != null && themValue != null;
   const a = Math.abs(Number(meValue ?? 0));
   const b = Math.abs(Number(themValue ?? 0));
   const total = a + b;
   let meShare = 0.5;
-  if (total > 0) {
+  if (hasBoth && total > 0) {
     meShare = format === 'low_better' || format === 'delta_low_better'
       ? b / total
       : a / total;
@@ -65,7 +72,7 @@ export const CompareStatRow: React.FC<Props> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '52px 1fr 52px',
+          gridTemplateColumns: '58px 1fr 58px',
           alignItems: 'center',
           gap: 8,
         }}
