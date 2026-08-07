@@ -288,7 +288,11 @@ export function LiveFieldPanel({
             color={low ? tourFigColor(low.toPar) : A.DIM}
           />
           <Cell
-            label={t('overview.onTheCourse.byLabel')}
+            label={
+              low && low.tied > 1
+                ? t('overview.onTheCourse.sharedByLabel')
+                : t('overview.onTheCourse.heldByLabel')
+            }
             value={
               low
                 ? low.tied > 1
@@ -296,10 +300,6 @@ export function LiveFieldPanel({
                   : shortPlayerName(low.playerName)
                 : '—'
             }
-          />
-          <Cell
-            label={t('overview.onTheCourse.roundsInLabel')}
-            value={field ? String(field.count) : '—'}
           />
           <Cell
             label={t('overview.onTheCourse.groupsLabel')}
