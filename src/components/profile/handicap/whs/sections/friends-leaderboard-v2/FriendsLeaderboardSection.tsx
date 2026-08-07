@@ -11,7 +11,7 @@ import {
   useFriendLeaderboardWeeklyBanner,
 } from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
@@ -39,7 +39,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
   const percentileQuery = useHandicapPercentile(userId);
   const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
-  const { open: openSheet } = useOpenFriendSheet();
+  const { resolve } = useMemberTapResolver();
   const [showInactive, setShowInactive] = useState(false);
   const [fullLeaderboardOpen, setFullLeaderboardOpen] = useState(false);
 
@@ -79,19 +79,17 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
       : `Ranked by current handicap · ${tail}`;
 
 
+  /**
+   * NO INTERMEDIATE SHEET. The row resolves straight to compare, the nudge or
+   * an invite; the friend sheet no longer appears on this path.
+   */
   const handleRowClick = (entry: FriendLeaderboardEntry) => {
     if (entry.is_self) return;
-    if (entry.friend_user_id) {
-      openSheet({
-        targetUserId: entry.friend_user_id,
-        source: 'friends_leaderboard_row',
-      });
-    } else {
-      openSheet({
-        whsOnlyEntry: entry,
-        source: 'friends_leaderboard_row',
-      });
-    }
+    void resolve(
+      entry.friend_user_id
+        ? { targetUserId: entry.friend_user_id }
+        : { whsOnlyEntry: entry },
+    );
   };
 
   return (

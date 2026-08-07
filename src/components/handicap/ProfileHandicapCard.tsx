@@ -30,6 +30,7 @@ import { ProfileGhost } from '@/components/handicap/ConnectGhostPreviews';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, SANS, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -91,6 +92,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   displayName,
 }) => {
   const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
@@ -142,7 +144,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
         friend_id: userId,
         source: 'profile_hero_ring',
       });
-      navigate(`/handicap/${userId}`);
+      void resolve({ targetUserId: userId });
     } else {
       navigate('/handicap');
     }
@@ -251,13 +253,13 @@ const ProfileHandicapCard: React.FC<Props> = ({
           viewMode={isOwnProfile ? 'owner' : 'friend'}
           ownerFirstName={resolvedName}
           variant="light"
-          onOpen={() =>
-            navigate(
-              isOwnProfile
-                ? '/handicap?gam=trophies'
-                : `/handicap/${userId}?gam=trophies`,
-            )
-          }
+          onOpen={() => {
+            // The trophy shelf of another member lived on their handicap page,
+            // which is now private. Only the owner keeps the ?gam=trophies
+            // deep link; a friend's tap resolves like any other.
+            if (isOwnProfile) navigate('/handicap?gam=trophies');
+            else void resolve({ targetUserId: userId });
+          }}
         />
       </div>
     </div>

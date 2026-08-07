@@ -114,11 +114,10 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     navigate(`/handicap?subtab=circle&compare=${encodeURIComponent(targetUserId)}`);
   };
 
-  const handleSeeHandicap = () => {
-    if (!targetUserId) return;
-    onClose();
-    navigate(`/handicap/${targetUserId}`);
-  };
+  // handleSeeHandicap is GONE. Another member's handicap page is private to
+  // them; every tap that used to lead there now resolves to compare, the
+  // nudge or an invite (see useMemberTapResolver).
+
   const handleInvite = async () => {
     if (state?.kind !== 'whs_only') return;
     const passportId = state.entry.friend_passport_id;
@@ -166,7 +165,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
         handleMessage,
         handleViewProfile,
         handleSeeRivalry,
-        handleSeeHandicap,
+        
         handleInvite,
         handleNudgeSync,
       }, friendFirstName)
@@ -317,10 +316,14 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
 
             {headerProps && state && (
               <>
+                {/* The header used to tap through to the member's handicap
+                    page - an ELEVENTH callsite the brief did not list. It now
+                    goes to their profile, the other thing the header names. */}
                 <SheetHeader
                   {...headerProps}
-                  onClick={isClbhouzUser ? handleSeeHandicap : null}
+                  onClick={isClbhouzUser ? handleViewProfile : null}
                 />
+
 
                 {/* ─── UNSYNCED states: single hero pitch card ─────────────── */}
                 {state.kind === 'whs_only' && (
@@ -397,7 +400,7 @@ interface Handlers {
   handleMessage: () => void;
   handleViewProfile: () => void;
   handleSeeRivalry: () => void;
-  handleSeeHandicap: () => void;
+  
   handleInvite: () => void;
   handleNudgeSync: () => void;
 }
@@ -424,11 +427,9 @@ function buildFooter(
             label: 'View profile',
             onClick: h.handleViewProfile,
           },
-          {
-            variant: 'secondary',
-            label: 'Handicap',
-            onClick: h.handleSeeHandicap,
-          },
+          // The 'Handicap' action is gone: no path may open another member's
+          // handicap page. Order of the survivors is unchanged.
+
           {
             variant: 'primary',
             label: 'See rivalry',
@@ -451,11 +452,10 @@ function buildFooter(
             label: 'View profile',
             onClick: h.handleViewProfile,
           },
-          {
-            variant: 'primary',
-            label: 'See full handicap',
-            onClick: h.handleSeeHandicap,
-          },
+          // NO HANDICAP ACTION. Another member's handicap page is private to
+          // them, so this state keeps only Message and View profile; the gap
+          // is deliberately not refilled.
+
         ],
       };
     case 'clbhouz_not_synced':

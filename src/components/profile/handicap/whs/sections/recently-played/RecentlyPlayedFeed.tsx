@@ -16,7 +16,7 @@ import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { CHART } from '../../charts';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
-import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 interface Props {
   ownerUserId: string;
@@ -52,22 +52,23 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const { data, isLoading } = useFriendsActivity(ownerUserId);
   const [sheetActivity, setSheetActivity] =
     useState<WhsFriendActivityWithImage | null>(null);
-  const { open: openFriendSheet } = useOpenFriendSheet();
+  const { resolve } = useMemberTapResolver();
 
   const handleOpen = (item: WhsFriendActivityWithImage) => {
-    // State D — Not a Clbhouz user (or unresolvable user_id) → invite-to-join sheet
+    // State D — Not a Clbhouz user (or unresolvable user_id) → invite
     if (!item.is_clbhouz_user || !item.friend_user_id) {
-      openFriendSheet({ whsOnlyEntry: toWhsOnlyEntry(item), source: 'cinema_friend_card' });
+      void resolve({ whsOnlyEntry: toWhsOnlyEntry(item) });
       return;
     }
-    // State C — Clbhouz user but not synced (no friend_connection_id) → friend sheet
+    // State C — Clbhouz member, no handicap connected → nudge to sync, NOT an
+    // invite-to-clbhouz: they are already here.
     if (!item.friend_connection_id) {
-      openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
+      void resolve({ targetUserId: item.friend_user_id });
       return;
     }
-    // State B — Synced friend, but no detailed scorecard for this round
+    // State B — Synced member, no detailed scorecard for this round → compare
     if (!item.last_round_score_id) {
-      openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
+      void resolve({ targetUserId: item.friend_user_id });
       return;
     }
     // State A — Synced + has scorecard → real scorecard sheet

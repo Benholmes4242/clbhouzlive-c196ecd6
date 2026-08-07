@@ -12,6 +12,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { compareRouteFor, useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
@@ -135,6 +136,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
   const { open: openHybridSheet } = useOpenFriendSheet();
+  const { resolve: resolveMemberTap } = useMemberTapResolver();
 
   const { logPoint } = useProfileTouchDebug();
   
@@ -308,7 +310,8 @@ const ProfilePageV2Content: React.FC = () => {
   );
 
   // Per fix brief §5.2 — legacy ?tab=stats deep links redirect to the
-  // dedicated handicap route. Own profile → /handicap. Friend → /handicap/:id.
+  // dedicated handicap route. Own profile → /handicap. Another member →
+  // compare against them, since their handicap page is private to them.
   useEffect(() => {
     if (activeSection !== 'stats') return;
     if (isSelf) {
@@ -316,7 +319,9 @@ const ProfilePageV2Content: React.FC = () => {
       navigate('/handicap', { replace: true });
     } else if (profile?.id) {
       analyticsEvents.track('handicap_legacy_redirect_fired', { source: 'friend_profile_stats_tab' });
-      navigate(`/handicap/${profile.id}`, { replace: true });
+      // A legacy ?tab=stats link on someone else's profile can no longer land
+      // on their handicap page. Compare answers the same question.
+      navigate(compareRouteFor(profile.id), { replace: true });
     }
   }, [activeSection, isSelf, profile?.id, navigate]);
 
@@ -768,7 +773,7 @@ const ProfilePageV2Content: React.FC = () => {
               // ?tab=stats id redirects here anyway, so we go straight to it.
               if (stat === 'index' || stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
-                else if (profileUserId) navigate(`/handicap/${profileUserId}`);
+                else if (profileUserId) void resolveMemberTap({ targetUserId: profileUserId });
                 return;
               }
               if (stat === 'rated') {

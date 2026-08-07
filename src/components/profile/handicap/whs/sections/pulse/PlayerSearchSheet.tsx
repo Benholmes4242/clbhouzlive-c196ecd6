@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, ChevronRight, X, Swords, Pin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import GamSheet from '@/components/profile/handicap/gam/_shared/GamSheet';
 import { Skeleton, EmptyStub, RetryStub } from '@/components/profile/handicap/gam/_shared/GamAtoms';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { usePlayerSearch, type PlayerSearchResult } from '@/hooks/gam/usePlayerSearch';
+import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -98,7 +98,7 @@ const PlayerRow: React.FC<{ p: PlayerSearchResult; onTap: () => void }> = ({ p, 
 };
 
 export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
-  const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const [value, setValue] = useState('');
   const [debounced, setDebounced] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -123,7 +123,9 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
   const handleSelect = (id: string) => {
     onClose();
-    navigate(`/handicap/${id}`);
+    // Search can surface the viewer themselves; the resolver sends self to
+    // their own page and everyone else to compare/nudge.
+    void resolve({ targetUserId: id });
   };
 
   return (
