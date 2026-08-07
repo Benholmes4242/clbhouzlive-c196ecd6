@@ -118,8 +118,8 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
       surfaceColor={A.CANVAS}
       zIndexBase={SHEET_Z_UNDER_VIEWER}
       style={{
-        height: '82dvh',
-        maxHeight: '82dvh',
+        height: '75dvh',
+        maxHeight: '75dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,
