@@ -11,7 +11,10 @@
  * POLARITY IS CARRIED BY `format`, never hardcoded per row. Gross, scoring
  * average and index are low_better; stableford, birdies, rounds are
  * high_better/count. A row where both sides are zero renders both figures INK
- * with no amber - nobody leads at zero aces.
+ * with no amber - nobody leads at zero aces. `neutral` is the sample-size
+ * format: no side ever leads it, so rounds played reads as the reference the
+ * career figures are measured against rather than as a win.
+
  */
 import React from 'react';
 import { CHART, CHART_FONT } from '../../charts';
