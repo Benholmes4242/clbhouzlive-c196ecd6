@@ -124,7 +124,7 @@ export function MomentsOfTheWeek({
         })}
 
         {/* A LEFTOVER SINGLE TILE ALWAYS GOES FULL WIDTH. */}
-        {trailing.length === 1 && <div>{tile(trailing[0], SHORT)}</div>}
+        {trailing.length === 1 && <div>{tile(trailing[0], SHORT, { width: '100%' })}</div>}
 
         {trailing.length === 2 && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: GAP }}>
