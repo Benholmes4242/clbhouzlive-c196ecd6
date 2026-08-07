@@ -91,6 +91,9 @@ export const ACTION_DEFAULTS: Record<string, string> = {
   'discover.wire.action.eagle': 'Eagled the {{hole}}',
   'discover.wire.action.eagleUnknownHole': 'Made an eagle',
   'discover.wire.action.birdieHaul': 'Made {{count}} birdies',
+  'discover.wire.action.underPar': 'Went round under par',
+  'discover.wire.action.bogeyFree': 'Went round bogey-free',
+  'discover.wire.action.stableford': 'Made {{points}} Stableford points',
 };
 
 export const UNIT_DEFAULTS: Record<string, string> = {
