@@ -23,7 +23,7 @@ import type { LatestReview } from './hooks/useLatestReviews';
 
 export const REVIEW_TILE_HEIGHT = 220;
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 48%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 52%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
 
@@ -167,9 +167,12 @@ export function ReviewTile({
               textTransform: 'uppercase',
               letterSpacing: '0.10em',
               color: 'rgba(255,255,255,0.72)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              lineHeight: 1.25,
+              // MEASURED FALLBACK (brief §4): at 8.5px/0.10em a multi-course
+              // club ("ROYAL PORTRUSH GOLF CLUB (DUNLUCE)" = 206px) loses its
+              // parenthetical on a 155px line, which is ambiguous identity.
+              // Two lines, scrim stop 52%.
+              ...clamp(2),
             }}
           >
             {r.courseName || t('discover.unknownCourse', 'Course')}
