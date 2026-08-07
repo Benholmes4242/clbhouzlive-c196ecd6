@@ -191,41 +191,40 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
       </div>
       )}
 
-      <div style={CARD_SHELL}>
-        <Bar style={{ borderRadius: 0, height: 128, width: '100%' }} />
-        <div style={{ padding: '3px 16px 5px' }}>
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '9px 0',
-                borderBottom: i === 2 ? 'none' : `1px solid ${A.BORDER}`,
-              }}
-            >
-              <Bar style={{ height: 30, width: 30, borderRadius: 10, flexShrink: 0 }} />
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <TextBar w={112} h={13} />
-                <TextBar w={148} h={11} />
-              </div>
+      {/* MASONRY SHELL — same two columns, same six photo heights and the same
+          shortest-column walk as the live section, so the swap does not move
+          the page. Unresolved is not absent. */}
+      {(() => {
+        const heights = [206, 168, 146, 130, 122, 116];
+        const cols: number[][] = [[], []];
+        const totals = [0, 0];
+        heights.forEach((h) => {
+          const c = totals[0] <= totals[1] ? 0 : 1;
+          cols[c].push(h);
+          totals[c] += h + 62 + (cols[c].length > 1 ? 8 : 0);
+        });
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            {cols.map((col, ci) => (
               <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  gap: 4,
-                  flexShrink: 0,
-                }}
+                key={ci}
+                style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
               >
-                <TextBar w={30} h={14} />
-                <TextBar w={22} h={9} />
+                {col.map((h, i) => (
+                  <div key={i} style={{ ...CARD_SHELL, padding: 0 }}>
+                    <Bar style={{ borderRadius: 0, height: h, width: '100%' }} />
+                    <div style={{ padding: '9px 10px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <TextBar w={96} h={12} />
+                      <TextBar w={128} h={10} />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        );
+      })()}
+
     </section>
   );
 }
