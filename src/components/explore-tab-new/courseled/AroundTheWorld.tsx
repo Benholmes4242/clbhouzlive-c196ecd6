@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -20,6 +20,7 @@ import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { createMasonryAssignment, placeStable, rememberColumns } from './stableMasonry';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 
 /**
@@ -279,6 +280,11 @@ export function AroundTheWorld({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pressed, setPressed] = useState<string | null>(null);
   const opener = useScorecardOpener();
+  /**
+   * Column memory for the life of this section (§4). A focus refetch may bring
+   * new events; it must not move tiles the member has already seen.
+   */
+  const masonry = useRef(createMasonryAssignment());
   const openReview = useReviewSheetStore((st) => st.open);
 
   const groups = useMemo<CourseGroup[]>(() => {
@@ -766,7 +772,16 @@ export function AroundTheWorld({
             };
           });
 
-          const { columns } = deClashColumns(splitMasonry(tiles, (tt) => tt.height).columns);
+          // Existing tiles hold the column they were given; only tiles new to
+          // this session are placed greedily. The de-clash pass may still swap
+          // a pair to keep two tiles of one course off consecutive rows, and
+          // the result is remembered so the repair itself never churns again.
+          const { columns } = (() => {
+            const placed = placeStable(tiles, masonry.current);
+            const declashed = deClashColumns(placed.columns);
+            rememberColumns(declashed.columns, masonry.current);
+            return declashed;
+          })();
 
 
           return (

@@ -2,6 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { supabase } from '@/integrations/supabase/client';
+import { LATEST_REVIEWS_KEY } from '../discoverQueryKeys';
 
 /**
  * useLatestReviews (BRIEF_LATEST_REVIEWS, section 2).
@@ -157,7 +158,7 @@ function mapRow(row: Row): LatestReview | null {
 
 export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE) {
   const query = useInfiniteQuery({
-    queryKey: ['courseled', 'latest-reviews', pageSize],
+    queryKey: [...LATEST_REVIEWS_KEY, pageSize],
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       const page = Number(pageParam ?? 0);
@@ -178,6 +179,9 @@ export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE) {
       return { rows, page, total: count ?? null, rawLength: (data ?? []).length };
     },
     getNextPageParam: (last) => (last.rawLength < pageSize ? undefined : last.page + 1),
+    // UNCHANGED at 60s: a member action can happen at any moment and recency is
+    // this section's whole promise. Own-contribution freshness is instant via
+    // invalidateDiscoverReviews; this threshold covers everyone else's.
     staleTime: 60_000,
   });
 

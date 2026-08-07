@@ -6,6 +6,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { uploadEventBus } from './uploadEventBus';
 import { postKeys } from '@/queryKeys/posts';
+import {
+  invalidateDiscoverMoments,
+  invalidateDiscoverPrompt,
+  invalidateDiscoverReviews,
+} from '@/components/explore-tab-new/courseled/discoverQueryKeys';
 import { deleteDraft } from '@/services/drafts/draftService';
 import { uploadManager } from './UploadManager';
 import { triggerHaptic } from '@/lib/ui/haptics';
@@ -62,6 +67,20 @@ export function UploadToastsBridge() {
       queryClient.invalidateQueries({ queryKey: ['videos-feed'] });
       queryClient.invalidateQueries({ queryKey: ['friends-feed'] });
       queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+
+      /**
+       * DISCOVER (BRIEF_DISCOVER_REFRESH_POLICY §3b). This is the right moment,
+       * not createPost: a post is inserted as `processing` and only becomes
+       * `published` with its media rows once finalizePost runs, and Moments
+       * reads published posts that hold media. Scheduled posts are not live
+       * yet, so they invalidate nothing.
+       */
+      if (!evt.isScheduled) {
+        if (evt.uploadType === 'review') invalidateDiscoverReviews(queryClient);
+        else invalidateDiscoverMoments(queryClient);
+        // The prompt row asks for a photo of a course; it now has one.
+        invalidateDiscoverPrompt(queryClient);
+      }
 
       // Legacy CustomEvent — recentMediaListener + a few hooks still listen.
       if (!evt.isScheduled && evt.uploadType !== 'review' && evt.postId) {

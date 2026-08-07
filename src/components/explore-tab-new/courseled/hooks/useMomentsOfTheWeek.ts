@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { MOMENTS_KEY } from '../discoverQueryKeys';
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
@@ -66,7 +67,7 @@ function streamThumb(streamId: string): string {
 
 export function useMomentsOfTheWeek() {
   return useQuery({
-    queryKey: ['courseled', 'moments', WINDOW_DAYS],
+    queryKey: [...MOMENTS_KEY, WINDOW_DAYS],
     queryFn: async (): Promise<Moment[]> => {
       const since = new Date(Date.now() - WINDOW_DAYS * DAY).toISOString();
       const { data, error } = await supabase
@@ -259,6 +260,9 @@ export function useMomentsOfTheWeek() {
         };
       });
     },
+    // UNCHANGED at 10 min. The member's own photo appears immediately via
+    // invalidateDiscoverMoments on upload completion, so this only governs
+    // other members' posts.
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });

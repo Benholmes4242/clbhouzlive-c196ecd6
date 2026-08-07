@@ -252,7 +252,10 @@ export function useFriendsLatestRounds(
       return out;
     },
     enabled: !!userId,
-    staleTime: 60_000,
+    // The source is the England Golf sync, which lands roughly DAILY. A
+    // one-minute threshold checked ~1,400 times for something that arrives
+    // once, on a mobile WebView. No polling here, then or now.
+    staleTime: 30 * 60 * 1000,
 
   });
 }

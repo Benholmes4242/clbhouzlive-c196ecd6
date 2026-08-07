@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { invalidateDiscoverReviews } from '@/components/explore-tab-new/courseled/discoverQueryKeys';
 
 interface NotifyReviewSharedParams {
   ratingId: string;
@@ -91,6 +92,10 @@ export function useShareReview() {
       queryClient.invalidateQueries({ queryKey: ['clubhouse-shorts'] });
       queryClient.invalidateQueries({ queryKey: ['friends-shorts'] });
       queryClient.invalidateQueries({ queryKey: ['review-shared', ratingId] });
+
+      // Discover: the member's own review must appear in Latest reviews without
+      // waiting for a threshold. One section, not the page.
+      invalidateDiscoverReviews(queryClient);
 
       window.dispatchEvent(new CustomEvent('postCreated'));
 

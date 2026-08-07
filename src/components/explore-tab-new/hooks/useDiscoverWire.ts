@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useRegionFeats, type FeatRow } from './useRegionFeats';
+import { ALLTIME_RAIL_STALE_MS, useRegionFeats, type FeatRow } from './useRegionFeats';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { getActiveLocale } from '@/i18n';
 import { formatNumber, formatOrdinal } from '@/i18n/format';
@@ -367,8 +367,16 @@ export function useDiscoverWire(
   categoryLabel: (category: string | null | undefined) => string,
 ): DiscoverWireResult {
   const live = { refetchOnWindowFocus: true };
+  /**
+   * The honours board is ALL-TIME records — it changes a few times a year, so
+   * it does not ride the 10-minute wire threshold. Its rail has its own query
+   * key (`legendary`), so this is a real separation, not a shared entry with
+   * two opinions. It keeps the focus refetch: returning after a week should
+   * show a new ace.
+   */
+  const honours = { refetchOnWindowFocus: true, staleTime: ALLTIME_RAIL_STALE_MS };
   const records = useRegionFeats(region, 'records', 'latest', live);
-  const legendaryRail = useRegionFeats(region, 'legendary', 'latest', live);
+  const legendaryRail = useRegionFeats(region, 'legendary', 'latest', honours);
   const eagles = useRegionFeats(region, 'eagles', 'latest', live);
   const hauls = useRegionFeats(region, 'birdie_hauls', 'latest', live);
   // Empty payloads until `refresh_discover_feats` starts writing these rails.
