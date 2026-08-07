@@ -59,7 +59,7 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 }
 
 /** Section 2 — friends rail: 224px cards, 99px image, 52px body. */
-function FriendsRail() {
+export function FriendsRail() {
   return (
     <section>
       <EyebrowBar w={168} aside />
@@ -90,7 +90,7 @@ function FriendsRail() {
 }
 
 /** Section 3 — tour rail: 272px cards, 100px image, 3-cell stat row, meta line. */
-function TourRail() {
+export function TourRail() {
   return (
     <section>
       <EyebrowBar w={140} aside />
@@ -131,7 +131,7 @@ function TourRail() {
 }
 
 /** Section 4 — around the world: pill row, then one card (128px image + 3 rows). */
-function AroundTheWorldCard() {
+export function AroundTheWorldCard() {
   return (
     <section>
       <EyebrowBar w={132} aside />
@@ -192,7 +192,7 @@ function AroundTheWorldCard() {
 }
 
 /** Section 5 — moments mosaic: tall 220 lead tile, 106 shorts, 8px gap. */
-function MomentsMosaic() {
+export function MomentsMosaic() {
   return (
     <section>
       <EyebrowBar w={158} aside />
@@ -206,7 +206,7 @@ function MomentsMosaic() {
 }
 
 /** Section 6 — most played: panel of rows (rank + 40px thumb + bars + figure). */
-function MostPlayedPanel() {
+export function MostPlayedPanel() {
   return (
     <section>
       <EyebrowBar w={152} aside />
@@ -237,7 +237,7 @@ function MostPlayedPanel() {
 }
 
 /** Section 7 — honours board: gold-wash panel, centred header, 2 rows. */
-function HonoursPanel() {
+export function HonoursPanel() {
   return (
     <section>
       <div style={{ ...HONOURS_SHELL, padding: '4px 14px' }}>
