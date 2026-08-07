@@ -823,7 +823,9 @@
     "tiedLead": "Líderes empatados",
     "roundFinished": "R{{round}} · F",
     "playersTied": "{{count}} jugadores empatados",
-    "playersTied_one": "{{count}} jugadores empatados"
+    "playersTied_one": "{{count}} jugadores empatados",
+    "momentsGroupCount": "{{count}} momentos",
+    "momentsGroupCount_one": "{{count}} momento"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

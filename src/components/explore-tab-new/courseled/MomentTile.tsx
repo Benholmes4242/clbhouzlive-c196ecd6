@@ -45,6 +45,14 @@ interface TileProps {
   labelSize: number;
   labelInset: number;
   scrimStop: string;
+  /**
+   * FALSE drops the course label AND the scrim together — the scrim exists only
+   * to keep the label legible, so without a label it is just a dark wash over a
+   * photograph. Used by the SHEET, where the course name is a group header and
+   * restating it on every tile says nothing new. Defaults TRUE so the page
+   * mosaic is untouched.
+   */
+  labelled?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -56,6 +64,7 @@ export function MomentTile({
   labelSize,
   labelInset,
   scrimStop,
+  labelled = true,
   style,
 }: TileProps) {
   const { t } = useTranslation('courses');
@@ -80,32 +89,36 @@ export function MomentTile({
         initialsSize={initialsSize}
         style={{ position: 'absolute', inset: 0 }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) ${scrimStop})`,
-          }}
-        />
-        <span
-          style={{
-            position: 'absolute',
-            left: labelInset,
-            right: labelInset,
-            bottom: labelInset - 1,
-            fontSize: labelSize,
-            fontWeight: 800,
-            color: '#fff',
-            letterSpacing: '-0.01em',
-            textShadow: '0 1px 6px rgba(0,0,0,0.4)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            textAlign: 'left',
-          }}
-        >
-          {m.courseName ?? t('discover.unknownCourse', 'Course')}
-        </span>
+        {labelled && (
+          <>
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: `linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) ${scrimStop})`,
+              }}
+            />
+            <span
+              style={{
+                position: 'absolute',
+                left: labelInset,
+                right: labelInset,
+                bottom: labelInset - 1,
+                fontSize: labelSize,
+                fontWeight: 800,
+                color: '#fff',
+                letterSpacing: '-0.01em',
+                textShadow: '0 1px 6px rgba(0,0,0,0.4)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                textAlign: 'left',
+              }}
+            >
+              {m.courseName ?? t('discover.unknownCourse', 'Course')}
+            </span>
+          </>
+        )}
         {m.mediaType === 'video' && <MomentPlayGlyph />}
       </CourseImageFallback>
     </button>

@@ -823,7 +823,9 @@
     "tiedLead": "Geteilte Führung",
     "roundFinished": "R{{round}} · beendet",
     "playersTied": "{{count}} Spieler gleichauf",
-    "playersTied_one": "{{count}} Spieler gleichauf"
+    "playersTied_one": "{{count}} Spieler gleichauf",
+    "momentsGroupCount": "{{count}} Momente",
+    "momentsGroupCount_one": "{{count}} Moment"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

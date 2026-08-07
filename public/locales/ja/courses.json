@@ -776,7 +776,9 @@
     "tiedLead": "首位タイ",
     "roundFinished": "R{{round}} · 終了",
     "playersTied": "{{count}}人がタイ",
-    "playersTied_one": "{{count}}人がタイ"
+    "playersTied_one": "{{count}}人がタイ",
+    "momentsGroupCount": "{{count}} moments",
+    "momentsGroupCount_one": "{{count}} moment"
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",
