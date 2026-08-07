@@ -175,6 +175,157 @@ export const CompareSheet: React.FC<Props> = ({
   const sharedCount = shared?.shared_rounds_count ?? 0;
   const isSharedMode = !!target && sharedCount > 0;
 
+  /**
+   * CAREER BLOCK GATE.
+   *
+   * useCompareStats flattens a MISSING aggregate to emptyPlayer() - every
+   * career figure zero or null - which is indistinguishable at this level from
+   * a genuine member who has posted nothing yet. Rendering a block of zeros
+   * against a real opponent's figures would say "they have never made a
+   * birdie", which is untrue of someone whose rounds simply are not synced.
+   *
+   * So the gate is the PRESENCE OF THE CONNECTION, not the values: no
+   * whs_connections row for the target means no aggregate was ever fetched, and
+   * the whole panel is withheld. A connected member with a real zero still
+   * sees their block.
+   */
+  const { data: targetConnection } = useWhsConnection(target?.userId);
+  const careerAvailable = !!season && !!connection?.id && !!targetConnection?.id;
+
+  /**
+   * The career rows. Two populations cannot share one list, so in SHARED mode
+   * these live in their own panel with their own footnote; the head-to-head
+   * rows above them come from the shared rounds only.
+   *
+   * `conditional` rows render only when at least one side is above zero - most
+   * pairs carry three or four dead "0 - 0" rows otherwise, which buries the
+   * rows that say something. Birdies and eagles are never conditional: a real
+   * zero there is information.
+   */
+  const careerRows = React.useMemo(() => {
+    if (!season) return [];
+    const { me, them } = season;
+    const defs: {
+      key: string;
+      label: string;
+      me: number | null;
+      them: number | null;
+      format: 'neutral' | 'high_better' | 'low_better';
+      conditional?: boolean;
+      /** Already on screen in season mode's first panel. */
+      inSeasonPanel?: boolean;
+    }[] = [
+      {
+        key: 'rounds',
+        label: t('handicap.compare.stat.rounds'),
+        me: me.rounds_played,
+        them: them.rounds_played,
+        format: 'neutral',
+        inSeasonPanel: true,
+      },
+      {
+        key: 'birdies',
+        label: t('handicap.compare.stat.birdies'),
+        me: me.birdies,
+        them: them.birdies,
+        format: 'high_better',
+      },
+      {
+        key: 'eagles',
+        label: t('handicap.compare.stat.eagles'),
+        me: me.eagles,
+        them: them.eagles,
+        format: 'high_better',
+      },
+      {
+        key: 'albatrosses',
+        label: t('handicap.compare.stat.albatrosses'),
+        me: me.albatrosses,
+        them: them.albatrosses,
+        format: 'high_better',
+        conditional: true,
+      },
+      {
+        key: 'aces',
+        label: t('handicap.compare.stat.aces'),
+        me: me.aces,
+        them: them.aces,
+        format: 'high_better',
+        conditional: true,
+      },
+      {
+        key: 'subPar',
+        label: t('handicap.compare.stat.roundsUnderPar'),
+        me: me.sub_par_rounds,
+        them: them.sub_par_rounds,
+        format: 'high_better',
+        conditional: true,
+      },
+      {
+        key: 'sub80',
+        label: t('handicap.compare.stat.roundsUnder80'),
+        me: me.sub80_rounds,
+        them: them.sub80_rounds,
+        format: 'high_better',
+        conditional: true,
+      },
+      {
+        key: 'bestGross',
+        label: t('handicap.compare.stat.bestGross'),
+        me: me.lowest_gross,
+        them: them.lowest_gross,
+        format: 'low_better',
+        inSeasonPanel: true,
+      },
+      {
+        key: 'bestStableford',
+        label: t('handicap.compare.stat.bestStableford'),
+        me: me.best_stableford,
+        them: them.best_stableford,
+        format: 'high_better',
+      },
+      {
+        key: 'top100',
+        label: t('handicap.compare.stat.top100Played'),
+        me: me.top100_played,
+        them: them.top100_played,
+        format: 'high_better',
+      },
+    ];
+    return defs.filter((d) => {
+      // Null on BOTH sides is nothing to compare. Null on one side renders,
+      // with the sheet's existing hyphen - never a substituted zero.
+      if (d.me == null && d.them == null) return false;
+      if (d.conditional && (d.me ?? 0) <= 0 && (d.them ?? 0) <= 0) return false;
+      return true;
+    });
+  }, [season, t]);
+
+  /**
+   * Season mode's first panel ALREADY carries rounds played and best gross,
+   * and both are career figures (total_rounds_count / best_gross), not season
+   * ones - so it absorbs the remaining career rows rather than gaining a
+   * second panel that would repeat two values on one screen.
+   */
+  const seasonCareerRows = React.useMemo(
+    () => careerRows.filter((d) => !d.inSeasonPanel),
+    [careerRows],
+  );
+
+  const renderCareerRows = (
+    rows: typeof careerRows,
+  ): React.ReactNode =>
+    rows.map((d) => (
+      <CompareStatRow
+        key={d.key}
+        label={d.label}
+        meValue={d.me}
+        themValue={d.them}
+        format={d.format}
+      />
+    ));
+
+
   /** Derived head-to-head figures, from the shared-round results only. */
   const h2h = React.useMemo(() => {
     const rounds = shared?.shared_round_results ?? [];
