@@ -181,9 +181,14 @@ export function AroundTheWorld({
     const byCourse = new Map<string, CourseGroup>();
     for (const e of events) {
       if (!e.courseId) continue;
+      // EAGLES have left THIS SECTION (BRIEF_ATW_MASONRY §5). The rail and the
+      // tier are untouched — this is a display filter, nothing more.
+      if (e.kind === 'eagle') continue;
       const g = byCourse.get(e.courseId);
       if (g) {
-        if (g.events.length < 3) g.events.push(e);
+        // The FULL list is kept: the tile shows one headline and counts the
+        // rest, and the Course News sheet reads from the same groups.
+        g.events.push(e);
         if (e.at > g.at) g.at = e.at;
       } else {
         byCourse.set(e.courseId, {
