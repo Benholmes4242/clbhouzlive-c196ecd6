@@ -760,7 +760,7 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "Played · not rated yet",
+      "statusRate": "최근 플레이 · 평가 전",
       "statusFinish": "Rated · detail missing",
       "statusPhoto": "Played · add a photo?",
       "actionRate": "RATE",
@@ -768,8 +768,8 @@
       "actionPhoto": "ADD",
       "dismiss": "Dismiss"
     },
-    "live": "라이뭐",
-    "latest": "최신",
+    "live": "라이브",
+    "latest": "라이브",
     "roundThru": "R{{round}} · {{thru}}홀 진행",
     "thruOnly": "{{thru}}홀 진행",
     "leader": "선두",

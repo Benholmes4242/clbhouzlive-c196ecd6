@@ -807,7 +807,7 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "Played · not rated yet",
+      "statusRate": "Kürzlich gespielt · noch nicht bewertet",
       "statusFinish": "Rated · detail missing",
       "statusPhoto": "Played · add a photo?",
       "actionRate": "RATE",
@@ -816,7 +816,7 @@
       "dismiss": "Dismiss"
     },
     "live": "Live",
-    "latest": "Aktuell",
+    "latest": "Live",
     "roundThru": "R{{round}} · bis Loch {{thru}}",
     "thruOnly": "Bis Loch {{thru}}",
     "leader": "Führend",

@@ -760,7 +760,7 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "Played · not rated yet",
+      "statusRate": "最近プレイ済み · 未評価",
       "statusFinish": "Rated · detail missing",
       "statusPhoto": "Played · add a photo?",
       "actionRate": "RATE",
@@ -769,7 +769,7 @@
       "dismiss": "Dismiss"
     },
     "live": "ライブ",
-    "latest": "最新",
+    "latest": "ライブ",
     "roundThru": "R{{round}} · {{thru}}ホール終了",
     "thruOnly": "{{thru}}ホール終了",
     "leader": "首位",

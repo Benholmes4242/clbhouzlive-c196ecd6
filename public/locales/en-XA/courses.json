@@ -758,7 +758,7 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "[Played · not rated yet]",
+      "statusRate": "[Recently played · not rated yet]",
       "statusFinish": "[Rated · detail missing]",
       "statusPhoto": "[Played · add a photo?]",
       "actionRate": "RATE",
@@ -767,7 +767,7 @@
       "dismiss": "Dismiss"
     },
     "live": "[Live]",
-    "latest": "[Latest]",
+    "latest": "[Live]",
     "roundThru": "[R{{round}} · thru {{thru}}]",
     "thruOnly": "[Thru {{thru}}]",
     "leader": "[Leader]",
