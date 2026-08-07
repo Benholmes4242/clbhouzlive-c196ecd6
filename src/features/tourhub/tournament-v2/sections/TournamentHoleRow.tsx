@@ -265,12 +265,6 @@ export const TournamentHoleRow: React.FC<{
                 value={t('courses:courseDetail.holes.rankOf', { rank, total: totalHoles })}
               />
             )}
-            {Number.isFinite(row.avg_gross) && (
-              <DetailFigure
-                label={t('courses:courseDetail.holes.avgScore', { defaultValue: 'Avg' })}
-                value={row.avg_gross.toFixed(2)}
-              />
-            )}
           </div>
         </div>
       )}
@@ -286,26 +280,5 @@ const DetailFigure: React.FC<{ label: string; value: string }> = ({ label, value
     <span style={{ fontSize: 12.5, fontWeight: 800, color: A.INK }}>{value}</span>
   </span>
 );
-
-/** Column header matching TOUR_HOLE_GRID. No SI column. */
-export const TourHoleColumnHeader: React.FC = () => {
-  const { t } = useTranslation(['courses', 'tourhub']);
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: TOUR_HOLE_GRID,
-        gap: 8,
-        paddingBottom: 6,
-      }}
-    >
-      <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:courseDetail.holes.hole')}</span>
-      <span style={{ ...LABEL, fontSize: 8, textAlign: 'center' }}>
-        {t('courses:courseDetail.holes.par')}
-      </span>
-      <span />
-    </div>
-  );
-};
 
 export default TournamentHoleRow;
