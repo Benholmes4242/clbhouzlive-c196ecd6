@@ -9,6 +9,7 @@
 
 export type H2HStatFormat =
   | 'count'
+  | 'neutral'
   | 'low_better'
   | 'high_better'
   | 'delta_low_better'
