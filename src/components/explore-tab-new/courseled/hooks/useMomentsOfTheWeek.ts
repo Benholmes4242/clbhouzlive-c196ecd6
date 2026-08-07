@@ -20,6 +20,8 @@ export interface Moment {
   post: FeedPost;
   thumbnail: string | null;
   mediaType: 'image' | 'video';
+  /** Seconds, video only. Undefined when unknown - the badge hides. */
+  durationSeconds?: number;
   /** Index of this tile's media within the post's mediaItems. */
   mediaIndex?: number;
   /** Stable media id of this tile's media — authoritative for the viewer. */
