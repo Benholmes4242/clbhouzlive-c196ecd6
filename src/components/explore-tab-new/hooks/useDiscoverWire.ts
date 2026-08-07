@@ -280,6 +280,8 @@ export interface DiscoverWireResult {
   /** All-time aces and albatrosses — rarity first, then newest. Not windowed. */
   legendary: WireEvent[];
   isLoading: boolean;
+  /** Has NOT settled yet — the flag Discover sections gate their shells on. */
+  isPending: boolean;
 }
 
 const DAY_MS = 86_400_000;
@@ -311,6 +313,8 @@ export function useDiscoverWire(
 
   const isLoading =
     records.isLoading || legendaryRail.isLoading || eagles.isLoading || hauls.isLoading;
+  const isPending =
+    records.isPending || legendaryRail.isPending || eagles.isPending || hauls.isPending;
 
   // The records rail is NOT windowed server-side (191 rows against 190 all
   // time), so the horizon is applied here or the month groups grow without
@@ -345,7 +349,7 @@ export function useDiscoverWire(
     return out.sort((a, b) => rank(a) - rank(b) || Date.parse(b.at) - Date.parse(a.at));
   }, [legendaryRail.data, userId]);
 
-  return { events, legendary, isLoading };
+  return { events, legendary, isLoading, isPending };
 }
 
 export interface WireMonthGroup {

@@ -106,14 +106,16 @@ export default function ExploreTabContent({
 
   // The pool is unchanged: ONE 90-day fetch, worldwide. The lenses are
   // client-side filters and ordering over data already loaded.
-  const { events: pool, legendary, isLoading: wireLoading } = useDiscoverWire(
+  const { events: pool, legendary, isPending: wireLoading } = useDiscoverWire(
     null,
     userId,
     crownCategoryLabel,
   );
 
-  const { data: moments } = useMomentsOfTheWeek();
-  const { data: mostPlayed } = useMostPlayedThisWeek();
+  const momentsQuery = useMomentsOfTheWeek();
+  const moments = momentsQuery.data;
+  const mostPlayedQuery = useMostPlayedThisWeek();
+  const mostPlayed = mostPlayedQuery.data;
 
   const [friendsSheet, setFriendsSheet] = useState(false);
   const [momentsSheet, setMomentsSheet] = useState(false);
@@ -442,6 +444,7 @@ export default function ExploreTabContent({
         <LatestReviews
           reviews={latestReviews.reviews}
           totalCount={latestReviews.total}
+          isPending={latestReviews.isPending}
           viewerId={userId}
           lastSeen={lastSeen}
           onTilePress={handleReviewTile}
@@ -452,7 +455,7 @@ export default function ExploreTabContent({
 
         <AroundTheWorld
           events={events}
-          isLoading={wireLoading}
+          isPending={wireLoading}
           userId={userId}
           lastSeen={lastSeen}
           scopeKey={lens}
@@ -480,6 +483,7 @@ export default function ExploreTabContent({
         <MomentsOfTheWeek
           moments={momentMosaic}
           totalCount={momentList.length}
+          isPending={momentsQuery.isPending}
           lastSeen={lastSeen}
           onTilePress={handleMoment}
           onSeeAll={() => setMomentsSheet(true)}
@@ -487,12 +491,14 @@ export default function ExploreTabContent({
 
         <MostPlayedLeaderboard
           rows={mostPlayedList}
+          isPending={mostPlayedQuery.isPending}
           onRowPress={handleMostPlayed}
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
         <HonoursBoard
           events={honours}
+          isPending={wireLoading}
           onRowPress={handleHonoursRow}
           onSeeAll={honours.length > 5 ? openHonoursSheet : undefined}
         />
