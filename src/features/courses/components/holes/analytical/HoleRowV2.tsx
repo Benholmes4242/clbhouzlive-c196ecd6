@@ -35,6 +35,30 @@ export interface HoleScale {
 }
 
 /**
+ * Marker placement against a SHARED domain. Extracted so the tournament
+ * hole row can share the positioning rule instead of forking it: the member
+ * surface passes min = 0 (its averages are floored at 0.1 and clamp there),
+ * the tour surface passes a signed domain because a professional field plays
+ * many holes under par and those must not all pin to the left edge.
+ */
+export function markerOffset(value: number, min: number, max: number): string {
+  const span = Math.max(0.0001, max - min);
+  const ratio = Math.max(0, Math.min(1, (value - min) / span));
+  return `${ratio * 100}%`;
+}
+
+/** Hole number -> difficulty rank, 1 = hardest by field average. Shared. */
+export function rankHolesByDifficulty(
+  holes: ReadonlyArray<{ hole_no: number; avg_to_par: number }>,
+): Map<number, number> {
+  const rankByHole = new Map<number, number>();
+  [...holes]
+    .sort((a, b) => b.avg_to_par - a.avg_to_par)
+    .forEach((h, i) => rankByHole.set(h.hole_no, i + 1));
+  return rankByHole;
+}
+
+/**
  * ONE scale for every marker on the page: the largest average on the course,
  * field or member, floored at 0.1 so a course that plays to par cannot divide
  * by zero. Ranks are derived here too so the row and the sheet agree.
@@ -51,12 +75,7 @@ export function buildHoleScale(
   });
   const scaleMax = Math.max(0.1, ...values, 0.1);
 
-  const rankByHole = new Map<number, number>();
-  [...holes]
-    .sort((a, b) => b.avg_to_par - a.avg_to_par)
-    .forEach((h, i) => rankByHole.set(h.hole_no, i + 1));
-
-  return { scaleMax, rankByHole };
+  return { scaleMax, rankByHole: rankHolesByDifficulty(holes) };
 }
 
 function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
@@ -64,9 +83,9 @@ function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
 }
 
 function markerLeft(value: number, scaleMax: number): string {
-  const ratio = Math.max(0, Math.min(1, value / scaleMax));
-  return `${ratio * 100}%`;
+  return markerOffset(value, 0, scaleMax);
 }
+
 
 /** Legend for the ink ramp. Rendered ONCE per surface, above the rows. */
 export const HoleRampLegend: React.FC<{ hasYou: boolean }> = ({ hasYou }) => {

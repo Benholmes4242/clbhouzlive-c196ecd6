@@ -2,9 +2,9 @@
  * CourseSection - "The Course" tournament section.
  *
  * One Panel that states its sample, names the hardest and easiest holes with
- * their to-par figures, and previews the first four holes using the SAME
- * HoleRow implementation as the course detail page (tournament variant: no
- * stroke index, no viewing member). "See all 18 holes" opens the 75dvh sheet.
+ * their to-par figures, and previews the FOUR MOST NOTABLE holes (two playing
+ * hardest, two playing easiest) using the analytical TournamentHoleRow - the
+ * course page's row family minus the member marker and the SI column. "See all 18 holes" opens the 75dvh sheet.
  * Section self-hides when the RPC reports unavailable coverage.
  */
 import React, { useEffect, useMemo, useState } from 'react';
@@ -20,11 +20,11 @@ import {
   A, CAPTION, KICKER, LABEL, NUM, Panel, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
-  HoleColumnHeader,
-  HoleRow,
-  PREVIEW_COUNT,
-} from '@/features/courses/components/holes/analytical/HoleRows';
-import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+  TournamentHoleRow,
+  TourHoleRampLegend,
+  TOUR_PREVIEW_COUNT,
+  buildTourHoleScale,
+} from './TournamentHoleRow';
 import { formatNumber } from '@/i18n/format';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -49,6 +49,21 @@ export function CourseSection({ tournamentId }: Props) {
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
   const totalPlayers = data.total_players ?? 0;
+
+  // The marker domain spans ALL EIGHTEEN played holes, so a tick further right
+  // always means a harder hole. Never per visible row.
+  const scale = buildTourHoleScale(played);
+
+  /**
+   * The four most notable holes: two playing hardest, two playing easiest,
+   * hardest first. Holes 1-4 is an arbitrary window - nothing about how a
+   * course is playing lives in its opening four. Mid-round, preview whatever
+   * has data.
+   */
+  const preview = (() => {
+    if (sorted.length <= TOUR_PREVIEW_COUNT) return sorted;
+    return [sorted[0], sorted[1], sorted[sorted.length - 2], sorted[sorted.length - 1]];
+  })();
 
   const togglePreview = (holeNo: number) => {
     setExpanded((prev) => {
@@ -87,14 +102,16 @@ export function CourseSection({ tournamentId }: Props) {
         {hardest.hole_no !== easiest.hole_no && (
           <FeaturePair hardest={hardest} easiest={easiest} />
         )}
-        <HoleColumnHeader variant="tournament" />
-        {holes.slice(0, PREVIEW_COUNT).map((h) => (
-          <HoleRow
+        <TourHoleRampLegend />
+        {preview.map((h, i) => (
+          <TournamentHoleRow
             key={h.hole_no}
-            row={h as CourseHole}
-            variant="tournament"
+            row={h}
+            scale={scale}
+            totalHoles={played.length}
             open={expanded.has(h.hole_no)}
             onToggle={() => togglePreview(h.hole_no)}
+            last={i === preview.length - 1}
           />
         ))}
       </Panel>
@@ -139,7 +156,12 @@ function HolesSheet({
   const holes = data?.holes ?? [];
   const totalPlayers = data?.total_players ?? 0;
 
-  const played = holes.filter((h) => Number.isFinite(h.avg_to_par));
+  // Hole order in the sheet - the sheet is the place for sequence. Holes with
+  // no finite average are omitted, never drawn as zero.
+  const played = [...holes]
+    .filter((h) => Number.isFinite(h.avg_to_par))
+    .sort((a, b) => a.hole_no - b.hole_no);
+  const sheetScale = buildTourHoleScale(played);
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
@@ -236,14 +258,16 @@ function HolesSheet({
                 <FeaturePair hardest={hardest} easiest={easiest} />
               )}
 
-              <HoleColumnHeader variant="tournament" />
-              {holes.map((h) => (
-                <HoleRow
+              <TourHoleRampLegend />
+              {played.map((h, i) => (
+                <TournamentHoleRow
                   key={h.hole_no}
-                  row={h as CourseHole}
-                  variant="tournament"
+                  row={h}
+                  scale={sheetScale}
+                  totalHoles={played.length}
                   open={expanded.has(h.hole_no)}
                   onToggle={() => toggle(h.hole_no)}
+                  last={i === played.length - 1}
                 />
               ))}
             </>
@@ -261,20 +285,22 @@ function HolesSheet({
  * Correctness: the figure is the hole's scoring average RELATIVE TO PAR
  * (canonical toParParts), never the gross average - a par 3 that plays to
  * 3.4 is "+0.4", and that is the only number that compares across holes.
- * Difficulty colour follows the canonical grammar: over par reads RED,
- * under par reads GREEN.
+ * Difficulty takes NEUTRAL INK. Hardest and easiest describe COURSE
+ * DIFFICULTY, not anybody's score, so the member green/red convention does not
+ * apply here and amber (the viewing member) has no meaning on a tour surface.
+ * Emphasis comes from position and weight, not hue.
  */
-const FeatureHalf: React.FC<{ tone: string; label: string; h: TournamentHole }> = ({ tone, label, h }) => {
+const FeatureHalf: React.FC<{ label: string; h: TournamentHole }> = ({ label, h }) => {
   const { t } = useTranslation(['tourhub', 'courses']);
   const parts = toParParts(h.avg_to_par, 1);
   return (
     <div style={{ minWidth: 0, flex: 1 }}>
-      <div style={{ ...LABEL, color: tone }}>{label}</div>
+      <div style={{ ...LABEL }}>{label}</div>
       <div style={{ ...NUM, fontSize: 17, color: A.INK, marginTop: 6, lineHeight: 1.1 }}>
         {t('tournament.course.holeN', { ns: 'tourhub', n: h.hole_no, defaultValue: 'Hole {{n}}' })}
       </div>
       {parts && (
-        <div style={{ ...NUM, fontSize: 22, color: parts.tone, marginTop: 4, lineHeight: 1.1 }}>
+        <div style={{ ...NUM, fontSize: 22, color: A.INK, marginTop: 4, lineHeight: 1.1 }}>
           {parts.text}
         </div>
       )}
@@ -292,9 +318,9 @@ const FeaturePair: React.FC<{ hardest: TournamentHole; easiest: TournamentHole }
   const { t } = useTranslation(['tourhub', 'courses']);
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 18 }}>
-      <FeatureHalf tone={A.OVER} label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
+      <FeatureHalf label={t('holes.hardest', { ns: 'courses' })} h={hardest} />
       <div style={{ width: 1, alignSelf: 'stretch', background: A.BORDER }} aria-hidden="true" />
-      <FeatureHalf tone={A.UNDER} label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
+      <FeatureHalf label={t('holes.easiest', { ns: 'courses' })} h={easiest} />
     </div>
   );
 };
