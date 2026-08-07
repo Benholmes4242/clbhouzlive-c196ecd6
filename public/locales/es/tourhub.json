@@ -213,7 +213,6 @@
       "backAria": "Back to featured",
       "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
-      "featuredChip": "FEATURED",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
@@ -224,11 +223,12 @@
       "lowRoundLabel": "Mejor ronda",
       "groupsLabel": "Grupos",
       "awaitingPlayers": "{{range}} pendientes",
-      "shapeCaption": "El hoyo {{hard}} es el mas dificil, el {{easy}} el mas facil.",
-      "heldByLabel": "En manos de",
-      "sharedByLabel": "Compartido por",
       "nShare_one": "{{count}} jugador",
-      "nShare_other": "{{count}} jugadores"
+      "nShare_other": "{{count}} jugadores",
+      "playingHardest": "Mas dificil",
+      "playingEasiest": "Mas facil",
+      "parShort": "Par {{par}}",
+      "featuredGroupLabel": "Grupo destacado"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

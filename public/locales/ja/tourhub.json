@@ -209,7 +209,6 @@
       "backAria": "Back to featured",
       "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
-      "featuredChip": "FEATURED",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
@@ -220,11 +219,12 @@
       "lowRoundLabel": "ベストラウンド",
       "groupsLabel": "組数",
       "awaitingPlayers": "{{range}} は集計待ち",
-      "shapeCaption": "{{hard}}番が最も難しく、{{easy}}番が最も易しい。",
-      "heldByLabel": "Held by",
-      "sharedByLabel": "Shared by",
       "nShare_one": "{{count}} players",
-      "nShare_other": "{{count}} players"
+      "nShare_other": "{{count}} players",
+      "playingHardest": "最も難しい",
+      "playingEasiest": "最も易しい",
+      "parShort": "パー {{par}}",
+      "featuredGroupLabel": "注目の組"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

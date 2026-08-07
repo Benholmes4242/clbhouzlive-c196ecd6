@@ -209,7 +209,6 @@
       "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]",
       "rightMetaWithRound": "[~~{{count}} gróúpš · R{{round}}~~]",
       "roundShort": "[~~R{{round}}~~]",
-      "featuredChip": "[~~FÉÁTÚRÉD~~]",
       "teeTimeLabel": "[~~TÉÉ {{time}}~~]",
       "holeLabelSep": "[~~ · HÓLÉ {{hole}}~~]",
       "backToFeaturedAria": "[~~Báçk tó féátúréd~~]",
@@ -220,11 +219,12 @@
       "lowRoundLabel": "Low round",
       "groupsLabel": "Groups",
       "awaitingPlayers": "{{range}} awaiting players",
-      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest.",
-      "heldByLabel": "[Held by]",
-      "sharedByLabel": "[Shared by]",
       "nShare_one": "[{{count}} player]",
-      "nShare_other": "[{{count}} players]"
+      "nShare_other": "[{{count}} players]",
+      "playingHardest": "[Playing hardest]",
+      "playingEasiest": "[Playing easiest]",
+      "parShort": "[Par {{par}}]",
+      "featuredGroupLabel": "[Featured group]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",

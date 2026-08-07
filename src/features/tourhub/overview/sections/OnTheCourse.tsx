@@ -550,6 +550,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   minWidth: 122,
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
+                  marginTop: FEATURED_LABEL_BLOCK,
+
                   background: V4.surface,
                   border: `1px dashed #CBD5E1`,
                   borderRadius: 16,
