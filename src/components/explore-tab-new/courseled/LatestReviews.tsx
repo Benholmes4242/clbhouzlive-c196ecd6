@@ -24,7 +24,7 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * panel), so the page's 28px section rhythm collapses cleanly.
  */
 
-const PAGE_CAP = 6;
+const PAGE_CAP = 4;
 
 interface Props {
   reviews: LatestReview[];

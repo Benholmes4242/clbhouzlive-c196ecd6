@@ -173,11 +173,10 @@ export function ReviewTile({
           >
             {r.courseName || t('discover.unknownCourse', 'Course')}
           </div>
-
-
           <div
             style={{
-              marginTop: 6,
+              marginTop: 5,
+
               fontSize: 9.5,
               fontWeight: 700,
               color: 'rgba(255,255,255,0.62)',
