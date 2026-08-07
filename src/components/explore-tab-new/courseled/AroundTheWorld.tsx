@@ -217,17 +217,35 @@ export function AroundTheWorld({
   const newGroupCount = countNewSince(groups, (g) => g.at, lastSeen);
   useReportNewCount('world', newGroupCount);
 
-  const shown = groups.slice(0, PAGE);
+  /**
+   * TILE RANK. Lens relevance still leads (the lenses are out of scope), then
+   * NOTABILITY of the course's headline feat, then recency. Position 1 gets the
+   * 206 photo, position 6 the 116.
+   */
+  const ranked = useMemo(() => {
+    return [...groups]
+      .map((g) => ({ g, top: headlineOf(g.events) }))
+      .sort((a, b) => {
+        if (priorityFor) {
+          const d = priorityFor(a.g.courseId) - priorityFor(b.g.courseId);
+          if (d !== 0) return d;
+        }
+        const n = notability(a.top) - notability(b.top);
+        if (n !== 0) return n;
+        return a.g.at < b.g.at ? 1 : -1;
+      })
+      .map(({ g }) => g);
+  }, [groups, priorityFor]);
+
+  const shown = useMemo(() => ranked.slice(0, PAGE), [ranked]);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
-  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
-  // rows react as 'round' on their score id; ANY rating row with a reviewId
-  // carries a control — a score with no prose is still likeable (the trigger
-  // wording says "liked your rating" in that case). Only a rating with no
-  // reviewId at all has nothing to target.
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible tiles. The
+  // headline feat reacts as 'round' on its score id; ANY rating with a reviewId
+  // carries a control — a score with no prose is still likeable.
   const reactionTargets = useMemo<ReactionTarget[]>(() => {
     const out: ReactionTarget[] = [];
     for (const g of shown) {
@@ -240,21 +258,6 @@ export function AroundTheWorld({
   const reactions = useContentReactions(reactionTargets);
 
 
-  /** Notability of a course's headline feat — drives the sheet's order. */
-  const notability = (e: WireEvent): number => {
-    if (e.kind === 'ace' || e.kind === 'albatross') return 0;
-    if (e.kind === 'crown') return 1;
-    if (e.kind === 'eagle') return 2;
-    if (e.kind === 'birdie_haul') return 3;
-    return 4;
-  };
-
-  /** Tier colour for the right-hand figure (BRIEF: green / ink / gold). */
-  const toneFor = (kind: WireEvent['kind'] | 'rating'): string => {
-    if (kind === 'ace' || kind === 'albatross') return GOLD_TEXT;
-    if (kind === 'crown') return A.GREEN;
-    return A.INK;
-  };
 
   /**
    * Actor name. NEVER falls back to "You" — a missing name returns '' and the
