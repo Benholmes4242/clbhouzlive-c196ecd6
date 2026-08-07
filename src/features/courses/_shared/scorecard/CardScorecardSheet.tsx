@@ -773,17 +773,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       label={t('courses:scorecard.fieldAvg')}
                     />
                   )}
-                  {hasBeads && (
-                    <LegendKey
-                      swatch={
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_UNDER_LIGHT }} />
-                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_OVER_LIGHT }} />
-                        </span>
-                      }
-                      label={t('courses:scorecard.legendBeads')}
-                    />
-                  )}
                 </div>
 
                 <TrajectoryLine holes={holes} own={isOwner} />
