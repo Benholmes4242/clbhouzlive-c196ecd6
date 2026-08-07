@@ -21,7 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
  *   WINDOW        none. "Latest" means latest; the age chip tells the truth.
  *   ORDER         created_at DESC. No engagement weighting.
  *
- * Pagination: PAGE_SIZE rows per page. The page mosaic reads the first six of
+ * Pagination: PAGE_SIZE rows per page. The page mosaic reads the first four of
  * page one; the see-all sheet walks the pages.
  */
 
