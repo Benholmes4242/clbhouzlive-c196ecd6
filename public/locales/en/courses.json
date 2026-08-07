@@ -1221,7 +1221,6 @@
       "labelRating": "RATING",
       "underPar": "Round under par",
       "bogeyFree": "Bogey-free round",
-      "stableford": "Stableford - {{points}} points",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here"
     },
