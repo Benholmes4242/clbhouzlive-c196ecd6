@@ -1,4 +1,6 @@
 import React, { useEffect, useLayoutEffect, useCallback, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from '@/lib/toast';
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
@@ -858,7 +860,18 @@ export function FullscreenFeedOverlay() {
 
   return (
     <>
+      {/* PORTAL TO BODY (invariant, see lib/zLayers.ts): a z-index only ranks an
+          element against siblings inside its nearest stacking-context ancestor.
+          Rendered in place, this overlay was clamped inside whichever ancestor
+          established a stacking context (transform / will-change / backdrop-filter
+          / -webkit-overflow-scrolling on iOS), so body-portaled BottomSheets
+          painted over it regardless of FS_OVERLAY_Z. Portalling to <body> makes
+          every value in the registry true. All geometry here is viewport-based
+          (position:fixed + getBoundingClientRect), so the FLIP open/close motion
+          is unaffected. */}
+      {typeof document !== 'undefined' && createPortal(
       <AnimatePresence>
+
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -1140,7 +1153,10 @@ export function FullscreenFeedOverlay() {
           </motion.div>
 
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body,
+      )}
+
 
       {!readOnly && (
         <CommentsSheetV2
