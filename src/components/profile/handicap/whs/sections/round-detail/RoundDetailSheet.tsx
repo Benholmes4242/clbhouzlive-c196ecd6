@@ -53,6 +53,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId,
 }) => {
   const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const { user } = useSupabaseSession();
   const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const userQuery = useRoundDetail(scoreId, open);

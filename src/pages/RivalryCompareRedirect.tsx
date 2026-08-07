@@ -20,10 +20,18 @@ const RivalryCompareRedirect: React.FC = () => {
     friendUserId?: string;
   }>();
 
-  const base = friendUserId ? `/handicap/${friendUserId}` : '/handicap';
+  /**
+   * BOTH LEGACY SHAPES NOW LAND ON THE VIEWER'S OWN CIRCLE, COMPARE OPEN.
+   * The :friendUserId segment used to become the base path, which is another
+   * member's handicap page - now private. Pointing the base there would only
+   * make this redirect depend on a second redirect hop, so it is dropped: the
+   * rival is the member the notification is about, and compare against them
+   * reads the same fact from the viewer's own page.
+   */
+  void friendUserId;
   const to = rivalUserId
-    ? `${base}?subtab=circle&compare=${encodeURIComponent(rivalUserId)}`
-    : `${base}?subtab=circle`;
+    ? `/handicap?subtab=circle&compare=${encodeURIComponent(rivalUserId)}`
+    : '/handicap?subtab=circle';
 
   return <Navigate to={to} replace />;
 };

@@ -92,6 +92,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   displayName,
 }) => {
   const navigate = useNavigate();
+  const { resolve } = useMemberTapResolver();
   const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);

@@ -12,6 +12,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { compareRouteFor, useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
@@ -135,6 +136,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
   const { open: openHybridSheet } = useOpenFriendSheet();
+  const { resolve: resolveMemberTap } = useMemberTapResolver();
 
   const { logPoint } = useProfileTouchDebug();
   
@@ -770,7 +772,7 @@ const ProfilePageV2Content: React.FC = () => {
               // ?tab=stats id redirects here anyway, so we go straight to it.
               if (stat === 'index' || stat === 'rounds') {
                 if (isSelf) navigate('/handicap');
-                else if (profileUserId) void resolve({ targetUserId: profileUserId });
+                else if (profileUserId) void resolveMemberTap({ targetUserId: profileUserId });
                 return;
               }
               if (stat === 'rated') {
