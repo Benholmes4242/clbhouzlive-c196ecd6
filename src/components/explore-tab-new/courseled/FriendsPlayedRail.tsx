@@ -8,6 +8,7 @@ import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import {
   A,
@@ -56,17 +57,27 @@ function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
 
 export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
-  const { data: rounds } = useFriendsLatestRounds(userId, {
+  const roundsQuery = useFriendsLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
   });
+  const rounds = roundsQuery.data;
 
   const rows = useMemo(() => (rounds ?? []).slice(0, RAIL_CAP), [rounds]);
   const courseIds = useMemo(
     () => rows.map((r) => r.course_id).filter((v): v is string => !!v),
     [rows],
   );
-  const { data: meta } = useCourseCardMeta(courseIds);
+  const metaQuery = useCourseCardMeta(courseIds);
+  const meta = metaQuery.data;
+
+  // UNRESOLVED IS NOT ABSENT (BRIEF_DISCOVER_LOADING_STATES).
+  // The rounds query is DISABLED without a userId — signed out is SETTLED-EMPTY,
+  // never pending, so nobody stares at a shell forever. The meta query is
+  // disabled on an empty id list, which is likewise settled.
+  const roundsPending = !!userId && roundsQuery.isPending;
+  const metaPending = courseIds.length > 0 && metaQuery.isPending;
+  const pending = roundsPending || metaPending;
 
   // REACTIONS (BRIEF_DISCOVER_REACTIONS): one read for the whole rail, keyed by
   // the round's whs_score id. A round with no score id carries no control.
@@ -81,11 +92,14 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
 
   // NEW SINCE: the rail already orders by play_date, so play_date is the
-  // arrival stamp this section compares.
-  const newCount = countNewSince(rows, (r) => r.play_date, lastSeen);
+  // arrival stamp this section compares. Not computed before settle — a ring
+  // on a skeleton is meaningless.
+  const newCount = pending ? 0 : countNewSince(rows, (r) => r.play_date, lastSeen);
   useReportNewCount('friends', newCount);
 
+  if (pending) return <FriendsRailShell />;
   if (rows.length === 0) return null;
+
 
   return (
     <section>

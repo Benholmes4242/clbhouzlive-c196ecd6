@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, InkAction, SANS, NUMF } from './tokens';
+import { GOLD_INK, GOLD_HAIR, HONOURS_SHELL } from './honoursTokens';
+import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
  * Section 6 — THE HONOURS BOARD (light mode; no dark values on this page).
@@ -13,18 +15,7 @@ import { A, InkAction, SANS, NUMF } from './tokens';
  * newest first inside each group).
  */
 
-export const GOLD_INK = '#A87718';
-export const GOLD_HAIR = 'rgba(216,169,60,0.22)';
-export const GOLD_BORDER = 'rgba(216,169,60,0.35)';
-export const HONOURS_WASH = '#FDFBF5';
-
-export const HONOURS_SHELL: React.CSSProperties = {
-  background: HONOURS_WASH,
-  border: `1px solid ${GOLD_BORDER}`,
-  borderRadius: 16,
-  overflow: 'hidden',
-  boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-};
+export { GOLD_INK, GOLD_HAIR, GOLD_BORDER, HONOURS_WASH, HONOURS_SHELL } from './honoursTokens';
 
 /** The mock's ring: one 30x30 gold circle, red tabular numeral. No inner ring. */
 function HonoursRing({ value }: { value: number }) {
@@ -177,6 +168,8 @@ interface Props {
   events: WireEvent[];
   /** Cap on the page panel. The sheet passes the full length. */
   limit?: number;
+  /** TRUE while the wire read has not settled — the gold shell holds the slot. */
+  isPending?: boolean;
   showHeader?: boolean;
   onRowPress?: (event: WireEvent) => void;
   onSeeAll?: () => void;
@@ -185,12 +178,15 @@ interface Props {
 export function HonoursBoard({
   events,
   limit = 5,
+  isPending = false,
   showHeader = true,
   onRowPress,
   onSeeAll,
 }: Props) {
   const { t } = useTranslation('courses');
+  if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
+
 
   const ordered = sortHonours(events);
   const shown = ordered.slice(0, limit);

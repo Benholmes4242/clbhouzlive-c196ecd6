@@ -8,6 +8,7 @@ import { formatCurrencyUsdCompact, formatNumber } from '@/i18n/format';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useTourThisWeek, type TourWeekEvent } from './hooks/useTourThisWeek';
 import { isPeekFresh, useTourLivePeek } from './hooks/useTourLivePeek';
+import { TourRail as TourRailShell } from './DiscoverCourseLedSkeleton';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -95,7 +96,8 @@ function scoreColor(score: number | null | undefined): string {
 
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
-  const { data: events } = useTourThisWeek();
+  const eventsQuery = useTourThisWeek();
+  const events = eventsQuery.data;
 
   const venues = useMemo(
     () =>
@@ -107,7 +109,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
       })),
     [events],
   );
-  const { data: resolved } = useCourseImageResolver(venues);
+  const resolverQuery = useCourseImageResolver(venues);
+  const resolved = resolverQuery.data;
   const courseIds = useMemo(
     () =>
       (events ?? [])
@@ -122,15 +125,28 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
     () => (events ?? []).filter((e) => e.isLive).map((e) => e.id),
     [events],
   );
-  const { data: peeks } = useTourLivePeek(liveIds);
+  const peekQuery = useTourLivePeek(liveIds);
+  const peeks = peekQuery.data;
   const reducedMotion = usePrefersReducedMotion();
+
+  // WHOLE-CARD HOLD (layer 2a). The resolver feeds the card's IMAGE and the
+  // peek feeds its headline figures, so a card built before either settles
+  // rewrites itself in front of the reader. Both are identity here, so the
+  // rail holds its shell until the three reads have settled. Each is only
+  // awaited when it actually has work: no venues / no live events is settled.
+  const pending =
+    eventsQuery.isPending ||
+    (venues.length > 0 && resolverQuery.isPending) ||
+    (liveIds.length > 0 && peekQuery.isPending);
 
   // NEW SINCE: a tournament is new when the WEEK changes, never per scoring
   // update — the card's startDate is the only stamp compared here.
   // A moving leaderboard is a state, not an event: this section neither shows
   // an eyebrow dot nor feeds the tab badge.
 
+  if (pending) return <TourRailShell />;
   if (!events || events.length === 0) return null;
+
   const anyThisWeek = events.some((e) => e.thisWeek);
 
   return (

@@ -78,7 +78,12 @@ export function CourseNewsSheet({
 
   const { t } = useTranslation('courses');
   const ids = useMemo(() => entries.map((e) => e.courseId), [entries]);
-  const { data: meta } = useCourseCardMeta(open ? ids : []);
+  const metaQuery = useCourseCardMeta(open ? ids : []);
+  const meta = metaQuery.data;
+  // Meta feeds the card's NAME and IMAGE, so the tile is held whole while it is
+  // in flight (BRIEF_DISCOVER_LOADING_STATES, layer 2a) — the entry's own
+  // fallback name/image would only be rewritten a moment later.
+  const metaPending = open && ids.length > 0 && metaQuery.isPending;
 
   return (
     <BottomSheet
@@ -169,6 +174,7 @@ export function CourseNewsSheet({
                   courseName={m?.name ?? e.courseName}
                   imageUrl={m?.imageUrl ?? e.courseImage}
                   initialsSize={20}
+                  pending={metaPending}
                   style={{ height: 76 }}
                 >
                   <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />

@@ -51,6 +51,13 @@ interface Props {
   imageUrl?: string | null;
   /** Initials size — the mosaic tiles run larger than the rail cards. */
   initialsSize?: number;
+  /**
+   * TRUE while the enrichment query feeding `imageUrl` / `courseName` is still
+   * in flight (BRIEF_DISCOVER_LOADING_STATES, layer 2c). A neutral shimmer at
+   * the given dimensions — never the gradient, never the initials, never an
+   * <img>. A fallback may only render once its source has settled.
+   */
+  pending?: boolean;
   style?: React.CSSProperties;
   children?: React.ReactNode;
 }
@@ -60,12 +67,23 @@ export function CourseImageFallback({
   courseName,
   imageUrl,
   initialsSize = 22,
+  pending = false,
   style,
   children,
 }: Props) {
   const [broken, setBroken] = useState(false);
   const showImage = !!imageUrl && !broken;
   const initials = initialsForCourse(courseName);
+
+  if (pending) {
+    return (
+      <div
+        className="clb-shimmer-light"
+        aria-hidden="true"
+        style={{ position: 'relative', backgroundColor: 'rgba(14,18,22,0.06)', overflow: 'hidden', ...style }}
+      />
+    );
+  }
 
   return (
     <div
@@ -76,6 +94,7 @@ export function CourseImageFallback({
         ...style,
       }}
     >
+
       {showImage ? (
         <img
           src={imageUrl as string}

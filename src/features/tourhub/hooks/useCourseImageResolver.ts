@@ -320,30 +320,45 @@ export function useCourseImageResolver(venues: VenueInput[]) {
       
       console.log(`[CourseResolver] Step 2: Resolving ${uncached.length} uncached venues...`);
       
-      // Step 2: Resolve uncached venues with server-side search
-      for (const venue of uncached) {
-        const { courses } = await searchCoursesForVenue(venue);
-        
-        if (courses.length > 0) {
-          const match = findBestMatch(venue, courses);
-          
-          if (match) {
-            results.set(venue.venueName, {
-              golfCourseId: match.course.id,
-              imageUrl: match.course.thumbnail_image,
-              confidence: match.score,
-              name: match.course.name,
-            });
-            
-            // Cache for future lookups (mark low confidence separately)
-            await cacheMatch(venue, match.course.id, match.score, match.isLowConfidence);
-          } else {
-            console.log(`[CourseResolver] ✗ No acceptable match for "${venue.venueName}"`);
+      // Step 2: Resolve uncached venues with server-side search.
+      // PARALLEL (BRIEF_DISCOVER_LOADING_STATES): the venues are independent, so
+      // the whole step now costs ONE round trip's latency instead of N — this
+      // query gates the Tour rail's shell, so serial waits were visible.
+      const resolutions = await Promise.all(
+        uncached.map(async (venue) => {
+          const { courses } = await searchCoursesForVenue(venue);
+          if (courses.length === 0) {
+            console.log(`[CourseResolver] ✗ No search results for "${venue.venueName}"`);
+            return null;
           }
-        } else {
-          console.log(`[CourseResolver] ✗ No search results for "${venue.venueName}"`);
-        }
+          const match = findBestMatch(venue, courses);
+          if (!match) {
+            console.log(`[CourseResolver] ✗ No acceptable match for "${venue.venueName}"`);
+            return null;
+          }
+          return { venue, match };
+        }),
+      );
+
+      for (const r of resolutions) {
+        if (!r) continue;
+        results.set(r.venue.venueName, {
+          golfCourseId: r.match.course.id,
+          imageUrl: r.match.course.thumbnail_image,
+          confidence: r.match.score,
+          name: r.match.course.name,
+        });
       }
+
+      // Cache writes are fire-and-parallel: they never gate the render.
+      await Promise.all(
+        resolutions
+          .filter((r): r is NonNullable<typeof r> => !!r)
+          .map((r) =>
+            cacheMatch(r.venue, r.match.course.id, r.match.score, r.match.isLowConfidence),
+          ),
+      );
+
       
       console.log('[CourseResolver] ===== RESOLUTION COMPLETE =====');
       console.log('[CourseResolver] Results:', 
