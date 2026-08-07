@@ -258,11 +258,11 @@
       "fieldAverageToday": "Field average today",
       "fromNRoundsIn": "from {{n}} rounds in",
       "lowRoundLabel": "Low round",
-      "byLabel": "By",
-      "roundsInLabel": "Rounds in",
       "groupsLabel": "Groups",
       "awaitingPlayers": "{{range}} awaiting players",
-      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest."
+      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest.",
+      "heldByLabel": "Held by",
+      "sharedByLabel": "Shared by"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

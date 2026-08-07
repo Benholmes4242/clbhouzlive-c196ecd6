@@ -222,11 +222,13 @@
       "fieldAverageToday": "Felddurchschnitt heute",
       "fromNRoundsIn": "aus {{n}} Runden",
       "lowRoundLabel": "Beste Runde",
-      "byLabel": "Von",
-      "roundsInLabel": "Runden",
       "groupsLabel": "Gruppen",
       "awaitingPlayers": "{{range}} noch offen",
-      "shapeCaption": "Loch {{hard}} spielt am schwersten, Loch {{easy}} am leichtesten."
+      "shapeCaption": "Loch {{hard}} spielt am schwersten, Loch {{easy}} am leichtesten.",
+      "heldByLabel": "Gehalten von",
+      "sharedByLabel": "Geteilt von",
+      "nShare_one": "{{count}} Spieler",
+      "nShare_other": "{{count}} Spieler"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

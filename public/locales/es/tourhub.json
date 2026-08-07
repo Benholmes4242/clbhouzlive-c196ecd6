@@ -222,11 +222,13 @@
       "fieldAverageToday": "Promedio del campo hoy",
       "fromNRoundsIn": "de {{n}} rondas",
       "lowRoundLabel": "Mejor ronda",
-      "byLabel": "Por",
-      "roundsInLabel": "Rondas",
       "groupsLabel": "Grupos",
       "awaitingPlayers": "{{range}} pendientes",
-      "shapeCaption": "El hoyo {{hard}} es el mas dificil, el {{easy}} el mas facil."
+      "shapeCaption": "El hoyo {{hard}} es el mas dificil, el {{easy}} el mas facil.",
+      "heldByLabel": "En manos de",
+      "sharedByLabel": "Compartido por",
+      "nShare_one": "{{count}} jugador",
+      "nShare_other": "{{count}} jugadores"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

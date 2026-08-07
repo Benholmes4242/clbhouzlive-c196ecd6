@@ -218,11 +218,13 @@
       "fieldAverageToday": "本日の平均スコア",
       "fromNRoundsIn": "{{n}}ラウンドから",
       "lowRoundLabel": "ベストラウンド",
-      "byLabel": "選手",
-      "roundsInLabel": "ラウンド数",
       "groupsLabel": "組数",
       "awaitingPlayers": "{{range}} は集計待ち",
-      "shapeCaption": "{{hard}}番が最も難しく、{{easy}}番が最も易しい。"
+      "shapeCaption": "{{hard}}番が最も難しく、{{easy}}番が最も易しい。",
+      "heldByLabel": "Held by",
+      "sharedByLabel": "Shared by",
+      "nShare_one": "{{count}} players",
+      "nShare_other": "{{count}} players"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

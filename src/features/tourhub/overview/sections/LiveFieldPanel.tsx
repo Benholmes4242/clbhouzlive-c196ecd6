@@ -31,7 +31,7 @@ import {
   shortPlayerName,
 } from '../data/liveRoundStats';
 
-const AXIS_HOLES = [1, 5, 10, 14, 18];
+const AXIS_HOLES = [1, 6, 12, 18];
 const BAR_HALF = 22;
 
 function tourFigColor(v: number | null | undefined): string {
@@ -161,10 +161,24 @@ function ShapeChart({ rows }: { rows: HoleAverageRow[] }) {
           gap: 8,
         }}
       >
-        <div style={{ display: 'flex', gap: 10 }}>
-          {AXIS_HOLES.filter((h) => present.has(h)).map((h) => (
-            <span key={h} style={{ fontSize: 9, fontWeight: 700, color: A.DIM, ...FIGS }}>
-              {h}
+        {/* Mirrors the bar row's flex structure exactly: one slot per bar,
+            flex:1/minWidth:0, gap:3. Numbers only in axis-hole slots. */}
+        <div style={{ display: 'flex', gap: 3, flex: 1, minWidth: 0 }}>
+          {bars.map((b) => (
+            <span
+              key={b.hole}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 700,
+                color: A.DIM,
+                whiteSpace: 'nowrap',
+                ...FIGS,
+              }}
+            >
+              {AXIS_HOLES.includes(b.hole) && present.has(b.hole) ? b.hole : ''}
             </span>
           ))}
         </div>
@@ -274,7 +288,11 @@ export function LiveFieldPanel({
             color={low ? tourFigColor(low.toPar) : A.DIM}
           />
           <Cell
-            label={t('overview.onTheCourse.byLabel')}
+            label={
+              low && low.tied > 1
+                ? t('overview.onTheCourse.sharedByLabel')
+                : t('overview.onTheCourse.heldByLabel')
+            }
             value={
               low
                 ? low.tied > 1
@@ -282,10 +300,6 @@ export function LiveFieldPanel({
                   : shortPlayerName(low.playerName)
                 : '—'
             }
-          />
-          <Cell
-            label={t('overview.onTheCourse.roundsInLabel')}
-            value={field ? String(field.count) : '—'}
           />
           <Cell
             label={t('overview.onTheCourse.groupsLabel')}
