@@ -21,9 +21,9 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * photography. The band colour lives in the review sheet.
  */
 
-export const REVIEW_TILE_HEIGHT = 172;
+export const REVIEW_TILE_HEIGHT = 220;
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.86) 0%, rgba(10,14,10,0.1) 60%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 52%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
 
@@ -158,15 +158,20 @@ export function ReviewTile({
           />
         </span>
 
-        {/* BOTTOM BLOCK — course name, the quote, then reviewer and age. */}
-        <div style={{ position: 'absolute', left: 9, right: 9, bottom: 9 }}>
+        {/* BOTTOM BLOCK — kicker (course), the quote as headline, then byline. */}
+        <div style={{ position: 'absolute', left: 10, right: 10, bottom: 10 }}>
           <div
             style={{
-              fontSize: 12,
+              fontSize: 8.5,
               fontWeight: 800,
-              color: '#fff',
-              letterSpacing: '-0.01em',
-              lineHeight: 1.2,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
+              color: 'rgba(255,255,255,0.72)',
+              lineHeight: 1.25,
+              // MEASURED FALLBACK (brief §4): at 8.5px/0.10em a multi-course
+              // club ("ROYAL PORTRUSH GOLF CLUB (DUNLUCE)" = 206px) loses its
+              // parenthetical on a 155px line, which is ambiguous identity.
+              // Two lines, scrim stop 52%.
               ...clamp(2),
             }}
           >
@@ -174,22 +179,24 @@ export function ReviewTile({
           </div>
           <div
             style={{
-              marginTop: 3,
-              fontSize: 10.5,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.8)',
+              marginTop: 5,
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              letterSpacing: 0,
               lineHeight: 1.3,
-              ...clamp(2),
+              ...clamp(3),
             }}
           >
             {r.quote}
           </div>
+
           <div
             style={{
-              marginTop: 4,
+              marginTop: 6,
               fontSize: 9.5,
               fontWeight: 700,
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.62)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
