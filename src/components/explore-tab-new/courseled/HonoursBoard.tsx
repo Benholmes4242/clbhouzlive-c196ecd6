@@ -177,6 +177,8 @@ interface Props {
   events: WireEvent[];
   /** Cap on the page panel. The sheet passes the full length. */
   limit?: number;
+  /** TRUE while the wire read has not settled — the gold shell holds the slot. */
+  isPending?: boolean;
   showHeader?: boolean;
   onRowPress?: (event: WireEvent) => void;
   onSeeAll?: () => void;
@@ -185,12 +187,15 @@ interface Props {
 export function HonoursBoard({
   events,
   limit = 5,
+  isPending = false,
   showHeader = true,
   onRowPress,
   onSeeAll,
 }: Props) {
   const { t } = useTranslation('courses');
+  if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
+
 
   const ordered = sortHonours(events);
   const shown = ordered.slice(0, limit);
