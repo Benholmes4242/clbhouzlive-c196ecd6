@@ -191,10 +191,13 @@ export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE) {
     /** Total qualifying-ish count from the same read (no extra round trip). */
     total: query.data?.pages?.[0]?.total ?? null,
     isLoading: query.isLoading,
+    /** Has NOT settled yet (BRIEF_DISCOVER_LOADING_STATES). Never disabled. */
+    isPending: query.isPending,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,
   };
 }
+
 
 export default useLatestReviews;
