@@ -781,11 +781,12 @@ export function AroundTheWorld({
                     const tint = CHIP_TINT[tt.tier];
                     return (
                       <div
-                        key={g.courseId}
+                        key={tt.slotKey}
                         role="button"
                         tabIndex={0}
                         onClick={() => onCoursePress(g.courseId)}
-                        onPointerDown={() => setPressed(g.courseId)}
+                        onPointerDown={() => setPressed(tt.slotKey)}
+
                         onPointerUp={() => setPressed(null)}
                         onPointerLeave={() => setPressed(null)}
                         onPointerCancel={() => setPressed(null)}
