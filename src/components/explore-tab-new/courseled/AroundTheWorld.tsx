@@ -379,6 +379,19 @@ export function AroundTheWorld({
           });
     }
 
+    if (e.kind === 'under_par') return t('discover.row.underPar', 'Round under par');
+
+    if (e.kind === 'bogey_free') return t('discover.row.bogeyFree', 'Bogey-free round');
+
+    if (e.kind === 'stableford') {
+      const points = Number(e.actionParams?.points ?? 0);
+      return t('discover.row.stableford', {
+        defaultValue: 'Stableford - {{points}} points',
+        points,
+      });
+    }
+
+
     if (e.kind === 'crown') {
       const slug = String(e.actionParams?.categorySlug ?? '');
       if (!slug || slug === 'lowest_gross')
