@@ -292,7 +292,81 @@ export function AroundTheWorld({
       .map(({ g }) => g);
   }, [groups, priorityFor]);
 
-  const shown = useMemo(() => ranked.slice(0, PAGE), [ranked]);
+  /**
+   * TILE SLOTS — TWO PASSES (BRIEF_ATW_BACKFILL).
+   *
+   * PASS 1: one tile per distinct course, in ranked order, each showing its
+   * headline event. Stop at PAGE. This is the old behaviour verbatim.
+   *
+   * PASS 2 (only if pass 1 came up short): walk every event NOT yet shown, most
+   * notable first with newest as the tie-break, and give it its own tile until
+   * the section reaches PAGE or the events run out. MAX_TILES_PER_COURSE caps a
+   * course at 2 tiles — never a third, even with slots to spare. Never pad,
+   * never repeat an event.
+   *
+   * The combined list is then re-sorted by the SAME comparator, so a backfilled
+   * tile can outrank another course's first tile and its photo height comes
+   * from final position like any other.
+   */
+  const slots = useMemo(() => {
+    type Slot = { g: CourseGroup; top: WireEvent | undefined; key: string };
+    const perCourse = new Map<string, number>();
+    const usedEventIds = new Set<string>();
+    const out: Slot[] = [];
+
+    // PASS 1
+    for (const g of ranked) {
+      if (out.length >= PAGE) break;
+      const top = headlineOf(g.events);
+      if (top) usedEventIds.add(top.id);
+      perCourse.set(g.courseId, 1);
+      out.push({ g, top, key: `${g.courseId}:${top?.id ?? 'top'}` });
+    }
+
+    // PASS 2 — backfill
+    if (out.length < PAGE) {
+      const byId = new Map(ranked.map((g) => [g.courseId, g] as const));
+      const spare = ranked
+        .flatMap((g) => g.events)
+        .filter((e) => !usedEventIds.has(e.id))
+        .sort((a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1));
+      for (const e of spare) {
+        if (out.length >= PAGE) break;
+        const g = e.courseId ? byId.get(e.courseId) : undefined;
+        if (!g) continue;
+        if ((perCourse.get(g.courseId) ?? 0) >= MAX_TILES_PER_COURSE) continue;
+        perCourse.set(g.courseId, (perCourse.get(g.courseId) ?? 0) + 1);
+        usedEventIds.add(e.id);
+        out.push({ g, top: e, key: `${g.courseId}:${e.id}` });
+      }
+    }
+
+    // FINAL ORDER — the same comparator as `ranked`.
+    out.sort((a, b) => {
+      if (priorityFor) {
+        const d = priorityFor(a.g.courseId) - priorityFor(b.g.courseId);
+        if (d !== 0) return d;
+      }
+      const n = notability(a.top) - notability(b.top);
+      if (n !== 0) return n;
+      const at = (a.top?.at ?? a.g.at) < (b.top?.at ?? b.g.at) ? 1 : -1;
+      return at;
+    });
+
+    return { list: out, shownPerCourse: perCourse };
+  }, [ranked, priorityFor]);
+
+  /** Distinct courses on the page — meta, ratings and reactions read once each. */
+  const shown = useMemo(() => {
+    const seen = new Set<string>();
+    const out: CourseGroup[] = [];
+    for (const s of slots.list) {
+      if (seen.has(s.g.courseId)) continue;
+      seen.add(s.g.courseId);
+      out.push(s.g);
+    }
+    return out;
+  }, [slots]);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
@@ -310,6 +384,7 @@ export function AroundTheWorld({
     }
     return out;
   }, [shown, ratings]);
+
   const reactions = useContentReactions(reactionTargets);
 
 
