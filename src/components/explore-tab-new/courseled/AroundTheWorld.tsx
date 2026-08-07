@@ -102,6 +102,61 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
   return { columns: cols, totals };
 }
 
+/**
+ * PRECEDENCE, which is also the notability order that drives tile size
+ * (BRIEF_ATW_MASONRY §5). Lower is more notable.
+ *
+ *   0 hole in one   1 albatross      2 new course record   3 45+ stableford
+ *   4 under par     5 bogey-free     6 birdie haul, 5+     7 anything else
+ *
+ * Eagles no longer reach this section, so they fall to the tail rather than
+ * being given a rung of their own.
+ */
+function notability(e: WireEvent | undefined): number {
+  switch (e?.kind) {
+    case 'ace':
+      return 0;
+    case 'albatross':
+      return 1;
+    case 'crown':
+      return 2;
+    case 'stableford':
+      return 3;
+    case 'under_par':
+      return 4;
+    case 'bogey_free':
+      return 5;
+    case 'birdie_haul':
+      return 6;
+    default:
+      return 7;
+  }
+}
+
+/** The one event a tile shows: most notable, newest as the tie-break. */
+function headlineOf(events: WireEvent[]): WireEvent | undefined {
+  return [...events].sort(
+    (a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1),
+  )[0];
+}
+
+/** Chip tier for the figure on the photograph. */
+function chipTierFor(kind: WireEvent['kind'] | 'rating'): ChipTier {
+  if (kind === 'ace' || kind === 'albatross') return 'gold';
+  if (kind === 'rating') return 'rating';
+  if (kind === 'crown' || kind === 'stableford' || kind === 'under_par' || kind === 'bogey_free')
+    return 'green';
+  return 'ink';
+}
+
+/** Legacy on-light figure tone — still used by the Course News sheet entries. */
+function toneFor(kind: WireEvent['kind'] | 'rating'): string {
+  const tier = chipTierFor(kind);
+  if (tier === 'gold') return GOLD_TEXT;
+  if (tier === 'green') return A.GREEN;
+  return A.INK;
+}
+
 
 interface CourseGroup {
   courseId: string;
