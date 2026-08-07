@@ -41,6 +41,55 @@ const GOLD_TEXT = '#A87718';
 const PAGE = 6;
 
 /**
+ * A course may hold at most TWO tiles, and only via backfill when pass 1 left
+ * the page short (BRIEF_ATW_BACKFILL). Never a third, even with slots to spare.
+ */
+const MAX_TILES_PER_COURSE = 2;
+
+/**
+ * ADJACENCY REPAIR. Two tiles for one course share a photograph, so they must
+ * not sit consecutively in a column. Walk each column once; on a clash, swap
+ * the offending tile with the next tile in the OTHER column when that resolves
+ * it. Pure, single-pass, and a no-op when no clash exists — with six distinct
+ * courses this never mutates anything.
+ */
+function deClashColumns<T extends { g: { courseId: string } }>(columns: T[][]): {
+  columns: T[][];
+  unresolved: number;
+} {
+  const cols = columns.map((c) => [...c]);
+  let unresolved = 0;
+  for (let ci = 0; ci < cols.length; ci += 1) {
+    const other = cols[1 - ci];
+    for (let i = 1; i < cols[ci].length; i += 1) {
+      if (cols[ci][i].g.courseId !== cols[ci][i - 1].g.courseId) continue;
+      // Candidate partner: the tile at the same depth in the other column.
+      const j = i;
+      const cand = other[j];
+      const prevOther = other[j - 1];
+      const nextOther = other[j + 1];
+      const mine = cols[ci][i];
+      const okThere =
+        !!cand &&
+        prevOther?.g.courseId !== mine.g.courseId &&
+        nextOther?.g.courseId !== mine.g.courseId;
+      const okHere =
+        !!cand &&
+        cand.g.courseId !== cols[ci][i - 1].g.courseId &&
+        cand.g.courseId !== cols[ci][i + 1]?.g.courseId;
+      if (okThere && okHere) {
+        cols[ci][i] = cand;
+        other[j] = mine;
+      } else {
+        unresolved += 1;
+      }
+    }
+  }
+  return { columns: cols, unresolved };
+}
+
+
+/**
  * PHOTO HEIGHT BY RANK POSITION, not by achievement (BRIEF_ATW_MASONRY §2).
  * Sized by type, a week of five aces would render five identical large tiles.
  * By position the silhouette is stable whatever happened and the largest tile
