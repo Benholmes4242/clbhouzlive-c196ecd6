@@ -21,6 +21,8 @@ interface Props {
   moments: Moment[];
   /** Size of the full ranked list behind the sheet (mosaic is capped). */
   totalCount?: number;
+  /** TRUE while the moments query has not settled — the shell holds the slot. */
+  isPending?: boolean;
   onTilePress: (m: Moment) => void;
   onSeeAll: () => void;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
@@ -30,6 +32,7 @@ interface Props {
 export function MomentsOfTheWeek({
   moments,
   totalCount,
+  isPending = false,
   onTilePress,
   onSeeAll,
   lastSeen = null,
@@ -37,10 +40,14 @@ export function MomentsOfTheWeek({
   const { t } = useTranslation('courses');
 
   // NEW SINCE: the post's created_at, the stamp the mosaic already ranks on.
-  const newCount = countNewSince(moments, (m) => m.post.createdAt, lastSeen);
+  // Not computed before settle.
+  const newCount = isPending ? 0 : countNewSince(moments, (m) => m.post.createdAt, lastSeen);
   useReportNewCount('moments', newCount);
 
+  // UNRESOLVED IS NOT ABSENT: shell in flight, nothing once settled empty.
+  if (isPending) return <MomentsMosaicShell />;
   if (moments.length === 0) return null;
+
 
   const shown = moments.slice(0, 5);
 
