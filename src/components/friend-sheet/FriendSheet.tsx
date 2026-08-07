@@ -397,7 +397,7 @@ interface Handlers {
   handleMessage: () => void;
   handleViewProfile: () => void;
   handleSeeRivalry: () => void;
-  handleSeeHandicap: () => void;
+  
   handleInvite: () => void;
   handleNudgeSync: () => void;
 }
