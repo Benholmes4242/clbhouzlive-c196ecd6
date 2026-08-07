@@ -37,7 +37,71 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW
 /** Deep gold: 8px bright gold fails contrast on a light wash. */
 const GOLD_TEXT = '#A87718';
 
-const PAGE = 4;
+/** Six courses, one event each (BRIEF_ATW_MASONRY §1). */
+const PAGE = 6;
+
+/**
+ * PHOTO HEIGHT BY RANK POSITION, not by achievement (BRIEF_ATW_MASONRY §2).
+ * Sized by type, a week of five aces would render five identical large tiles.
+ * By position the silhouette is stable whatever happened and the largest tile
+ * always means "the most notable thing in the last 90 days".
+ */
+export const ATW_PHOTO_HEIGHTS = [206, 168, 146, 130, 122, 116] as const;
+
+/** A photo at or above this height gets the larger chip and name sizes. */
+const TALL = 180;
+
+const TILE_SCRIM =
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 58%)';
+
+type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
+
+/**
+ * ON-DARK tier tints for the figure chip. These live here and ONLY here — they
+ * do not replace the light `A` tokens anywhere else in the app.
+ */
+const CHIP_TINT: Record<ChipTier, { fg: string; bg: string }> = {
+  gold: { fg: '#FFE9B8', bg: 'rgba(120,86,10,0.62)' },
+  green: { fg: '#B9F0CF', bg: 'rgba(9,74,40,0.62)' },
+  ink: { fg: '#FFFFFF', bg: 'rgba(10,14,10,0.58)' },
+  rating: { fg: '#FFD9AE', bg: 'rgba(120,62,10,0.60)' },
+};
+
+/**
+ * DETERMINISTIC panel-height estimate for the masonry walk. Purely a function
+ * of the strings and flags on the tile — no DOM measurement, no refs, no
+ * reflow. Same input, same layout, every render.
+ *
+ *   padding 9 + 10, WHO line 17, WHAT lines 14 each (10.5/1.32), more line 17
+ *
+ * The WHAT line count comes from a character threshold at the ~167px inner
+ * width (10.5px, ~5.6px/char => ~30 chars a line), clamped at two.
+ */
+function estimatePanelHeight(detail: string, hasMore: boolean): number {
+  const lines = Math.min(2, Math.max(1, Math.ceil((detail.length || 1) / 30)));
+  return 19 + 17 + 2 + lines * 14 + (hasMore ? 17 : 0);
+}
+
+/**
+ * SHORTEST-COLUMN PLACEMENT. Walk the ranked list in order, put each tile in
+ * whichever column is currently shorter by TOTAL rendered height (photo +
+ * panel + the 8px gap), tie to the left. Pure and deterministic.
+ *
+ * KNOWN AND ACCEPTED: visual order is therefore not strictly rank order. That
+ * is inherent to masonry. Alternating strictly left/right instead would leave
+ * one column consistently longer on every render.
+ */
+export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) => number) {
+  const cols: T[][] = [[], []];
+  const totals = [0, 0];
+  items.forEach((item, i) => {
+    const c = totals[0] <= totals[1] ? 0 : 1;
+    cols[c].push(item);
+    totals[c] += heightOf(item, i) + (cols[c].length > 1 ? 8 : 0);
+  });
+  return { columns: cols, totals };
+}
+
 
 interface CourseGroup {
   courseId: string;
