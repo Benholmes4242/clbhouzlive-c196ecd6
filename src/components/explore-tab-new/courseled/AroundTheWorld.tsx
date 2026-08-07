@@ -37,7 +37,126 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW
 /** Deep gold: 8px bright gold fails contrast on a light wash. */
 const GOLD_TEXT = '#A87718';
 
-const PAGE = 4;
+/** Six courses, one event each (BRIEF_ATW_MASONRY §1). */
+const PAGE = 6;
+
+/**
+ * PHOTO HEIGHT BY RANK POSITION, not by achievement (BRIEF_ATW_MASONRY §2).
+ * Sized by type, a week of five aces would render five identical large tiles.
+ * By position the silhouette is stable whatever happened and the largest tile
+ * always means "the most notable thing in the last 90 days".
+ */
+export const ATW_PHOTO_HEIGHTS = [206, 168, 146, 130, 122, 116] as const;
+
+/** A photo at or above this height gets the larger chip and name sizes. */
+const TALL = 180;
+
+const TILE_SCRIM =
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 58%)';
+
+type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
+
+/**
+ * ON-DARK tier tints for the figure chip. These live here and ONLY here — they
+ * do not replace the light `A` tokens anywhere else in the app.
+ */
+const CHIP_TINT: Record<ChipTier, { fg: string; bg: string }> = {
+  gold: { fg: '#FFE9B8', bg: 'rgba(120,86,10,0.62)' },
+  green: { fg: '#B9F0CF', bg: 'rgba(9,74,40,0.62)' },
+  ink: { fg: '#FFFFFF', bg: 'rgba(10,14,10,0.58)' },
+  rating: { fg: '#FFD9AE', bg: 'rgba(120,62,10,0.60)' },
+};
+
+/**
+ * DETERMINISTIC panel-height estimate for the masonry walk. Purely a function
+ * of the strings and flags on the tile — no DOM measurement, no refs, no
+ * reflow. Same input, same layout, every render.
+ *
+ *   padding 9 + 10, WHO line 17, WHAT lines 14 each (10.5/1.32), more line 17
+ *
+ * The WHAT line count comes from a character threshold at the ~167px inner
+ * width (10.5px, ~5.6px/char => ~30 chars a line), clamped at two.
+ */
+function estimatePanelHeight(detail: string, hasMore: boolean): number {
+  const lines = Math.min(2, Math.max(1, Math.ceil((detail.length || 1) / 30)));
+  return 19 + 17 + 2 + lines * 14 + (hasMore ? 17 : 0);
+}
+
+/**
+ * SHORTEST-COLUMN PLACEMENT. Walk the ranked list in order, put each tile in
+ * whichever column is currently shorter by TOTAL rendered height (photo +
+ * panel + the 8px gap), tie to the left. Pure and deterministic.
+ *
+ * KNOWN AND ACCEPTED: visual order is therefore not strictly rank order. That
+ * is inherent to masonry. Alternating strictly left/right instead would leave
+ * one column consistently longer on every render.
+ */
+export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) => number) {
+  const cols: T[][] = [[], []];
+  const totals = [0, 0];
+  items.forEach((item, i) => {
+    const c = totals[0] <= totals[1] ? 0 : 1;
+    cols[c].push(item);
+    totals[c] += heightOf(item, i) + (cols[c].length > 1 ? 8 : 0);
+  });
+  return { columns: cols, totals };
+}
+
+/**
+ * PRECEDENCE, which is also the notability order that drives tile size
+ * (BRIEF_ATW_MASONRY §5). Lower is more notable.
+ *
+ *   0 hole in one   1 albatross      2 new course record   3 45+ stableford
+ *   4 under par     5 bogey-free     6 birdie haul, 5+     7 anything else
+ *
+ * Eagles no longer reach this section, so they fall to the tail rather than
+ * being given a rung of their own.
+ */
+function notability(e: WireEvent | undefined): number {
+  switch (e?.kind) {
+    case 'ace':
+      return 0;
+    case 'albatross':
+      return 1;
+    case 'crown':
+      return 2;
+    case 'stableford':
+      return 3;
+    case 'under_par':
+      return 4;
+    case 'bogey_free':
+      return 5;
+    case 'birdie_haul':
+      return 6;
+    default:
+      return 7;
+  }
+}
+
+/** The one event a tile shows: most notable, newest as the tie-break. */
+function headlineOf(events: WireEvent[]): WireEvent | undefined {
+  return [...events].sort(
+    (a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1),
+  )[0];
+}
+
+/** Chip tier for the figure on the photograph. */
+function chipTierFor(kind: WireEvent['kind'] | 'rating'): ChipTier {
+  if (kind === 'ace' || kind === 'albatross') return 'gold';
+  if (kind === 'rating') return 'rating';
+  if (kind === 'crown' || kind === 'stableford' || kind === 'under_par' || kind === 'bogey_free')
+    return 'green';
+  return 'ink';
+}
+
+/** Legacy on-light figure tone — still used by the Course News sheet entries. */
+function toneFor(kind: WireEvent['kind'] | 'rating'): string {
+  const tier = chipTierFor(kind);
+  if (tier === 'gold') return GOLD_TEXT;
+  if (tier === 'green') return A.GREEN;
+  return A.INK;
+}
+
 
 interface CourseGroup {
   courseId: string;
@@ -117,9 +236,14 @@ export function AroundTheWorld({
     const byCourse = new Map<string, CourseGroup>();
     for (const e of events) {
       if (!e.courseId) continue;
+      // EAGLES have left THIS SECTION (BRIEF_ATW_MASONRY §5). The rail and the
+      // tier are untouched — this is a display filter, nothing more.
+      if (e.kind === 'eagle') continue;
       const g = byCourse.get(e.courseId);
       if (g) {
-        if (g.events.length < 3) g.events.push(e);
+        // The FULL list is kept: the tile shows one headline and counts the
+        // rest, and the Course News sheet reads from the same groups.
+        g.events.push(e);
         if (e.at > g.at) g.at = e.at;
       } else {
         byCourse.set(e.courseId, {
@@ -148,17 +272,35 @@ export function AroundTheWorld({
   const newGroupCount = countNewSince(groups, (g) => g.at, lastSeen);
   useReportNewCount('world', newGroupCount);
 
-  const shown = groups.slice(0, PAGE);
+  /**
+   * TILE RANK. Lens relevance still leads (the lenses are out of scope), then
+   * NOTABILITY of the course's headline feat, then recency. Position 1 gets the
+   * 206 photo, position 6 the 116.
+   */
+  const ranked = useMemo(() => {
+    return [...groups]
+      .map((g) => ({ g, top: headlineOf(g.events) }))
+      .sort((a, b) => {
+        if (priorityFor) {
+          const d = priorityFor(a.g.courseId) - priorityFor(b.g.courseId);
+          if (d !== 0) return d;
+        }
+        const n = notability(a.top) - notability(b.top);
+        if (n !== 0) return n;
+        return a.g.at < b.g.at ? 1 : -1;
+      })
+      .map(({ g }) => g);
+  }, [groups, priorityFor]);
+
+  const shown = useMemo(() => ranked.slice(0, PAGE), [ranked]);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
-  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
-  // rows react as 'round' on their score id; ANY rating row with a reviewId
-  // carries a control — a score with no prose is still likeable (the trigger
-  // wording says "liked your rating" in that case). Only a rating with no
-  // reviewId at all has nothing to target.
+  // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible tiles. The
+  // headline feat reacts as 'round' on its score id; ANY rating with a reviewId
+  // carries a control — a score with no prose is still likeable.
   const reactionTargets = useMemo<ReactionTarget[]>(() => {
     const out: ReactionTarget[] = [];
     for (const g of shown) {
@@ -171,21 +313,6 @@ export function AroundTheWorld({
   const reactions = useContentReactions(reactionTargets);
 
 
-  /** Notability of a course's headline feat — drives the sheet's order. */
-  const notability = (e: WireEvent): number => {
-    if (e.kind === 'ace' || e.kind === 'albatross') return 0;
-    if (e.kind === 'crown') return 1;
-    if (e.kind === 'eagle') return 2;
-    if (e.kind === 'birdie_haul') return 3;
-    return 4;
-  };
-
-  /** Tier colour for the right-hand figure (BRIEF: green / ink / gold). */
-  const toneFor = (kind: WireEvent['kind'] | 'rating'): string => {
-    if (kind === 'ace' || kind === 'albatross') return GOLD_TEXT;
-    if (kind === 'crown') return A.GREEN;
-    return A.INK;
-  };
 
   /**
    * Actor name. NEVER falls back to "You" — a missing name returns '' and the
@@ -251,6 +378,19 @@ export function AroundTheWorld({
             count,
           });
     }
+
+    if (e.kind === 'under_par') return t('discover.row.underPar', 'Round under par');
+
+    if (e.kind === 'bogey_free') return t('discover.row.bogeyFree', 'Bogey-free round');
+
+    if (e.kind === 'stableford') {
+      const points = Number(e.actionParams?.points ?? 0);
+      return t('discover.row.stableford', {
+        defaultValue: 'Stableford - {{points}} points',
+        points,
+      });
+    }
+
 
     if (e.kind === 'crown') {
       const slug = String(e.actionParams?.categorySlug ?? '');
@@ -402,306 +542,385 @@ export function AroundTheWorld({
 
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {shown.map((g) => {
+        <>
+        {(() => {
+          /**
+           * TILE MODELS, built in rank order so the photo height is a pure
+           * function of position. Everything the masonry walk needs is decided
+           * here — the placement step never touches the DOM.
+           */
+          const tiles = shown.map((g, i) => {
             const m = meta?.get(g.courseId);
             const rating = ratings?.get(g.courseId);
-            const rows: Array<{
-              key: string;
-              name: string;
-              isOwn: boolean;
-              avatar: string | null;
-              userId: string | null;
-              detail: string;
-              fig: string | null;
-              figLabel: string;
-              tone: string;
-              isNew: boolean;
-              onPress?: () => void;
-              reactTo?: { type: 'round' | 'review'; id: string };
-            }> = g.events.map((e) => ({
-              key: e.id,
-              isNew: isNewSince(e.at, lastSeen),
-              name: nameFor(e),
-              isOwn: !!userId && !!e.userId && e.userId === userId,
-              avatar: e.actorAvatar,
-              userId: e.userId,
-              detail: detailFor(e),
-              fig: e.figure ?? null,
-              figLabel: figLabelFor(e),
-              tone: toneFor(e.kind),
-              reactTo: e.scoreId ? { type: 'round', id: e.scoreId } : undefined,
-              onPress: e.scoreId
-                ? () => {
-                    analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
-                    opener.openByScore(e.scoreId, null, e.userId);
-                  }
-                : undefined,
-            }));
+            const top = headlineOf(g.events);
+            const photo = ATW_PHOTO_HEIGHTS[Math.min(i, ATW_PHOTO_HEIGHTS.length - 1)];
+            const tall = photo >= TALL;
 
-            if (rating) {
-              rows.push({
-                key: `rating:${g.courseId}`,
-                isNew: false,
-                name: rating.actorName?.trim() ?? '',
-                isOwn: !!userId && !!rating.userId && rating.userId === userId,
-                avatar: rating.actorAvatar,
-                userId: rating.userId,
-                detail: t('discover.row.rated', 'Rated this course'),
-                fig: rating.rating.toFixed(1),
-                figLabel: t('discover.row.labelRating', 'RATING'),
-                tone: reviewLabelColor(rating.rating, 'light'),
-                reactTo:
-                  // LIKEABLE whenever there is a review row to target, prose or
-                  // not. Deliberately BROADER than the tap rule below.
-                  rating.reviewId ? { type: 'review', id: rating.reviewId } : undefined,
+            // ONE FIGURE PER TILE, on the photograph. A rating only steps in
+            // when the headline feat has no figure of its own.
+            let figure: string | null = null;
+            let unit = '';
+            let tier: ChipTier = 'ink';
+            let who = '';
+            let isOwn = false;
+            let detail = '';
+            let reactTo: { type: 'round' | 'review'; id: string } | undefined;
+            let onPress: (() => void) | undefined;
 
-                // TAP opens the sheet ONLY when there is prose to read. A
-                // score-only rating is inert to tap while still being likeable
-                // — that asymmetry is intentional, not a bug to "fix".
-                onPress:
-                  rating.reviewId && (rating.reviewText ?? '').trim()
-                  ? () => {
-                      analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
-                      openReview({
-                        user: {
-                          id: rating.userId ?? '',
-                          name: rating.actorName?.trim() || '',
-                          avatar: rating.actorAvatar ?? undefined,
-                        },
-                        courseId: g.courseId,
-                        courseName: m?.name ?? g.courseName ?? '',
-                        rating: rating.rating,
-                        reviewId: rating.reviewId,
-                        reviewText: rating.reviewText,
-                      });
-                    }
-                  : undefined,
-              });
+            if (top) {
+              who = nameFor(top);
+              isOwn = !!userId && !!top.userId && top.userId === userId;
+              detail = detailFor(top);
+              tier = chipTierFor(top.kind);
+              if (top.figure) {
+                figure = top.figure;
+                unit = figLabelFor(top);
+              } else if (top.kind === 'ace' || top.kind === 'albatross') {
+                figure = '1';
+                unit = t(
+                  top.kind === 'ace'
+                    ? 'discover.wire.unit.ace'
+                    : 'discover.wire.unit.albatross',
+                  { defaultValue: top.kind === 'ace' ? 'ace' : 'albatross' },
+                ).toUpperCase();
+              }
+              if (top.scoreId) {
+                reactTo = { type: 'round', id: top.scoreId };
+                const scoreId = top.scoreId;
+                const ownerId = top.userId;
+                onPress = () => {
+                  analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
+                  opener.openByScore(scoreId, null, ownerId);
+                };
+              }
             }
 
-            const showShortlist = !!onToggleShortlist && !!canShortlist?.(g.courseId);
+            if (!figure && rating) {
+              figure = rating.rating.toFixed(1);
+              unit = t('discover.row.labelRating', 'RATING');
+              tier = 'rating';
+              if (!top) {
+                who = rating.actorName?.trim() ?? '';
+                isOwn = !!userId && !!rating.userId && rating.userId === userId;
+                detail = t('discover.row.rated', 'Rated this course');
+                if (rating.reviewId) reactTo = { type: 'review', id: rating.reviewId };
+                if (rating.reviewId && (rating.reviewText ?? '').trim()) {
+                  onPress = () => {
+                    analyticsEvents.track('discover_world_row_tap', { kind: 'rating' });
+                    openReview({
+                      user: {
+                        id: rating.userId ?? '',
+                        name: rating.actorName?.trim() || '',
+                        avatar: rating.actorAvatar ?? undefined,
+                      },
+                      courseId: g.courseId,
+                      courseName: m?.name ?? g.courseName ?? '',
+                      rating: rating.rating,
+                      reviewId: rating.reviewId,
+                      reviewText: rating.reviewText,
+                    });
+                  };
+                }
+              }
+            }
 
-            return (
-              <button
-                key={g.courseId}
-                type="button"
-                onClick={() => onCoursePress(g.courseId)}
-                style={{
-                  ...CARD_SHELL,
-                  ...(isNewSince(g.at, lastSeen) ? NEW_CARD_RING : null),
-                  padding: 0,
-                  textAlign: 'left',
-                  fontFamily: SANS,
-                  cursor: 'pointer',
-                }}
-              >
-                <CourseImageFallback
-                  courseId={g.courseId}
-                  courseName={m?.name ?? g.courseName}
-                  imageUrl={m?.imageUrl ?? g.courseImage}
-                  initialsSize={30}
-                  style={{ height: 128 }}
+            const more = Math.max(0, g.events.length - 1);
+
+            return {
+              g,
+              m,
+              photo,
+              tall,
+              figure,
+              unit,
+              tier,
+              who,
+              isOwn,
+              detail,
+              more,
+              reactTo,
+              onPress,
+              height: photo + estimatePanelHeight(detail, more > 0),
+            };
+          });
+
+          const { columns } = splitMasonry(tiles, (tt) => tt.height);
+
+          return (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              {columns.map((col, ci) => (
+                <div
+                  key={ci}
+                  style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
                 >
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
-                  <ImageChip>{relativeWhen(g.at, t)}</ImageChip>
-                  {showShortlist && (
-                    <ShortlistGlassAction
-                      shortlisted={!!isShortlisted?.(g.courseId)}
-                      onToggle={() => onToggleShortlist?.(g.courseId)}
-                      label={t('discover.shortlist.action', 'Add to your list')}
-                    />
-                  )}
-                  {/* Name keeps clear of the bottom-right glass action at 320dp. */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 14,
-                      right: showShortlist ? 46 : 14,
-                      bottom: 10,
-                    }}
-                  >
-
-                    <div
-                      style={{
-                        fontSize: 16.5,
-                        fontWeight: 800,
-                        color: '#fff',
-                        letterSpacing: '-0.02em',
-                      }}
-                    >
-                      {m?.name ?? g.courseName ?? t('discover.unknownCourse', 'Course')}
-                    </div>
-                    {m?.region && (
+                  {col.map((tt) => {
+                    const { g, m } = tt;
+                    const tint = CHIP_TINT[tt.tier];
+                    return (
                       <div
+                        key={g.courseId}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => onCoursePress(g.courseId)}
+                        onPointerDown={() => setPressed(g.courseId)}
+                        onPointerUp={() => setPressed(null)}
+                        onPointerLeave={() => setPressed(null)}
+                        onPointerCancel={() => setPressed(null)}
                         style={{
-                          fontSize: 11,
-                          color: 'rgba(255,255,255,0.78)',
-                          marginTop: 2,
+                          ...CARD_SHELL,
+                          ...(isNewSince(g.at, lastSeen) ? NEW_CARD_RING : null),
+                          padding: 0,
+                          textAlign: 'left',
+                          fontFamily: SANS,
+                          cursor: 'pointer',
+                          opacity: pressed === g.courseId ? 0.72 : 1,
+                          transition: 'opacity 120ms ease',
                         }}
                       >
-                        {m.region}
-                      </div>
-                    )}
-                  </div>
-                </CourseImageFallback>
+                        <CourseImageFallback
+                          courseId={g.courseId}
+                          courseName={m?.name ?? g.courseName}
+                          imageUrl={m?.imageUrl ?? g.courseImage}
+                          initialsSize={tt.tall ? 26 : 22}
+                          style={{ height: tt.photo }}
+                        >
+                          <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
 
-                <div style={{ padding: '3px 16px 5px' }}>
-                  {rows.map((r, i) => (
-                    <div
-                      key={r.key}
-                      role={r.onPress ? 'button' : undefined}
-                      tabIndex={r.onPress ? 0 : undefined}
-                      onClick={
-                        r.onPress
-                          ? (ev) => {
-                              ev.stopPropagation();
-                              r.onPress?.();
-                            }
-                          : undefined
-                      }
-                      onPointerDown={r.onPress ? () => setPressed(r.key) : undefined}
-                      onPointerUp={r.onPress ? () => setPressed(null) : undefined}
-                      onPointerLeave={r.onPress ? () => setPressed(null) : undefined}
-                      onPointerCancel={r.onPress ? () => setPressed(null) : undefined}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '9px 0',
-                        borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
-                        cursor: r.onPress ? 'pointer' : 'default',
-                        opacity: r.onPress && pressed === r.key ? 0.62 : 1,
-                        transition: 'opacity 120ms ease',
-                      }}
-                    >
-                      {r.isNew && <span aria-hidden style={NEW_ROW_BAR} />}
-                      <SquircleAvatar
-                        size={30}
-                        src={r.avatar}
-                        alt={r.name}
-                        userId={r.userId}
-                        hairlineRing
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        {r.name ? (
-                          <>
+                          {/* FIGURE CHIP — the truncation fix: the figure lives
+                              on the photograph so the panel keeps the full
+                              width for prose. */}
+                          {tt.figure && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                top: 8,
+                                left: 8,
+                                display: 'inline-flex',
+                                alignItems: 'baseline',
+                                gap: 4,
+                                padding: tt.tall ? '4px 9px' : '3px 7px',
+                                borderRadius: 999,
+                                background: tint.bg,
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                              }}
+                            >
+                              <span
+                                style={{
+                                  ...NUMF,
+                                  fontSize: tt.tall ? 15 : 13,
+                                  lineHeight: 1,
+                                  color: '#FFFFFF',
+                                }}
+                              >
+                                {tt.figure}
+                              </span>
+                              {tt.unit && (
+                                <span
+                                  style={{
+                                    fontSize: 7.5,
+                                    fontWeight: 800,
+                                    letterSpacing: '0.14em',
+                                    textTransform: 'uppercase',
+                                    lineHeight: 1,
+                                    color: tint.fg,
+                                  }}
+                                >
+                                  {tt.unit}
+                                </span>
+                              )}
+                            </span>
+                          )}
+
+                          {/* WHEN CHIP */}
+                          <span
+                            style={{
+                              position: 'absolute',
+                              top: 8,
+                              right: 8,
+                              fontSize: 7,
+                              fontWeight: 800,
+                              letterSpacing: '0.14em',
+                              textTransform: 'uppercase',
+                              color: '#FFFFFF',
+                              background: 'rgba(10,14,10,0.5)',
+                              backdropFilter: 'blur(8px)',
+                              WebkitBackdropFilter: 'blur(8px)',
+                              borderRadius: 999,
+                              padding: '3px 6px',
+                            }}
+                          >
+                            {relativeWhen(g.at, t)}
+                          </span>
+
+                          <div
+                            style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}
+                          >
                             <div
                               style={{
-                                fontSize: 13,
+                                fontSize: tt.tall ? 12.5 : 12,
+                                fontWeight: 800,
+                                color: '#fff',
+                                letterSpacing: '-0.015em',
+                                lineHeight: 1.15,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {m?.name ?? g.courseName ?? t('discover.unknownCourse', 'Course')}
+                            </div>
+                            {m?.region && (
+                              <div
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 600,
+                                  color: 'rgba(255,255,255,0.78)',
+                                  marginTop: 2,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {m.region}
+                              </div>
+                            )}
+                          </div>
+                        </CourseImageFallback>
+
+                        {/* TEXT PANEL — no figure here. One figure per tile. */}
+                        <div style={{ padding: '9px 10px 10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <div
+                              style={{
+                                flex: 1,
+                                minWidth: 0,
+                                fontSize: 12,
                                 fontWeight: 700,
                                 letterSpacing: '-0.005em',
-                                color: r.isOwn ? A.AMBER_DEEP : A.INK,
+                                color: tt.isOwn ? A.AMBER_DEEP : A.INK,
+                                whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
                               }}
                             >
-                              {r.isOwn ? t('discover.wire.you', 'You') : r.name}
+                              {tt.who
+                                ? tt.isOwn
+                                  ? t('discover.wire.you', 'You')
+                                  : tt.who
+                                : tt.detail}
                             </div>
+                            {/* FIXED-WIDTH TRAILING SLOT — rendered whether or
+                                not a control appears, so names never go ragged
+                                between a tile with a reaction and one without. */}
+                            <ReactionSlot>
+                              {tt.reactTo
+                                ? (() => {
+                                    const st = reactions.stateFor(
+                                      tt.reactTo.type,
+                                      tt.reactTo.id,
+                                    );
+                                    return (
+                                      <ReactionAction
+                                        hidden={!reactions.viewerId || reactions.unavailable}
+                                        readOnly={tt.isOwn}
+                                        count={st.count}
+                                        reacted={st.mine}
+                                        onToggle={() =>
+                                          reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
+                                        }
+                                        label={
+                                          tt.reactTo.type === 'round'
+                                            ? t('discover.reactions.action', 'Like this round')
+                                            : t(
+                                                'discover.reactions.actionReview',
+                                                'Like this review',
+                                              )
+                                        }
+                                      />
+                                    );
+                                  })()
+                                : null}
+                            </ReactionSlot>
+                          </div>
+
+                          {tt.who && tt.detail && (
+                            <div
+                              role={tt.onPress ? 'button' : undefined}
+                              onClick={
+                                tt.onPress
+                                  ? (ev) => {
+                                      ev.stopPropagation();
+                                      tt.onPress?.();
+                                    }
+                                  : undefined
+                              }
+                              style={{
+                                fontSize: 10.5,
+                                fontWeight: 600,
+                                lineHeight: 1.32,
+                                color: A.BODY,
+                                marginTop: 2,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                cursor: tt.onPress ? 'pointer' : 'inherit',
+                              }}
+                            >
+                              {tt.detail}
+                            </div>
+                          )}
+
+                          {tt.more > 0 && (
                             <div
                               style={{
-                                fontSize: 11,
-                                fontWeight: 600,
-                                lineHeight: 1.35,
-                                color: A.BODY,
-                                marginTop: 1.5,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
+                                fontSize: 7.5,
+                                fontWeight: 800,
+                                letterSpacing: '0.14em',
+                                textTransform: 'uppercase',
+                                color: A.MUTE,
+                                marginTop: 6,
                               }}
                             >
-                              {r.detail}
+                              {t('discover.row.moreHere', {
+                                defaultValue: '+{{count}} more here',
+                                count: tt.more,
+                              })}
                             </div>
-                          </>
-                        ) : (
-                          <div
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 700,
-                              letterSpacing: '-0.005em',
-                              color: A.INK,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {r.detail}
-                          </div>
-                        )}
-                      </div>
-                      {/* FIGURE BLOCK — fixed min-width so 72 / 6 / 8.9 all sit
-                          on one axis regardless of digit count. */}
-                      {r.fig && (
-                        <div style={{ flexShrink: 0, textAlign: 'center', minWidth: 46 }}>
-                          <div style={{ ...NUMF, fontSize: 17, color: r.tone, lineHeight: 1.05 }}>
-                            {r.fig}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 8,
-                              fontWeight: 800,
-                              letterSpacing: '0.13em',
-                              textTransform: 'uppercase',
-                              color: A.DIM,
-                              marginTop: 2,
-                            }}
-                          >
-                            {r.figLabel}
-                          </div>
+                          )}
                         </div>
-                      )}
-                      {/* TRAILING SLOT — reserved on EVERY row, control or not. */}
-                      <ReactionSlot>
-                        {r.reactTo
-                          ? (() => {
-                              const st = reactions.stateFor(r.reactTo.type, r.reactTo.id);
-                              return (
-                                <ReactionAction
-                                  hidden={!reactions.viewerId || reactions.unavailable}
-                                  readOnly={r.isOwn}
-                                  count={st.count}
-                                  reacted={st.mine}
-                                  onToggle={() =>
-                                    reactions.toggle(r.reactTo!.type, r.reactTo!.id)
-                                  }
-                                  label={
-                                    r.reactTo.type === 'round'
-                                      ? t('discover.reactions.action', 'Like this round')
-                                      : t('discover.reactions.actionReview', 'Like this review')
-                                  }
-                                />
-                              );
-                            })()
-                          : null}
-                      </ReactionSlot>
-
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
-              </button>
-            );
-          })}
-
-          {groups.length > PAGE && (
-            <div style={{ textAlign: 'center', paddingTop: 4 }}>
-              <InkAction
-                onClick={() => {
-                  analyticsEvents.track('discover_world_sheet_open', {
-                    courses: groups.length,
-                  });
-                  setSheetOpen(true);
-                  onExpand?.(groups.length - PAGE);
-                }}
-              >
-                {t('discover.seeAllCourses', {
-                  defaultValue: 'See all {{count}} courses',
-                  count: groups.length,
-                })}
-              </InkAction>
+              ))}
             </div>
-          )}
-        </div>
+          );
+        })()}
+
+
+        {groups.length > PAGE && (
+          <div style={{ textAlign: 'center', paddingTop: 12 }}>
+            <InkAction
+              onClick={() => {
+                analyticsEvents.track('discover_world_sheet_open', {
+                  courses: groups.length,
+                });
+                setSheetOpen(true);
+                onExpand?.(groups.length - PAGE);
+              }}
+            >
+              {t('discover.seeAllCourses', {
+                defaultValue: 'See all {{count}} courses',
+                count: groups.length,
+              })}
+            </InkAction>
+          </div>
+        )}
+        </>
+
       )}
     </section>
 

@@ -1218,7 +1218,12 @@
       "compactBirdieHaul_other": "Birdie haul - {{count}}",
       "rated": "Rated this course",
       "labelScore": "SCORE",
-      "labelRating": "RATING"
+      "labelRating": "RATING",
+      "underPar": "Round under par",
+      "bogeyFree": "Bogey-free round",
+      "stableford": "Stableford - {{points}} points",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here"
     },
     "onTourThisWeek": "On tour this week",
     "onTourNext": "Next on tour",

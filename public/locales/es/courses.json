@@ -824,7 +824,14 @@
     "playersTied": "{{count}} jugadores empatados",
     "playersTied_one": "{{count}} jugadores empatados",
     "momentsGroupCount": "{{count}} momentos",
-    "momentsGroupCount_one": "{{count}} momento"
+    "momentsGroupCount_one": "{{count}} momento",
+    "row": {
+      "underPar": "Round under par",
+      "bogeyFree": "Bogey-free round",
+      "stableford": "Stableford - {{points}} points",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here"
+    }
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

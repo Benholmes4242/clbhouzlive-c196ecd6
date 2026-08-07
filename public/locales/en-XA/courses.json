@@ -775,7 +775,14 @@
     "playersTied": "[{{count}} players tied]",
     "playersTied_one": "[{{count}} players tied]",
     "momentsGroupCount": "[{{count}} moments]",
-    "momentsGroupCount_one": "[{{count}} moment]"
+    "momentsGroupCount_one": "[{{count}} moment]",
+    "row": {
+      "underPar": "Round under par",
+      "bogeyFree": "Bogey-free round",
+      "stableford": "Stableford - {{points}} points",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here"
+    }
   },
   "statBrowse": {
     "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",
