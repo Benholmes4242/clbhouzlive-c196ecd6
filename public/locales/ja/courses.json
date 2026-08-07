@@ -115,8 +115,7 @@
     "gross": "GROSS",
     "toPar": "TO PAR",
     "viewProfile": "View profile",
-    "viewCourse": "View course",
-    "legendBeads": "ドット: バーディー以上は赤、ダブル以上は濃色"
+    "viewCourse": "View course"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

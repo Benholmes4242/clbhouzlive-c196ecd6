@@ -608,12 +608,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     ];
   }, [played, t]);
 
-  /**
-   * The beads plot only birdie-or-better and double-or-worse (see
-   * beadForScore); par and bogey are unbeaded. With neither present the chart
-   * draws no beads at all, so the legend key would name nothing.
-   */
-  const hasBeads = split[0].n > 0 || split[3].n > 0;
+
+
 
   const out = holes.filter((h) => h.holeNo <= 9);
 
@@ -755,10 +751,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   LEGEND — the swatches must match what the chart actually draws.
                   The round line is INK unless the round is the viewer's own, in
                   which case it is AMBER (amber means the viewing member). The
-                  third key names the beads, which mark only the holes that
-                  swung the round: birdie or better in red (ace/albatross gold)
-                  and double or worse in over-par ink. Par and bogey carry no
-                  bead by design — see beadForScore.
+                  beads are deliberately unnamed: red for birdie-or-better and
+                  over-par ink for double-or-worse are read straight off the
+                  card above, so a key for them only added noise.
                 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
                   {(isOwner || hasName) && (
@@ -771,17 +766,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     <LegendKey
                       swatch={<i style={{ width: 12, height: 1.6, borderRadius: 1, background: FIELD_LINE_SWATCH }} />}
                       label={t('courses:scorecard.fieldAvg')}
-                    />
-                  )}
-                  {hasBeads && (
-                    <LegendKey
-                      swatch={
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_UNDER_LIGHT }} />
-                          <i style={{ width: 6, height: 6, borderRadius: '50%', background: TOPAR_OVER_LIGHT }} />
-                        </span>
-                      }
-                      label={t('courses:scorecard.legendBeads')}
                     />
                   )}
                 </div>

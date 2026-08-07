@@ -121,8 +121,7 @@
     "gross": "GROSS",
     "toPar": "TO PAR",
     "viewProfile": "View profile",
-    "viewCourse": "View course",
-    "legendBeads": "Puntos: birdie+ rojo, doble+ tinta"
+    "viewCourse": "View course"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
