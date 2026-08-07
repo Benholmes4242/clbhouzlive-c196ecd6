@@ -9,6 +9,7 @@
 
 export type H2HStatFormat =
   | 'count'
+  | 'neutral'
   | 'low_better'
   | 'high_better'
   | 'delta_low_better'
@@ -72,17 +73,25 @@ export type Winner = 'me' | 'them' | 'tie';
 /**
  * Compare a single stat between the two sides. Polarity comes from `format`,
  * never from the call site.
+ *
+ * `neutral` is a figure with NO better direction - rounds played is the sample
+ * size that makes a career birdie count readable, not a contest, so nobody
+ * ever leads it and it is never coloured amber. Distinct from `count`, which
+ * IS a contest (stableford wins) and is scored high-better.
  */
 export function whoLeads(
   format: H2HStatFormat,
   me: unknown,
   them: unknown,
 ): { winner: Winner; diff: number } {
+  if (format === 'neutral') return { winner: 'tie', diff: 0 };
+
   if (format === 'hot_flag') {
     if (me === 'HOT' && them !== 'HOT') return { winner: 'me', diff: 0 };
     if (them === 'HOT' && me !== 'HOT') return { winner: 'them', diff: 0 };
     return { winner: 'tie', diff: 0 };
   }
+
 
   const m = me as number | null | undefined;
   const t = them as number | null | undefined;

@@ -433,8 +433,18 @@
         "bestMargin": "Best margin",
         "index": "Handicap index",
         "scoringAverage": "Scoring average",
-        "rounds": "Rounds"
-      }
+        "rounds": "Rounds",
+        "birdies": "Birdies",
+        "eagles": "Eagles",
+        "albatrosses": "Albatrosses",
+        "aces": "Holes in one",
+        "roundsUnderPar": "Rounds under par",
+        "roundsUnder80": "Rounds under 80",
+        "bestStableford": "Best stableford",
+        "top100Played": "Top 100 played"
+      },
+      "career": "CAREER",
+      "careerFooter": "Every round each of you has posted, at any course - not just the ones you played together"
     },
     "legends": {
       "window90d": "90 days",
