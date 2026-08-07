@@ -2,7 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { slugToCacheRegion } from '../regionScope';
 
-export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records';
+/**
+ * `round_feats` carries the round-level kinds (under par, bogey-free, 45+
+ * Stableford) added for BRIEF_ATW_MASONRY, at `feats:<region>:round_feats`.
+ * `eagles` is RETAINED — see the report; it still has a reader.
+ */
+export type FeatTier = 'legendary' | 'eagles' | 'birdie_hauls' | 'records' | 'round_feats';
 
 export interface FeatRow {
   course_name: string;
