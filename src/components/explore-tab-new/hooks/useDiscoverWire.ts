@@ -105,6 +105,11 @@ export const UNIT_DEFAULTS: Record<string, string> = {
   'discover.wire.unit.aces': 'aces',
   'discover.wire.unit.albatrosses': 'albatrosses',
   'discover.wire.unit.rounds': 'rounds',
+  'discover.wire.unit.ace': 'ace',
+  'discover.wire.unit.albatross': 'albatross',
+  'discover.wire.unit.toPar': 'to par',
+  'discover.wire.unit.bogeys': 'bogeys',
+  'discover.wire.unit.rating': 'rating',
 };
 
 /** Crown category -> the label key and the unit that sits under its figure. */
