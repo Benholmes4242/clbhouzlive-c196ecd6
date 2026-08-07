@@ -28,7 +28,7 @@ import {
   lowRoundToday,
   formatToParAvg,
   formatToPar,
-  shortPlayerName,
+  
 } from '../data/liveRoundStats';
 
 function tourFigColor(v: number | null | undefined): string {

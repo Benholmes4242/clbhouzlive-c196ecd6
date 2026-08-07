@@ -64,9 +64,35 @@ interface GroupShape {
   players?: GroupPlayerShape[];
 }
 
-const AMBER = '#F7931E';
 const CARD_MIN_W = 218;
 const CARD_H_EST = 150;
+/**
+ * Height of the "FEATURED GROUP" kicker above the featured cards. Measured in
+ * the preview: 8px text at lineHeight 1.2 = 9.6px box + 6px gap = 15.6 -> 16.
+ * Non-featured cards reserve exactly this so the rail stays one height.
+ */
+const FEATURED_LABEL_BLOCK = 16;
+
+function FeaturedLabel({ text }: { text?: string }) {
+  return (
+    <div
+      aria-hidden={!text}
+      style={{
+        height: FEATURED_LABEL_BLOCK,
+        lineHeight: '9.6px',
+        fontSize: 8,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: A.INK,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text ?? ''}
+    </div>
+  );
+}
+
 
 function parseGroups(raw: unknown): GroupShape[] {
   if (!raw) return [];
