@@ -97,7 +97,7 @@ export function useSuggestedFeed(userId: string | undefined) {
   });
 
   const allPosts = useMemo(
-    () => deduplicatePosts(query.data?.pages.flatMap((page) => page.posts) ?? []),
+    () => deduplicatePosts(query.data?.pages?.flatMap((page) => page.posts) ?? []),
     [query.data]
   );
 
