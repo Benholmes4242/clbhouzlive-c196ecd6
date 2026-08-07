@@ -740,11 +740,17 @@ export function AroundTheWorld({
               }
             }
 
-            const more = Math.max(0, g.events.length - 1);
+            // "+n more here" EXCLUDES every event promoted into its own tile,
+            // otherwise a backfilled event would be advertised twice.
+            const more = Math.max(
+              0,
+              g.events.length - (slots.shownPerCourse.get(g.courseId) ?? 1),
+            );
 
             return {
               g,
               m,
+              slotKey,
               photo,
               tall,
               figure,
@@ -760,7 +766,8 @@ export function AroundTheWorld({
             };
           });
 
-          const { columns } = splitMasonry(tiles, (tt) => tt.height);
+          const { columns } = deClashColumns(splitMasonry(tiles, (tt) => tt.height).columns);
+
 
           return (
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
