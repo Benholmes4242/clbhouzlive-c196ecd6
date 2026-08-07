@@ -90,34 +90,68 @@ export function MomentTile({
         style={{ position: 'absolute', inset: 0 }}
       >
         {labelled && (
-          <>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: `linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) ${scrimStop})`,
-              }}
-            />
-            <span
-              style={{
-                position: 'absolute',
-                left: labelInset,
-                right: labelInset,
-                bottom: labelInset - 1,
-                fontSize: labelSize,
-                fontWeight: 800,
-                color: '#fff',
-                letterSpacing: '-0.01em',
-                textShadow: '0 1px 6px rgba(0,0,0,0.4)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                textAlign: 'left',
-              }}
-            >
-              {m.courseName ?? t('discover.unknownCourse', 'Course')}
-            </span>
-          </>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) ${scrimStop})`,
+            }}
+          />
+        )}
+        {(labelled || durationLabel) && (
+          <div
+            style={{
+              position: 'absolute',
+              left: labelInset,
+              right: labelInset,
+              bottom: labelInset - 1,
+              display: 'flex',
+              alignItems: 'flex-end',
+              gap: 6,
+            }}
+          >
+            {labelled && (
+              <span
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: labelSize,
+                  fontWeight: 800,
+                  color: '#fff',
+                  letterSpacing: '-0.01em',
+                  textShadow: '0 1px 6px rgba(0,0,0,0.4)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'left',
+                }}
+              >
+                {m.courseName ?? t('discover.unknownCourse', 'Course')}
+              </span>
+            )}
+            {durationLabel && (
+              <span
+                aria-hidden
+                style={{
+                  flexShrink: 0,
+                  marginLeft: 'auto',
+                  background: 'rgba(10,14,10,0.5)',
+                  backdropFilter: 'blur(6px)',
+                  WebkitBackdropFilter: 'blur(6px)',
+                  color: '#FFFFFF',
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  borderRadius: 5,
+                  padding: '2px 5px',
+                  letterSpacing: 0,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  pointerEvents: 'none',
+                }}
+              >
+                {durationLabel}
+              </span>
+            )}
+          </div>
         )}
         {m.mediaType === 'video' && <MomentPlayGlyph />}
       </CourseImageFallback>
