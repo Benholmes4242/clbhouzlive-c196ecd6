@@ -29,6 +29,8 @@ interface Props {
   reviews: LatestReview[];
   /** Total qualifying reviews behind the sheet (the mosaic is capped at six). */
   totalCount?: number | null;
+  /** TRUE while the reviews query has not settled — the shell holds the slot. */
+  isPending?: boolean;
   viewerId?: string;
   onTilePress: (r: LatestReview) => void;
   onSeeAll: () => void;
@@ -39,6 +41,7 @@ interface Props {
 export function LatestReviews({
   reviews,
   totalCount,
+  isPending = false,
   viewerId,
   onTilePress,
   onSeeAll,
@@ -56,11 +59,15 @@ export function LatestReviews({
   const reactions = useContentReactions(reactionTargets);
 
   // NEW SINCE: the review's created_at, the stamp the section already sorts by.
-  const newCount = countNewSince(shown, (r) => r.at, lastSeen);
+  // Not computed before settle.
+  const newCount = isPending ? 0 : countNewSince(shown, (r) => r.at, lastSeen);
   useReportNewCount('reviews', newCount);
 
+  // UNRESOLVED IS NOT ABSENT: a shell while in flight, nothing once settled empty.
+  if (isPending) return <ReviewsMosaicShell />;
   if (reviews.length === 0) return null;
   const total = totalCount ?? reviews.length;
+
 
   return (
     <section>
