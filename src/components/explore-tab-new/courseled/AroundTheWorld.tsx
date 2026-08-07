@@ -11,6 +11,7 @@ import { useScorecardOpener } from '../useScorecardOpener';
 import { ACTION_DEFAULTS, UNIT_DEFAULTS, type WireEvent } from '../hooks/useDiscoverWire';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { AroundTheWorldCard as AroundTheWorldCardShell } from './DiscoverCourseLedSkeleton';
 import { useCourseLatestRatings } from './hooks/useCourseLatestRatings';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
@@ -48,7 +49,11 @@ interface CourseGroup {
 
 interface Props {
   events: WireEvent[];
-  isLoading: boolean;
+  /**
+   * TRUE while the wire read has NOT SETTLED (isPending, not isLoading — a
+   * background refetch must never blank a populated section).
+   */
+  isPending: boolean;
   userId: string | undefined;
   scopeKey: string;
   pills: React.ReactNode;
@@ -88,7 +93,7 @@ function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
 
 export function AroundTheWorld({
   events,
-  isLoading,
+  isPending,
   userId,
   scopeKey,
   pills,
@@ -145,7 +150,8 @@ export function AroundTheWorld({
 
   const shown = groups.slice(0, PAGE);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
-  const { data: meta } = useCourseCardMeta(courseIds);
+  const metaQuery = useCourseCardMeta(courseIds);
+  const meta = metaQuery.data;
   const { data: ratings } = useCourseLatestRatings(courseIds);
 
   // REACTIONS (BRIEF_DISCOVER_REACTIONS): ONE read for the visible cards. Feat
@@ -367,18 +373,12 @@ export function AroundTheWorld({
 
 
 
-  if (isLoading) {
-    return (
-      <section>
-        <Eyebrow>{t('discover.aroundTheWorld', 'Around the world')}</Eyebrow>
-        {pills}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} style={{ ...CARD_SHELL, height: 190, background: A.TRACK }} />
-          ))}
-        </div>
-      </section>
-    );
+  // WHOLE-CARD HOLD (layer 2a): course meta feeds each card's NAME and IMAGE,
+  // so a card cannot be drawn from the wire rows alone without rewriting itself
+  // a moment later. The shared shell holds the slot; the pills stay live so the
+  // lens row never disappears under the reader's thumb.
+  if (isPending || (courseIds.length > 0 && metaQuery.isPending)) {
+    return <AroundTheWorldCardShell pills={pills} />;
   }
 
   return (
