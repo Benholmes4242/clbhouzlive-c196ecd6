@@ -714,9 +714,15 @@ export const CompareSheet: React.FC<Props> = ({
                       label={t('handicap.compare.stat.rounds')}
                       meValue={season?.me.rounds_played ?? null}
                       themValue={season?.them.rounds_played ?? null}
-                      format="count"
+                      format="neutral"
                     />
+                    {/* The remaining career figures, already fetched. This
+                        panel's rounds and best gross are career figures too, so
+                        the extra rows belong here rather than in a second
+                        panel that would repeat them. */}
+                    {careerAvailable && renderCareerRows(seasonCareerRows)}
                   </>
+
                 )}
               </div>
 
