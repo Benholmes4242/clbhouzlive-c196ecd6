@@ -1296,7 +1296,9 @@
     "tiedLead": "Tied lead",
     "roundFinished": "R{{round}} · F",
     "playersTied": "{{count}} players tied",
-    "playersTied_one": "{{count}} players tied"
+    "playersTied_one": "{{count}} players tied",
+    "momentsGroupCount": "{{count}} moments",
+    "momentsGroupCount_one": "{{count}} moment"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

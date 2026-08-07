@@ -776,7 +776,9 @@
     "tiedLead": "공동 선두",
     "roundFinished": "R{{round}} · 종료",
     "playersTied": "{{count}}명 공동",
-    "playersTied_one": "{{count}}명 공동"
+    "playersTied_one": "{{count}}명 공동",
+    "momentsGroupCount": "{{count}} moments",
+    "momentsGroupCount_one": "{{count}} moment"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",
