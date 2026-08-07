@@ -7,6 +7,7 @@
 //     transparency + Median status-bar style push
 //   • edge-to-edge chrome sitting directly on the blurred backdrop
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
@@ -115,8 +116,15 @@ export function MediaPreviewViewer({
 
   const backdropUrl = item.type === 'video' ? item.thumbnailUrl : item.previewUrl;
 
-  return (
+  // PORTAL TO BODY (invariant, see lib/zLayers.ts): rendered in place this
+  // viewer was clamped inside any ancestor stacking context (transform /
+  // will-change / backdrop-filter / -webkit-overflow-scrolling on iOS), so
+  // body-portaled BottomSheets painted over it whatever its z-index. All
+  // layout here is position:fixed/absolute inset-0, so portalling changes
+  // nothing visually.
+  return createPortal(
     <motion.div
+
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -310,6 +318,8 @@ export function MediaPreviewViewer({
           />
         </div>
       )}
-    </motion.div>
+    </motion.div>,
+    document.body,
   );
 }
+
