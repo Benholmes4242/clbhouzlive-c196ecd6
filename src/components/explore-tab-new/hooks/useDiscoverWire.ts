@@ -388,11 +388,15 @@ export function useDiscoverWire(
   const legendaryRail = useRegionFeats(region, 'legendary', 'latest', live);
   const eagles = useRegionFeats(region, 'eagles', 'latest', live);
   const hauls = useRegionFeats(region, 'birdie_hauls', 'latest', live);
+  // Empty payload until `refresh_discover_feats` starts writing this rail.
+  const roundFeats = useRegionFeats(region, 'round_feats', 'latest', live);
 
   const isLoading =
-    records.isLoading || legendaryRail.isLoading || eagles.isLoading || hauls.isLoading;
+    records.isLoading || legendaryRail.isLoading || eagles.isLoading || hauls.isLoading ||
+    roundFeats.isLoading;
   const isPending =
-    records.isPending || legendaryRail.isPending || eagles.isPending || hauls.isPending;
+    records.isPending || legendaryRail.isPending || eagles.isPending || hauls.isPending ||
+    roundFeats.isPending;
 
   // The records rail is NOT windowed server-side (191 rows against 190 all
   // time), so the horizon is applied here or the month groups grow without
@@ -411,10 +415,14 @@ export function useDiscoverWire(
       const e = birdieHaulEvent(row, i, userId);
       if (e) out.push(e);
     });
+    (roundFeats.data ?? []).forEach((row, i) => {
+      const e = roundFeatEvent(row, i, userId);
+      if (e) out.push(e);
+    });
     return out
       .filter((e) => withinHorizon(e.at))
       .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
-  }, [records.data, eagles.data, hauls.data, userId, categoryLabel]);
+  }, [records.data, eagles.data, hauls.data, roundFeats.data, userId, categoryLabel]);
 
   // Deliberately not windowed: history is the point of the panel.
   const legendary = useMemo(() => {
