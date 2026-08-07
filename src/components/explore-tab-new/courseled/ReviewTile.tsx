@@ -7,25 +7,26 @@ import { SANS, FIGS, NEW_CARD_RING } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
 
 /**
- * REVIEW TILE — option D mosaic tile (BRIEF_LATEST_REVIEWS, section 3).
+ * REVIEW TILE — mosaic tile (BRIEF_REVIEW_TILE_LIGHTER).
  *
- * The words are the content, so the tile is an image with a quote on it, not a
- * statistic. Every tile is the SAME fixed height regardless of how the course
- * name or quote wraps: short content leaves space, nothing stretches.
+ * Photo-led tile with its text on the photograph. The course name IS the
+ * headline; the quote no longer appears here (it lives in the review sheet).
+ * Every tile is the SAME fixed height regardless of how the name wraps.
  *
  * Image chain: the review's own first photo -> the course image (via
  * CourseImageFallback) -> the deterministic gradient. Video reviews use their
- * poster and carry the same 28px glass play glyph the Moments tiles use.
+ * poster.
  *
  * The score chip is WHITE, not band-coloured: band colours do not survive on
  * photography. The band colour lives in the review sheet.
  */
 
-export const REVIEW_TILE_HEIGHT = 220;
+export const REVIEW_TILE_HEIGHT = 186;
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 52%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 38%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
+
 
 function relativeAge(iso: string, t: (k: string, o?: any) => string): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
@@ -158,38 +159,21 @@ export function ReviewTile({
           />
         </span>
 
-        {/* BOTTOM BLOCK — kicker (course), the quote as headline, then byline. */}
+        {/* BOTTOM BLOCK — course name as headline, then byline. */}
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 10 }}>
           <div
             style={{
-              fontSize: 8.5,
+              fontSize: 14,
               fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.10em',
-              color: 'rgba(255,255,255,0.72)',
-              lineHeight: 1.25,
-              // MEASURED FALLBACK (brief §4): at 8.5px/0.10em a multi-course
-              // club ("ROYAL PORTRUSH GOLF CLUB (DUNLUCE)" = 206px) loses its
-              // parenthetical on a 155px line, which is ambiguous identity.
-              // Two lines, scrim stop 52%.
+              color: '#FFFFFF',
+              letterSpacing: '-0.015em',
+              lineHeight: 1.18,
               ...clamp(2),
             }}
           >
             {r.courseName || t('discover.unknownCourse', 'Course')}
           </div>
-          <div
-            style={{
-              marginTop: 5,
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: '#FFFFFF',
-              letterSpacing: 0,
-              lineHeight: 1.3,
-              ...clamp(3),
-            }}
-          >
-            {r.quote}
-          </div>
+
 
           <div
             style={{
