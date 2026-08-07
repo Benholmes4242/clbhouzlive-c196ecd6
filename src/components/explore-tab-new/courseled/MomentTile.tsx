@@ -45,6 +45,14 @@ interface TileProps {
   labelSize: number;
   labelInset: number;
   scrimStop: string;
+  /**
+   * FALSE drops the course label AND the scrim together — the scrim exists only
+   * to keep the label legible, so without a label it is just a dark wash over a
+   * photograph. Used by the SHEET, where the course name is a group header and
+   * restating it on every tile says nothing new. Defaults TRUE so the page
+   * mosaic is untouched.
+   */
+  labelled?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -56,6 +64,7 @@ export function MomentTile({
   labelSize,
   labelInset,
   scrimStop,
+  labelled = true,
   style,
 }: TileProps) {
   const { t } = useTranslation('courses');
