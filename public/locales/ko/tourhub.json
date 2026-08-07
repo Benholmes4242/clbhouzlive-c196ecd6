@@ -209,7 +209,6 @@
       "backAria": "Back to featured",
       "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
-      "featuredChip": "FEATURED",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
@@ -220,11 +219,12 @@
       "lowRoundLabel": "베스트 라운드",
       "groupsLabel": "그룹",
       "awaitingPlayers": "{{range}} 집계 대기",
-      "shapeCaption": "{{hard}}번 홀이 가장 어렵고 {{easy}}번 홀이 가장 쉽습니다.",
-      "heldByLabel": "Held by",
-      "sharedByLabel": "Shared by",
       "nShare_one": "{{count}} players",
-      "nShare_other": "{{count}} players"
+      "nShare_other": "{{count}} players",
+      "playingHardest": "가장 어려운",
+      "playingEasiest": "가장 쉬운",
+      "parShort": "파 {{par}}",
+      "featuredGroupLabel": "주목 그룹"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

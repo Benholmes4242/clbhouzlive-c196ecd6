@@ -213,7 +213,6 @@
       "backAria": "Back to featured",
       "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
-      "featuredChip": "FEATURED",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
@@ -224,11 +223,12 @@
       "lowRoundLabel": "Beste Runde",
       "groupsLabel": "Gruppen",
       "awaitingPlayers": "{{range}} noch offen",
-      "shapeCaption": "Loch {{hard}} spielt am schwersten, Loch {{easy}} am leichtesten.",
-      "heldByLabel": "Gehalten von",
-      "sharedByLabel": "Geteilt von",
       "nShare_one": "{{count}} Spieler",
-      "nShare_other": "{{count}} Spieler"
+      "nShare_other": "{{count}} Spieler",
+      "playingHardest": "Spielt am schwersten",
+      "playingEasiest": "Spielt am leichtesten",
+      "parShort": "Par {{par}}",
+      "featuredGroupLabel": "Featured-Gruppe"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -28,15 +28,20 @@ import {
   lowRoundToday,
   formatToParAvg,
   formatToPar,
-  shortPlayerName,
+  
 } from '../data/liveRoundStats';
-
-const AXIS_HOLES = [1, 6, 12, 18];
-const BAR_HALF = 22;
 
 function tourFigColor(v: number | null | undefined): string {
   if (v == null || v === 0) return A.INK;
   return v < 0 ? TOUR_UNDER : A.INK;
+}
+
+/** "+0.41" / "−0.58" / "E" — two decimals, true minus. */
+function fmtAvgToPar(v: number): string {
+  const r = Number(v.toFixed(2));
+  if (Math.abs(r) < 0.005) return 'E';
+  if (r > 0) return `+${r.toFixed(2)}`;
+  return `\u2212${Math.abs(r).toFixed(2)}`;
 }
 
 /** "16-18" / "17" — contiguous ranges of the holes with no field figure yet. */
@@ -58,7 +63,17 @@ function missingRanges(present: Set<number>): string | null {
   return parts.join(', ');
 }
 
-function Cell({ label, value, color }: { label: string; value: string; color?: string }) {
+function Cell({
+  label,
+  value,
+  color,
+  sub,
+}: {
+  label: string;
+  value: string;
+  color?: string;
+  sub?: string | null;
+}) {
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
@@ -87,116 +102,166 @@ function Cell({ label, value, color }: { label: string; value: string; color?: s
       >
         {label}
       </div>
-    </div>
-  );
-}
-
-function ShapeChart({ rows }: { rows: HoleAverageRow[] }) {
-  const { t } = useTranslation('tourhub');
-
-  const bars = useMemo(
-    () =>
-      rows.map((r) => ({
-        hole: r.hole_number,
-        toPar: Number(r.field_avg) - Number(r.par),
-      })),
-    [rows],
-  );
-
-  if (bars.length === 0) return null;
-
-  const max = Math.max(0.15, ...bars.map((b) => Math.abs(b.toPar)));
-  const hardest = bars.reduce((a, b) => (b.toPar > a.toPar ? b : a), bars[0]);
-  const easiest = bars.reduce((a, b) => (b.toPar < a.toPar ? b : a), bars[0]);
-  const present = new Set(bars.map((b) => b.hole));
-  const gaps = missingRanges(present);
-  const showCaption = bars.length >= 9 && hardest.hole !== easiest.hole;
-
-  return (
-    <div style={{ paddingTop: 10 }}>
-      <div style={{ position: 'relative', height: BAR_HALF * 2 }}>
-        {/* dashed centre line = level par */}
+      {sub && (
         <div
-          aria-hidden
           style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: BAR_HALF,
-            borderTop: `1px dashed ${A.HAIRLINE}`,
+            marginTop: 3,
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: A.BODY,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
-        />
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 3, height: '100%' }}>
-          {bars.map((b) => {
-            const h = Math.max(1.5, (Math.abs(b.toPar) / max) * BAR_HALF);
-            const emphasis = b.hole === hardest.hole || b.hole === easiest.hole;
-            const fill = emphasis ? 'rgba(14,18,22,0.62)' : 'rgba(14,18,22,0.20)';
-            const over = b.toPar > 0;
-            return (
-              <div key={b.hole} style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    height: h,
-                    background: fill,
-                    borderRadius: 1,
-                    ...(over ? { bottom: BAR_HALF } : { top: BAR_HALF }),
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Axis row */}
-      <div
-        style={{
-          marginTop: 5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-        }}
-      >
-        {/* Mirrors the bar row's flex structure exactly: one slot per bar,
-            flex:1/minWidth:0, gap:3. Numbers only in axis-hole slots. */}
-        <div style={{ display: 'flex', gap: 3, flex: 1, minWidth: 0 }}>
-          {bars.map((b) => (
-            <span
-              key={b.hole}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                textAlign: 'center',
-                fontSize: 9,
-                fontWeight: 700,
-                color: A.DIM,
-                whiteSpace: 'nowrap',
-                ...FIGS,
-              }}
-            >
-              {AXIS_HOLES.includes(b.hole) && present.has(b.hole) ? b.hole : ''}
-            </span>
-          ))}
-        </div>
-        {gaps && (
-          <span style={{ fontSize: 9, fontWeight: 700, color: A.DIM, ...FIGS }}>
-            {t('overview.onTheCourse.awaitingPlayers', { range: gaps })}
-          </span>
-        )}
-      </div>
-
-      {showCaption && (
-        <div style={{ marginTop: 6, fontSize: 12, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
-          {t('overview.onTheCourse.shapeCaption', { hard: hardest.hole, easy: easiest.hole })}
+        >
+          {sub}
         </div>
       )}
     </div>
   );
 }
+
+interface LadderRow {
+  hole: number;
+  par: number;
+  toPar: number;
+}
+
+/**
+ * One ranked row. The bar's denominator is `maxAbs`, computed across ALL
+ * eighteen holes by the caller — never within the three rows shown, which
+ * would make the easiest hole's bar as long as the hardest hole's.
+ */
+function HoleRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: boolean }) {
+  const { t } = useTranslation('tourhub');
+  const pct = Math.min(100, (Math.abs(r.toPar) / maxAbs) * 100);
+  const over = r.toPar > 0;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 0',
+        borderTop: first ? 'none' : `1px solid ${A.HAIRLINE}`,
+      }}
+    >
+      <div style={{ width: 22, fontSize: 12.5, fontWeight: 800, color: A.INK, ...FIGS }}>
+        {r.hole}
+      </div>
+      <div
+        style={{
+          width: 30,
+          fontSize: 8,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: A.DIM,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {t('overview.onTheCourse.parShort', { par: r.par })}
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          height: 6,
+          borderRadius: 2,
+          background: 'rgba(14,18,22,0.06)',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            width: `${pct}%`,
+            height: '100%',
+            borderRadius: 2,
+            background: over ? 'rgba(14,18,22,0.62)' : 'rgba(14,18,22,0.28)',
+          }}
+        />
+      </div>
+      <div
+        style={{
+          width: 46,
+          textAlign: 'right',
+          fontSize: 13,
+          fontWeight: 800,
+          color: A.INK,
+          ...FIGS,
+        }}
+      >
+        {fmtAvgToPar(r.toPar)}
+      </div>
+    </div>
+  );
+}
+
+function HoleLadder({ rows }: { rows: HoleAverageRow[] }) {
+  const { t } = useTranslation('tourhub');
+
+  const all = useMemo<LadderRow[]>(
+    () =>
+      rows
+        .map((r) => ({
+          hole: r.hole_number,
+          par: Number(r.par),
+          toPar: Number(r.field_avg) - Number(r.par),
+        }))
+        .filter((r) => Number.isFinite(r.toPar)),
+    [rows],
+  );
+
+  if (all.length < 3) return null;
+
+  // Denominator spans EVERY hole with a figure, not the six rows shown.
+  const maxAbs = Math.max(0.15, ...all.map((r) => Math.abs(r.toPar)));
+
+  const desc = [...all].sort((a, b) => b.toPar - a.toPar);
+  const hardest = desc.slice(0, 3);
+  const easiest = all.length >= 6 ? [...all].sort((a, b) => a.toPar - b.toPar).slice(0, 3) : [];
+
+  const gaps = missingRanges(new Set(all.map((r) => r.hole)));
+
+  return (
+    <div style={{ paddingTop: 8 }}>
+      <Group label={t('overview.onTheCourse.playingHardest')} rows={hardest} maxAbs={maxAbs} />
+      {easiest.length === 3 && (
+        <div style={{ marginTop: 12 }}>
+          <Group label={t('overview.onTheCourse.playingEasiest')} rows={easiest} maxAbs={maxAbs} />
+        </div>
+      )}
+      {gaps && (
+        <div style={{ marginTop: 8, fontSize: 9, fontWeight: 700, color: A.DIM, ...FIGS }}>
+          {t('overview.onTheCourse.awaitingPlayers', { range: gaps })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Group({ label, rows, maxAbs }: { label: string; rows: LadderRow[]; maxAbs: number }) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 8.5,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: A.MUTE,
+          marginBottom: 2,
+        }}
+      >
+        {label}
+      </div>
+      {rows.map((r, i) => (
+        <HoleRow key={r.hole} r={r} maxAbs={maxAbs} first={i === 0} />
+      ))}
+    </div>
+  );
+}
+
 
 export function LiveFieldPanel({
   entries,
@@ -216,6 +281,33 @@ export function LiveFieldPanel({
   const low = useMemo(() => lowRoundToday(entries as any, round), [entries, round]);
   const { data: holeRows } = useTournamentHoleAverages(tournamentId || undefined, round, { live });
   const rows = holeRows ?? [];
+
+  /**
+   * Surnames of everyone on the low round — one name when outright, all of
+   * them when shared. Read off the same completed-round figures lowRoundToday
+   * used, so the set can never disagree with the figure above it.
+   */
+  const holders = useMemo(() => {
+    if (!low) return [] as string[];
+    const key = ['round_1', 'round_2', 'round_3', 'round_4'][round - 1];
+    if (!key) return [] as string[];
+    const names: string[] = [];
+    for (const e of entries as any[]) {
+      const v = e?.[key];
+      if (v == null || Number(v) !== low.toPar) continue;
+      if (e?.thru != null && e.thru < 18) continue;
+      const full = (e?.player?.full_name ?? '').trim();
+      if (!full) continue;
+      const parts = full.split(/\s+/);
+      names.push(parts[parts.length - 1]);
+    }
+    if (names.length === 0 && low.playerName) {
+      const parts = low.playerName.trim().split(/\s+/);
+      names.push(parts[parts.length - 1]);
+    }
+    return names;
+  }, [entries, round, low]);
+
 
   useEffect(() => {
     if (!field || !tournamentId) return;
@@ -286,20 +378,7 @@ export function LiveFieldPanel({
             label={t('overview.onTheCourse.lowRoundLabel')}
             value={low ? formatToPar(low.toPar) : '—'}
             color={low ? tourFigColor(low.toPar) : A.DIM}
-          />
-          <Cell
-            label={
-              low && low.tied > 1
-                ? t('overview.onTheCourse.sharedByLabel')
-                : t('overview.onTheCourse.heldByLabel')
-            }
-            value={
-              low
-                ? low.tied > 1
-                  ? t('overview.onTheCourse.nShare', { count: low.tied })
-                  : shortPlayerName(low.playerName)
-                : '—'
-            }
+            sub={holders.length > 0 ? holders.join(', ') : null}
           />
           <Cell
             label={t('overview.onTheCourse.groupsLabel')}
@@ -307,12 +386,13 @@ export function LiveFieldPanel({
           />
         </div>
 
-        {/* Shape chart */}
+        {/* Ranked hole ladder */}
         {rows.length > 0 && (
           <div style={{ marginTop: 12, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}` }}>
-            <ShapeChart rows={rows} />
+            <HoleLadder rows={rows} />
           </div>
         )}
+
       </div>
     </div>
   );

@@ -245,7 +245,6 @@
       "backAria": "Back to featured",
       "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
-      "featuredChip": "FEATURED",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
@@ -260,9 +259,10 @@
       "lowRoundLabel": "Low round",
       "groupsLabel": "Groups",
       "awaitingPlayers": "{{range}} awaiting players",
-      "shapeCaption": "Hole {{hard}} is playing hardest, hole {{easy}} easiest.",
-      "heldByLabel": "Held by",
-      "sharedByLabel": "Shared by"
+      "playingHardest": "Playing hardest",
+      "playingEasiest": "Playing easiest",
+      "parShort": "Par {{par}}",
+      "featuredGroupLabel": "Featured group"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

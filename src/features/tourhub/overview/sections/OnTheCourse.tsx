@@ -64,9 +64,35 @@ interface GroupShape {
   players?: GroupPlayerShape[];
 }
 
-const AMBER = '#F7931E';
 const CARD_MIN_W = 218;
 const CARD_H_EST = 150;
+/**
+ * Height of the "FEATURED GROUP" kicker above the featured cards. Measured in
+ * the preview: 8px text at lineHeight 1.2 = 9.6px box + 6px gap = 15.6 -> 16.
+ * Non-featured cards reserve exactly this so the rail stays one height.
+ */
+const FEATURED_LABEL_BLOCK = 16;
+
+function FeaturedLabel({ text }: { text?: string }) {
+  return (
+    <div
+      aria-hidden={!text}
+      style={{
+        height: FEATURED_LABEL_BLOCK,
+        lineHeight: '9.6px',
+        fontSize: 8,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: A.INK,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text ?? ''}
+    </div>
+  );
+}
+
 
 function parseGroups(raw: unknown): GroupShape[] {
   if (!raw) return [];
@@ -262,44 +288,25 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   minWidth: CARD_MIN_W,
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
-                  background: V4.surface,
-                  border: `1px solid ${AMBER}`,
-                  boxShadow: V4.cardShadow,
-                  borderRadius: 14,
-                  padding: '12px 12px 10px',
-                  position: 'relative',
                 }}
               >
+                <FeaturedLabel text={t('overview.onTheCourse.featuredGroupLabel')} />
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    marginBottom: 8,
+                    background: V4.surface,
+                    border: `0.5px solid ${V4.cardBorder}`,
+                    boxShadow: V4.cardShadow,
+                    borderRadius: 14,
+                    padding: '12px 12px 10px',
+                    position: 'relative',
                   }}
                 >
-                  <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    {time ? `TEE ${time}` : ''}
-                    {time && thru != null ? ' · ' : ''}
-                    {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 8,
-                      fontWeight: 900,
-                      letterSpacing: '0.12em',
-                      color: '#fff',
-                      background: AMBER,
-                      padding: '2px 5px',
-                      borderRadius: 5,
-                      textTransform: 'uppercase',
-                      lineHeight: 1,
-                    }}
-                  >
-                    ★ {t('overview.onTheCourse.featuredChip')}
-                  </span>
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                  {time ? `TEE ${time}` : ''}
+                  {time && thru != null ? ' · ' : ''}
+                  {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
                 </div>
+
                 {(g.players ?? []).slice(0, 3).map((p, pi) => {
                   const name = p.full_name || p.name || '';
                   const status = (p.status || '').toUpperCase();
@@ -352,7 +359,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     </button>
                   );
                 })}
+                </div>
               </div>
+
             );
           })}
 
@@ -365,6 +374,10 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 minWidth: 122,
                 flexShrink: 0,
                 scrollSnapAlign: 'start',
+                // Reserve the FEATURED GROUP kicker's space so the rail keeps
+                // one height and every tile top-aligns.
+                marginTop: FEATURED_LABEL_BLOCK,
+
                 background: V4.surface,
                 border: `1px dashed #CBD5E1`,
                 borderRadius: 16,
@@ -393,6 +406,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 style={{
                   minWidth: 34,
                   flexShrink: 0,
+                  marginTop: FEATURED_LABEL_BLOCK,
+                  alignSelf: 'stretch',
+
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -428,6 +444,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                         minWidth: CARD_MIN_W,
                         flexShrink: 0,
                         scrollSnapAlign: 'start',
+                        marginTop: FEATURED_LABEL_BLOCK,
+
                         background: V4.surface,
                         border: `0.5px solid ${V4.cardBorder}`,
                         borderRadius: 14,
@@ -457,6 +475,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       minWidth: CARD_MIN_W,
                       flexShrink: 0,
                       scrollSnapAlign: 'start',
+                      marginTop: FEATURED_LABEL_BLOCK,
+
                       background: V4.surface,
                       border: `0.5px solid ${V4.cardBorder}`,
                       boxShadow: V4.cardShadow,
@@ -530,6 +550,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   minWidth: 122,
                   flexShrink: 0,
                   scrollSnapAlign: 'start',
+                  marginTop: FEATURED_LABEL_BLOCK,
+
                   background: V4.surface,
                   border: `1px dashed #CBD5E1`,
                   borderRadius: 16,
