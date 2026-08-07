@@ -13,7 +13,8 @@
     "friends": "Friends",
     "requested": "Requested",
     "accept": "Accept",
-    "followers": "Followers"
+    "followers": "Followers",
+    "coverGuidance": "推奨: 1500x1500px、1:1 - JPG、PNGまたはWebP"
   },
   "social": {
     "followers": "{{count}} followers",

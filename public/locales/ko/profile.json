@@ -13,7 +13,8 @@
     "friends": "Friends",
     "requested": "Requested",
     "accept": "Accept",
-    "followers": "Followers"
+    "followers": "Followers",
+    "coverGuidance": "권장: 1500x1500px, 1:1 - JPG, PNG 또는 WebP"
   },
   "social": {
     "followers": "{{count}} followers",

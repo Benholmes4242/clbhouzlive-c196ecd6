@@ -34,6 +34,59 @@ export const COVER_RAMP =
 export const HERO_CONTENT_INSET =
   'calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px)';
 
+/* ------------------------------------------------------------------ *
+ * PINNED BLOCK HEIGHT
+ *
+ * The block must NOT grow as the index, trend and history resolve - the
+ * cover would reflow under the member mid-render, and the crop ratio
+ * would be unknowable. So the shell carries a MIN-HEIGHT equal to its
+ * TALLEST content case: personal profile with index, trend chip AND
+ * sparkline.
+ *
+ * Every figure below is the literal the component itself renders, so
+ * this stays honest if the type scale moves. Text line boxes are
+ * fontSize x LINE (Geist resolves `line-height: normal` to 1.5) except
+ * where a lineHeight is stated inline.
+ * ------------------------------------------------------------------ */
+const LINE = 1.5;
+const H_PAD_TOP = 18;          // content gap below HERO_CONTENT_INSET
+const H_PAD_BOTTOM = 16;       // section padding-bottom
+const H_IDENTITY_ROW = 56;     // 56px avatar floors the row (name + subline are shorter)
+const H_HEADLINE_GAP = 18;     // headline button marginTop
+const H_HEADLINE_LABEL = 8.5 * LINE;
+const H_FIGURE_GAP = 4;
+const H_FIGURE = 40;           // fontSize 40, lineHeight 1
+const H_SPARKLINE = 10 + 42;   // ProfileHero sparkline: marginTop 10 + H 42
+const H_STRIP_GAP = 14;        // counter strip marginTop
+const H_STRIP_RULE = 1;        // 1px borderTop
+const H_STRIP_PAD = 13;        // counter strip paddingTop
+const H_CELL_VALUE = 17 * 1.1; // HeroCell figure, lineHeight 1.1
+const H_CELL_LABEL_GAP = 4;
+const H_CELL_LABEL = 7.5 * LINE;
+
+/** Tallest content stack, rounded up to a whole pixel. */
+const HERO_TALLEST_CONTENT = Math.ceil(
+  H_PAD_TOP +
+    H_IDENTITY_ROW +
+    H_HEADLINE_GAP +
+    H_HEADLINE_LABEL +
+    H_FIGURE_GAP +
+    H_FIGURE +
+    H_SPARKLINE +
+    H_STRIP_GAP +
+    H_STRIP_RULE +
+    H_STRIP_PAD +
+    H_CELL_VALUE +
+    H_CELL_LABEL_GAP +
+    H_CELL_LABEL +
+    H_PAD_BOTTOM,
+);
+
+/** One height for every hero, on every device. Tracks the safe area because
+ *  HERO_CONTENT_INSET carries `var(--sat)` rather than a measured number. */
+export const HERO_MIN_HEIGHT =
+  `calc(${HERO_CONTENT_INSET} + ${HERO_TALLEST_CONTENT}px)`;
+
 /** Short top gradient so white status-bar text stays legible over a bright
  *  cover; fades out by 60px. */
 export const COVER_TOP_GUARD =
@@ -165,6 +218,8 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
+        minHeight: HERO_MIN_HEIGHT,
+
       }}
     >
       {/* Cover photograph under a heavy scrim - decoration only, never a
