@@ -41,6 +41,55 @@ const GOLD_TEXT = '#A87718';
 const PAGE = 6;
 
 /**
+ * A course may hold at most TWO tiles, and only via backfill when pass 1 left
+ * the page short (BRIEF_ATW_BACKFILL). Never a third, even with slots to spare.
+ */
+const MAX_TILES_PER_COURSE = 2;
+
+/**
+ * ADJACENCY REPAIR. Two tiles for one course share a photograph, so they must
+ * not sit consecutively in a column. Walk each column once; on a clash, swap
+ * the offending tile with the next tile in the OTHER column when that resolves
+ * it. Pure, single-pass, and a no-op when no clash exists — with six distinct
+ * courses this never mutates anything.
+ */
+function deClashColumns<T extends { g: { courseId: string } }>(columns: T[][]): {
+  columns: T[][];
+  unresolved: number;
+} {
+  const cols = columns.map((c) => [...c]);
+  let unresolved = 0;
+  for (let ci = 0; ci < cols.length; ci += 1) {
+    const other = cols[1 - ci];
+    for (let i = 1; i < cols[ci].length; i += 1) {
+      if (cols[ci][i].g.courseId !== cols[ci][i - 1].g.courseId) continue;
+      // Candidate partner: the tile at the same depth in the other column.
+      const j = i;
+      const cand = other[j];
+      const prevOther = other[j - 1];
+      const nextOther = other[j + 1];
+      const mine = cols[ci][i];
+      const okThere =
+        !!cand &&
+        prevOther?.g.courseId !== mine.g.courseId &&
+        nextOther?.g.courseId !== mine.g.courseId;
+      const okHere =
+        !!cand &&
+        cand.g.courseId !== cols[ci][i - 1].g.courseId &&
+        cand.g.courseId !== cols[ci][i + 1]?.g.courseId;
+      if (okThere && okHere) {
+        cols[ci][i] = cand;
+        other[j] = mine;
+      } else {
+        unresolved += 1;
+      }
+    }
+  }
+  return { columns: cols, unresolved };
+}
+
+
+/**
  * PHOTO HEIGHT BY RANK POSITION, not by achievement (BRIEF_ATW_MASONRY §2).
  * Sized by type, a week of five aces would render five identical large tiles.
  * By position the silhouette is stable whatever happened and the largest tile
@@ -292,7 +341,81 @@ export function AroundTheWorld({
       .map(({ g }) => g);
   }, [groups, priorityFor]);
 
-  const shown = useMemo(() => ranked.slice(0, PAGE), [ranked]);
+  /**
+   * TILE SLOTS — TWO PASSES (BRIEF_ATW_BACKFILL).
+   *
+   * PASS 1: one tile per distinct course, in ranked order, each showing its
+   * headline event. Stop at PAGE. This is the old behaviour verbatim.
+   *
+   * PASS 2 (only if pass 1 came up short): walk every event NOT yet shown, most
+   * notable first with newest as the tie-break, and give it its own tile until
+   * the section reaches PAGE or the events run out. MAX_TILES_PER_COURSE caps a
+   * course at 2 tiles — never a third, even with slots to spare. Never pad,
+   * never repeat an event.
+   *
+   * The combined list is then re-sorted by the SAME comparator, so a backfilled
+   * tile can outrank another course's first tile and its photo height comes
+   * from final position like any other.
+   */
+  const slots = useMemo(() => {
+    type Slot = { g: CourseGroup; top: WireEvent | undefined; key: string };
+    const perCourse = new Map<string, number>();
+    const usedEventIds = new Set<string>();
+    const out: Slot[] = [];
+
+    // PASS 1
+    for (const g of ranked) {
+      if (out.length >= PAGE) break;
+      const top = headlineOf(g.events);
+      if (top) usedEventIds.add(top.id);
+      perCourse.set(g.courseId, 1);
+      out.push({ g, top, key: `${g.courseId}:${top?.id ?? 'top'}` });
+    }
+
+    // PASS 2 — backfill
+    if (out.length < PAGE) {
+      const byId = new Map(ranked.map((g) => [g.courseId, g] as const));
+      const spare = ranked
+        .flatMap((g) => g.events)
+        .filter((e) => !usedEventIds.has(e.id))
+        .sort((a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1));
+      for (const e of spare) {
+        if (out.length >= PAGE) break;
+        const g = e.courseId ? byId.get(e.courseId) : undefined;
+        if (!g) continue;
+        if ((perCourse.get(g.courseId) ?? 0) >= MAX_TILES_PER_COURSE) continue;
+        perCourse.set(g.courseId, (perCourse.get(g.courseId) ?? 0) + 1);
+        usedEventIds.add(e.id);
+        out.push({ g, top: e, key: `${g.courseId}:${e.id}` });
+      }
+    }
+
+    // FINAL ORDER — the same comparator as `ranked`.
+    out.sort((a, b) => {
+      if (priorityFor) {
+        const d = priorityFor(a.g.courseId) - priorityFor(b.g.courseId);
+        if (d !== 0) return d;
+      }
+      const n = notability(a.top) - notability(b.top);
+      if (n !== 0) return n;
+      const at = (a.top?.at ?? a.g.at) < (b.top?.at ?? b.g.at) ? 1 : -1;
+      return at;
+    });
+
+    return { list: out, shownPerCourse: perCourse };
+  }, [ranked, priorityFor]);
+
+  /** Distinct courses on the page — meta, ratings and reactions read once each. */
+  const shown = useMemo(() => {
+    const seen = new Set<string>();
+    const out: CourseGroup[] = [];
+    for (const s of slots.list) {
+      if (seen.has(s.g.courseId)) continue;
+      seen.add(s.g.courseId);
+      out.push(s.g);
+    }
+    return out;
+  }, [slots]);
   const courseIds = useMemo(() => shown.map((g) => g.courseId), [shown]);
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
@@ -310,6 +433,7 @@ export function AroundTheWorld({
     }
     return out;
   }, [shown, ratings]);
+
   const reactions = useContentReactions(reactionTargets);
 
 
@@ -541,10 +665,10 @@ export function AroundTheWorld({
            * function of position. Everything the masonry walk needs is decided
            * here — the placement step never touches the DOM.
            */
-          const tiles = shown.map((g, i) => {
+          const tiles = slots.list.map(({ g, top, key: slotKey }, i) => {
             const m = meta?.get(g.courseId);
             const rating = ratings?.get(g.courseId);
-            const top = headlineOf(g.events);
+
             const photo = ATW_PHOTO_HEIGHTS[Math.min(i, ATW_PHOTO_HEIGHTS.length - 1)];
             const tall = photo >= TALL;
 
@@ -616,11 +740,17 @@ export function AroundTheWorld({
               }
             }
 
-            const more = Math.max(0, g.events.length - 1);
+            // "+n more here" EXCLUDES every event promoted into its own tile,
+            // otherwise a backfilled event would be advertised twice.
+            const more = Math.max(
+              0,
+              g.events.length - (slots.shownPerCourse.get(g.courseId) ?? 1),
+            );
 
             return {
               g,
               m,
+              slotKey,
               photo,
               tall,
               figure,
@@ -636,7 +766,8 @@ export function AroundTheWorld({
             };
           });
 
-          const { columns } = splitMasonry(tiles, (tt) => tt.height);
+          const { columns } = deClashColumns(splitMasonry(tiles, (tt) => tt.height).columns);
+
 
           return (
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
@@ -650,11 +781,12 @@ export function AroundTheWorld({
                     const tint = CHIP_TINT[tt.tier];
                     return (
                       <div
-                        key={g.courseId}
+                        key={tt.slotKey}
                         role="button"
                         tabIndex={0}
                         onClick={() => onCoursePress(g.courseId)}
-                        onPointerDown={() => setPressed(g.courseId)}
+                        onPointerDown={() => setPressed(tt.slotKey)}
+
                         onPointerUp={() => setPressed(null)}
                         onPointerLeave={() => setPressed(null)}
                         onPointerCancel={() => setPressed(null)}
@@ -665,7 +797,7 @@ export function AroundTheWorld({
                           textAlign: 'left',
                           fontFamily: SANS,
                           cursor: 'pointer',
-                          opacity: pressed === g.courseId ? 0.72 : 1,
+                          opacity: pressed === tt.slotKey ? 0.72 : 1,
                           transition: 'opacity 120ms ease',
                         }}
                       >
