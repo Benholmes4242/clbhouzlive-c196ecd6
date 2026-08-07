@@ -351,20 +351,7 @@ export function LiveFieldPanel({
             label={t('overview.onTheCourse.lowRoundLabel')}
             value={low ? formatToPar(low.toPar) : '—'}
             color={low ? tourFigColor(low.toPar) : A.DIM}
-          />
-          <Cell
-            label={
-              low && low.tied > 1
-                ? t('overview.onTheCourse.sharedByLabel')
-                : t('overview.onTheCourse.heldByLabel')
-            }
-            value={
-              low
-                ? low.tied > 1
-                  ? t('overview.onTheCourse.nShare', { count: low.tied })
-                  : shortPlayerName(low.playerName)
-                : '—'
-            }
+            sub={holders.length > 0 ? holders.join(', ') : null}
           />
           <Cell
             label={t('overview.onTheCourse.groupsLabel')}
@@ -372,12 +359,13 @@ export function LiveFieldPanel({
           />
         </div>
 
-        {/* Shape chart */}
+        {/* Ranked hole ladder */}
         {rows.length > 0 && (
           <div style={{ marginTop: 12, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}` }}>
-            <ShapeChart rows={rows} />
+            <HoleLadder rows={rows} />
           </div>
         )}
+
       </div>
     </div>
   );
