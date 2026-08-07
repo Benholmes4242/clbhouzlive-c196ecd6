@@ -359,7 +359,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     </button>
                   );
                 })}
+                </div>
               </div>
+
             );
           })}
 
