@@ -68,6 +68,12 @@ export function MomentTile({
   style,
 }: TileProps) {
   const { t } = useTranslation('courses');
+  // Video only, and only when the duration is actually known: absent renders
+  // nothing at all (no placeholder, no reserved space).
+  const durationLabel =
+    m.mediaType === 'video' && m.durationSeconds
+      ? formatDuration(m.durationSeconds)
+      : '';
   return (
     <button
       type="button"
