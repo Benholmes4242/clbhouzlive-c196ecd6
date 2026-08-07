@@ -751,10 +751,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   LEGEND — the swatches must match what the chart actually draws.
                   The round line is INK unless the round is the viewer's own, in
                   which case it is AMBER (amber means the viewing member). The
-                  third key names the beads, which mark only the holes that
-                  swung the round: birdie or better in red (ace/albatross gold)
-                  and double or worse in over-par ink. Par and bogey carry no
-                  bead by design — see beadForScore.
+                  beads are deliberately unnamed: red for birdie-or-better and
+                  over-par ink for double-or-worse are read straight off the
+                  card above, so a key for them only added noise.
                 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
                   {(isOwner || hasName) && (
