@@ -5,7 +5,9 @@
  *   /handicap/rivalry/:rivalUserId
  *     -> /handicap?compare=:rivalUserId
  *   /handicap/:friendUserId/rivalry/:rivalUserId
- *     -> /handicap/:friendUserId?compare=:rivalUserId
+ *     -> /handicap?compare=:rivalUserId  (the :friendUserId segment is dropped;
+ *        another member's handicap page is private, so there is nothing to
+ *        hop through)
  *
  * The compare sheet reads ?compare= on mount, opens itself and selects that
  * player, so the deep link keeps landing on the same fact it always did.

@@ -4,7 +4,10 @@ import { Skeleton } from '@/components/ui/skeleton';
  *
  * Two modes:
  * - Own handicap (route: /handicap) — full controls, greeting, sync pill.
- * - Friend handicap (route: /handicap/:userId) — read-only. Shows the
+ * - Friend handicap (route: /handicap/:userId) — RETIRED SURFACE. The route
+ *   survives only to redirect stored notification links to compare; the
+ *   friend-view branches below are reachable only from the owner's own page.
+ *   Historically it was read-only and showed the
  *   friend's name in the title, hides the sync pill / more menu, and
  *   threads `readOnly` into HandicapDashboard.
  *

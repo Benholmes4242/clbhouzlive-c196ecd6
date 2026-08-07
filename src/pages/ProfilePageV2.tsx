@@ -310,7 +310,8 @@ const ProfilePageV2Content: React.FC = () => {
   );
 
   // Per fix brief §5.2 — legacy ?tab=stats deep links redirect to the
-  // dedicated handicap route. Own profile → /handicap. Friend → /handicap/:id.
+  // dedicated handicap route. Own profile → /handicap. Another member →
+  // compare against them, since their handicap page is private to them.
   useEffect(() => {
     if (activeSection !== 'stats') return;
     if (isSelf) {
