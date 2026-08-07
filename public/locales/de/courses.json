@@ -824,7 +824,14 @@
     "playersTied": "{{count}} Spieler gleichauf",
     "playersTied_one": "{{count}} Spieler gleichauf",
     "momentsGroupCount": "{{count}} Momente",
-    "momentsGroupCount_one": "{{count}} Moment"
+    "momentsGroupCount_one": "{{count}} Moment",
+    "row": {
+      "underPar": "Round under par",
+      "bogeyFree": "Bogey-free round",
+      "stableford": "Stableford - {{points}} points",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here"
+    }
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

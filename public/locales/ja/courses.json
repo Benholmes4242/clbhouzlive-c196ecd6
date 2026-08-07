@@ -777,7 +777,14 @@
     "playersTied": "{{count}}人がタイ",
     "playersTied_one": "{{count}}人がタイ",
     "momentsGroupCount": "{{count}} moments",
-    "momentsGroupCount_one": "{{count}} moment"
+    "momentsGroupCount_one": "{{count}} moment",
+    "row": {
+      "underPar": "Round under par",
+      "bogeyFree": "Bogey-free round",
+      "stableford": "Stableford - {{points}} points",
+      "moreHere_one": "+{{count}} more here",
+      "moreHere_other": "+{{count}} more here"
+    }
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",
