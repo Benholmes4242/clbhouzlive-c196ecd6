@@ -901,25 +901,26 @@ export function AroundTheWorld({
         })()}
 
 
-          {groups.length > PAGE && (
-            <div style={{ textAlign: 'center', paddingTop: 4 }}>
-              <InkAction
-                onClick={() => {
-                  analyticsEvents.track('discover_world_sheet_open', {
-                    courses: groups.length,
-                  });
-                  setSheetOpen(true);
-                  onExpand?.(groups.length - PAGE);
-                }}
-              >
-                {t('discover.seeAllCourses', {
-                  defaultValue: 'See all {{count}} courses',
-                  count: groups.length,
-                })}
-              </InkAction>
-            </div>
-          )}
-        </div>
+        {groups.length > PAGE && (
+          <div style={{ textAlign: 'center', paddingTop: 12 }}>
+            <InkAction
+              onClick={() => {
+                analyticsEvents.track('discover_world_sheet_open', {
+                  courses: groups.length,
+                });
+                setSheetOpen(true);
+                onExpand?.(groups.length - PAGE);
+              }}
+            >
+              {t('discover.seeAllCourses', {
+                defaultValue: 'See all {{count}} courses',
+                count: groups.length,
+              })}
+            </InkAction>
+          </div>
+        )}
+        </>
+
       )}
     </section>
 
