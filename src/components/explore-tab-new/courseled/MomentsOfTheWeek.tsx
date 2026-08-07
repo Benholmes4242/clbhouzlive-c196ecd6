@@ -7,16 +7,28 @@ import { Eyebrow, InkAction, NEW_CARD_RING } from './tokens';
 import { MomentsMosaic as MomentsMosaicShell } from './DiscoverCourseLedSkeleton';
 
 /**
- * Section 4 — MOMENTS OF THE MONTH (BRIEF, section 4).
+ * Section 4 — MOMENTS OF THE MONTH (BRIEF_MOMENTS_MOSAIC_ALTERNATING).
  *
- * The only image-led section: a two-column mosaic where the first tile runs
- * tall. Every tile is labelled with the COURSE, never the poster — Discover is
- * course-led. Tapping opens the shared fullscreen viewer READ-ONLY, so Discover
- * never becomes a second engagement surface.
+ * The only image-led section. The unit is a BLOCK OF EXACTLY THREE: one TALL
+ * tile (220) beside a column of TWO SHORTS (106 + 8 + 106 = 220), so every
+ * block squares off flush. Blocks stack with the same 8px gap and the tall tile
+ * ALTERNATES SIDE — block 1 left, block 2 right, block 3 left.
+ *
+ * Rank order is untouched: tiles are chunked in rank order and the FIRST tile
+ * of each block takes the tall slot, so hierarchy cascades instead of resetting.
+ * A remainder of one renders FULL WIDTH (never half, which leaves a hole); a
+ * remainder of two renders as a pair row. Trailing rows do not consume an
+ * alternation turn.
+ *
+ * Every tile is labelled with the COURSE, never the poster — Discover is
+ * course-led. Tapping opens the shared fullscreen viewer READ-ONLY.
  */
 
 const TALL = 220;
 const SHORT = 106;
+const GAP = 8;
+/** Page cap. The see-all sheet stays uncapped. */
+const PAGE_CAP = 8;
 
 interface Props {
   moments: Moment[];
