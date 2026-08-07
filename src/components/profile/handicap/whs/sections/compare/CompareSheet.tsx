@@ -744,6 +744,32 @@ export const CompareSheet: React.FC<Props> = ({
                   {t('handicap.compare.seasonOnly')}
                 </div>
               )}
+
+              {/* CAREER - a SECOND panel, because it is a SECOND population:
+                  every round each member has posted, not the shared ones. Read
+                  as one list with the head-to-head rows above, "birdies 31-47"
+                  would be taken for a head-to-head figure, which it is not. */}
+              {isSharedMode && careerAvailable && careerRows.length > 0 && (
+                <>
+                  <div style={{ ...LABEL_STYLE, marginTop: 22, color: CHART.MUTE }}>
+                    {t('handicap.compare.career')}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      background: CHART.PANEL,
+                      border: `1px solid ${CHART.BORDER}`,
+                      borderRadius: 16,
+                      padding: '4px 14px 12px',
+                    }}
+                  >
+                    {renderCareerRows(careerRows)}
+                  </div>
+                  <div style={{ ...LABEL_STYLE, marginTop: 10, lineHeight: 1.5 }}>
+                    {t('handicap.compare.careerFooter')}
+                  </div>
+                </>
+              )}
             </div>
           </>
         )}
