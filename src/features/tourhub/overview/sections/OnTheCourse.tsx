@@ -34,7 +34,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
-import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { LiveFieldPanel } from './LiveFieldPanel';
 import { formatToPar } from '../data/liveRoundStats';
 
@@ -67,24 +67,29 @@ interface GroupShape {
 const CARD_MIN_W = 218;
 const CARD_H_EST = 150;
 /**
- * Height of the "FEATURED GROUP" kicker above the featured cards. Measured in
- * the preview: 8px text at lineHeight 1.2 = 9.6px box + 6px gap = 15.6 -> 16.
- * Non-featured cards reserve exactly this so the rail stays one height.
+ * The "FEATURED GROUP" kicker above the featured cards. It renders through the
+ * canonical KICKER token (10 / 700 / 0.16em) in A.MUTE — it is subordinate to
+ * the section's own eyebrow and must not read as a second section header.
+ *
+ * Vertical block, re-measured against the 10px token:
+ *   16 above (matches SectionEyebrow's top padding) + 12px line box + 6px gap
+ *   to the card = 34. Non-featured tiles reserve exactly this so the rail
+ *   holds ONE height.
  */
-const FEATURED_LABEL_BLOCK = 16;
+const FEATURED_LABEL_TOP = 16;
+const FEATURED_LABEL_H = 18; // 12px line box + 6px gap
+const FEATURED_LABEL_BLOCK = FEATURED_LABEL_TOP + FEATURED_LABEL_H; // 34
 
 function FeaturedLabel({ text }: { text?: string }) {
   return (
     <div
       aria-hidden={!text}
       style={{
-        height: FEATURED_LABEL_BLOCK,
-        lineHeight: '9.6px',
-        fontSize: 8,
-        fontWeight: 800,
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-        color: A.INK,
+        ...KICKER,
+        color: A.MUTE,
+        marginTop: FEATURED_LABEL_TOP,
+        height: FEATURED_LABEL_H,
+        lineHeight: '12px',
         whiteSpace: 'nowrap',
       }}
     >
