@@ -6,10 +6,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
+import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
 
 /** Static venue image overrides for venues not present in golf_courses. */
 const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Sedgefield Country Club': sedgefieldCC.url,
+  'The Club at Indian Creek': clubAtIndianCreek.url,
 };
 
 interface ResolvedCourse {

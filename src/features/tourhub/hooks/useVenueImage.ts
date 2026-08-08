@@ -21,6 +21,7 @@ import harbourTownGL from '@/assets/harbour-town-upcoming.webp';
 import asiadCountryClub from '@/assets/courses/asiad-country-club.jpg';
 import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg.asset.json';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
+import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -39,6 +40,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Asiad Country Club': asiadCountryClub,
   'Hazeltine National Golf Club': hazeltineNational.url,
   'Sedgefield Country Club': sedgefieldCC.url,
+  'The Club at Indian Creek': clubAtIndianCreek.url,
 };
 
 interface VenueImageResult {
