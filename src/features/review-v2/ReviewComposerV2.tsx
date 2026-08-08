@@ -719,7 +719,21 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                   : t('review.wizard.step0.captionSet')
               }
               ariaLabel={t('review.wizard.step0.a11y')}
+              bandLabels={{
+                low: t('review.wizard.step0.bandLow'),
+                mid: t('review.wizard.step0.bandMid'),
+                high: t('review.wizard.step0.bandHigh'),
+              }}
+              calibration={
+                calibration
+                  ? t('review.wizard.step0.calibration', {
+                      ordinal: ordinal(calibration.ordinal),
+                      count: calibration.total,
+                    })
+                  : null
+              }
             />
+
           </div>
         </section>
       )}
