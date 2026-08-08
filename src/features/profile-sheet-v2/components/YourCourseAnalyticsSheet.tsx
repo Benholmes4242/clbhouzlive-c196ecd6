@@ -138,6 +138,7 @@ function Row({
       </div>
       <span style={{ color: A.DIM, fontSize: 16 }}>{CHEVRON}</span>
     </button>
+    </div>
   );
 }
 
