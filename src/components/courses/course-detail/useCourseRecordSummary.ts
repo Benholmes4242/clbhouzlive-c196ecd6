@@ -12,7 +12,6 @@ import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  formatGapFromChampion,
   isLowerBetterCategory,
 } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/helpers';
 
