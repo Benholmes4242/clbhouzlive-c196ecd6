@@ -950,7 +950,7 @@ const ProfilePageV2Content: React.FC = () => {
                   className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-6')}
                   style={{
                     fontFamily: SANS,
-                    fontSize: 12.5,
+                    fontSize: 13.5,
                     lineHeight: 1.55,
                     color: A.BODY,
                     overflowWrap: 'anywhere',
