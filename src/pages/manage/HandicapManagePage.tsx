@@ -11,7 +11,7 @@ import type { WhsConnection } from '@/lib/whs/types';
 
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import ManageScreen from '@/components/profile/handicap/whs/connect/ManageScreen';
-import { CANVAS } from '@/components/profile/handicap/whs/connect/designTokens';
+import { CANVAS, SURFACE } from "@/components/profile/handicap/whs/connect/designTokens";
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
@@ -97,7 +97,7 @@ export default function HandicapManagePage() {
       title={connection ? bodyNameForProvider(connection.provider) : 'Handicap'}
       fill
     >
-      <div className="flex flex-col flex-1 min-h-0" style={{ background: CANVAS }}>
+      <div className="flex flex-col flex-1 min-h-0" style={{ background: connection ? CANVAS : SURFACE }}>
         {connection ? (
           <ManageScreen
             connection={connection}
