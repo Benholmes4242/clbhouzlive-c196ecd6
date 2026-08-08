@@ -14,7 +14,10 @@
     "requested": "Requested",
     "accept": "Accept",
     "followers": "Followers",
-    "coverGuidance": "Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP"
+    "coverGuidance": "Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP",
+    "window30d": "30 days",
+    "window12mo": "12 months",
+    "trendLevel": "Level"
   },
   "social": {
     "followers": "{{count}} followers",
