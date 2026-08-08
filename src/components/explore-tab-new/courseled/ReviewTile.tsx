@@ -195,10 +195,17 @@ export function ReviewTile({
               tabIndex={-1}
               onPlaying={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
-              onError={() => {
-                // Fall back to the existing image chain, never a black box.
-                setFailed(true);
+              onError={(e) => {
+                // RELEASING a tile (src removed, then load()) makes Chrome fire
+                // a synthetic error with an empty src. That is our own teardown,
+                // NOT a failed media load — treating it as one would strand the
+                // tile on its poster for good.
+                const el = e.currentTarget as HTMLVideoElement;
                 setPlaying(false);
+                if (!el.getAttribute('src')) return;
+                // A real failure: fall back to the existing image chain, never a
+                // black box.
+                setFailed(true);
               }}
               style={{
                 position: 'absolute',
