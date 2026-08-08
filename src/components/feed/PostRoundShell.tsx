@@ -65,11 +65,13 @@ const NineShell: React.FC = () => (
             alignItems: 'center',
           }}
         >
+          {/* The strut of each line box (font-size x line-height) owns the
+              height, so these dashes cannot shift the block. */}
           <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.2 }}>
-            <span style={bar(7, BAR_SOFT)}>&nbsp;</span>
+            <span style={{ ...bar(7, BAR_SOFT), height: 3 }}>&nbsp;</span>
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.3 }}>
-            <span style={bar(7, BAR_SOFT)}>&nbsp;</span>
+            <span style={{ ...bar(7, BAR_SOFT), height: 3 }}>&nbsp;</span>
           </span>
           <div style={{ width: 27, height: 27, borderRadius: 999, background: BAR_SOFT }} />
         </div>
