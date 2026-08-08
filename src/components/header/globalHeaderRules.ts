@@ -73,6 +73,8 @@ export function isImmersiveRoute(pathname: string): boolean {
   // The review composer is a plain light page, not a hero page — it must
   // never mount immersive (the post-mount flip caused device paint bugs).
   if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname)) return false;
+  // Connect flow only — the connected manage surface stays non-immersive.
+  if (pathname === WHS_CONNECT_PATH) return whsConnectImmersive;
   if (isBusinessProfilePath(pathname)) return true;
   const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
     (r) => pathname === r
