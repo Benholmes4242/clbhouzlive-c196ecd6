@@ -20,11 +20,11 @@ import {
   KICKER,
   LABEL,
   NUM,
+  RAMP,
   SANS,
   StatRow,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { DIST_SEG_COLORS } from '@/features/courses/components/holes/HoleDataSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -118,6 +118,35 @@ function Row({
   );
 }
 
+/**
+ * Down caret for the rows that EXPAND IN PLACE. Deliberately NOT the right
+ * chevron used by the rows that navigate: two behaviours, two glyphs.
+ */
+function ExpandCaret({ open }: { open: boolean }) {
+  return (
+    <svg
+      width={14}
+      height={14}
+      viewBox="0 0 14 14"
+      aria-hidden="true"
+      style={{
+        display: 'block',
+        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        transition: 'transform 160ms ease',
+      }}
+    >
+      <path
+        d="M3.5 5.5 L7 9 L10.5 5.5"
+        fill="none"
+        stroke={A.DIM}
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function hasScoringData(course: UserAnalyticsCourse): boolean {
   // Gate on COUNTS, not percentages: a course with rounds but no hole-level
   // enrichment has no distribution at all, which is different from a
@@ -171,7 +200,7 @@ function AnalyticsCourseRow({
     ? [
         {
           key: 'eagles',
-          bg: DIST_SEG_COLORS.eaglePlus,
+          bg: RAMP.birdie,
           label: t('yourCourses.pillEaglesLong'),
           pct: course.eagles_plus_pct as number,
           pctExact: course.eagles_plus_pct_exact as number,
@@ -179,7 +208,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'birdies',
-          bg: DIST_SEG_COLORS.birdie,
+          bg: RAMP.birdie,
           label: t('yourCourses.pillBirdiesLong'),
           pct: course.birdies_pct as number,
           pctExact: course.birdies_pct_exact as number,
@@ -187,7 +216,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'pars',
-          bg: DIST_SEG_COLORS.par,
+          bg: RAMP.par,
           label: t('yourCourses.pillParsLong'),
           pct: course.pars_pct as number,
           pctExact: course.pars_pct_exact as number,
@@ -195,7 +224,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'bogeys',
-          bg: DIST_SEG_COLORS.bogey,
+          bg: RAMP.bogey,
           label: t('yourCourses.pillBogeysLong'),
           pct: course.bogeys_plus_pct as number,
           pctExact: course.bogeys_plus_pct_exact as number,
@@ -209,7 +238,7 @@ function AnalyticsCourseRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 16px 52px',
+        gridTemplateColumns: hasScoring ? '1fr 16px 52px 14px' : '1fr 16px 52px',
         gap: '0 10px',
         alignItems: 'end',
         minWidth: 0,
@@ -281,6 +310,20 @@ function AnalyticsCourseRow({
       {hasScoring && (
         <span
           style={{
+            gridColumn: 4,
+            alignSelf: 'center',
+            // The grid's 10px column gap plus this -2px lands the caret 8px
+            // from the AVG block, per spec.
+            marginLeft: -2,
+          }}
+        >
+          <ExpandCaret open={expanded} />
+        </span>
+      )}
+
+      {hasScoring && (
+        <span
+          style={{
             gridColumn: '1 / -1',
             marginTop: 9,
             height: 5,
@@ -339,7 +382,21 @@ function AnalyticsCourseRow({
           >
             {segs.map((s) => (
               <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                <div style={{ height: 3, borderRadius: 2, background: s.bg, marginBottom: 6 }} />
+                {/*
+                  EAGLES+ folds into the BIRDIE band on the bar, so a solid
+                  swatch here would repeat the birdie colour on two labels.
+                  It reads instead as a hairline rule: part of that band, not
+                  a band of its own.
+                */}
+                <div
+                  style={{
+                    height: 3,
+                    borderRadius: 2,
+                    background: s.key === 'eagles' ? 'transparent' : s.bg,
+                    borderTop: s.key === 'eagles' ? `1px solid ${A.HAIRLINE}` : undefined,
+                    marginBottom: 6,
+                  }}
+                />
                 <div style={LABEL}>{s.label}</div>
                 <div style={{ ...NUM, fontSize: 15, color: A.INK, marginTop: 2 }}>
                   {fmtBucketPct(s.pct ?? 0, s.pctExact ?? 0, s.count ?? 0)}

@@ -215,11 +215,11 @@ function HolesSheet({
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={A.PANEL}
       ariaLabelledBy="tournament-holes-sheet-title"
       style={{ height: '75dvh', maxHeight: '75dvh' }}
     >
-      <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+      {/* Canonical sheet surface: --bg-page #F8FAFC. Panels inside stay A.PANEL. */}
+      <div style={{ background: '#F8FAFC', fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
           <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
           <h2
