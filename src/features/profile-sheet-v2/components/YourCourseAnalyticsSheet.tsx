@@ -382,7 +382,21 @@ function AnalyticsCourseRow({
           >
             {segs.map((s) => (
               <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                <div style={{ height: 3, borderRadius: 2, background: s.bg, marginBottom: 6 }} />
+                {/*
+                  EAGLES+ folds into the BIRDIE band on the bar, so a solid
+                  swatch here would repeat the birdie colour on two labels.
+                  It reads instead as a hairline rule: part of that band, not
+                  a band of its own.
+                */}
+                <div
+                  style={{
+                    height: 3,
+                    borderRadius: 2,
+                    background: s.key === 'eagles' ? 'transparent' : s.bg,
+                    borderTop: s.key === 'eagles' ? `1px solid ${A.HAIRLINE}` : undefined,
+                    marginBottom: 6,
+                  }}
+                />
                 <div style={LABEL}>{s.label}</div>
                 <div style={{ ...NUM, fontSize: 15, color: A.INK, marginTop: 2 }}>
                   {fmtBucketPct(s.pct ?? 0, s.pctExact ?? 0, s.count ?? 0)}
