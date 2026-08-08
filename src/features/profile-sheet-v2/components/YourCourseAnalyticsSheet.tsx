@@ -701,19 +701,15 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
           {/* Search results override list when active */}
           {searchActive ? (
-            <div
-              style={{
-                margin: '0 20px',
-                background: '#fff',
-                border: `1px solid ${A.BORDER}`,
-                borderRadius: 16,
-                overflow: 'hidden',
-              }}
-            >
+            <div style={CARD_LIST}>
               {searching && searchResults.length === 0 ? (
-                <div style={{ padding: 16, ...CAPTION }}>{t('yourCourses.searching')}</div>
+                <div style={{ ...CARD(), padding: 16, ...CAPTION }}>
+                  {t('yourCourses.searching')}
+                </div>
               ) : searchResults.length === 0 ? (
-                <div style={{ padding: 16, ...CAPTION }}>{t('yourCourses.noResults')}</div>
+                <div style={{ ...CARD(), padding: 16, ...CAPTION }}>
+                  {t('yourCourses.noResults')}
+                </div>
               ) : (
                 searchResults.map((c) => (
                   <Row
@@ -727,15 +723,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             </div>
           ) : showList ? (
             <>
-              <div
-                style={{
-                  margin: '0 20px',
-                  background: '#fff',
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                }}
-              >
+              <div style={CARD_LIST}>
                 {listItems.map((c) => (
                   <AnalyticsCourseRow
                     key={c.course_id}
@@ -746,6 +734,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                   />
                 ))}
               </div>
+
 
             </>
           ) : null}
