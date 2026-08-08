@@ -586,16 +586,37 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   }, [isTour, courseContext, totals, whose, whoseCap, impersonal, t]);
 
   /**
-   * With no subject to name, use the subject-less form (capital B, no leading
-   * space) rather than interpolating an empty string into "{{who}} beat ...".
+   * The caption must state what it measures. Two faults it must not repeat:
+   *
+   *  - The comparison at :485 is `strokes <= fieldAvg`, so a hole MATCHED is
+   *    counted. The words are "matched or beat", never "beat".
+   *  - The denominator is fieldHoles.length: holes with BOTH the member's
+   *    strokes and a field average. When the community lacks data on a hole
+   *    that number falls, which has nothing to do with the round's progress -
+   *    so no form of this caption says "so far". When some scored holes have
+   *    no field average we name the sample instead ("holes with field data").
+   *
+   * The test is fieldHoles.length against played.length, the holes the member
+   * actually scored - NOT 18. A nine-hole round has played.length 9 and is
+   * never described as missing field data for the back nine.
+   *
+   * With no subject to name, use the subject-less form (capital M, no leading
+   * space) rather than interpolating an empty string into "{{who}} matched ...".
    */
+  const fieldPartial = fieldHoles.length < played.length;
   const fieldCaption = withField && beatFieldOn != null
-    ? t((isTour || impersonal) ? 'courses:scorecard.beatFieldOnTour' : 'courses:scorecard.beatFieldVoice', {
-        who: subject,
-        beat: beatFieldOn,
-        scored: fieldHoles.length,
-      })
+    ? t(
+        (isTour || impersonal)
+          ? (fieldPartial ? 'courses:scorecard.beatFieldOnTourPartial' : 'courses:scorecard.beatFieldOnTour')
+          : (fieldPartial ? 'courses:scorecard.beatFieldVoicePartial' : 'courses:scorecard.beatFieldVoice'),
+        {
+          who: subject,
+          beat: beatFieldOn,
+          scored: fieldHoles.length,
+        },
+      )
     : null;
+
 
 
   const split = useMemo(() => {
