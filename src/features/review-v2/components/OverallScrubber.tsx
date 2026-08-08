@@ -11,7 +11,12 @@ interface Props {
   onChange: (v: number) => void;
   caption: string;
   ariaLabel: string;
+  /** Band markers for the axis, e.g. "Below 5.0" / "5.0 to 8.9" / "9.0 and up". */
+  bandLabels: { low: string; mid: string; high: string };
+  /** Live calibration against the member's OWN rated courses. Null hides it. */
+  calibration?: string | null;
 }
+
 
 const MIN = 1;
 const MAX = 10;
@@ -166,10 +171,15 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel }: Props) 
           textTransform: 'uppercase',
         }}
       >
-        <span style={{ width: `${MARK_5}%`, color: bandColor(1) }}>Under 5.0</span>
-        <span style={{ width: `${MARK_9 - MARK_5}%`, color: bandColor(5) }}>5.0</span>
-        <span style={{ flex: 1, color: bandColor(9) }}>9.0</span>
+        <span style={{ width: `${MARK_5}%`, color: bandColor(1) }}>{bandLabels.low}</span>
+        <span style={{ width: `${MARK_9 - MARK_5}%`, color: bandColor(5) }}>{bandLabels.mid}</span>
+        <span style={{ flex: 1, color: bandColor(9) }}>{bandLabels.high}</span>
       </div>
+
+      {calibration && (
+        <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 12 }}>{calibration}</div>
+      )}
     </div>
+
   );
 }
