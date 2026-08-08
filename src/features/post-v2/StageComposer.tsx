@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, ImagePlus, Loader2, Pencil } from 'lucide-react';
+import { ChevronRight, Loader2, Pencil } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -771,40 +771,38 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
 
         {emptyStage ? (
-          /* EMPTY STAGE — a designed block, not a dark void. Both inputs live
-             HERE so the OS chooser (library path only) anchors mid-stage. */
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', background: CT_DARK.bg }}>
-            <ImagePlus size={30} color={CT_DARK.dim} strokeWidth={1.6} />
-            <div style={{ marginTop: 14, fontSize: 16, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.015em' }}>
-              Add photos or videos
+          /* EMPTY STAGE — bottom-anchored and left-aligned, matching the
+             uploading and success screens. Both inputs live HERE, each one
+             anchored EXACTLY OVER ITS OWN BUTTON so the OS chooser opens from
+             the control that was tapped. Scrolls rather than clipping when a
+             long headline meets a short viewport. */
+          <div
+            style={{
+              flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column',
+              justifyContent: 'flex-end', padding: '0 28px 30px',
+              background: CT_DARK.bg, overflowY: 'auto',
+            }}
+          >
+            <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: CT_DARK.dim }}>
+              {t('emptyState.limitKicker', { count: MAX_MEDIA })}
             </div>
-            <div style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: CT_DARK.dim }}>
-              Up to {MAX_MEDIA} · photos and clips
+            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, color: CT_DARK.ink }}>
+              {isEditMode ? t('emptyState.promptEdit') : t('emptyState.prompt')}
+            </div>
+            <div
+              style={{
+                marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(248,250,252,0.10)',
+                fontSize: 13, fontWeight: 600, lineHeight: 1.45, color: CT_DARK.mute,
+              }}
+            >
+              {t('emptyState.nextStep')}
             </div>
 
-            <div style={{ marginTop: 22, width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ position: 'relative' }}>
-                <button
-                  onClick={() => emptyCameraInputRef.current?.click()}
-                  style={emptyPrimaryButtonStyle}
-                >
-                  Take photo or video
-                </button>
-                <input
-                  ref={emptyCameraInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
-              </div>
+            <div style={{ marginTop: 24, width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => emptyLibraryInputRef.current?.click()}
-                  style={emptySecondaryButtonStyle}
+                  style={emptyPrimaryButtonStyle}
                 >
                   Choose from library
                 </button>
@@ -819,6 +817,24 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   style={anchoredInputStyle}
                 />
               </div>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => emptyCameraInputRef.current?.click()}
+                  style={emptySecondaryButtonStyle}
+                >
+                  Take photo or video
+                </button>
+                <input
+                  ref={emptyCameraInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  capture="environment"
+                  onChange={handleStageAddFiles}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={anchoredInputStyle}
+                />
+              </div>
               <button
                 onClick={() => setPage(2)}
                 style={{ background: 'transparent', border: 0, padding: '6px 0 0', fontSize: 12, fontWeight: 700, color: CT_DARK.mute, cursor: 'pointer' }}
@@ -827,6 +843,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               </button>
             </div>
           </div>
+
         ) : (
           <>
             {/* Media preview — aspect follows the frame pill, capped at 56vh */}

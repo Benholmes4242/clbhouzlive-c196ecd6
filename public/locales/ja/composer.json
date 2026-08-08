@@ -33,7 +33,11 @@
       "the fourball on the first tee",
       "your card from this morning",
       "the view from the 18th"
-    ]
+    ],
+    "limitKicker": "UP TO {{count}} PHOTOS OR CLIPS",
+    "prompt": "What happened out there?",
+    "promptEdit": "Add to this post",
+    "nextStep": "Photos and clips now. The round and the course come on the next step."
   },
   "drafts": {
     "footerNote": "Drafts keep your words, tags and settings. Photos and video are not saved."

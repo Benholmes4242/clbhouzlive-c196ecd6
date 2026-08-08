@@ -33,7 +33,11 @@
       "[~~ţĥé ƒőúřƀáļļ őñ ţĥé ƒířšţ ţéé~~]",
       "[~~ýőúř ĉářđ ƒřőɱ ţĥíš ɱőřñíñĝ~~]",
       "[~~ţĥé ṽíéŵ ƒřőɱ ţĥé 18ţĥ~~]"
-    ]
+    ],
+    "limitKicker": "[~~UP TO {{count}} PHOTOS OR CLIPS~~]",
+    "prompt": "[~~What happened out there?~~]",
+    "promptEdit": "[~~Add to this post~~]",
+    "nextStep": "[~~Photos and clips now. The round and the course come on the next step.~~]"
   },
   "drafts": {
     "footerNote": "[~~Ďřáƒţš ǩééƥ ýőúř ŵőřđš, ţáĝš áñđ šéţţíñĝš. Ƥĥőţőš áñđ ṽíđéő ářé ñőţ šáṽéđ.~~]"
