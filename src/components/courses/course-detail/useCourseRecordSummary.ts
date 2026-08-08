@@ -84,7 +84,8 @@ export function useCourseRecordSummary(
       const behind = isLowerBetterCategory(category) ? diff > 0 : diff < 0;
       viewerByCategory.set(category, {
         row,
-        gap: formatGapFromChampion(category, row.value, champion.value),
+        // Unsigned magnitude: the word ("behind") owns the direction.
+        gap: Math.abs(diff).toFixed(1).replace(/\.0$/, ''),
         behind,
       });
     });
