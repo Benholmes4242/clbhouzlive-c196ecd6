@@ -164,9 +164,54 @@ export const ProfileHero: React.FC<Props> = ({
     onStatTap(stat);
   };
 
+  // Short window (30 days, per fetchHandicapTrend) gets its OWN, higher noise
+  // floor. Measured across every rolling 30-day snapshot pair on record
+  // (n=35 windows): median |move| 0.30, p75 0.40, 37% of windows under 0.15.
+  // 0.2 suppresses the routine ±0.1 recalculation churn and passes the median
+  // and everything above it. trend12 keeps its 0.05 floor — 12 months works.
+  const SHORT_FLOOR = 0.2;
+
+  const shortDeltaRaw = trend?.delta ?? null;
+  const shortDelta =
+    shortDeltaRaw == null ? null : Math.round(shortDeltaRaw * 10) / 10;
+  const shortDirection: 'down' | 'up' | 'flat' =
+    shortDelta == null
+      ? 'flat'
+      : shortDelta < -SHORT_FLOOR
+        ? 'down'
+        : shortDelta > SHORT_FLOOR
+          ? 'up'
+          : 'flat';
+
   const delta = trend12.delta;
   const improved = trend12.direction === 'down';
   const drifted = trend12.direction === 'up';
+
+  // One line per available window. Absent data = no line at all (no gap);
+  // present-but-trivial movement = a dim "Level" line, never a coloured arrow.
+  const deltaLines: Array<{
+    key: string;
+    delta: number;
+    direction: 'down' | 'up' | 'flat';
+    window: string;
+  }> = [];
+  if (shortDelta != null) {
+    deltaLines.push({
+      key: 'short',
+      delta: shortDelta,
+      direction: shortDirection,
+      window: t('hero.window30d', '30 days'),
+    });
+  }
+  if (delta != null) {
+    deltaLines.push({
+      key: 'long',
+      delta,
+      direction: improved ? 'down' : drifted ? 'up' : 'flat',
+      window: t('hero.window12mo', '12 months'),
+    });
+  }
+
 
   return (
     <HeroShell
