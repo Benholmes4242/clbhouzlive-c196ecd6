@@ -57,6 +57,7 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
+import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
@@ -197,7 +198,15 @@ const ClubhouseContent = () => {
   // Round drill-in from a feed scorecard tap.
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
-  const isLoading = activeFeed.isLoading;
+  // The round chain is TWO sequential reads that land after the posts do, so
+  // the feed's own loading state clears a round trip too early and a scorecard
+  // post paints without its scorecard. Hold the skeleton until both round
+  // queries have settled — capped, and never for a page whose rounds will
+  // never come (both hooks report a disabled query as settled).
+  const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
+  const roundsReady = useRoundChainGate(roundChainSettled, !activeFeed.isLoading && posts.length > 0);
+
+  const isLoading = activeFeed.isLoading || (posts.length > 0 && !roundsReady);
   const hasNextPage = activeFeed.hasNextPage ?? false;
   
   // Skeleton timing — first-content-ready contract
@@ -486,6 +495,7 @@ const ClubhouseContent = () => {
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}
               postRoundMap={postRoundMap}
+              postRoundsSettled={roundChainSettled}
               onRoundTap={(post, round) =>
                 setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
               }
