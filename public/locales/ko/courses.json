@@ -657,8 +657,9 @@
     },
     "records": {
       "youHold": "You hold this board",
-      "youBehind": "You {{value}} · {{gap}} behind",
-      "youAhead": "You {{value}} · {{gap}}",
+      "youValue": "You {{value}}",
+      "youBehind": "{{gap}} behind",
+      "youAhead": "Level with the board",
       "units": {
         "gross": "Gross",
         "rounds": "Rounds",
