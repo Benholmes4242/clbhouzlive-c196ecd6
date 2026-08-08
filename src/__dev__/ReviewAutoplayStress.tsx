@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { ReviewTile } from '@/components/explore-tab-new/courseled/ReviewTile';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
-const VID = '/__dev_test_clip.mp4';
+const VID = '/__dev_test_clip.webm';
 const POSTER = '/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png';
 
 export default function ReviewAutoplayStress() {
