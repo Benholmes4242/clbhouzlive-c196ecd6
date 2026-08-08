@@ -760,22 +760,3 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
     </BottomSheet>
   );
 }
-
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    style={{
-                      height: 52,
-                      background:
-                        'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </BottomSheet>
-  );
-}
