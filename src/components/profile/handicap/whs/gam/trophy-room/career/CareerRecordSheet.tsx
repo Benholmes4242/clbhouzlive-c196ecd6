@@ -216,6 +216,7 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
   return (
     <GamSheet
       open={open}
+      surface={REC.CANVAS}
       onClose={() => {
         setOpen(false);
         setView({ kind: 'room' });
@@ -234,7 +235,6 @@ export const CareerRecordSheet: React.FC<Props> = ({ userId, viewerUserId, owner
           willChange: 'transform',
           padding: '8px 16px 40px',
           fontFamily: REC.FONT,
-          background: REC.CANVAS,
         }}
       >
         {detail ?? (
