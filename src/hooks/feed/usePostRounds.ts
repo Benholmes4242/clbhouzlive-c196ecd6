@@ -60,8 +60,18 @@ export interface PostRound {
 export type PostRoundMap = Map<string, PostRound>;
 export type PostScoreIdMap = Map<string, string>;
 
-const EMPTY_ROUNDS: PostRoundMap = new Map();
-const EMPTY_SCORE_IDS: PostScoreIdMap = new Map();
+/**
+ * Both hooks return the Map as before — no callsite breaks on shape — with a
+ * `settled` flag attached to it (BRIEF_CLUBHOUSE_ROUND_POP_IN §1). A DISABLED
+ * query counts as SETTLED: a page with no posts, or no post carrying a score
+ * id, is READY, not perpetually loading.
+ */
+export type PostRoundMapState = PostRoundMap & { readonly settled: boolean };
+export type PostScoreIdMapState = PostScoreIdMap & { readonly settled: boolean };
+
+function withSettled<M extends Map<string, unknown>>(map: M, settled: boolean): M & { settled: boolean } {
+  return Object.assign(new Map(map) as M, { settled });
+}
 
 function stableIds(ids: (string | null | undefined)[]): string[] {
   const unique = Array.from(new Set(ids.filter((v): v is string => !!v)));
@@ -70,7 +80,7 @@ function stableIds(ids: (string | null | undefined)[]): string[] {
 }
 
 /** Batched post_id -> whs_score_id for one feed page. */
-export function usePostScoreIds(postIds: string[]): PostScoreIdMap {
+export function usePostScoreIds(postIds: string[]): PostScoreIdMapState {
   const ids = useMemo(() => stableIds(postIds), [postIds]);
 
   const query = useQuery({
@@ -93,11 +103,16 @@ export function usePostScoreIds(postIds: string[]): PostScoreIdMap {
     },
   });
 
-  return query.data ?? EMPTY_SCORE_IDS;
+  // Disabled (no post ids) => settled. Error => settled (isPending is false).
+  const settled = ids.length === 0 || !query.isPending;
+  return useMemo(
+    () => withSettled(query.data ?? new Map<string, string>(), settled) as PostScoreIdMapState,
+    [query.data, settled],
+  );
 }
 
 /** Batched round stats + hole shape for one feed page. */
-export function usePostRounds(scoreIds: string[]): PostRoundMap {
+export function usePostRounds(scoreIds: string[]): PostRoundMapState {
   const ids = useMemo(() => stableIds(scoreIds), [scoreIds]);
 
   const query = useQuery({
@@ -191,5 +206,11 @@ export function usePostRounds(scoreIds: string[]): PostRoundMap {
     },
   });
 
-  return query.data ?? EMPTY_ROUNDS;
+  // Disabled (no score ids on the page) => settled, so a feed of pure photo
+  // posts is never held back by a query that will never run.
+  const settled = ids.length === 0 || !query.isPending;
+  return useMemo(
+    () => withSettled(query.data ?? new Map<string, PostRound>(), settled) as PostRoundMapState,
+    [query.data, settled],
+  );
 }

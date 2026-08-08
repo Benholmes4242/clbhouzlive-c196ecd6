@@ -36,6 +36,7 @@ import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
 import { PendingPostCard } from './PendingPostCard';
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
+import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
@@ -123,6 +124,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   const postScoreIdMap = usePostScoreIds(feedPostIds);
   const feedScoreIds = useMemo(() => Array.from(postScoreIdMap.values()), [postScoreIdMap]);
   const postRoundMap = usePostRounds(feedScoreIds);
+  const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
+  const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
 
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
 
@@ -229,7 +232,10 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
 
   // ── Loading / error / empty states ──
-  if (isLoading && posts.length === 0) {
+  // Same fault, same fix as Clubhouse: hold the skeleton while the chained
+  // round queries are outstanding, capped, and not at all when no post on the
+  // page carries a round.
+  if (posts.length === 0 ? isLoading : !roundsReady) {
     return <PostsFeedSkeleton />;
   }
 
@@ -345,6 +351,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           resolveCourseId={resolvePostCourseId}
           postScoreIdMap={postScoreIdMap}
           postRoundMap={postRoundMap}
+          postRoundsSettled={roundChainSettled}
           onRoundTap={(post, round) =>
             setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
           }

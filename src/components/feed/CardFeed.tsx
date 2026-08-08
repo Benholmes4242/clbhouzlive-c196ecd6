@@ -116,6 +116,8 @@ export interface CardFeedProps {
   postRoundMap?: Map<string, PostRound>;
   /** post_id -> whs_score_id for the current page (C3). */
   postScoreIdMap?: Map<string, string>;
+  /** False while the batched round chain is still in flight (shell state). */
+  postRoundsSettled?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
@@ -156,6 +158,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   resolveCourseId,
   postRoundMap,
   postScoreIdMap,
+  postRoundsSettled = true,
   onRoundTap,
 }, ref) {
 
@@ -727,6 +730,11 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return sid ? postRoundMap?.get(sid) ?? null : null;
                 })()}
+                postRoundPending={(() => {
+                  if (postRoundsSettled) return false;
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return !!sid && !postRoundMap?.get(sid);
+                })()}
                 onRoundTap={onRoundTap}
               />
             )}
@@ -758,6 +766,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       resolveCourseId,
       postRoundMap,
       postScoreIdMap,
+      postRoundsSettled,
       onRoundTap,
     ],
   );

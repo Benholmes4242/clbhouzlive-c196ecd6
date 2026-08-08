@@ -82,6 +82,8 @@ export interface LightCardFeedProps {
   /** post.id -> whs score id, and score id -> round (both batched at page level). */
   postScoreIdMap?: Map<string, string>;
   postRoundMap?: Map<string, PostRound>;
+  /** False while the batched round chain is still in flight (shell state). */
+  postRoundsSettled?: boolean;
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
 
@@ -107,6 +109,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   resolveCourseId,
   postScoreIdMap,
   postRoundMap,
+  postRoundsSettled = true,
   onRoundTap,
 }) => {
   // ── Active-card tracking (ported from CardFeed) ──
@@ -464,6 +467,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return sid ? postRoundMap?.get(sid) ?? null : null;
                 })()}
+                postRoundPending={(() => {
+                  if (postRoundsSettled) return false;
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return !!sid && !postRoundMap?.get(sid);
+                })()}
                 onRoundTap={onRoundTap}
               />
             )}
@@ -494,6 +502,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       resolveCourseId,
       postScoreIdMap,
       postRoundMap,
+      postRoundsSettled,
       onRoundTap,
     ],
   );

@@ -40,6 +40,7 @@ import { PostRoundCard } from '@/components/feed/PostRoundCard';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+import { PostRoundShell } from '@/components/feed/PostRoundShell';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -94,6 +95,8 @@ export interface LightFeedCardProps {
   courseContext?: PostCourseContext | null;
   /** Batched round attached to this post (resolved once at page level). */
   postRound?: PostRound | null;
+  /** True when the round is still in flight — render the shell, not nothing. */
+  postRoundPending?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
@@ -230,6 +233,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   feedIndex,
   courseContext,
   postRound,
+  postRoundPending,
   onRoundTap,
 }) => {
   const { activeActor, setActiveActor } = useActiveActor();
@@ -398,6 +402,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
       />
 
       {/* Attached round — scorecard block sits ABOVE media (parity with Clubhouse) */}
+      {!postRound && postRoundPending && <PostRoundShell />}
       {postRound && (
         <PostRoundCard
           round={postRound}
