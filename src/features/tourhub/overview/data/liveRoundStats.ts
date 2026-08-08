@@ -32,6 +32,11 @@ function roundValue(e: BoardEntry, round: number): number | null {
 export interface FieldAverage {
   avg: number;
   count: number;
+  /**
+   * How many of those SAME `count` rounds are under par. Derived in the one
+   * loop below so the pair can never disagree with the headline's figure.
+   */
+  underPar: number;
 }
 
 export function fieldAverageToday(
@@ -41,16 +46,19 @@ export function fieldAverageToday(
   if (round == null || round < 1 || round > 4) return null;
   let sum = 0;
   let count = 0;
+  let underPar = 0;
   for (const e of entries) {
     const v = roundValue(e, round);
     if (v == null) continue;
     if (e.thru != null && e.thru < 18) continue;
     sum += v;
     count += 1;
+    if (v < 0) underPar += 1;
   }
   if (count < FIELD_GATE) return null;
-  return { avg: sum / count, count };
+  return { avg: sum / count, count, underPar };
 }
+
 
 export interface LowRound {
   toPar: number;
