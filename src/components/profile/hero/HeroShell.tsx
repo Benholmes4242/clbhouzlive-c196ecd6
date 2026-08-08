@@ -214,7 +214,21 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         background: HERO_INK,
         marginTop: 0,
         padding: '0 16px 16px',
+        /* MINIMUM top inset - it clears the status bar and ChromeIsland and
+           still does under bottom-anchoring: `justify-content: flex-end`
+           packs content against the padding box's BOTTOM edge and can only
+           ever overflow downwards, never up past padding-top. */
         paddingTop: `calc(${HERO_CONTENT_INSET} + 18px)`,
+        /* Content bottom-anchors. The floor below is set by the TALLEST
+           content case (personal hero with index, trend and sparkline), which
+           fills it exactly - so this is a no-op there. Heroes with less inside
+           them (business, personal with no handicap connection) used to strand
+           their identity block at the top with the slack collecting beneath
+           it; now the slack collects ABOVE as photograph. Heroes with no cover
+           have no floor, so there is no slack and nothing moves. */
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
         fontFamily: SANS,
         color: '#FFFFFF',
         isolation: 'isolate',
