@@ -85,6 +85,16 @@ export function ReviewReceipt({
     clubhouse: t('review.subscore.clubhouse'),
     facilities: t('review.subscore.facilities'),
   };
+  // The overall is NOT derived from the categories - these are five
+  // independent columns. This average only makes the divergence legible.
+  // With any null category we omit the line rather than average three.
+  const catAvg = useMemo(() => {
+    const vals = CAT_ORDER.map((k) => scores[k]);
+    if (vals.some((v) => v == null)) return null;
+    const sum = vals.reduce((a, v) => a + (v as number), 0);
+    return Math.round((sum / vals.length) * 10) / 10;
+  }, [scores]);
+
 
   // Row list is variable: build the rendered set first so the divider logic
   // never assumes a fixed count.
