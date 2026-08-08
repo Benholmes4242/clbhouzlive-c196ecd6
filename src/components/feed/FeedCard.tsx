@@ -425,7 +425,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     };
   }, [isFirstCard, isMulti, media, fireContentReady]);
   // Photo backdrop only for round posts that actually have a course photo.
-  const hasRoundBackdrop = Boolean(postRound && post.courseThumbnailImage);
+  // The backdrop is claimed by the shell too, so the card surface does not
+  // change under the member when the round lands.
+  const hasRoundBackdrop = Boolean((postRound || postRoundPending) && post.courseThumbnailImage);
 
   return (
     <article
