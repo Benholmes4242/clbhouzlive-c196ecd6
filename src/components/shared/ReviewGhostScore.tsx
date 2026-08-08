@@ -11,7 +11,7 @@
  *     information. Thresholds match the app-wide bands exactly.
  */
 import React from 'react';
-import { getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTierLabel, type RatingTier } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 
 export type ReviewGhostSurface = 'dark' | 'light';
