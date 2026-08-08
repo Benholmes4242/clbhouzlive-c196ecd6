@@ -1,32 +1,43 @@
 import React, { useMemo, useState } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
-import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL, CAPTION } from './designTokens';
-import { Panel, PanelGap, Collapsible } from './Primitives';
+import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL, CAPTION, H1, H1_SUB } from './designTokens';
+import { Panel, PanelGap, Collapsible, CopyBlock } from './Primitives';
 
 interface Props {
   onSelect: (country: WhsCountry) => void;
 }
 
-/** SCREEN 2 - COUNTRY. No pills anywhere: panel membership carries the state. */
+/** SCREEN 2 - COUNTRY. Federation-neutral: statuses only, no pitch. */
 export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
   const [query, setQuery] = useState('');
 
-  const { live, soon, rest, empty } = useMemo(() => {
+  const { live, notYet, empty } = useMemo(() => {
     const q = query.trim().toLowerCase();
     const match = (c: WhsCountry) =>
       !q || c.name.toLowerCase().includes(q) || c.body.toLowerCase().includes(q);
     const filtered = WHS_COUNTRIES.filter(match);
+    const unsupported = filtered.filter((c) => !c.supported);
     return {
       live: filtered.filter((c) => c.supported),
-      soon: filtered.filter((c) => !c.supported && c.comingSoon),
-      rest: filtered.filter((c) => !c.supported && !c.comingSoon),
+      // Partnership-agreed federations pin to the top of the one list.
+      notYet: [
+        ...unsupported.filter((c) => c.comingSoon),
+        ...unsupported.filter((c) => !c.comingSoon),
+      ],
       empty: filtered.length === 0,
     };
   }, [query]);
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
+      <CopyBlock>
+        <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>Where do you play?</h1>
+        <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
+          We read your index from the body that holds it.
+        </p>
+      </CopyBlock>
+
       <div
         style={{
           display: 'flex',
@@ -60,16 +71,15 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
 
       {empty ? (
         <Panel kicker="No match">
-          <div style={{ ...CAPTION }}>
-            Nothing here by that name. Federations are listed by country and by governing body,
-            so try either.
+          <div style={CAPTION}>
+            Nothing by that name. Countries and governing bodies both match, so try either.
           </div>
         </Panel>
       ) : null}
 
       {live.length > 0 ? (
         <>
-          <Panel kicker="Connected federations" aside="live">
+          <Panel kicker="Live">
             {live.map((c, i) => (
               <button
                 key={c.id}
@@ -101,54 +111,38 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
         </>
       ) : null}
 
-      {soon.length > 0 ? (
-        <>
-          <Panel kicker="Coming soon" aside="in conversation">
-            {soon.map((c, i) => (
-              <div
-                key={c.id}
-                style={{
-                  borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
-                  padding: i === 0 ? '0 0 2px' : '12px 0 2px',
-                }}
-              >
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: MUTE }}>{c.name}</div>
-                <div style={{ ...LABEL, marginTop: 4 }}>{c.body}</div>
-              </div>
-            ))}
-          </Panel>
-          <PanelGap />
-        </>
-      ) : null}
-
-      {rest.length > 0 ? (
-        <Panel
-          kicker="On the list"
-          aside={`${rest.length} federation${rest.length === 1 ? '' : 's'}`}
-        >
+      {notYet.length > 0 ? (
+        <Panel kicker="Not yet" aside={`${notYet.length}`}>
           <Collapsible
-            threshold={4}
-            collapsedCount={4}
-            showAllLabel={`Show all ${rest.length}`}
+            threshold={5}
+            collapsedCount={5}
+            showAllLabel={`Show all ${notYet.length}`}
             showFewerLabel="Show fewer"
           >
-            {rest.map((c, i) => (
+            {notYet.map((c, i) => (
               <div
                 key={c.id}
                 style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 12,
                   borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
                   padding: i === 0 ? '0 0 2px' : '12px 0 2px',
                 }}
               >
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: MUTE }}>{c.name}</div>
-                <div style={{ ...LABEL, marginTop: 4 }}>{c.body}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: MUTE }}>{c.name}</div>
+                  <div style={{ ...LABEL, marginTop: 4 }}>{c.body}</div>
+                </div>
+                <div style={{ ...LABEL, textAlign: 'right', flexShrink: 0 }}>
+                  {c.comingSoon ? 'coming soon' : 'on the list'}
+                </div>
               </div>
             ))}
           </Collapsible>
 
           <div style={{ ...CAPTION, marginTop: 14 }}>
-            A federation has to open an API before we can read from it. Until yours does you can
-            post rounds by hand, and everything else works.
+            A federation has to open an API before we can read from it.
           </div>
         </Panel>
       ) : null}
