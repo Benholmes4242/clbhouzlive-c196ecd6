@@ -160,12 +160,14 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   alignItems: 'center',
                   gap: 12,
                   padding: '12px 16px',
-                  background: '#FFFFFF',
-                  borderBottom: '1px solid #F1F5F9',
+                  // Rows sit ON the canvas, separated by hairlines — a long
+                  // scrolling list, not a stack of cards.
+                  background: 'transparent',
                   border: 0,
                   borderBottomWidth: 1,
                   borderBottomStyle: 'solid',
-                  borderBottomColor: '#F1F5F9',
+                  borderBottomColor: '#E2E8F0',
+
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
