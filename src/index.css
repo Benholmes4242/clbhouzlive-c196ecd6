@@ -122,6 +122,15 @@ body.lightbox-open {
   .clbhouz-gold-shimmer-bar { animation: none !important; }
 }
 
+/* Review tile video covers (BRIEF_REVIEW_TILE_AUTOPLAY): the JS gate already
+   declines to mount the element under reduced motion. This is the belt-and-
+   braces guard, matching the Discover live-tour pulse pattern — if a video
+   ever reaches the DOM under this preference, it is not shown and the tile's
+   poster plus play glyph stand alone. */
+@media (prefers-reduced-motion: reduce) {
+  .review-tile-video { display: none !important; }
+}
+
 
 html.lightbox-open {
   overflow: hidden;
