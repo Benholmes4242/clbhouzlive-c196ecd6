@@ -164,16 +164,39 @@ export const ProfileHero: React.FC<Props> = ({
     onStatTap(stat);
   };
 
-  // Short window (30 days, per fetchHandicapTrend) gets its OWN, higher noise
-  // floor. Measured across every rolling 30-day snapshot pair on record
-  // (n=35 windows): median |move| 0.30, p75 0.40, 37% of windows under 0.15.
-  // 0.2 suppresses the routine ±0.1 recalculation churn and passes the median
-  // and everything above it. trend12 keeps its 0.05 floor — 12 months works.
+  // Short window = 90 DAYS, derived here from the `history` this component
+  // already fetches (same technique as useHandicapTrend12mo) — fetchHandicapTrend's
+  // own 30-day window is left alone so its other consumers do not shift.
+  // It carries its OWN, higher noise floor than trend12's 0.05: measured over
+  // every long snapshot pair on record (n=30 windows spanning 60+ days, the
+  // longest history available is ~86 days) median |move| 0.40, p75 0.50, 27%
+  // under 0.25. 0.2 suppresses routine ±0.1 recalculation churn and passes the
+  // median and everything above it. trend12 keeps its floor — 12 months works.
   const SHORT_FLOOR = 0.2;
+  const SHORT_TARGET_DAYS = 90;
+  const SHORT_MIN_HISTORY_DAYS = 75;
 
-  const shortDeltaRaw = trend?.delta ?? null;
-  const shortDelta =
-    shortDeltaRaw == null ? null : Math.round(shortDeltaRaw * 10) / 10;
+  const shortDelta = React.useMemo<number | null>(() => {
+    const current = indexValue ?? trend?.current ?? null;
+    if (current == null || !history || history.length === 0) return null;
+    const now = Date.now();
+    const earliest = new Date(history[0].observed_at).getTime();
+    if (now - earliest < SHORT_MIN_HISTORY_DAYS * MS_PER_DAY) return null;
+    const target = now - SHORT_TARGET_DAYS * MS_PER_DAY;
+    let closest = history[0];
+    let best = Math.abs(new Date(closest.observed_at).getTime() - target);
+    for (const pt of history) {
+      const diff = Math.abs(new Date(pt.observed_at).getTime() - target);
+      if (diff < best) {
+        closest = pt;
+        best = diff;
+      }
+    }
+    const past = Number(closest.handicap_index);
+    if (!Number.isFinite(past)) return null;
+    return Math.round((current - past) * 10) / 10;
+  }, [history, indexValue, trend]);
+
   const shortDirection: 'down' | 'up' | 'flat' =
     shortDelta == null
       ? 'flat'
@@ -182,6 +205,7 @@ export const ProfileHero: React.FC<Props> = ({
         : shortDelta > SHORT_FLOOR
           ? 'up'
           : 'flat';
+
 
   const delta = trend12.delta;
   const improved = trend12.direction === 'down';
