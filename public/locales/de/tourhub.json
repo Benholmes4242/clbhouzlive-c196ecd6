@@ -221,14 +221,16 @@
       "fieldAverageToday": "Felddurchschnitt heute",
       "fromNRoundsIn": "aus {{n}} Runden",
       "lowRoundLabel": "Beste Runde",
-      "groupsLabel": "Gruppen",
       "awaitingPlayers": "{{range}} noch offen",
       "nShare_one": "{{count}} Spieler",
       "nShare_other": "{{count}} Spieler",
       "playingHardest": "Spielt am schwersten",
       "playingEasiest": "Spielt am leichtesten",
       "parShort": "Par {{par}}",
-      "featuredGroupLabel": "Featured-Gruppe"
+      "featuredGroupLabel": "Featured-Gruppe",
+      "underParTodayLabel": "HEUTE UNTER PAR",
+      "underParTodayValue": "{{n}} von {{m}}",
+      "underParTodaySub": "Spieler bisher im Ziel"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

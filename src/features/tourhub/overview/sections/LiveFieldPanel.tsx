@@ -4,7 +4,7 @@
  *
  *   FIELD AVERAGE TODAY   +1.4  from 62 rounds in
  *   ---------------------------------------------
- *   LOW ROUND  BY  ROUNDS IN  GROUPS
+ *   LOW ROUND            UNDER PAR TODAY
  *   ---------------------------------------------
  *   hole-shape chart (over par above the centre line, under par below)
  *
@@ -63,6 +63,10 @@ function missingRanges(present: Set<number>): string | null {
   return parts.join(', ');
 }
 
+/**
+ * Local to this file — not exported, and the counter strip below is its only
+ * consumer, so the figure size moves outright to 26px (no size prop needed).
+ */
 function Cell({
   label,
   value,
@@ -78,10 +82,11 @@ function Cell({
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
         style={{
-          fontSize: 15,
+          fontSize: 26,
           fontWeight: 800,
+          lineHeight: 1,
           color: color ?? A.INK,
-          letterSpacing: '-0.01em',
+          letterSpacing: '-0.02em',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -267,13 +272,11 @@ export function LiveFieldPanel({
   entries,
   round,
   tournamentId,
-  groupCount,
   live,
 }: {
   entries: any[];
   round: number;
   tournamentId: string;
-  groupCount: number | null;
   live: boolean;
 }) {
   const { t } = useTranslation('tourhub');
@@ -380,10 +383,16 @@ export function LiveFieldPanel({
             color={low ? tourFigColor(low.toPar) : A.DIM}
             sub={holders.length > 0 ? holders.join(', ') : null}
           />
-          <Cell
-            label={t('overview.onTheCourse.groupsLabel')}
-            value={groupCount != null ? String(groupCount) : '—'}
-          />
+          {field && field.count > 0 && (
+            <Cell
+              label={t('overview.onTheCourse.underParTodayLabel')}
+              value={t('overview.onTheCourse.underParTodayValue', {
+                n: field.underPar,
+                m: field.count,
+              })}
+              sub={t('overview.onTheCourse.underParTodaySub')}
+            />
+          )}
         </div>
 
         {/* Ranked hole ladder */}
