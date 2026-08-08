@@ -715,7 +715,7 @@
         "nextEyebrow_other": "{{count}} played courses still unrated",
         "nextPlayed": "Played {{date}}",
         "nextRate": "Rate",
-        "actionClubhouse": "See it in the Clubhouse",
+        "actionClubhouse": "Back to the clubhouse",
         "actionBack": "Back to {{course}}"
       }
     }
