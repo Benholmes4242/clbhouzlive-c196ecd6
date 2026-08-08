@@ -50,6 +50,7 @@ import { PostRoundCard } from './PostRoundCard';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+import { PostRoundShell } from '@/components/feed/PostRoundShell';
 
 
 
@@ -128,6 +129,12 @@ export interface FeedCardProps {
   courseContext?: PostCourseContext | null;
   /** Batched round attached to this post (resolved in Clubhouse.tsx). */
   postRound?: PostRound | null;
+  /**
+   * True when this post carries a round that has not arrived yet: the block
+   * renders as a shell at its own height rather than as nothing, so the card
+   * never paints without its scorecard and then gains one.
+   */
+  postRoundPending?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
@@ -270,6 +277,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onContentReady,
   courseContext,
   postRound,
+  postRoundPending,
   onRoundTap,
 }) => {
   
@@ -564,7 +572,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
-      {/* Attached round — scorecard block sits ABOVE media */}
+      {/* Attached round — scorecard block sits ABOVE media. Waiting posts
+          render the shell in the same space (no pop-in, no jump). */}
+      {!postRound && postRoundPending && <PostRoundShell />}
       {postRound && (
         <PostRoundCard
           round={postRound}
