@@ -159,13 +159,23 @@ export const Action: React.FC<{
  * the wash runs straight through it - no screen paints a top bar.
  * Title is a quiet kicker-weight label; the screen's own headline carries voice.
  */
-export const BackRow: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
+export const BackRow: React.FC<{
+  title: string;
+  onBack?: () => void;
+  /** Immersive host: content must clear the notch while the wash runs behind it. */
+  immersive?: boolean;
+}> = ({ title, onBack, immersive }) => (
   <div
     style={{
       display: 'flex',
       alignItems: 'center',
       gap: 9,
-      padding: '10px 16px 6px',
+      paddingLeft: 16,
+      paddingRight: 16,
+      paddingBottom: 6,
+      paddingTop: immersive
+        ? 'calc(max(env(safe-area-inset-top, 0px), 12px) + 10px)'
+        : 10,
       background: 'transparent',
       flexShrink: 0,
       minHeight: 34,

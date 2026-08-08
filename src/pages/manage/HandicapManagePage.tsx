@@ -82,39 +82,47 @@ export default function HandicapManagePage() {
   };
 
   if (connectionLoading) {
+    // No header here: the resolved surface may be immersive (connect flow) or
+    // shelled (connected). Painting a header now would flash a bar that then
+    // disappears.
     return (
-      <ManagePageShell title="Handicap">
-        <div className="px-4 pt-4 pb-0 space-y-3">
+      <div style={{ background: SURFACE, minHeight: '100dvh' }}>
+        <div className="px-4 pt-4 pb-0 space-y-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
           <Skeleton className="h-24 w-full rounded-2xl" />
           <Skeleton className="h-40 w-full rounded-2xl" />
         </div>
-      </ManagePageShell>
+      </div>
+    );
+  }
+
+  // CONNECT FLOW: immersive. The page owns its single back + title; no app
+  // header, and the wash runs through the notch.
+  if (!connection) {
+    return (
+      <WhsConnectScreen
+        onConnected={async () => {
+          invalidateAll();
+          navigate('/handicap', { replace: true });
+        }}
+        onDecline={declineHandicapChip}
+      />
     );
   }
 
   return (
     <ManagePageShell
-      title={connection ? bodyNameForProvider(connection.provider) : 'Handicap'}
+      title={bodyNameForProvider(connection.provider)}
       fill
     >
-      <div className="flex flex-col flex-1 min-h-0" style={{ background: connection ? CANVAS : SURFACE }}>
-        {connection ? (
-          <ManageScreen
-            connection={connection}
-            onDisconnect={() => setConfirmDisconnect(true)}
-            onDelete={() => setConfirmDelete(true)}
-            onReconnect={() => setConfirmDisconnect(true)}
-          />
-        ) : (
-          <WhsConnectScreen
-            onConnected={async () => {
-              invalidateAll();
-              navigate('/handicap', { replace: true });
-            }}
-            onDecline={declineHandicapChip}
-          />
-        )}
+      <div className="flex flex-col flex-1 min-h-0" style={{ background: CANVAS }}>
+        <ManageScreen
+          connection={connection}
+          onDisconnect={() => setConfirmDisconnect(true)}
+          onDelete={() => setConfirmDelete(true)}
+          onReconnect={() => setConfirmDisconnect(true)}
+        />
       </div>
+
 
       <DisconnectConfirmSheet
         open={confirmDisconnect}

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
 import { useSelectedCountry } from '@/lib/whs/useSelectedCountry';
@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { setWhsConnectImmersive } from '@/components/header/globalHeaderRules';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import EmptyStateScreen from './connect/EmptyStateScreen';
 import CountryScreen from './connect/CountryScreen';
 import EnglandGolfForm from './connect/EnglandGolfForm';
@@ -16,6 +18,7 @@ import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
 import { BackRow } from './connect/Primitives';
 import { WASH, FONT } from './connect/designTokens';
+
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: 'Please sign in to clbhouz first, then try again.',
@@ -43,6 +46,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
 }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(user?.id);
@@ -50,6 +54,22 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
+
+  const immersive = layout === 'page';
+
+  /* Page layout owns the whole viewport: the app chrome stops drawing a header
+     (one back, one title) and the wash paints from physical y=0 behind the
+     notch. Reuses the existing data-immersive-route mechanism via
+     applyRouteChrome, exactly as course detail and the profile hero do. */
+  useLayoutEffect(() => {
+    if (!immersive) return;
+    setWhsConnectImmersive(true);
+    applyRouteChrome(window.location.pathname, true);
+    return () => {
+      setWhsConnectImmersive(false);
+      applyRouteChrome(window.location.pathname, true);
+    };
+  }, [immersive]);
 
   useEffect(() => {
     const preselect = (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
@@ -59,6 +79,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handlePick = (c: WhsCountry) => {
     setCountryId(c.id);
@@ -110,17 +131,27 @@ export const WhsConnectScreen: React.FC<Props> = ({
     ? 'comingSoon'
     : 'form';
 
-  /** No federation is named before the member has chosen one - and the name
-   *  comes from the CHOSEN country, never a literal, so the second federation
-   *  to go live does not inherit England's name. */
-  const HEADERS: Record<Stage, { title: string; back?: () => void }> = {
-    intro: { title: 'Connect your handicap' },
-    country: { title: 'Where do you play?', back: () => setStep('intro') },
-    form: { title: country?.body ?? 'Sign in', back: () => setStep('country') },
-    comingSoon: { title: country?.name ?? 'Not yet', back: () => setStep('country') },
-    sync: { title: 'Connecting' },
-    done: { title: 'Connected' },
+  /** ONE title on every stage. Each screen's own headline carries the voice,
+   *  so the header never restates it - and never names a federation. */
+  const HEADER_TITLE = 'Handicap';
+
+  /** Per-stage back. Intro exits the flow (back to wherever the member came
+   *  from, /profile as the fallback). Sync and done have no back: the sync is
+   *  in flight, and done is completed by its own continue action. */
+  const BACKS: Record<Stage, (() => void) | undefined> = {
+    intro: immersive
+      ? () => {
+          if (window.history.length > 1) navigate(-1);
+          else navigate('/profile', { replace: true });
+        }
+      : undefined,
+    country: () => setStep('intro'),
+    form: () => setStep('country'),
+    comingSoon: () => setStep('country'),
+    sync: undefined,
+    done: undefined,
   };
+
 
   const activeScreen = (() => {
     switch (stage) {
@@ -163,26 +194,29 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
   })();
 
-  const wrapperClass =
-    layout === 'page' ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col';
-
-  const header = HEADERS[stage];
+  const wrapperClass = immersive ? 'flex flex-col' : 'flex flex-col';
 
   return (
     <div
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* The wash runs edge to edge and behind the content. No screen paints a
-           separate top bar. */
+        /* Immersive host: the wash's gradient origin sits at the PHYSICAL top of
+           the viewport (y=0, behind the notch) because .app-shell drops its
+           safe-area padding on immersive routes. Content clears the inset via
+           BackRow; the background does not. */
         background: WASH,
         backgroundAttachment: 'local',
+        ...(immersive
+          ? { minHeight: '100dvh', flex: '1 1 auto' }
+          : { flex: '1 1 auto', minHeight: 0 }),
       }}
     >
-      <BackRow title={header.title} onBack={header.back} />
+      <BackRow title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />
       {activeScreen}
     </div>
   );
+
 };
 
 
