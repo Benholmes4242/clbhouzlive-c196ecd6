@@ -5,6 +5,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
+
+/** Static venue image overrides for venues not present in golf_courses. */
+const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
+  'Sedgefield Country Club': sedgefieldCC.url,
+};
 
 interface ResolvedCourse {
   golfCourseId: string;
@@ -310,7 +316,7 @@ export function useCourseImageResolver(venues: VenueInput[]) {
         } else {
           console.log(`[CourseResolver] Cache hits: ${cached?.length || 0}`);
           cached?.forEach((row: any) => {
-            if (row.golf_courses) {
+            if (row.golf_courses && !results.has(row.sr_venue_name)) {
               console.log(`[CourseResolver] Cache hit: "${row.sr_venue_name}" -> "${row.golf_courses.name}"`);
               results.set(row.sr_venue_name, {
                 golfCourseId: row.golf_courses.id,
