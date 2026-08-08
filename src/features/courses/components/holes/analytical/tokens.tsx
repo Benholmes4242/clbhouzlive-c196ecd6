@@ -178,42 +178,61 @@ export interface StatItem {
   subVariant?: 'label' | 'caption';
 }
 
+/** Label line-height used to reserve a consistent two-line label box. */
+const STATROW_LABEL_LH = 1.25;
+const statRowLabelBox = (fontSize: number): React.CSSProperties => ({
+  lineHeight: STATROW_LABEL_LH,
+  minHeight: `${fontSize * STATROW_LABEL_LH * 2}px`,
+});
+
 export const StatRow: React.FC<{
   items: StatItem[];
   size?: number;
   style?: React.CSSProperties;
-}> = ({ items, size = 22, style }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
-      ...style,
-    }}
-  >
-    {items.map((it) => (
-      <div key={it.label} style={{ textAlign: 'center', minWidth: 0 }}>
-        <div style={LABEL}>{it.label}</div>
-        <div style={{ ...NUM, fontSize: size, color: it.tone ?? A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>
-          {it.value}
-        </div>
-        {it.sub ? (
-          <div
-            style={{
-              ...(it.subVariant === 'caption' ? CAPTION : { ...LABEL, fontSize: 8 }),
-              marginTop: 3,
-              ...(it.subTone ? { color: it.subTone } : null),
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {it.sub}
+}> = ({ items, size = 22, style }) => {
+  const anySub = items.some((it) => !!it.sub);
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
+        ...style,
+      }}
+    >
+      {items.map((it) => {
+        const subStyle: React.CSSProperties =
+          it.subVariant === 'caption' ? { ...CAPTION } : { ...LABEL, fontSize: 8 };
+        const subFontSize = (subStyle.fontSize as number) ?? 8;
+        return (
+          <div key={it.label} style={{ textAlign: 'center', minWidth: 0 }}>
+            {/* Two-line reservation keeps every value on one baseline; labels stay top-aligned. */}
+            <div style={{ ...LABEL, ...statRowLabelBox(LABEL.fontSize as number) }}>{it.label}</div>
+            <div style={{ ...NUM, fontSize: size, color: it.tone ?? A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>
+              {it.value}
+            </div>
+            {anySub ? (
+              <div
+                style={{
+                  ...subStyle,
+                  marginTop: 3,
+                  lineHeight: STATROW_LABEL_LH,
+                  minHeight: `${subFontSize * STATROW_LABEL_LH}px`,
+                  ...(it.subTone ? { color: it.subTone } : null),
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {it.sub ?? '\u00A0'}
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
-    ))}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
+
 
 
 /**
