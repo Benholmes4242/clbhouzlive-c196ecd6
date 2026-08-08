@@ -79,6 +79,8 @@ export function MomentsOfTheWeek({
       onPress={onTilePress}
       radius={14}
       initialsSize={height === TALL ? 30 : 20}
+      // Both page sizes (220 / 106) are large enough for moving video to read.
+      autoplayGroup="moments-page"
       labelSize={10}
       labelInset={8}
       scrimStop="45%"
