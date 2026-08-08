@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
 import { useSelectedCountry } from '@/lib/whs/useSelectedCountry';
@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { setWhsConnectImmersive } from '@/components/header/globalHeaderRules';
+import { applyRouteChrome } from '@/lib/routeChrome';
 import EmptyStateScreen from './connect/EmptyStateScreen';
 import CountryScreen from './connect/CountryScreen';
 import EnglandGolfForm from './connect/EnglandGolfForm';
@@ -16,6 +18,7 @@ import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
 import { BackRow } from './connect/Primitives';
 import { WASH, FONT } from './connect/designTokens';
+
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: 'Please sign in to clbhouz first, then try again.',
