@@ -141,7 +141,9 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
         />
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto" style={{ background: '#FFFFFF' }}>
+        {/* Body inherits the shell's canvas — no white paint over #F8FAFC. */}
+        <div className="flex-1 overflow-y-auto">
+
           {missingCourses.map((course) => {
             const dateIso = course.review_date ?? course.last_played_at ?? null;
             const dateText = formatDate(dateIso);
