@@ -3,7 +3,8 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light analytical surface. Canvas #F4F6F9, comments as hairline
+ * Design: light surface on the canonical page background (--bg-page, #F8FAFC),
+ * comments as hairline
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
  */
