@@ -24,7 +24,6 @@ import {
   StatRow,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { DIST_SEG_COLORS } from '@/features/courses/components/holes/HoleDataSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
