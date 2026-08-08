@@ -1,4 +1,3 @@
-import ReviewAutoplayStress from "@/__dev__/ReviewAutoplayStress";
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
@@ -485,7 +484,6 @@ function AppRoutes() {
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
 
         
-        <Route path="/__dev/review-autoplay" element={<ReviewAutoplayStress />} />
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
