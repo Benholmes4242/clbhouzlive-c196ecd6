@@ -77,7 +77,12 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       ? [{ label: t('legacy.countries', { defaultValue: 'COUNTRIES' }), value: String(countriesPlayed) }]
       : []),
     ...(top100Played != null && top100Played > 0
-      ? [{ label: t('legacy.top100', { defaultValue: 'TOP 100' }), value: String(top100Played) }]
+      ? [{
+          // Names the list: the figure is the WORLDWIDE list's played count
+          // (useTop100ProgressForUser), not every Top 100 list combined.
+          label: t('legacy.top100World', { defaultValue: 'WORLD TOP 100' }),
+          value: String(top100Played),
+        }]
       : []),
     ...(avgRating != null && avgRating > 0
       ? [{ label: t('legacy.avgRating', { defaultValue: 'AVG RATING' }), value: avgRating.toFixed(1) }]
