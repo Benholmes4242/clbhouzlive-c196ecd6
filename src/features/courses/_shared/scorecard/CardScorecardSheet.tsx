@@ -663,12 +663,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       open={open}
       onClose={onClose}
       variant="light"
-      surfaceColor={A.PANEL}
-      style={{ background: A.PANEL, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}
+      style={{ height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.PANEL, flex: 1, minHeight: 0, ...FIGS }}>
+      <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/* HEADER — course-first */}
-        <div style={{ padding: '10px 16px 14px', background: A.PANEL, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: '10px 16px 14px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <div style={{ minWidth: 0 }}>
             {!!eyebrowText && (
               <div style={{ ...KICKER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
