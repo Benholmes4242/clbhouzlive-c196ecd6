@@ -67,6 +67,27 @@ function fmtBucketPct(pct: number, pctExact: number, count: number): string {
   return `${pct}%`;
 }
 
+/**
+ * These rows EXPAND, so each one owns a card rather than sharing one panel:
+ * an open row's block has to visibly belong to it. Open state raises the
+ * border to heavier ink - no colour, no shadow, no scale.
+ */
+const CARD = (open = false): React.CSSProperties => ({
+  background: '#FFFFFF',
+  border: `1px solid ${open ? 'rgba(14,18,22,0.16)' : A.BORDER}`,
+  borderRadius: 14,
+  overflow: 'hidden',
+});
+
+/** Card list container: the 10px gap replaces per-card margin, so the last
+ *  card carries no trailing space. */
+const CARD_LIST: React.CSSProperties = {
+  margin: '0 20px',
+  display: 'grid',
+  gap: 10,
+};
+
+
 function Row({
   title,
   subtitle,
@@ -77,6 +98,8 @@ function Row({
   onClick: () => void;
 }) {
   return (
+    <div style={CARD()}>
+
     <button
       type="button"
       onClick={onClick}
@@ -115,6 +138,7 @@ function Row({
       </div>
       <span style={{ color: A.DIM, fontSize: 16 }}>{CHEVRON}</span>
     </button>
+    </div>
   );
 }
 
@@ -351,22 +375,25 @@ function AnalyticsCourseRow({
     fontFamily: SANS,
   };
 
-  // No distribution: keep the original tap-to-navigate row.
+  // No distribution: same card, right chevron, tap-to-navigate.
   if (!hasScoring) {
     return (
-      <button
-        type="button"
-        onClick={() => onOpen('row')}
-        className="active:scale-[0.99]"
-        style={{ ...shell, cursor: 'pointer' }}
-      >
-        {body}
-      </button>
+      <div style={CARD()}>
+        <button
+          type="button"
+          onClick={() => onOpen('row')}
+          className="active:scale-[0.99]"
+          style={{ ...shell, cursor: 'pointer' }}
+        >
+          {body}
+        </button>
+      </div>
     );
   }
 
   return (
-    <div>
+    <div style={CARD(expanded)}>
+
       <button type="button" onClick={onToggle} aria-expanded={expanded} style={{ ...shell, cursor: 'pointer' }}>
         {body}
       </button>
@@ -674,19 +701,15 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
           {/* Search results override list when active */}
           {searchActive ? (
-            <div
-              style={{
-                margin: '0 20px',
-                background: '#fff',
-                border: `1px solid ${A.BORDER}`,
-                borderRadius: 16,
-                overflow: 'hidden',
-              }}
-            >
+            <div style={CARD_LIST}>
               {searching && searchResults.length === 0 ? (
-                <div style={{ padding: 16, ...CAPTION }}>{t('yourCourses.searching')}</div>
+                <div style={{ ...CARD(), padding: 16, ...CAPTION }}>
+                  {t('yourCourses.searching')}
+                </div>
               ) : searchResults.length === 0 ? (
-                <div style={{ padding: 16, ...CAPTION }}>{t('yourCourses.noResults')}</div>
+                <div style={{ ...CARD(), padding: 16, ...CAPTION }}>
+                  {t('yourCourses.noResults')}
+                </div>
               ) : (
                 searchResults.map((c) => (
                   <Row
@@ -700,15 +723,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             </div>
           ) : showList ? (
             <>
-              <div
-                style={{
-                  margin: '0 20px',
-                  background: '#fff',
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                }}
-              >
+              <div style={CARD_LIST}>
                 {listItems.map((c) => (
                   <AnalyticsCourseRow
                     key={c.course_id}
@@ -720,31 +735,24 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                 ))}
               </div>
 
+
             </>
           ) : null}
 
           {/* Loading skeleton for first paint */}
           {isLoading && !showBuildingState && !showList && (
-            <div style={{ padding: '0 20px' }}>
-              <div
-                style={{
-                  background: '#fff',
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                }}
-              >
-                {[0, 1, 2].map((i) => (
+            <div style={CARD_LIST}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ ...CARD(), height: 52 }}>
                   <div
-                    key={i}
                     style={{
-                      height: 52,
+                      height: '100%',
                       background:
                         'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
                     }}
                   />
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
