@@ -85,6 +85,16 @@ export function ReviewReceipt({
     clubhouse: t('review.subscore.clubhouse'),
     facilities: t('review.subscore.facilities'),
   };
+  // The overall is NOT derived from the categories - these are five
+  // independent columns. This average only makes the divergence legible.
+  // With any null category we omit the line rather than average three.
+  const catAvg = useMemo(() => {
+    const vals = CAT_ORDER.map((k) => scores[k]);
+    if (vals.some((v) => v == null)) return null;
+    const sum = vals.reduce((a, v) => a + (v as number), 0);
+    return Math.round((sum / vals.length) * 10) / 10;
+  }, [scores]);
+
 
   // Row list is variable: build the rendered set first so the divider logic
   // never assumes a fixed count.
@@ -214,7 +224,37 @@ export function ReviewReceipt({
               );
             })}
           </div>
+          {catAvg != null && (
+            <div
+              style={{
+                fontSize: 11.5,
+                lineHeight: '17px',
+                color: RV2.secondary,
+                marginTop: 10,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              <Trans
+                i18nKey="review.wizard.receipt.categoryAverage"
+                ns="courses"
+                values={{ avg: catAvg.toFixed(1) }}
+                components={{
+                  avg: (
+                    <span
+                      style={{
+                        fontWeight: 800,
+                        color: bandColor(catAvg),
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    />
+                  ),
+                }}
+              />
+            </div>
+          )}
+
         </div>
+
 
         {receipt && (
           <>

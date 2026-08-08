@@ -31,7 +31,9 @@ import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
-import { ReviewReceipt } from './components/ReviewReceipt';
+import { ReviewReceipt, ordinal } from './components/ReviewReceipt';
+import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
+
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
@@ -195,6 +197,8 @@ function InnerComposer() {
   });
 
   const ready =
+
+
     !!courseQ.data &&
     !sessionLoading &&
     (!userId
@@ -328,6 +332,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   });
   const composer = useReviewComposer(existing, course.id);
   const submit = useReviewSubmit();
+
+  // ONE fetch of the member's own overall ratings (this course excluded, so an
+  // edit never ranks the member against themselves). The ordinal below is
+  // computed client-side on every drag - no query per drag.
+  const myRatedQ = useMyRatedScores(userId, course.id);
+  const calibration = calibrationRank(composer.state.overall, myRatedQ.data);
+
 
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
@@ -719,7 +730,21 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
                   : t('review.wizard.step0.captionSet')
               }
               ariaLabel={t('review.wizard.step0.a11y')}
+              bandLabels={{
+                low: t('review.wizard.step0.bandLow'),
+                mid: t('review.wizard.step0.bandMid'),
+                high: t('review.wizard.step0.bandHigh'),
+              }}
+              calibration={
+                calibration
+                  ? t('review.wizard.step0.calibration', {
+                      ordinal: ordinal(calibration.ordinal),
+                      count: calibration.total,
+                    })
+                  : null
+              }
             />
+
           </div>
         </section>
       )}

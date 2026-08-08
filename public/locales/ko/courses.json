@@ -441,7 +441,11 @@
         "captionEmpty": "드래그해서 점수를 정하세요",
         "captionSet": "내 종합 점수",
         "gate": "점수를 정하세요",
-        "a11y": "종합 점수, 1에서 10"
+        "a11y": "종합 점수, 1에서 10",
+        "bandLow": "Below 5.0",
+        "bandMid": "5.0 to 8.9",
+        "bandHigh": "9.0 and up",
+        "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
         "heading": "세부 평가",
@@ -483,7 +487,8 @@
         "nextPlayed": "{{date}} 플레이",
         "nextRate": "평가하기",
         "actionClubhouse": "클럽하우스에서 보기",
-        "actionBack": "{{course}}(으)로 돌아가기"
+        "actionBack": "{{course}}(으)로 돌아가기",
+        "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
   },
