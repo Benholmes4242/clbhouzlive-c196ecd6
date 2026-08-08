@@ -194,26 +194,29 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
   })();
 
-  const wrapperClass =
-    layout === 'page' ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col';
-
-  const header = HEADERS[stage];
+  const wrapperClass = immersive ? 'flex flex-col' : 'flex flex-col';
 
   return (
     <div
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* The wash runs edge to edge and behind the content. No screen paints a
-           separate top bar. */
+        /* Immersive host: the wash's gradient origin sits at the PHYSICAL top of
+           the viewport (y=0, behind the notch) because .app-shell drops its
+           safe-area padding on immersive routes. Content clears the inset via
+           BackRow; the background does not. */
         background: WASH,
         backgroundAttachment: 'local',
+        ...(immersive
+          ? { minHeight: '100dvh', flex: '1 1 auto' }
+          : { flex: '1 1 auto', minHeight: 0 }),
       }}
     >
-      <BackRow title={header.title} onBack={header.back} />
+      <BackRow title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />
       {activeScreen}
     </div>
   );
+
 };
 
 
