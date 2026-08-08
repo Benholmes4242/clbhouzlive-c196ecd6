@@ -324,16 +324,12 @@ function CoursesPageHeroInner() {
                   gap: 7,
                 }}
               >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: 999,
-                    background: '#F7931E',
-                    flexShrink: 0,
-                  }}
-                />
+                {fact && (
+                  <span style={{ display: 'flex', flexShrink: 0 }}>
+                    <FactIcon fact={fact} />
+                  </span>
+                )}
+
                 <span
                   style={{
                     fontSize: 12.5,
