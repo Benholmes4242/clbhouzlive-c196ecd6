@@ -186,7 +186,8 @@ export function ReviewTile({
               muted
               loop
               playsInline
-              // @ts-expect-error legacy iOS attribute, required or iOS goes fullscreen
+              // Legacy iOS attribute: required alongside playsInline or older
+              // WKWebView builds still go fullscreen.
               webkit-playsinline="true"
               preload="none"
               disableRemotePlayback
