@@ -224,7 +224,7 @@ export const ProfileHero: React.FC<Props> = ({
       key: 'short',
       delta: shortDelta,
       direction: shortDirection,
-      window: t('hero.window30d', '30 days'),
+      window: t('hero.window90d', '90 days'),
     });
   }
   if (delta != null) {
