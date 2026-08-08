@@ -323,7 +323,6 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 </div>
               </div>
             </div>
-            {referenceCaption && <Caption>{referenceCaption}</Caption>}
           </>
         )}
 
