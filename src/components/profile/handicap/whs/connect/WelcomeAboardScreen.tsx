@@ -70,18 +70,22 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
     return { values: tail, delta: d, years: spanYears };
   }, [history, handicapIndex]);
 
-  const headline =
-    years && years > 1 ? `${years} years of golf, all here.` : 'Your record is all here.';
+  /* The copy must not assert completion the member cannot see. While the
+     figures are still landing the headline states what is happening. */
+  const headline = countersPending
+    ? 'Your rounds are landing.'
+    : years && years > 1
+    ? `${years} years of golf, all here.`
+    : 'Your record is all here.';
+
+  const sub = countersPending
+    ? 'Your index is live. The rounds finish arriving on our servers - you can carry on either way.'
+    : 'Nothing else to do - your index and your rounds move on their own from here.';
 
   return (
     <>
       <FlowBody>
-        <FlowHead
-          kicker="Connected"
-          kickerColor={GOOD}
-          headline={headline}
-          sub="Nothing else to do - your index and your rounds move on their own from here."
-        />
+        <FlowHead kicker="Connected" kickerColor={GOOD} headline={headline} sub={sub} />
 
         <div style={{ marginTop: 22 }}>
           <HandicapCard
@@ -95,9 +99,11 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               courses: counts?.courses ?? null,
               years,
             }}
+            countersPending={countersPending}
             replayKey={`${values.length}-${handicapIndex ?? 'na'}`}
           />
         </div>
+
       </FlowBody>
 
       <FooterBar>
