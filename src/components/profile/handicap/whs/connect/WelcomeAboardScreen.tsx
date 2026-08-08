@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { GOOD } from './designTokens';
 import { PrimaryButton, FooterBar, FlowBody, FlowHead } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
@@ -18,14 +18,37 @@ interface Props {
 
 const YEAR = 365 * 86400_000;
 
+/**
+ * Ceiling on the pending state. useImportedCounts polls forever, so the screen
+ * owns the end of waiting: after this the counters settle to the em dash (the
+ * honest "we cannot read a figure" state) rather than shimmering indefinitely.
+ */
+const PENDING_CEILING_MS = 45_000;
+
 /** SCREEN 5 - DONE. The screen-1 card, now carrying real figures. */
 export const WelcomeAboardScreen: React.FC<Props> = ({
   handicapIndex,
   connectionId,
   onContinue,
 }) => {
-  const { data: counts } = useImportedCounts(connectionId);
-  const { data: history } = useHandicapHistory(connectionId ?? undefined, 'all');
+  const { data: counts, isFetching: countsFetching } = useImportedCounts(connectionId);
+  const { data: history, isFetching: historyFetching } = useHandicapHistory(
+    connectionId ?? undefined,
+    'all',
+  );
+
+  const [ceilingHit, setCeilingHit] = useState(false);
+  useEffect(() => {
+    if (counts) return;
+    const t = setTimeout(() => setCeilingHit(true), PENDING_CEILING_MS);
+    return () => clearTimeout(t);
+  }, [counts]);
+
+  /* UNRESOLVED IS NOT ABSENT: pending while the source has not settled - the
+     connection id is not known yet, or the counts query is still polling. */
+  const countersPending =
+    !ceilingHit && !counts && (!connectionId || countsFetching || historyFetching || !history);
+
 
   const { values, delta, years } = useMemo(() => {
     const pts = (history ?? []).filter((p) => Number.isFinite(p.handicap_index));
