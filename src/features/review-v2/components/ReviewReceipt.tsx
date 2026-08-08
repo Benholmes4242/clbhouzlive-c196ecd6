@@ -224,13 +224,25 @@ export function ReviewReceipt({
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {t('review.wizard.receipt.categoryAverage', {
-                avg: catAvg.toFixed(1),
-              })
-                .split('{{avg}}')
-                .join(catAvg.toFixed(1))}
+              <Trans
+                i18nKey="review.wizard.receipt.categoryAverage"
+                ns="courses"
+                values={{ avg: catAvg.toFixed(1) }}
+                components={{
+                  avg: (
+                    <span
+                      style={{
+                        fontWeight: 800,
+                        color: bandColor(catAvg),
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    />
+                  ),
+                }}
+              />
             </div>
           )}
+
         </div>
 
 
