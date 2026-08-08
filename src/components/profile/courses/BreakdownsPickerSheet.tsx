@@ -44,8 +44,14 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="!bg-[#F8FAFC] border-0 p-0 max-h-[85vh] flex flex-col rounded-t-2xl"
+        className="!bg-[#F8FAFC] border-0 p-0 flex flex-col rounded-t-2xl"
+        // 75dvh as BOTH height and maxHeight — the canonical scrolling-list
+        // sheet (CourseDirectorySheet). The inner height stops a short list
+        // from shrinking the sheet to its content; dvh so dynamic browser
+        // chrome is measured correctly.
+        style={{ height: '75dvh', maxHeight: '75dvh' }}
       >
+
         {/* Drag handle */}
         <div
           style={{
