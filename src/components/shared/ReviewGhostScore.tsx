@@ -46,6 +46,38 @@ export function reviewLabelColor(
   return '#FF6B6B';
 }
 
+/**
+ * Band colour for a TIER NAME rather than a score, for surfaces that group
+ * ratings into the five tiers (My Ratings dividers, the tier distribution bars,
+ * the loop card label). It resolves through `reviewLabelColor` — the same three
+ * bands, no thresholds and no hexes restated here.
+ *
+ * Five tiers against three bands, mapped by each tier's own midpoint:
+ *   EXCEPTIONAL  (>=9.0, mid 9.5)     -> green
+ *   EXCELLENT    (7.5-8.9, mid 8.2)   -> mid band
+ *   GOOD         (6.0-7.4, mid 6.7)   -> mid band
+ *   FAIR         (4.0-5.9, mid 4.95)  -> red   (its midpoint falls under 5.0)
+ *   POOR         (<4.0, mid 2.0)      -> red
+ * Adjacent tiers sharing a band is deliberate: the bands are the app's rule and
+ * a fourth colour would fork it.
+ */
+export const TIER_MIDPOINT: Record<RatingTier, number> = {
+  EXCEPTIONAL: 9.5,
+  EXCELLENT: 8.2,
+  GOOD: 6.7,
+  FAIR: 4.95,
+  POOR: 2.0,
+};
+
+export function reviewTierColor(
+  tier: RatingTier,
+  surface: ReviewGhostSurface = 'dark',
+): string {
+  return reviewLabelColor(TIER_MIDPOINT[tier], surface);
+}
+
+
+
 interface ReviewGhostNumeralProps {
   rating: number;
   /** Watermark font size — card uses 110; sheet uses ~86. */
