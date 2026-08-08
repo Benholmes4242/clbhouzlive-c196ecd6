@@ -7,7 +7,7 @@ import type { WhsCountry } from '@/lib/whs/whsCountries';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useWhsConnection } from '@/lib/whs/hooks';
+import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import { setWhsConnectImmersive } from '@/components/header/globalHeaderRules';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import EmptyStateScreen from './connect/EmptyStateScreen';
@@ -111,6 +111,12 @@ export const WhsConnectScreen: React.FC<Props> = ({
         } catch (e) {
           console.warn('[WhsConnectScreen] failed to clear hide_handicap_chip:', e);
         }
+      }
+      /* The done screen reads its counters off the connection row. Without this
+         the ['whs-connection'] cache is still the pre-connect null, the counts
+         query stays disabled, and every counter waits for nothing. */
+      if (user?.id) {
+        await queryClient.invalidateQueries({ queryKey: whsKeys.connection(user.id) });
       }
       setSuccessData(data);
     } catch (err) {
