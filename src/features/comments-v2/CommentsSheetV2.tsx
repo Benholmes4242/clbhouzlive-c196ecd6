@@ -3,7 +3,8 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light analytical surface. Canvas #F4F6F9, comments as hairline
+ * Design: light surface on the canonical page background (--bg-page, #F8FAFC),
+ * comments as hairline
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
  */
@@ -36,7 +37,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const CANVAS = '#F4F6F9';
+/** Canonical page background. Token, not a literal, so it cannot drift. */
+const CANVAS = 'var(--bg-page)';
 const INK = '#0E1216';
 const MUTE = '#68707B';
 const AMBER = '#F7931E';
