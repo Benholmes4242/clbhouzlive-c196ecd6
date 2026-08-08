@@ -97,6 +97,8 @@ export const CourseRecordBook: React.FC<Props> = ({
     }
     const standing = viewerByCategory.get(category);
     if (!standing) return null;
+    // TWO facts, not one phrase: the member's own value, then the gap. The
+    // separator is 9px of space - no middot, no rule, no dash.
     return (
       <div
         style={{
@@ -107,10 +109,16 @@ export const CourseRecordBook: React.FC<Props> = ({
           ...FIGS,
         }}
       >
-        {t(standing.behind ? 'courseDetail.records.youBehind' : 'courseDetail.records.youAhead', {
-          value: formatLegendValueCompact(category, standing.row.value),
-          gap: standing.gap,
-        })}
+        <span>
+          {t('courseDetail.records.youValue', {
+            value: formatLegendValueCompact(category, standing.row.value),
+          })}
+        </span>
+        <span style={{ marginLeft: 9, color: A.MUTE }}>
+          {standing.behind
+            ? t('courseDetail.records.youBehind', { gap: standing.gap })
+            : t('courseDetail.records.youAhead')}
+        </span>
       </div>
     );
   };
