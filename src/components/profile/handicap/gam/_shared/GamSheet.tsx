@@ -4,8 +4,16 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 interface GamSheetProps {
   open: boolean;
   onClose: () => void;
+  /**
+   * The ONE surface colour for the whole sheet: grabber strip, body, and the
+   * area behind the home indicator. Content inside must NOT paint its own
+   * full-bleed background — pass it here instead so there is one owner.
+   * Defaults to the historical gam shell dark.
+   */
+  surface?: string;
   children: React.ReactNode;
 }
+
 
 /**
  * Canonical wrapper for every gam_* bottom sheet.
@@ -21,7 +29,12 @@ interface GamSheetProps {
  *
  * Use this for ALL gam_* sheets. Do not call `BottomSheet` directly.
  */
-export const GamSheet: React.FC<GamSheetProps> = ({ open, onClose, children }) => (
+export const GamSheet: React.FC<GamSheetProps> = ({
+  open,
+  onClose,
+  surface = '#15171F',
+  children,
+}) => (
   <BottomSheet
     open={open}
     onClose={onClose}
@@ -29,7 +42,8 @@ export const GamSheet: React.FC<GamSheetProps> = ({ open, onClose, children }) =
     style={{
       display: 'flex',
       flexDirection: 'column',
-      background: '#15171F',
+      background: surface,
+
       height: '75dvh',
       maxHeight: '75dvh',
       minHeight: 0,
