@@ -254,9 +254,22 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
    * than the field. Tone is taken from the negated gap so "better" reads as the
    * improvement tone through the existing toneFor convention.
    */
+  /**
+   * Round ONCE, here, and derive the gap from the DISPLAYED components so the
+   * subtraction a member can do on screen is always true.
+   */
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  const disp = reference
+    ? (() => {
+        const you = r1(reference.you);
+        const field = r1(reference.field);
+        return { you, field, gap: r1(field - you) };
+      })()
+    : null;
+
   const headline = (() => {
-    if (reference) {
-      const gap = Math.round(reference.gap * 10) / 10;
+    if (disp) {
+      const gap = disp.gap;
       if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
         return {
           text: signed(0),
@@ -273,6 +286,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             : t('courses:courseDetail.you.gapWorse'),
       };
     }
+
     // Round before branching so -0.04 never renders "-0.0".
     const roundedTotal = Math.round(total * 10) / 10;
     return {
