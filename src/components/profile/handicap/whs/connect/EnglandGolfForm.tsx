@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { INK, MUTE, BORDER, BAD, FONT, LABEL, H1, H1_SUB, CAPTION } from './designTokens';
+import { INK, MUTE, DIM, BORDER, BAD, FONT, LABEL, H1, H1_SUB, KICKER } from './designTokens';
 import { Panel, PrimaryButton, FooterBar, CopyBlock } from './Primitives';
 
 interface Props {
   onSubmit: (membershipNumber: string, password: string) => void;
   error: string | null;
   submitting: boolean;
+  /** Governing body of the chosen country - the FIRST time it is named. */
+  bodyName?: string;
+  /** Short product name for the credentials, e.g. MyEG. */
+  bodyShort?: string;
   /** Kept for API compatibility - the header back chevron owns this now. */
   onChangeCountry?: () => void;
 }
@@ -24,8 +28,14 @@ const inputStyle: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining',
 };
 
-/** SCREEN 3 - FORM. */
-export const EnglandGolfForm: React.FC<Props> = ({ onSubmit, error, submitting }) => {
+/** SCREEN 3 - SIGN IN. */
+export const EnglandGolfForm: React.FC<Props> = ({
+  onSubmit,
+  error,
+  submitting,
+  bodyName = 'England Golf',
+  bodyShort = 'MyEG',
+}) => {
   const [membershipNumber, setMembershipNumber] = useState('');
   const [password, setPassword] = useState('');
 
@@ -42,10 +52,14 @@ export const EnglandGolfForm: React.FC<Props> = ({ onSubmit, error, submitting }
       className="flex flex-col flex-1 min-h-0"
       style={{ fontFamily: FONT }}
     >
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
-        <CopyBlock kicker="Step 2 of 2">
-          <h1 style={{ ...H1, fontSize: 21 }}>Sign in to MyEG</h1>
-          <p style={H1_SUB}>The same details you use for the England Golf app.</p>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
+        <CopyBlock kicker={bodyName}>
+          <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>
+            Sign in to {bodyShort}
+          </h1>
+          <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
+            The same details you use with {bodyName}.
+          </p>
         </CopyBlock>
 
         <Panel>
@@ -62,30 +76,30 @@ export const EnglandGolfForm: React.FC<Props> = ({ onSubmit, error, submitting }
             Ten digits, on your member card
           </div>
 
-          <div style={{ ...LABEL, margin: '18px 0 7px' }}>MyEG password</div>
+          <div style={{ ...LABEL, margin: '18px 0 7px' }}>{bodyShort} password</div>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
-            aria-label="MyEG password"
+            aria-label={`${bodyShort} password`}
             style={inputStyle}
           />
-
-          <div style={{ ...CAPTION, marginTop: 14 }}>
-            Your password is encrypted in a secure vault and decrypted only when a sync runs. It
-            never leaves our servers, and you can disconnect or delete it at any time.
+          <div style={{ fontSize: 11.5, color: DIM, marginTop: 7, lineHeight: 1.5 }}>
+            Encrypted in a vault, never leaves our servers, delete it any time.
           </div>
 
           {error ? (
             <div style={{ fontSize: 12.5, color: BAD, marginTop: 14, lineHeight: 1.5 }}>{error}</div>
           ) : null}
         </Panel>
+
+        <div style={{ ...KICKER, color: DIM, marginTop: 14, padding: '0 4px' }}>Step 2 of 2</div>
       </div>
 
       <FooterBar>
         <PrimaryButton type="submit" disabled={disabled}>
-          Connect to England Golf
+          Connect to {bodyName}
         </PrimaryButton>
       </FooterBar>
     </form>

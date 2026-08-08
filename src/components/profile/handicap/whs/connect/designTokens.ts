@@ -18,6 +18,16 @@ export const TRACK = 'rgba(14,18,22,0.08)';
 export const FONT =
   'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
+/**
+ * Connect-surface base. #F8FAFC matches the host page (ManagePageShell) and the
+ * notch shield exactly, so there is no seam or white strip under the header.
+ */
+export const SURFACE = '#F8FAFC';
+
+/** Amber wash. Runs edge to edge, sits behind the content, never a top bar. */
+export const WASH =
+  `radial-gradient(130% 52% at 50% -6%, rgba(247,147,30,0.20) 0%, rgba(247,147,30,0.07) 42%, rgba(247,147,30,0) 72%), ${SURFACE}`;
+
 /** Every figure on this surface. */
 export const NUM: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining',

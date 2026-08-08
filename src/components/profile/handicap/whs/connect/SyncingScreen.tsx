@@ -1,32 +1,48 @@
 import React from 'react';
-import { INK, BORDER, MUTE, H1, H1_SUB, CAPTION } from './designTokens';
-import { Panel, Indeterminate, CopyBlock } from './Primitives';
+import { INK, MUTE, DIM, BORDER, GOOD, LABEL, H1, H1_SUB, CAPTION, NUM } from './designTokens';
+import { CopyBlock } from './Primitives';
 
 /**
- * SCREEN 4 - SYNCING.
- * connect-whs is a single synchronous call, so there is no running count to
- * report. The four rows are a STATEMENT of what the server is doing, not a
- * tracker: no changing dots, no "2 of 4", no percentage.
+ * SCREEN 4 - SYNCING. No spinner.
+ *
+ * connect-whs is ONE synchronous call that returns only when the whole import
+ * is finished - it streams nothing back, and the connection row (and therefore
+ * whs_imported_counts) does not exist until it resolves. So there is NO real
+ * rounds-so-far figure to count up here, and a fabricated one on this screen
+ * would be the worst possible place for one.
+ *
+ * The figure slot is therefore held with an em dash and labelled honestly. The
+ * three steps are a STATEMENT of what the server is doing, in order - no ticks,
+ * because we cannot know which one it has reached.
  */
-const STEPS = [
-  'Signing in to England Golf',
-  'Saving your index',
-  'Reading your scoring record',
-  'Finding friends at your club',
-] as const;
+const STEPS = ['Signing you in', 'Reading your record', 'Importing rounds'] as const;
 
 export const SyncingScreen: React.FC = () => (
-  <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
-    <CopyBlock kicker="England Golf">
-      <h1 style={{ ...H1, fontSize: 21 }}>Pulling your record</h1>
-      <p style={H1_SUB}>
-        Under a minute for most accounts. You can close this - it finishes on our side either way.
+  <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
+    <CopyBlock kicker="Connecting" kickerColor={GOOD}>
+      <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>Pulling your record</h1>
+      <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
+        Under a minute for most accounts. You can leave - it finishes either way.
       </p>
     </CopyBlock>
 
-    <Indeterminate />
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, padding: '0 4px 18px' }}>
+      <div
+        style={{
+          fontSize: 54,
+          fontWeight: 800,
+          letterSpacing: '-0.035em',
+          lineHeight: 0.92,
+          color: DIM,
+          ...NUM,
+        }}
+      >
+        {'\u2014'}
+      </div>
+      <div style={{ ...LABEL, color: MUTE }}>rounds so far</div>
+    </div>
 
-    <Panel kicker="What's happening" aside="in order">
+    <div style={{ padding: '0 4px' }}>
       {STEPS.map((label, i) => (
         <div
           key={label}
@@ -41,10 +57,10 @@ export const SyncingScreen: React.FC = () => (
           {label}
         </div>
       ))}
-    </Panel>
+    </div>
 
-    <div style={{ ...CAPTION, marginTop: 18, textAlign: 'center', color: MUTE }}>
-      Long records take a little longer. Nothing is lost if you leave.
+    <div style={{ ...CAPTION, marginTop: 18, color: DIM, padding: '0 4px' }}>
+      The count arrives with the import. Long records take a little longer.
     </div>
   </div>
 );

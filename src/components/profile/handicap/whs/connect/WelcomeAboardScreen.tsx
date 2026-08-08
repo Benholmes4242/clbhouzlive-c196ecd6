@@ -1,7 +1,9 @@
-import React from 'react';
-import { INK, MUTE, BORDER, GOOD, LABEL, H1, H1_SUB } from './designTokens';
-import { Panel, PanelGap, Figure, PrimaryButton, FooterBar, CopyBlock } from './Primitives';
+import React, { useMemo } from 'react';
+import { GOOD, H1, H1_SUB } from './designTokens';
+import { PrimaryButton, FooterBar, CopyBlock } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
+import { useHandicapHistory } from '@/lib/whs/hooks';
+import HandicapCard from './HandicapCard';
 
 interface Props {
   firstName: string;
@@ -14,90 +16,77 @@ interface Props {
   onContinue: () => void;
 }
 
-const formatIndex = (h: number | null): string => {
-  if (h === null || h === undefined) return '--';
-  return h < 0 ? `+${Math.abs(h).toFixed(1)}` : h.toFixed(1);
-};
+const YEAR = 365 * 86400_000;
 
-const NEXT_ROWS = [
-  { title: 'Scoring breakdown', sub: 'Where the shots go, by par type and by third' },
-  { title: 'Index history', sub: 'Every move since your first counting round' },
-];
-
-/** SCREEN 5 - DONE. All three figures derived client-side. Never a zero. */
+/** SCREEN 5 - DONE. The screen-1 card, now carrying real figures. */
 export const WelcomeAboardScreen: React.FC<Props> = ({
   handicapIndex,
-  homeClub,
   connectionId,
   onContinue,
 }) => {
   const { data: counts } = useImportedCounts(connectionId);
+  const { data: history } = useHandicapHistory(connectionId ?? undefined, 'all');
+
+  const { values, delta, years } = useMemo(() => {
+    const pts = (history ?? []).filter((p) => Number.isFinite(p.handicap_index));
+    if (pts.length === 0) return { values: [] as number[], delta: null as number | null, years: null as number | null };
+
+    const first = new Date(pts[0].observed_at).getTime();
+    const last = new Date(pts[pts.length - 1].observed_at).getTime();
+    const spanYears = Math.max(1, Math.round((last - first) / YEAR));
+
+    // Delta only exists with a full 12 months behind the member.
+    const cutoff = Date.now() - YEAR;
+    const hasYear = first <= cutoff;
+    const oldest = pts.find((p) => new Date(p.observed_at).getTime() >= cutoff) ?? pts[0];
+    const current = handicapIndex ?? pts[pts.length - 1].handicap_index;
+    const d = hasYear ? Number((current - oldest.handicap_index).toFixed(1)) : null;
+
+    // Cap the series so the line stays readable at 118px wide.
+    const tail = pts.slice(-40).map((p) => p.handicap_index);
+    return { values: tail, delta: d, years: spanYears };
+  }, [history, handicapIndex]);
 
   return (
     <>
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>
-        <CopyBlock kicker={`England Golf \u00B7 live`} kickerColor={GOOD}>
-          <h1 style={{ ...H1, fontSize: 23 }}>That's it. You're on.</h1>
-          <p style={H1_SUB}>Nothing else to do - your index moves on its own from here.</p>
-        </CopyBlock>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          padding: '8px 16px 4px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          gap: 24,
+        }}
+      >
+        <HandicapCard
+          kicker="Connected"
+          kickerColor={GOOD}
+          index={handicapIndex}
+          delta={delta}
+          values={values}
+          counters={{
+            rounds: counts?.rounds ?? null,
+            courses: counts?.courses ?? null,
+            years,
+          }}
+          replayKey={`${values.length}-${handicapIndex ?? 'na'}`}
+        />
 
-        <Panel kicker="Your index" aside={homeClub ?? undefined}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 11, marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 46,
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums lining',
-              }}
-            >
-              {formatIndex(handicapIndex)}
-            </div>
-            <div style={{ ...LABEL, color: MUTE }}>as of today</div>
-          </div>
-
-          <div style={{ paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
-            {counts ? (
-              <div style={{ display: 'flex' }}>
-                <Figure label="Rounds in" value={counts.rounds} />
-                <Figure label="Courses" value={counts.courses} />
-                <Figure label="Friends" value={counts.friends} />
-              </div>
-            ) : (
-              <div style={{ fontSize: 12.5, lineHeight: 1.52, color: MUTE }}>
-                Your rounds are still importing. They will be here shortly - nothing more for you
-                to do.
-              </div>
-            )}
-          </div>
-        </Panel>
-        <PanelGap />
-
-        <Panel kicker="Open to you now">
-          {[
-            NEXT_ROWS[0],
-            {
-              title: 'Course records',
-              sub: counts
-                ? `Your best at all ${counts.courses}, and who holds what`
-                : 'Your best at every course, and who holds what',
-            },
-            NEXT_ROWS[1],
-          ].map((r, i) => (
-            <div
-              key={r.title}
-              style={{
-                padding: i === 0 ? '0 0 12px' : '12px 0',
-                borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
-              }}
-            >
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: INK }}>{r.title}</div>
-              <div style={{ fontSize: 11.5, color: MUTE, marginTop: 3 }}>{r.sub}</div>
-            </div>
-          ))}
-        </Panel>
+        <div>
+          <CopyBlock>
+            <h1 style={{ ...H1, fontSize: 30, letterSpacing: '-0.035em' }}>
+              Your index and your
+              <br />
+              record are in.
+            </h1>
+            <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
+              Nothing else to do - it moves on its own from here.
+            </p>
+          </CopyBlock>
+        </div>
       </div>
 
       <FooterBar>

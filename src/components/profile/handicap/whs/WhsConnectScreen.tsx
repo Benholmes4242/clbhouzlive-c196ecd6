@@ -14,8 +14,8 @@ import EnglandGolfForm from './connect/EnglandGolfForm';
 import ComingSoonScreen from './connect/ComingSoonScreen';
 import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
-import { HeaderBar } from './connect/Primitives';
-import { CANVAS, FONT } from './connect/designTokens';
+import { BackRow } from './connect/Primitives';
+import { WASH, FONT } from './connect/designTokens';
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: 'Please sign in to clbhouz first, then try again.',
@@ -110,11 +110,14 @@ export const WhsConnectScreen: React.FC<Props> = ({
     ? 'comingSoon'
     : 'form';
 
+  /** No federation is named before the member has chosen one - and the name
+   *  comes from the CHOSEN country, never a literal, so the second federation
+   *  to go live does not inherit England's name. */
   const HEADERS: Record<Stage, { title: string; back?: () => void }> = {
     intro: { title: 'Connect your handicap' },
     country: { title: 'Where do you play?', back: () => setStep('intro') },
-    form: { title: 'England Golf', back: () => setStep('country') },
-    comingSoon: { title: country?.name ?? 'Coming soon', back: () => setStep('country') },
+    form: { title: country?.body ?? 'Sign in', back: () => setStep('country') },
+    comingSoon: { title: country?.name ?? 'Not yet', back: () => setStep('country') },
     sync: { title: 'Connecting' },
     done: { title: 'Connected' },
   };
@@ -148,7 +151,15 @@ export const WhsConnectScreen: React.FC<Props> = ({
         );
       case 'form':
       default:
-        return <EnglandGolfForm onSubmit={handleSubmit} error={error} submitting={false} />;
+        return (
+          <EnglandGolfForm
+            onSubmit={handleSubmit}
+            error={error}
+            submitting={false}
+            bodyName={country?.body}
+            bodyShort={country?.bodyShort ?? country?.body}
+          />
+        );
     }
   })();
 
@@ -158,11 +169,21 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const header = HEADERS[stage];
 
   return (
-    <div className={wrapperClass} style={{ fontFamily: FONT, background: CANVAS }}>
-      <HeaderBar title={header.title} onBack={header.back} />
+    <div
+      className={wrapperClass}
+      style={{
+        fontFamily: FONT,
+        /* The wash runs edge to edge and behind the content. No screen paints a
+           separate top bar. */
+        background: WASH,
+        backgroundAttachment: 'local',
+      }}
+    >
+      <BackRow title={header.title} onBack={header.back} />
       {activeScreen}
     </div>
   );
 };
+
 
 export default WhsConnectScreen;
