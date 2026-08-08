@@ -1,6 +1,6 @@
 import React from 'react';
-import { INK, MUTE, DIM, BORDER, GOOD, LABEL, H1, H1_SUB, CAPTION, NUM } from './designTokens';
-import { CopyBlock } from './Primitives';
+import { INK, MUTE, DIM, BORDER, GOOD, LABEL, CAPTION, NUM } from './designTokens';
+import { FlowBody, FlowHead } from './Primitives';
 
 /**
  * SCREEN 4 - SYNCING. No spinner.
@@ -18,18 +18,19 @@ import { CopyBlock } from './Primitives';
 const STEPS = ['Signing you in', 'Reading your record', 'Importing rounds'] as const;
 
 export const SyncingScreen: React.FC = () => (
-  <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
-    <CopyBlock kicker="Connecting" kickerColor={GOOD}>
-      <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>Pulling your record</h1>
-      <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
-        Under a minute for most accounts. You can leave - it finishes either way.
-      </p>
-    </CopyBlock>
+  <FlowBody>
+    <FlowHead
+      kicker="Connecting"
+      kickerColor={GOOD}
+      size={27}
+      headline="Pulling your record."
+      sub="Under a minute for most accounts. It finishes on our servers either way."
+    />
 
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, padding: '0 4px 18px' }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '22px 0 18px' }}>
       <div
         style={{
-          fontSize: 54,
+          fontSize: 46,
           fontWeight: 800,
           letterSpacing: '-0.035em',
           lineHeight: 0.92,
@@ -42,7 +43,7 @@ export const SyncingScreen: React.FC = () => (
       <div style={{ ...LABEL, color: MUTE }}>rounds so far</div>
     </div>
 
-    <div style={{ padding: '0 4px' }}>
+    <div>
       {STEPS.map((label, i) => (
         <div
           key={label}
@@ -59,10 +60,10 @@ export const SyncingScreen: React.FC = () => (
       ))}
     </div>
 
-    <div style={{ ...CAPTION, marginTop: 18, color: DIM, padding: '0 4px' }}>
+    <div style={{ ...CAPTION, marginTop: 18, color: DIM, paddingBottom: 24 }}>
       The count arrives with the import. Long records take a little longer.
     </div>
-  </div>
+  </FlowBody>
 );
 
 export default SyncingScreen;
