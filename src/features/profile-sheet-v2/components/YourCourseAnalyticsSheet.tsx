@@ -375,22 +375,25 @@ function AnalyticsCourseRow({
     fontFamily: SANS,
   };
 
-  // No distribution: keep the original tap-to-navigate row.
+  // No distribution: same card, right chevron, tap-to-navigate.
   if (!hasScoring) {
     return (
-      <button
-        type="button"
-        onClick={() => onOpen('row')}
-        className="active:scale-[0.99]"
-        style={{ ...shell, cursor: 'pointer' }}
-      >
-        {body}
-      </button>
+      <div style={CARD()}>
+        <button
+          type="button"
+          onClick={() => onOpen('row')}
+          className="active:scale-[0.99]"
+          style={{ ...shell, cursor: 'pointer' }}
+        >
+          {body}
+        </button>
+      </div>
     );
   }
 
   return (
-    <div>
+    <div style={CARD(expanded)}>
+
       <button type="button" onClick={onToggle} aria-expanded={expanded} style={{ ...shell, cursor: 'pointer' }}>
         {body}
       </button>
