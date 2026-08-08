@@ -741,15 +741,26 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
           {/* Loading skeleton for first paint */}
           {isLoading && !showBuildingState && !showList && (
-            <div style={{ padding: '0 20px' }}>
-              <div
-                style={{
-                  background: '#fff',
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                }}
-              >
+            <div style={CARD_LIST}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ ...CARD(), height: 52 }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      background:
+                        'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </BottomSheet>
+  );
+}
+
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
