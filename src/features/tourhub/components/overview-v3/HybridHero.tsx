@@ -447,6 +447,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           isSignature={tournament.isSignature}
           datesString={datesString}
           insight={insightLine}
+          insightKind={insightLine && insightLine === aiInsight ? 'course' : 'result'}
           momentLabel={moment?.label ?? null}
           momentName={moment?.name ?? null}
           momentScore={moment?.score ?? null}
