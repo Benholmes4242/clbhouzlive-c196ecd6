@@ -13,7 +13,15 @@
     "uploadFailed": "[~~Úƥļőáđ ƒáíļéđ~~]",
     "uploadFailedFallback": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ - ýőúř ƥőšţ ŵáš ñőţ ƥúƀļíšĥéđ.~~]",
     "uploadingBody": "[~~Úƥļőáđíñĝ - ŵé'ļļ ţáǩé íţ ƒřőɱ ĥéřé. Ýőú ĉáñ ǩééƥ úšíñĝ ţĥé áƥƥ.~~]",
-    "uploadingScheduledBody": "[~~Úƥļőáđíñĝ - íţ'ļļ ĝő őúţ {{when}}.~~]"
+    "uploadingScheduledBody": "[~~Úƥļőáđíñĝ - íţ'ļļ ĝő őúţ {{when}}.~~]",
+    "liveKicker": "[~~Ļívé ín ţĥé ċļúƀĥóúšé~~]",
+    "uploadingKicker": "[~~Úpļóádíñg . {{n}}%~~]",
+    "scheduledKicker": "[~~Šċĥédúļíñg . {{n}}%~~]",
+    "statGross": "[~~Gróšš~~]",
+    "statToPar": "[~~Tó pár~~]",
+    "statBirdies": "[~~Bírdíéš~~]",
+    "statPhotos": "[~~Pĥóţóš~~]",
+    "statVideos": "[~~Vídéóš~~]"
   },
   "emptyState": {
     "headline": "[~~Ƥúţ íţ őñ ţĥé ŵáļļ~~]",

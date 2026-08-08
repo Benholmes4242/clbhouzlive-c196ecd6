@@ -44,6 +44,22 @@ export interface SubmitResult {
   isUploading?: boolean;
   /** True when the post is scheduled (independent of upload state). */
   isScheduled?: boolean;
+
+  // ---- facts the success screen states. Nothing is derived or invented here:
+  // a field is absent when the post does not have it, and the screen omits
+  // whatever is absent rather than showing a zero or a dash.
+  /** Primary tagged course name, when one was tagged. */
+  courseName?: string;
+  /** Photo count on this post (0 for text-only). */
+  photoCount?: number;
+  /** Video count on this post. */
+  videoCount?: number;
+  /**
+   * Round figures for a round post. NOTE: the post-v2 composer cannot attach a
+   * round today, so nothing populates this yet - the success strip renders it
+   * only when a caller supplies it, and shows media counts otherwise.
+   */
+  round?: { gross?: number | null; toPar?: number | null; birdies?: number | null };
 }
 
 export function usePostSubmit() {
@@ -160,6 +176,7 @@ export function usePostSubmit() {
           postId,
           scheduledAt: bornObj.scheduled_at,
           isScheduled: !!input.scheduledAt,
+          courseName: input.course?.name,
         };
       }
 
@@ -185,6 +202,9 @@ export function usePostSubmit() {
         scheduledAt: input.scheduledAt?.toISOString(),
         isUploading: true,
         isScheduled: !!input.scheduledAt,
+        courseName: input.course?.name,
+        photoCount: input.media.filter((m) => m.type !== 'video').length,
+        videoCount: input.media.filter((m) => m.type === 'video').length,
       };
     } catch (e) {
       // Roll back the optimistic pending card - the post was never born.

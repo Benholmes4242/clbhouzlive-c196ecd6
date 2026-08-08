@@ -13,7 +13,15 @@
     "uploadFailed": "Upload failed",
     "uploadFailedFallback": "Something went wrong - your post was not published.",
     "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
-    "uploadingScheduledBody": "Uploading - it'll go out {{when}}."
+    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+    "liveKicker": "En directo en el clubhouse",
+    "uploadingKicker": "Subiendo . {{n}}%",
+    "scheduledKicker": "Programando . {{n}}%",
+    "statGross": "Bruto",
+    "statToPar": "Al par",
+    "statBirdies": "Birdies",
+    "statPhotos": "Fotos",
+    "statVideos": "Videos"
   },
   "emptyState": {
     "headline": "Put it on the wall",

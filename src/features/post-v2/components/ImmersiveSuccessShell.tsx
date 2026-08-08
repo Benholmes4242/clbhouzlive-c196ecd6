@@ -13,7 +13,19 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { CT } from '@/features/_shared/composerTokens';
 
+/** hex -> "r,g,b" for the radial's rgba() stops. */
+function rgbTriplet(hex: string): string {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+}
+
 interface Props {
+  /**
+   * Accent of the radial tint. Same geometry, stops and opacities whatever it
+   * is - only the rgb moves. Defaults to amber so existing callers do not.
+   */
+  accent?: string;
   /** Provide to make the overlay tap-anywhere-to-close. */
   onTapClose?: () => void;
   /** When true, a muted "TAP ANYWHERE TO CLOSE" hint renders at the bottom. */
@@ -23,7 +35,14 @@ interface Props {
   children: React.ReactNode;
 }
 
-export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, children }: Props) {
+export function ImmersiveSuccessShell({
+  accent = CT.amber,
+  onTapClose,
+  showTapHint,
+  padded = true,
+  children,
+}: Props) {
+  const rgb = rgbTriplet(accent);
 
   // Full-bleed into the notch: transparent shield + white status-bar icons for
   // the dark overlay. Mirrors FullscreenFeedOverlay. useLayoutEffect so the
@@ -50,7 +69,7 @@ export function ImmersiveSuccessShell({ onTapClose, showTapHint, padded = true, 
         inset: 0,
         zIndex: 12500,
         background:
-          `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(247,147,30,0.14) 0%, rgba(247,147,30,0.05) 32%, ${CT.shellBg} 62%), ${CT.shellBg}`,
+          `radial-gradient(ellipse 120% 90% at 50% 16%, rgba(${rgb},0.14) 0%, rgba(${rgb},0.05) 32%, ${CT.shellBg} 62%), ${CT.shellBg}`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         color: 'rgba(255,255,255,0.96)',
