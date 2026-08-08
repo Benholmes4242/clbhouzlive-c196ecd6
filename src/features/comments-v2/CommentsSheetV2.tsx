@@ -37,7 +37,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const CANVAS = '#F4F6F9';
+/** Canonical page background. Token, not a literal, so it cannot drift. */
+const CANVAS = 'var(--bg-page)';
 const INK = '#0E1216';
 const MUTE = '#68707B';
 const AMBER = '#F7931E';
