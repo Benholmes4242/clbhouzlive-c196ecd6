@@ -88,6 +88,9 @@ export function attachTileHls(
       // Only a FATAL error is a failure. Non-fatal errors are hls.js's normal
       // recovery chatter and must not strand the tile on its poster.
       if (data.fatal) {
+        if (import.meta.env.DEV) {
+          console.warn('[tileHls] fatal', data.type, data.details, data.reason ?? '');
+        }
         try {
           hls?.destroy();
         } catch {
