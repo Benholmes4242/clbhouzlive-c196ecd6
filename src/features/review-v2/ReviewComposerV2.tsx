@@ -196,11 +196,8 @@ function InnerComposer() {
     },
   });
 
-  // One fetch of the member's own overall ratings; the ordinal is computed
-  // client-side as the value changes. Nothing here touches other members.
-  const myRatedQ = useMyRatedScores(userId, courseId ?? null);
-
   const ready =
+
 
     !!courseQ.data &&
     !sessionLoading &&
