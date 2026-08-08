@@ -98,6 +98,8 @@ function Row({
   onClick: () => void;
 }) {
   return (
+    <div style={CARD()}>
+
     <button
       type="button"
       onClick={onClick}
