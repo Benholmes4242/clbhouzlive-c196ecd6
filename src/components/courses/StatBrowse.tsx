@@ -491,8 +491,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         aria-label={t('statBrowse.selectLensA11y')}
       >
         {compact ? (
-          <span className="truncate">
-            {`${LENS_EMOJI[lens]}  `}
+          <span className="truncate flex items-center gap-2">
+            <LensIcon lens={lens} />
             {t(`statBrowse.lens.${lens}.label`)}
           </span>
         ) : (
@@ -502,11 +502,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         {STAT_LENSES.map((l) => (
           <SelectItem key={l} value={l}>
-            {`${LENS_EMOJI[l]}  `}
-            {t(`statBrowse.lens.${l}.label`)}
+            <span className="flex items-center gap-2">
+              <LensIcon lens={l} />
+              {t(`statBrowse.lens.${l}.label`)}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>
+
     </Select>
   );
 
