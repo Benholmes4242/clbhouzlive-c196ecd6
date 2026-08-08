@@ -76,6 +76,8 @@ export const HandicapCard: React.FC<Props> = ({
   delta,
   values,
   counters,
+  countersPending,
+  indexPending,
   kicker,
   kickerColor,
   replayKey,
@@ -103,6 +105,9 @@ export const HandicapCard: React.FC<Props> = ({
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 11, flex: 1, minWidth: 0 }}>
           <div
             style={{
+              height: INDEX_FIGURE_H,
+              display: 'flex',
+              alignItems: 'center',
               fontSize: 46,
               fontWeight: 800,
               letterSpacing: '-0.035em',
@@ -111,7 +116,11 @@ export const HandicapCard: React.FC<Props> = ({
               ...NUM,
             }}
           >
-            {fmtIndex(index)}
+            {indexPending ? (
+              <Skeleton className="h-[32px] w-[76px] rounded-md" />
+            ) : (
+              fmtIndex(index)
+            )}
           </div>
           {/* Delta slot is always present so the card keeps its shape. */}
           <div style={{ minWidth: 58 }}>
@@ -141,10 +150,11 @@ export const HandicapCard: React.FC<Props> = ({
           borderTop: `1px solid ${BORDER}`,
         }}
       >
-        <Counter label="Rounds" value={counters.rounds} />
-        <Counter label="Courses" value={counters.courses} />
-        <Counter label="Years" value={counters.years} />
+        <Counter label="Rounds" value={counters.rounds} pending={countersPending} />
+        <Counter label="Courses" value={counters.courses} pending={countersPending} />
+        <Counter label="Years" value={counters.years} pending={countersPending} />
       </div>
+
 
     </div>
   );
