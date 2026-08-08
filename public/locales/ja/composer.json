@@ -13,7 +13,15 @@
     "uploadFailed": "Upload failed",
     "uploadFailedFallback": "Something went wrong - your post was not published.",
     "uploadingBody": "Uploading - we'll take it from here. You can keep using the app.",
-    "uploadingScheduledBody": "Uploading - it'll go out {{when}}."
+    "uploadingScheduledBody": "Uploading - it'll go out {{when}}.",
+    "liveKicker": "クラブハウスに公開",
+    "uploadingKicker": "アップロード中 . {{n}}%",
+    "scheduledKicker": "予約中 . {{n}}%",
+    "statGross": "グロス",
+    "statToPar": "パー差",
+    "statBirdies": "バーディ",
+    "statPhotos": "写真",
+    "statVideos": "動画"
   },
   "emptyState": {
     "headline": "Put it on the wall",
