@@ -853,7 +853,8 @@
       "rated_other": "{{count}} von {{total}} verfolgten Kursen haben Bewertungen",
       "chase_one": "{{count}} von {{total}} verfolgtem Kurs hat offene Rekorde",
       "chase_other": "{{count}} von {{total}} verfolgten Kursen haben offene Rekorde"
-    }
+    },
+    "countryCount": "{{formattedCount}} of {{total}}"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

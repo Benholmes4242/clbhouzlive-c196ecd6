@@ -804,7 +804,8 @@
       "rated_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕáţíñĝš~~]",
       "chase_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ŕéĉőŕđš ţő ĉĥášé~~]",
       "chase_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕéĉőŕđš ţő ĉĥášé~~]"
-    }
+    },
+    "countryCount": "[{{formattedCount}} of {{total}}]"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

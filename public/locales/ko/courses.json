@@ -806,7 +806,8 @@
       "rated_other": "{{total}}개 코스 중 {{count}}개 코스에 평가가 있습니다",
       "chase_one": "{{total}}개 코스 중 {{count}}개 코스에 깨지지 않은 기록이 있습니다",
       "chase_other": "{{total}}개 코스 중 {{count}}개 코스에 깨지지 않은 기록이 있습니다"
-    }
+    },
+    "countryCount": "{{formattedCount}} of {{total}}"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

@@ -1329,7 +1329,6 @@
     "allAreas": "All areas",
     "allRegions": "All regions",
     "allOf": "All of {{country}}",
-    "countryOption": "{{country}} ({{count}})",
     "regionOption": "{{region}} ({{count}})",
     "selectCountryA11y": "Select country",
     "selectRegionA11y": "Select region",
@@ -1399,7 +1398,8 @@
       "body": "These are the courses our members have played and logged. The full directory has {{total}} more, waiting for their first round.",
       "cta": "Browse the full directory"
     },
-    "loadingMore": "Loading more courses..."
+    "loadingMore": "Loading more courses...",
+    "countryCount": "{{formattedCount}} of {{total}}"
   },
   "directorySheet": {
     "placeholder": "Search all courses",
