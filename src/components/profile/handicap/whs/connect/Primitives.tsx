@@ -154,16 +154,21 @@ export const Action: React.FC<{
   </button>
 );
 
-export const HeaderBar: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
+/**
+ * BackRow: the ONLY top chrome on this surface. Transparent and borderless, so
+ * the wash runs straight through it - no screen paints a top bar.
+ * Title is a quiet kicker-weight label; the screen's own headline carries voice.
+ */
+export const BackRow: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
   <div
     style={{
       display: 'flex',
       alignItems: 'center',
-      gap: 12,
-      padding: '14px 20px',
-      background: PANEL,
-      borderBottom: `1px solid ${BORDER}`,
+      gap: 9,
+      padding: '10px 16px 6px',
+      background: 'transparent',
       flexShrink: 0,
+      minHeight: 34,
     }}
   >
     {onBack ? (
@@ -173,18 +178,20 @@ export const HeaderBar: React.FC<{ title: string; onBack?: () => void }> = ({ ti
         aria-label="Back"
         style={{ background: 'none', border: 'none', padding: 0, display: 'flex', cursor: 'pointer', color: MUTE }}
       >
-        <ChevronLeft size={17} strokeWidth={2.2} />
+        <ChevronLeft size={17} strokeWidth={2.4} />
       </button>
     ) : null}
-    <div style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>{title}</div>
+    <div style={{ ...LABEL, color: MUTE }}>{title}</div>
   </div>
 );
 
+/** Bottom action area. Transparent: the wash and canvas continue behind it. */
 export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ padding: 16, borderTop: `1px solid ${BORDER}`, background: PANEL, flexShrink: 0 }}>
+  <div style={{ padding: '14px 16px 18px', background: 'transparent', flexShrink: 0 }}>
     {children}
   </div>
 );
+
 
 /** Column shell: fixed header, scrolling body, fixed footer. */
 export const ScreenShell: React.FC<{
