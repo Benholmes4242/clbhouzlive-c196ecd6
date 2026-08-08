@@ -46,6 +46,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
 }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(user?.id);
@@ -53,6 +54,22 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
+
+  const immersive = layout === 'page';
+
+  /* Page layout owns the whole viewport: the app chrome stops drawing a header
+     (one back, one title) and the wash paints from physical y=0 behind the
+     notch. Reuses the existing data-immersive-route mechanism via
+     applyRouteChrome, exactly as course detail and the profile hero do. */
+  useLayoutEffect(() => {
+    if (!immersive) return;
+    setWhsConnectImmersive(true);
+    applyRouteChrome(window.location.pathname, true);
+    return () => {
+      setWhsConnectImmersive(false);
+      applyRouteChrome(window.location.pathname, true);
+    };
+  }, [immersive]);
 
   useEffect(() => {
     const preselect = (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
@@ -62,6 +79,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handlePick = (c: WhsCountry) => {
     setCountryId(c.id);
