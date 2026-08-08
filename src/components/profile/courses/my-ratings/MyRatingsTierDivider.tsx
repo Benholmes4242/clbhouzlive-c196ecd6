@@ -1,16 +1,23 @@
 import React from 'react';
+import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
+import type { RatingTier } from '@/lib/ratingTier';
 
 /**
  * Editorial section header for the stratified My Ratings list.
  * Inset within the page's 16px side padding (not full-bleed).
+ *
+ * Tier colour comes from the app-wide score bands via `reviewTierColor` — never
+ * amber (that is the viewing member's colour) and never a local hex.
  */
 
 const FONT_SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
 
-const AMBER = '#F7931E';
 const INK_TERTIARY = '#94A3B8';
 const HAIRLINE = '#E2E8F0';
+
+const TIER_NAMES: readonly string[] = ['EXCEPTIONAL', 'EXCELLENT', 'GOOD', 'FAIR', 'POOR'];
+
 
 interface MyRatingsTierDividerProps {
   tierName: string;
@@ -49,7 +56,10 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
               style={{
                 fontSize: 10.5,
                 fontWeight: 800,
-                color: tierName === 'EXCEPTIONAL' ? AMBER : INK_TERTIARY,
+                color: TIER_NAMES.includes(tierName)
+                  ? reviewTierColor(tierName as RatingTier, 'light')
+                  : INK_TERTIARY,
+
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
               }}
