@@ -722,7 +722,7 @@
     },
     "personalReview": {
       "title": "Your Rating",
-      "playedOn": "Played on {{date}}",
+      "reviewedOn": "Reviewed on {{date}}",
       "matchesConsensus": "Matches community consensus",
       "aboveAvg": "{{diff}} above community avg",
       "belowAvg": "{{diff}} below community avg"

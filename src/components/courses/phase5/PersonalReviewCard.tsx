@@ -83,7 +83,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   return (
     <Panel
       title={t('courseDetail.you.yourRating')}
-      aside={t('phase5.personalReview.playedOn', { date: dateLabel })}
+      aside={t('phase5.personalReview.reviewedOn', { date: dateLabel })}
     >
       <StatRow items={items} style={{ marginBottom: categories.length > 0 ? 20 : 0 }} />
 
