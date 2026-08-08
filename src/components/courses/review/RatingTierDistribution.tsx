@@ -46,7 +46,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         const hasCount = item.count > 0;
-        const ramp = RATING_RAMPS[TIER_RAMP_KEY[item.key]];
+        const bandFill = reviewTierColor(item.key as RatingTier, 'light');
 
         return (
           <div key={item.key} className="flex items-center gap-2">
@@ -59,9 +59,8 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${percentage}%`,
-                  background: hasCount
-                    ? `linear-gradient(to right, ${ramp.lo}, ${ramp.mid}, ${ramp.hi})`
-                    : '#f3f4f6',
+                  background: hasCount ? bandFill : '#f3f4f6',
+
                 }}
               />
             </div>
