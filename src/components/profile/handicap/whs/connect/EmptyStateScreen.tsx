@@ -1,6 +1,6 @@
 import React from 'react';
-import { MUTE, H1, H1_SUB } from './designTokens';
-import { PrimaryButton, Action, FooterBar } from './Primitives';
+import { MUTE } from './designTokens';
+import { PrimaryButton, Action, FooterBar, FlowBody, FlowHead } from './Primitives';
 import HandicapCard from './HandicapCard';
 
 interface Props {
@@ -13,44 +13,33 @@ const PREVIEW_VALUES = [14.2, 14.0, 13.6, 13.7, 13.1, 12.8, 12.9, 12.4, 12.0, 11
 
 /**
  * SCREEN 1 - INTRO. Federation-neutral: no governing body is named here.
- * Also the decline surface - onDecline hides the connect chip and that
- * behaviour is unchanged.
+ * Claim before evidence: headline, sub, THEN the example card.
+ * Also the decline surface - onDecline is unchanged in behaviour.
  */
 export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => (
   <>
-    <div
-      style={{
-        flex: 1,
-        minHeight: 0,
-        overflowY: 'auto',
-        padding: '8px 16px 4px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-        gap: 24,
-      }}
-    >
-      <HandicapCard
-        kicker="Example profile"
-        illustrative
-        index={11.4}
-        delta={-2.8}
-        values={PREVIEW_VALUES}
-        counters={{ rounds: 68, courses: 21, years: 4 }}
+    <FlowBody>
+      <FlowHead
+        headline={
+          <>
+            Connect once.
+            <br />
+            Then it looks after itself.
+          </>
+        }
+        sub="Your official index and every round on your record, kept current without you typing a thing."
       />
 
-      <div>
-        <h1 style={{ ...H1, fontSize: 30, letterSpacing: '-0.035em' }}>
-          Connect once.
-          <br />
-          Then it looks after itself.
-        </h1>
-        <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
-          Your official index and every round on your record, kept current without you typing a
-          thing.
-        </p>
+      <div style={{ marginTop: 22 }}>
+        <HandicapCard
+          kicker="Example profile"
+          index={11.4}
+          delta={-2.8}
+          values={PREVIEW_VALUES}
+          counters={{ rounds: 68, courses: 21, years: 4 }}
+        />
       </div>
-    </div>
+    </FlowBody>
 
     <FooterBar>
       <PrimaryButton onClick={onPickCountry}>Choose your country</PrimaryButton>
