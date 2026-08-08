@@ -439,7 +439,11 @@
         "captionEmpty": "[~~Dŕáĝ ţó šéţ ýóúŕ šĉóŕé~~]",
         "captionSet": "[~~Yóúŕ óvéŕáļļ šĉóŕé~~]",
         "gate": "[~~Séţ ýóúŕ šĉóŕé~~]",
-        "a11y": "[~~Óvéŕáļļ šĉóŕé, 1 ţó 10~~]"
+        "a11y": "[~~Óvéŕáļļ šĉóŕé, 1 ţó 10~~]",
+        "bandLow": "[Below 5.0]",
+        "bandMid": "[5.0 to 8.9]",
+        "bandHigh": "[9.0 and up]",
+        "calibration": "[Would be your {{ordinal}} highest of {{count}}]"
       },
       "step1": {
         "heading": "[~~Bŕéáķ íţ đówñ~~]",
@@ -481,7 +485,8 @@
         "nextPlayed": "[~~Pļáýéđ {{date}}~~]",
         "nextRate": "[~~Ráţé~~]",
         "actionClubhouse": "[~~Báćķ ţó ţĥé ċļúƀĥóúšé~~]",
-        "actionBack": "[~~Báĉķ ţó {{course}}~~]"
+        "actionBack": "[~~Báĉķ ţó {{course}}~~]",
+        "categoryAverage": "[Your categories average <avg>{{avg}}</avg>]"
       }
     }
   },

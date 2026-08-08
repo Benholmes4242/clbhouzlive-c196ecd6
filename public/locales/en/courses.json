@@ -674,7 +674,11 @@
         "captionEmpty": "Drag to set your score",
         "captionSet": "Your overall score",
         "gate": "Set your score",
-        "a11y": "Overall score, 1 to 10"
+        "a11y": "Overall score, 1 to 10",
+        "bandLow": "Below 5.0",
+        "bandMid": "5.0 to 8.9",
+        "bandHigh": "9.0 and up",
+        "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
         "heading": "Break it down",
@@ -716,7 +720,8 @@
         "nextPlayed": "Played {{date}}",
         "nextRate": "Rate",
         "actionClubhouse": "Back to the clubhouse",
-        "actionBack": "Back to {{course}}"
+        "actionBack": "Back to {{course}}",
+        "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
   },

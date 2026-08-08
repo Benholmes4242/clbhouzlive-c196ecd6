@@ -448,7 +448,11 @@
         "captionEmpty": "Desliza para poner tu nota",
         "captionSet": "Tu nota general",
         "gate": "Pon tu nota",
-        "a11y": "Nota general, del 1 al 10"
+        "a11y": "Nota general, del 1 al 10",
+        "bandLow": "Below 5.0",
+        "bandMid": "5.0 to 8.9",
+        "bandHigh": "9.0 and up",
+        "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
         "heading": "Desglósalo",
@@ -490,7 +494,8 @@
         "nextPlayed": "Jugado el {{date}}",
         "nextRate": "Valorar",
         "actionClubhouse": "Verlo en el Clubhouse",
-        "actionBack": "Volver a {{course}}"
+        "actionBack": "Volver a {{course}}",
+        "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
   },

@@ -441,7 +441,11 @@
         "captionEmpty": "ドラッグしてスコアを設定",
         "captionSet": "あなたの総合スコア",
         "gate": "スコアを設定",
-        "a11y": "総合スコア、1〜10"
+        "a11y": "総合スコア、1〜10",
+        "bandLow": "Below 5.0",
+        "bandMid": "5.0 to 8.9",
+        "bandHigh": "9.0 and up",
+        "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
         "heading": "項目別に評価",
@@ -483,7 +487,8 @@
         "nextPlayed": "{{date}} にプレー",
         "nextRate": "評価する",
         "actionClubhouse": "クラブハウスで見る",
-        "actionBack": "{{course}} に戻る"
+        "actionBack": "{{course}} に戻る",
+        "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
   },
