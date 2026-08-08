@@ -240,27 +240,56 @@ export const ProfileHero: React.FC<Props> = ({
               value: formatIndex(shownIndex),
               onTap: tap('index'),
               aside:
-                delta != null && (improved || drifted) ? (
+                deltaLines.length > 0 ? (
                   <span
                     style={{
                       display: 'inline-flex',
-                      alignItems: 'baseline',
-                      gap: 5,
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: 3,
                       paddingBottom: 3,
-                      fontSize: 11.5,
-                      fontWeight: 800,
                       fontFamily: SANS,
-                      ...FIGS,
                     }}
                   >
-                    <span style={{ color: improved ? GREEN : RED }}>
-                      {improved ? '\u2193' : '\u2191'} {Math.abs(delta).toFixed(1)}
-                    </span>
-                    <span style={{ color: W_40, fontWeight: 600 }}>
-                      {t('hero.trendWindow', '12mo')}
-                    </span>
+                    {deltaLines.map((l) => {
+                      const up = l.direction === 'up';
+                      const down = l.direction === 'down';
+                      return (
+                        <span
+                          key={l.key}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'baseline',
+                            gap: 5,
+                            fontSize: 12,
+                            fontWeight: 800,
+                            ...FIGS,
+                          }}
+                        >
+                          <span
+                            style={{ color: down ? GREEN : up ? RED : W_40 }}
+                          >
+                            {down || up
+                              ? `${down ? '\u2193' : '\u2191'} ${Math.abs(l.delta).toFixed(1)}`
+                              : t('hero.trendLevel', 'Level')}
+                          </span>
+                          <span
+                            style={{
+                              color: W_40,
+                              fontSize: 7.5,
+                              fontWeight: 800,
+                              letterSpacing: '0.16em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {l.window}
+                          </span>
+                        </span>
+                      );
+                    })}
                   </span>
                 ) : undefined,
+
               below: <Sparkline points={series} />,
             }
       }
