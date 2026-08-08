@@ -282,6 +282,20 @@ export function useCourseImageResolver(venues: VenueInput[]) {
       
       const results = new Map<string, ResolvedCourse>();
       const uncached: VenueInput[] = [];
+
+      // Step 0: Static overrides for venues not present in golf_courses.
+      for (const v of venues) {
+        const override = VENUE_IMAGE_OVERRIDES[v.venueName];
+        if (override) {
+          results.set(v.venueName, {
+            golfCourseId: '',
+            imageUrl: override,
+            confidence: 1,
+            name: v.venueName,
+          });
+        }
+      }
+
       
       // Step 1: Check cache
       console.log('[CourseResolver] Step 1: Checking cache...');
