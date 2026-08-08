@@ -26,10 +26,8 @@ interface Props {
  * does not render at all.
  */
 export const ChampionsYouCard: React.FC<Props> = ({
-  userId,
-  courseId,
-  theme = 'dark',
   slots,
+
   heldCount,
   window,
   onWindowChange,
