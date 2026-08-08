@@ -34,6 +34,14 @@ const HALF_H = 81;
 const SOLO_H = 132;
 const RADIUS = 12;
 const COLS = '1.35fr 1fr';
+/**
+ * AUTOPLAY FLOOR. An 81px tile is ~a quarter of a phone's width tall: at that
+ * size a moving clip reads as flicker in the corner of the eye, not as content,
+ * and it competes with the 168px lead tile beside it for the same glance. Those
+ * tiles keep their poster and play glyph; everything 100px and up plays. The
+ * square thirds (~117px on a 390px screen) clear the floor.
+ */
+const MIN_AUTOPLAY_H = 100;
 
 interface CourseGroup {
   courseId: string;
@@ -105,6 +113,9 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
       labelInset={6}
       scrimStop="50%"
       labelled={false}
+      autoplayGroup="moments-sheet"
+      // 81px tiles hold their poster — see MIN_AUTOPLAY_H.
+      autoplay={typeof style.height !== 'number' || style.height >= MIN_AUTOPLAY_H}
       style={style}
     />
   );
