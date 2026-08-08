@@ -302,8 +302,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         aside={t('courses:courseDetail.you.roundsCount', { count: rounds })}
       >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ ...NUM, fontSize: 44, lineHeight: 1, color: headlineTone }}>{headlineText}</div>
-          <div style={{ ...LABEL, marginTop: 8 }}>{headlineLabel}</div>
+          <div style={{ ...NUM, fontSize: 44, lineHeight: 1, color: headline.tone }}>{headline.text}</div>
+          <div style={{ ...LABEL, marginTop: 8 }}>{headline.label}</div>
         </div>
 
         {reference && (
