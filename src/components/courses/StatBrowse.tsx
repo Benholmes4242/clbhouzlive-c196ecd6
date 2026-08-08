@@ -57,15 +57,29 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
-/** Scanning aid inside the dropdowns only - never in the headline copy. */
-const LENS_EMOJI: Record<StatLens, string> = {
-  toughest: '\u{1F624}',
-  scoreable: '\u{1F3AF}',
-  played: '\u26F3',
-  longest: '\u{1F4CF}',
-  rated: '\u2B50',
-  chase: '\u{1F451}',
+/**
+ * Scanning aid inside the dropdowns only - never in the headline copy.
+ * Icons follow the MEANING of each lens: toughest / scoreable are opposites
+ * and read as a pair, and `chase` reuses the Crown that marks a course record
+ * everywhere else in the app.
+ */
+const LENS_ICON: Record<StatLens, LucideIcon> = {
+  toughest: TrendingUp,
+  scoreable: TrendingDown,
+  played: Users,
+  longest: Ruler,
+  rated: Star,
+  chase: Crown,
 };
+
+/** Dropdown icon geometry — one treatment for lenses and the areas trigger. */
+const DD_ICON = { size: 15, strokeWidth: 2, 'aria-hidden': true } as const;
+
+function LensIcon({ lens }: { lens: StatLens }) {
+  const Icon = LENS_ICON[lens];
+  return <Icon {...DD_ICON} />;
+}
+
 
 
 /** Short list labels for the verdict explainer sheet. */
