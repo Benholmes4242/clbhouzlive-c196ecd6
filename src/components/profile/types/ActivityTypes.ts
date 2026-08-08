@@ -47,7 +47,10 @@ export interface ActivityPost {
     width?: number | null;
     height?: number | null;
     poster_url?: string | null;
+    /** Cloudflare Stream UID. Videos uploaded to Stream have a null media_url. */
+    stream_id?: string | null;
     duration_seconds?: number | null;
+    display_order?: number | null;
   }>;
   post_tags?: PostTag[];
   user: {

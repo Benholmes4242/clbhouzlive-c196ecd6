@@ -196,7 +196,11 @@ const PostDeepLinkPage: React.FC = () => {
           width: m.width,
           height: m.height,
           poster_url: m.poster_url,
+          // Stream-backed videos have a NULL media_url; the playable manifest is
+          // built from stream_id downstream (see activityPostMapper).
+          stream_id: m.stream_id ?? null,
           duration_seconds: m.duration_seconds,
+          display_order: m.display_order,
         })),
         user: {
           id: profileRow.id,
