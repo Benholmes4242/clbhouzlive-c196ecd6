@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { ReviewTile } from '@/components/explore-tab-new/courseled/ReviewTile';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
-const VID = 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4';
-const POSTER = 'https://placehold.co/400x400/222/fff.png';
+const VID = '/__dev_test_clip.mp4';
+const POSTER = '/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png';
 
 export default function ReviewAutoplayStress() {
   const rows = useMemo<LatestReview[]>(
