@@ -10,29 +10,54 @@
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 import type { FeedPost, ReviewData, MediaItem } from '@/components/media-system/types/media';
 import { isReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
+import {
+  extractStreamUid,
+  generateStreamHlsUrl,
+  generateStreamThumbnailUrl,
+} from '@/config/cloudflareStream';
 
 export function mapActivityPostToFeedPost(post: ActivityPost): FeedPost {
   const userData = extractUserData(post);
   const isReview = isReviewPost(post);
   const reviewData = isReview ? extractReviewData(post) : null;
 
-  // Map media array — ActivityPost stores resolved URLs in media_url.
-  // For videos, .m3u8 → hlsUrl, otherwise → mp4Url. Mirrors useMediaViewer.normalizeItem.
+  // VIDEO SOURCES RESOLVE EXACTLY AS THE FEED DOES (feedMapper.mapRowToFeedPost):
+  //   1. stream_id column
+  //   2. a stream UID extracted from media_url
+  //   3. media_url used directly (plain mp4, or a real .m3u8)
+  // Stream rows carry a NULL media_url, so building from stream_id is the only
+  // way the fullscreen viewer ever gets a playable manifest.
   const mediaItems: MediaItem[] = (post.post_media || []).map((m, idx) => {
     const isVideo = m.media_type === 'video';
     const src = m.media_url || '';
+    const streamId = m.stream_id || (isVideo ? extractStreamUid(src) : null);
     const isHls = isVideo && src.includes('.m3u8');
+    // Readiness proxy, same as feedMapper: duration_seconds is stamped by the
+    // Cloudflare webhook. An unencoded video gets no manifest (poster only).
+    const videoReady = isVideo && m.duration_seconds != null;
+
+    const hlsUrl = isVideo && videoReady
+      ? (streamId ? generateStreamHlsUrl(streamId) : (isHls ? src : undefined))
+      : undefined;
+    const mp4Url = isVideo && videoReady && !streamId && !isHls && src ? src : undefined;
+
     return {
       id: m.id,
       type: (isVideo ? 'video' : 'image') as 'video' | 'image',
-      hlsUrl: isVideo && isHls ? src : undefined,
-      mp4Url: isVideo && !isHls ? src : undefined,
-      thumbnailUrl: m.poster_url || undefined,
+      hlsUrl,
+      mp4Url,
+      // POSTER: fall back to the Stream thumbnail so a loading video shows a
+      // still instead of a black frame.
+      thumbnailUrl:
+        m.poster_url ||
+        (streamId ? generateStreamThumbnailUrl(streamId, { time: 0, height: 1080 }) : undefined),
       imageUrl: !isVideo ? src : undefined,
+      streamId: streamId ?? undefined,
       width: m.width || 1080,
       height: m.height || 1920,
       duration: m.duration_seconds ?? undefined,
-      displayOrder: idx,
+      displayOrder: m.display_order ?? idx,
+      isProcessing: isVideo && !videoReady,
     };
   });
 
