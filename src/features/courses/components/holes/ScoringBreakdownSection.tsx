@@ -244,28 +244,49 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     <p style={CAPTION}>{children}</p>
   );
 
-  // Headline: round before branching so -0.04 never renders "-0.0".
-  const roundedTotal = Math.round(total * 10) / 10;
-  const headlineTone = toneFor(total);
-  const headlineText = signed(total);
-  const headlineLabel =
-    roundedTotal > 0
-      ? t('courses:courseDetail.you.shotsOverPar')
-      : roundedTotal < 0
-        ? t('courses:courseDetail.you.shotsUnderPar')
-        : t('courses:courseDetail.you.levelPar');
-
-  /** Both caption variants; the level variant claims no direction. */
-  const referenceCaption = (() => {
-    if (!reference) return null;
-    const gap = Math.round(reference.gap * 10) / 10;
-    if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
-      return t('courses:courseDetail.you.refLevel');
+  /**
+   * Headline. With field data it is the GAP (the one fact a member cannot read
+   * off their own scorecard); without it, it falls back to the member's own
+   * average to par. The label is derived in the SAME branch as the figure, so
+   * the two can never disagree about what the number means.
+   *
+   * `reference.gap` is field minus you, so POSITIVE means the member is better
+   * than the field. Tone is taken from the negated gap so "better" reads as the
+   * improvement tone through the existing toneFor convention.
+   */
+  const headline = (() => {
+    if (reference) {
+      const gap = Math.round(reference.gap * 10) / 10;
+      if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
+        return {
+          text: signed(0),
+          tone: toneFor(0),
+          label: t('courses:courseDetail.you.gapLevel'),
+        };
+      }
+      return {
+        text: signed(gap),
+        tone: toneFor(-gap),
+        label:
+          gap > 0
+            ? t('courses:courseDetail.you.gapBetter')
+            : t('courses:courseDetail.you.gapWorse'),
+      };
     }
-    return gap > 0
-      ? t('courses:courseDetail.you.refBetter', { n: gap.toFixed(1) })
-      : t('courses:courseDetail.you.refWorse', { n: Math.abs(gap).toFixed(1) });
+    // Round before branching so -0.04 never renders "-0.0".
+    const roundedTotal = Math.round(total * 10) / 10;
+    return {
+      text: signed(total),
+      tone: toneFor(total),
+      label:
+        roundedTotal > 0
+          ? t('courses:courseDetail.you.shotsOverPar')
+          : roundedTotal < 0
+            ? t('courses:courseDetail.you.shotsUnderPar')
+            : t('courses:courseDetail.you.levelPar'),
+    };
   })();
+
 
   const split = [
     { key: 'par', label: t('courses:courseDetail.you.parOrBetter'), pct: pctPar, holes: sumPar, tone: UNDER },
