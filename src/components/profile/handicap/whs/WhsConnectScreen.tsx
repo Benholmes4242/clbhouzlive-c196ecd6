@@ -131,17 +131,27 @@ export const WhsConnectScreen: React.FC<Props> = ({
     ? 'comingSoon'
     : 'form';
 
-  /** No federation is named before the member has chosen one - and the name
-   *  comes from the CHOSEN country, never a literal, so the second federation
-   *  to go live does not inherit England's name. */
-  const HEADERS: Record<Stage, { title: string; back?: () => void }> = {
-    intro: { title: 'Connect your handicap' },
-    country: { title: 'Where do you play?', back: () => setStep('intro') },
-    form: { title: country?.body ?? 'Sign in', back: () => setStep('country') },
-    comingSoon: { title: country?.name ?? 'Not yet', back: () => setStep('country') },
-    sync: { title: 'Connecting' },
-    done: { title: 'Connected' },
+  /** ONE title on every stage. Each screen's own headline carries the voice,
+   *  so the header never restates it - and never names a federation. */
+  const HEADER_TITLE = 'Handicap';
+
+  /** Per-stage back. Intro exits the flow (back to wherever the member came
+   *  from, /profile as the fallback). Sync and done have no back: the sync is
+   *  in flight, and done is completed by its own continue action. */
+  const BACKS: Record<Stage, (() => void) | undefined> = {
+    intro: immersive
+      ? () => {
+          if (window.history.length > 1) navigate(-1);
+          else navigate('/profile', { replace: true });
+        }
+      : undefined,
+    country: () => setStep('intro'),
+    form: () => setStep('country'),
+    comingSoon: () => setStep('country'),
+    sync: undefined,
+    done: undefined,
   };
+
 
   const activeScreen = (() => {
     switch (stage) {
