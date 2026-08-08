@@ -28,7 +28,11 @@ export const RECORD_BOOK_ORDER: LegendCategory[] = [
 /** The viewing member's own standing on a board they do not hold. */
 export interface ViewerStanding {
   row: CourseLegendRow;
-  /** Signed gap from the champion, e.g. "+4" or "-60". */
+  /**
+   * Gap from the champion as an UNSIGNED magnitude, e.g. "4" or "60". The
+   * direction is carried by the word in the string, so a sign here could only
+   * ever contradict it ("-60 behind").
+   */
   gap: string;
   /** True when the gap means the viewer is BEHIND the champion. */
   behind: boolean;
