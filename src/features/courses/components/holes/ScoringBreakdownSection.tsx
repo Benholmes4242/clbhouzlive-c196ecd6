@@ -254,9 +254,22 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
    * than the field. Tone is taken from the negated gap so "better" reads as the
    * improvement tone through the existing toneFor convention.
    */
+  /**
+   * Round ONCE, here, and derive the gap from the DISPLAYED components so the
+   * subtraction a member can do on screen is always true.
+   */
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  const disp = reference
+    ? (() => {
+        const you = r1(reference.you);
+        const field = r1(reference.field);
+        return { you, field, gap: r1(field - you) };
+      })()
+    : null;
+
   const headline = (() => {
-    if (reference) {
-      const gap = Math.round(reference.gap * 10) / 10;
+    if (disp) {
+      const gap = disp.gap;
       if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
         return {
           text: signed(0),
@@ -273,6 +286,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             : t('courses:courseDetail.you.gapWorse'),
       };
     }
+
     // Round before branching so -0.04 never renders "-0.0".
     const roundedTotal = Math.round(total * 10) / 10;
     return {
@@ -306,24 +320,25 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           <div style={{ ...LABEL, marginTop: 8 }}>{headline.label}</div>
         </div>
 
-        {reference && (
+        {disp && (
           <>
             <Hairline style={{ margin: '16px 0 14px' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
               <div style={{ textAlign: 'center', minWidth: 0 }}>
                 <div style={LABEL}>{t('courses:courseDetail.you.yours')}</div>
-                <div style={{ ...NUM, fontSize: 20, color: toneFor(reference.you), marginTop: 4 }}>
-                  {signed(reference.you)}
+                <div style={{ ...NUM, fontSize: 20, color: toneFor(disp.you), marginTop: 4 }}>
+                  {signed(disp.you)}
                 </div>
               </div>
               <div style={{ textAlign: 'center', minWidth: 0 }}>
                 <div style={LABEL}>{t('courses:courseDetail.you.fieldHere')}</div>
-                <div style={{ ...NUM, fontSize: 20, color: toneFor(reference.field), marginTop: 4 }}>
-                  {signed(reference.field)}
+                <div style={{ ...NUM, fontSize: 20, color: toneFor(disp.field), marginTop: 4 }}>
+                  {signed(disp.field)}
                 </div>
               </div>
             </div>
           </>
+
         )}
 
         <Hairline style={{ margin: '16px 0 14px' }} />
