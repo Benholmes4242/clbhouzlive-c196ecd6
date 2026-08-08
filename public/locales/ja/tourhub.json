@@ -217,14 +217,16 @@
       "fieldAverageToday": "本日の平均スコア",
       "fromNRoundsIn": "{{n}}ラウンドから",
       "lowRoundLabel": "ベストラウンド",
-      "groupsLabel": "組数",
       "awaitingPlayers": "{{range}} は集計待ち",
       "nShare_one": "{{count}} players",
       "nShare_other": "{{count}} players",
       "playingHardest": "最も難しい",
       "playingEasiest": "最も易しい",
       "parShort": "パー {{par}}",
-      "featuredGroupLabel": "注目の組"
+      "featuredGroupLabel": "注目の組",
+      "underParTodayLabel": "本日アンダーパー",
+      "underParTodayValue": "{{m}}人中{{n}}人",
+      "underParTodaySub": "現在までの選手"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

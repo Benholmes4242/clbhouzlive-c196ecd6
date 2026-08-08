@@ -266,7 +266,6 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
           entries={(leaderboardQuery.data ?? []) as any[]}
           round={round}
           tournamentId={tournamentId ?? ''}
-          groupCount={totalKnown ?? featuredCount}
           live={live}
         />
         <CutWatchLine tournamentId={tournamentId} />

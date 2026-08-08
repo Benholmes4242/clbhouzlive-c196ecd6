@@ -217,14 +217,16 @@
       "fieldAverageToday": "오늘 필드 평균",
       "fromNRoundsIn": "{{n}} 라운드 기준",
       "lowRoundLabel": "베스트 라운드",
-      "groupsLabel": "그룹",
       "awaitingPlayers": "{{range}} 집계 대기",
       "nShare_one": "{{count}} players",
       "nShare_other": "{{count}} players",
       "playingHardest": "가장 어려운",
       "playingEasiest": "가장 쉬운",
       "parShort": "파 {{par}}",
-      "featuredGroupLabel": "주목 그룹"
+      "featuredGroupLabel": "주목 그룹",
+      "underParTodayLabel": "오늘 언더파",
+      "underParTodayValue": "{{m}}명 중 {{n}}명",
+      "underParTodaySub": "현재까지 선수"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -257,12 +257,14 @@
       "fieldAverageToday": "Field average today",
       "fromNRoundsIn": "from {{n}} rounds in",
       "lowRoundLabel": "Low round",
-      "groupsLabel": "Groups",
       "awaitingPlayers": "{{range}} awaiting players",
       "playingHardest": "Playing hardest",
       "playingEasiest": "Playing easiest",
       "parShort": "Par {{par}}",
-      "featuredGroupLabel": "Featured group"
+      "featuredGroupLabel": "Featured group",
+      "underParTodayLabel": "UNDER PAR TODAY",
+      "underParTodayValue": "{{n}} of {{m}}",
+      "underParTodaySub": "players in so far"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
