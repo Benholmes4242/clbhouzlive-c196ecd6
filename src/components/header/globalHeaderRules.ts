@@ -32,9 +32,28 @@ export const LIGHT_IMMERSIVE_EXACT_ROUTES = [
   '/watch/videos',
 ] as const;
 
+/**
+ * /manage/handicap serves TWO surfaces: the WHS connect flow (page owns its
+ * own back + title, wash runs through the notch) and the CONNECTED manage
+ * surface (keeps ManagePageShell's header). Immersive is therefore scoped by
+ * state, not by path: the connect screen raises this flag while mounted.
+ */
+export const WHS_CONNECT_PATH = '/manage/handicap';
+let whsConnectImmersive = false;
+
+export function setWhsConnectImmersive(value: boolean): void {
+  whsConnectImmersive = value;
+}
+
+export function isWhsConnectImmersive(): boolean {
+  return whsConnectImmersive;
+}
+
 export function isLightImmersiveRoute(pathname: string): boolean {
+  if (pathname === WHS_CONNECT_PATH && whsConnectImmersive) return true;
   return (LIGHT_IMMERSIVE_EXACT_ROUTES as readonly string[]).includes(pathname);
 }
+
 
 /**
  * Business PROFILE only is immersive (hero bleed). All other /business/*
