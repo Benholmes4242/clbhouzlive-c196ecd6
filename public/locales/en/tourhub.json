@@ -148,6 +148,8 @@
       "championIconLabel": "Champion"
     },
     "photoBand": {
+      "insightKickerCourse": "COURSE INTELLIGENCE",
+      "insightKickerResult": "HOW IT FINISHED",
       "wonBy": "Won by {{winnerName}}",
       "tournamentCta": "TOURNAMENT",
       "leaderLabel": "LEADER",

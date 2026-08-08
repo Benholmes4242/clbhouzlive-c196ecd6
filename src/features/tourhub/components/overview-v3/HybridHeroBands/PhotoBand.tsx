@@ -10,7 +10,7 @@
  *   2. Moment row      — leader / champion / defending champ chip
  *   3. Venue · Dates
  *   4. Title (2-line split — headline + subhead)
- *   5. Insight line    — italic pulled quote (AI course insight / round label / winner narrative)
+ *   5. Insight line    — labelled editorial line (AI course insight / winner narrative)
  *   6. State pill      — LIVE · FINAL · UPCOMING (with round/countdown)
  *
  * The dots row (rendered by OverviewHero) sits above the wire ticker below.
@@ -52,8 +52,10 @@ export interface PhotoBandProps {
   isMajor?: boolean;
   isSignature?: boolean;
   datesString?: string | null;
-  /** Italic editorial line — AI insight (upcoming) / round marker (live) / winner beat (results). */
+  /** Editorial line — AI course insight (upcoming/live) or derived winner beat (results). */
   insight?: string | null;
+  /** Which kind of line `insight` carries — drives the kicker label. */
+  insightKind?: 'course' | 'result';
   /** Moment row: single chip surfacing the headline person. */
   momentLabel?: string | null;
   momentName?: string | null;
@@ -117,6 +119,7 @@ export function PhotoBand({
   tourLabel,
   datesString,
   insight,
+  insightKind = 'course',
   momentLabel,
   momentName,
   momentScore,
@@ -317,21 +320,36 @@ export function PhotoBand({
         </div>
 
 
-        {/* Insight line — italic pulled quote (clamped to 2 lines) */}
+        {/* Insight line — labelled editorial line (clamped to 2 lines) */}
         {insight && (
           <div>
+            <div
+              style={{
+                fontFamily: FONT,
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.42)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
+                marginBottom: 5,
+              }}
+            >
+              {insightKind === 'result'
+                ? t('overview.photoBand.insightKickerResult', { defaultValue: 'HOW IT FINISHED' })
+                : t('overview.photoBand.insightKickerCourse', { defaultValue: 'COURSE INTELLIGENCE' })}
+            </div>
             <div
               ref={insightRef}
               onClick={truncated ? () => setSheetOpen(true) : undefined}
               style={{
                 fontFamily: FONT,
-                fontSize: 12.5,
-                fontStyle: 'italic',
-                fontWeight: 400,
-                lineHeight: 1.35,
-                color: 'rgba(255,255,255,0.82)',
+                fontSize: 13,
+                fontWeight: 600,
+                lineHeight: 1.4,
+                color: 'rgba(255,255,255,0.88)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-                maxWidth: '92%',
+                maxWidth: '94%',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',

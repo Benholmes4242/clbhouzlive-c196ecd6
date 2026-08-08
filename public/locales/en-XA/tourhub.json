@@ -137,6 +137,8 @@
       "championIconLabel": "[~~Ĉĥáɱƥíőñ~~]"
     },
     "photoBand": {
+      "insightKickerCourse": "COURSE INTELLIGENCE",
+      "insightKickerResult": "HOW IT FINISHED",
       "wonBy": "[~~Ŵőñ ƀý {{winnerName}}~~]"
     },
     "trajectorySparkline": {
