@@ -7,7 +7,7 @@
 // Transient moment: tap anywhere to close; complete auto-dismisses at 1200ms.
 
 import { useEffect, useState } from 'react';
-import { Check, Clock, AlertTriangle } from 'lucide-react';
+import { Clock, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
@@ -16,7 +16,6 @@ import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
 import { CT } from '@/features/_shared/composerTokens';
 
 const AMBER = CT.amber;
-const GREEN = CT.success;
 /** On-dark green: the shell's accent, the top bar at 100%, the LIVE kicker. */
 const GREEN_ON_DARK = CT.successOnDark;
 const NEUTRAL = 'rgba(255,255,255,0.5)';
@@ -410,57 +409,6 @@ function GlyphTile({ accent, noGlow, children }: { accent: string; noGlow?: bool
       filter: noGlow ? undefined : `drop-shadow(0 0 24px ${accent}55) drop-shadow(0 0 8px ${accent}66)`,
     }}>
       {children}
-    </div>
-  );
-}
-
-function RingTile({ progress, accent, showCheck }: { progress: number; accent: string; showCheck?: boolean }) {
-  const size = 104;
-  const stroke = 5;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const clamped = Math.max(0, Math.min(100, progress));
-  const dashOffset = clamped === 0 ? c * 0.75 : c - (c * clamped) / 100;
-  return (
-    <div style={{
-      width: size, height: size,
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: CT.cardRadius,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative',
-      filter: `drop-shadow(0 0 24px ${accent}55) drop-shadow(0 0 8px ${accent}66)`,
-      transition: 'filter 400ms ease',
-    }}>
-      <svg width={size - 20} height={size - 20} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth={stroke} />
-        <circle
-          cx={size/2} cy={size/2} r={r} fill="none"
-          stroke={accent} strokeWidth={stroke} strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={dashOffset}
-          style={{
-            transition: 'stroke-dashoffset 300ms ease, stroke 400ms ease',
-            animation: clamped === 0 ? 'pv2-ring-spin 1.2s linear infinite' : undefined,
-            transformOrigin: `${size/2}px ${size/2}px`,
-          }}
-        />
-      </svg>
-      {showCheck && (
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          animation: 'pv2-check-draw 400ms ease-out both',
-        }}>
-          <Check size={44} color={accent} strokeWidth={2.75} />
-        </div>
-      )}
-      <style>{`
-        @keyframes pv2-ring-spin { to { transform: rotate(360deg); } }
-        @keyframes pv2-check-draw {
-          from { transform: scale(0.6); opacity: 0; }
-          to   { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }

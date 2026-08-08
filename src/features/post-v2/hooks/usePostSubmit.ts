@@ -54,6 +54,12 @@ export interface SubmitResult {
   photoCount?: number;
   /** Video count on this post. */
   videoCount?: number;
+  /**
+   * Round figures for a round post. NOTE: the post-v2 composer cannot attach a
+   * round today, so nothing populates this yet - the success strip renders it
+   * only when a caller supplies it, and shows media counts otherwise.
+   */
+  round?: { gross?: number | null; toPar?: number | null; birdies?: number | null };
 }
 
 export function usePostSubmit() {
