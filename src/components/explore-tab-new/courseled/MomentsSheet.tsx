@@ -105,6 +105,9 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
       labelInset={6}
       scrimStop="50%"
       labelled={false}
+      autoplayGroup="moments-sheet"
+      // 81px tiles hold their poster — see MIN_AUTOPLAY_H.
+      autoplay={typeof style.height !== 'number' || style.height >= MIN_AUTOPLAY_H}
       style={style}
     />
   );
