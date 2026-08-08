@@ -773,7 +773,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   <button
                     type="button"
                     onClick={handleRateClick}
-                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: AMBER, color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: '#0F172A', color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
                   >
                     <Pencil className="w-3.5 h-3.5" /> {t('review.editYours')}
                   </button>
