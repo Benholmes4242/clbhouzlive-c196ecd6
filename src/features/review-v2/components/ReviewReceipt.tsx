@@ -214,7 +214,25 @@ export function ReviewReceipt({
               );
             })}
           </div>
+          {catAvg != null && (
+            <div
+              style={{
+                fontSize: 11.5,
+                lineHeight: '17px',
+                color: RV2.secondary,
+                marginTop: 10,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {t('review.wizard.receipt.categoryAverage', {
+                avg: catAvg.toFixed(1),
+              })
+                .split('{{avg}}')
+                .join(catAvg.toFixed(1))}
+            </div>
+          )}
         </div>
+
 
         {receipt && (
           <>
