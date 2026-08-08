@@ -4,15 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNowAgo } from '@/i18n/format';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 
-// Dark-surface tier label colour (mirrors FeedCard LABEL_COLOR map).
+// Dark-surface tier label colour. Resolved from the app-wide score bands —
+// no local hexes, no gold, no amber-for-quality.
 const LOOP_LABEL_COLOR: Record<ReturnType<typeof getRatingTier>, string> = {
-  EXCEPTIONAL: '#FFC23D',
-  EXCELLENT: '#F7931E',
-  GOOD: '#F7931E',
-  FAIR: 'rgba(255,255,255,0.55)',
-  POOR: 'rgba(255,255,255,0.45)',
+  EXCEPTIONAL: reviewTierColor('EXCEPTIONAL', 'dark'),
+  EXCELLENT: reviewTierColor('EXCELLENT', 'dark'),
+  GOOD: reviewTierColor('GOOD', 'dark'),
+  FAIR: reviewTierColor('FAIR', 'dark'),
+  POOR: reviewTierColor('POOR', 'dark'),
 };
+
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
