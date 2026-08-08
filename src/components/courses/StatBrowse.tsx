@@ -422,8 +422,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         aria-label={t('statBrowse.selectCountryA11y')}
       >
         {compact ? (
-          <span className="truncate">
-            {'\u{1F30D}  '}
+          <span className="truncate flex items-center gap-2">
+            <Globe {...DD_ICON} />
             {countryTriggerLabel}
           </span>
         ) : (
@@ -432,19 +432,29 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectItem value="all">
-          <span>{'\u{1F30D}  '}{t('statBrowse.allAreas')}</span>
+          <span className="flex items-center gap-2">
+            <Globe {...DD_ICON} />
+            {t('statBrowse.allAreas')}
+          </span>
         </SelectItem>
+        {/* The facet count is courses with tracked rounds, so it carries its
+            reference point: "Texas  1 of 635" — tracked against catalogue. */}
         {(facets?.countries ?? []).map((c) => (
           <SelectItem key={c.sub_country} value={c.sub_country}>
             <span className="flex items-center gap-2">
               <CountryFlag country={c.sub_country} size="sm" />
-              {t('statBrowse.countryOption', {
-                country: c.sub_country,
-                count: c.courses,
-              })}
+              <span>{c.sub_country}</span>
+              <span style={{ color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+                {t('statBrowse.countryCount', {
+                  count: c.courses,
+                  formattedCount: formatNumber(c.courses),
+                  total: formatNumber(c.directory_total),
+                })}
+              </span>
             </span>
           </SelectItem>
         ))}
+
       </SelectContent>
     </Select>
   );
