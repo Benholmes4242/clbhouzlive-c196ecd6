@@ -1,6 +1,7 @@
 import React from 'react';
 import { INK, MUTE, DIM, BORDER, PANEL, GOOD, BAD, LABEL, KICKER, NUM } from './designTokens';
 import DrawSparkline from './DrawSparkline';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface CardCounters {
   rounds: number | null;
@@ -15,6 +16,9 @@ interface Props {
   delta: number | null;
   values: number[];
   counters: CardCounters;
+  /** Source has NOT settled: figures shimmer in their own box, never a dash. */
+  countersPending?: boolean;
+  indexPending?: boolean;
   kicker: string;
   kickerColor?: string;
   replayKey?: string | number;
@@ -27,16 +31,40 @@ const fmtIndex = (h: number | null) => {
 
 const MINUS = '\u2212';
 
-const Counter: React.FC<{ label: string; value: number | null }> = ({ label, value }) => (
+/** Figure box heights are fixed so pending / settled / empty are pixel-identical. */
+const COUNTER_FIGURE_H = 21;
+const INDEX_FIGURE_H = 43;
+
+const Counter: React.FC<{ label: string; value: number | null; pending?: boolean }> = ({
+  label,
+  value,
+  pending,
+}) => (
   <div style={{ flex: 1, minWidth: 0 }}>
     <div
-      style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', color: INK, ...NUM }}
+      style={{
+        height: COUNTER_FIGURE_H,
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: 17,
+        fontWeight: 800,
+        letterSpacing: '-0.02em',
+        color: INK,
+        ...NUM,
+      }}
     >
-      {value === null || value === undefined ? '\u2014' : value}
+      {pending ? (
+        <Skeleton className="h-[13px] w-[26px] rounded" />
+      ) : value === null || value === undefined ? (
+        '\u2014'
+      ) : (
+        value
+      )}
     </div>
     <div style={{ ...LABEL, marginTop: 5 }}>{label}</div>
   </div>
 );
+
 
 /**
  * The handicap card. Screen 1 renders it with ILLUSTRATIVE figures; screen 5
