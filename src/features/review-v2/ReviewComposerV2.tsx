@@ -333,6 +333,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const composer = useReviewComposer(existing, course.id);
   const submit = useReviewSubmit();
 
+  // ONE fetch of the member's own overall ratings (this course excluded, so an
+  // edit never ranks the member against themselves). The ordinal below is
+  // computed client-side on every drag - no query per drag.
+  const myRatedQ = useMyRatedScores(userId, course.id);
+  const calibration = calibrationRank(composer.state.overall, myRatedQ.data);
+
+
   const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
