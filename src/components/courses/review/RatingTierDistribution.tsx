@@ -1,13 +1,10 @@
 import React from 'react';
-import { RATING_RAMPS } from '@/lib/ratingTier';
+import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
+import type { RatingTier } from '@/lib/ratingTier';
 
-const TIER_RAMP_KEY: Record<'EXCEPTIONAL' | 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR', keyof typeof RATING_RAMPS> = {
-  EXCEPTIONAL: 'gold',
-  EXCELLENT: 'amber',
-  GOOD: 'amber',
-  FAIR: 'grey',
-  POOR: 'grey',
-};
+// Bar fill comes from the app-wide score bands via `reviewTierColor` — a flat
+// band colour, not a gold/amber ramp.
+
 
 export type RatingTierKey = 'EXCEPTIONAL' | 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 
