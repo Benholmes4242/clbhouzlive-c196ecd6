@@ -126,7 +126,6 @@ export function ReviewTile({
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    console.log('[rtDbg] active', r.reviewId, active);
     if (active) {
       if (v.getAttribute('src') !== r.mediaUrl) {
         v.setAttribute('src', r.mediaUrl as string);
@@ -203,7 +202,6 @@ export function ReviewTile({
                 // tile on its poster for good.
                 const el = e.currentTarget as HTMLVideoElement;
                 setPlaying(false);
-                console.log('[rtDbg] error', r.reviewId, el.getAttribute('src'), el.error && el.error.code);
                 if (!el.getAttribute('src')) return;
                 // A real failure: fall back to the existing image chain, never a
                 // black box.
