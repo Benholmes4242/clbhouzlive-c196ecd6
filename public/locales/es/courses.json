@@ -853,7 +853,8 @@
       "rated_other": "{{count}} de {{total}} cursos seguidos tienen valoraciones",
       "chase_one": "{{count}} de {{total}} curso seguido tiene récords por batir",
       "chase_other": "{{count}} de {{total}} cursos seguidos tienen récords por batir"
-    }
+    },
+    "countryCount": "{{formattedCount}} of {{total}}"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

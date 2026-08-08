@@ -806,7 +806,8 @@
       "rated_other": "{{total}}コース中{{count}}コースが評価を持っています",
       "chase_one": "{{total}}コース中{{count}}コースが未達成の記録を持っています",
       "chase_other": "{{total}}コース中{{count}}コースが未達成の記録を持っています"
-    }
+    },
+    "countryCount": "{{formattedCount}} of {{total}}"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

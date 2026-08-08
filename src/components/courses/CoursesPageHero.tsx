@@ -1,6 +1,8 @@
 import { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Crown, Flag, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
 import { useExploreMood } from '@/components/explore-tab-new/hooks/useExploreMood';
@@ -97,6 +99,36 @@ function buildFactLine(
 
   return null;
 }
+
+/**
+ * The fact line's mark. A crown belongs to course_record ONLY — it is this
+ * app's mark for a course record (gam_course_legends are "crowns"). The other
+ * kinds take icons that match their own meaning; a crown on an over-par fact
+ * would claim something untrue.
+ *
+ * Colour matches the text beside it, never amber: amber is reserved for the
+ * viewing member and the record holder is usually somebody else.
+ */
+const FACT_ICON_COLOR = 'rgba(255,255,255,0.72)';
+
+function FactIcon({ fact }: { fact: HeroCourseFactRow }) {
+  // 13px sits on the 12.5px line by cap height rather than line box.
+  const props = { size: 13, strokeWidth: 2, color: FACT_ICON_COLOR, 'aria-hidden': true } as const;
+
+  if (fact.fact_kind === 'course_record') return <Crown {...props} />;
+  // A single hole playing hardest — the flagstick is that hole.
+  if (fact.fact_kind === 'hardest_hole') return <Flag {...props} />;
+  if (fact.fact_kind === 'over_par') {
+    const avg = fact.avg_over_par == null ? null : Number(fact.avg_over_par);
+    if (avg == null || !Number.isFinite(avg)) return null;
+    const rounded = Number(oneDecimal(avg));
+    if (rounded === 0) return <Minus {...props} />;
+    return avg < 0 ? <TrendingDown {...props} /> : <TrendingUp {...props} />;
+  }
+  return null;
+}
+
+
 
 
 function CoursesPageHeroInner() {
@@ -292,16 +324,12 @@ function CoursesPageHeroInner() {
                   gap: 7,
                 }}
               >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: 999,
-                    background: '#F7931E',
-                    flexShrink: 0,
-                  }}
-                />
+                {fact && (
+                  <span style={{ display: 'flex', flexShrink: 0 }}>
+                    <FactIcon fact={fact} />
+                  </span>
+                )}
+
                 <span
                   style={{
                     fontSize: 12.5,

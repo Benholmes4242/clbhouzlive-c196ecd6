@@ -8,7 +8,18 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search } from 'lucide-react';
+import {
+  Crown,
+  Globe,
+  Ruler,
+  Search,
+  Star,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
+
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Select,
@@ -57,15 +68,29 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
-/** Scanning aid inside the dropdowns only - never in the headline copy. */
-const LENS_EMOJI: Record<StatLens, string> = {
-  toughest: '\u{1F624}',
-  scoreable: '\u{1F3AF}',
-  played: '\u26F3',
-  longest: '\u{1F4CF}',
-  rated: '\u2B50',
-  chase: '\u{1F451}',
+/**
+ * Scanning aid inside the dropdowns only - never in the headline copy.
+ * Icons follow the MEANING of each lens: toughest / scoreable are opposites
+ * and read as a pair, and `chase` reuses the Crown that marks a course record
+ * everywhere else in the app.
+ */
+const LENS_ICON: Record<StatLens, LucideIcon> = {
+  toughest: TrendingUp,
+  scoreable: TrendingDown,
+  played: Users,
+  longest: Ruler,
+  rated: Star,
+  chase: Crown,
 };
+
+/** Dropdown icon geometry — one treatment for lenses and the areas trigger. */
+const DD_ICON = { size: 15, strokeWidth: 2, 'aria-hidden': true } as const;
+
+function LensIcon({ lens }: { lens: StatLens }) {
+  const Icon = LENS_ICON[lens];
+  return <Icon {...DD_ICON} />;
+}
+
 
 
 /** Short list labels for the verdict explainer sheet. */
@@ -397,8 +422,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         aria-label={t('statBrowse.selectCountryA11y')}
       >
         {compact ? (
-          <span className="truncate">
-            {'\u{1F30D}  '}
+          <span className="truncate flex items-center gap-2">
+            <Globe {...DD_ICON} />
             {countryTriggerLabel}
           </span>
         ) : (
@@ -407,19 +432,29 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectItem value="all">
-          <span>{'\u{1F30D}  '}{t('statBrowse.allAreas')}</span>
+          <span className="flex items-center gap-2">
+            <Globe {...DD_ICON} />
+            {t('statBrowse.allAreas')}
+          </span>
         </SelectItem>
+        {/* The facet count is courses with tracked rounds, so it carries its
+            reference point: "Texas  1 of 635" — tracked against catalogue. */}
         {(facets?.countries ?? []).map((c) => (
           <SelectItem key={c.sub_country} value={c.sub_country}>
             <span className="flex items-center gap-2">
               <CountryFlag country={c.sub_country} size="sm" />
-              {t('statBrowse.countryOption', {
-                country: c.sub_country,
-                count: c.courses,
-              })}
+              <span>{c.sub_country}</span>
+              <span style={{ color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+                {t('statBrowse.countryCount', {
+                  count: c.courses,
+                  formattedCount: formatNumber(c.courses),
+                  total: formatNumber(c.directory_total),
+                })}
+              </span>
             </span>
           </SelectItem>
         ))}
+
       </SelectContent>
     </Select>
   );
@@ -466,8 +501,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         aria-label={t('statBrowse.selectLensA11y')}
       >
         {compact ? (
-          <span className="truncate">
-            {`${LENS_EMOJI[lens]}  `}
+          <span className="truncate flex items-center gap-2">
+            <LensIcon lens={lens} />
             {t(`statBrowse.lens.${lens}.label`)}
           </span>
         ) : (
@@ -477,11 +512,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         {STAT_LENSES.map((l) => (
           <SelectItem key={l} value={l}>
-            {`${LENS_EMOJI[l]}  `}
-            {t(`statBrowse.lens.${l}.label`)}
+            <span className="flex items-center gap-2">
+              <LensIcon lens={l} />
+              {t(`statBrowse.lens.${l}.label`)}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>
+
     </Select>
   );
 
