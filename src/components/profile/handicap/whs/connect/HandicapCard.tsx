@@ -1,5 +1,5 @@
 import React from 'react';
-import { INK, MUTE, DIM, BORDER, PANEL, GOOD, BAD, LABEL, KICKER, NUM, CAPTION } from './designTokens';
+import { INK, MUTE, DIM, BORDER, PANEL, GOOD, BAD, LABEL, KICKER, NUM } from './designTokens';
 import DrawSparkline from './DrawSparkline';
 
 export interface CardCounters {
@@ -17,8 +17,6 @@ interface Props {
   counters: CardCounters;
   kicker: string;
   kickerColor?: string;
-  /** Screen 1: the figures are an illustration, not the member's data. */
-  illustrative?: boolean;
   replayKey?: string | number;
 }
 
@@ -52,7 +50,6 @@ export const HandicapCard: React.FC<Props> = ({
   counters,
   kicker,
   kickerColor,
-  illustrative = false,
   replayKey,
 }) => {
   const improved = delta !== null && delta < 0;
@@ -78,7 +75,7 @@ export const HandicapCard: React.FC<Props> = ({
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 11, flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 54,
+              fontSize: 46,
               fontWeight: 800,
               letterSpacing: '-0.035em',
               lineHeight: 0.92,
@@ -121,11 +118,6 @@ export const HandicapCard: React.FC<Props> = ({
         <Counter label="Years" value={counters.years} />
       </div>
 
-      {illustrative ? (
-        <div style={{ ...CAPTION, marginTop: 13, color: DIM }}>
-          Example figures. This is what a connected profile looks like, not your record.
-        </div>
-      ) : null}
     </div>
   );
 };

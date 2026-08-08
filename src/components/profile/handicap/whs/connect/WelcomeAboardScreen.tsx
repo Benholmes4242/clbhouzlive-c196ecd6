@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { GOOD, H1, H1_SUB } from './designTokens';
-import { PrimaryButton, FooterBar, CopyBlock } from './Primitives';
+import { GOOD } from './designTokens';
+import { PrimaryButton, FooterBar, FlowBody, FlowHead } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import HandicapCard from './HandicapCard';
@@ -47,47 +47,35 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
     return { values: tail, delta: d, years: spanYears };
   }, [history, handicapIndex]);
 
+  const headline =
+    years && years > 1 ? `${years} years of golf, all here.` : 'Your record is all here.';
+
   return (
     <>
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          padding: '8px 16px 4px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          gap: 24,
-        }}
-      >
-        <HandicapCard
+      <FlowBody>
+        <FlowHead
           kicker="Connected"
           kickerColor={GOOD}
-          index={handicapIndex}
-          delta={delta}
-          values={values}
-          counters={{
-            rounds: counts?.rounds ?? null,
-            courses: counts?.courses ?? null,
-            years,
-          }}
-          replayKey={`${values.length}-${handicapIndex ?? 'na'}`}
+          headline={headline}
+          sub="Nothing else to do - your index and your rounds move on their own from here."
         />
 
-        <div>
-          <CopyBlock>
-            <h1 style={{ ...H1, fontSize: 30, letterSpacing: '-0.035em' }}>
-              Your index and your
-              <br />
-              record are in.
-            </h1>
-            <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
-              Nothing else to do - it moves on its own from here.
-            </p>
-          </CopyBlock>
+        <div style={{ marginTop: 22 }}>
+          <HandicapCard
+            kicker="Your profile"
+            kickerColor={GOOD}
+            index={handicapIndex}
+            delta={delta}
+            values={values}
+            counters={{
+              rounds: counts?.rounds ?? null,
+              courses: counts?.courses ?? null,
+              years,
+            }}
+            replayKey={`${values.length}-${handicapIndex ?? 'na'}`}
+          />
         </div>
-      </div>
+      </FlowBody>
 
       <FooterBar>
         <PrimaryButton onClick={onContinue}>See my handicap</PrimaryButton>

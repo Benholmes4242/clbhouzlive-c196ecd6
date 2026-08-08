@@ -16,6 +16,7 @@ import EnglandGolfForm from './connect/EnglandGolfForm';
 import ComingSoonScreen from './connect/ComingSoonScreen';
 import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
+import DeclinedScreen from './connect/DeclinedScreen';
 import { BackRow } from './connect/Primitives';
 import { WASH, FONT } from './connect/designTokens';
 
@@ -37,7 +38,7 @@ interface Props {
   layout?: 'page' | 'embedded';
 }
 
-type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done';
+type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done' | 'declined';
 
 export const WhsConnectScreen: React.FC<Props> = ({
   onConnected,
@@ -50,7 +51,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(user?.id);
-  const [step, setStep] = useState<'intro' | 'country' | 'chosen'>('intro');
+  const [step, setStep] = useState<'intro' | 'country' | 'chosen' | 'declined'>('intro');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
@@ -123,6 +124,8 @@ export const WhsConnectScreen: React.FC<Props> = ({
     ? 'done'
     : submitting
     ? 'sync'
+    : step === 'declined'
+    ? 'declined'
     : step === 'intro'
     ? 'intro'
     : step === 'country' || !country
@@ -150,6 +153,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
     comingSoon: () => setStep('country'),
     sync: undefined,
     done: undefined,
+    declined: () => setStep('intro'),
   };
 
 
@@ -170,9 +174,31 @@ export const WhsConnectScreen: React.FC<Props> = ({
         );
       case 'sync':
         return <SyncingScreen />;
+      case 'declined':
+        return (
+          <DeclinedScreen
+            onContinue={() => {
+              if (window.history.length > 1) navigate(-1);
+              else navigate('/profile', { replace: true });
+            }}
+            onReconsider={() => setStep('country')}
+          />
+        );
       case 'intro':
         return (
-          <EmptyStateScreen onPickCountry={() => setStep('country')} onDecline={onDecline} />
+          <EmptyStateScreen
+            onPickCountry={() => setStep('country')}
+            onDecline={
+              onDecline
+                ? () => {
+                    // The chip-hiding side effect is unchanged; the member now
+                    // lands on a screen instead of nowhere.
+                    onDecline();
+                    setStep('declined');
+                  }
+                : undefined
+            }
+          />
         );
       case 'country':
         return <CountryScreen onSelect={handlePick} />;

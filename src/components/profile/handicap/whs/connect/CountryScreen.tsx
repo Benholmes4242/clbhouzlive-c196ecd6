@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
-import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL, CAPTION, H1, H1_SUB } from './designTokens';
-import { Panel, PanelGap, Collapsible, CopyBlock } from './Primitives';
+import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL, CAPTION } from './designTokens';
+import { Panel, PanelGap, Collapsible, FlowBody, FlowHead } from './Primitives';
 
 interface Props {
   onSelect: (country: WhsCountry) => void;
@@ -30,13 +30,12 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
   }, [query]);
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
-      <CopyBlock>
-        <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>Where do you play?</h1>
-        <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
-          We read your index from the body that holds it.
-        </p>
-      </CopyBlock>
+    <FlowBody>
+      <FlowHead
+        size={27}
+        headline="Where do you play?"
+        sub="We read your index from the body that holds it."
+      />
 
       <div
         style={{
@@ -47,7 +46,8 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
           border: `1px solid ${BORDER}`,
           borderRadius: 18,
           padding: '10px 14px',
-          marginBottom: 16,
+          marginTop: 22,
+          marginBottom: 14,
         }}
       >
         <Search size={14} color={DIM} strokeWidth={2.4} />
@@ -112,7 +112,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
       ) : null}
 
       {notYet.length > 0 ? (
-        <Panel kicker="Not yet" aside={`${notYet.length}`}>
+        <Panel kicker="Not yet" aside={`${notYet.length} countries`}>
           <Collapsible
             threshold={5}
             collapsedCount={5}
@@ -140,13 +140,14 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
               </div>
             ))}
           </Collapsible>
-
-          <div style={{ ...CAPTION, marginTop: 14 }}>
-            A federation has to open an API before we can read from it.
-          </div>
         </Panel>
       ) : null}
-    </div>
+
+      {/* The footnote belongs to the page, not to the panel it explains. */}
+      <div style={{ ...CAPTION, color: DIM, marginTop: 14, paddingBottom: 24 }}>
+        A federation has to open an API before we can read from it.
+      </div>
+    </FlowBody>
   );
 };
 

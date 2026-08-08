@@ -33,7 +33,7 @@ export const DrawSparkline: React.FC<Props> = ({
   color,
   w = 118,
   h = 34,
-  delay = 200,
+  delay = 250,
   duration = 1400,
   replayKey,
 }) => {
@@ -84,7 +84,7 @@ export const DrawSparkline: React.FC<Props> = ({
           d={d}
           fill="none"
           stroke={color}
-          strokeWidth={1.9}
+          strokeWidth={1.4}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
