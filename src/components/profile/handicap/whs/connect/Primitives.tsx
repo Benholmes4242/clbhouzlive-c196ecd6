@@ -157,50 +157,84 @@ export const Action: React.FC<{
 /**
  * BackRow: the ONLY top chrome on this surface. Transparent and borderless, so
  * the wash runs straight through it - no screen paints a top bar.
- * Title is a quiet kicker-weight label; the screen's own headline carries voice.
+ *
+ * The chevron and the label are ONE 44px-tall button, never a chevron with a
+ * dead label beside it. Where a stage has no back the button renders at 0.3
+ * opacity and is disabled, so the header never changes height between stages.
  */
 export const BackRow: React.FC<{
   title: string;
   onBack?: () => void;
   /** Immersive host: content must clear the notch while the wash runs behind it. */
   immersive?: boolean;
-}> = ({ title, onBack, immersive }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 9,
-      paddingLeft: 16,
-      paddingRight: 16,
-      paddingBottom: 6,
-      paddingTop: immersive
-        ? 'calc(max(env(safe-area-inset-top, 0px), 12px) + 10px)'
-        : 10,
-      background: 'transparent',
-      flexShrink: 0,
-      minHeight: 34,
-    }}
-  >
-    {onBack ? (
+}> = ({ title, onBack, immersive }) => {
+  const [pressed, setPressed] = useState(false);
+  const disabled = !onBack;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: 12,
+        paddingRight: 12,
+        paddingBottom: 4,
+        paddingTop: immersive
+          ? 'calc(max(env(safe-area-inset-top, 0px), 12px) + 6px)'
+          : 6,
+        background: 'transparent',
+        flexShrink: 0,
+      }}
+    >
       <button
         type="button"
         onClick={onBack}
-        aria-label="Back"
-        style={{ background: 'none', border: 'none', padding: 0, display: 'flex', cursor: 'pointer', color: MUTE }}
+        disabled={disabled}
+        aria-label={disabled ? undefined : `Back to ${title}`}
+        aria-disabled={disabled}
+        onPointerDown={() => setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        onPointerCancel={() => setPressed(false)}
+        style={{
+          minHeight: 44,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          padding: '0 10px 0 6px',
+          border: 'none',
+          borderRadius: 12,
+          background: pressed && !disabled ? 'rgba(14,18,22,0.06)' : 'transparent',
+          transition: 'background 120ms ease',
+          opacity: disabled ? 0.3 : 1,
+          cursor: disabled ? 'default' : 'pointer',
+          fontFamily: FONT,
+        }}
       >
-        <ChevronLeft size={17} strokeWidth={2.4} />
+        <ChevronLeft size={17} strokeWidth={2.4} color={INK} />
+        <span style={{ ...KICKER, fontSize: 9, color: INK }}>{title}</span>
       </button>
-    ) : null}
-    <div style={{ ...LABEL, color: MUTE }}>{title}</div>
-  </div>
-);
+    </div>
+  );
+};
 
-/** Bottom action area. Transparent: the wash and canvas continue behind it. */
+/**
+ * Bottom action area. Transparent: the wash and canvas continue behind it.
+ * 16/22/8 padding PLUS max(env(safe-area-inset-bottom), 20px), so text clears
+ * the home indicator on a notched device and still gets 20px on a notchless one.
+ */
 export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ padding: '14px 16px 18px', background: 'transparent', flexShrink: 0 }}>
+  <div
+    style={{
+      padding: '16px 22px 8px',
+      paddingBottom: 'calc(8px + max(env(safe-area-inset-bottom, 0px), 20px))',
+      background: 'transparent',
+      flexShrink: 0,
+    }}
+  >
     {children}
   </div>
 );
+
 
 
 /** Column shell: fixed header, scrolling body, fixed footer. */
