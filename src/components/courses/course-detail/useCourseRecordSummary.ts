@@ -12,7 +12,6 @@ import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  formatGapFromChampion,
   isLowerBetterCategory,
 } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/helpers';
 
@@ -28,7 +27,11 @@ export const RECORD_BOOK_ORDER: LegendCategory[] = [
 /** The viewing member's own standing on a board they do not hold. */
 export interface ViewerStanding {
   row: CourseLegendRow;
-  /** Signed gap from the champion, e.g. "+4" or "-60". */
+  /**
+   * Gap from the champion as an UNSIGNED magnitude, e.g. "4" or "60". The
+   * direction is carried by the word in the string, so a sign here could only
+   * ever contradict it ("-60 behind").
+   */
   gap: string;
   /** True when the gap means the viewer is BEHIND the champion. */
   behind: boolean;
@@ -80,7 +83,8 @@ export function useCourseRecordSummary(
       const behind = isLowerBetterCategory(category) ? diff > 0 : diff < 0;
       viewerByCategory.set(category, {
         row,
-        gap: formatGapFromChampion(category, row.value, champion.value),
+        // Unsigned magnitude: the word ("behind") owns the direction.
+        gap: Math.abs(diff).toFixed(1).replace(/\.0$/, ''),
         behind,
       });
     });

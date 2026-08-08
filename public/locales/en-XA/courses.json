@@ -655,8 +655,9 @@
     },
     "records": {
       "youHold": "You hold this board",
-      "youBehind": "You {{value}} · {{gap}} behind",
-      "youAhead": "You {{value}} · {{gap}}",
+      "youValue": "[~~Ýőú {{value}}~~]",
+      "youBehind": "[~~{{gap}} ƀéĥíñđ~~]",
+      "youAhead": "[~~Ļéνéļ ŵíŧĥ ŧĥé ƀőáŕđ~~]",
       "units": {
         "gross": "Gross",
         "rounds": "Rounds",
