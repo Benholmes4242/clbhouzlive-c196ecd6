@@ -137,6 +137,8 @@
       "championIconLabel": "Champion"
     },
     "photoBand": {
+      "insightKickerCourse": "COURSE INTELLIGENCE",
+      "insightKickerResult": "HOW IT FINISHED",
       "wonBy": "Won by {{winnerName}}",
       "readMore": "Read more",
       "insightTitle": "Course insight",
