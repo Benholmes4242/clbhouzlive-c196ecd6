@@ -44,8 +44,14 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="!bg-[#F8FAFC] border-0 p-0 max-h-[85vh] flex flex-col rounded-t-2xl"
+        className="!bg-[#F8FAFC] border-0 p-0 flex flex-col rounded-t-2xl"
+        // 75dvh as BOTH height and maxHeight — the canonical scrolling-list
+        // sheet (CourseDirectorySheet). The inner height stops a short list
+        // from shrinking the sheet to its content; dvh so dynamic browser
+        // chrome is measured correctly.
+        style={{ height: '75dvh', maxHeight: '75dvh' }}
       >
+
         {/* Drag handle */}
         <div
           style={{
@@ -135,7 +141,9 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
         />
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto" style={{ background: '#FFFFFF' }}>
+        {/* Body inherits the shell's canvas — no white paint over #F8FAFC. */}
+        <div className="flex-1 overflow-y-auto">
+
           {missingCourses.map((course) => {
             const dateIso = course.review_date ?? course.last_played_at ?? null;
             const dateText = formatDate(dateIso);
@@ -152,12 +160,14 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   alignItems: 'center',
                   gap: 12,
                   padding: '12px 16px',
-                  background: '#FFFFFF',
-                  borderBottom: '1px solid #F1F5F9',
+                  // Rows sit ON the canvas, separated by hairlines — a long
+                  // scrolling list, not a stack of cards.
+                  background: 'transparent',
                   border: 0,
                   borderBottomWidth: 1,
                   borderBottomStyle: 'solid',
-                  borderBottomColor: '#F1F5F9',
+                  borderBottomColor: '#E2E8F0',
+
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
