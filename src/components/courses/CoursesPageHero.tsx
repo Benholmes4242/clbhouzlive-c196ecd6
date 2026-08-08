@@ -1,6 +1,8 @@
 import { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Crown, Flag, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreHero } from '@/components/explore-tab-new/hooks/useExploreHero';
 import { useExploreMood } from '@/components/explore-tab-new/hooks/useExploreMood';
