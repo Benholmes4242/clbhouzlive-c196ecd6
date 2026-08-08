@@ -25,6 +25,10 @@ export const CT = {
   pillRadius: 999,
   danger: '#B00020',
   success: '#0F8F4A',
+  // ON-DARK green. CT.success (#0F8F4A) is the light-surface green and stays
+  // exactly as it is; on the #0A0B0D success shell it reads muddy and all but
+  // vanishes as a 14%-alpha radial. This one is tuned against that shell.
+  successOnDark: '#3ECF8E',
   shellBg: '#0A0B0D',
 } as const;
 
