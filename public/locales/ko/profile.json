@@ -15,9 +15,9 @@
     "accept": "Accept",
     "followers": "Followers",
     "coverGuidance": "권장: 1500x1500px, 1:1 - JPG, PNG 또는 WebP",
-    "window30d": "30 days",
     "window12mo": "12 months",
-    "trendLevel": "Level"
+    "trendLevel": "Level",
+    "window90d": "90 days"
   },
   "social": {
     "followers": "{{count}} followers",
