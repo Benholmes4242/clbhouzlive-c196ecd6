@@ -123,6 +123,7 @@ export function LatestReviewsSheet({
                 key={r.reviewId}
                 review={r}
                 isOwn={own}
+                autoplayGroup="reviews-sheet"
                 onPress={onTilePress}
                 reactionHidden={!reactions.viewerId || reactions.unavailable}
                 reactionReadOnly={own}

@@ -1,9 +1,14 @@
+import { useEffect, useRef, useState } from 'react';
+import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { ReactionAction } from './ReactionAction';
 
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
 import { SANS, FIGS, NEW_CARD_RING } from './tokens';
+import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
 /**
@@ -15,7 +20,10 @@ import type { LatestReview } from './hooks/useLatestReviews';
  *
  * Image chain: the review's own first photo -> the course image (via
  * CourseImageFallback) -> the deterministic gradient. Video reviews use their
- * poster.
+ * poster, which AUTOPLAYS MUTED ON LOOP once the tile is meaningfully in view
+ * (BRIEF_REVIEW_TILE_AUTOPLAY). Playback is coordinated by
+ * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
+ * the three physical feed lanes and do not map onto a two-column grid.
  *
  * The score chip is WHITE, not band-coloured: band colours do not survive on
  * photography. The band colour lives in the review sheet.
@@ -66,6 +74,11 @@ interface Props {
   reactionCount?: number;
   reacted?: boolean;
   onToggleReaction?: () => void;
+  /**
+   * Autoplay coordination group. Each group carries its own two-at-once cap.
+   * Pass a stable key per surface ('discover-reviews' | 'reviews-sheet').
+   */
+  autoplayGroup?: string;
 }
 
 
@@ -81,6 +94,7 @@ export function ReviewTile({
   reactionCount = 0,
   reacted = false,
   onToggleReaction,
+  autoplayGroup = 'discover-reviews',
 }: Props) {
 
   const { t } = useTranslation('courses');
@@ -89,6 +103,51 @@ export function ReviewTile({
   const ownImage = isVideo ? r.posterUrl : r.mediaUrl;
   const imageUrl = ownImage ?? r.courseImage ?? null;
   const reviewer = r.reviewerName || t('discover.reviews.someone', 'A member');
+
+  const reducedMotion = usePrefersReducedMotion();
+  const [failed, setFailed] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const hostRef = useRef<HTMLSpanElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Reduced motion / Save-Data mount NO video element at all: poster only.
+  const mountVideo = isVideo && !!r.mediaUrl && !failed && !autoplayBlocked(reducedMotion);
+
+  // The coordinator answers one question: may this tile be playing right now?
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!mountVideo || !el) return;
+    return registerReviewVideo(autoplayGroup, el, setActive);
+  }, [mountVideo, autoplayGroup]);
+
+  // ACTIVE -> load and play. INACTIVE -> pause AND release the buffers, so an
+  // off-screen tile in a 100-tile sheet costs nothing again.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (active) {
+      if (v.getAttribute('src') !== r.mediaUrl) {
+        v.setAttribute('src', r.mediaUrl as string);
+      }
+      v.preload = 'auto';
+      v.muted = true;
+      const p = v.play();
+      if (p && typeof p.catch === 'function') {
+        // A rejected play() is not an error worth surfacing: the poster and the
+        // play glyph are already the correct fallback.
+        p.catch(() => setPlaying(false));
+      }
+    } else {
+      v.pause();
+      setPlaying(false);
+      if (v.getAttribute('src')) {
+        v.removeAttribute('src');
+        v.load();
+      }
+      v.preload = 'none';
+    }
+  }, [active, r.mediaUrl]);
 
   return (
     <button
@@ -116,7 +175,78 @@ export function ReviewTile({
         initialsSize={28}
         style={{ position: 'absolute', inset: 0 }}
       >
+        {/* VIDEO COVER — muted, looping, playsInline. Same box as the poster,
+            so the first frame cannot shift the layout. The poster stays
+            visible until that frame paints: no flash of black. */}
+        {mountVideo && (
+          <span ref={hostRef} className="review-tile-video" style={{ position: 'absolute', inset: 0 }}>
+            <video
+              ref={videoRef}
+              poster={r.posterUrl ?? undefined}
+              muted
+              loop
+              playsInline
+              // Legacy iOS attribute: required alongside playsInline or older
+              // WKWebView builds still go fullscreen.
+              webkit-playsinline="true"
+              preload="none"
+              disableRemotePlayback
+              aria-hidden="true"
+              tabIndex={-1}
+              onPlaying={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+              onError={(e) => {
+                // RELEASING a tile (src removed, then load()) makes Chrome fire
+                // a synthetic error with an empty src. That is our own teardown,
+                // NOT a failed media load — treating it as one would strand the
+                // tile on its poster for good.
+                const el = e.currentTarget as HTMLVideoElement;
+                setPlaying(false);
+                if (!el.getAttribute('src')) return;
+                // A real failure: fall back to the existing image chain, never a
+                // black box.
+                setFailed(true);
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+                pointerEvents: 'none',
+              }}
+            />
+          </span>
+        )}
+
         <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
+
+        {/* PLAY GLYPH — a "tap to play" affordance, so it is hidden WHILE
+            playing and shown in every non-playing state (reduced motion,
+            Save-Data, off-screen, over the two-at-once cap, load failure). */}
+        {isVideo && !playing && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 34,
+              height: 34,
+              borderRadius: 999,
+              background: 'rgba(10,14,10,0.46)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Play size={15} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
+          </span>
+        )}
 
         {/* SCORE CHIP — same glass badge, clbhouz mark then the rating. */}
         <span
