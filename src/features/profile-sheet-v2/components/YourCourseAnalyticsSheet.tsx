@@ -67,6 +67,27 @@ function fmtBucketPct(pct: number, pctExact: number, count: number): string {
   return `${pct}%`;
 }
 
+/**
+ * These rows EXPAND, so each one owns a card rather than sharing one panel:
+ * an open row's block has to visibly belong to it. Open state raises the
+ * border to heavier ink - no colour, no shadow, no scale.
+ */
+const CARD = (open = false): React.CSSProperties => ({
+  background: '#FFFFFF',
+  border: `1px solid ${open ? 'rgba(14,18,22,0.16)' : A.BORDER}`,
+  borderRadius: 14,
+  overflow: 'hidden',
+});
+
+/** Card list container: the 10px gap replaces per-card margin, so the last
+ *  card carries no trailing space. */
+const CARD_LIST: React.CSSProperties = {
+  margin: '0 20px',
+  display: 'grid',
+  gap: 10,
+};
+
+
 function Row({
   title,
   subtitle,
