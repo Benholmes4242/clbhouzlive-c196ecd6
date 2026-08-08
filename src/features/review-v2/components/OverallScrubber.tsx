@@ -27,7 +27,7 @@ const toPct = (v: number) => ((v - MIN) / (MAX - MIN)) * 100;
 const MARK_5 = toPct(5);
 const MARK_9 = toPct(9);
 
-export function OverallScrubber({ value, onChange, caption, ariaLabel }: Props) {
+export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabels, calibration }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
   const color = bandColor(value);
