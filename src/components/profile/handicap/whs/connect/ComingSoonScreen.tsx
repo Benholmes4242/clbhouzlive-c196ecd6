@@ -1,7 +1,7 @@
 import React from 'react';
 import type { WhsCountry } from '@/lib/whs/whsCountries';
-import { H1, H1_SUB, CAPTION, DIM } from './designTokens';
-import { PrimaryButton, FooterBar, CopyBlock } from './Primitives';
+import { CAPTION, DIM } from './designTokens';
+import { PrimaryButton, FooterBar, FlowBody, FlowHead } from './Primitives';
 
 interface Props {
   country: WhsCountry;
@@ -20,24 +20,21 @@ interface Props {
  */
 export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) => (
   <>
-    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px 20px' }}>
-      <CopyBlock kicker={country.body}>
-        <h1 style={{ ...H1, fontSize: 26, letterSpacing: '-0.03em' }}>
-          {country.name} is not open yet
-        </h1>
-        <p style={{ ...H1_SUB, fontSize: 14.5, fontWeight: 500 }}>
-          {country.body} has not opened an API we can read from. When it does, it appears in the
-          list here.
-        </p>
-      </CopyBlock>
+    <FlowBody>
+      <FlowHead
+        kicker="Coming soon"
+        size={27}
+        headline={`${country.name} is not open yet.`}
+        sub={`${country.body} has to open an API before we can read your record. When it does, it appears in the list here.`}
+      />
 
-      <div style={{ ...CAPTION, color: DIM, padding: '0 4px' }}>
+      <div style={{ ...CAPTION, color: DIM, marginTop: 22 }}>
         Nothing to sign up for. If you also hold a membership somewhere live, connect that instead.
       </div>
-    </div>
+    </FlowBody>
 
     <FooterBar>
-      <PrimaryButton onClick={onChangeCountry}>Choose a different country</PrimaryButton>
+      <PrimaryButton onClick={onChangeCountry}>Choose another country</PrimaryButton>
     </FooterBar>
   </>
 );
