@@ -31,7 +31,9 @@ import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
-import { ReviewReceipt } from './components/ReviewReceipt';
+import { ReviewReceipt, ordinal } from './components/ReviewReceipt';
+import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
+
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
