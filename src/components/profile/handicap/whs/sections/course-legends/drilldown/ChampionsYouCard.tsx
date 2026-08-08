@@ -5,9 +5,7 @@ import { Crown } from 'lucide-react';
 import type { LegendWindow } from '@/lib/gam/types';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 
-import { YouAtThisClubStrip } from './YouAtThisClubStrip';
 import { CrownCabinet, type CabinetSlot } from './CrownCabinet';
-import { CourseRivalryLine } from './CourseRivalryLine';
 import type { WindowToggleVariant } from '../types';
 
 interface Props {
@@ -22,11 +20,10 @@ interface Props {
 }
 
 /**
- * One card grouping the viewer's personal context at this course:
- *   - top region: "you at this club" stats (left) + crown cabinet squircles (right)
- *   - footer region: the rivalry line, on a faint tint behind a hairline
- * Each region is independently optional, so an absent rival or an empty cabinet
- * never blanks or collapses the card.
+ * One card holding the viewer's crown cabinet at this course, plus the
+ * All time / 90 days window control. The cabinet leads and takes the full
+ * row width. With no cabinet slots there is nothing to scope, so the card
+ * does not render at all.
  */
 export const ChampionsYouCard: React.FC<Props> = ({
   userId,
@@ -39,7 +36,7 @@ export const ChampionsYouCard: React.FC<Props> = ({
   toggleVariant = 'dark',
 }) => {
   const hasCabinet = slots.length > 0;
-  if (!userId && !hasCabinet) return null;
+  if (!hasCabinet) return null;
 
   return (
     <div
@@ -52,66 +49,42 @@ export const ChampionsYouCard: React.FC<Props> = ({
       }}
     >
       <div style={{ padding: '12px 16px' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'flex-start',
-            gap: 16,
-          }}
-        >
-          {userId ? (
-            <div style={{ flex: '1 1 280px', minWidth: 0 }}>
-              <YouAtThisClubStrip
-                userId={userId}
-                courseId={courseId}
-                theme={theme}
-                heldCountOverride={heldCount}
-                bare
-              />
+        <div style={{ width: '100%', minWidth: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 6,
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span style={KICKER}>Your crown cabinet</span>
             </div>
-          ) : null}
-
-          {hasCabinet ? (
-            <div style={{ flex: '1 1 280px', minWidth: 0 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 12,
-                  marginBottom: 6,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <span style={KICKER}>Your crown cabinet</span>
-                </div>
-                <span
-                  style={{
-                    ...KICKER,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1,
-                  }}
-                >
-                  <Crown size={11} strokeWidth={2.6} />
-                  {heldCount} / {slots.length}
-                </span>
-
-              </div>
-              <CrownCabinet
-                slots={slots}
-                heldCount={heldCount}
-                window={window}
-                onWindowChange={onWindowChange}
-                toggleVariant={toggleVariant}
-                bare
-              />
-            </div>
-          ) : null}
+            <span
+              style={{
+                ...KICKER,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+              }}
+            >
+              <Crown size={11} strokeWidth={2.6} />
+              {heldCount} / {slots.length}
+            </span>
+          </div>
+          <CrownCabinet
+            slots={slots}
+            heldCount={heldCount}
+            window={window}
+            onWindowChange={onWindowChange}
+            toggleVariant={toggleVariant}
+            bare
+          />
         </div>
 
         <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-start' }}>
@@ -126,8 +99,6 @@ export const ChampionsYouCard: React.FC<Props> = ({
           />
         </div>
       </div>
-
-      <CourseRivalryLine userId={userId} courseId={courseId} theme={theme} bare />
     </div>
   );
 };
