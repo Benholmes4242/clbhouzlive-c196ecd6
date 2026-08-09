@@ -310,15 +310,16 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     }
 
                     return (
-                      <div style={{ padding: '8px 11px 7px' }}>
+                      <div style={{ padding: '12px 14px 13px' }}>
                         {/* LINE 1 — the figure, who holds it, and the margin. */}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
                           <span
                             style={{
                               ...NUMF,
-                              fontSize: 24,
+                              fontSize: 25,
                               fontWeight: 800,
-                              lineHeight: 1,
+                              lineHeight: 0.92,
+                              letterSpacing: '-0.035em',
                               color: scoreColor(peek.leaderScore),
                             }}
                           >
@@ -328,9 +329,9 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             style={{
                               flex: 1,
                               minWidth: 0,
-                              fontSize: 13,
+                              fontSize: 13.5,
                               fontWeight: 700,
-                              color: A.INK,
+                              color: A.BODY,
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -347,7 +348,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             <span
                               style={{
                                 ...LABEL,
-                                fontSize: 8,
+                                fontSize: 6.5,
+                                fontWeight: 800,
                                 letterSpacing: '0.13em',
                                 color: A.DIM,
                                 marginLeft: 'auto',
@@ -364,48 +366,12 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                           )}
                         </div>
 
-                        {/* LINE 2 — does the lead mean anything yet. */}
-                        {cellsLive.length > 0 && (
-                          <div
-                            style={{
-                              marginTop: 8,
-                              paddingTop: 7,
-                              borderTop: `1px solid ${A.HAIRLINE}`,
-                              display: 'grid',
-                              gridTemplateColumns: `repeat(${cellsLive.length}, 1fr)`,
-                            }}
-                          >
-                            {cellsLive.map(([label, value, tone], i) => (
-                              <div
-                                key={label}
-                                style={{
-                                  // The end cell mirrors the first: it hugs its
-                                  // own edge so "Second" sits the same distance
-                                  // from the right as "Round" does from the
-                                  // left, in line with the margin above it.
-                                  textAlign:
-                                    i === 0
-                                      ? 'left'
-                                      : i === cellsLive.length - 1
-                                        ? 'right'
-                                        : 'center',
-                                }}
-                              >
-
-                                <div style={{ ...NUMF, fontSize: 15, fontWeight: 800, color: tone }}>
-                                  {value}
-                                </div>
-                                <div
-                                  style={{ ...LABEL, fontSize: 7.5, color: A.DIM, marginTop: 2 }}
-                                >
-                                  {label}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {/* LINE 2 — does the lead mean anything yet. No rule
+                            inside a panel: whitespace separates the blocks. */}
+                        <ThreeUp cells={cellsLive} />
                       </div>
                     );
+
                   })()
                 ) : (
 
