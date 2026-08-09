@@ -232,7 +232,9 @@
       "featuredGroupLabel": "Featured-Gruppe",
       "underParTodayLabel": "HEUTE UNTER PAR",
       "underParTodayValue": "{{n}} von {{m}}",
-      "underParTodaySub": "Spieler bisher im Ziel"
+      "underParTodaySub": "Spieler bisher im Ziel",
+      "axisEasier": "Leichter",
+      "axisHarder": "Schwerer"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

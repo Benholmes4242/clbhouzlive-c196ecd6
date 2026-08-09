@@ -217,7 +217,7 @@
       "backToLine1": "[~~Báçk tó~~]",
       "backToLine2": "[~~féátúréd~~]",
       "fieldAverageToday": "Field average today",
-      "fromNRoundsIn": "from {{n}} rounds in",
+      "fromNRoundsIn": "from {{n}} rounds",
       "lowRoundLabel": "Low round",
       "awaitingPlayers": "{{range}} awaiting players",
       "nShare_one": "[{{count}} player]",
@@ -228,7 +228,9 @@
       "featuredGroupLabel": "[Featured group]",
       "underParTodayLabel": "UNDER PAR TODAY",
       "underParTodayValue": "{{n}} of {{m}}",
-      "underParTodaySub": "players in so far"
+      "underParTodaySub": "players in",
+      "axisEasier": "[Easier]",
+      "axisHarder": "[Harder]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
