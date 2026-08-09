@@ -236,6 +236,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           count: totalRounds,
           rounds: formatNumber(totalRounds),
         })}
+        headerGap={10}
+        style={{ padding: '12px 16px' }}
       >
         <ShapeChart
           holes={holes}
@@ -245,7 +247,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         />
 
         {/* Legend: what the bars are, and what the line is. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             <i style={{ width: 10, height: 6, borderRadius: 2, background: A.TRACK }} />
             <span style={{ ...LABEL, fontSize: 8 }}>
@@ -262,7 +264,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           )}
         </div>
 
-        <Hairline style={{ margin: '14px 0 12px' }} />
+        <Hairline style={{ margin: '10px 0 8px' }} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
           <Figure
@@ -297,7 +299,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
         {extremes.length > 0 && (
           <>
-            <Hairline style={{ margin: '12px 0' }} />
+            <Hairline style={{ margin: '8px 0' }} />
             <div
               style={{
                 display: 'grid',
@@ -328,6 +330,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         aside={t('courses:courseDetail.holes.tapHint')}
         footer={t('courses:holes.preview.seeAll', { count: holes.length })}
         onOpen={() => setHolesSheetOpen(true)}
+        headerGap={10}
+        style={{ padding: '12px 16px' }}
       >
         <HoleRampLegend hasYou={hasYou} />
         {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
