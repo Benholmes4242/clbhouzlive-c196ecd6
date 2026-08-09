@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
-import { useTranslation } from 'react-i18next';
+
 
 
 interface HeaderPhotoCardProps {
@@ -29,7 +29,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   onFileChange,
   onRemove,
 }) => {
-  const { t } = useTranslation('profile');
+  
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -145,17 +145,6 @@ return (
           {displayUrl ? 'Edit cover' : 'Add cover'}
         </span>
       </button>
-      <p
-        style={{
-          margin: '8px 16px 0',
-          fontFamily: 'Geist, -apple-system, sans-serif',
-          fontSize: 11.5,
-          fontWeight: 500,
-          color: 'hsl(var(--muted-foreground))',
-        }}
-      >
-        {t('hero.coverGuidance')}
-      </p>
       {fileInput}
       {cropper}
       <PhotoActionSheet
