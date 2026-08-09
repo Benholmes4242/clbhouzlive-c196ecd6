@@ -257,32 +257,39 @@ export function ReviewTile({
           </span>
         )}
 
-        {/* SCORE CHIP — same glass badge, clbhouz mark then the rating. */}
+        {/* SCORE CHIP — glass badge: the figure, then the scale. A 10px radius
+            rectangle, not a pill: a pill against a square tile corner reads as
+            a foreign shape. */}
         <span
           style={{
             position: 'absolute',
             top: 8,
             left: 8,
             display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '3px 8px',
-            borderRadius: 999,
-            background: 'rgba(10,14,10,0.55)',
+            alignItems: 'baseline',
+            gap: 2,
+            padding: '5px 10px',
+            borderRadius: 10,
+            background: 'rgba(10,14,10,0.58)',
             backdropFilter: 'blur(6px)',
             WebkitBackdropFilter: 'blur(6px)',
           }}
         >
-          <img
-            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-            alt=""
-            aria-hidden="true"
-            style={{ width: 13, height: 13, objectFit: 'contain', display: 'block' }}
-          />
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', ...FIGS }}>
+          <span
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: '#fff',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              ...FIGS,
+            }}
+          >
             {r.rating.toFixed(1)}
           </span>
+          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.55)' }}>/10</span>
         </span>
+
 
 
         {/* REACTION — glass corner, opposite the score chip. */}
