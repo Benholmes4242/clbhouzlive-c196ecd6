@@ -166,6 +166,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: finishMatch.course_id,
         courseName: finishMatch.name,
         thumbnail: finishMatch.thumbnail_image,
+        at: finishMatch.review_date,
+
       },
     };
   }
