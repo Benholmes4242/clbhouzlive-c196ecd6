@@ -8,8 +8,9 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
  *
  *  - the gross gets a reference point: to-par (coloured by the canonical
  *    convention: under par RED, over par INK, level a muted "E") and PAR n
- *  - the index movement is a MOVEMENT, not a score: arrow + figure in INK,
- *    the word in LABEL/DIM. No tint, no capsule, no green, no red.
+ *  - the index movement is a MOVEMENT, not a score: arrow + figure coloured
+ *    (improved GREEN / drifted RED, per BRIEF_INDEX_DELTA_COLOUR), the word in
+ *    LABEL/DIM. No tint, no capsule.
  *  - the personal reference line resolves in priority order, and is OMITTED
  *    rather than dashed when nothing resolves.
  */
@@ -24,11 +25,21 @@ export function toParFor(row: FriendRoundRow): { text: string; tone: string } | 
   return { text: 'E', tone: A.MUTE };
 }
 
-/** Index movement — uncoloured by design. Null below the 0.05 floor. */
-export function movementFor(row: FriendRoundRow): { arrow: string; figure: string } | null {
+/**
+ * Index movement — coloured GREEN when improved, RED when drifted, matching the
+ * light analytical index-delta convention (A.UNDER / A.OVER, as HcpStrip uses).
+ * Null below the 0.05 floor.
+ */
+export function movementFor(
+  row: FriendRoundRow,
+): { arrow: string; figure: string; tone: string } | null {
   const d = row.hcp_delta;
   if (d == null || Math.abs(d) < MOVEMENT_FLOOR) return null;
-  return { arrow: d < 0 ? '\u2193' : '\u2191', figure: Math.abs(d).toFixed(1) };
+  return {
+    arrow: d < 0 ? '\u2193' : '\u2191',
+    figure: Math.abs(d).toFixed(1),
+    tone: d < 0 ? A.UNDER : A.OVER,
+  };
 }
 
 export function IndexMovement({ row }: { row: FriendRoundRow }) {
@@ -45,7 +56,7 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...FIGS, fontSize: 12, fontWeight: 800, color: A.INK }}>
+      <span style={{ ...FIGS, fontSize: 12, fontWeight: 800, color: mv.tone }}>
         {mv.arrow} {mv.figure}
       </span>
       <span
