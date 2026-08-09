@@ -82,8 +82,14 @@ const HERO_TALLEST_CONTENT = Math.ceil(
     H_PAD_BOTTOM,
 );
 
-/** One height for every hero, on every device. Tracks the safe area because
- *  HERO_CONTENT_INSET carries `var(--sat)` rather than a measured number. */
+/** A FLOOR, not a height. The hero's SHAPE is set by the 1/1 aspectRatio
+ *  applied alongside this (see the root style), so the block renders as the
+ *  LARGER of viewport width and this floor - square on 390/430, slightly
+ *  taller on 320. The floor survives because the aspect alone would let the
+ *  block reflow as the index, trend chip and sparkline resolve, and on the
+ *  narrowest phones a square box is shorter than the content stack. Tracks the
+ *  safe area because HERO_CONTENT_INSET carries `var(--sat)` rather than a
+ *  measured number. */
 export const HERO_MIN_HEIGHT =
   `calc(${HERO_CONTENT_INSET} + ${HERO_TALLEST_CONTENT}px)`;
 
