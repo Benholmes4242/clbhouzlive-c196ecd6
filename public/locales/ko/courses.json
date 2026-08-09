@@ -779,9 +779,10 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "최근 플레이 · 평가 전",
-      "statusFinish": "Rated · detail missing",
-      "statusPhoto": "Played · add a photo?",
+      "whenPlayed": "Played {{when}}",
+      "whenRated": "Rated {{when}}",
+      "statusNoDate": "On your card",
+      "statusFinishNoDate": "Rated · detail missing",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",

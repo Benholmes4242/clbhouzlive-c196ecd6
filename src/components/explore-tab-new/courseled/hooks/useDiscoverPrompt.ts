@@ -24,7 +24,19 @@ export interface DiscoverPrompt {
   courseId: string;
   courseName: string;
   thumbnail: string | null;
+  /**
+   * WHEN the thing happened, so the row can state a fact instead of hedging
+   * with "recently" (BRIEF_ONE_THING_ROW_CRAFT). Every kind already had a date
+   * in the rows it filters on, so NO new fetch was needed:
+   *   rate   — last_played from usePlayedUnratedCourses
+   *   finish — review_date (falling back to created_at) on the rating
+   *   photo  — play_date on the tracked round
+   * Null only when the underlying column is null; the row then keeps a
+   * non-temporal line rather than inventing one.
+   */
+  at: string | null;
 }
+
 
 interface MissingDetailRow {
   course_id: string;
@@ -138,6 +150,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: rateMatch.course_id,
         courseName: rateMatch.name,
         thumbnail: rateMatch.thumbnail_image ?? null,
+        at: rateMatch.last_played ?? null,
+
       },
     };
   }
@@ -152,6 +166,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: finishMatch.course_id,
         courseName: finishMatch.name,
         thumbnail: finishMatch.thumbnail_image,
+        at: finishMatch.review_date,
+
       },
     };
   }
@@ -166,6 +182,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: photoMatch.course_id as string,
         courseName: photoMatch.course_name as string,
         thumbnail: null,
+        at: (photoMatch.play_date as string | null) ?? null,
+
       },
     };
   }
