@@ -6,6 +6,7 @@ import { trackedLazy } from '@/perf/navTiming';
 const lazy = <T extends { default: React.ComponentType<any> }>(factory: () => Promise<T>) =>
   trackedLazy('route', factory);
 import { usePageTracking } from '@/hooks/usePageTracking';
+import { useFullScreenSurface } from '@/stores/fullScreenSurfaceStore';
 
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -337,7 +338,10 @@ const ReviewComposerRoute: React.FC = () => (
   </Suspense>
 );
 
-const ReviewComposerOverlay: React.FC = () => (
+const ReviewComposerOverlay: React.FC = () => {
+  // In-tree full-screen surface — body-level affordances stand down.
+  useFullScreenSurface();
+  return (
   <div
     role="dialog"
     aria-modal="true"
@@ -352,7 +356,8 @@ const ReviewComposerOverlay: React.FC = () => (
   >
     <ReviewComposerRoute />
   </div>
-);
+  );
+};
 
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
