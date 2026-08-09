@@ -842,6 +842,14 @@
       "bogeyFree": "Bogey-free round",
       "moreHere_one": "+{{count}} more here",
       "moreHere_other": "+{{count}} more here"
+    },
+    "friendsRail": {
+      "par": "Par {{par}}",
+      "index": "Index",
+      "firstHere": "Their first round here",
+      "bestHere": "Their best here, of {{count}} rounds",
+      "betterThanAvg": "{{figure}} better than their average here",
+      "worseThanAvg": "{{figure}} worse than their average here"
     }
   },
   "statBrowse": {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { ALLTIME_RAIL_STALE_MS, useRegionFeats, type FeatRow } from './useRegionFeats';
-import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, TOPAR_RED, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { getActiveLocale } from '@/i18n';
 import { formatNumber, formatOrdinal } from '@/i18n/format';
 
@@ -480,5 +480,6 @@ export function groupWireByMonth(
     }));
 }
 
-export const WIRE_TONE = { over: A.RED, under: A.GREEN } as const;
+// BRIEF_UNDER_PAR_RED: under par red, over par ink.
+export const WIRE_TONE = { over: A.INK, under: TOPAR_RED } as const;
 

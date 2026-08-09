@@ -12,6 +12,13 @@
  *   - absent values render nothing (no placeholder dashes)
  */
 import React from 'react';
+import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+
+/**
+ * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
+ * red serves every golf surface. See BRIEF_UNDER_PAR_RED.
+ */
+export const TOPAR_RED = TOPAR_UNDER_LIGHT;
 
 export const A = {
   CANVAS: '#F4F6F9',
@@ -93,15 +100,21 @@ export interface ToParParts { text: string; tone: string }
 /**
  * Round first, then branch on the rounded value.
  * Returns null when there is nothing to show - callers render nothing.
+ *
+ * TONE CONVENTION (BRIEF_UNDER_PAR_RED): the member surfaces adopt the tour
+ * convention. UNDER par is RED (TOPAR_RED), OVER par is INK, level is a muted
+ * "E". A.GREEN / A.RED keep their values and their non-golf work (success,
+ * connected, errors, rating bands) - only the tone SELECTION moved.
  */
 export function toParParts(v: number | null | undefined, digits = 1): ToParParts | null {
   if (v == null || !Number.isFinite(v)) return null;
   const f = Math.pow(10, digits);
   const r = Math.round(v * f) / f;
-  if (r > 0) return { text: `+${r.toFixed(digits)}`, tone: A.RED };
-  if (r < 0) return { text: `\u2212${Math.abs(r).toFixed(digits)}`, tone: A.GREEN };
-  return { text: 'E', tone: A.INK };
+  if (r > 0) return { text: `+${r.toFixed(digits)}`, tone: A.INK };
+  if (r < 0) return { text: `\u2212${Math.abs(r).toFixed(digits)}`, tone: TOPAR_RED };
+  return { text: 'E', tone: A.MUTE };
 }
+
 
 export const Panel: React.FC<{
   kicker?: string;

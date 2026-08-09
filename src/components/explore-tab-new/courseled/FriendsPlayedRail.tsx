@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { featChipBase, RoundFeatChips } from '../RoundFeatChips';
+import { IndexMovement, referenceLine, toParFor } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
@@ -12,6 +12,7 @@ import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import {
   A,
+  FIGS,
   CARD_SHELL,
   Eyebrow,
   NEW_CARD_RING,
@@ -168,89 +169,100 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
               </CourseImageFallback>
 
 
-              <div
-                style={{
-                  padding: '9px 11px',
-                  minHeight: 52,
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 6,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: A.INK,
-                      letterSpacing: '-0.005em',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.15,
-                    }}
-                  >
-                    {r.display_name}
-                  </span>
-                  {(r.feats.length > 0 ||
-                    (r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05)) && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                      {r.hcp_delta != null && Math.abs(r.hcp_delta) >= 0.05 && (
-                        <span
-                          style={{
-                            ...featChipBase,
-                            background:
-                              r.hcp_delta < 0 ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
-                            color: r.hcp_delta < 0 ? '#0e8a57' : '#D2222D',
-                          }}
-                        >
-                          {r.hcp_delta < 0 ? '\u2193' : '\u2191'}{' '}
-                          {Math.abs(r.hcp_delta).toFixed(1)}
+              {(() => {
+                const toPar = toParFor(r);
+                const reference = referenceLine(r, t as never);
+                return (
+                  <div style={{ padding: '9px 11px 10px' }}>
+                    {/* LINE 1 — the gross with its reference point. */}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                      <span style={{ ...NUMF, fontSize: 26, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}>
+                        {r.gross ?? '\u2014'}
+                      </span>
+                      {toPar && (
+                        <span style={{ ...NUMF, fontSize: 15, color: toPar.tone, lineHeight: 1 }}>
+                          {toPar.text}
                         </span>
                       )}
-                      {r.feats.length > 0 && <RoundFeatChips feats={r.feats} maxChips={1} />}
-                    </span>
-                  )}
-                </div>
+                      {r.course_par != null && (
+                        <span
+                          style={{
+                            fontSize: 8,
+                            fontWeight: 800,
+                            letterSpacing: '0.13em',
+                            textTransform: 'uppercase',
+                            color: A.DIM,
+                          }}
+                        >
+                          {t('discover.friendsRail.par', { defaultValue: 'Par {{par}}', par: r.course_par })}
+                        </span>
+                      )}
+                    </div>
 
-                {/* GROSS — fixed min-width so two- and three-digit scores share
-                    one right-hand axis down the card. */}
-                {r.gross != null && (
-                  <span
-                    style={{
-                      ...NUMF,
-                      flexShrink: 0,
-                      minWidth: 26,
-                      textAlign: 'right',
-                      fontSize: 15,
-                      color: A.INK,
-                      lineHeight: 1.15,
-                    }}
-                  >
-                    {r.gross}
-                  </span>
-                )}
+                    {/* LINE 2 — who played it, and how their index moved. */}
+                    <div
+                      style={{
+                        marginTop: 7,
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: A.BODY,
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {r.display_name}
+                      </span>
+                      <IndexMovement row={r} />
+                    </div>
 
-                {/* TRAILING SLOT — reserved on EVERY row, control or not. */}
-                <ReactionSlot>
-                  {(() => {
-                    const st = reactions.stateFor('round', r.score_id);
-                    return (
-                      <ReactionAction
-                        hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
-                        readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
-                        count={st.count}
-                        reacted={st.mine}
-                        onToggle={() => reactions.toggle('round', r.score_id)}
-                        label={t('discover.reactions.action', 'Like this round')}
-                      />
-                    );
-                  })()}
-                </ReactionSlot>
+                    {/* LINE 3 — the personal reference; absent, never dashed. */}
+                    {reference && (
+                      <div
+                        style={{
+                          marginTop: 9,
+                          paddingTop: 9,
+                          borderTop: `1px solid ${A.HAIRLINE}`,
+                          ...FIGS,
+                          fontSize: 11.5,
+                          fontWeight: 600,
+                          color: A.MUTE,
+                        }}
+                      >
+                        {reference}
+                      </div>
+                    )}
 
-
-
-              </div>
+                    {/* TRAILING SLOT — reserved on EVERY card, control or not. */}
+                    <div style={{ marginTop: 6, display: 'flex', justifyContent: 'flex-end' }}>
+                      <ReactionSlot>
+                        {(() => {
+                          const st = reactions.stateFor('round', r.score_id);
+                          return (
+                            <ReactionAction
+                              hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+                              readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
+                              count={st.count}
+                              reacted={st.mine}
+                              onToggle={() => reactions.toggle('round', r.score_id)}
+                              label={t('discover.reactions.action', 'Like this round')}
+                            />
+                          );
+                        })()}
+                      </ReactionSlot>
+                    </div>
+                  </div>
+                );
+              })()}
 
             </button>
           );

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
-import { A, SANS, LABEL, NUM, Action, StatRow } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
@@ -236,10 +236,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
                         value: fmtSigned(avgToPar),
                         tone:
                           Math.round(avgToPar * 10) / 10 > 0
-                            ? A.RED
+                            ? A.INK
                             : Math.round(avgToPar * 10) / 10 < 0
-                              ? A.GREEN
-                              : A.INK,
+                              ? TOPAR_RED
+                              : A.MUTE,
                       },
                     ]
                   : []),

@@ -44,6 +44,14 @@ export interface FriendRoundRow {
   course_id: string | null;
 
   gross: number | null;
+  /** Course par for THIS round — the reference point for the gross. */
+  course_par: number | null;
+  /** How many 18-hole rounds this friend has at this course (incl. this one). */
+  rounds_here: number | null;
+  /** Their lowest gross at this course. */
+  best_here: number | null;
+  /** Their average gross at this course. */
+  avg_gross_here: number | null;
   net: number | null;
   /** current handicap index minus hcp_at_time. Negative = handicap dropped (good). */
   hcp_delta: number | null;
@@ -218,6 +226,39 @@ export function useFriendsLatestRounds(
       //    Priority order is rarest first; capped at two per row.
       const featsForRound = (r: Round): RoundFeat[] => deriveRoundFeats(r);
 
+      // 7b. PERSONAL REFERENCE (BRIEF_UNDER_PAR_RED, part 2) — each surfaced
+      //     friend's history at the course they played. One extra round-trip,
+      //     scoped to the (user, course) pairs actually on screen.
+      const surfacedCourseIds = Array.from(
+        new Set(rowsWindow.map((r) => r.course_id).filter((v): v is string => !!v)),
+      );
+      type Hist = { rounds: number; best: number; sum: number };
+      const histKey = (u: string, c: string) => `${u}|${c}`;
+      const histBy = new Map<string, Hist>();
+      if (surfacedCourseIds.length > 0) {
+        const { data: hist } = await supabase
+          .from('gam_round_stats' as never)
+          .select('user_id, course_id, gross_score')
+          .in('user_id', surfacedFriendIds)
+          .in('course_id', surfacedCourseIds)
+          .eq('holes_played', 18);
+        for (const h of ((hist ?? []) as unknown) as Array<{
+          user_id: string;
+          course_id: string | null;
+          gross_score: number | null;
+        }>) {
+          if (!h.course_id || h.gross_score == null) continue;
+          const k = histKey(h.user_id, h.course_id);
+          const cur = histBy.get(k);
+          if (!cur) histBy.set(k, { rounds: 1, best: h.gross_score, sum: h.gross_score });
+          else {
+            cur.rounds += 1;
+            cur.sum += h.gross_score;
+            if (h.gross_score < cur.best) cur.best = h.gross_score;
+          }
+        }
+      }
+
       // 8. Assemble rows.
       const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
         const profile = profileById.get(r.user_id);
@@ -227,6 +268,7 @@ export function useFriendsLatestRounds(
             ? score.adjusted_gross - score.course_handicap
             : null;
         const current = currentHcpByUser.get(r.user_id) ?? null;
+        const hist = r.course_id ? histBy.get(histKey(r.user_id, r.course_id)) : undefined;
         const hcpDelta =
           current != null && r.hcp_at_time != null
             ? Math.round((current - Number(r.hcp_at_time)) * 10) / 10
@@ -242,6 +284,10 @@ export function useFriendsLatestRounds(
           course_name: r.course_name,
           course_id: r.course_id ?? null,
           gross: r.gross_score,
+          course_par: r.course_par ?? null,
+          rounds_here: hist?.rounds ?? null,
+          best_here: hist?.best ?? null,
+          avg_gross_here: hist ? Math.round((hist.sum / hist.rounds) * 10) / 10 : null,
 
           net,
           hcp_delta: hcpDelta,
