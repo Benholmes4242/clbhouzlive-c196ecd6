@@ -298,8 +298,10 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             ...INSIGHT_CLAMP,
                           }}
                         >
-                          <InsightGlyph />
-                          {insight}
+                          <span style={{ display: 'inline' }}>
+                            <InsightGlyph />
+                            {insight}
+                          </span>
                         </div>
                       )}
                     </div>
