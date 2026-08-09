@@ -75,16 +75,24 @@ export function OneThingRow({ userId }: Props) {
     return <div aria-hidden style={{ height: 24 }} />;
   }
 
-  // The row already shows a thumbnail and names the action, so the sentence
-  // spends no width restating them: line 1 is the course, line 2 the status.
-  const status =
-    shown.kind === 'rate'
-      ? t('discover.prompt.statusRate', 'Played \u00B7 not rated yet')
-      : shown.kind === 'finish'
-        ? t('discover.prompt.statusFinish', 'Rated \u00B7 detail missing')
-        : t('discover.prompt.statusPhoto', 'Played \u00B7 add a photo?');
+  // THE STATUS NO LONGER RESTATES THE ACTION. "not rated yet" beside RATE named
+  // the lack and the remedy in the same row; the tappable one is the one worth
+  // keeping, so line 2 states WHEN instead — a fact the app holds rather than
+  // the impression "recently".
+  const when = shown.at ? relativeDay(shown.at, t, 'long') : '';
+
+  const status = when
+    ? shown.kind === 'finish'
+      ? t('discover.prompt.whenRated', 'Rated {{when}}', { when })
+      : t('discover.prompt.whenPlayed', 'Played {{when}}', { when })
+    : // NO DATE IN HAND: say what is true of the record rather than inventing an
+      // age. Only reachable when the underlying column is null.
+      shown.kind === 'finish'
+      ? t('discover.prompt.statusFinishNoDate', 'Rated \u00B7 detail missing')
+      : t('discover.prompt.statusNoDate', 'On your card');
 
   const [actionKey, actionFallback] = ACTION_KEY[shown.kind];
+
 
 
   return (
