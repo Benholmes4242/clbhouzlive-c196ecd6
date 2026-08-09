@@ -92,7 +92,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
         fontFamily: FONT,
       }}
     >
-      <div style={{ flexShrink: 0 }}>
+      <div style={{ flexShrink: 0, marginTop: 1 }}>
         <SquircleAvatar
           size={AVATAR_SIZE}
           srcCandidates={profile_photo_url ? [profile_photo_url] : []}
