@@ -14,8 +14,10 @@ export type TeeGenderScope = 'ladies' | 'mens' | 'unisex' | 'unknown';
 export interface TeeHole {
   hole_no: number;
   par: number;
-  si: number;
-  yards: number;
+  /** null when the catalogue carries no stroke index for the hole. */
+  si: number | null;
+  /** null when the catalogue carries no yardage for the hole. */
+  yards: number | null;
 }
 
 export interface TeeSet {
