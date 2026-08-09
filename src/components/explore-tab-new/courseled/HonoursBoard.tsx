@@ -37,7 +37,7 @@ function HolderAvatar({ event: e }: { event: WireEvent }) {
   return (
     <span style={{ flex: '0 0 auto', display: 'block' }}>
       <SquircleAvatar
-        size={30}
+        size={34}
         src={e.actorAvatar}
         alt={e.actorName}
         userId={e.userId}
@@ -46,6 +46,7 @@ function HolderAvatar({ event: e }: { event: WireEvent }) {
     </span>
   );
 }
+
 
 
 export function sortHonours(events: WireEvent[]): WireEvent[] {
