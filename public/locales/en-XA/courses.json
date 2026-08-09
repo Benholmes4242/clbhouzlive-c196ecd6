@@ -635,7 +635,7 @@
       "slopeLabel": "Slope rating",
       "lengthLabel": "Length",
       "courseRating": "Course rating",
-      "vsStandard": "vs standard {{standard}}",
+      "vsStandard": "vs standard course rating of {{standard}}",
       "playsHarder": "Plays harder than an average course for a scratch golfer.",
       "playsEasier": "Plays easier than an average course for a scratch golfer.",
       "playsAverage": "Plays to average difficulty for a scratch golfer.",
