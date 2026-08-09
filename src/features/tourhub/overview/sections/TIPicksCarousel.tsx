@@ -19,7 +19,7 @@ import { tiVerdict, verdictFromResult, formatTiPosition, formatTiScore, type TiV
 import type { EventState } from '@/features/tourhub/components/overview-v3/useTournamentPulse';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { TourStatusBlock } from '../../_shared/TourStatusBlock';
+import { TourStatusBlock, TOUR_UNDER } from '../../_shared/TourStatusBlock';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
@@ -99,6 +99,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
+  // The denominator is the REAL pick count for this tournament (every contender
+  // the prediction payload holds), not the number of cards the carousel renders.
+  const pickTotal = picks.length;
+
 
   // Hide the floating bottom nav while any TI sheet is open so it doesn't
   // sit on top of the sheet content.
@@ -175,14 +179,31 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       border: isWin ? `1px solid ${GOLD_RING}` : `1px solid ${HAIR}`,
                       boxShadow: isWin ? GOLD_SHADOW : V4.cardShadow,
                       borderRadius: 16,
-                      padding: 14,
+                      padding: '14px 15px',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 0,
                       cursor: 'pointer',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    {/* Top row: the pick with its denominator, opposite the live state */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                        marginBottom: 11,
+                        minHeight: 10,
+                      }}
+                    >
+                      <span style={{ ...PICK_META, color: A.DIM }}>
+                        {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
+                      </span>
+                      <PickStatusTag live={live} t={t} />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 11 }}>
                       <div
                         role="link"
                         onClick={(e) => {
@@ -192,7 +213,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         style={{ cursor: 'pointer', flexShrink: 0 }}
                       >
                         <SquircleAvatar
-                          size={46}
+                          size={52}
                           srcCandidates={
                             p.photoUrl
                               ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
@@ -225,58 +246,38 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 13.5,
                         fontWeight: 500,
                         color: 'rgba(15,23,42,0.78)',
-                        lineHeight: 1.4,
-                        minHeight: 36,
+                        lineHeight: 1.45,
+                        minHeight: 39,
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        margin: '10px 0 0',
+                        margin: '11px 0 0',
                       }}
                     >
                       {p.pulledQuote || p.reasons?.[0] || '—'}
                     </div>
 
-                    <div
+                    {/* Affordance, not a control — the whole card is the tap target */}
+                    <span
                       style={{
-                        marginTop: 10,
-                        paddingTop: 10,
-                        borderTop: `1px solid ${HAIR}`,
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        justifyContent: 'space-between',
+                        marginTop: 12,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        color: AMBER_DEEP,
+                        letterSpacing: '0.09em',
+                        textTransform: 'uppercase',
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 800,
-                          color: '#0E1216',
-                          letterSpacing: '0.06em',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.theCase')}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_45,
-                          letterSpacing: '0.06em',
-                          textTransform: 'uppercase',
-                          fontVariantNumeric: 'tabular-nums',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
-                      </span>
-                    </div>
+                      {t('overview.tiPicks.card.theCase')}
+                    </span>
                   </button>
                 );
               })}
+
             </div>
 
             {sheet?.kind === 'index' ? (
@@ -310,7 +311,39 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
 // ---- Card state slot: chip / neutral live / course fit line ----
 
+// ---- Shared pick grammar: the index meta line and the live-state tag ----
+
+/** 7.5/800 uppercase tabular — the pick index and the status share one voice. */
+const PICK_META: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 800,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  fontVariantNumeric: 'tabular-nums',
+};
+
+const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
+
+/**
+ * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
+ * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ */
+function PickStatusTag({ live, t }: { live: PickLiveState | undefined; t: TFunction }) {
+  if (!live || live.thru == null) return null;
+  if (DEMOTED_STATUS.has((live.status ?? '').toUpperCase())) return null;
+  if (live.thru >= 18) {
+    return <span style={{ ...PICK_META, color: A.DIM }}>{t('overview.status.finished')}</span>;
+  }
+  return (
+    <span style={{ ...PICK_META, color: A.MUTE, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+      <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
+      {t('overview.status.thru', { n: live.thru })}
+    </span>
+  );
+}
+
 function CardStateSlot({
+
   state,
   pick,
   live,
@@ -341,8 +374,8 @@ function CardStateSlot({
           score={live.score}
           position={live.position}
           positionTied={live.positionTied}
-          thru={live.thru}
           status={live.status}
+
           align="left"
         />
       );
@@ -404,7 +437,8 @@ function SheetShell({
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
           height: '75dvh',
-          maxHeight: '75dvh',
+          maxHeight: '90dvh',
+
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -551,8 +585,7 @@ function CaseSheet({
             style={{
               display: 'flex',
               gap: 12,
-              padding: '11px 0',
-              borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+              marginTop: i === 0 ? 0 : 16,
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 800, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
@@ -568,10 +601,10 @@ function CaseSheet({
             style={{
               display: 'flex',
               gap: 12,
-              padding: '11px 0',
-              borderTop: (pick.reasons?.length ?? 0) > 0 ? `1px solid ${HAIR}` : 'none',
+              marginTop: (pick.reasons?.length ?? 0) > 0 ? 16 : 0,
             }}
           >
+
             <div style={{ fontSize: 15, fontWeight: 800, color: RED_TX, minWidth: 22, lineHeight: 1.2 }}>!</div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
               {pick.concern}
@@ -668,8 +701,8 @@ function VerdictBanner({
       <div
         style={{
           marginTop: 14,
-          paddingBottom: 12,
-          borderBottom: `1px solid ${HAIR}`,
+          paddingBottom: 4,
+
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'space-between',
@@ -968,24 +1001,28 @@ function AllPicksSheet({
               role="button"
               onClick={() => onPick(p)}
               style={{
-                padding: '12px 0',
-                borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+                marginTop: i === 0 ? 0 : 22,
                 cursor: 'pointer',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 800,
-                    color: INK,
-                    fontVariantNumeric: 'tabular-nums lining',
-                    minWidth: 14,
-                    textAlign: 'right',
-                  }}
-                >
-                  {p.rank}
+              {/* Same grammar as the card: the pick with its denominator, then the state */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginBottom: 7,
+                  minHeight: 10,
+                }}
+              >
+                <span style={{ ...PICK_META, color: A.DIM }}>
+                  {t('overview.tiPicks.card.pickOf', { n: p.rank, total })}
                 </span>
+                <PickStatusTag live={live} t={t} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+
                 <div
                   role="link"
                   onClick={(e) => {
@@ -1058,8 +1095,8 @@ function AllPicksSheet({
                         score={live.score}
                         position={live.position}
                         positionTied={live.positionTied}
-                        thru={live.thru}
                         status={live.status}
+
                         align="right"
                       />
                     ) : null
@@ -1071,7 +1108,6 @@ function AllPicksSheet({
                 <div
                   style={{
                     marginTop: 7,
-                    paddingLeft: 26,
                     fontSize: 12,
                     fontWeight: 600,
                     color: A.BODY,
@@ -1087,9 +1123,7 @@ function AllPicksSheet({
 
         <div
           style={{
-            marginTop: 14,
-            paddingTop: 12,
-            borderTop: `1px solid ${HAIR}`,
+            marginTop: 26,
             fontSize: 12,
             fontWeight: 600,
             color: A.BODY,

@@ -284,7 +284,8 @@
       },
       "card": {
         "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}"
+        "pickLabel": "Pick {{rank}}",
+        "pickOf": "Elección {{n}} de {{total}}"
       },
       "case": {
         "eyebrow": "The case for",
