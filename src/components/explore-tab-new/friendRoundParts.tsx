@@ -43,13 +43,16 @@ export const INSIGHT_CLAMP = {
 export function InsightGlyph() {
   return (
     <ChartNoAxesColumn
-      size={11}
+      size={10}
       strokeWidth={2.5}
       aria-hidden
-      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, display: 'inline-block', verticalAlign: '-1px', transform: 'translateY(0.5px)' }}
+      // Aligned to the first line's CAP HEIGHT, not its baseline: a glyph on the
+      // baseline of a 600-weight line sits visually low.
+      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, display: 'inline-block', verticalAlign: '-0.5px', transform: 'translateY(-0.5px)' }}
     />
   );
 }
+
 
 export function toParFor(row: FriendRoundRow): { text: string; tone: string } | null {
   if (row.gross == null || row.course_par == null) return null;
