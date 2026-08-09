@@ -296,18 +296,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
                     <div
                       style={{
-                        fontSize: 14,
+                        fontSize: 14.5,
                         fontWeight: 800,
                         color: '#fff',
-                        letterSpacing: '-0.015em',
+                        letterSpacing: '-0.02em',
                       }}
                     >
                       {match?.name ?? e.venueName}
                     </div>
                     <div
                       style={{
-                        fontSize: 10.5,
-                        color: 'rgba(255,255,255,0.8)',
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.7)',
                         marginTop: 1,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -317,6 +318,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       {e.name}
                     </div>
                   </div>
+
                 </CourseImageFallback>
 
                 {peek && peek.leaderScore != null ? (
