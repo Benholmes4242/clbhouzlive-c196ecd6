@@ -214,35 +214,49 @@ export function HonoursBoard({
           <div
             style={{
               padding: '14px 0 12px',
-              textAlign: 'center',
               borderBottom: `1px solid ${GOLD_HAIR}`,
             }}
           >
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: GOLD_INK,
-              }}
-            >
-              {t('discover.honoursTitle', 'The honours board')}
+            {/* SECTION GRAMMAR: eyebrow left, sample size right. The COUNT is
+                the whole board (`events`), never `shown` — the page caps at 5
+                and the sheet holds the rest. */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <div
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: GOLD_INK,
+                }}
+              >
+                {t('discover.honoursTitle', 'The honours board')}
+              </div>
+              <div
+                style={{
+                  ...LABEL,
+                  fontSize: 7,
+                  color: A.DIM,
+                  marginLeft: 'auto',
+                  fontVariantNumeric: 'tabular-nums lining',
+                }}
+              >
+                {t('discover.honoursOnTheBoard', '{{count}} on the board', {
+                  count: events.length,
+                })}
+              </div>
             </div>
-            <div style={{ fontSize: 10.5, fontWeight: 600, lineHeight: 1.35, color: A.BODY, marginTop: 5 }}>
-              {/* COUNT = the whole board (`events`), never `shown` — the page
-                  caps at 5 and the sheet holds the rest. No time claim: the
-                  legendary rail narrows to 30/90/365-day windows once volume
-                  passes 10 entries, so "all time" would eventually be false. */}
+            <div
+              style={{ fontSize: 12.5, fontWeight: 500, lineHeight: 1.35, color: A.MUTE, marginTop: 5 }}
+            >
               {t(
-                'discover.honoursCaptionCount',
-                '{{count}} aces and albatrosses on the board',
-                { count: events.length },
+                'discover.honoursWhatItIs',
+                'Every ace and albatross in clbhouz history',
               )}
-
             </div>
           </div>
         ) : null}
+
 
         {shown.map((e, i) => (
           <HonoursRow
