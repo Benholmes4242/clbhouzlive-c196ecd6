@@ -103,7 +103,10 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
         />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* LINE 1 — IDENTITY. The index movement is a fact about the PERSON, not
+            about this round, so it ends this line: fixed x on every row whatever
+            the insight below does. */}
         <div
           style={{
             display: 'flex',
@@ -115,7 +118,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           <div
             style={{
               fontSize: NAME_SIZE,
-              fontWeight: 600,
+              fontWeight: 800,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.2,
@@ -140,15 +143,19 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           >
             {relative}
           </div>
+          <span style={{ marginLeft: 'auto', flexShrink: 0 }}>
+            <IndexMovement row={row} />
+          </span>
         </div>
 
         <div
           style={{
+            marginTop: 3,
             display: 'flex',
             alignItems: 'center',
             gap: 4,
             fontSize: SUBLINE_SIZE,
-            fontWeight: 500,
+            fontWeight: 600,
             color: SLATE_500,
             lineHeight: 1.2,
             minWidth: 0,
@@ -156,7 +163,6 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
         >
           <span
             style={{
-              fontWeight: 600,
               minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -167,21 +173,12 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           </span>
         </div>
 
-        {/* LINE 3 — the analytical line: the insight, marked by its glyph, with
-            the HCP movement right-aligned beside it. The course name above keeps
-            the full row width. */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 8,
-            minWidth: 0,
-          }}
-        >
+        {/* LINE 3 — the analytical line: the insight, marked by its glyph. */}
+        {reference && (
           <div
             className="tabular-nums"
             style={{
-              flex: 1,
+              marginTop: 6,
               minWidth: 0,
               display: 'flex',
               alignItems: 'baseline',
@@ -191,27 +188,20 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
               color: SLATE_500,
             }}
           >
-            {reference && (
-              <>
-                <InsightGlyph />
-                <span style={{ minWidth: 0 }}>{reference}</span>
-              </>
-            )}
+            <InsightGlyph />
+            <span style={{ minWidth: 0 }}>{reference}</span>
           </div>
-          <IndexMovement row={row} />
-        </div>
-
+        )}
       </div>
-
 
       {gross != null ? (
         <div
           style={{
             flexShrink: 0,
+            width: SCORE_COL_W,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-end',
-            gap: 3,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -222,7 +212,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
                 fontWeight: 700,
                 lineHeight: 1,
                 color: INK,
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.03em',
               }}
             >
               {gross}
@@ -230,7 +220,13 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
             {toPar && (
               <div
                 className="tabular-nums"
-                style={{ fontSize: 12.5, fontWeight: 800, lineHeight: 1, color: toPar.tone }}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                  color: toPar.tone,
+                }}
               >
                 {toPar.text}
               </div>
@@ -238,9 +234,10 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           </div>
           <div
             style={{
+              marginTop: 4,
               fontSize: STAT_LABEL_SIZE,
-              fontWeight: 600,
-              letterSpacing: '0.08em',
+              fontWeight: 800,
+              letterSpacing: '0.13em',
               textTransform: 'uppercase',
               color: SLATE_400,
               lineHeight: 1,
@@ -249,8 +246,10 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
             {row.course_par != null ? `PAR ${row.course_par}` : 'GROSS'}
           </div>
         </div>
+      ) : (
+        <div style={{ flexShrink: 0, width: SCORE_COL_W }} />
+      )}
 
-      ) : null}
     </button>
   );
 }
