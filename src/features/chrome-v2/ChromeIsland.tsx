@@ -11,7 +11,7 @@
  *     publishes --header-h: 64 (10 top gap + 44 island + 10 breathing).
  *
  * Reuses (not forks):
- *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapTrend90d
+ *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapHistory (last change)
  *     (the exact hooks HandicapChip.tsx uses), so index value AND
  *     improving/drifting logic AND visibility rules mirror the pill.
  *   - Avatar cell: useActiveActor + useActorUnreadCounts (the pattern
@@ -37,8 +37,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
-import { useHandicapTrend90d } from '@/hooks/useHandicapTrend90d';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { safeGoBack } from '@/utils/navigation';
 
 const ISLAND_H = 44;
@@ -49,6 +48,51 @@ const LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
 const HCP_IMPROVING = '#16a34a';
 const HCP_DRIFTING = '#dc2626';
+
+// ---------------------------------------------------------------------------
+// Last-change arrow (BRIEF_CHIP_LAST_CHANGE)
+// ---------------------------------------------------------------------------
+// The chip's arrow describes the member's MOST RECENT index movement — the
+// difference between the current value and the distinct value before it — not a
+// 90-day verdict. A quarter that drifted up must not contradict an index that
+// fell at the weekend.
+//
+// Source: the existing whsKeys.history query with 'all' (already warm in cache
+// from other handicap surfaces), so no new query and no window guesswork on the
+// fetch side. Staleness is applied in memory instead: movements land a median
+// 4.75 days apart (p75 11d, p90 16d), so a 30-day recency window covers an
+// ordinary gap between counting rounds without narrating a dormant season.
+const HCP_MOVE_MAX_AGE_DAYS = 30;
+const HCP_MOVE_EPSILON = 0.05;
+
+type HcpMove = 'improving' | 'drifting' | 'none';
+
+function lastIndexMove(
+  history: { observed_at: string; handicap_index: number }[] | undefined,
+): HcpMove {
+  if (!history || history.length < 2) return 'none';
+  // history is ascending; walk back to the first point that differs from the
+  // latest value — that boundary is the last actual change.
+  const latest = history[history.length - 1];
+  const current = Number(latest.handicap_index);
+  if (!Number.isFinite(current)) return 'none';
+
+  for (let i = history.length - 2; i >= 0; i--) {
+    const prev = Number(history[i].handicap_index);
+    if (!Number.isFinite(prev)) continue;
+    if (Math.abs(prev - current) < HCP_MOVE_EPSILON) continue;
+
+    // The movement happened at history[i + 1] — the first point holding the
+    // current value after the previous one.
+    const movedAt = new Date(history[i + 1].observed_at).getTime();
+    const ageDays = (Date.now() - movedAt) / 86_400_000;
+    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return 'none';
+
+    return current < prev ? 'improving' : 'drifting';
+  }
+
+  return 'none';
+}
 
 function glassStyle(tone: ChromeTone): React.CSSProperties {
   const isLight = tone === 'light';
@@ -223,7 +267,8 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
-  const trend = useHandicapTrend90d(connection?.id);
+  const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
+  const lastMove = lastIndexMove(hcpHistory as any);
 
   if (!user) return null;
   if (isBusinessActor) return null;
@@ -261,7 +306,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
     }
 
     const indexValue = Number(trendData!.current).toFixed(1);
-    const direction = trend.direction;
+    const direction = lastMove;
     const showArrow = direction === 'improving' || direction === 'drifting';
     const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
     const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
