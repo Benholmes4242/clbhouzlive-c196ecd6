@@ -430,7 +430,7 @@ export function LiveFieldPanel({
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
-          padding: '12px 14px 14px',
+          padding: '18px 16px 14px',
         }}
       >
         {/* Headline */}
@@ -438,7 +438,7 @@ export function LiveFieldPanel({
           <>
             <div
               style={{
-                fontSize: 8.5,
+                fontSize: 7.5,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -450,17 +450,17 @@ export function LiveFieldPanel({
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, marginTop: 2 }}>
               <span
                 style={{
-                  fontSize: 38,
+                  fontSize: 44,
                   fontWeight: 800,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 0.9,
                   color: tourFigColor(field.avg),
                   ...FIGS,
                 }}
               >
                 {formatToParAvg(field.avg)}
               </span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: A.BODY }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: A.MUTE, ...FIGS }}>
                 {t('overview.onTheCourse.fromNRoundsIn', { n: field.count })}
               </span>
             </div>
@@ -470,13 +470,14 @@ export function LiveFieldPanel({
         {/* Counter strip */}
         <div
           style={{
-            marginTop: 12,
-            paddingTop: 10,
+            marginTop: 16,
+            paddingTop: 14,
             borderTop: `1px solid ${A.HAIRLINE}`,
             display: 'flex',
             gap: 10,
           }}
         >
+
           <Cell
             label={t('overview.onTheCourse.lowRoundLabel')}
             value={low ? formatToPar(low.toPar) : '—'}
