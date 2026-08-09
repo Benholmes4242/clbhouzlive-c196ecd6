@@ -234,7 +234,9 @@
       "underParTodayValue": "{{n}} de {{m}}",
       "underParTodaySub": "jugadores hasta ahora",
       "axisEasier": "Mas facil",
-      "axisHarder": "Mas dificil"
+      "axisHarder": "Mas dificil",
+      "finishedLabel": "Finalizado",
+      "todaySuffix": "{{value}} hoy"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
