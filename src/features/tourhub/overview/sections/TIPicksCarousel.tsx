@@ -311,7 +311,39 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
 // ---- Card state slot: chip / neutral live / course fit line ----
 
+// ---- Shared pick grammar: the index meta line and the live-state tag ----
+
+/** 7.5/800 uppercase tabular — the pick index and the status share one voice. */
+const PICK_META: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 800,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  fontVariantNumeric: 'tabular-nums',
+};
+
+const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
+
+/**
+ * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
+ * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ */
+function PickStatusTag({ live, t }: { live: PickLiveState | undefined; t: TFunction }) {
+  if (!live || live.thru == null) return null;
+  if (DEMOTED_STATUS.has((live.status ?? '').toUpperCase())) return null;
+  if (live.thru >= 18) {
+    return <span style={{ ...PICK_META, color: A.DIM }}>{t('overview.status.finished')}</span>;
+  }
+  return (
+    <span style={{ ...PICK_META, color: A.MUTE, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+      <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
+      {t('overview.status.thru', { n: live.thru })}
+    </span>
+  );
+}
+
 function CardStateSlot({
+
   state,
   pick,
   live,
