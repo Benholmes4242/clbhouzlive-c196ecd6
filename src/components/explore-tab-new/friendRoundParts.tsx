@@ -46,7 +46,7 @@ export function InsightGlyph() {
       size={11}
       strokeWidth={2.5}
       aria-hidden
-      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, transform: 'translateY(1px)' }}
+      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, display: 'inline-block', verticalAlign: '-1px', transform: 'translateY(0.5px)' }}
     />
   );
 }
