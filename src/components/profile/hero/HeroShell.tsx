@@ -82,8 +82,14 @@ const HERO_TALLEST_CONTENT = Math.ceil(
     H_PAD_BOTTOM,
 );
 
-/** One height for every hero, on every device. Tracks the safe area because
- *  HERO_CONTENT_INSET carries `var(--sat)` rather than a measured number. */
+/** A FLOOR, not a height. The hero's SHAPE is set by the 1/1 aspectRatio
+ *  applied alongside this (see the root style), so the block renders as the
+ *  LARGER of viewport width and this floor - square on 390/430, slightly
+ *  taller on 320. The floor survives because the aspect alone would let the
+ *  block reflow as the index, trend chip and sparkline resolve, and on the
+ *  narrowest phones a square box is shorter than the content stack. Tracks the
+ *  safe area because HERO_CONTENT_INSET carries `var(--sat)` rather than a
+ *  measured number. */
 export const HERO_MIN_HEIGHT =
   `calc(${HERO_CONTENT_INSET} + ${HERO_TALLEST_CONTENT}px)`;
 
@@ -239,7 +245,11 @@ export const HeroShell: React.FC<HeroShellProps> = ({
            `coverBroken` is set by onError after first paint, so gating on it
            would collapse the block post-paint - a worse jump than the one the
            floor removes. A URL that 404s keeps the floor and shows ink. */
+        /* The SHAPE: the cropper takes a 1:1 crop, so the hero holds 1:1 too.
+           Box renders as the larger of width and the floor. */
+        aspectRatio: coverUrl ? '1 / 1' : undefined,
         minHeight: coverUrl ? HERO_MIN_HEIGHT : undefined,
+
 
 
       }}
