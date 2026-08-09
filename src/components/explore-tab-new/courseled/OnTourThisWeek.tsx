@@ -373,8 +373,20 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             {cellsLive.map(([label, value, tone], i) => (
                               <div
                                 key={label}
-                                style={{ textAlign: i === 0 ? 'left' : 'center' }}
+                                style={{
+                                  // The end cell mirrors the first: it hugs its
+                                  // own edge so "Second" sits the same distance
+                                  // from the right as "Round" does from the
+                                  // left, in line with the margin above it.
+                                  textAlign:
+                                    i === 0
+                                      ? 'left'
+                                      : i === cellsLive.length - 1
+                                        ? 'right'
+                                        : 'center',
+                                }}
                               >
+
                                 <div style={{ ...NUMF, fontSize: 15, fontWeight: 800, color: tone }}>
                                   {value}
                                 </div>
