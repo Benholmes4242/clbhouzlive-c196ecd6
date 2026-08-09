@@ -386,28 +386,29 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           count: totalRounds,
           rounds: formatNumber(totalRounds),
         })}
-        headerGap={10}
-        style={{ padding: '12px 16px' }}
+        headerGap={16}
+        style={{ padding: '18px 16px 12px' }}
       >
         <ShapeChart
           holes={holes}
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
+          hardestText={beastFig ? beastFig.text : ''}
           hasYou={hasYou}
         />
 
         {/* Legend: what the bars are, and what the line is. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 10 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <i style={{ width: 10, height: 6, borderRadius: 2, background: A.TRACK }} />
-            <span style={{ ...LABEL, fontSize: 8 }}>
+            <i style={{ width: 12, height: 6, borderRadius: 2, background: A.TRACK }} />
+            <span style={{ ...LABEL, fontSize: 7 }}>
               {t('courses:courseDetail.plays.legendField')}
             </span>
           </span>
           {hasYou && (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <i style={{ width: 12, height: 2, borderRadius: 1, background: A.AMBER }} />
-              <span style={{ ...LABEL, fontSize: 8 }}>
+              <span style={{ ...LABEL, fontSize: 7 }}>
                 {t('courses:courseDetail.plays.legendYou')}
               </span>
             </span>
@@ -416,33 +417,29 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
         <Hairline style={{ margin: '10px 0 8px' }} />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+        {/* Toughest/easiest live ONLY in the pair beneath, with their figures. */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: hasYou ? 'repeat(3, minmax(0, 1fr))' : '1fr',
+          }}
+        >
           <Figure
             label={t('courses:courseDetail.plays.fieldAvg')}
             value={field ? field.text : '\u2014'}
             tone={field ? field.tone : A.INK}
           />
-          {hasYou && you ? (
+          {hasYou && you && (
             <Figure
               label={t('courses:courseDetail.plays.yourAvg')}
               value={you.text}
               tone={A.AMBER_DEEP}
             />
-          ) : (
-            <Figure
-              label={t('courses:courseDetail.plays.toughestHole')}
-              value={stats.hardest.hole_no}
-            />
           )}
-          {hasYou ? (
+          {hasYou && (
             <Figure
               label={t('courses:courseDetail.plays.youBeat')}
               value={`${stats.beat}/${stats.withYou}`}
-            />
-          ) : (
-            <Figure
-              label={t('courses:courseDetail.plays.easiestHole')}
-              value={stats.easiest.hole_no}
             />
           )}
         </div>
@@ -458,20 +455,40 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
               }}
             >
               {extremes.map((c) => (
-                <Figure
-                  key={c.key}
-                  label={c.label}
-                  value={
-                    <>
-                      {t('courses:courseDetail.plays.holeN', { hole: c.hole })}
-                      <span style={{ color: c.tone, marginLeft: 6 }}>{c.text}</span>
-                    </>
-                  }
-                />
+                <div key={c.key} style={{ textAlign: 'center', minWidth: 0 }}>
+                  <div style={{ ...LABEL, fontSize: 7.5 }}>{c.label}</div>
+                  <div
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 800,
+                      letterSpacing: '-0.025em',
+                      color: A.INK,
+                      marginTop: 3,
+                      whiteSpace: 'nowrap',
+                      ...FIGS,
+                    }}
+                  >
+                    {t('courses:courseDetail.plays.holeN', { hole: c.hole })}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 800,
+                      letterSpacing: '-0.025em',
+                      color: c.tone,
+                      marginTop: 4,
+                      whiteSpace: 'nowrap',
+                      ...FIGS,
+                    }}
+                  >
+                    {c.text}
+                  </div>
+                </div>
               ))}
             </div>
           </>
         )}
+
       </Panel>
 
       {/* Block 3 - Hole by hole */}
