@@ -35,7 +35,7 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
       style={{
         fontSize: 20,
         fontWeight: 800,
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.025em',
         color: tone,
         marginTop: 3,
         whiteSpace: 'nowrap',
@@ -56,15 +56,73 @@ interface Props {
   courseId: string | undefined;
 }
 
+/**
+ * Monotone cubic interpolation, Fritsch-Carlson tangents.
+ *
+ * Implemented here rather than pulled from d3 (curveMonotoneX) to avoid the
+ * dependency: the guarantee we need is that the curve NEVER leaves the range
+ * of its own data, so the member's line cannot dip under par on a hole they
+ * bogeyed. A Catmull-Rom / naive spline overshoots exactly there.
+ */
+function monotonePath(pts: { x: number; y: number }[]): string {
+  const n = pts.length;
+  if (n < 2) return '';
+  const dx: number[] = [];
+  const dy: number[] = [];
+  const slope: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    dx.push(pts[i + 1].x - pts[i].x);
+    dy.push(pts[i + 1].y - pts[i].y);
+    slope.push(dx[i] === 0 ? 0 : dy[i] / dx[i]);
+  }
+  // Initial tangents = average of neighbouring slopes.
+  const m: number[] = new Array(n);
+  m[0] = slope[0];
+  m[n - 1] = slope[n - 2];
+  for (let i = 1; i < n - 1; i++) {
+    if (slope[i - 1] * slope[i] <= 0) m[i] = 0;
+    else m[i] = (slope[i - 1] + slope[i]) / 2;
+  }
+  // Fritsch-Carlson limiter - clamps tangents so no segment overshoots.
+  for (let i = 0; i < n - 1; i++) {
+    if (slope[i] === 0) {
+      m[i] = 0;
+      m[i + 1] = 0;
+      continue;
+    }
+    const a = m[i] / slope[i];
+    const b = m[i + 1] / slope[i];
+    const s = a * a + b * b;
+    if (s > 9) {
+      const tau = 3 / Math.sqrt(s);
+      m[i] = tau * a * slope[i];
+      m[i + 1] = tau * b * slope[i];
+    }
+  }
+  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+  for (let i = 0; i < n - 1; i++) {
+    const h = dx[i] / 3;
+    const c1x = pts[i].x + h;
+    const c1y = pts[i].y + m[i] * h;
+    const c2x = pts[i + 1].x - h;
+    const c2y = pts[i + 1].y - m[i + 1] * h;
+    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${pts[i + 1].x.toFixed(2)} ${pts[i + 1].y.toFixed(2)}`;
+  }
+  return d;
+}
+
 /** Shape chart - bars are the field, the amber line is the member. */
 const ShapeChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hardestHole: number;
+  hardestText: string;
   hasYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hasYou }) => {
+}> = ({ holes, myByHole, hardestHole, hardestText, hasYou }) => {
   const W = 340;
-  const H = 74;
+  const H = 116;
+  /** Headroom for the hardest hole's own figure - the line shares it. */
+  const TOP = 20;
   const n = holes.length;
   if (n === 0) return null;
 
@@ -77,64 +135,156 @@ const ShapeChart: React.FC<{
   const span = Math.max(0.1, domainMax - domainMin);
 
   const slot = W / n;
-  const barW = Math.max(5, slot - 6);
-  const y = (v: number) => 4 + (1 - (v - domainMin) / span) * (H - 10);
+  const barW = Math.max(5, slot - 4);
+  const y = (v: number) => TOP + 4 + (1 - (v - domainMin) / span) * (H - TOP - 10);
   const yBase = y(0);
+  const cx = (i: number) => i * slot + slot / 2;
 
-  const points = hasYou
+  const linePts = hasYou
     ? holes
         .map((h, i) => {
           const mine = myByHole.get(h.hole_no)?.avg_to_par;
-          return mine == null ? null : `${i * slot + slot / 2},${y(mine)}`;
+          return mine == null ? null : { x: cx(i), y: y(mine) };
         })
-        .filter((p): p is string => p !== null)
+        .filter((p): p is { x: number; y: number } => p !== null)
     : [];
+  const linePath = linePts.length > 1 ? monotonePath(linePts) : '';
+  const endPt = linePts.length > 1 ? linePts[linePts.length - 1] : null;
 
-  const axisIdx = [0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1];
+  const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
+  const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
+
+  // 1, 6, 12, 18 - the ends are read, the middles orient.
+  const axisIdx = Array.from(
+    new Set([0, Math.min(n - 1, 5), Math.min(n - 1, 11), n - 1]),
+  ).sort((a, b) => a - b);
 
   return (
     <>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} style={{ display: 'block' }} aria-hidden="true">
-        {holes.map((h, i) => {
-          const yv = y(h.avg_to_par);
-          const top = Math.min(yv, yBase);
-          const height = Math.max(2, Math.abs(yBase - yv));
-          return (
-            <rect
-              key={h.hole_no}
-              x={i * slot + (slot - barW) / 2}
-              y={top}
-              width={barW}
-              height={height}
-              rx={2}
-              fill={h.hole_no === hardestHole ? A.BODY : A.TRACK}
+      {/* Overlays are positioned in REAL PIXELS: preserveAspectRatio="none"
+          stretches the viewBox non-uniformly, so an SVG circle would render
+          as an ellipse. */}
+      <div style={{ position: 'relative', height: H }}>
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          width="100%"
+          height={H}
+          preserveAspectRatio="none"
+          style={{ display: 'block' }}
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="hip-bar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#E4E9EF" />
+              <stop offset="100%" stopColor="#EEF2F6" />
+            </linearGradient>
+            <linearGradient id="hip-bar-ink" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(14,18,22,0.78)" />
+              <stop offset="100%" stopColor="rgba(14,18,22,0.62)" />
+            </linearGradient>
+          </defs>
+          {holes.map((h, i) => {
+            const yv = y(h.avg_to_par);
+            const top = Math.min(yv, yBase);
+            const height = Math.max(2, Math.abs(yBase - yv));
+            const x = i * slot + (slot - barW) / 2;
+            const r = Math.min(3, barW / 2);
+            const rb = Math.min(1, barW / 2);
+            const d = [
+              `M ${x} ${top + r}`,
+              `Q ${x} ${top} ${x + r} ${top}`,
+              `L ${x + barW - r} ${top}`,
+              `Q ${x + barW} ${top} ${x + barW} ${top + r}`,
+              `L ${x + barW} ${top + height - rb}`,
+              `Q ${x + barW} ${top + height} ${x + barW - rb} ${top + height}`,
+              `L ${x + rb} ${top + height}`,
+              `Q ${x} ${top + height} ${x} ${top + height - rb}`,
+              'Z',
+            ].join(' ');
+            return (
+              <path
+                key={h.hole_no}
+                d={d}
+                fill={h.hole_no === hardestHole ? 'url(#hip-bar-ink)' : 'url(#hip-bar)'}
+              />
+            );
+          })}
+          {linePath && (
+            <path
+              d={linePath}
+              fill="none"
+              stroke={A.AMBER}
+              strokeWidth={2}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
             />
-          );
-        })}
-        {points.length > 1 && (
-          <polyline
-            points={points.join(' ')}
-            fill="none"
-            stroke={A.AMBER}
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
+          )}
+        </svg>
+
+        {/* The hardest hole carries its own value. ONE label only. */}
+        {hardestTopY != null && (
+          <span
+            style={{
+              position: 'absolute',
+              left: `${(cx(hardestIdx) / W) * 100}%`,
+              top: Math.max(0, hardestTopY - 15),
+              transform: 'translateX(-50%)',
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
+              color: A.INK,
+              whiteSpace: 'nowrap',
+              ...FIGS,
+            }}
+          >
+            {hardestText}
+          </span>
+        )}
+
+        {/* End dot in real pixels so it stays circular. */}
+        {endPt && (
+          <span
+            style={{
+              position: 'absolute',
+              left: `${(endPt.x / W) * 100}%`,
+              top: endPt.y,
+              transform: 'translate(-50%, -50%)',
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: A.AMBER,
+              boxShadow: '0 0 0 2.5px #FFFFFF',
+            }}
           />
         )}
-      </svg>
-      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 2px 0' }}>
-        {axisIdx.map((i) => (
-          <span
-            key={i}
-            style={{ ...LABEL, fontSize: 8.5, color: i === n - 1 ? A.INK : A.DIM }}
-          >
-            {holes[i].hole_no}
-          </span>
-        ))}
+      </div>
+
+      <div style={{ position: 'relative', height: 12, margin: '9px 0 0' }}>
+        {axisIdx.map((i) => {
+          const end = i === 0 || i === n - 1;
+          return (
+            <span
+              key={i}
+              style={{
+                ...LABEL,
+                position: 'absolute',
+                left: `${(cx(i) / W) * 100}%`,
+                transform: 'translateX(-50%)',
+                fontSize: 8.5,
+                fontWeight: end ? 800 : 600,
+                color: end ? A.BODY : A.DIM,
+              }}
+            >
+              {holes[i].hole_no}
+            </span>
+          );
+        })}
       </div>
     </>
   );
 };
+
 
 export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const { t } = useTranslation(['courses']);
