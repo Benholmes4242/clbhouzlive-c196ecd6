@@ -243,7 +243,7 @@ function GolferRow({
         display: 'flex',
         gap: GUTTER,
         alignItems: 'center',
-        padding: '13px 0',
+        padding: '11px 0',
         minHeight: ROW_CONTENT_MIN,
       }}
     >
