@@ -1097,7 +1097,6 @@ function AllPicksSheet({
                         positionTied={live.positionTied}
                         status={live.status}
 
-                        status={live.status}
                         align="right"
                       />
                     ) : null
