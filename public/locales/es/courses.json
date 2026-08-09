@@ -108,7 +108,8 @@
       "legendDouble": "Double+",
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
-      "showLess": "Show less"
+      "showLess": "Show less",
+      "seeAllShort": "Los {{count}}"
     }
   },
   "scorecard": {
@@ -664,7 +665,10 @@
     "holes": {
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
-      "yourGap": "Your gap"
+      "yourGap": "Your gap",
+      "scaleLabel": "Escala de dificultad",
+      "scaleCaption": "Este hoyo frente al resto del campo: más a la derecha, más difícil.",
+      "yourGapVsField": "Tu diferencia con el campo"
     },
     "records": {
       "youHold": "You hold this board",

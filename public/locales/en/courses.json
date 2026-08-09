@@ -228,7 +228,8 @@
       "legendDouble": "Double+",
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
-      "showLess": "Show less"
+      "showLess": "Show less",
+      "seeAllShort": "All {{count}}"
     },
     "battle": {
       "youBeat": "Better than most here, but still your worst hole",
@@ -930,7 +931,10 @@
       "yards": "Yards",
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
-      "yourGap": "Your gap"
+      "yourGap": "Your gap",
+      "scaleLabel": "Difficulty scale",
+      "scaleCaption": "This hole against every other hole on the course — further right plays harder.",
+      "yourGapVsField": "Your gap vs field"
     },
     "records": {
       "kicker": "THE RECORD BOOK",
