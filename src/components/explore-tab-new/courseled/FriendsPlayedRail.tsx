@@ -204,12 +204,17 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       )}
                     </div>
 
-                    {/* LINE 2 — who played it, and how their index moved. */}
+                    {/* LINE 2 — who played it, how their index moved, and the
+                        reaction. The heart lives on the NAME ROW now: it is an
+                        act aimed at a person, so it sits beside the person, and
+                        the card loses a whole row of height. The slot is still
+                        reserved on every card so the row's right edge is
+                        identical whether or not a control renders. */}
                     <div
                       style={{
                         marginTop: 7,
                         display: 'flex',
-                        alignItems: 'baseline',
+                        alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: 8,
                       }}
@@ -227,11 +232,35 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       >
                         {r.display_name}
                       </span>
-                      <IndexMovement row={r} />
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <IndexMovement row={r} />
+                        <ReactionSlot>
+                          {(() => {
+                            const st = reactions.stateFor('round', r.score_id);
+                            return (
+                              <ReactionAction
+                                hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+                                readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
+                                count={st.count}
+                                reacted={st.mine}
+                                onToggle={() => reactions.toggle('round', r.score_id)}
+                                label={t('discover.reactions.action', 'Like this round')}
+                              />
+                            );
+                          })()}
+                        </ReactionSlot>
+                      </span>
                     </div>
 
-                    {/* LINE 3 — the personal reference; absent, never dashed. */}
-                    {reference && (
+                    {/* LINE 3 — the insight; absent, never dashed. */}
+                    {insight && (
                       <div
                         style={{
                           marginTop: 9,
@@ -243,28 +272,10 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           color: A.MUTE,
                         }}
                       >
-                        {reference}
+                        {insight}
                       </div>
                     )}
 
-                    {/* TRAILING SLOT — reserved on EVERY card, control or not. */}
-                    <div style={{ marginTop: 6, display: 'flex', justifyContent: 'flex-end' }}>
-                      <ReactionSlot>
-                        {(() => {
-                          const st = reactions.stateFor('round', r.score_id);
-                          return (
-                            <ReactionAction
-                              hidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
-                              readOnly={!!reactions.viewerId && r.user_id === reactions.viewerId}
-                              count={st.count}
-                              reacted={st.mine}
-                              onToggle={() => reactions.toggle('round', r.score_id)}
-                              label={t('discover.reactions.action', 'Like this round')}
-                            />
-                          );
-                        })()}
-                      </ReactionSlot>
-                    </div>
                   </div>
                 );
               })()}
