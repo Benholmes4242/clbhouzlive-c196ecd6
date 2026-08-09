@@ -167,7 +167,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {`Standard ${STANDARD_SLOPE}`}
+          {t('courses:courseDetail.card.standardMark', { standard: STANDARD_SLOPE })}
         </span>
         <span>{SCALE_MAX}</span>
       </div>
