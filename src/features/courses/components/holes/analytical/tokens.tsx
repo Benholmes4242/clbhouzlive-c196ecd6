@@ -12,6 +12,13 @@
  *   - absent values render nothing (no placeholder dashes)
  */
 import React from 'react';
+import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+
+/**
+ * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
+ * red serves every golf surface. See BRIEF_UNDER_PAR_RED.
+ */
+export const TOPAR_RED = TOPAR_UNDER_LIGHT;
 
 export const A = {
   CANVAS: '#F4F6F9',
