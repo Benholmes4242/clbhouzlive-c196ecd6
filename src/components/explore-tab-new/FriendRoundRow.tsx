@@ -32,12 +32,15 @@ const RED = '#D2222D';         // hcp rise = red
 
 // Compact density (canonical Discover/Champions).
 const ROW_MIN_HEIGHT = 56;
-const ROW_PADDING = '10px 16px';
+const ROW_PADDING = '13px 16px';
 const AVATAR_SIZE = 34;
-const NAME_SIZE = 14.5;
-const SUBLINE_SIZE = 12.5;
-const STAT_VALUE_SIZE = 17;
-const STAT_LABEL_SIZE = 9.5;
+const NAME_SIZE = 13.5;
+const SUBLINE_SIZE = 12;
+const STAT_VALUE_SIZE = 21;
+const STAT_LABEL_SIZE = 6.5;
+/** Fixed score column: with no separators the grid is what aligns the sheet. */
+const SCORE_COL_W = 76;
+
 
 interface Props {
   row: FriendRoundRow;
