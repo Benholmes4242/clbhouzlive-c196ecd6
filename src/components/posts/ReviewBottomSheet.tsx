@@ -20,10 +20,12 @@ import { formatMonthYearShort } from '@/i18n/format';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, Play } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
@@ -73,6 +75,8 @@ export interface ReviewBottomSheetProps {
   } | null;
   reviewDate?: string | null;
   courseSubtitle?: string | null;
+  /** Optional review media, when the calling surface already holds it. */
+  media?: ReviewMediaItem[] | null;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -105,6 +109,43 @@ function formatMonthLabel(iso?: string | null): string {
 }
 
 
+/** One cell of the reference block: figure over a small caps label. */
+const RefCell: React.FC<{
+  figure: string;
+  figureSize: number;
+  color: string;
+  label: string;
+}> = ({ figure, figureSize, color, label }) => (
+  <div style={{ minWidth: 0 }}>
+    <div
+      style={{
+        fontSize: figureSize,
+        fontWeight: 300,
+        lineHeight: 1,
+        color,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {figure}
+    </div>
+    <div
+      style={{
+        marginTop: 5,
+        fontSize: 9.5,
+        fontWeight: 600,
+        letterSpacing: '0.1em',
+        color: MUTE,
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {label}
+    </div>
+  </div>
+);
+
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
   onClose,
@@ -120,6 +161,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   breakdown,
   reviewerStats,
   reviewDate,
+  media,
 }) => {
   const navigate = useNavigate();
 
@@ -286,7 +328,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               bottom: 0,
               zIndex: REVIEW_SHEET_Z + 1,
               width: '100%',
-              maxHeight: '75dvh',
+              maxHeight: '90dvh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
