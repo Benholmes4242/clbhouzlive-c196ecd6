@@ -6,7 +6,7 @@ import {
   type ScoringBreakdownHole,
 } from './useCourseScoringBreakdown';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
-import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS } from './analytical/tokens';
+import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED } from './analytical/tokens';
 import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
 
 /**
