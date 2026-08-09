@@ -51,7 +51,7 @@ interface TrendRowProps {
 function TrendRow({ label, delta, caption, borderTop }: TrendRowProps) {
   const improved = delta != null && delta < -0.05;
   const drifted = delta != null && delta > 0.05;
-  const color = improved ? A.UNDER : drifted ? A.OVER : A.MUTE;
+  const color = improved ? A.IMPROVED : drifted ? A.DRIFTED : A.MUTE;
   const fmt =
     delta == null
       ? null

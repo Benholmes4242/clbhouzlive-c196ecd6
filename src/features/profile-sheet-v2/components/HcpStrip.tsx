@@ -101,10 +101,10 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
     deltaTone = A.DIM;
   } else if (rounded > 0) {
     deltaValue = `+${rounded.toFixed(1)}`;
-    deltaTone = A.OVER;
+    deltaTone = A.DRIFTED;
   } else {
     deltaValue = `\u2212${Math.abs(rounded).toFixed(1)}`;
-    deltaTone = A.UNDER;
+    deltaTone = A.IMPROVED;
   }
 
   const go = () => onNavigate('/handicap');
