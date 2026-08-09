@@ -58,17 +58,9 @@ interface Props {
   onSeeAll: () => void;
 }
 
-function relativeDay(iso: string, t: (k: string, o?: any) => string): string {
-  const then = new Date(`${iso}T12:00:00`).getTime();
-  const days = Math.round((Date.now() - then) / 86_400_000);
-  if (days <= 0) return t('discover.when.today', 'Today');
-  if (days === 1) return t('discover.when.yesterday', 'Yesterday');
-  if (days < 7) {
-    return new Date(then).toLocaleDateString(undefined, { weekday: 'short' });
-  }
-  if (days < 14) return t('discover.when.lastWeek', 'Last week');
-  return t('discover.when.weeksAgo', { defaultValue: '{{count}}w ago', count: Math.floor(days / 7) });
-}
+/* relativeDay now lives in ./discoverWhen so the one-thing row reads the same
+   wording for the same age. Behaviour here is unchanged ('short' weekday). */
+
 
 export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
