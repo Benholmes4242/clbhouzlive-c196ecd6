@@ -129,9 +129,11 @@ export const Panel: React.FC<{
   aside?: string;
   footer?: string;
   onOpen?: () => void;
+  /** Override the gap beneath the header row (px). Default 16. */
+  headerGap?: number;
   children: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ kicker, title, aside, footer, onOpen, children, style }) => (
+}> = ({ kicker, title, aside, footer, onOpen, headerGap = 16, children, style }) => (
   <section
     style={{
       background: A.PANEL,
@@ -150,7 +152,7 @@ export const Panel: React.FC<{
           justifyContent: 'space-between',
           alignItems: 'baseline',
           gap: 12,
-          marginBottom: 16,
+          marginBottom: headerGap,
         }}
       >
         {kicker && <span style={KICKER}>{kicker}</span>}
