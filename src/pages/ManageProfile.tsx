@@ -442,22 +442,26 @@ function ProfileTabBody({
             />
           </div>
           <div style={{ position: 'relative', padding: '0 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: -34 }}>
-              <ProfilePhotoCard
-                ref={profilePickerRef}
-                variant="bare"
-                currentUrl={form.profilePhotoUrl}
-                onFileChange={(file) => {
-                  setField('profilePhotoBlob', file);
-                  if (file) setField('profilePhotoUrl', URL.createObjectURL(file));
-                }}
-                onRemove={() => {
-                  setField('profilePhotoBlob', null);
-                  setField('profilePhotoUrl', null);
-                }}
-              />
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, marginTop: -34 }}>
+              <div style={{ flexShrink: 0 }}>
+                <ProfilePhotoCard
+                  ref={profilePickerRef}
+                  variant="bare"
+                  currentUrl={form.profilePhotoUrl}
+                  onFileChange={(file) => {
+                    setField('profilePhotoBlob', file);
+                    if (file) setField('profilePhotoUrl', URL.createObjectURL(file));
+                  }}
+                  onRemove={() => {
+                    setField('profilePhotoBlob', null);
+                    setField('profilePhotoUrl', null);
+                  }}
+                />
+              </div>
+              <CoverGuidance />
             </div>
-            <div style={{ paddingTop: 12, paddingBottom: 12 }}>
+            <div style={{ paddingTop: 14, paddingBottom: 12 }}>
+
               {!hasAvatar ? (
                 <Nudge icon={<Sparkles size={12} strokeWidth={2.25} />}>
                   Golfers with a photo get 3x more friend requests

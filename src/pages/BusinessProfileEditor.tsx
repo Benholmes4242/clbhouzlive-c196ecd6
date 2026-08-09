@@ -746,13 +746,19 @@ export default function BusinessProfileEditor() {
                 onRemove={onCoverRemove}
               />
               <div style={{ position: 'relative', padding: '0 16px 12px', marginTop: -34 }}>
-                <ProfilePhotoCard
-                  variant="bare"
-                  currentUrl={effectiveLogoUrl}
-                  onFileChange={(file) => { if (file) onLogoFile(file); }}
-                  onRemove={onLogoRemove}
-                />
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14 }}>
+                  <div style={{ flexShrink: 0 }}>
+                    <ProfilePhotoCard
+                      variant="bare"
+                      currentUrl={effectiveLogoUrl}
+                      onFileChange={(file) => { if (file) onLogoFile(file); }}
+                      onRemove={onLogoRemove}
+                    />
+                  </div>
+                  <CoverGuidance />
+                </div>
               </div>
+
             </div>
           </div>
 
