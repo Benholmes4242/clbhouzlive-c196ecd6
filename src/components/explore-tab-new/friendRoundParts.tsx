@@ -68,7 +68,7 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
           color: A.DIM,
         }}
       >
-        {t('discover.friendsRail.index', 'Index')}
+        {t('discover.friendsRail.index', 'HCP')}
       </span>
     </span>
   );
