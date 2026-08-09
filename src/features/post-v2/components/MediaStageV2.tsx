@@ -3,10 +3,12 @@
 // never leaves a dead screen.
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Volume2, VolumeX } from 'lucide-react';
 import type { StageMediaItem, FrameId } from '../hooks/useStageComposer';
 import CroppedImage from './CroppedImage';
 import { CT_DARK } from '@/features/_shared/composerTokens';
+import { useSessionAudio } from '@/audio/sessionAudioStore';
+
 
 const FRAME_RATIO: Record<FrameId, number | null> = {
   original: null,
