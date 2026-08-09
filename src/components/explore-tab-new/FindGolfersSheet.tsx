@@ -125,6 +125,47 @@ function Pill({
   );
 }
 
+/**
+ * TextAction — Follow, as a word rather than a pill. Fixed 16px high so the
+ * settled state cannot change the row's height either.
+ */
+function TextAction({
+  onClick,
+  color,
+  children,
+}: {
+  onClick?: () => void;
+  color: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      style={{
+        height: 16,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 4,
+        whiteSpace: 'nowrap',
+        color,
+        fontFamily: SANS,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.09em',
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+
 /** A figure and its label, inline. Absent values are not rendered at all. */
 function Fig({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
