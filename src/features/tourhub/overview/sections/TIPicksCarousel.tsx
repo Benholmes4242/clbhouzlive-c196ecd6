@@ -701,8 +701,8 @@ function VerdictBanner({
       <div
         style={{
           marginTop: 14,
-          paddingBottom: 12,
-          borderBottom: `1px solid ${HAIR}`,
+          paddingBottom: 4,
+
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'space-between',
