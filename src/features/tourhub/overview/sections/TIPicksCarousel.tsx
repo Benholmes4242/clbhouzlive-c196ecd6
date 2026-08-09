@@ -175,14 +175,31 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       border: isWin ? `1px solid ${GOLD_RING}` : `1px solid ${HAIR}`,
                       boxShadow: isWin ? GOLD_SHADOW : V4.cardShadow,
                       borderRadius: 16,
-                      padding: 14,
+                      padding: '14px 15px',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 0,
                       cursor: 'pointer',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    {/* Top row: the pick with its denominator, opposite the live state */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                        marginBottom: 11,
+                        minHeight: 10,
+                      }}
+                    >
+                      <span style={{ ...PICK_META, color: A.DIM }}>
+                        {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
+                      </span>
+                      <PickStatusTag live={live} t={t} />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 11 }}>
                       <div
                         role="link"
                         onClick={(e) => {
@@ -192,7 +209,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         style={{ cursor: 'pointer', flexShrink: 0 }}
                       >
                         <SquircleAvatar
-                          size={46}
+                          size={52}
                           srcCandidates={
                             p.photoUrl
                               ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
@@ -225,58 +242,38 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 13.5,
                         fontWeight: 500,
                         color: 'rgba(15,23,42,0.78)',
-                        lineHeight: 1.4,
-                        minHeight: 36,
+                        lineHeight: 1.45,
+                        minHeight: 39,
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        margin: '10px 0 0',
+                        margin: '11px 0 0',
                       }}
                     >
                       {p.pulledQuote || p.reasons?.[0] || '—'}
                     </div>
 
-                    <div
+                    {/* Affordance, not a control — the whole card is the tap target */}
+                    <span
                       style={{
-                        marginTop: 10,
-                        paddingTop: 10,
-                        borderTop: `1px solid ${HAIR}`,
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        justifyContent: 'space-between',
+                        marginTop: 12,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        color: AMBER_DEEP,
+                        letterSpacing: '0.09em',
+                        textTransform: 'uppercase',
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 800,
-                          color: '#0E1216',
-                          letterSpacing: '0.06em',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.theCase')}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_45,
-                          letterSpacing: '0.06em',
-                          textTransform: 'uppercase',
-                          fontVariantNumeric: 'tabular-nums',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.pickLabel', { rank: p.rank })}
-                      </span>
-                    </div>
+                      {t('overview.tiPicks.card.theCase')}
+                    </span>
                   </button>
                 );
               })}
+
             </div>
 
             {sheet?.kind === 'index' ? (
