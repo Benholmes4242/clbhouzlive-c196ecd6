@@ -27,6 +27,8 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
     allowMultiplePerFriend: true,
   });
   const total = rounds?.length ?? 0;
+  // Insight resolution spans the whole list so one kind cannot flood the sheet.
+  const insights = useMemo(() => buildInsightMap(rounds ?? [], t as never), [rounds, t]);
 
   return (
     <BottomSheet
