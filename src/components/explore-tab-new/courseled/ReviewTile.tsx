@@ -7,7 +7,7 @@ import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
-import { SANS, FIGS, NEW_CARD_RING } from './tokens';
+import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -25,15 +25,24 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score chip is WHITE, not band-coloured: band colours do not survive on
- * photography. The band colour lives in the review sheet.
+ * The score chip is WHITE, not band-coloured. This was RE-TESTED
+ * (BRIEF_LATEST_REVIEWS_CRAFT_AND_FILTER) against the four live photographs on
+ * the dark glass substrate, including a bright sky-heavy one: BAND_GREEN
+ * (#047857) all but disappears on rgba(10,14,10,0.58) — a 9.8 reads as a
+ * smudge — and the only way to make green legible there is to invent a second,
+ * lighter rating green that exists nowhere else in the app. So the chip stays
+ * white and the band colour lives in the review sheet. Settled; do not revisit.
+ *
+ * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
+ * (a figure on a review tile can only be a rating).
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 38%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 30%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
+
 
 
 function relativeAge(iso: string, t: (k: string, o?: any) => string): string {
@@ -248,32 +257,39 @@ export function ReviewTile({
           </span>
         )}
 
-        {/* SCORE CHIP — same glass badge, clbhouz mark then the rating. */}
+        {/* SCORE CHIP — glass badge: the figure, then the scale. A 10px radius
+            rectangle, not a pill: a pill against a square tile corner reads as
+            a foreign shape. */}
         <span
           style={{
             position: 'absolute',
             top: 8,
             left: 8,
             display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '3px 8px',
-            borderRadius: 999,
-            background: 'rgba(10,14,10,0.55)',
+            alignItems: 'baseline',
+            gap: 2,
+            padding: '5px 10px',
+            borderRadius: 10,
+            background: 'rgba(10,14,10,0.58)',
             backdropFilter: 'blur(6px)',
             WebkitBackdropFilter: 'blur(6px)',
           }}
         >
-          <img
-            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-            alt=""
-            aria-hidden="true"
-            style={{ width: 13, height: 13, objectFit: 'contain', display: 'block' }}
-          />
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', ...FIGS }}>
+          <span
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: '#fff',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              ...FIGS,
+            }}
+          >
             {r.rating.toFixed(1)}
           </span>
+          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.55)' }}>/10</span>
         </span>
+
 
 
         {/* REACTION — glass corner, opposite the score chip. */}
@@ -289,15 +305,16 @@ export function ReviewTile({
           />
         </span>
 
-        {/* BOTTOM BLOCK — course name as headline, then byline. */}
-        <div style={{ position: 'absolute', left: 10, right: 10, bottom: 10 }}>
+        {/* BOTTOM BLOCK — course name as headline (two lines maximum, so a long
+            club name cannot crowd the byline), then the byline. */}
+        <div style={{ position: 'absolute', left: 13, right: 13, bottom: 11 }}>
           <div
             style={{
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 800,
               color: '#FFFFFF',
-              letterSpacing: '-0.015em',
-              lineHeight: 1.18,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.12,
               ...clamp(2),
             }}
           >
@@ -305,10 +322,9 @@ export function ReviewTile({
           </div>
           <div
             style={{
+              ...LABEL,
+              fontSize: 7,
               marginTop: 5,
-
-              fontSize: 9.5,
-              fontWeight: 700,
               color: 'rgba(255,255,255,0.62)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -320,6 +336,7 @@ export function ReviewTile({
             <span style={FIGS}>{relativeAge(r.at, t)}</span>
           </div>
         </div>
+
       </CourseImageFallback>
     </button>
   );

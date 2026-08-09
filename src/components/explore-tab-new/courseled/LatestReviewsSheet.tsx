@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -15,9 +15,41 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * LATEST_REVIEWS_PAGE_SIZE (24). A tile tap opens the shared review sheet
  * STACKED ABOVE this one — ReviewBottomSheet lives at REVIEW_SHEET_Z (240), so
  * this sheet is deliberately based below it and stays open beneath.
+ *
+ * REGION FILTER (BRIEF_LATEST_REVIEWS_CRAFT_AND_FILTER, section 4).
+ * The region comes from `golf_courses.country`, which despite its name already
+ * holds the COARSE bucket ('Britain & Ireland' | 'USA' | 'Continental Europe' |
+ * 'Oceania' | 'Asia' | ...), carried on the review row as `courseCountry`. So
+ * GB&I is definable without the geo_regions vocabulary and without SQL.
+ *
+ * "Rest of the world" is DEFINED BY EXCLUSION, never by a list: a course in a
+ * bucket nobody enumerated (or with no bucket at all) still belongs to exactly
+ * one pill, so the five pills partition the whole set.
+ *
+ * HONESTY OF THE COUNT: the sheet paginates, so filtering only what has loaded
+ * would under-report. While a region is selected the sheet DRAINS the remaining
+ * pages, and the header reads "loading" until it has them all — it never states
+ * a number it cannot stand behind.
  */
 
 const SHEET_Z_UNDER_REVIEW = 150;
+
+type RegionKey = 'all' | 'gbi' | 'usa' | 'europe' | 'rest';
+
+/** The coarse buckets each named pill owns. Everything else falls to 'rest'. */
+const REGION_BUCKETS: Record<Exclude<RegionKey, 'all' | 'rest'>, string[]> = {
+  gbi: ['britain & ireland', 'britain and ireland', 'gb&i'],
+  usa: ['usa', 'united states', 'united states of america'],
+  europe: ['continental europe', 'europe'],
+};
+
+function regionOf(r: LatestReview): Exclude<RegionKey, 'all'> {
+  const bucket = String(r.courseCountry ?? '').trim().toLowerCase();
+  for (const key of ['gbi', 'usa', 'europe'] as const) {
+    if (REGION_BUCKETS[key].includes(bucket)) return key;
+  }
+  return 'rest';
+}
 
 interface Props {
   open: boolean;
@@ -44,6 +76,21 @@ export function LatestReviewsSheet({
 }: Props) {
   const { t } = useTranslation('courses');
   const sentinel = useRef<HTMLDivElement | null>(null);
+  const [region, setRegion] = useState<RegionKey>('all');
+
+  const pills: Array<{ key: RegionKey; label: string }> = [
+    { key: 'all', label: t('discover.reviews.region.all', 'Worldwide') },
+    { key: 'gbi', label: t('discover.reviews.region.gbi', 'GB&I') },
+    { key: 'usa', label: t('discover.reviews.region.usa', 'USA') },
+    { key: 'europe', label: t('discover.reviews.region.europe', 'Europe') },
+    { key: 'rest', label: t('discover.reviews.region.rest', 'Rest of the world') },
+  ];
+  const activeLabel = pills.find((p) => p.key === region)?.label ?? pills[0].label;
+
+  const visible = useMemo(
+    () => (region === 'all' ? reviews : reviews.filter((r) => regionOf(r) === region)),
+    [reviews, region],
+  );
 
   // REACTIONS — one read for the loaded page set, keyed by review id.
   const reactionTargets = useMemo<ReactionTarget[]>(
@@ -67,7 +114,29 @@ export function LatestReviewsSheet({
     return () => io.disconnect();
   }, [open, hasNextPage, isFetchingNextPage, onLoadMore]);
 
-  const total = totalCount ?? reviews.length;
+  // FILTERED = DRAIN. A filtered view over a partial set would show "3 reviews"
+  // when there are thirty, and an empty region that simply has not loaded yet
+  // is indistinguishable from one with nothing in it.
+  useEffect(() => {
+    if (!open || region === 'all') return;
+    if (!hasNextPage || isFetchingNextPage || !onLoadMore) return;
+    onLoadMore();
+  }, [open, region, hasNextPage, isFetchingNextPage, onLoadMore]);
+
+  const complete = !hasNextPage;
+  const total = region === 'all' ? totalCount ?? reviews.length : visible.length;
+  const caption =
+    region === 'all' || complete
+      ? t('discover.reviews.sheetRegionCaption', {
+          defaultValue: '{{region}} — {{count}} reviews',
+          region: activeLabel,
+          count: total,
+        })
+      : t('discover.reviews.sheetRegionLoading', {
+          defaultValue: '{{region}} — loading reviews',
+          region: activeLabel,
+        });
+
 
   return (
     <BottomSheet
@@ -88,55 +157,114 @@ export function LatestReviewsSheet({
     >
       <div
         style={{
-          padding: '10px 16px 12px',
+          padding: '10px 0 10px',
           background: A.CANVAS,
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <div style={{ ...KICKER, color: A.DIM, marginBottom: 5, ...FIGS }}>
-          {t('discover.reviews.sheetCaption', {
-            defaultValue: '{{count}} reviews',
-            count: total,
-          })}
+        <div style={{ padding: '0 16px' }}>
+          <div style={{ ...KICKER, color: A.DIM, marginBottom: 5, ...FIGS }}>{caption}</div>
+          <div
+            id="courseled-reviews-title"
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              color: A.INK,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {t('discover.latestReviews', 'Latest reviews')}
+          </div>
         </div>
+
+        {/* REGION PILLS — five pills that partition every review. An empty
+            region KEEPS its pill: hiding it would change the control's shape as
+            data arrives. */}
         <div
-          id="courseled-reviews-title"
+          role="tablist"
+          aria-label={t('discover.reviews.region.aria', 'Filter reviews by region')}
           style={{
-            fontSize: 20,
-            fontWeight: 800,
-            color: A.INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
+            marginTop: 10,
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            padding: '0 16px',
+            scrollbarWidth: 'none',
           }}
         >
-          {t('discover.latestReviews', 'Latest reviews')}
+          {pills.map((p) => {
+            const on = p.key === region;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setRegion(p.key)}
+                style={{
+                  flexShrink: 0,
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  fontFamily: SANS,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  background: on ? A.INK : A.PANEL,
+                  color: on ? A.PANEL : A.BODY,
+                  border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+                }}
+              >
+                {p.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {reviews.map((r) => {
-            const st = reactions.stateFor('review', r.reviewId);
-            const own = !!viewerId && r.userId === viewerId;
-            return (
-              <ReviewTile
-                key={r.reviewId}
-                review={r}
-                isOwn={own}
-                autoplayGroup="reviews-sheet"
-                onPress={onTilePress}
-                reactionHidden={!reactions.viewerId || reactions.unavailable}
-                reactionReadOnly={own}
-                reactionCount={st.count}
-                reacted={st.mine}
-                onToggleReaction={() => reactions.toggle('review', r.reviewId)}
-              />
-            );
-          })}
-        </div>
+        {visible.length === 0 && complete ? (
+          <div style={{ padding: '28px 8px', textAlign: 'center' }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.02em' }}>
+              {t('discover.reviews.region.emptyTitle', {
+                defaultValue: 'No reviews from {{region}} yet',
+                region: activeLabel,
+              })}
+            </div>
+            <div style={{ marginTop: 6, fontSize: 12.5, fontWeight: 500, color: A.MUTE }}>
+              {t(
+                'discover.reviews.region.emptyBody',
+                'Rate a course there and yours will be the first.',
+              )}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {visible.map((r) => {
+              const st = reactions.stateFor('review', r.reviewId);
+              const own = !!viewerId && r.userId === viewerId;
+              return (
+                <ReviewTile
+                  key={r.reviewId}
+                  review={r}
+                  isOwn={own}
+                  autoplayGroup="reviews-sheet"
+                  onPress={onTilePress}
+                  reactionHidden={!reactions.viewerId || reactions.unavailable}
+                  reactionReadOnly={own}
+                  reactionCount={st.count}
+                  reacted={st.mine}
+                  onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+                />
+              );
+            })}
+          </div>
+        )}
 
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
       </div>
+
     </BottomSheet>
   );
 }
