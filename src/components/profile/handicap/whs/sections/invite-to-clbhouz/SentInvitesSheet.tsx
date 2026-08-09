@@ -174,7 +174,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
       onClose={onClose}
       variant="dark"
       surfaceColor={REC.PANEL}
-      maxHeight="75dvh"
+      maxHeight="90dvh"
       ariaLabelledBy={TITLE_ID}
       style={{
         display: 'flex',

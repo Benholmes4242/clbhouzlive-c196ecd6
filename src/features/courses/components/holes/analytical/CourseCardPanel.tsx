@@ -531,7 +531,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         open={open}
         onClose={closeSheet}
         variant="light"
-        maxHeight="75dvh"
+        maxHeight="90dvh"
         ariaLabelledBy="course-card-sheet-title"
         style={{
           height: '75dvh',
