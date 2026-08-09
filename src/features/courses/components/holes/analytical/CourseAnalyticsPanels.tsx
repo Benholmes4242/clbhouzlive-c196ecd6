@@ -501,18 +501,14 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         subline={
           totalRounds > 0
             ? t('courses:holes.preview.description', {
+                holes: formatNumber(holes.length),
                 count: totalRounds,
-                holes: t('courses:courseDetail.holes.rankOf', {
-                  rank: holes.length,
-                  total: holes.length,
-                }).includes('of')
-                  ? `${holes.length} holes`
-                  : `${holes.length} holes`,
                 rounds: formatNumber(totalRounds),
                 personal: hasYou ? t('courses:holes.preview.personalClause') : '',
               })
-            : t('courses:holes.preview.descriptionNoRounds', { holes: `${holes.length} holes` })
+            : t('courses:holes.preview.descriptionNoRounds', { holes: formatNumber(holes.length) })
         }
+
         headerGap={10}
         style={{ padding: '18px 16px 12px' }}
       >
