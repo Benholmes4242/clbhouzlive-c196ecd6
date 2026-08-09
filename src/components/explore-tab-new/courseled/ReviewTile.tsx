@@ -25,15 +25,24 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score chip is WHITE, not band-coloured: band colours do not survive on
- * photography. The band colour lives in the review sheet.
+ * The score chip is WHITE, not band-coloured. This was RE-TESTED
+ * (BRIEF_LATEST_REVIEWS_CRAFT_AND_FILTER) against the four live photographs on
+ * the dark glass substrate, including a bright sky-heavy one: BAND_GREEN
+ * (#047857) all but disappears on rgba(10,14,10,0.58) — a 9.8 reads as a
+ * smudge — and the only way to make green legible there is to invent a second,
+ * lighter rating green that exists nowhere else in the app. So the chip stays
+ * white and the band colour lives in the review sheet. Settled; do not revisit.
+ *
+ * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
+ * (a figure on a review tile can only be a rating).
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 38%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 30%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
+
 
 
 function relativeAge(iso: string, t: (k: string, o?: any) => string): string {
