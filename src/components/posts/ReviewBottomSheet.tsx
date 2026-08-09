@@ -531,7 +531,78 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 ))
               )}
 
+              {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
+                  NON-INTERACTIVE: opening the fullscreen viewer from here is
+                  the exact z-order case that once put the viewer BEHIND a
+                  sheet on iOS, and it is not verifiable from a sheet that
+                  itself sits at REVIEW_SHEET_Z. Video shows poster + glyph
+                  and never autoplays. */}
+              {mediaStrip.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      color: MUTE,
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                    }}
+                  >
+                    {mediaTotal === 1 ? '1 PHOTO' : `${mediaTotal} PHOTOS`}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {mediaStrip.map((m) => (
+                      <div
+                        key={m.id}
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          height: 78,
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          background: BORDER,
+                          position: 'relative',
+                        }}
+                      >
+                        <img
+                          src={m.mediaType === 'video' ? (m.posterUrl ?? m.mediaUrl) : m.mediaUrl}
+                          alt=""
+                          loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                        {m.mediaType === 'video' && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: 999,
+                                background: 'rgba(14,18,22,0.55)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <Play size={12} strokeWidth={2.5} color="#FFFFFF" fill="#FFFFFF" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
             <div
