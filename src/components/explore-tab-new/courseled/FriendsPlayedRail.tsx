@@ -13,6 +13,8 @@ import {
   INSIGHT_CLAMP,
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
+import { relativeDay } from './discoverWhen';
+
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
