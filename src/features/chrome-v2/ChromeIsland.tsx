@@ -37,8 +37,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
-import { useHandicapTrend90d } from '@/hooks/useHandicapTrend90d';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { safeGoBack } from '@/utils/navigation';
 
 const ISLAND_H = 44;
