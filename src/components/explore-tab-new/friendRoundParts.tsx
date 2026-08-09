@@ -93,12 +93,12 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...FIGS, fontSize: 12, fontWeight: 800, color: mv.tone }}>
-        {mv.arrow} {mv.figure}
+      <span style={{ ...FIGS, fontSize: 12.5, fontWeight: 800, color: mv.tone }}>
+        {mv.arrow}{mv.figure}
       </span>
       <span
         style={{
-          fontSize: 8,
+          fontSize: 6.5,
           fontWeight: 800,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
@@ -107,6 +107,7 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
       >
         {t('discover.friendsRail.index', 'HCP')}
       </span>
+
     </span>
   );
 }
