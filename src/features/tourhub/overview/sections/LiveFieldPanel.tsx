@@ -132,32 +132,35 @@ interface LadderRow {
   toPar: number;
 }
 
-/**
- * One ranked row. The bar's denominator is `maxAbs`, computed across ALL
- * eighteen holes by the caller — never within the three rows shown, which
- * would make the easiest hole's bar as long as the hardest hole's.
- */
-function HoleRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: boolean }) {
+const COL_HOLE = 20;
+const COL_PAR = 26;
+const COL_FIG = 44;
+const ROW_GAP = 8;
+const BAR_H = 7;
+
+const HARDER_FILL = 'linear-gradient(to right, rgba(14,18,22,0.34), rgba(14,18,22,0.62))';
+const EASIER_FILL = 'linear-gradient(to left, rgba(14,18,22,0.20), rgba(14,18,22,0.40))';
+
+function HoleNumeral({ hole, par }: { hole: number; par: number }) {
   const { t } = useTranslation('tourhub');
-  const pct = Math.min(100, (Math.abs(r.toPar) / maxAbs) * 100);
-  const over = r.toPar > 0;
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '8px 0',
-        borderTop: first ? 'none' : `1px solid ${A.HAIRLINE}`,
-      }}
-    >
-      <div style={{ width: 22, fontSize: 12.5, fontWeight: 800, color: A.INK, ...FIGS }}>
-        {r.hole}
+    <>
+      <div
+        style={{
+          width: COL_HOLE,
+          fontSize: 15,
+          fontWeight: 800,
+          letterSpacing: '-0.03em',
+          color: A.INK,
+          ...FIGS,
+        }}
+      >
+        {hole}
       </div>
       <div
         style={{
-          width: 30,
-          fontSize: 8,
+          width: COL_PAR,
+          fontSize: 6.5,
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
@@ -165,39 +168,130 @@ function HoleRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: bo
           whiteSpace: 'nowrap',
         }}
       >
-        {t('overview.onTheCourse.parShort', { par: r.par })}
+        {t('overview.onTheCourse.parShort', { par })}
       </div>
+    </>
+  );
+}
+
+function Figure({ v }: { v: number }) {
+  return (
+    <div
+      style={{
+        width: COL_FIG,
+        textAlign: 'right',
+        fontSize: 14,
+        fontWeight: 800,
+        letterSpacing: '-0.02em',
+        color: A.INK,
+        ...FIGS,
+      }}
+    >
+      {fmtAvgToPar(v)}
+    </div>
+  );
+}
+
+/**
+ * One row of the diverging chart. `maxAbs` is computed across ALL eighteen
+ * holes by the caller — never within the rows shown, which would make the
+ * easiest hole's bar as long as the hardest hole's. Half-width denominator
+ * because the column now holds two directions off a shared centre baseline.
+ */
+function DivergingRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: boolean }) {
+  const pct = Math.min(50, (Math.abs(r.toPar) / maxAbs) * 50);
+  const over = r.toPar > 0;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: ROW_GAP,
+        padding: '8px 0',
+        borderTop: first ? 'none' : `1px solid ${A.HAIRLINE}`,
+      }}
+    >
+      <HoleNumeral hole={r.hole} par={r.par} />
+      <div style={{ flex: 1, minWidth: 0, position: 'relative', height: BAR_H }}>
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            bottom: 0,
+            width: 1,
+            background: A.HAIRLINE,
+          }}
+        />
+        {pct > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              height: '100%',
+              width: `${pct}%`,
+              left: over ? '50%' : undefined,
+              right: over ? undefined : '50%',
+              background: over ? HARDER_FILL : EASIER_FILL,
+              borderRadius: over ? '1px 4px 4px 1px' : '4px 1px 1px 4px',
+            }}
+          />
+        )}
+      </div>
+      <Figure v={r.toPar} />
+    </div>
+  );
+}
+
+/** Fallback shape below six holes: plain left-aligned bar, no baseline. */
+function PlainRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: boolean }) {
+  const pct = Math.min(100, (Math.abs(r.toPar) / maxAbs) * 100);
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: ROW_GAP,
+        padding: '8px 0',
+        borderTop: first ? 'none' : `1px solid ${A.HAIRLINE}`,
+      }}
+    >
+      <HoleNumeral hole={r.hole} par={r.par} />
       <div
         style={{
           flex: 1,
           minWidth: 0,
-          height: 6,
+          height: BAR_H,
           borderRadius: 2,
           background: 'rgba(14,18,22,0.06)',
           overflow: 'hidden',
         }}
       >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: '100%',
-            borderRadius: 2,
-            background: over ? 'rgba(14,18,22,0.62)' : 'rgba(14,18,22,0.28)',
-          }}
-        />
+        <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: HARDER_FILL }} />
       </div>
-      <div
-        style={{
-          width: 46,
-          textAlign: 'right',
-          fontSize: 13,
-          fontWeight: 800,
-          color: A.INK,
-          ...FIGS,
-        }}
-      >
-        {fmtAvgToPar(r.toPar)}
+      <Figure v={r.toPar} />
+    </div>
+  );
+}
+
+function AxisMarkers() {
+  const { t } = useTranslation('tourhub');
+  const label = {
+    fontSize: 7,
+    fontWeight: 800,
+    letterSpacing: '0.14em',
+    textTransform: 'uppercase' as const,
+    color: A.DIM,
+  };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: ROW_GAP, marginBottom: 6 }}>
+      <div style={{ width: COL_HOLE }} />
+      <div style={{ width: COL_PAR }} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between' }}>
+        <span style={label}>{t('overview.onTheCourse.axisEasier')}</span>
+        <span style={label}>{t('overview.onTheCourse.axisHarder')}</span>
       </div>
+      <div style={{ width: COL_FIG }} />
     </div>
   );
 }
@@ -226,15 +320,39 @@ function HoleLadder({ rows }: { rows: HoleAverageRow[] }) {
   const hardest = desc.slice(0, 3);
   const easiest = all.length >= 6 ? [...all].sort((a, b) => a.toPar - b.toPar).slice(0, 3) : [];
 
+  // One continuously ranked list: hardest descending, then easiest ending at
+  // the easiest hole of all.
+  const merged = easiest.length === 3 ? [...hardest, ...[...easiest].reverse()] : hardest;
+
   const gaps = missingRanges(new Set(all.map((r) => r.hole)));
 
   return (
     <div style={{ paddingTop: 8 }}>
-      <Group label={t('overview.onTheCourse.playingHardest')} rows={hardest} maxAbs={maxAbs} />
-      {easiest.length === 3 && (
-        <div style={{ marginTop: 12 }}>
-          <Group label={t('overview.onTheCourse.playingEasiest')} rows={easiest} maxAbs={maxAbs} />
-        </div>
+      {easiest.length === 3 ? (
+        <>
+          <AxisMarkers />
+          {merged.map((r, i) => (
+            <DivergingRow key={r.hole} r={r} maxAbs={maxAbs} first={i === 0} />
+          ))}
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              fontSize: 7.5,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: A.MUTE,
+              marginBottom: 2,
+            }}
+          >
+            {t('overview.onTheCourse.playingHardest')}
+          </div>
+          {merged.map((r, i) => (
+            <PlainRow key={r.hole} r={r} maxAbs={maxAbs} first={i === 0} />
+          ))}
+        </>
       )}
       {gaps && (
         <div style={{ marginTop: 8, fontSize: 9, fontWeight: 700, color: A.DIM, ...FIGS }}>
@@ -245,27 +363,6 @@ function HoleLadder({ rows }: { rows: HoleAverageRow[] }) {
   );
 }
 
-function Group({ label, rows, maxAbs }: { label: string; rows: LadderRow[]; maxAbs: number }) {
-  return (
-    <div>
-      <div
-        style={{
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: A.MUTE,
-          marginBottom: 2,
-        }}
-      >
-        {label}
-      </div>
-      {rows.map((r, i) => (
-        <HoleRow key={r.hole} r={r} maxAbs={maxAbs} first={i === 0} />
-      ))}
-    </div>
-  );
-}
 
 
 export function LiveFieldPanel({
