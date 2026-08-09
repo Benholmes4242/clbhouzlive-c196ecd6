@@ -29,7 +29,7 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
       surfaceColor={A.CANVAS}
       style={{
         height: '75dvh',
-        maxHeight: '75dvh',
+        maxHeight: '90dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,
@@ -43,22 +43,25 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <div style={{ ...KICKER, color: A.DIM, marginBottom: 5 }}>
-          {t('discover.trackedRounds', 'Tracked rounds')}
+        <div style={{ ...LABEL, color: A.DIM, marginBottom: 5 }}>
+          {t('discover.mostPlayedSheetCaption', '{{count}} courses', {
+            count: rows.length,
+          })}
         </div>
         <div
           id="courseled-mostplayed-title"
           style={{
-            fontSize: 20,
+            fontSize: 19,
             fontWeight: 800,
             color: A.INK,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.025em',
             lineHeight: 1.1,
           }}
         >
           {t('discover.mostPlayed', 'Most played this week')}
         </div>
       </div>
+
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
         <MostPlayedLeaderboard
