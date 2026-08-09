@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, InkAction, SANS, NUMF } from './tokens';
+import { A, InkAction, LABEL, SANS } from './tokens';
 import { GOLD_INK, GOLD_HAIR, HONOURS_SHELL } from './honoursTokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
@@ -37,7 +37,7 @@ function HolderAvatar({ event: e }: { event: WireEvent }) {
   return (
     <span style={{ flex: '0 0 auto', display: 'block' }}>
       <SquircleAvatar
-        size={30}
+        size={34}
         src={e.actorAvatar}
         alt={e.actorName}
         userId={e.userId}
@@ -46,6 +46,7 @@ function HolderAvatar({ event: e }: { event: WireEvent }) {
     </span>
   );
 }
+
 
 
 export function sortHonours(events: WireEvent[]): WireEvent[] {
@@ -73,16 +74,17 @@ export function HonoursRow({
   const feat =
     e.holeNo != null
       ? t(
-          isAce ? 'discover.row.ace' : 'discover.row.albatross',
+          isAce ? 'discover.row.aceTight' : 'discover.row.albatrossTight',
           isAce
-            ? 'Hole in one - the {{hole}}, par {{par}}'
-            : 'Albatross - the {{hole}}, par {{par}}',
+            ? 'Hole in one, {{hole}} - par {{par}}'
+            : 'Albatross, {{hole}} - par {{par}}',
           { hole: formatOrdinal(e.holeNo), par },
         )
       : t(
           isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
           isAce ? 'Hole in one' : 'Albatross',
         );
+
 
   const who = e.isOwn ? t('discover.wire.you', 'You') : e.actorName;
 
@@ -120,7 +122,7 @@ export function HonoursRow({
             fontSize: 13.5,
             fontWeight: 800,
             color: A.INK,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.015em',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -131,10 +133,10 @@ export function HonoursRow({
         <span
           style={{
             display: 'block',
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.35,
+            color: A.MUTE,
+            lineHeight: 1.32,
             marginTop: 2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -146,9 +148,9 @@ export function HonoursRow({
         <span
           style={{
             display: 'block',
-            fontSize: 11,
-            fontWeight: e.isOwn ? 700 : 600,
-            lineHeight: 1.35,
+            fontSize: 11.5,
+            fontWeight: e.isOwn ? 800 : 600,
+            lineHeight: 1.32,
             color: e.isOwn ? A.AMBER_DEEP : A.BODY,
             marginTop: 1,
             overflow: 'hidden',
@@ -160,9 +162,19 @@ export function HonoursRow({
         </span>
       </span>
 
-      <span style={{ ...NUMF, fontSize: 16, color: GOLD_INK, flexShrink: 0 }}>
+      {/* THE YEAR ANCHORS THE CHRONOLOGY, it no longer leads the row. */}
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 9,
+          color: GOLD_INK,
+          flexShrink: 0,
+          fontVariantNumeric: 'tabular-nums lining',
+        }}
+      >
         {formatYearNumeric(e.at)}
       </span>
+
     </button>
   );
 }
@@ -202,35 +214,49 @@ export function HonoursBoard({
           <div
             style={{
               padding: '14px 0 12px',
-              textAlign: 'center',
               borderBottom: `1px solid ${GOLD_HAIR}`,
             }}
           >
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: GOLD_INK,
-              }}
-            >
-              {t('discover.honoursTitle', 'The honours board')}
+            {/* SECTION GRAMMAR: eyebrow left, sample size right. The COUNT is
+                the whole board (`events`), never `shown` — the page caps at 5
+                and the sheet holds the rest. */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <div
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: GOLD_INK,
+                }}
+              >
+                {t('discover.honoursTitle', 'The honours board')}
+              </div>
+              <div
+                style={{
+                  ...LABEL,
+                  fontSize: 7,
+                  color: A.DIM,
+                  marginLeft: 'auto',
+                  fontVariantNumeric: 'tabular-nums lining',
+                }}
+              >
+                {t('discover.honoursOnTheBoard', '{{count}} on the board', {
+                  count: events.length,
+                })}
+              </div>
             </div>
-            <div style={{ fontSize: 10.5, fontWeight: 600, lineHeight: 1.35, color: A.BODY, marginTop: 5 }}>
-              {/* COUNT = the whole board (`events`), never `shown` — the page
-                  caps at 5 and the sheet holds the rest. No time claim: the
-                  legendary rail narrows to 30/90/365-day windows once volume
-                  passes 10 entries, so "all time" would eventually be false. */}
+            <div
+              style={{ fontSize: 12.5, fontWeight: 500, lineHeight: 1.35, color: A.MUTE, marginTop: 5 }}
+            >
               {t(
-                'discover.honoursCaptionCount',
-                '{{count}} aces and albatrosses on the board',
-                { count: events.length },
+                'discover.honoursWhatItIs',
+                'Every ace and albatross in clbhouz history',
               )}
-
             </div>
           </div>
         ) : null}
+
 
         {shown.map((e, i) => (
           <HonoursRow

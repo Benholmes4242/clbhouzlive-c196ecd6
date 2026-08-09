@@ -77,7 +77,7 @@ export function MostPlayedLeaderboard({
                 alignItems: 'center',
                 gap: 11,
                 width: '100%',
-                padding: '10px 0',
+                padding: '12px 0',
                 border: 'none',
                 background: 'transparent',
                 borderBottom: i === shown.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
@@ -86,7 +86,16 @@ export function MostPlayedLeaderboard({
                 cursor: 'pointer',
               }}
             >
-              <span style={{ ...NUMF, fontSize: 12, color: A.DIM, width: 14, flexShrink: 0 }}>
+              <span
+                style={{
+                  ...LABEL,
+                  fontSize: 8,
+                  color: A.DIM,
+                  width: 13,
+                  flexShrink: 0,
+                  fontVariantNumeric: 'tabular-nums lining',
+                }}
+              >
                 {formatNumber(i + 1)}
               </span>
               <CourseImageFallback
@@ -95,77 +104,89 @@ export function MostPlayedLeaderboard({
                 imageUrl={m?.imageUrl}
                 initialsSize={13}
                 pending={thumbPending}
-                style={{ width: 40, height: 40, borderRadius: 11, flexShrink: 0 }}
+                style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0 }}
               />
               <span style={{ flex: 1, minWidth: 0 }}>
+                {/* TWO LINES, NOT A TRUNCATION: the parenthetical on a
+                    two-course club is the only thing telling the two apart. */}
                 <span
                   style={{
-                    display: 'block',
-                    fontSize: 13,
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2,
+                    fontSize: 13.5,
                     fontWeight: 800,
                     color: A.INK,
-                    letterSpacing: '-0.01em',
+                    letterSpacing: '-0.015em',
+                    lineHeight: 1.2,
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                   }}
                 >
                   {name}
                 </span>
+                {m?.region && (
+                  <span
+                    style={{
+                      ...LABEL,
+                      display: 'block',
+                      fontSize: 6.5,
+                      color: A.DIM,
+                      marginTop: 3,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m.region}
+                  </span>
+                )}
+                {r.delta != null && r.delta > 0 && (
+                  <span
+                    style={{
+                      ...LABEL,
+                      display: 'block',
+                      fontSize: 6.5,
+                      color: A.DIM,
+                      marginTop: 2,
+                      fontVariantNumeric: 'tabular-nums lining',
+                    }}
+                  >
+                    {t('discover.mostPlayedDelta', '+{{count}} on last week', {
+                      count: r.delta,
+                    })}
+                  </span>
+                )}
+              </span>
+              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 30 }}>
                 <span
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    marginTop: 2,
-                    minWidth: 0,
+                    ...NUMF,
+                    display: 'block',
+                    fontSize: 24,
+                    letterSpacing: '-0.035em',
+                    lineHeight: 0.95,
+                    color: A.INK,
                   }}
                 >
-                  {m?.region && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        lineHeight: 1.35,
-                        color: A.BODY,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {m.region}
-                    </span>
-                  )}
-                  {r.delta != null && r.delta > 0 && (
-                    <span
-                      style={{
-                        ...LABEL,
-                        flexShrink: 0,
-                        color: A.DIM,
-                        fontVariantNumeric: 'tabular-nums lining',
-                      }}
-                    >
-                      {`+${formatNumber(r.delta)}`}
-                    </span>
-                  )}
+                  {formatNumber(r.count)}
                 </span>
-              </span>
-              <span
-                style={{
-                  ...NUMF,
-                  fontSize: 17,
-                  color: A.INK,
-                  flexShrink: 0,
-                  minWidth: 26,
-                  textAlign: 'right',
-                }}
-              >
-                {formatNumber(r.count)}
+                <span
+                  style={{
+                    ...LABEL,
+                    display: 'block',
+                    fontSize: 6,
+                    color: A.DIM,
+                    marginTop: 3,
+                  }}
+                >
+                  {t('discover.roundsLabel', 'Rounds')}
+                </span>
               </span>
             </button>
           );
         })}
       </div>
+
 
     </section>
   );

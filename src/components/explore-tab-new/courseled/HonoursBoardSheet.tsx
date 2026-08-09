@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { HonoursBoard, GOLD_INK, HONOURS_WASH } from './HonoursBoard';
-import { A, SANS } from './tokens';
+import { A, LABEL, SANS } from './tokens';
 
 /**
  * THE HONOURS BOARD, ALL TIME — the complete legendary set in the same row
@@ -30,7 +30,7 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
       surfaceColor={HONOURS_WASH}
       style={{
         height: '75dvh',
-        maxHeight: '75dvh',
+        maxHeight: '90dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,
@@ -45,23 +45,31 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
         }}
       >
         <div
+          style={{
+            ...LABEL,
+            color: GOLD_INK,
+            marginBottom: 5,
+            fontVariantNumeric: 'tabular-nums lining',
+          }}
+        >
+          {t('discover.honoursOnTheBoard', '{{count}} on the board', {
+            count: events.length,
+          })}
+        </div>
+        <div
           id="courseled-honours-title"
           style={{
-            fontSize: 20,
+            fontSize: 19,
             fontWeight: 800,
             color: A.INK,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.025em',
             lineHeight: 1.1,
           }}
         >
           {t('discover.honoursTitleSentence', 'The honours board')}
         </div>
-        <div style={{ fontSize: 10.5, color: GOLD_INK, marginTop: 5, fontWeight: 600 }}>
-          {t('discover.honoursSheetCaption', '{{count}} entries', {
-            count: events.length,
-          })}
-        </div>
       </div>
+
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
         <HonoursBoard
