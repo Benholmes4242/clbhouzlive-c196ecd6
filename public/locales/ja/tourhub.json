@@ -230,7 +230,9 @@
       "underParTodayValue": "{{m}}人中{{n}}人",
       "underParTodaySub": "現在までの選手",
       "axisEasier": "易しい",
-      "axisHarder": "難しい"
+      "axisHarder": "難しい",
+      "finishedLabel": "終了",
+      "todaySuffix": "本日 {{value}}"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -268,7 +268,9 @@
       "underParTodayValue": "{{n}} of {{m}}",
       "underParTodaySub": "players in",
       "axisEasier": "Easier",
-      "axisHarder": "Harder"
+      "axisHarder": "Harder",
+      "finishedLabel": "Finished",
+      "todaySuffix": "{{value}} today"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
