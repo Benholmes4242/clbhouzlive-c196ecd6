@@ -472,7 +472,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
 };
 
 
-export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
+export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
   const { data } = useCourseTeeSets(courseId);
