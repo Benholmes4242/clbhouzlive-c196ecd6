@@ -392,7 +392,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
-          padding: '12px 16px',
+          padding: '12px 16px 3px',
           fontFamily: SANS,
           ...FIGS,
         }}
