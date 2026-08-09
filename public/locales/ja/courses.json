@@ -6,7 +6,7 @@
     "errorTitle": "Couldn't load media",
     "errorBody": "Please check your connection and try again.",
     "emptyTitle": "No media yet",
-    "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
+    "emptyBody": "Be the first to capture <1>{{courseName}}</1> \u2014 photos and videos from your round help fellow golfers discover it.",
     "emptyCourseFallback": "this course",
     "shareExperience": "Share your experience",
     "uploadVideo": "Upload a video",
@@ -48,15 +48,15 @@
     "sortByDifficulty": "By difficulty",
     "errorLoading": "Couldn't load hole analysis.",
     "credibilityKicker": "OFFICIAL HOLE DATA",
-    "credibilitySuffix": " · Official WHS",
+    "credibilitySuffix": " \u00b7 Official WHS",
     "hardestTitle": "Hardest",
     "easiestTitle": "Easiest",
     "playsToInline": "Plays to {{playsTo}}",
-    "parAndSi": "Par {{par}} · SI {{si}}",
+    "parAndSi": "Par {{par}} \u00b7 SI {{si}}",
     "empty": {
       "eyebrow": "Official hole data",
       "title": "Hole insights are coming",
-      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
+      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole \u2014 average score, hardest and easiest, and the full birdie-to-double spread.",
       "thisCourse": "this course"
     },
     "scoringKey": {
@@ -78,17 +78,17 @@
     "aceA11y": "Hole in one",
     "clubGuide": {
       "title": "How the course plays",
-      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
-      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole."
+      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
     "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
     "shapeOfCourse": "The shape of the course",
     "legendEveryone": "Everyone",
     "legendYou": "You",
-    "theBeastSuffix": " · the beast",
+    "theBeastSuffix": " \u00b7 the beast",
     "youAvg": "You {{avg}}",
     "preview": {
       "eyebrow": "Hole by hole",
@@ -103,7 +103,7 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
-      "seeAllShort": "全{{count}}"
+      "seeAllShort": "\u5168{{count}}"
     }
   },
   "scorecard": {
@@ -123,8 +123,8 @@
     "beatFieldOnPartial": "You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
-    "holeByHole": "スコアカード",
-    "hideHoleByHole": "スコアカードを隠す"
+    "holeByHole": "\u30b9\u30b3\u30a2\u30ab\u30fc\u30c9",
+    "hideHoleByHole": "\u30b9\u30b3\u30a2\u30ab\u30fc\u30c9\u3092\u96a0\u3059"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
@@ -141,12 +141,12 @@
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
     "experiencePoints": "Experience Points Earned",
-    "yourRounds": "あなたのラウンド"
+    "yourRounds": "\u3042\u306a\u305f\u306e\u30e9\u30a6\u30f3\u30c9"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
     "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
-    "loadMoreRetry": "Couldn't load more courses · Tap to retry",
+    "loadMoreRetry": "Couldn't load more courses \u00b7 Tap to retry",
     "allSubRegions": "All sub-regions",
     "chooseRegionFirst": "Choose a region first",
     "subRegionA11y": "Select sub-region",
@@ -158,7 +158,7 @@
     "results_one": "<1>{{formattedCount}}</1> result",
     "results_other": "<1>{{formattedCount}}</1> results",
     "resetFilters": "Reset filters",
-    "searchPlaceholder": "Search by name, county or area…",
+    "searchPlaceholder": "Search by name, county or area\u2026",
     "searchA11y": "Search golf courses",
     "searching": "Searching",
     "filtersA11y": "Course filters",
@@ -175,15 +175,15 @@
     "outOfTen": "/ 10",
     "added": "Added",
     "retry": "Retry",
-    "ratingBullet": "• "
+    "ratingBullet": "\u2022 "
   },
   "rateSheet": {
     "subtitle": "Search any course you've played",
     "emptyLong": "Type a course name to get started",
-    "searching": "Searching…",
+    "searching": "Searching\u2026",
     "noResults": "No courses found for \"{{query}}\"",
-    "rateAction": "Rate →",
-    "searchPlaceholder": "Search courses…"
+    "rateAction": "Rate \u2192",
+    "searchPlaceholder": "Search courses\u2026"
   },
   "tabs": {
     "explore": "Explore"
@@ -213,7 +213,7 @@
     "rateCta": "Rate",
     "playedEyebrow": "YOU HAVEN'T RATED YET",
     "suggestedEyebrow": "TRY RATING",
-    "playedSubWithRegion": "{{region}} · Played, not rated",
+    "playedSubWithRegion": "{{region}} \u00b7 Played, not rated",
     "playedSubNoRegion": "Played, not rated",
     "suggestedForYou": "Suggested for you"
   },
@@ -222,7 +222,7 @@
       "headline": "Can't find a course?",
       "headlineWithQuery": "Can't find \"{{query}}\"?",
       "body": "If a course is missing, tell us and we'll add it to the map.",
-      "perkQuick": "Takes 20 seconds – just name and location",
+      "perkQuick": "Takes 20 seconds \u2013 just name and location",
       "perkNotify": "We'll notify you the moment it's live",
       "cta": "Request this course"
     },
@@ -232,7 +232,7 @@
       "subtitle": "Still not the one? Tap to request it."
     },
     "sheet": {
-      "successTitle": "Thanks — we've got it.",
+      "successTitle": "Thanks \u2014 we've got it.",
       "successBody": "We'll email you when this course is added.",
       "done": "Done",
       "title": "Request a course",
@@ -242,9 +242,9 @@
       "locationPlaceholder": "Town, region, country",
       "noteLabel": "Note",
       "optional": "(optional)",
-      "notePlaceholder": "Anything else? New opening, alternative name…",
+      "notePlaceholder": "Anything else? New opening, alternative name\u2026",
       "submit": "Request course",
-      "sending": "Sending…",
+      "sending": "Sending\u2026",
       "error": "Something went wrong. Please try again."
     }
   },
@@ -254,8 +254,8 @@
     "listsA11y": "Top 100 lists",
     "metaResults_one": "<1>{{count}}</1> result",
     "metaResults_other": "<1>{{count}}</1> results",
-    "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
-    "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
+    "metaCourses_one": "<1>{{count}}</1> course \u00b7 {{listLabel}}",
+    "metaCourses_other": "<1>{{count}}</1> courses \u00b7 {{listLabel}}",
     "clearSearch": "Clear search",
     "resetFilters": "Reset filters",
     "sectionTitle": "The world's best",
@@ -275,10 +275,10 @@
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
       "noRoundsCta": "Be the first.",
-      "ratingLabel": "評価",
-      "avgToParLabel": "平均対パー",
-      "harderThanLabel": "難しい",
-      "easierThanLabel": "易しい"
+      "ratingLabel": "\u8a55\u4fa1",
+      "avgToParLabel": "\u5e73\u5747\u5bfe\u30d1\u30fc",
+      "harderThanLabel": "\u96e3\u3057\u3044",
+      "easierThanLabel": "\u6613\u3057\u3044"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",
@@ -319,7 +319,7 @@
     "regionalSortView": "Sort & View",
     "regionalAddCourses": "Add Courses",
     "showingRegion": "Showing {{region}} courses",
-    "regionalAddCoursesEmoji": "📍",
+    "regionalAddCoursesEmoji": "\ud83d\udccd",
     "emptyTop100OwnTitle": "No Top 100 courses rated yet",
     "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
     "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
@@ -371,7 +371,7 @@
       "title": "Played here?",
       "body": "Your rating helps golfers worldwide",
       "rate": "Rate",
-      "emoji": "⭐"
+      "emoji": "\u2b50"
     },
     "reportA11y": "Report review",
     "sort": {
@@ -411,14 +411,14 @@
       "kicker": "WHAT TO INCLUDE"
     },
     "search": {
-      "placeholder": "Search reviews…",
+      "placeholder": "Search reviews\u2026",
       "openA11y": "Search reviews",
       "cancel": "Cancel"
     },
     "sortA11y": "Sort reviews",
     "filterA11y": "Filter reviews: {{label}} ({{count}})",
     "editYours": "Edit yours",
-    "writePromptInline": "⭐ Write your review",
+    "writePromptInline": "\u2b50 Write your review",
     "noMatches": {
       "body": "No reviews match your criteria.",
       "clear": "Clear filters"
@@ -433,70 +433,70 @@
     },
     "wizard": {
       "rail": {
-        "score": "スコア",
-        "breakdown": "内訳",
-        "words": "コメント"
+        "score": "\u30b9\u30b3\u30a2",
+        "breakdown": "\u5185\u8a33",
+        "words": "\u30b3\u30e1\u30f3\u30c8"
       },
-      "backA11y": "戻る",
-      "deleteA11y": "レビューを削除",
-      "a11yStep": "ステップ {{n}} / 3、{{label}}",
-      "continue": "次へ",
-      "save": "レビューを保存",
-      "post": "レビューを投稿",
-      "saving": "保存中...",
-      "posting": "投稿中...",
+      "backA11y": "\u623b\u308b",
+      "deleteA11y": "\u30ec\u30d3\u30e5\u30fc\u3092\u524a\u9664",
+      "a11yStep": "\u30b9\u30c6\u30c3\u30d7 {{n}} / 3\u3001{{label}}",
+      "continue": "\u6b21\u3078",
+      "save": "\u30ec\u30d3\u30e5\u30fc\u3092\u4fdd\u5b58",
+      "post": "\u30ec\u30d3\u30e5\u30fc\u3092\u6295\u7a3f",
+      "saving": "\u4fdd\u5b58\u4e2d...",
+      "posting": "\u6295\u7a3f\u4e2d...",
       "step0": {
-        "heading": "10点満点でどのくらい？",
-        "captionEmpty": "ドラッグしてスコアを設定",
-        "captionSet": "あなたの総合スコア",
-        "gate": "スコアを設定",
-        "a11y": "総合スコア、1〜10",
+        "heading": "10\u70b9\u6e80\u70b9\u3067\u3069\u306e\u304f\u3089\u3044\uff1f",
+        "captionEmpty": "\u30c9\u30e9\u30c3\u30b0\u3057\u3066\u30b9\u30b3\u30a2\u3092\u8a2d\u5b9a",
+        "captionSet": "\u3042\u306a\u305f\u306e\u7dcf\u5408\u30b9\u30b3\u30a2",
+        "gate": "\u30b9\u30b3\u30a2\u3092\u8a2d\u5b9a",
+        "a11y": "\u7dcf\u5408\u30b9\u30b3\u30a2\u30011\u301c10",
         "bandLow": "Below 5.0",
         "bandMid": "5.0 to 8.9",
         "bandHigh": "9.0 and up",
         "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
-        "heading": "項目別に評価",
-        "body": "4項目すべてが必要です。これがコミュニティの数値に意味を与えます。",
-        "gate_one": "残り {{count}} 項目",
-        "gate_other": "残り {{count}} 項目"
+        "heading": "\u9805\u76ee\u5225\u306b\u8a55\u4fa1",
+        "body": "4\u9805\u76ee\u3059\u3079\u3066\u304c\u5fc5\u8981\u3067\u3059\u3002\u3053\u308c\u304c\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u306e\u6570\u5024\u306b\u610f\u5473\u3092\u4e0e\u3048\u307e\u3059\u3002",
+        "gate_one": "\u6b8b\u308a {{count}} \u9805\u76ee",
+        "gate_other": "\u6b8b\u308a {{count}} \u9805\u76ee"
       },
       "hint": {
-        "design": "ルーティング、ショットの多様性、記憶に残るか",
-        "condition": "当日のグリーン、フェアウェイ、バンカー",
-        "clubhouse": "接客、食事、雰囲気",
-        "facilities": "練習場、練習エリア、更衣室"
+        "design": "\u30eb\u30fc\u30c6\u30a3\u30f3\u30b0\u3001\u30b7\u30e7\u30c3\u30c8\u306e\u591a\u69d8\u6027\u3001\u8a18\u61b6\u306b\u6b8b\u308b\u304b",
+        "condition": "\u5f53\u65e5\u306e\u30b0\u30ea\u30fc\u30f3\u3001\u30d5\u30a7\u30a2\u30a6\u30a7\u30a4\u3001\u30d0\u30f3\u30ab\u30fc",
+        "clubhouse": "\u63a5\u5ba2\u3001\u98df\u4e8b\u3001\u96f0\u56f2\u6c17",
+        "facilities": "\u7df4\u7fd2\u5834\u3001\u7df4\u7fd2\u30a8\u30ea\u30a2\u3001\u66f4\u8863\u5ba4"
       },
       "step2": {
-        "wordsEyebrow": "あなたのコメント",
-        "placeholder": "ここでプレーする前に他のゴルファーが知っておくべきことは？",
-        "optionalNote": "任意です。以下もすべて任意です。",
-        "photosEyebrow": "写真",
-        "teesEyebrow": "プレーしたティー",
-        "shareTitle": "クラブハウスに共有",
-        "shareSub": "レビューがフィードに表示されます"
+        "wordsEyebrow": "\u3042\u306a\u305f\u306e\u30b3\u30e1\u30f3\u30c8",
+        "placeholder": "\u3053\u3053\u3067\u30d7\u30ec\u30fc\u3059\u308b\u524d\u306b\u4ed6\u306e\u30b4\u30eb\u30d5\u30a1\u30fc\u304c\u77e5\u3063\u3066\u304a\u304f\u3079\u304d\u3053\u3068\u306f\uff1f",
+        "optionalNote": "\u4efb\u610f\u3067\u3059\u3002\u4ee5\u4e0b\u3082\u3059\u3079\u3066\u4efb\u610f\u3067\u3059\u3002",
+        "photosEyebrow": "\u5199\u771f",
+        "teesEyebrow": "\u30d7\u30ec\u30fc\u3057\u305f\u30c6\u30a3\u30fc",
+        "shareTitle": "\u30af\u30e9\u30d6\u30cf\u30a6\u30b9\u306b\u5171\u6709",
+        "shareSub": "\u30ec\u30d3\u30e5\u30fc\u304c\u30d5\u30a3\u30fc\u30c9\u306b\u8868\u793a\u3055\u308c\u307e\u3059"
       },
       "receipt": {
-        "eyebrow": "レビューを投稿しました",
-        "didEyebrow": "この投稿の効果",
-        "rowA": "<cnt>{{count}}</cnt> 人のメンバーが {{course}} を <avg>{{avg}}</avg> と評価",
-        "rowADeltaAbove": "平均より {{delta}} 高い評価です",
-        "rowADeltaBelow": "平均より {{delta}} 低い評価です",
-        "rowB": "このコースを最初に評価しました",
-        "rowBSub": "あなたのスコアがコミュニティ平均になります",
-        "rowC": "{{list}} Top 100 で <b>#{{rank}}</b> 位",
-        "rowCRight_one": "{{count}} 件評価",
-        "rowCRight_other": "{{count}} 件評価",
-        "rowD": "あなたの評価で <b>{{ordinal}}</b> 番目に高いコース",
-        "rowDRight_one": "{{count}} 件中",
-        "rowDRight_other": "{{count}} 件中",
-        "nextEyebrow_one": "未評価のプレー済みコース {{count}} 件",
-        "nextEyebrow_other": "未評価のプレー済みコース {{count}} 件",
-        "nextPlayed": "{{date}} にプレー",
-        "nextRate": "評価する",
-        "actionClubhouse": "クラブハウスで見る",
-        "actionBack": "{{course}} に戻る",
+        "eyebrow": "\u30ec\u30d3\u30e5\u30fc\u3092\u6295\u7a3f\u3057\u307e\u3057\u305f",
+        "didEyebrow": "\u3053\u306e\u6295\u7a3f\u306e\u52b9\u679c",
+        "rowA": "<cnt>{{count}}</cnt> \u4eba\u306e\u30e1\u30f3\u30d0\u30fc\u304c {{course}} \u3092 <avg>{{avg}}</avg> \u3068\u8a55\u4fa1",
+        "rowADeltaAbove": "\u5e73\u5747\u3088\u308a {{delta}} \u9ad8\u3044\u8a55\u4fa1\u3067\u3059",
+        "rowADeltaBelow": "\u5e73\u5747\u3088\u308a {{delta}} \u4f4e\u3044\u8a55\u4fa1\u3067\u3059",
+        "rowB": "\u3053\u306e\u30b3\u30fc\u30b9\u3092\u6700\u521d\u306b\u8a55\u4fa1\u3057\u307e\u3057\u305f",
+        "rowBSub": "\u3042\u306a\u305f\u306e\u30b9\u30b3\u30a2\u304c\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u5e73\u5747\u306b\u306a\u308a\u307e\u3059",
+        "rowC": "{{list}} Top 100 \u3067 <b>#{{rank}}</b> \u4f4d",
+        "rowCRight_one": "{{count}} \u4ef6\u8a55\u4fa1",
+        "rowCRight_other": "{{count}} \u4ef6\u8a55\u4fa1",
+        "rowD": "\u3042\u306a\u305f\u306e\u8a55\u4fa1\u3067 <b>{{ordinal}}</b> \u756a\u76ee\u306b\u9ad8\u3044\u30b3\u30fc\u30b9",
+        "rowDRight_one": "{{count}} \u4ef6\u4e2d",
+        "rowDRight_other": "{{count}} \u4ef6\u4e2d",
+        "nextEyebrow_one": "\u672a\u8a55\u4fa1\u306e\u30d7\u30ec\u30fc\u6e08\u307f\u30b3\u30fc\u30b9 {{count}} \u4ef6",
+        "nextEyebrow_other": "\u672a\u8a55\u4fa1\u306e\u30d7\u30ec\u30fc\u6e08\u307f\u30b3\u30fc\u30b9 {{count}} \u4ef6",
+        "nextPlayed": "{{date}} \u306b\u30d7\u30ec\u30fc",
+        "nextRate": "\u8a55\u4fa1\u3059\u308b",
+        "actionClubhouse": "\u30af\u30e9\u30d6\u30cf\u30a6\u30b9\u3067\u898b\u308b",
+        "actionBack": "{{course}} \u306b\u623b\u308b",
         "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
@@ -514,7 +514,7 @@
       },
       "profileLink": {
         "manages": "Manages this course",
-        "visit": "Visit profile →"
+        "visit": "Visit profile \u2192"
       },
       "sheet": {
         "title": "Claim {{clubName}}",
@@ -549,7 +549,7 @@
       "websiteLabel": "Website",
       "cancel": "Cancel",
       "submit": "Submit suggestion for review",
-      "submitting": "Submitting…",
+      "submitting": "Submitting\u2026",
       "successTitle": "Suggestion submitted",
       "successBody": "Your suggestion has been submitted. We'll review it shortly.",
       "noChangesTitle": "No changes",
@@ -558,34 +558,34 @@
       "errorBody": "Failed to submit suggestion. Please try again."
     },
     "mediaStrip": {
-      "helpDiscover": "Help fellow golfers discover this course — share your experience.",
+      "helpDiscover": "Help fellow golfers discover this course \u2014 share your experience.",
       "share": "Share your experience",
       "seeAll": "See all"
     },
     "communityScore": {
-      "dashPlaceholder": "–",
+      "dashPlaceholder": "\u2013",
       "beFirst": "Be the first to rate this course",
-      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
+      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0\u201310 and help fellow golfers discover it.",
       "thisCourse": "this course",
       "rateThis": "Rate this course",
       "basedOn_one": "Based on 1 rating",
       "basedOn_other": "Based on {{count}} ratings",
-      "onlyYouSuffix": " · Only you",
+      "onlyYouSuffix": " \u00b7 Only you",
       "categoryScores": "Category Scores",
       "seeAllReviews": "See all reviews"
     },
     "handicapCue": {
-      "bannerAction": "Connect →",
-      "cardCta": "Connect your handicap →",
+      "bannerAction": "Connect \u2192",
+      "cardCta": "Connect your handicap \u2192",
       "cardFootnote": "Works with WHS handicaps worldwide",
       "variants": {
         "about": {
           "benefit": "See how your handicap compares here",
-          "sub": "Friends, members and the world’s best at this course"
+          "sub": "Friends, members and the world\u2019s best at this course"
         },
         "holes": {
           "benefit": "See your scoring on every hole",
-          "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+          "sub": "Your average vs everyone who\u2019s played {{name}}, hole by hole."
         },
         "champions": {
           "benefit": "See where you rank at this course",
@@ -593,23 +593,23 @@
         },
         "progress": {
           "benefit": "Fill in your Top 100 automatically",
-          "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+          "sub": "Connect your handicap and every round you play counts itself \u2014 no manual logging."
         },
         "leaderboard": {
           "benefit": "See where you rank worldwide",
           "sub": "Connect your handicap to join the championship and climb the global rankings."
         },
         "discover": {
-          "benefit": "See which of these you’ve played",
+          "benefit": "See which of these you\u2019ve played",
           "sub": "Connect your handicap to see how you scored at every course."
         },
         "tour-venue": {
           "benefit": "See how you'd score at {{name}}",
-          "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+          "sub": "Connect your WHS handicap to compare your game to this week\u2019s venue."
         },
         "tour-holes": {
           "benefit": "See your scoring on these holes vs the field",
-          "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+          "sub": "Connect your WHS handicap to measure your game against the pros\u2019, hole by hole."
         }
       }
     },
@@ -619,7 +619,7 @@
       "officialWebsite": "Official Course Website"
     },
     "locationPills": {
-      "separator": "›"
+      "separator": "\u203a"
     },
     "a11y": {
       "openMediaTab": "Open Media tab",
@@ -659,9 +659,9 @@
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
-      "scaleLabel": "難易度スケール",
-      "scaleCaption": "コース内の他のホールとの比較 — 右にいくほど難しい。",
-      "yourGapVsField": "フィールドとの差"
+      "scaleLabel": "\u96e3\u6613\u5ea6\u30b9\u30b1\u30fc\u30eb",
+      "scaleCaption": "\u30b3\u30fc\u30b9\u5185\u306e\u4ed6\u306e\u30db\u30fc\u30eb\u3068\u306e\u6bd4\u8f03 \u2014 \u53f3\u306b\u3044\u304f\u307b\u3069\u96e3\u3057\u3044\u3002",
+      "yourGapVsField": "\u30d5\u30a3\u30fc\u30eb\u30c9\u3068\u306e\u5dee"
     },
     "records": {
       "youHold": "You hold this board",
@@ -677,7 +677,7 @@
       }
     },
     "you": {
-      "oneToGoHole": "One to go · hole {{n}}",
+      "oneToGoHole": "One to go \u00b7 hole {{n}}",
       "fieldHere": "The field here",
       "gapBetter": "Better than the field here",
       "gapWorse": "Worse than the field here",
@@ -690,7 +690,7 @@
     }
   },
   "network": {
-    "emojiFlag": "⛳",
+    "emojiFlag": "\u26f3",
     "viewCourseA11y": "View {{name}}",
     "badge": {
       "playedByFriends_one": "Played by {{count}} friend",
@@ -699,11 +699,11 @@
       "topRated": "Top rated",
       "trending": "Trending"
     },
-    "unseenReviewsTitle": "🔔 New review from your network",
-    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
+    "unseenReviewsTitle": "\ud83d\udd14 New review from your network",
+    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> \u00b7 <rating>{{rating}}</rating>",
     "unseenReviewsMore_one": " +{{count}} more",
     "unseenReviewsMore_other": " +{{count}} more",
-    "viewArrow": "View →",
+    "viewArrow": "View \u2192",
     "circleKicker": "YOUR CIRCLE",
     "friendsPlayedTitle": "Courses played by friends"
   },
@@ -755,7 +755,7 @@
       "ordinal_ordinal_other": "{{count}}th"
     },
     "hero": {
-      "viewScorecard": "スコアカードを見る"
+      "viewScorecard": "\u30b9\u30b3\u30a2\u30ab\u30fc\u30c9\u3092\u898b\u308b"
     },
     "lens": {
       "suggested": "Suggested",
@@ -782,21 +782,24 @@
       "whenPlayed": "Played {{when}}",
       "whenRated": "Rated {{when}}",
       "statusNoDate": "On your card",
-      "statusFinishNoDate": "Rated · detail missing",
+      "statusFinishNoDate": "Rated \u00b7 detail missing",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "friendsTitle": "Tomodachi no round wo miru",
+      "friendsStatus": "Kare-ra no score wa koko ni",
+      "actionFriends": "SAGASU"
     },
-    "live": "ライブ",
+    "live": "\u30e9\u30a4\u30d6",
     "latest": "Latest",
-    "roundThru": "R{{round}} · {{thru}}ホール終了",
-    "thruOnly": "{{thru}}ホール終了",
-    "leader": "首位",
-    "tiedLead": "首位タイ",
-    "roundFinished": "R{{round}} · 終了",
-    "playersTied": "{{count}}人がタイ",
-    "playersTied_one": "{{count}}人がタイ",
+    "roundThru": "R{{round}} \u00b7 {{thru}}\u30db\u30fc\u30eb\u7d42\u4e86",
+    "thruOnly": "{{thru}}\u30db\u30fc\u30eb\u7d42\u4e86",
+    "leader": "\u9996\u4f4d",
+    "tiedLead": "\u9996\u4f4d\u30bf\u30a4",
+    "roundFinished": "R{{round}} \u00b7 \u7d42\u4e86",
+    "playersTied": "{{count}}\u4eba\u304c\u30bf\u30a4",
+    "playersTied_one": "{{count}}\u4eba\u304c\u30bf\u30a4",
     "momentsGroupCount": "{{count}} moments",
     "momentsGroupCount_one": "{{count}} moment",
     "row": {
@@ -842,25 +845,48 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "ボード上のホールインワンとアルバトロス {{count}} 件",
-    "aroundTheWorld": "傑出したラウンド"
+    "honoursCaptionCount": "\u30dc\u30fc\u30c9\u4e0a\u306e\u30db\u30fc\u30eb\u30a4\u30f3\u30ef\u30f3\u3068\u30a2\u30eb\u30d0\u30c8\u30ed\u30b9 {{count}} \u4ef6",
+    "aroundTheWorld": "\u5091\u51fa\u3057\u305f\u30e9\u30a6\u30f3\u30c9",
+    "findGolfers": {
+      "kicker": "Menba",
+      "title": "Gorufa wo sagasu",
+      "count": "{{total}} nin no uchi {{shown}} nin",
+      "requestsSent": "{{count}} ken soshin",
+      "searchPlaceholder": "Namae mataha handoru",
+      "clear": "Kuria",
+      "hcp": "HCP",
+      "rounds": "RAUNDO",
+      "homeClub": "HOMU KURABU",
+      "addFriend": "Tomodachi ni tsuika",
+      "requested": "Shinsei-zumi",
+      "follow": "Foro",
+      "following": "Foro-chu",
+      "groupFollowedBy": "Foro sarete iru",
+      "groupPlays": "Onaji kosu de purei",
+      "groupPopular": "Shitte okitai menba",
+      "groupMatch": "Icchi",
+      "emptyTitle": "\"{{q}}\" no gorufa wa imasen",
+      "emptyBody": "Handoru de sagasu ka clbhouz ni shotai shite kudasai",
+      "inviteQuiet": "Gorufa wo shotai",
+      "inviteCta": "Gorufa wo clbhouz ni shotai"
+    }
   },
   "statBrowse": {
-    "countTracked_one": "トラック済みコース",
-    "countTracked_other": "トラック済みコース",
+    "countTracked_one": "\u30c8\u30e9\u30c3\u30af\u6e08\u307f\u30b3\u30fc\u30b9",
+    "countTracked_other": "\u30c8\u30e9\u30c3\u30af\u6e08\u307f\u30b3\u30fc\u30b9",
     "countLens": {
-      "toughest_one": "{{total}}コース中{{count}}コースが難易度データを持っています",
-      "toughest_other": "{{total}}コース中{{count}}コースが難易度データを持っています",
-      "scoreable_one": "{{total}}コース中{{count}}コースがスコアリングデータを持っています",
-      "scoreable_other": "{{total}}コース中{{count}}コースがスコアリングデータを持っています",
-      "played_one": "{{total}}コース中{{count}}コースがラウンドデータを持っています",
-      "played_other": "{{total}}コース中{{count}}コースがラウンドデータを持っています",
-      "longest_one": "{{total}}コース中{{count}}コースが距離データを持っています",
-      "longest_other": "{{total}}コース中{{count}}コースが距離データを持っています",
-      "rated_one": "{{total}}コース中{{count}}コースが評価を持っています",
-      "rated_other": "{{total}}コース中{{count}}コースが評価を持っています",
-      "chase_one": "{{total}}コース中{{count}}コースが未達成の記録を持っています",
-      "chase_other": "{{total}}コース中{{count}}コースが未達成の記録を持っています"
+      "toughest_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u96e3\u6613\u5ea6\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "toughest_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u96e3\u6613\u5ea6\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "scoreable_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u30b9\u30b3\u30a2\u30ea\u30f3\u30b0\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "scoreable_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u30b9\u30b3\u30a2\u30ea\u30f3\u30b0\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "played_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u30e9\u30a6\u30f3\u30c9\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "played_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u30e9\u30a6\u30f3\u30c9\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "longest_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u8ddd\u96e2\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "longest_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u8ddd\u96e2\u30c7\u30fc\u30bf\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "rated_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u8a55\u4fa1\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "rated_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u8a55\u4fa1\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "chase_one": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u672a\u9054\u6210\u306e\u8a18\u9332\u3092\u6301\u3063\u3066\u3044\u307e\u3059",
+      "chase_other": "{{total}}\u30b3\u30fc\u30b9\u4e2d{{count}}\u30b3\u30fc\u30b9\u304c\u672a\u9054\u6210\u306e\u8a18\u9332\u3092\u6301\u3063\u3066\u3044\u307e\u3059"
     },
     "countryCount": "{{formattedCount}} of {{total}}"
   },

@@ -8,7 +8,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronRight, Users, X } from 'lucide-react';
 
 import { A, SANS, FIGS, LABEL } from './tokens';
 import CourseImageFallback from './CourseImageFallback';
@@ -23,15 +23,18 @@ import {
 
 interface Props {
   userId: string | undefined;
+  /** Opens the Find golfers sheet — the 'friends' kind's only destination. */
+  onFindGolfers?: () => void;
 }
 
 const ACTION_KEY: Record<DiscoverPromptKind, [string, string]> = {
   rate: ['discover.prompt.actionRate', 'RATE'],
   finish: ['discover.prompt.actionFinish', 'FINISH'],
   photo: ['discover.prompt.actionPhoto', 'ADD'],
+  friends: ['discover.prompt.actionFriends', 'FIND'],
 };
 
-export function OneThingRow({ userId }: Props) {
+export function OneThingRow({ userId, onFindGolfers }: Props) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const openForCourse = usePostStudioStore((s) => s.openPostStudioForCourse);
@@ -52,6 +55,10 @@ export function OneThingRow({ userId }: Props) {
     if (!prompt) return;
     analyticsEvents.track('discover_prompt_action', { kind: prompt.kind });
     setDismissed(true);
+    if (prompt.kind === 'friends') {
+      onFindGolfers?.();
+      return;
+    }
     if (prompt.kind === 'photo') {
       openForCourse({
         course: { id: prompt.courseId, name: prompt.courseName },
@@ -60,7 +67,7 @@ export function OneThingRow({ userId }: Props) {
       return;
     }
     navigate(`/courses/${prompt.courseId}/rate`);
-  }, [prompt, navigate, openForCourse]);
+  }, [prompt, navigate, openForCourse, onFindGolfers]);
 
   const handleDismiss = useCallback(() => {
     if (prompt) {
@@ -83,7 +90,16 @@ export function OneThingRow({ userId }: Props) {
   // the impression "recently".
   const when = shown.at ? relativeDay(shown.at, t, 'long') : '';
 
-  const status = when
+  // NO COURSE BEHIND THIS ONE: the line is a promise, not a date.
+  const isFriends = shown.kind === 'friends';
+
+  const title = isFriends
+    ? t('discover.prompt.friendsTitle', "See your friends' rounds")
+    : shown.courseName;
+
+  const status = isFriends
+    ? t('discover.prompt.friendsStatus', 'Their scores land here')
+    : when
     ? shown.kind === 'finish'
       ? t('discover.prompt.whenRated', 'Rated {{when}}', { when })
       : t('discover.prompt.whenPlayed', 'Played {{when}}', { when })
@@ -109,7 +125,26 @@ export function OneThingRow({ userId }: Props) {
         ...FIGS,
       }}
     >
-      {shown.courseId && (
+      {isFriends ? (
+        // THE ONLY DIFFERENCE FROM THE OTHER KINDS: no course, so the same
+        // 36px squircle carries a glyph instead of a course image.
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 12,
+            flexShrink: 0,
+            background: A.BORDER,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: A.MUTE,
+          }}
+        >
+          <Users size={17} strokeWidth={2.2} />
+        </div>
+      ) : (
+        shown.courseId && (
         // PX RADIUS, not a percentage: 12px is the squircle used everywhere
         // else, and it does not re-shape itself if the size ever changes.
         <CourseImageFallback
@@ -119,6 +154,7 @@ export function OneThingRow({ userId }: Props) {
           initialsSize={12}
           style={{ width: 36, height: 36, borderRadius: 12, flexShrink: 0 }}
         />
+        )
       )}
 
       {/* TWO single-line children: the course name is the only thing allowed to
@@ -136,7 +172,7 @@ export function OneThingRow({ userId }: Props) {
             textOverflow: 'ellipsis',
           }}
         >
-          {shown.courseName}
+          {title}
         </div>
         {/* A LABEL, so the course name clearly leads the row. */}
         <div

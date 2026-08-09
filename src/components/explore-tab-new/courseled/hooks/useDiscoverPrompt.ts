@@ -16,11 +16,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
+import { useFriendIdSet } from './useFriendIdSet';
 
-export type DiscoverPromptKind = 'rate' | 'finish' | 'photo';
+export type DiscoverPromptKind = 'rate' | 'finish' | 'photo' | 'friends';
 
 export interface DiscoverPrompt {
   kind: DiscoverPromptKind;
+  /** Empty for 'friends' — there is no course behind that ask. */
   courseId: string;
   courseName: string;
   thumbnail: string | null;
@@ -31,11 +33,12 @@ export interface DiscoverPrompt {
    *   rate   — last_played from usePlayedUnratedCourses
    *   finish — review_date (falling back to created_at) on the rating
    *   photo  — play_date on the tracked round
-   * Null only when the underlying column is null; the row then keeps a
-   * non-temporal line rather than inventing one.
+   * Null only when the underlying column is null, and always null for
+   * 'friends', whose line is a promise rather than a date.
    */
   at: string | null;
 }
+
 
 
 interface MissingDetailRow {
@@ -124,6 +127,12 @@ export function useDiscoverPrompt(userId: string | undefined): {
   const rounds = useCareerRounds(needPhoto ? userId : undefined);
   const posted = usePostedCourseIds(userId, needPhoto);
 
+  // 4 friends — LAST, and only on ZERO accepted friendships. A member with
+  // friends who have not played is looking at a data gap they cannot act on;
+  // nagging there would fire every quiet fortnight.
+  const friendIds = useFriendIdSet(userId);
+
+
   const photoMatch = useMemo(() => {
     if (!needPhoto || !rounds.data || !posted.data) return null;
     const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
@@ -184,6 +193,21 @@ export function useDiscoverPrompt(userId: string | undefined): {
         thumbnail: null,
         at: (photoMatch.play_date as string | null) ?? null,
 
+      },
+    };
+  }
+
+  if (friendIds.isLoading) return { prompt: null, resolved: false };
+
+  if ((friendIds.data?.size ?? 0) === 0) {
+    return {
+      resolved: true,
+      prompt: {
+        kind: 'friends',
+        courseId: '',
+        courseName: '',
+        thumbnail: null,
+        at: null,
       },
     };
   }

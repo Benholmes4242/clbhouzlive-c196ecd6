@@ -6,7 +6,7 @@
     "errorTitle": "Couldn't load media",
     "errorBody": "Please check your connection and try again.",
     "emptyTitle": "No media yet",
-    "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
+    "emptyBody": "Be the first to capture <1>{{courseName}}</1> \u2014 photos and videos from your round help fellow golfers discover it.",
     "emptyCourseFallback": "this course",
     "shareExperience": "Share your experience",
     "uploadVideo": "Upload a video",
@@ -48,15 +48,15 @@
     "sortByDifficulty": "By difficulty",
     "errorLoading": "Couldn't load hole analysis.",
     "credibilityKicker": "OFFICIAL HOLE DATA",
-    "credibilitySuffix": " · Official WHS",
+    "credibilitySuffix": " \u00b7 Official WHS",
     "hardestTitle": "Hardest",
     "easiestTitle": "Easiest",
     "playsToInline": "Plays to {{playsTo}}",
-    "parAndSi": "Par {{par}} · SI {{si}}",
+    "parAndSi": "Par {{par}} \u00b7 SI {{si}}",
     "empty": {
       "eyebrow": "Official hole data",
       "title": "Hole insights are coming",
-      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
+      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole \u2014 average score, hardest and easiest, and the full birdie-to-double spread.",
       "thisCourse": "this course"
     },
     "scoringKey": {
@@ -78,17 +78,17 @@
     "aceA11y": "Hole in one",
     "clubGuide": {
       "title": "How the course plays",
-      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
-      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole."
+      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
     "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
     "shapeOfCourse": "The shape of the course",
     "legendEveryone": "Everyone",
     "legendYou": "You",
-    "theBeastSuffix": " · the beast",
+    "theBeastSuffix": " \u00b7 the beast",
     "youAvg": "You {{avg}}",
     "yourCourses": {
       "eyebrow": "Course by course",
@@ -153,7 +153,7 @@
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
     "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
-    "loadMoreRetry": "Couldn't load more courses · Tap to retry",
+    "loadMoreRetry": "Couldn't load more courses \u00b7 Tap to retry",
     "allSubRegions": "All sub-regions",
     "chooseRegionFirst": "Choose a region first",
     "subRegionA11y": "Select sub-region",
@@ -165,7 +165,7 @@
     "results_one": "<1>{{formattedCount}}</1> result",
     "results_other": "<1>{{formattedCount}}</1> results",
     "resetFilters": "Reset filters",
-    "searchPlaceholder": "Search by name, county or area…",
+    "searchPlaceholder": "Search by name, county or area\u2026",
     "searchA11y": "Search golf courses",
     "searching": "Searching",
     "filtersA11y": "Course filters",
@@ -182,15 +182,15 @@
     "outOfTen": "/ 10",
     "added": "Added",
     "retry": "Retry",
-    "ratingBullet": "• "
+    "ratingBullet": "\u2022 "
   },
   "rateSheet": {
     "subtitle": "Search any course you've played",
     "emptyLong": "Type a course name to get started",
-    "searching": "Searching…",
+    "searching": "Searching\u2026",
     "noResults": "No courses found for \"{{query}}\"",
-    "rateAction": "Rate →",
-    "searchPlaceholder": "Search courses…"
+    "rateAction": "Rate \u2192",
+    "searchPlaceholder": "Search courses\u2026"
   },
   "tabs": {
     "explore": "Explore"
@@ -220,7 +220,7 @@
     "rateCta": "Rate",
     "playedEyebrow": "YOU HAVEN'T RATED YET",
     "suggestedEyebrow": "TRY RATING",
-    "playedSubWithRegion": "{{region}} · Played, not rated",
+    "playedSubWithRegion": "{{region}} \u00b7 Played, not rated",
     "playedSubNoRegion": "Played, not rated",
     "suggestedForYou": "Suggested for you"
   },
@@ -229,7 +229,7 @@
       "headline": "Can't find a course?",
       "headlineWithQuery": "Can't find \"{{query}}\"?",
       "body": "If a course is missing, tell us and we'll add it to the map.",
-      "perkQuick": "Takes 20 seconds – just name and location",
+      "perkQuick": "Takes 20 seconds \u2013 just name and location",
       "perkNotify": "We'll notify you the moment it's live",
       "cta": "Request this course"
     },
@@ -239,7 +239,7 @@
       "subtitle": "Still not the one? Tap to request it."
     },
     "sheet": {
-      "successTitle": "Thanks — we've got it.",
+      "successTitle": "Thanks \u2014 we've got it.",
       "successBody": "We'll email you when this course is added.",
       "done": "Done",
       "title": "Request a course",
@@ -249,9 +249,9 @@
       "locationPlaceholder": "Town, region, country",
       "noteLabel": "Note",
       "optional": "(optional)",
-      "notePlaceholder": "Anything else? New opening, alternative name…",
+      "notePlaceholder": "Anything else? New opening, alternative name\u2026",
       "submit": "Request course",
-      "sending": "Sending…",
+      "sending": "Sending\u2026",
       "error": "Something went wrong. Please try again."
     }
   },
@@ -261,8 +261,8 @@
     "listsA11y": "Top 100 lists",
     "metaResults_one": "<1>{{count}}</1> result",
     "metaResults_other": "<1>{{count}}</1> results",
-    "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
-    "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
+    "metaCourses_one": "<1>{{count}}</1> course \u00b7 {{listLabel}}",
+    "metaCourses_other": "<1>{{count}}</1> courses \u00b7 {{listLabel}}",
     "clearSearch": "Clear search",
     "resetFilters": "Reset filters",
     "sectionTitle": "The world's best",
@@ -326,7 +326,7 @@
     "regionalSortView": "Sort & View",
     "regionalAddCourses": "Add Courses",
     "showingRegion": "Showing {{region}} courses",
-    "regionalAddCoursesEmoji": "📍",
+    "regionalAddCoursesEmoji": "\ud83d\udccd",
     "emptyTop100OwnTitle": "No Top 100 courses rated yet",
     "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
     "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
@@ -378,7 +378,7 @@
       "title": "Played here?",
       "body": "Your rating helps golfers worldwide",
       "rate": "Rate",
-      "emoji": "⭐"
+      "emoji": "\u2b50"
     },
     "reportA11y": "Report review",
     "sort": {
@@ -418,14 +418,14 @@
       "kicker": "WHAT TO INCLUDE"
     },
     "search": {
-      "placeholder": "Search reviews…",
+      "placeholder": "Search reviews\u2026",
       "openA11y": "Search reviews",
       "cancel": "Cancel"
     },
     "sortA11y": "Sort reviews",
     "filterA11y": "Filter reviews: {{label}} ({{count}})",
     "editYours": "Edit yours",
-    "writePromptInline": "⭐ Write your review",
+    "writePromptInline": "\u2b50 Write your review",
     "noMatches": {
       "body": "No reviews match your criteria.",
       "clear": "Clear filters"
@@ -444,7 +444,7 @@
         "breakdown": "Details",
         "words": "Worte"
       },
-      "backA11y": "Zurück",
+      "backA11y": "Zur\u00fcck",
       "deleteA11y": "Bewertung entfernen",
       "a11yStep": "Schritt {{n}} von 3, {{label}}",
       "continue": "Weiter",
@@ -465,22 +465,22 @@
       },
       "step1": {
         "heading": "Im Detail",
-        "body": "Alle vier sind nötig. Nur so bekommen die Community-Zahlen Bedeutung.",
+        "body": "Alle vier sind n\u00f6tig. Nur so bekommen die Community-Zahlen Bedeutung.",
         "gate_one": "Noch {{count}} Kategorie",
         "gate_other": "Noch {{count}} Kategorien"
       },
       "hint": {
-        "design": "Routing, Schlagvielfalt, Einprägsamkeit",
-        "condition": "Grüns, Fairways, Bunker am Spieltag",
-        "clubhouse": "Empfang, Essen, Atmosphäre",
-        "facilities": "Range, Übungsbereiche, Umkleiden"
+        "design": "Routing, Schlagvielfalt, Einpr\u00e4gsamkeit",
+        "condition": "Gr\u00fcns, Fairways, Bunker am Spieltag",
+        "clubhouse": "Empfang, Essen, Atmosph\u00e4re",
+        "facilities": "Range, \u00dcbungsbereiche, Umkleiden"
       },
       "step2": {
         "wordsEyebrow": "Deine Worte",
         "placeholder": "Was sollte ein anderer Golfer vorher wissen?",
         "optionalNote": "Optional. Alles Weitere unten auch.",
         "photosEyebrow": "Fotos",
-        "teesEyebrow": "Gespielte Abschläge",
+        "teesEyebrow": "Gespielte Abschl\u00e4ge",
         "shareTitle": "Im Clubhouse teilen",
         "shareSub": "Deine Bewertung erscheint im Feed"
       },
@@ -488,7 +488,7 @@
         "eyebrow": "Bewertung gepostet",
         "didEyebrow": "Was das bewirkt hat",
         "rowA": "<cnt>{{count}}</cnt> Mitglieder bewerten {{course}} mit <avg>{{avg}}</avg>",
-        "rowADeltaAbove": "Du hast {{delta}} über dem Durchschnitt bewertet",
+        "rowADeltaAbove": "Du hast {{delta}} \u00fcber dem Durchschnitt bewertet",
         "rowADeltaBelow": "Du hast {{delta}} unter dem Durchschnitt bewertet",
         "rowB": "Du bist der Erste, der diesen Platz bewertet",
         "rowBSub": "Deine Wertung setzt den Community-Durchschnitt",
@@ -499,11 +499,11 @@
         "rowDRight_one": "von {{count}} bewertet",
         "rowDRight_other": "von {{count}} bewertet",
         "nextEyebrow_one": "{{count}} gespielter Platz noch unbewertet",
-        "nextEyebrow_other": "{{count}} gespielte Plätze noch unbewertet",
+        "nextEyebrow_other": "{{count}} gespielte Pl\u00e4tze noch unbewertet",
         "nextPlayed": "Gespielt am {{date}}",
         "nextRate": "Bewerten",
         "actionClubhouse": "Im Clubhouse ansehen",
-        "actionBack": "Zurück zu {{course}}",
+        "actionBack": "Zur\u00fcck zu {{course}}",
         "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
@@ -521,7 +521,7 @@
       },
       "profileLink": {
         "manages": "Manages this course",
-        "visit": "Visit profile →"
+        "visit": "Visit profile \u2192"
       },
       "sheet": {
         "title": "Claim {{clubName}}",
@@ -556,7 +556,7 @@
       "websiteLabel": "Website",
       "cancel": "Cancel",
       "submit": "Submit suggestion for review",
-      "submitting": "Submitting…",
+      "submitting": "Submitting\u2026",
       "successTitle": "Suggestion submitted",
       "successBody": "Your suggestion has been submitted. We'll review it shortly.",
       "noChangesTitle": "No changes",
@@ -565,34 +565,34 @@
       "errorBody": "Failed to submit suggestion. Please try again."
     },
     "mediaStrip": {
-      "helpDiscover": "Help fellow golfers discover this course — share your experience.",
+      "helpDiscover": "Help fellow golfers discover this course \u2014 share your experience.",
       "share": "Share your experience",
       "seeAll": "See all"
     },
     "communityScore": {
-      "dashPlaceholder": "–",
+      "dashPlaceholder": "\u2013",
       "beFirst": "Be the first to rate this course",
-      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
+      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0\u201310 and help fellow golfers discover it.",
       "thisCourse": "this course",
       "rateThis": "Rate this course",
       "basedOn_one": "Based on 1 rating",
       "basedOn_other": "Based on {{count}} ratings",
-      "onlyYouSuffix": " · Only you",
+      "onlyYouSuffix": " \u00b7 Only you",
       "categoryScores": "Category Scores",
       "seeAllReviews": "See all reviews"
     },
     "handicapCue": {
-      "bannerAction": "Connect →",
-      "cardCta": "Connect your handicap →",
+      "bannerAction": "Connect \u2192",
+      "cardCta": "Connect your handicap \u2192",
       "cardFootnote": "Works with WHS handicaps worldwide",
       "variants": {
         "about": {
           "benefit": "See how your handicap compares here",
-          "sub": "Friends, members and the world’s best at this course"
+          "sub": "Friends, members and the world\u2019s best at this course"
         },
         "holes": {
           "benefit": "See your scoring on every hole",
-          "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+          "sub": "Your average vs everyone who\u2019s played {{name}}, hole by hole."
         },
         "champions": {
           "benefit": "See where you rank at this course",
@@ -600,23 +600,23 @@
         },
         "progress": {
           "benefit": "Fill in your Top 100 automatically",
-          "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+          "sub": "Connect your handicap and every round you play counts itself \u2014 no manual logging."
         },
         "leaderboard": {
           "benefit": "See where you rank worldwide",
           "sub": "Connect your handicap to join the championship and climb the global rankings."
         },
         "discover": {
-          "benefit": "See which of these you’ve played",
+          "benefit": "See which of these you\u2019ve played",
           "sub": "Connect your handicap to see how you scored at every course."
         },
         "tour-venue": {
           "benefit": "See how you'd score at {{name}}",
-          "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+          "sub": "Connect your WHS handicap to compare your game to this week\u2019s venue."
         },
         "tour-holes": {
           "benefit": "See your scoring on these holes vs the field",
-          "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+          "sub": "Connect your WHS handicap to measure your game against the pros\u2019, hole by hole."
         }
       }
     },
@@ -626,7 +626,7 @@
       "officialWebsite": "Official Course Website"
     },
     "locationPills": {
-      "separator": "›"
+      "separator": "\u203a"
     },
     "a11y": {
       "openMediaTab": "Open Media tab",
@@ -667,7 +667,7 @@
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
       "scaleLabel": "Schwierigkeitsskala",
-      "scaleCaption": "Dieses Loch im Vergleich zu allen anderen — weiter rechts spielt schwerer.",
+      "scaleCaption": "Dieses Loch im Vergleich zu allen anderen \u2014 weiter rechts spielt schwerer.",
       "yourGapVsField": "Dein Abstand zum Feld"
     },
     "records": {
@@ -684,7 +684,7 @@
       }
     },
     "you": {
-      "oneToGoHole": "One to go · hole {{n}}",
+      "oneToGoHole": "One to go \u00b7 hole {{n}}",
       "fieldHere": "The field here",
       "gapBetter": "Better than the field here",
       "gapWorse": "Worse than the field here",
@@ -697,7 +697,7 @@
     }
   },
   "network": {
-    "emojiFlag": "⛳",
+    "emojiFlag": "\u26f3",
     "viewCourseA11y": "View {{name}}",
     "badge": {
       "playedByFriends_one": "Played by {{count}} friend",
@@ -706,11 +706,11 @@
       "topRated": "Top rated",
       "trending": "Trending"
     },
-    "unseenReviewsTitle": "🔔 New review from your network",
-    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
+    "unseenReviewsTitle": "\ud83d\udd14 New review from your network",
+    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> \u00b7 <rating>{{rating}}</rating>",
     "unseenReviewsMore_one": " +{{count}} more",
     "unseenReviewsMore_other": " +{{count}} more",
-    "viewArrow": "View →",
+    "viewArrow": "View \u2192",
     "circleKicker": "YOUR CIRCLE",
     "friendsPlayedTitle": "Courses played by friends"
   },
@@ -772,7 +772,7 @@
       "viewAll": "Alle ansehen",
       "entrySingular": "RUNDE",
       "entryPlural": "RUNDEN",
-      "empty": "Noch keine kürzlichen Runden von Freunden."
+      "empty": "Noch keine k\u00fcrzlichen Runden von Freunden."
     },
     "moments": {
       "title": "Moments of the game",
@@ -829,19 +829,22 @@
       "whenPlayed": "Played {{when}}",
       "whenRated": "Rated {{when}}",
       "statusNoDate": "On your card",
-      "statusFinishNoDate": "Rated · detail missing",
+      "statusFinishNoDate": "Rated \u00b7 detail missing",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "friendsTitle": "Runden deiner Freunde sehen",
+      "friendsStatus": "Ihre Scores landen hier",
+      "actionFriends": "SUCHEN"
     },
     "live": "Live",
     "latest": "Latest",
-    "roundThru": "R{{round}} · bis Loch {{thru}}",
+    "roundThru": "R{{round}} \u00b7 bis Loch {{thru}}",
     "thruOnly": "Bis Loch {{thru}}",
-    "leader": "Führend",
-    "tiedLead": "Geteilte Führung",
-    "roundFinished": "R{{round}} · beendet",
+    "leader": "F\u00fchrend",
+    "tiedLead": "Geteilte F\u00fchrung",
+    "roundFinished": "R{{round}} \u00b7 beendet",
     "playersTied": "{{count}} Spieler gleichauf",
     "playersTied_one": "{{count}} Spieler gleichauf",
     "momentsGroupCount": "{{count}} Momente",
@@ -890,7 +893,30 @@
       "nTied": "{{count}} tied"
     },
     "honoursCaptionCount": "{{count}} Hole-in-One und Albatrosse auf der Tafel",
-    "aroundTheWorld": "Herausragende Runden"
+    "aroundTheWorld": "Herausragende Runden",
+    "findGolfers": {
+      "kicker": "Die Mitglieder",
+      "title": "Golfer finden",
+      "count": "{{shown}} von {{total}} Mitgliedern",
+      "requestsSent": "{{count}} Anfragen gesendet",
+      "searchPlaceholder": "Name oder Handle",
+      "clear": "Loeschen",
+      "hcp": "HCP",
+      "rounds": "RUNDEN",
+      "homeClub": "HEIMCLUB",
+      "addFriend": "Freund hinzufuegen",
+      "requested": "Angefragt",
+      "follow": "Folgen",
+      "following": "Folgt",
+      "groupFollowedBy": "Gefolgt von",
+      "groupPlays": "Spielt wo du spielst",
+      "groupPopular": "Mitglieder zum Kennenlernen",
+      "groupMatch": "Treffer",
+      "emptyTitle": "Kein Golfer namens \"{{q}}\"",
+      "emptyBody": "Versuche den Handle oder lade sie zu clbhouz ein",
+      "inviteQuiet": "Golfer einladen",
+      "inviteCta": "Einen Golfer zu clbhouz einladen"
+    }
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",
@@ -902,8 +928,8 @@
       "scoreable_other": "{{count}} von {{total}} verfolgten Kursen sind scorebar",
       "played_one": "{{count}} von {{total}} verfolgtem Kurs hat Runden",
       "played_other": "{{count}} von {{total}} verfolgten Kursen haben Runden",
-      "longest_one": "{{count}} von {{total}} verfolgtem Kurs hat Länge",
-      "longest_other": "{{count}} von {{total}} verfolgten Kursen haben Länge",
+      "longest_one": "{{count}} von {{total}} verfolgtem Kurs hat L\u00e4nge",
+      "longest_other": "{{count}} von {{total}} verfolgten Kursen haben L\u00e4nge",
       "rated_one": "{{count}} von {{total}} verfolgtem Kurs hat Bewertungen",
       "rated_other": "{{count}} von {{total}} verfolgten Kursen haben Bewertungen",
       "chase_one": "{{count}} von {{total}} verfolgtem Kurs hat offene Rekorde",

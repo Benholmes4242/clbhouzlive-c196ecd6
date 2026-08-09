@@ -1,72 +1,72 @@
 {
   "media": {
-    "signInTitle": "[~~Šíĝñ íñ ţő ṽíéŵ ɱéđíá~~]",
-    "signInBody": "[~~Šéé ƥĥőţőš áñđ ṽíđéőš ƒřőɱ ĝőļƒéřš ŵĥő'ṽé ƥļáýéđ ĥéřé.~~]",
-    "signInCta": "[~~Šíĝñ íñ~~]",
-    "errorTitle": "[~~Ĉőúļđñ'ţ ļőáđ ɱéđíá~~]",
-    "errorBody": "[~~Ƥļéášé ĉĥéĉǩ ýőúř ĉőññéĉţíőñ áñđ ţřý áĝáíñ.~~]",
-    "emptyTitle": "[~~Ñő ɱéđíá ýéţ~~]",
-    "emptyBody": "[~~Ɓé ţĥé ƒířšţ ţő ĉáƥţúřé <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.~~]",
-    "emptyCourseFallback": "[~~ţĥíš ĉőúřšé~~]",
-    "shareExperience": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
-    "uploadVideo": "[~~Úƥļőáđ á ṽíđéő~~]",
-    "filterAll": "[~~Áļļ~~]",
-    "filterPhotos": "[~~Ƥĥőţőš~~]",
-    "filterVideos": "[~~Ṽíđéőš~~]",
-    "filterA11y": "[~~Ṁéđíá ƒíļţéř~~]",
-    "addMediaA11y": "[~~Áđđ ɱéđíá~~]",
+    "signInTitle": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u1e7d\u00ed\u00e9\u0175 \u0271\u00e9\u0111\u00ed\u00e1~~]",
+    "signInBody": "[~~\u0160\u00e9\u00e9 \u01a5\u0125\u0151\u0163\u0151\u0161 \u00e1\u00f1\u0111 \u1e7d\u00ed\u0111\u00e9\u0151\u0161 \u0192\u0159\u0151\u0271 \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0175\u0125\u0151'\u1e7d\u00e9 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 \u0125\u00e9\u0159\u00e9.~~]",
+    "signInCta": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1~~]",
+    "errorTitle": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0271\u00e9\u0111\u00ed\u00e1~~]",
+    "errorBody": "[~~\u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0109\u0125\u00e9\u0109\u01e9 \u00fd\u0151\u00fa\u0159 \u0109\u0151\u00f1\u00f1\u00e9\u0109\u0163\u00ed\u0151\u00f1 \u00e1\u00f1\u0111 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]",
+    "emptyTitle": "[~~\u00d1\u0151 \u0271\u00e9\u0111\u00ed\u00e1 \u00fd\u00e9\u0163~~]",
+    "emptyBody": "[~~\u0181\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0159\u0161\u0163 \u0163\u0151 \u0109\u00e1\u01a5\u0163\u00fa\u0159\u00e9 <1>{{courseName}}</1> \u2014 photos and videos from your round help fellow golfers discover it.~~]",
+    "emptyCourseFallback": "[~~\u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+    "shareExperience": "[~~\u0160\u0125\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9~~]",
+    "uploadVideo": "[~~\u00da\u01a5\u013c\u0151\u00e1\u0111 \u00e1 \u1e7d\u00ed\u0111\u00e9\u0151~~]",
+    "filterAll": "[~~\u00c1\u013c\u013c~~]",
+    "filterPhotos": "[~~\u01a4\u0125\u0151\u0163\u0151\u0161~~]",
+    "filterVideos": "[~~\u1e7c\u00ed\u0111\u00e9\u0151\u0161~~]",
+    "filterA11y": "[~~\u1e40\u00e9\u0111\u00ed\u00e1 \u0192\u00ed\u013c\u0163\u00e9\u0159~~]",
+    "addMediaA11y": "[~~\u00c1\u0111\u0111 \u0271\u00e9\u0111\u00ed\u00e1~~]",
     "guide": {
-      "kicker": "[~~Ŵĥáţ ţő šĥářé~~]",
-      "signatureHoles": "[~~Šíĝñáţúřé ĥőļéš~~]",
-      "signatureHolesSub": "[~~Šĥőŵ ţĥé ŵőřļđ ŵĥáţ ɱáǩéš ţĥíš ĉőúřšé šƥéĉíáļ~~]",
-      "shots": "[~~Šĥőţš ƒřőɱ ýőúř řőúñđ~~]",
-      "shotsSub": "[~~Šĥőřţ ĉļíƥš őƒ ýőúř ƀéšţ ɱőɱéñţš őñ ţĥé ĉőúřšé~~]",
-      "views": "[~~Ṽíéŵš & áţɱőšƥĥéřé~~]",
-      "viewsSub": "[~~Šúñšéţš, ļáñđšĉáƥéš, ţĥé ƒééļíñĝ őƒ ƀéíñĝ ţĥéřé~~]",
-      "clubhouse": "[~~Ĉļúƀĥőúšé & ƒáĉíļíţíéš~~]",
-      "clubhouseSub": "[~~Ĥéļƥ őţĥéřš ǩñőŵ ŵĥáţ ţő éẋƥéĉţ ƀéƒőřé ţĥéý ṽíšíţ~~]"
+      "kicker": "[~~\u0174\u0125\u00e1\u0163 \u0163\u0151 \u0161\u0125\u00e1\u0159\u00e9~~]",
+      "signatureHoles": "[~~\u0160\u00ed\u011d\u00f1\u00e1\u0163\u00fa\u0159\u00e9 \u0125\u0151\u013c\u00e9\u0161~~]",
+      "signatureHolesSub": "[~~\u0160\u0125\u0151\u0175 \u0163\u0125\u00e9 \u0175\u0151\u0159\u013c\u0111 \u0175\u0125\u00e1\u0163 \u0271\u00e1\u01e9\u00e9\u0161 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0161\u01a5\u00e9\u0109\u00ed\u00e1\u013c~~]",
+      "shots": "[~~\u0160\u0125\u0151\u0163\u0161 \u0192\u0159\u0151\u0271 \u00fd\u0151\u00fa\u0159 \u0159\u0151\u00fa\u00f1\u0111~~]",
+      "shotsSub": "[~~\u0160\u0125\u0151\u0159\u0163 \u0109\u013c\u00ed\u01a5\u0161 \u0151\u0192 \u00fd\u0151\u00fa\u0159 \u0180\u00e9\u0161\u0163 \u0271\u0151\u0271\u00e9\u00f1\u0163\u0161 \u0151\u00f1 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "views": "[~~\u1e7c\u00ed\u00e9\u0175\u0161 & \u00e1\u0163\u0271\u0151\u0161\u01a5\u0125\u00e9\u0159\u00e9~~]",
+      "viewsSub": "[~~\u0160\u00fa\u00f1\u0161\u00e9\u0163\u0161, \u013c\u00e1\u00f1\u0111\u0161\u0109\u00e1\u01a5\u00e9\u0161, \u0163\u0125\u00e9 \u0192\u00e9\u00e9\u013c\u00ed\u00f1\u011d \u0151\u0192 \u0180\u00e9\u00ed\u00f1\u011d \u0163\u0125\u00e9\u0159\u00e9~~]",
+      "clubhouse": "[~~\u0108\u013c\u00fa\u0180\u0125\u0151\u00fa\u0161\u00e9 & \u0192\u00e1\u0109\u00ed\u013c\u00ed\u0163\u00ed\u00e9\u0161~~]",
+      "clubhouseSub": "[~~\u0124\u00e9\u013c\u01a5 \u0151\u0163\u0125\u00e9\u0159\u0161 \u01e9\u00f1\u0151\u0175 \u0175\u0125\u00e1\u0163 \u0163\u0151 \u00e9\u1e8b\u01a5\u00e9\u0109\u0163 \u0180\u00e9\u0192\u0151\u0159\u00e9 \u0163\u0125\u00e9\u00fd \u1e7d\u00ed\u0161\u00ed\u0163~~]"
     }
   },
   "holes": {
-    "detailsA11y": "[~~Ĥőļé {{holeNo}} đéţáíļš~~]",
-    "parLabel": "[~~Ƥář {{par}}~~]",
-    "yards": "[~~{{yards}} ýđš~~]",
-    "strokeIndex": "[~~ŠÍ {{index}}~~]",
-    "hardest": "[~~ĤÁŘĐÉŠŢ~~]",
-    "easiest": "[~~ÉÁŠÍÉŠŢ~~]",
-    "subPar": "[~~Šúƀ-ƥář~~]",
-    "par": "[~~Ƥář~~]",
-    "overPar": "[~~Őṽéř-ƥář~~]",
-    "avgToPar": "[~~ÁṼĜ ŢŐ ƤÁŘ~~]",
-    "playsTo": "[~~ƤĻÁÝŠ ŢŐ <1>{{playsTo}}</1>~~]",
-    "rounds_one": "[~~{{formattedCount}} řőúñđ~~]",
-    "rounds_other": "[~~{{formattedCount}} řőúñđš~~]",
-    "players_one": "[~~{{formattedCount}} ƥļáýéř~~]",
-    "players_other": "[~~{{formattedCount}} ƥļáýéřš~~]",
-    "allHolesKicker": "[~~ÁĻĻ ĤŐĻÉŠ~~]",
-    "sortByHole": "[~~Ɓý ĥőļé~~]",
-    "sortByDifficulty": "[~~Ɓý đíƒƒíĉúļţý~~]",
-    "errorLoading": "[~~Ĉőúļđñ'ţ ļőáđ ĥőļé áñáļýšíš.~~]",
-    "credibilityKicker": "[~~ŐƑƑÍĈÍÁĻ ĤŐĻÉ ĐÁŢÁ~~]",
-    "credibilitySuffix": "[~~ · Őƒƒíĉíáļ ŴĤŠ~~]",
-    "hardestTitle": "[~~Ĥářđéšţ~~]",
-    "easiestTitle": "[~~Éášíéšţ~~]",
-    "playsToInline": "[~~Ƥļáýš ţő {{playsTo}}~~]",
-    "parAndSi": "[~~Ƥář {{par}} · ŠÍ {{si}}~~]",
+    "detailsA11y": "[~~\u0124\u0151\u013c\u00e9 {{holeNo}} \u0111\u00e9\u0163\u00e1\u00ed\u013c\u0161~~]",
+    "parLabel": "[~~\u01a4\u00e1\u0159 {{par}}~~]",
+    "yards": "[~~{{yards}} \u00fd\u0111\u0161~~]",
+    "strokeIndex": "[~~\u0160\u00cd {{index}}~~]",
+    "hardest": "[~~\u0124\u00c1\u0158\u0110\u00c9\u0160\u0162~~]",
+    "easiest": "[~~\u00c9\u00c1\u0160\u00cd\u00c9\u0160\u0162~~]",
+    "subPar": "[~~\u0160\u00fa\u0180-\u01a5\u00e1\u0159~~]",
+    "par": "[~~\u01a4\u00e1\u0159~~]",
+    "overPar": "[~~\u0150\u1e7d\u00e9\u0159-\u01a5\u00e1\u0159~~]",
+    "avgToPar": "[~~\u00c1\u1e7c\u011c \u0162\u0150 \u01a4\u00c1\u0158~~]",
+    "playsTo": "[~~\u01a4\u013b\u00c1\u00dd\u0160 \u0162\u0150 <1>{{playsTo}}</1>~~]",
+    "rounds_one": "[~~{{formattedCount}} \u0159\u0151\u00fa\u00f1\u0111~~]",
+    "rounds_other": "[~~{{formattedCount}} \u0159\u0151\u00fa\u00f1\u0111\u0161~~]",
+    "players_one": "[~~{{formattedCount}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159~~]",
+    "players_other": "[~~{{formattedCount}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+    "allHolesKicker": "[~~\u00c1\u013b\u013b \u0124\u0150\u013b\u00c9\u0160~~]",
+    "sortByHole": "[~~\u0181\u00fd \u0125\u0151\u013c\u00e9~~]",
+    "sortByDifficulty": "[~~\u0181\u00fd \u0111\u00ed\u0192\u0192\u00ed\u0109\u00fa\u013c\u0163\u00fd~~]",
+    "errorLoading": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0125\u0151\u013c\u00e9 \u00e1\u00f1\u00e1\u013c\u00fd\u0161\u00ed\u0161.~~]",
+    "credibilityKicker": "[~~\u0150\u0191\u0191\u00cd\u0108\u00cd\u00c1\u013b \u0124\u0150\u013b\u00c9 \u0110\u00c1\u0162\u00c1~~]",
+    "credibilitySuffix": "[~~ \u00b7 \u0150\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0174\u0124\u0160~~]",
+    "hardestTitle": "[~~\u0124\u00e1\u0159\u0111\u00e9\u0161\u0163~~]",
+    "easiestTitle": "[~~\u00c9\u00e1\u0161\u00ed\u00e9\u0161\u0163~~]",
+    "playsToInline": "[~~\u01a4\u013c\u00e1\u00fd\u0161 \u0163\u0151 {{playsTo}}~~]",
+    "parAndSi": "[~~\u01a4\u00e1\u0159 {{par}} \u00b7 \u0160\u00cd {{si}}~~]",
     "empty": {
-      "eyebrow": "[~~Őƒƒíĉíáļ ĥőļé đáţá~~]",
-      "title": "[~~Ĥőļé íñšíĝĥţš ářé ĉőɱíñĝ~~]",
-      "body": "[~~Ŵĥéñ ĝļőƀáļ ĝőļƒéřš ĥőļđíñĝ őƒƒíĉíáļ ŴĤŠ ĥáñđíĉáƥš ļőĝ řőúñđš ŵíţĥ ĥőļé šĉőřéš áţ <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.~~]",
-      "thisCourse": "[~~ţĥíš ĉőúřšé~~]"
+      "eyebrow": "[~~\u0150\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0125\u0151\u013c\u00e9 \u0111\u00e1\u0163\u00e1~~]",
+      "title": "[~~\u0124\u0151\u013c\u00e9 \u00ed\u00f1\u0161\u00ed\u011d\u0125\u0163\u0161 \u00e1\u0159\u00e9 \u0109\u0151\u0271\u00ed\u00f1\u011d~~]",
+      "body": "[~~\u0174\u0125\u00e9\u00f1 \u011d\u013c\u0151\u0180\u00e1\u013c \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0125\u0151\u013c\u0111\u00ed\u00f1\u011d \u0151\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0174\u0124\u0160 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5\u0161 \u013c\u0151\u011d \u0159\u0151\u00fa\u00f1\u0111\u0161 \u0175\u00ed\u0163\u0125 \u0125\u0151\u013c\u00e9 \u0161\u0109\u0151\u0159\u00e9\u0161 \u00e1\u0163 <1>{{courseName}}</1>, we'll break down every hole \u2014 average score, hardest and easiest, and the full birdie-to-double spread.~~]",
+      "thisCourse": "[~~\u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]"
     },
     "scoringKey": {
-      "title": "[~~Šĉőříñĝ ǩéý~~]",
-      "ace": "[~~Áĉé~~]",
-      "albatross": "[~~Áļƀáţřőšš~~]",
-      "eagle": "[~~Éáĝļé~~]",
-      "birdie": "[~~Ɓířđíé~~]",
-      "bogey": "[~~Ɓőĝéý~~]",
-      "doublePlus": "[~~Đƀļ+~~]"
+      "title": "[~~\u0160\u0109\u0151\u0159\u00ed\u00f1\u011d \u01e9\u00e9\u00fd~~]",
+      "ace": "[~~\u00c1\u0109\u00e9~~]",
+      "albatross": "[~~\u00c1\u013c\u0180\u00e1\u0163\u0159\u0151\u0161\u0161~~]",
+      "eagle": "[~~\u00c9\u00e1\u011d\u013c\u00e9~~]",
+      "birdie": "[~~\u0181\u00ed\u0159\u0111\u00ed\u00e9~~]",
+      "bogey": "[~~\u0181\u0151\u011d\u00e9\u00fd~~]",
+      "doublePlus": "[~~\u0110\u0180\u013c+~~]"
     },
     "yourNemesisTitle": "Your nemesis",
     "yourScoringHoleTitle": "Your scoring hole",
@@ -77,19 +77,19 @@
     "youValue": "You: {{value}}",
     "aceA11y": "Hole in one",
     "clubGuide": {
-      "title": "[~~Ĥőŵ ţĥé ĉőúřšé ƥļáýš~~]",
-      "bodySignedIn_one": "[~~Ɓúíļţ ƒřőɱ {{count}} řőúñď ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé, ŵíţĥ ýőúř óŵñ ĝáɱé áļőñĝšíđé.~~]",
-      "bodySignedIn_other": "[~~Ɓúíļţ ƒřőɱ {{count}} řőúñđš ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé, ŵíţĥ ýőúř óŵñ ĝáɱé áļőñĝšíđé.~~]",
-      "bodySignedOut_one": "[~~Ɓúíļţ ƒřőɱ {{count}} řőúñď ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé.~~]",
-      "bodySignedOut_other": "[~~Ɓúíļţ ƒřőɱ {{count}} řőúñđš ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ — ţĥé ĉőɱɱúñíţý'š šĉőříñĝ óñ évéřý ĥőļé.~~]"
+      "title": "[~~\u0124\u0151\u0175 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u01a5\u013c\u00e1\u00fd\u0161~~]",
+      "bodySignedIn_one": "[~~\u0181\u00fa\u00ed\u013c\u0163 \u0192\u0159\u0151\u0271 {{count}} \u0159\u0151\u00fa\u00f1\u010f \u0175\u00ed\u0163\u0125 \u0125\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0111\u00e9\u0163\u00e1\u00ed\u013c \u2014 \u0163\u0125\u00e9 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd'\u0161 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u00f3\u00f1 \u00e9v\u00e9\u0159\u00fd \u0125\u0151\u013c\u00e9, \u0175\u00ed\u0163\u0125 \u00fd\u0151\u00fa\u0159 \u00f3\u0175\u00f1 \u011d\u00e1\u0271\u00e9 \u00e1\u013c\u0151\u00f1\u011d\u0161\u00ed\u0111\u00e9.~~]",
+      "bodySignedIn_other": "[~~\u0181\u00fa\u00ed\u013c\u0163 \u0192\u0159\u0151\u0271 {{count}} \u0159\u0151\u00fa\u00f1\u0111\u0161 \u0175\u00ed\u0163\u0125 \u0125\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0111\u00e9\u0163\u00e1\u00ed\u013c \u2014 \u0163\u0125\u00e9 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd'\u0161 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u00f3\u00f1 \u00e9v\u00e9\u0159\u00fd \u0125\u0151\u013c\u00e9, \u0175\u00ed\u0163\u0125 \u00fd\u0151\u00fa\u0159 \u00f3\u0175\u00f1 \u011d\u00e1\u0271\u00e9 \u00e1\u013c\u0151\u00f1\u011d\u0161\u00ed\u0111\u00e9.~~]",
+      "bodySignedOut_one": "[~~\u0181\u00fa\u00ed\u013c\u0163 \u0192\u0159\u0151\u0271 {{count}} \u0159\u0151\u00fa\u00f1\u010f \u0175\u00ed\u0163\u0125 \u0125\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0111\u00e9\u0163\u00e1\u00ed\u013c \u2014 \u0163\u0125\u00e9 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd'\u0161 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u00f3\u00f1 \u00e9v\u00e9\u0159\u00fd \u0125\u0151\u013c\u00e9.~~]",
+      "bodySignedOut_other": "[~~\u0181\u00fa\u00ed\u013c\u0163 \u0192\u0159\u0151\u0271 {{count}} \u0159\u0151\u00fa\u00f1\u0111\u0161 \u0175\u00ed\u0163\u0125 \u0125\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0111\u00e9\u0163\u00e1\u00ed\u013c \u2014 \u0163\u0125\u00e9 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd'\u0161 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u00f3\u00f1 \u00e9v\u00e9\u0159\u00fd \u0125\u0151\u013c\u00e9.~~]"
     },
-    "holeByHole": "[~~Ĥőļé ƀý ĥőļé~~]",
-    "birdieRingNote": "[~~Á ĝőļđ říñĝ ƀý á ĥőļé ńúɱƀéř ɱéáñš ýőú'vé ƀířđíéđ íţ.~~]",
-    "shapeOfCourse": "[~~Ţĥé šĥáƥé őƒ ţĥé ĉőúřšé~~]",
-    "legendEveryone": "[~~Évéřýőñé~~]",
-    "legendYou": "[~~Ýőú~~]",
-    "theBeastSuffix": "[~~ · ţĥé ƀéášţ~~]",
-    "youAvg": "[~~Ýőú {{avg}}~~]",
+    "holeByHole": "[~~\u0124\u0151\u013c\u00e9 \u0180\u00fd \u0125\u0151\u013c\u00e9~~]",
+    "birdieRingNote": "[~~\u00c1 \u011d\u0151\u013c\u0111 \u0159\u00ed\u00f1\u011d \u0180\u00fd \u00e1 \u0125\u0151\u013c\u00e9 \u0144\u00fa\u0271\u0180\u00e9\u0159 \u0271\u00e9\u00e1\u00f1\u0161 \u00fd\u0151\u00fa'v\u00e9 \u0180\u00ed\u0159\u0111\u00ed\u00e9\u0111 \u00ed\u0163.~~]",
+    "shapeOfCourse": "[~~\u0162\u0125\u00e9 \u0161\u0125\u00e1\u01a5\u00e9 \u0151\u0192 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+    "legendEveryone": "[~~\u00c9v\u00e9\u0159\u00fd\u0151\u00f1\u00e9~~]",
+    "legendYou": "[~~\u00dd\u0151\u00fa~~]",
+    "theBeastSuffix": "[~~ \u00b7 \u0163\u0125\u00e9 \u0180\u00e9\u00e1\u0161\u0163~~]",
+    "youAvg": "[~~\u00dd\u0151\u00fa {{avg}}~~]",
     "preview": {
       "eyebrow": "Hole by hole",
       "title": "How the field scores every hole",
@@ -103,88 +103,88 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
-      "seeAllShort": "[Àĺĺ {{count}}]"
+      "seeAllShort": "[\u00c0\u013a\u013a {{count}}]"
     }
   },
   "scorecard": {
-    "syncingTitle": "[~~Šĉőřéĉářđ őñ ţĥé ŵáý~~]",
-    "syncingBody": "[~~Ĥőļé-ƀý-ĥőļé đáţá íš šýñĉíñĝ ƒřőɱ Éñĝļáñđ Ĝőļƒ. Íţ úšúáļļý ļáñđš ŵíţĥíñ á ƒéŵ ĥőúřš.~~]",
-    "grossOnlyTitle": "[~~Ĝřőšš šĉőřé őñļý~~]",
-    "grossOnlyBody": "[~~Ţĥíš řőúñđ ŵáš ļőĝĝéđ áš á ţőţáļ, ŵíţĥőúţ ĥőļé-ƀý-ĥőļé šĉőřéš.~~]",
-    "gross": "[~~ĜŘŐŠŠ~~]",
-    "toPar": "[~~ŢŐ ƤÁŘ~~]",
-    "viewProfile": "[~~Ṽíéŵ ƥřőƒíļé~~]",
-    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
+    "syncingTitle": "[~~\u0160\u0109\u0151\u0159\u00e9\u0109\u00e1\u0159\u0111 \u0151\u00f1 \u0163\u0125\u00e9 \u0175\u00e1\u00fd~~]",
+    "syncingBody": "[~~\u0124\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0111\u00e1\u0163\u00e1 \u00ed\u0161 \u0161\u00fd\u00f1\u0109\u00ed\u00f1\u011d \u0192\u0159\u0151\u0271 \u00c9\u00f1\u011d\u013c\u00e1\u00f1\u0111 \u011c\u0151\u013c\u0192. \u00cd\u0163 \u00fa\u0161\u00fa\u00e1\u013c\u013c\u00fd \u013c\u00e1\u00f1\u0111\u0161 \u0175\u00ed\u0163\u0125\u00ed\u00f1 \u00e1 \u0192\u00e9\u0175 \u0125\u0151\u00fa\u0159\u0161.~~]",
+    "grossOnlyTitle": "[~~\u011c\u0159\u0151\u0161\u0161 \u0161\u0109\u0151\u0159\u00e9 \u0151\u00f1\u013c\u00fd~~]",
+    "grossOnlyBody": "[~~\u0162\u0125\u00ed\u0161 \u0159\u0151\u00fa\u00f1\u0111 \u0175\u00e1\u0161 \u013c\u0151\u011d\u011d\u00e9\u0111 \u00e1\u0161 \u00e1 \u0163\u0151\u0163\u00e1\u013c, \u0175\u00ed\u0163\u0125\u0151\u00fa\u0163 \u0125\u0151\u013c\u00e9-\u0180\u00fd-\u0125\u0151\u013c\u00e9 \u0161\u0109\u0151\u0159\u00e9\u0161.~~]",
+    "gross": "[~~\u011c\u0158\u0150\u0160\u0160~~]",
+    "toPar": "[~~\u0162\u0150 \u01a4\u00c1\u0158~~]",
+    "viewProfile": "[~~\u1e7c\u00ed\u00e9\u0175 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9~~]",
+    "viewCourse": "[~~\u1e7c\u00ed\u00e9\u0175 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
     "beatFieldOn": "[You matched or beat the field average on {{beat}} of {{scored}} holes.]",
     "beatFieldOnTour": "[Matched or beat the field average on {{beat}} of {{scored}} holes.]",
     "beatFieldVoice": "[{{who}} matched or beat the field average on {{beat}} of {{scored}} holes.]",
     "beatFieldOnPartial": "[You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
     "beatFieldOnTourPartial": "[Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
     "beatFieldVoicePartial": "[{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
-    "holeByHole": "[Šçőřéćářð]",
-    "hideHoleByHole": "[Ĥîðé šçőřéćářð]"
+    "holeByHole": "[\u0160\u00e7\u0151\u0159\u00e9\u0107\u00e1\u0159\u00f0]",
+    "hideHoleByHole": "[\u0124\u00ee\u00f0\u00e9 \u0161\u00e7\u0151\u0159\u00e9\u0107\u00e1\u0159\u00f0]"
   },
   "card": {
-    "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
-    "friendsPlayed_other": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđš~~]",
-    "yourRating": "[~~Ýőúř: {{rating}}~~]",
-    "avgRating": "[~~Áṽĝ: {{rating}}~~]",
-    "xpValue": "[~~{{xp}} ẊƤ~~]",
-    "rate": "[~~Řáţé~~]",
-    "played": "[~~Ƥļáýéđ~~]",
-    "logged": "[~~Ļőĝĝéđ: {{date}}~~]",
-    "friendsPlayedCount_one": "[~~{{count}} ƒříéñđ ƥļáýéđ~~]",
-    "friendsPlayedCount_other": "[~~{{count}} ƒříéñđš ƥļáýéđ~~]",
-    "noFriendsPlayed": "[~~Ñő ƒříéñđš ƥļáýéđ ýéţ~~]",
-    "aiQuoteLoading": "[~~Ĝéñéřáţíñĝ ʠúőţé...~~]",
-    "aiQuoteFallback": "[~~Á ĝőļƒ éẋƥéříéñĉé ļíǩé ñő őţĥéř~~]",
-    "experiencePoints": "[~~Éẋƥéříéñĉé Ƥőíñţš Éářñéđ~~]",
-    "yourRounds": "[Ýöür röünds]"
+    "friendsPlayed_one": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0180\u00fd {{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111~~]",
+    "friendsPlayed_other": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0180\u00fd {{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161~~]",
+    "yourRating": "[~~\u00dd\u0151\u00fa\u0159: {{rating}}~~]",
+    "avgRating": "[~~\u00c1\u1e7d\u011d: {{rating}}~~]",
+    "xpValue": "[~~{{xp}} \u1e8a\u01a4~~]",
+    "rate": "[~~\u0158\u00e1\u0163\u00e9~~]",
+    "played": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111~~]",
+    "logged": "[~~\u013b\u0151\u011d\u011d\u00e9\u0111: {{date}}~~]",
+    "friendsPlayedCount_one": "[~~{{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+    "friendsPlayedCount_other": "[~~{{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+    "noFriendsPlayed": "[~~\u00d1\u0151 \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 \u00fd\u00e9\u0163~~]",
+    "aiQuoteLoading": "[~~\u011c\u00e9\u00f1\u00e9\u0159\u00e1\u0163\u00ed\u00f1\u011d \u02a0\u00fa\u0151\u0163\u00e9...~~]",
+    "aiQuoteFallback": "[~~\u00c1 \u011d\u0151\u013c\u0192 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9 \u013c\u00ed\u01e9\u00e9 \u00f1\u0151 \u0151\u0163\u0125\u00e9\u0159~~]",
+    "experiencePoints": "[~~\u00c9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9 \u01a4\u0151\u00ed\u00f1\u0163\u0161 \u00c9\u00e1\u0159\u00f1\u00e9\u0111~~]",
+    "yourRounds": "[\u00dd\u00f6\u00fcr r\u00f6\u00fcnds]"
   },
   "explorer": {
-    "unableToLoadTitle": "[~~Úñáƀļé ţő ļőáđ ĉőúřšéš~~]",
-    "unableToLoadBody": "[~~Ŵé ĉőúļđñ'ţ ƒéţĉĥ ţĥé ĉőúřšéš. Ƥļéášé ĉĥéĉǩ ýőúř ĉőññéĉţíőñ áñđ ţřý áĝáíñ.~~]",
-    "loadMoreRetry": "[~~Ĉőúļđñ'ţ ļőáđ ɱőřé ĉőúřšéš · Ţáƥ ţő řéţřý~~]",
-    "allSubRegions": "[~~Áļļ šúƀ-řéĝíőñš~~]",
-    "chooseRegionFirst": "[~~Ĉĥőőšé á řéĝíőñ ƒířšţ~~]",
-    "subRegionA11y": "[~~Šéļéĉţ šúƀ-řéĝíőñ~~]",
-    "sortA11y": "[~~Šőřţ ĉőúřšéš~~]",
+    "unableToLoadTitle": "[~~\u00da\u00f1\u00e1\u0180\u013c\u00e9 \u0163\u0151 \u013c\u0151\u00e1\u0111 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "unableToLoadBody": "[~~\u0174\u00e9 \u0109\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u0192\u00e9\u0163\u0109\u0125 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0109\u0125\u00e9\u0109\u01e9 \u00fd\u0151\u00fa\u0159 \u0109\u0151\u00f1\u00f1\u00e9\u0109\u0163\u00ed\u0151\u00f1 \u00e1\u00f1\u0111 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]",
+    "loadMoreRetry": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0271\u0151\u0159\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00b7 \u0162\u00e1\u01a5 \u0163\u0151 \u0159\u00e9\u0163\u0159\u00fd~~]",
+    "allSubRegions": "[~~\u00c1\u013c\u013c \u0161\u00fa\u0180-\u0159\u00e9\u011d\u00ed\u0151\u00f1\u0161~~]",
+    "chooseRegionFirst": "[~~\u0108\u0125\u0151\u0151\u0161\u00e9 \u00e1 \u0159\u00e9\u011d\u00ed\u0151\u00f1 \u0192\u00ed\u0159\u0161\u0163~~]",
+    "subRegionA11y": "[~~\u0160\u00e9\u013c\u00e9\u0109\u0163 \u0161\u00fa\u0180-\u0159\u00e9\u011d\u00ed\u0151\u00f1~~]",
+    "sortA11y": "[~~\u0160\u0151\u0159\u0163 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
     "countWorldwide_one": "[~~<1>{{formattedCount}}</1> course worldwide~~]",
     "countWorldwide_other": "[~~<1>{{formattedCount}}</1> courses worldwide~~]",
     "countInRegion_one": "[~~<1>{{formattedCount}}</1> course in {{region}}~~]",
     "countInRegion_other": "[~~<1>{{formattedCount}}</1> courses in {{region}}~~]",
     "results_one": "[~~<1>{{formattedCount}}</1> result~~]",
     "results_other": "[~~<1>{{formattedCount}}</1> results~~]",
-    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]",
-    "searchPlaceholder": "[~~Šéářĉĥ ƀý ñáɱé, ĉőúñţý őř ářéá…~~]",
-    "searchA11y": "[~~Šéářĉĥ ĝőļƒ ĉőúřšéš~~]",
-    "searching": "[~~Šéářĉĥíñĝ~~]",
-    "filtersA11y": "[~~Ĉőúřšé ƒíļţéřš~~]",
-    "selectRegionA11y": "[~~Šéļéĉţ řéĝíőñ~~]",
-    "allRegions": "[~~Áļļ Řéĝíőñš~~]"
+    "resetFilters": "[~~\u0158\u00e9\u0161\u00e9\u0163 \u0192\u00ed\u013c\u0163\u00e9\u0159\u0161~~]",
+    "searchPlaceholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0180\u00fd \u00f1\u00e1\u0271\u00e9, \u0109\u0151\u00fa\u00f1\u0163\u00fd \u0151\u0159 \u00e1\u0159\u00e9\u00e1\u2026~~]",
+    "searchA11y": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u011d\u0151\u013c\u0192 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "searching": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125\u00ed\u00f1\u011d~~]",
+    "filtersA11y": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u0192\u00ed\u013c\u0163\u00e9\u0159\u0161~~]",
+    "selectRegionA11y": "[~~\u0160\u00e9\u013c\u00e9\u0109\u0163 \u0159\u00e9\u011d\u00ed\u0151\u00f1~~]",
+    "allRegions": "[~~\u00c1\u013c\u013c \u0158\u00e9\u011d\u00ed\u0151\u00f1\u0161~~]"
   },
   "searchSheet": {
-    "title": "[~~Ĉĥőőšé Ĝőļƒ Ĉļúƀ~~]",
-    "closeA11y": "[~~Ĉļőšé šéářĉĥ~~]",
-    "placeholder": "[~~Šéářĉĥ ƒőř á ĝőļƒ ĉőúřšé...~~]",
-    "clearSearchA11y": "[~~Ĉļéář šéářĉĥ~~]",
-    "trouble": "[~~Ţřőúƀļé ļőáđíñĝ ĉőúřšéš~~]",
-    "yourCourses": "[~~Ýőúř ĉőúřšéš~~]",
+    "title": "[~~\u0108\u0125\u0151\u0151\u0161\u00e9 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180~~]",
+    "closeA11y": "[~~\u0108\u013c\u0151\u0161\u00e9 \u0161\u00e9\u00e1\u0159\u0109\u0125~~]",
+    "placeholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0192\u0151\u0159 \u00e1 \u011d\u0151\u013c\u0192 \u0109\u0151\u00fa\u0159\u0161\u00e9...~~]",
+    "clearSearchA11y": "[~~\u0108\u013c\u00e9\u00e1\u0159 \u0161\u00e9\u00e1\u0159\u0109\u0125~~]",
+    "trouble": "[~~\u0162\u0159\u0151\u00fa\u0180\u013c\u00e9 \u013c\u0151\u00e1\u0111\u00ed\u00f1\u011d \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "yourCourses": "[~~\u00dd\u0151\u00fa\u0159 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
     "outOfTen": "[~~/ 10~~]",
-    "added": "[~~Áđđéđ~~]",
-    "retry": "[~~Řéţřý~~]",
-    "ratingBullet": "[~~• ~~]"
+    "added": "[~~\u00c1\u0111\u0111\u00e9\u0111~~]",
+    "retry": "[~~\u0158\u00e9\u0163\u0159\u00fd~~]",
+    "ratingBullet": "[~~\u2022 ~~]"
   },
   "rateSheet": {
-    "subtitle": "[~~Šéářĉĥ áñý ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
-    "emptyLong": "[~~Ţýƥé á ĉőúřšé ñáɱé ţő ĝéţ šţářţéđ~~]",
-    "searching": "[~~Šéářĉĥíñĝ…~~]",
-    "noResults": "[~~Ñő ĉőúřšéš ƒőúñđ ƒőř \"{{query}}\"~~]",
-    "rateAction": "[~~Řáţé →~~]",
-    "searchPlaceholder": "[~~Šéářĉĥ ĉőúřšéš…~~]"
+    "subtitle": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u00e1\u00f1\u00fd \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00fd\u0151\u00fa'\u1e7d\u00e9 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+    "emptyLong": "[~~\u0162\u00fd\u01a5\u00e9 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00f1\u00e1\u0271\u00e9 \u0163\u0151 \u011d\u00e9\u0163 \u0161\u0163\u00e1\u0159\u0163\u00e9\u0111~~]",
+    "searching": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125\u00ed\u00f1\u011d\u2026~~]",
+    "noResults": "[~~\u00d1\u0151 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u0192\u0151\u00fa\u00f1\u0111 \u0192\u0151\u0159 \"{{query}}\"~~]",
+    "rateAction": "[~~\u0158\u00e1\u0163\u00e9 \u2192~~]",
+    "searchPlaceholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161\u2026~~]"
   },
   "tabs": {
-    "explore": "[~~Éẋƥļőřé~~]"
+    "explore": "[~~\u00c9\u1e8b\u01a5\u013c\u0151\u0159\u00e9~~]"
   },
   "hero": {
     "factBestRound": "Best round tracked here: {{gross}}, {{holder}}",
@@ -192,7 +192,7 @@
     "factOverPar": "Plays {{over}} over par on average",
     "factUnderPar": "Plays {{over}} under par on average",
     "factLevelPar": "Plays level par on average",
-    "viewCourse": "[~~Ṽíéŵ ĉőúřšé~~]",
+    "viewCourse": "[~~\u1e7c\u00ed\u00e9\u0175 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
     "contextFriendsOne": "{{name1}} has played here",
     "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
     "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
@@ -202,61 +202,61 @@
     "contextHidden_other": "Rated {{avg}} from just {{count}} members"
   },
   "friends": {
-    "signInTitle": "[~~Šíĝñ íñ ţő šéé ƒříéñđš' ĉőúřšéš~~]",
-    "signInBody": "[~~Đíšĉőṽéř ŵĥéřé ýőúř ƒříéñđš ĥáṽé ƀééñ ƥļáýíñĝ áñđ ŵĥíĉĥ ĉőúřšéš ářé ţřéñđíñĝ íñ ýőúř ĉířĉļé.~~]",
-    "signIn": "[~~Šíĝñ íñ~~]"
+    "signInTitle": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u0161\u00e9\u00e9 \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161' \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "signInBody": "[~~\u0110\u00ed\u0161\u0109\u0151\u1e7d\u00e9\u0159 \u0175\u0125\u00e9\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161 \u0125\u00e1\u1e7d\u00e9 \u0180\u00e9\u00e9\u00f1 \u01a5\u013c\u00e1\u00fd\u00ed\u00f1\u011d \u00e1\u00f1\u0111 \u0175\u0125\u00ed\u0109\u0125 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00e1\u0159\u00e9 \u0163\u0159\u00e9\u00f1\u0111\u00ed\u00f1\u011d \u00ed\u00f1 \u00fd\u0151\u00fa\u0159 \u0109\u00ed\u0159\u0109\u013c\u00e9.~~]",
+    "signIn": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1~~]"
   },
   "rateNudge": {
-    "emptyLabel": "[~~Řáţé á ĉőúřšé ýőú'ṽé ƥļáýéđ~~]",
-    "rateCta": "[~~Řáţé~~]",
-    "playedEyebrow": "[~~Ÿőú ĥáṽéŋ'ţ ŕáţéđ ýéţ~~]",
-    "suggestedEyebrow": "[~~ŦŔŶ ŔÁŦĨŃĜ~~]",
-    "playedSubWithRegion": "[~~{{region}} · Ƥļáýéđ, ŋőţ ŕáţéđ~~]",
-    "playedSubNoRegion": "[~~Ƥļáýéđ, ŋőţ ŕáţéđ~~]",
-    "suggestedForYou": "[~~Śúĝĝéśţéď ƒőŕ ýőú~~]"
+    "emptyLabel": "[~~\u0158\u00e1\u0163\u00e9 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00fd\u0151\u00fa'\u1e7d\u00e9 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+    "rateCta": "[~~\u0158\u00e1\u0163\u00e9~~]",
+    "playedEyebrow": "[~~\u0178\u0151\u00fa \u0125\u00e1\u1e7d\u00e9\u014b'\u0163 \u0155\u00e1\u0163\u00e9\u0111 \u00fd\u00e9\u0163~~]",
+    "suggestedEyebrow": "[~~\u0166\u0154\u0176 \u0154\u00c1\u0166\u0128\u0143\u011c~~]",
+    "playedSubWithRegion": "[~~{{region}} \u00b7 \u01a4\u013c\u00e1\u00fd\u00e9\u0111, \u014b\u0151\u0163 \u0155\u00e1\u0163\u00e9\u0111~~]",
+    "playedSubNoRegion": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111, \u014b\u0151\u0163 \u0155\u00e1\u0163\u00e9\u0111~~]",
+    "suggestedForYou": "[~~\u015a\u00fa\u011d\u011d\u00e9\u015b\u0163\u00e9\u010f \u0192\u0151\u0155 \u00fd\u0151\u00fa~~]"
   },
   "request": {
     "hero": {
-      "headline": "[~~Ĉáñ'ţ ƒíñđ á ĉőúřšé?~~]",
-      "headlineWithQuery": "[~~Ĉáñ'ţ ƒíñđ \"{{query}}\"?~~]",
-      "body": "[~~Íƒ á ĉőúřšé íš ɱíššíñĝ, ţéļļ úš áñđ ŵé'ļļ áđđ íţ ţő ţĥé ɱáƥ.~~]",
-      "perkQuick": "[~~Ţáǩéš 20 šéĉőñđš – ĵúšţ ñáɱé áñđ ļőĉáţíőñ~~]",
-      "perkNotify": "[~~Ŵé'ļļ ñőţíƒý ýőú ţĥé ɱőɱéñţ íţ'š ļíṽé~~]",
-      "cta": "[~~Řéʠúéšţ ţĥíš ĉőúřšé~~]"
+      "headline": "[~~\u0108\u00e1\u00f1'\u0163 \u0192\u00ed\u00f1\u0111 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9?~~]",
+      "headlineWithQuery": "[~~\u0108\u00e1\u00f1'\u0163 \u0192\u00ed\u00f1\u0111 \"{{query}}\"?~~]",
+      "body": "[~~\u00cd\u0192 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00ed\u0161 \u0271\u00ed\u0161\u0161\u00ed\u00f1\u011d, \u0163\u00e9\u013c\u013c \u00fa\u0161 \u00e1\u00f1\u0111 \u0175\u00e9'\u013c\u013c \u00e1\u0111\u0111 \u00ed\u0163 \u0163\u0151 \u0163\u0125\u00e9 \u0271\u00e1\u01a5.~~]",
+      "perkQuick": "[~~\u0162\u00e1\u01e9\u00e9\u0161 20 \u0161\u00e9\u0109\u0151\u00f1\u0111\u0161 \u2013 \u0135\u00fa\u0161\u0163 \u00f1\u00e1\u0271\u00e9 \u00e1\u00f1\u0111 \u013c\u0151\u0109\u00e1\u0163\u00ed\u0151\u00f1~~]",
+      "perkNotify": "[~~\u0174\u00e9'\u013c\u013c \u00f1\u0151\u0163\u00ed\u0192\u00fd \u00fd\u0151\u00fa \u0163\u0125\u00e9 \u0271\u0151\u0271\u00e9\u00f1\u0163 \u00ed\u0163'\u0161 \u013c\u00ed\u1e7d\u00e9~~]",
+      "cta": "[~~\u0158\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]"
     },
-    "buttonCta": "[~~Řéʠúéšţ á ĉőúřšé~~]",
+    "buttonCta": "[~~\u0158\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
     "row": {
-      "title": "[~~Řéʠúéšţ á ĉőúřšé~~]",
-      "subtitle": "[~~Šţíļļ ñőţ ţĥé őñé? Ţáƥ ţő řéʠúéšţ íţ.~~]"
+      "title": "[~~\u0158\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "subtitle": "[~~\u0160\u0163\u00ed\u013c\u013c \u00f1\u0151\u0163 \u0163\u0125\u00e9 \u0151\u00f1\u00e9? \u0162\u00e1\u01a5 \u0163\u0151 \u0159\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u00ed\u0163.~~]"
     },
     "sheet": {
-      "successTitle": "[~~Ţĥáñǩš — ŵé'ṽé ĝőţ íţ.~~]",
-      "successBody": "[~~Ŵé'ļļ éɱáíļ ýőú ŵĥéñ ţĥíš ĉőúřšé íš áđđéđ.~~]",
-      "done": "[~~Đőñé~~]",
-      "title": "[~~Řéʠúéšţ á ĉőúřšé~~]",
-      "subtitle": "[~~Ĉáñ'ţ ƒíñđ íţ? Ţéļļ úš ţĥé ñáɱé áñđ ļőĉáţíőñ áñđ ŵé'ļļ ĝéţ íţ áđđéđ.~~]",
-      "nameLabel": "[~~Ĉőúřšé ñáɱé~~]",
-      "locationLabel": "[~~Ļőĉáţíőñ~~]",
-      "locationPlaceholder": "[~~Ţőŵñ, řéĝíőñ, ĉőúñţřý~~]",
-      "noteLabel": "[~~Ñőţé~~]",
-      "optional": "[~~(őƥţíőñáļ)~~]",
-      "notePlaceholder": "[~~Áñýţĥíñĝ éļšé? Ñéŵ őƥéñíñĝ, áļţéřñáţíṽé ñáɱé…~~]",
-      "submit": "[~~Řéʠúéšţ ĉőúřšé~~]",
-      "sending": "[~~Šéñđíñĝ…~~]",
-      "error": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ. Ƥļéášé ţřý áĝáíñ.~~]"
+      "successTitle": "[~~\u0162\u0125\u00e1\u00f1\u01e9\u0161 \u2014 \u0175\u00e9'\u1e7d\u00e9 \u011d\u0151\u0163 \u00ed\u0163.~~]",
+      "successBody": "[~~\u0174\u00e9'\u013c\u013c \u00e9\u0271\u00e1\u00ed\u013c \u00fd\u0151\u00fa \u0175\u0125\u00e9\u00f1 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00ed\u0161 \u00e1\u0111\u0111\u00e9\u0111.~~]",
+      "done": "[~~\u0110\u0151\u00f1\u00e9~~]",
+      "title": "[~~\u0158\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "subtitle": "[~~\u0108\u00e1\u00f1'\u0163 \u0192\u00ed\u00f1\u0111 \u00ed\u0163? \u0162\u00e9\u013c\u013c \u00fa\u0161 \u0163\u0125\u00e9 \u00f1\u00e1\u0271\u00e9 \u00e1\u00f1\u0111 \u013c\u0151\u0109\u00e1\u0163\u00ed\u0151\u00f1 \u00e1\u00f1\u0111 \u0175\u00e9'\u013c\u013c \u011d\u00e9\u0163 \u00ed\u0163 \u00e1\u0111\u0111\u00e9\u0111.~~]",
+      "nameLabel": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u00f1\u00e1\u0271\u00e9~~]",
+      "locationLabel": "[~~\u013b\u0151\u0109\u00e1\u0163\u00ed\u0151\u00f1~~]",
+      "locationPlaceholder": "[~~\u0162\u0151\u0175\u00f1, \u0159\u00e9\u011d\u00ed\u0151\u00f1, \u0109\u0151\u00fa\u00f1\u0163\u0159\u00fd~~]",
+      "noteLabel": "[~~\u00d1\u0151\u0163\u00e9~~]",
+      "optional": "[~~(\u0151\u01a5\u0163\u00ed\u0151\u00f1\u00e1\u013c)~~]",
+      "notePlaceholder": "[~~\u00c1\u00f1\u00fd\u0163\u0125\u00ed\u00f1\u011d \u00e9\u013c\u0161\u00e9? \u00d1\u00e9\u0175 \u0151\u01a5\u00e9\u00f1\u00ed\u00f1\u011d, \u00e1\u013c\u0163\u00e9\u0159\u00f1\u00e1\u0163\u00ed\u1e7d\u00e9 \u00f1\u00e1\u0271\u00e9\u2026~~]",
+      "submit": "[~~\u0158\u00e9\u02a0\u00fa\u00e9\u0161\u0163 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "sending": "[~~\u0160\u00e9\u00f1\u0111\u00ed\u00f1\u011d\u2026~~]",
+      "error": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]"
     }
   },
   "top100": {
-    "searchPlaceholder": "[~~Šéářĉĥ ţĥé {{listLabel}} Ţőƥ 100~~]",
-    "searchA11y": "[~~Šéářĉĥ ŵíţĥíñ Ţőƥ 100 ļíšţ~~]",
-    "listsA11y": "[~~Ţőƥ 100 ļíšţš~~]",
+    "searchPlaceholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0163\u0125\u00e9 {{listLabel}} \u0162\u0151\u01a5 100~~]",
+    "searchA11y": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0175\u00ed\u0163\u0125\u00ed\u00f1 \u0162\u0151\u01a5 100 \u013c\u00ed\u0161\u0163~~]",
+    "listsA11y": "[~~\u0162\u0151\u01a5 100 \u013c\u00ed\u0161\u0163\u0161~~]",
     "metaResults_one": "[~~<1>{{count}}</1> result~~]",
     "metaResults_other": "[~~<1>{{count}}</1> results~~]",
-    "metaCourses_one": "[~~<1>{{count}}</1> course · {{listLabel}}~~]",
-    "metaCourses_other": "[~~<1>{{count}}</1> courses · {{listLabel}}~~]",
-    "clearSearch": "[~~Ĉļéář šéářĉĥ~~]",
-    "resetFilters": "[~~Řéšéţ ƒíļţéřš~~]",
-    "sectionTitle": "[~~Ţĥé ŵőřļđ'š ƀéšţ~~]",
+    "metaCourses_one": "[~~<1>{{count}}</1> course \u00b7 {{listLabel}}~~]",
+    "metaCourses_other": "[~~<1>{{count}}</1> courses \u00b7 {{listLabel}}~~]",
+    "clearSearch": "[~~\u0108\u013c\u00e9\u00e1\u0159 \u0161\u00e9\u00e1\u0159\u0109\u0125~~]",
+    "resetFilters": "[~~\u0158\u00e9\u0161\u00e9\u0163 \u0192\u00ed\u013c\u0163\u00e9\u0159\u0161~~]",
+    "sectionTitle": "[~~\u0162\u0125\u00e9 \u0175\u0151\u0159\u013c\u0111'\u0161 \u0180\u00e9\u0161\u0163~~]",
     "stats": {
       "heading": "Course stats",
       "fromRatings_one": "from {{count}} rating",
@@ -273,10 +273,10 @@
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
       "noRoundsCta": "Be the first.",
-      "ratingLabel": "[Rätïng]",
-      "avgToParLabel": "[Ävg tö pär]",
-      "harderThanLabel": "[Härdér thän]",
-      "easierThanLabel": "[Éäsïér thän]"
+      "ratingLabel": "[R\u00e4t\u00efng]",
+      "avgToParLabel": "[\u00c4vg t\u00f6 p\u00e4r]",
+      "harderThanLabel": "[H\u00e4rd\u00e9r th\u00e4n]",
+      "easierThanLabel": "[\u00c9\u00e4s\u00ef\u00e9r th\u00e4n]"
     },
     "verdict": {
       "higher": "Members rate {{course}} higher than its rank",
@@ -305,196 +305,196 @@
     }
   },
   "userCourses": {
-    "emptyRegion": "[~~Ñő ĉőúřšéš ƒőúñđ íñ ţĥé šéļéĉţéđ řéĝíőñ.~~]",
-    "signInTitle": "[~~Úšéř'š Ĝőļƒ Ĉőúřšéš~~]",
-    "signInBody": "[~~Šíĝñ íñ ţő ṽíéŵ úšéř ƥřőƒíļéš áñđ ĉőúřšé ĉĥéĉǩļíšţš~~]",
-    "signInRequired": "[~~Šíĝñ íñ řéʠúířéđ~~]",
-    "signInRequiredBody": "[~~Ĉřéáţé áñ áĉĉőúñţ ţő ṽíéŵ úšéř ƥřőƒíļéš áñđ ĉőúřšé íñƒőřɱáţíőñ~~]",
-    "loading": "[~~Ļőáđíñĝ...~~]",
-    "loadingBody": "[~~Ļőáđíñĝ úšéř ƥřőƒíļé áñđ ĉőúřšé íñƒőřɱáţíőñ~~]",
-    "notFound": "[~~Úšéř Ñőţ Ƒőúñđ~~]",
-    "notFoundBody": "[~~Ţĥé úšéř ƥřőƒíļé ýőú'řé ļőőǩíñĝ ƒőř đőéšñ'ţ éẋíšţ őř íšñ'ţ ƥúƀļíĉ~~]",
-    "regionalSortView": "[~~Šőřţ & Ṽíéŵ~~]",
-    "regionalAddCourses": "[~~Áđđ Ĉőúřšéš~~]",
-    "showingRegion": "[~~Šĥőŵíñĝ {{region}} ĉőúřšéš~~]",
-    "regionalAddCoursesEmoji": "[~~📍~~]",
-    "emptyTop100OwnTitle": "[~~Ñő Ţőƥ 100 ĉőúřšéš řáţéđ ýéţ~~]",
-    "emptyTop100OtherTitle": "[~~{{name}} ĥášñ'ţ řáţéđ áñý Ţőƥ 100 ĉőúřšéš ýéţ~~]",
-    "emptyTop100OwnBody": "[~~Éẋƥļőřé ţĥé ŵőřļđ'š ĝřéáţéšţ ĝőļƒ ĉőúřšéš áñđ řáţé ţĥéɱ ţő ţřáĉǩ ýőúř ĵőúřñéý~~]",
-    "emptyTop100OtherBody": "[~~Ĉĥéĉǩ ƀáĉǩ ļáţéř ţő šéé ţĥéíř ĝőļƒ ĉőúřšé ĵőúřñéý~~]",
-    "emptyRecentOwnTitle": "[~~Ñő řéĉéñţ áĉţíṽíţý~~]",
-    "emptyRecentOtherTitle": "[~~{{name}} ĥáš ñő řéĉéñţ áĉţíṽíţý~~]",
-    "emptyRecentOwnBody": "[~~Ƥļáý šőɱé ĉőúřšéš íñ ţĥé ļášţ 30 đáýš áñđ ţĥéý'ļļ áƥƥéář ĥéřé~~]",
-    "emptyRecentOtherBody": "[~~Ñő ĉőúřšéš ƥļáýéđ íñ ţĥé ļášţ 30 đáýš~~]"
+    "emptyRegion": "[~~\u00d1\u0151 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u0192\u0151\u00fa\u00f1\u0111 \u00ed\u00f1 \u0163\u0125\u00e9 \u0161\u00e9\u013c\u00e9\u0109\u0163\u00e9\u0111 \u0159\u00e9\u011d\u00ed\u0151\u00f1.~~]",
+    "signInTitle": "[~~\u00da\u0161\u00e9\u0159'\u0161 \u011c\u0151\u013c\u0192 \u0108\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "signInBody": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u1e7d\u00ed\u00e9\u0175 \u00fa\u0161\u00e9\u0159 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9\u0161 \u00e1\u00f1\u0111 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0109\u0125\u00e9\u0109\u01e9\u013c\u00ed\u0161\u0163\u0161~~]",
+    "signInRequired": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0159\u00e9\u02a0\u00fa\u00ed\u0159\u00e9\u0111~~]",
+    "signInRequiredBody": "[~~\u0108\u0159\u00e9\u00e1\u0163\u00e9 \u00e1\u00f1 \u00e1\u0109\u0109\u0151\u00fa\u00f1\u0163 \u0163\u0151 \u1e7d\u00ed\u00e9\u0175 \u00fa\u0161\u00e9\u0159 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9\u0161 \u00e1\u00f1\u0111 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00ed\u00f1\u0192\u0151\u0159\u0271\u00e1\u0163\u00ed\u0151\u00f1~~]",
+    "loading": "[~~\u013b\u0151\u00e1\u0111\u00ed\u00f1\u011d...~~]",
+    "loadingBody": "[~~\u013b\u0151\u00e1\u0111\u00ed\u00f1\u011d \u00fa\u0161\u00e9\u0159 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u00e1\u00f1\u0111 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00ed\u00f1\u0192\u0151\u0159\u0271\u00e1\u0163\u00ed\u0151\u00f1~~]",
+    "notFound": "[~~\u00da\u0161\u00e9\u0159 \u00d1\u0151\u0163 \u0191\u0151\u00fa\u00f1\u0111~~]",
+    "notFoundBody": "[~~\u0162\u0125\u00e9 \u00fa\u0161\u00e9\u0159 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u00fd\u0151\u00fa'\u0159\u00e9 \u013c\u0151\u0151\u01e9\u00ed\u00f1\u011d \u0192\u0151\u0159 \u0111\u0151\u00e9\u0161\u00f1'\u0163 \u00e9\u1e8b\u00ed\u0161\u0163 \u0151\u0159 \u00ed\u0161\u00f1'\u0163 \u01a5\u00fa\u0180\u013c\u00ed\u0109~~]",
+    "regionalSortView": "[~~\u0160\u0151\u0159\u0163 & \u1e7c\u00ed\u00e9\u0175~~]",
+    "regionalAddCourses": "[~~\u00c1\u0111\u0111 \u0108\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "showingRegion": "[~~\u0160\u0125\u0151\u0175\u00ed\u00f1\u011d {{region}} \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]",
+    "regionalAddCoursesEmoji": "[~~\ud83d\udccd~~]",
+    "emptyTop100OwnTitle": "[~~\u00d1\u0151 \u0162\u0151\u01a5 100 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u0159\u00e1\u0163\u00e9\u0111 \u00fd\u00e9\u0163~~]",
+    "emptyTop100OtherTitle": "[~~{{name}} \u0125\u00e1\u0161\u00f1'\u0163 \u0159\u00e1\u0163\u00e9\u0111 \u00e1\u00f1\u00fd \u0162\u0151\u01a5 100 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00fd\u00e9\u0163~~]",
+    "emptyTop100OwnBody": "[~~\u00c9\u1e8b\u01a5\u013c\u0151\u0159\u00e9 \u0163\u0125\u00e9 \u0175\u0151\u0159\u013c\u0111'\u0161 \u011d\u0159\u00e9\u00e1\u0163\u00e9\u0161\u0163 \u011d\u0151\u013c\u0192 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00e1\u00f1\u0111 \u0159\u00e1\u0163\u00e9 \u0163\u0125\u00e9\u0271 \u0163\u0151 \u0163\u0159\u00e1\u0109\u01e9 \u00fd\u0151\u00fa\u0159 \u0135\u0151\u00fa\u0159\u00f1\u00e9\u00fd~~]",
+    "emptyTop100OtherBody": "[~~\u0108\u0125\u00e9\u0109\u01e9 \u0180\u00e1\u0109\u01e9 \u013c\u00e1\u0163\u00e9\u0159 \u0163\u0151 \u0161\u00e9\u00e9 \u0163\u0125\u00e9\u00ed\u0159 \u011d\u0151\u013c\u0192 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0135\u0151\u00fa\u0159\u00f1\u00e9\u00fd~~]",
+    "emptyRecentOwnTitle": "[~~\u00d1\u0151 \u0159\u00e9\u0109\u00e9\u00f1\u0163 \u00e1\u0109\u0163\u00ed\u1e7d\u00ed\u0163\u00fd~~]",
+    "emptyRecentOtherTitle": "[~~{{name}} \u0125\u00e1\u0161 \u00f1\u0151 \u0159\u00e9\u0109\u00e9\u00f1\u0163 \u00e1\u0109\u0163\u00ed\u1e7d\u00ed\u0163\u00fd~~]",
+    "emptyRecentOwnBody": "[~~\u01a4\u013c\u00e1\u00fd \u0161\u0151\u0271\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00ed\u00f1 \u0163\u0125\u00e9 \u013c\u00e1\u0161\u0163 30 \u0111\u00e1\u00fd\u0161 \u00e1\u00f1\u0111 \u0163\u0125\u00e9\u00fd'\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u0125\u00e9\u0159\u00e9~~]",
+    "emptyRecentOtherBody": "[~~\u00d1\u0151 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 \u00ed\u00f1 \u0163\u0125\u00e9 \u013c\u00e1\u0161\u0163 30 \u0111\u00e1\u00fd\u0161~~]"
   },
   "review": {
     "filter": {
-      "title": "[~~Ƒíļţéř ƀý řáţíñĝ~~]",
-      "button": "[~~Ƒíļţéř~~]",
-      "buttonLabel": "[~~Ƒíļţéř: {{label}}. Ţáƥ ţő ĉĥáñĝé.~~]",
-      "buttonLabelDefault": "[~~Ƒíļţéř řéṽíéŵš ƀý řáţíñĝ~~]",
-      "clear": "[~~Ĉļéář ƒíļţéř~~]",
-      "optionAll": "[~~Áļļ řáţíñĝš~~]",
-      "optionExceptional": "[~~Éẋĉéƥţíőñáļ~~]",
-      "optionExcellent": "[~~Éẋĉéļļéñţ~~]",
-      "optionGood": "[~~Ĝőőđ~~]",
-      "optionFair": "[~~Ƒáíř~~]",
-      "optionPoor": "[~~Ƥőőř~~]"
+      "title": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159 \u0180\u00fd \u0159\u00e1\u0163\u00ed\u00f1\u011d~~]",
+      "button": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159~~]",
+      "buttonLabel": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159: {{label}}. \u0162\u00e1\u01a5 \u0163\u0151 \u0109\u0125\u00e1\u00f1\u011d\u00e9.~~]",
+      "buttonLabelDefault": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161 \u0180\u00fd \u0159\u00e1\u0163\u00ed\u00f1\u011d~~]",
+      "clear": "[~~\u0108\u013c\u00e9\u00e1\u0159 \u0192\u00ed\u013c\u0163\u00e9\u0159~~]",
+      "optionAll": "[~~\u00c1\u013c\u013c \u0159\u00e1\u0163\u00ed\u00f1\u011d\u0161~~]",
+      "optionExceptional": "[~~\u00c9\u1e8b\u0109\u00e9\u01a5\u0163\u00ed\u0151\u00f1\u00e1\u013c~~]",
+      "optionExcellent": "[~~\u00c9\u1e8b\u0109\u00e9\u013c\u013c\u00e9\u00f1\u0163~~]",
+      "optionGood": "[~~\u011c\u0151\u0151\u0111~~]",
+      "optionFair": "[~~\u0191\u00e1\u00ed\u0159~~]",
+      "optionPoor": "[~~\u01a4\u0151\u0151\u0159~~]"
     },
     "subscore": {
-      "design": "[~~Đéšíĝñ~~]",
-      "condition": "[~~Ĉőñđíţíőñ~~]",
-      "clubhouse": "[~~Ĉļúƀĥőúšé~~]",
-      "facilities": "[~~Ƒáĉíļíţíéš~~]"
+      "design": "[~~\u0110\u00e9\u0161\u00ed\u011d\u00f1~~]",
+      "condition": "[~~\u0108\u0151\u00f1\u0111\u00ed\u0163\u00ed\u0151\u00f1~~]",
+      "clubhouse": "[~~\u0108\u013c\u00fa\u0180\u0125\u0151\u00fa\u0161\u00e9~~]",
+      "facilities": "[~~\u0191\u00e1\u0109\u00ed\u013c\u00ed\u0163\u00ed\u00e9\u0161~~]"
     },
-    "helpful": "[~~Ĥéļƥƒúļ?~~]",
+    "helpful": "[~~\u0124\u00e9\u013c\u01a5\u0192\u00fa\u013c?~~]",
     "response": {
-      "ownerBadge": "[~~- Őŵñéř řéšƥőñšé~~]",
-      "editA11y": "[~~Éđíţ řéšƥőñšé~~]",
-      "deleteA11y": "[~~Đéļéţé řéšƥőñšé~~]",
-      "edit": "[~~Éđíţ~~]",
-      "delete": "[~~Đéļéţé~~]",
-      "cancel": "[~~Ĉáñĉéļ~~]",
-      "deleteConfirm": "[~~Đéļéţé ţĥíš řéšƥőñšé? Ţĥíš ĉáññőţ ƀé úñđőñé.~~]",
-      "reply": "[~~Řéƥļý~~]",
-      "saving": "[~~Šáṽíñĝ...~~]",
-      "save": "[~~Šáṽé~~]",
-      "posting": "[~~Ƥőšţíñĝ...~~]",
-      "post": "[~~Ƥőšţ řéšƥőñšé~~]",
-      "replyPlaceholder": "[~~Řéšƥőñđ áš {{business}}...~~]",
-      "verifyLink": "[~~Ṽéříƒý {{business}}~~]",
+      "ownerBadge": "[~~- \u0150\u0175\u00f1\u00e9\u0159 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0161\u00e9~~]",
+      "editA11y": "[~~\u00c9\u0111\u00ed\u0163 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0161\u00e9~~]",
+      "deleteA11y": "[~~\u0110\u00e9\u013c\u00e9\u0163\u00e9 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0161\u00e9~~]",
+      "edit": "[~~\u00c9\u0111\u00ed\u0163~~]",
+      "delete": "[~~\u0110\u00e9\u013c\u00e9\u0163\u00e9~~]",
+      "cancel": "[~~\u0108\u00e1\u00f1\u0109\u00e9\u013c~~]",
+      "deleteConfirm": "[~~\u0110\u00e9\u013c\u00e9\u0163\u00e9 \u0163\u0125\u00ed\u0161 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0161\u00e9? \u0162\u0125\u00ed\u0161 \u0109\u00e1\u00f1\u00f1\u0151\u0163 \u0180\u00e9 \u00fa\u00f1\u0111\u0151\u00f1\u00e9.~~]",
+      "reply": "[~~\u0158\u00e9\u01a5\u013c\u00fd~~]",
+      "saving": "[~~\u0160\u00e1\u1e7d\u00ed\u00f1\u011d...~~]",
+      "save": "[~~\u0160\u00e1\u1e7d\u00e9~~]",
+      "posting": "[~~\u01a4\u0151\u0161\u0163\u00ed\u00f1\u011d...~~]",
+      "post": "[~~\u01a4\u0151\u0161\u0163 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0161\u00e9~~]",
+      "replyPlaceholder": "[~~\u0158\u00e9\u0161\u01a5\u0151\u00f1\u0111 \u00e1\u0161 {{business}}...~~]",
+      "verifyLink": "[~~\u1e7c\u00e9\u0159\u00ed\u0192\u00fd {{business}}~~]",
       "verifyPrompt": "[~~<1>Verify {{business}}</1> to respond to reviews.~~]"
     },
     "write": {
-      "title": "[~~Ƥļáýéđ ĥéřé?~~]",
-      "body": "[~~Ýőúř řáţíñĝ ĥéļƥš ĝőļƒéřš ŵőřļđŵíđé~~]",
-      "rate": "[~~Řáţé~~]",
-      "emoji": "[~~⭐~~]"
+      "title": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0125\u00e9\u0159\u00e9?~~]",
+      "body": "[~~\u00dd\u0151\u00fa\u0159 \u0159\u00e1\u0163\u00ed\u00f1\u011d \u0125\u00e9\u013c\u01a5\u0161 \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0175\u0151\u0159\u013c\u0111\u0175\u00ed\u0111\u00e9~~]",
+      "rate": "[~~\u0158\u00e1\u0163\u00e9~~]",
+      "emoji": "[~~\u2b50~~]"
     },
-    "reportA11y": "[~~Řéƥőřţ řéṽíéŵ~~]",
+    "reportA11y": "[~~\u0158\u00e9\u01a5\u0151\u0159\u0163 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
     "sort": {
-      "recent": "[~~Ṁőšţ řéĉéñţ~~]",
-      "highest": "[~~Ĥíĝĥéšţ řáţéđ~~]",
-      "helpful": "[~~Ṁőšţ ĥéļƥƒúļ~~]"
+      "recent": "[~~\u1e40\u0151\u0161\u0163 \u0159\u00e9\u0109\u00e9\u00f1\u0163~~]",
+      "highest": "[~~\u0124\u00ed\u011d\u0125\u00e9\u0161\u0163 \u0159\u00e1\u0163\u00e9\u0111~~]",
+      "helpful": "[~~\u1e40\u0151\u0161\u0163 \u0125\u00e9\u013c\u01a5\u0192\u00fa\u013c~~]"
     },
     "emptyGuide": {
       "condition": {
-        "title": "[~~Ĉőúřšé ĉőñđíţíőñ~~]",
-        "sub": "[~~Ĝřééñš, ƒáířŵáýš, ƀúñǩéřš, řőúĝĥ~~]"
+        "title": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u0109\u0151\u00f1\u0111\u00ed\u0163\u00ed\u0151\u00f1~~]",
+        "sub": "[~~\u011c\u0159\u00e9\u00e9\u00f1\u0161, \u0192\u00e1\u00ed\u0159\u0175\u00e1\u00fd\u0161, \u0180\u00fa\u00f1\u01e9\u00e9\u0159\u0161, \u0159\u0151\u00fa\u011d\u0125~~]"
       },
       "layout": {
-        "title": "[~~Ļáýőúţ & đéšíĝñ~~]",
-        "sub": "[~~Ĉĥáļļéñĝé, ṽáříéţý, šĉéñéřý, řőúţíñĝ~~]"
+        "title": "[~~\u013b\u00e1\u00fd\u0151\u00fa\u0163 & \u0111\u00e9\u0161\u00ed\u011d\u00f1~~]",
+        "sub": "[~~\u0108\u0125\u00e1\u013c\u013c\u00e9\u00f1\u011d\u00e9, \u1e7d\u00e1\u0159\u00ed\u00e9\u0163\u00fd, \u0161\u0109\u00e9\u00f1\u00e9\u0159\u00fd, \u0159\u0151\u00fa\u0163\u00ed\u00f1\u011d~~]"
       },
       "facilities": {
-        "title": "[~~Ƒáĉíļíţíéš~~]",
-        "sub": "[~~Ĉļúƀĥőúšé, ƥřáĉţíĉé ářéáš, šéřṽíĉé~~]"
+        "title": "[~~\u0191\u00e1\u0109\u00ed\u013c\u00ed\u0163\u00ed\u00e9\u0161~~]",
+        "sub": "[~~\u0108\u013c\u00fa\u0180\u0125\u0151\u00fa\u0161\u00e9, \u01a5\u0159\u00e1\u0109\u0163\u00ed\u0109\u00e9 \u00e1\u0159\u00e9\u00e1\u0161, \u0161\u00e9\u0159\u1e7d\u00ed\u0109\u00e9~~]"
       },
       "value": {
-        "title": "[~~Ṽáļúé~~]",
-        "sub": "[~~Ŵáš íţ ŵőřţĥ ţĥé ĝřééñ ƒéé?~~]"
+        "title": "[~~\u1e7c\u00e1\u013c\u00fa\u00e9~~]",
+        "sub": "[~~\u0174\u00e1\u0161 \u00ed\u0163 \u0175\u0151\u0159\u0163\u0125 \u0163\u0125\u00e9 \u011d\u0159\u00e9\u00e9\u00f1 \u0192\u00e9\u00e9?~~]"
       }
     },
-    "ratingCount_one": "[~~{{count}} řáţíñĝ~~]",
-    "ratingCount_other": "[~~{{count}} řáţíñĝš~~]",
+    "ratingCount_one": "[~~{{count}} \u0159\u00e1\u0163\u00ed\u00f1\u011d~~]",
+    "ratingCount_other": "[~~{{count}} \u0159\u00e1\u0163\u00ed\u00f1\u011d\u0161~~]",
     "error": {
-      "title": "[~~Ĉőúļđñ'ţ ļőáđ řéṽíéŵš~~]",
-      "body": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ. Ƥļéášé ţřý áĝáíñ.~~]",
-      "retry": "[~~Ţřý Áĝáíñ~~]"
+      "title": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]",
+      "body": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]",
+      "retry": "[~~\u0162\u0159\u00fd \u00c1\u011d\u00e1\u00ed\u00f1~~]"
     },
     "empty": {
-      "title": "[~~Ñő řéṽíéŵš ýéţ~~]",
-      "body": "[~~Ɓé ţĥé ƒířšţ ţő šĥářé ýőúř éẋƥéříéñĉé áţ {{courseName}}.~~]",
-      "cta": "[~~Ŵříţé ţĥé ƒířšţ řéṽíéŵ~~]",
-      "kicker": "[~~ŴĤÁŢ ŢŐ ÍÑĈĻÚĐÉ~~]"
+      "title": "[~~\u00d1\u0151 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161 \u00fd\u00e9\u0163~~]",
+      "body": "[~~\u0181\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0159\u0161\u0163 \u0163\u0151 \u0161\u0125\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9 \u00e1\u0163 {{courseName}}.~~]",
+      "cta": "[~~\u0174\u0159\u00ed\u0163\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0159\u0161\u0163 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
+      "kicker": "[~~\u0174\u0124\u00c1\u0162 \u0162\u0150 \u00cd\u00d1\u0108\u013b\u00da\u0110\u00c9~~]"
     },
     "search": {
-      "placeholder": "[~~Šéářĉĥ řéṽíéŵš…~~]",
-      "openA11y": "[~~Šéářĉĥ řéṽíéŵš~~]",
-      "cancel": "[~~Ĉáñĉéļ~~]"
+      "placeholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161\u2026~~]",
+      "openA11y": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]",
+      "cancel": "[~~\u0108\u00e1\u00f1\u0109\u00e9\u013c~~]"
     },
-    "sortA11y": "[~~Šőřţ řéṽíéŵš~~]",
-    "filterA11y": "[~~Ƒíļţéř řéṽíéŵš: {{label}} ({{count}})~~]",
-    "editYours": "[~~Éđíţ ýőúřš~~]",
-    "writePromptInline": "[~~⭐ Ŵříţé ýőúř řéṽíéŵ~~]",
+    "sortA11y": "[~~\u0160\u0151\u0159\u0163 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]",
+    "filterA11y": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161: {{label}} ({{count}})~~]",
+    "editYours": "[~~\u00c9\u0111\u00ed\u0163 \u00fd\u0151\u00fa\u0159\u0161~~]",
+    "writePromptInline": "[~~\u2b50 \u0174\u0159\u00ed\u0163\u00e9 \u00fd\u0151\u00fa\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
     "noMatches": {
-      "body": "[~~Ñő řéṽíéŵš ɱáţĉĥ ýőúř ĉříţéříá.~~]",
-      "clear": "[~~Ĉļéář ƒíļţéřš~~]"
+      "body": "[~~\u00d1\u0151 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161 \u0271\u00e1\u0163\u0109\u0125 \u00fd\u0151\u00fa\u0159 \u0109\u0159\u00ed\u0163\u00e9\u0159\u00ed\u00e1.~~]",
+      "clear": "[~~\u0108\u013c\u00e9\u00e1\u0159 \u0192\u00ed\u013c\u0163\u00e9\u0159\u0161~~]"
     },
-    "endMessage_one": "[~~Ýőú'ṽé šééñ áļļ {{count}} řéṽíéŵ.~~]",
-    "endMessage_other": "[~~Ýőú'ṽé šééñ áļļ {{count}} řéṽíéŵš.~~]",
-    "shareExperience": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
+    "endMessage_one": "[~~\u00dd\u0151\u00fa'\u1e7d\u00e9 \u0161\u00e9\u00e9\u00f1 \u00e1\u013c\u013c {{count}} \u0159\u00e9\u1e7d\u00ed\u00e9\u0175.~~]",
+    "endMessage_other": "[~~\u00dd\u0151\u00fa'\u1e7d\u00e9 \u0161\u00e9\u00e9\u00f1 \u00e1\u013c\u013c {{count}} \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161.~~]",
+    "shareExperience": "[~~\u0160\u0125\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9~~]",
     "toast": {
-      "signInRequired": "[~~Šíĝñ íñ řéʠúířéđ~~]",
-      "voteBody": "[~~Ƥļéášé šíĝñ íñ ţő ṽőţé őñ řéṽíéŵš~~]",
-      "rateBody": "[~~Ƥļéášé šíĝñ íñ ţő řáţé ĉőúřšéš~~]"
+      "signInRequired": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0159\u00e9\u02a0\u00fa\u00ed\u0159\u00e9\u0111~~]",
+      "voteBody": "[~~\u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0161\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u1e7d\u0151\u0163\u00e9 \u0151\u00f1 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]",
+      "rateBody": "[~~\u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0161\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u0159\u00e1\u0163\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161~~]"
     },
     "wizard": {
       "rail": {
-        "score": "[~~Sĉóŕé~~]",
-        "breakdown": "[~~Bŕéáķđówñ~~]",
-        "words": "[~~Wóŕđš~~]"
+        "score": "[~~S\u0109\u00f3\u0155\u00e9~~]",
+        "breakdown": "[~~B\u0155\u00e9\u00e1\u0137\u0111\u00f3w\u00f1~~]",
+        "words": "[~~W\u00f3\u0155\u0111\u0161~~]"
       },
-      "backA11y": "[~~Báĉķ~~]",
-      "deleteA11y": "[~~Rémóvé ŕévíéw~~]",
-      "a11yStep": "[~~Sţéþ {{n}} óƒ 3, {{label}}~~]",
-      "continue": "[~~Cóñţíñúé~~]",
-      "save": "[~~Sávé ŕévíéw~~]",
-      "post": "[~~Póšţ ŕévíéw~~]",
-      "saving": "[~~Sávíñĝ...~~]",
-      "posting": "[~~Póšţíñĝ...~~]",
+      "backA11y": "[~~B\u00e1\u0109\u0137~~]",
+      "deleteA11y": "[~~R\u00e9m\u00f3v\u00e9 \u0155\u00e9v\u00ed\u00e9w~~]",
+      "a11yStep": "[~~S\u0163\u00e9\u00fe {{n}} \u00f3\u0192 3, {{label}}~~]",
+      "continue": "[~~C\u00f3\u00f1\u0163\u00ed\u00f1\u00fa\u00e9~~]",
+      "save": "[~~S\u00e1v\u00e9 \u0155\u00e9v\u00ed\u00e9w~~]",
+      "post": "[~~P\u00f3\u0161\u0163 \u0155\u00e9v\u00ed\u00e9w~~]",
+      "saving": "[~~S\u00e1v\u00ed\u00f1\u011d...~~]",
+      "posting": "[~~P\u00f3\u0161\u0163\u00ed\u00f1\u011d...~~]",
       "step0": {
-        "heading": "[~~Hów ĝóóđ íš íţ, óúţ óƒ ţéñ?~~]",
-        "captionEmpty": "[~~Dŕáĝ ţó šéţ ýóúŕ šĉóŕé~~]",
-        "captionSet": "[~~Yóúŕ óvéŕáļļ šĉóŕé~~]",
-        "gate": "[~~Séţ ýóúŕ šĉóŕé~~]",
-        "a11y": "[~~Óvéŕáļļ šĉóŕé, 1 ţó 10~~]",
+        "heading": "[~~H\u00f3w \u011d\u00f3\u00f3\u0111 \u00ed\u0161 \u00ed\u0163, \u00f3\u00fa\u0163 \u00f3\u0192 \u0163\u00e9\u00f1?~~]",
+        "captionEmpty": "[~~D\u0155\u00e1\u011d \u0163\u00f3 \u0161\u00e9\u0163 \u00fd\u00f3\u00fa\u0155 \u0161\u0109\u00f3\u0155\u00e9~~]",
+        "captionSet": "[~~Y\u00f3\u00fa\u0155 \u00f3v\u00e9\u0155\u00e1\u013c\u013c \u0161\u0109\u00f3\u0155\u00e9~~]",
+        "gate": "[~~S\u00e9\u0163 \u00fd\u00f3\u00fa\u0155 \u0161\u0109\u00f3\u0155\u00e9~~]",
+        "a11y": "[~~\u00d3v\u00e9\u0155\u00e1\u013c\u013c \u0161\u0109\u00f3\u0155\u00e9, 1 \u0163\u00f3 10~~]",
         "bandLow": "[Below 5.0]",
         "bandMid": "[5.0 to 8.9]",
         "bandHigh": "[9.0 and up]",
         "calibration": "[Would be your {{ordinal}} highest of {{count}}]"
       },
       "step1": {
-        "heading": "[~~Bŕéáķ íţ đówñ~~]",
-        "body": "[~~Áļļ ƒóúŕ áŕé ñééđéđ. Tĥíš íš wĥáţ máķéš ţĥé ĉómmúñíţý ñúmƀéŕš méáñ šóméţĥíñĝ.~~]",
-        "gate_one": "[~~{{count}} ĉáţéĝóŕý ļéƒţ~~]",
-        "gate_other": "[~~{{count}} ĉáţéĝóŕíéš ļéƒţ~~]"
+        "heading": "[~~B\u0155\u00e9\u00e1\u0137 \u00ed\u0163 \u0111\u00f3w\u00f1~~]",
+        "body": "[~~\u00c1\u013c\u013c \u0192\u00f3\u00fa\u0155 \u00e1\u0155\u00e9 \u00f1\u00e9\u00e9\u0111\u00e9\u0111. T\u0125\u00ed\u0161 \u00ed\u0161 w\u0125\u00e1\u0163 m\u00e1\u0137\u00e9\u0161 \u0163\u0125\u00e9 \u0109\u00f3mm\u00fa\u00f1\u00ed\u0163\u00fd \u00f1\u00fam\u0180\u00e9\u0155\u0161 m\u00e9\u00e1\u00f1 \u0161\u00f3m\u00e9\u0163\u0125\u00ed\u00f1\u011d.~~]",
+        "gate_one": "[~~{{count}} \u0109\u00e1\u0163\u00e9\u011d\u00f3\u0155\u00fd \u013c\u00e9\u0192\u0163~~]",
+        "gate_other": "[~~{{count}} \u0109\u00e1\u0163\u00e9\u011d\u00f3\u0155\u00ed\u00e9\u0161 \u013c\u00e9\u0192\u0163~~]"
       },
       "hint": {
-        "design": "[~~Róúţíñĝ, šĥóţ váŕíéţý, mémóŕáƀíļíţý~~]",
-        "condition": "[~~Gŕééñš, ƒáíŕwáýš, ƀúñķéŕš óñ ţĥé đáý~~]",
-        "clubhouse": "[~~Wéļĉómé, ƒóóđ, áţmóšþĥéŕé~~]",
-        "facilities": "[~~Ráñĝé, þŕáĉţíĉé áŕéáš, ĉĥáñĝíñĝ ŕóómš~~]"
+        "design": "[~~R\u00f3\u00fa\u0163\u00ed\u00f1\u011d, \u0161\u0125\u00f3\u0163 v\u00e1\u0155\u00ed\u00e9\u0163\u00fd, m\u00e9m\u00f3\u0155\u00e1\u0180\u00ed\u013c\u00ed\u0163\u00fd~~]",
+        "condition": "[~~G\u0155\u00e9\u00e9\u00f1\u0161, \u0192\u00e1\u00ed\u0155w\u00e1\u00fd\u0161, \u0180\u00fa\u00f1\u0137\u00e9\u0155\u0161 \u00f3\u00f1 \u0163\u0125\u00e9 \u0111\u00e1\u00fd~~]",
+        "clubhouse": "[~~W\u00e9\u013c\u0109\u00f3m\u00e9, \u0192\u00f3\u00f3\u0111, \u00e1\u0163m\u00f3\u0161\u00fe\u0125\u00e9\u0155\u00e9~~]",
+        "facilities": "[~~R\u00e1\u00f1\u011d\u00e9, \u00fe\u0155\u00e1\u0109\u0163\u00ed\u0109\u00e9 \u00e1\u0155\u00e9\u00e1\u0161, \u0109\u0125\u00e1\u00f1\u011d\u00ed\u00f1\u011d \u0155\u00f3\u00f3m\u0161~~]"
       },
       "step2": {
-        "wordsEyebrow": "[~~Yóúŕ wóŕđš~~]",
-        "placeholder": "[~~Wĥáţ šĥóúļđ áñóţĥéŕ ĝóļƒéŕ ķñów ƀéƒóŕé ţĥéý þļáý ĥéŕé?~~]",
-        "optionalNote": "[~~Óþţíóñáļ. Évéŕýţĥíñĝ ƀéļów íš ţóó.~~]",
-        "photosEyebrow": "[~~Pĥóţóš~~]",
-        "teesEyebrow": "[~~Tééš þļáýéđ~~]",
-        "shareTitle": "[~~Sĥáŕé ţó ţĥé Cļúƀĥóúšé~~]",
-        "shareSub": "[~~Yóúŕ ŕévíéw áþþéáŕš íñ ţĥé ƒééđ~~]"
+        "wordsEyebrow": "[~~Y\u00f3\u00fa\u0155 w\u00f3\u0155\u0111\u0161~~]",
+        "placeholder": "[~~W\u0125\u00e1\u0163 \u0161\u0125\u00f3\u00fa\u013c\u0111 \u00e1\u00f1\u00f3\u0163\u0125\u00e9\u0155 \u011d\u00f3\u013c\u0192\u00e9\u0155 \u0137\u00f1\u00f3w \u0180\u00e9\u0192\u00f3\u0155\u00e9 \u0163\u0125\u00e9\u00fd \u00fe\u013c\u00e1\u00fd \u0125\u00e9\u0155\u00e9?~~]",
+        "optionalNote": "[~~\u00d3\u00fe\u0163\u00ed\u00f3\u00f1\u00e1\u013c. \u00c9v\u00e9\u0155\u00fd\u0163\u0125\u00ed\u00f1\u011d \u0180\u00e9\u013c\u00f3w \u00ed\u0161 \u0163\u00f3\u00f3.~~]",
+        "photosEyebrow": "[~~P\u0125\u00f3\u0163\u00f3\u0161~~]",
+        "teesEyebrow": "[~~T\u00e9\u00e9\u0161 \u00fe\u013c\u00e1\u00fd\u00e9\u0111~~]",
+        "shareTitle": "[~~S\u0125\u00e1\u0155\u00e9 \u0163\u00f3 \u0163\u0125\u00e9 C\u013c\u00fa\u0180\u0125\u00f3\u00fa\u0161\u00e9~~]",
+        "shareSub": "[~~Y\u00f3\u00fa\u0155 \u0155\u00e9v\u00ed\u00e9w \u00e1\u00fe\u00fe\u00e9\u00e1\u0155\u0161 \u00ed\u00f1 \u0163\u0125\u00e9 \u0192\u00e9\u00e9\u0111~~]"
       },
       "receipt": {
-        "eyebrow": "[~~Révíéw þóšţéđ~~]",
-        "didEyebrow": "[~~Wĥáţ ţĥíš đíđ~~]",
-        "rowA": "[~~<cnt>{{count}}</cnt> mémƀéŕš ŕáţé {{course}} áţ <avg>{{avg}}</avg>~~]",
-        "rowADeltaAbove": "[~~Yóú ŕáţéđ íţ {{delta}} áƀóvé ţĥé ávéŕáĝé~~]",
-        "rowADeltaBelow": "[~~Yóú ŕáţéđ íţ {{delta}} ƀéļów ţĥé ávéŕáĝé~~]",
-        "rowB": "[~~Yóú áŕé ţĥé ƒíŕšţ ţó ŕáţé ţĥíš ĉóúŕšé~~]",
-        "rowBSub": "[~~Yóúŕ šĉóŕé šéţš ţĥé ĉómmúñíţý ávéŕáĝé~~]",
-        "rowC": "[~~Ráñķéđ <b>#{{rank}}</b> óñ ţĥé {{list}} Tóþ 100~~]",
-        "rowCRight_one": "[~~{{count}} ŕáţéđ~~]",
-        "rowCRight_other": "[~~{{count}} ŕáţéđ~~]",
-        "rowD": "[~~Yóúŕ <b>{{ordinal}}</b> ĥíĝĥéšţ ŕáţéđ ĉóúŕšé~~]",
-        "rowDRight_one": "[~~óƒ {{count}} ŕáţéđ~~]",
-        "rowDRight_other": "[~~óƒ {{count}} ŕáţéđ~~]",
-        "nextEyebrow_one": "[~~{{count}} þļáýéđ ĉóúŕšé šţíļļ úñŕáţéđ~~]",
-        "nextEyebrow_other": "[~~{{count}} þļáýéđ ĉóúŕšéš šţíļļ úñŕáţéđ~~]",
-        "nextPlayed": "[~~Pļáýéđ {{date}}~~]",
-        "nextRate": "[~~Ráţé~~]",
-        "actionClubhouse": "[~~Báćķ ţó ţĥé ċļúƀĥóúšé~~]",
-        "actionBack": "[~~Báĉķ ţó {{course}}~~]",
+        "eyebrow": "[~~R\u00e9v\u00ed\u00e9w \u00fe\u00f3\u0161\u0163\u00e9\u0111~~]",
+        "didEyebrow": "[~~W\u0125\u00e1\u0163 \u0163\u0125\u00ed\u0161 \u0111\u00ed\u0111~~]",
+        "rowA": "[~~<cnt>{{count}}</cnt> m\u00e9m\u0180\u00e9\u0155\u0161 \u0155\u00e1\u0163\u00e9 {{course}} \u00e1\u0163 <avg>{{avg}}</avg>~~]",
+        "rowADeltaAbove": "[~~Y\u00f3\u00fa \u0155\u00e1\u0163\u00e9\u0111 \u00ed\u0163 {{delta}} \u00e1\u0180\u00f3v\u00e9 \u0163\u0125\u00e9 \u00e1v\u00e9\u0155\u00e1\u011d\u00e9~~]",
+        "rowADeltaBelow": "[~~Y\u00f3\u00fa \u0155\u00e1\u0163\u00e9\u0111 \u00ed\u0163 {{delta}} \u0180\u00e9\u013c\u00f3w \u0163\u0125\u00e9 \u00e1v\u00e9\u0155\u00e1\u011d\u00e9~~]",
+        "rowB": "[~~Y\u00f3\u00fa \u00e1\u0155\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0155\u0161\u0163 \u0163\u00f3 \u0155\u00e1\u0163\u00e9 \u0163\u0125\u00ed\u0161 \u0109\u00f3\u00fa\u0155\u0161\u00e9~~]",
+        "rowBSub": "[~~Y\u00f3\u00fa\u0155 \u0161\u0109\u00f3\u0155\u00e9 \u0161\u00e9\u0163\u0161 \u0163\u0125\u00e9 \u0109\u00f3mm\u00fa\u00f1\u00ed\u0163\u00fd \u00e1v\u00e9\u0155\u00e1\u011d\u00e9~~]",
+        "rowC": "[~~R\u00e1\u00f1\u0137\u00e9\u0111 <b>#{{rank}}</b> \u00f3\u00f1 \u0163\u0125\u00e9 {{list}} T\u00f3\u00fe 100~~]",
+        "rowCRight_one": "[~~{{count}} \u0155\u00e1\u0163\u00e9\u0111~~]",
+        "rowCRight_other": "[~~{{count}} \u0155\u00e1\u0163\u00e9\u0111~~]",
+        "rowD": "[~~Y\u00f3\u00fa\u0155 <b>{{ordinal}}</b> \u0125\u00ed\u011d\u0125\u00e9\u0161\u0163 \u0155\u00e1\u0163\u00e9\u0111 \u0109\u00f3\u00fa\u0155\u0161\u00e9~~]",
+        "rowDRight_one": "[~~\u00f3\u0192 {{count}} \u0155\u00e1\u0163\u00e9\u0111~~]",
+        "rowDRight_other": "[~~\u00f3\u0192 {{count}} \u0155\u00e1\u0163\u00e9\u0111~~]",
+        "nextEyebrow_one": "[~~{{count}} \u00fe\u013c\u00e1\u00fd\u00e9\u0111 \u0109\u00f3\u00fa\u0155\u0161\u00e9 \u0161\u0163\u00ed\u013c\u013c \u00fa\u00f1\u0155\u00e1\u0163\u00e9\u0111~~]",
+        "nextEyebrow_other": "[~~{{count}} \u00fe\u013c\u00e1\u00fd\u00e9\u0111 \u0109\u00f3\u00fa\u0155\u0161\u00e9\u0161 \u0161\u0163\u00ed\u013c\u013c \u00fa\u00f1\u0155\u00e1\u0163\u00e9\u0111~~]",
+        "nextPlayed": "[~~P\u013c\u00e1\u00fd\u00e9\u0111 {{date}}~~]",
+        "nextRate": "[~~R\u00e1\u0163\u00e9~~]",
+        "actionClubhouse": "[~~B\u00e1\u0107\u0137 \u0163\u00f3 \u0163\u0125\u00e9 \u010b\u013c\u00fa\u0180\u0125\u00f3\u00fa\u0161\u00e9~~]",
+        "actionBack": "[~~B\u00e1\u0109\u0137 \u0163\u00f3 {{course}}~~]",
         "categoryAverage": "[Your categories average <avg>{{avg}}</avg>]"
       }
     }
@@ -502,134 +502,134 @@
   "courseDetail": {
     "claim": {
       "cta": {
-        "title": "[~~Őŵñ őř ɱáñáĝé ţĥíš ĉőúřšé?~~]",
-        "body": "[~~Ĉļáíɱ íţ ţő řéšƥőñđ ţő řéṽíéŵš áñđ úƥđáţé íñƒő~~]",
-        "action": "[~~Ĉļáíɱ~~]"
+        "title": "[~~\u0150\u0175\u00f1 \u0151\u0159 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9?~~]",
+        "body": "[~~\u0108\u013c\u00e1\u00ed\u0271 \u00ed\u0163 \u0163\u0151 \u0159\u00e9\u0161\u01a5\u0151\u00f1\u0111 \u0163\u0151 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161 \u00e1\u00f1\u0111 \u00fa\u01a5\u0111\u00e1\u0163\u00e9 \u00ed\u00f1\u0192\u0151~~]",
+        "action": "[~~\u0108\u013c\u00e1\u00ed\u0271~~]"
       },
       "underReview": {
-        "title": "[~~Ĉļáíɱ úñđéř řéṽíéŵ~~]",
-        "body": "[~~Á ƀúšíñéšš ĥáš řéʠúéšţéđ ţő ɱáñáĝé ţĥíš ĉőúřšé. Ṽéříƒíĉáţíőñ íš íñ ƥřőĝřéšš.~~]"
+        "title": "[~~\u0108\u013c\u00e1\u00ed\u0271 \u00fa\u00f1\u0111\u00e9\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
+        "body": "[~~\u00c1 \u0180\u00fa\u0161\u00ed\u00f1\u00e9\u0161\u0161 \u0125\u00e1\u0161 \u0159\u00e9\u02a0\u00fa\u00e9\u0161\u0163\u00e9\u0111 \u0163\u0151 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9. \u1e7c\u00e9\u0159\u00ed\u0192\u00ed\u0109\u00e1\u0163\u00ed\u0151\u00f1 \u00ed\u0161 \u00ed\u00f1 \u01a5\u0159\u0151\u011d\u0159\u00e9\u0161\u0161.~~]"
       },
       "profileLink": {
-        "manages": "[~~Ṁáñáĝéš ţĥíš ĉőúřšé~~]",
-        "visit": "[~~Ṽíšíţ ƥřőƒíļé →~~]"
+        "manages": "[~~\u1e40\u00e1\u00f1\u00e1\u011d\u00e9\u0161 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+        "visit": "[~~\u1e7c\u00ed\u0161\u00ed\u0163 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u2192~~]"
       },
       "sheet": {
-        "title": "[~~Ĉļáíɱ {{clubName}}~~]",
-        "signInBody": "[~~Šíĝñ íñ ţő ĉļáíɱ ţĥíš ĉőúřšé.~~]",
-        "signIn": "[~~Šíĝñ íñ~~]",
-        "reviewBody": "[~~Ĉļáíɱ ţĥíš ĉőúřšé ƒőř ýőúř ĝőļƒ ĉļúƀ ƥřőƒíļé. Ŵé ŵíļļ řéṽíéŵ íţ ƀéƒőřé íţ ĝőéš ļíṽé.~~]",
-        "claimAs": "[~~Ĉļáíɱ áš {{name}}~~]",
-        "claimAsFallback": "[~~ƀúšíñéšš~~]",
-        "footnote": "[~~Ĉļáíɱíñĝ ĉőṽéřš áļļ ļíšţíñĝš őƒ ţĥíš ĉļúƀ őñ ĉļƀĥőúž.~~]",
-        "setupInstead": "[~~Šéţ úƥ á ñéŵ ĝőļƒ ĉļúƀ ƥřőƒíļé íñšţéáđ~~]",
-        "linkedAlreadyManages": "[~~{{name}} áļřéáđý ɱáñáĝéš áñőţĥéř ĉļúƀ áñđ ĉáññőţ ĉļáíɱ á šéĉőñđ ĉőúřšé.~~]",
-        "setupGolfClub": "[~~Šéţ úƥ á Ĝőļƒ Ĉļúƀ ƥřőƒíļé~~]",
-        "setupGolfClubShort": "[~~Šéţ úƥ Ĝőļƒ Ĉļúƀ ƥřőƒíļé~~]",
-        "stateCSingle": "[~~Ýőúř ĝőļƒ ĉļúƀ ƥřőƒíļé {{name}} áļřéáđý ɱáñáĝéš áñőţĥéř ĉļúƀ. Á ƀúšíñéšš ĉáñ ɱáñáĝé őñé ĉļúƀ, šő šéţ úƥ á šéƥářáţé Ĝőļƒ Ĉļúƀ ƥřőƒíļé ƒőř {{clubName}}.~~]",
-        "stateCMulti": "[~~Ýőúř ĝőļƒ ĉļúƀ ƥřőƒíļéš áļřéáđý ɱáñáĝé őţĥéř ĉļúƀš. Á ƀúšíñéšš ĉáñ ɱáñáĝé őñé ĉļúƀ, šő šéţ úƥ á šéƥářáţé Ĝőļƒ Ĉļúƀ ƥřőƒíļé ƒőř {{clubName}}.~~]",
-        "needsGolfClub": "[~~Ĉļáíɱíñĝ á ĉőúřšé ñééđš á Ĝőļƒ Ĉļúƀ ƥřőƒíļé. Ýőúř {{category}} ƥřőƒíļé ĉáññőţ ɱáñáĝé á ĉőúřšé. Šéţ úƥ á Ĝőļƒ Ĉļúƀ ƥřőƒíļé ţő ĉļáíɱ {{clubName}}.~~]",
-        "categoryFallback": "[~~ƀúšíñéšš~~]",
-        "stateDBody": "[~~Šéţ úƥ á Ĝőļƒ Ĉļúƀ ƥřőƒíļé ţő ĉļáíɱ ţĥíš ĉőúřšé áñđ ɱáñáĝé íţš đéţáíļš, řéṽíéŵš, áñđ úƥđáţéš.~~]",
-        "submitted": "[~~Ĉļáíɱ šúƀɱíţţéđ ƒőř řéṽíéŵ.~~]",
-        "submitError": "[~~Ĉőúļđ ñőţ šúƀɱíţ ĉļáíɱ. Ƥļéášé ţřý áĝáíñ.~~]"
+        "title": "[~~\u0108\u013c\u00e1\u00ed\u0271 {{clubName}}~~]",
+        "signInBody": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u0109\u013c\u00e1\u00ed\u0271 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9.~~]",
+        "signIn": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1~~]",
+        "reviewBody": "[~~\u0108\u013c\u00e1\u00ed\u0271 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0192\u0151\u0159 \u00fd\u0151\u00fa\u0159 \u011d\u0151\u013c\u0192 \u0109\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9. \u0174\u00e9 \u0175\u00ed\u013c\u013c \u0159\u00e9\u1e7d\u00ed\u00e9\u0175 \u00ed\u0163 \u0180\u00e9\u0192\u0151\u0159\u00e9 \u00ed\u0163 \u011d\u0151\u00e9\u0161 \u013c\u00ed\u1e7d\u00e9.~~]",
+        "claimAs": "[~~\u0108\u013c\u00e1\u00ed\u0271 \u00e1\u0161 {{name}}~~]",
+        "claimAsFallback": "[~~\u0180\u00fa\u0161\u00ed\u00f1\u00e9\u0161\u0161~~]",
+        "footnote": "[~~\u0108\u013c\u00e1\u00ed\u0271\u00ed\u00f1\u011d \u0109\u0151\u1e7d\u00e9\u0159\u0161 \u00e1\u013c\u013c \u013c\u00ed\u0161\u0163\u00ed\u00f1\u011d\u0161 \u0151\u0192 \u0163\u0125\u00ed\u0161 \u0109\u013c\u00fa\u0180 \u0151\u00f1 \u0109\u013c\u0180\u0125\u0151\u00fa\u017e.~~]",
+        "setupInstead": "[~~\u0160\u00e9\u0163 \u00fa\u01a5 \u00e1 \u00f1\u00e9\u0175 \u011d\u0151\u013c\u0192 \u0109\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u00ed\u00f1\u0161\u0163\u00e9\u00e1\u0111~~]",
+        "linkedAlreadyManages": "[~~{{name}} \u00e1\u013c\u0159\u00e9\u00e1\u0111\u00fd \u0271\u00e1\u00f1\u00e1\u011d\u00e9\u0161 \u00e1\u00f1\u0151\u0163\u0125\u00e9\u0159 \u0109\u013c\u00fa\u0180 \u00e1\u00f1\u0111 \u0109\u00e1\u00f1\u00f1\u0151\u0163 \u0109\u013c\u00e1\u00ed\u0271 \u00e1 \u0161\u00e9\u0109\u0151\u00f1\u0111 \u0109\u0151\u00fa\u0159\u0161\u00e9.~~]",
+        "setupGolfClub": "[~~\u0160\u00e9\u0163 \u00fa\u01a5 \u00e1 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9~~]",
+        "setupGolfClubShort": "[~~\u0160\u00e9\u0163 \u00fa\u01a5 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9~~]",
+        "stateCSingle": "[~~\u00dd\u0151\u00fa\u0159 \u011d\u0151\u013c\u0192 \u0109\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 {{name}} \u00e1\u013c\u0159\u00e9\u00e1\u0111\u00fd \u0271\u00e1\u00f1\u00e1\u011d\u00e9\u0161 \u00e1\u00f1\u0151\u0163\u0125\u00e9\u0159 \u0109\u013c\u00fa\u0180. \u00c1 \u0180\u00fa\u0161\u00ed\u00f1\u00e9\u0161\u0161 \u0109\u00e1\u00f1 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u0151\u00f1\u00e9 \u0109\u013c\u00fa\u0180, \u0161\u0151 \u0161\u00e9\u0163 \u00fa\u01a5 \u00e1 \u0161\u00e9\u01a5\u00e1\u0159\u00e1\u0163\u00e9 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u0192\u0151\u0159 {{clubName}}.~~]",
+        "stateCMulti": "[~~\u00dd\u0151\u00fa\u0159 \u011d\u0151\u013c\u0192 \u0109\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9\u0161 \u00e1\u013c\u0159\u00e9\u00e1\u0111\u00fd \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u0151\u0163\u0125\u00e9\u0159 \u0109\u013c\u00fa\u0180\u0161. \u00c1 \u0180\u00fa\u0161\u00ed\u00f1\u00e9\u0161\u0161 \u0109\u00e1\u00f1 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u0151\u00f1\u00e9 \u0109\u013c\u00fa\u0180, \u0161\u0151 \u0161\u00e9\u0163 \u00fa\u01a5 \u00e1 \u0161\u00e9\u01a5\u00e1\u0159\u00e1\u0163\u00e9 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u0192\u0151\u0159 {{clubName}}.~~]",
+        "needsGolfClub": "[~~\u0108\u013c\u00e1\u00ed\u0271\u00ed\u00f1\u011d \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00f1\u00e9\u00e9\u0111\u0161 \u00e1 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9. \u00dd\u0151\u00fa\u0159 {{category}} \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u0109\u00e1\u00f1\u00f1\u0151\u0163 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u00e1 \u0109\u0151\u00fa\u0159\u0161\u00e9. \u0160\u00e9\u0163 \u00fa\u01a5 \u00e1 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u0163\u0151 \u0109\u013c\u00e1\u00ed\u0271 {{clubName}}.~~]",
+        "categoryFallback": "[~~\u0180\u00fa\u0161\u00ed\u00f1\u00e9\u0161\u0161~~]",
+        "stateDBody": "[~~\u0160\u00e9\u0163 \u00fa\u01a5 \u00e1 \u011c\u0151\u013c\u0192 \u0108\u013c\u00fa\u0180 \u01a5\u0159\u0151\u0192\u00ed\u013c\u00e9 \u0163\u0151 \u0109\u013c\u00e1\u00ed\u0271 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u00e1\u00f1\u0111 \u0271\u00e1\u00f1\u00e1\u011d\u00e9 \u00ed\u0163\u0161 \u0111\u00e9\u0163\u00e1\u00ed\u013c\u0161, \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161, \u00e1\u00f1\u0111 \u00fa\u01a5\u0111\u00e1\u0163\u00e9\u0161.~~]",
+        "submitted": "[~~\u0108\u013c\u00e1\u00ed\u0271 \u0161\u00fa\u0180\u0271\u00ed\u0163\u0163\u00e9\u0111 \u0192\u0151\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175.~~]",
+        "submitError": "[~~\u0108\u0151\u00fa\u013c\u0111 \u00f1\u0151\u0163 \u0161\u00fa\u0180\u0271\u00ed\u0163 \u0109\u013c\u00e1\u00ed\u0271. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]"
       }
     },
     "exploreLinks": {
-      "kicker": "[~~ǨÉÉƤ ÉẊƤĻŐŘÍÑĜ~~]",
-      "nearby": "[~~Ṁőřé ĉőúřšéš ñéářƀý~~]",
-      "top100Suffix": "[~~{{region}} Ţőƥ 100~~]",
-      "exploreList": "[~~Éẋƥļőřé ţĥé ƒúļļ ļíšţ~~]"
+      "kicker": "[~~\u01e8\u00c9\u00c9\u01a4 \u00c9\u1e8a\u01a4\u013b\u0150\u0158\u00cd\u00d1\u011c~~]",
+      "nearby": "[~~\u1e40\u0151\u0159\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u00f1\u00e9\u00e1\u0159\u0180\u00fd~~]",
+      "top100Suffix": "[~~{{region}} \u0162\u0151\u01a5 100~~]",
+      "exploreList": "[~~\u00c9\u1e8b\u01a5\u013c\u0151\u0159\u00e9 \u0163\u0125\u00e9 \u0192\u00fa\u013c\u013c \u013c\u00ed\u0161\u0163~~]"
     },
     "suggestEdit": {
-      "title": "[~~Šúĝĝéšţ áñ éđíţ~~]",
-      "descriptionLabel": "[~~Đéšĉříƥţíőñ~~]",
-      "websiteLabel": "[~~Ŵéƀšíţé~~]",
-      "cancel": "[~~Ĉáñĉéļ~~]",
-      "submit": "[~~Šúƀɱíţ šúĝĝéšţíőñ ƒőř řéṽíéŵ~~]",
-      "submitting": "[~~Šúƀɱíţţíñĝ…~~]",
-      "successTitle": "[~~Šúĝĝéšţíőñ šúƀɱíţţéđ~~]",
-      "successBody": "[~~Ýőúř šúĝĝéšţíőñ ĥáš ƀééñ šúƀɱíţţéđ. Ŵé'ļļ řéṽíéŵ íţ šĥőřţļý.~~]",
-      "noChangesTitle": "[~~Ñő ĉĥáñĝéš~~]",
-      "noChangesBody": "[~~Ṁáǩé áţ ļéášţ őñé ĉĥáñĝé ţő šúƀɱíţ.~~]",
-      "errorTitle": "[~~Éřřőř~~]",
-      "errorBody": "[~~Ƒáíļéđ ţő šúƀɱíţ šúĝĝéšţíőñ. Ƥļéášé ţřý áĝáíñ.~~]"
+      "title": "[~~\u0160\u00fa\u011d\u011d\u00e9\u0161\u0163 \u00e1\u00f1 \u00e9\u0111\u00ed\u0163~~]",
+      "descriptionLabel": "[~~\u0110\u00e9\u0161\u0109\u0159\u00ed\u01a5\u0163\u00ed\u0151\u00f1~~]",
+      "websiteLabel": "[~~\u0174\u00e9\u0180\u0161\u00ed\u0163\u00e9~~]",
+      "cancel": "[~~\u0108\u00e1\u00f1\u0109\u00e9\u013c~~]",
+      "submit": "[~~\u0160\u00fa\u0180\u0271\u00ed\u0163 \u0161\u00fa\u011d\u011d\u00e9\u0161\u0163\u00ed\u0151\u00f1 \u0192\u0151\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
+      "submitting": "[~~\u0160\u00fa\u0180\u0271\u00ed\u0163\u0163\u00ed\u00f1\u011d\u2026~~]",
+      "successTitle": "[~~\u0160\u00fa\u011d\u011d\u00e9\u0161\u0163\u00ed\u0151\u00f1 \u0161\u00fa\u0180\u0271\u00ed\u0163\u0163\u00e9\u0111~~]",
+      "successBody": "[~~\u00dd\u0151\u00fa\u0159 \u0161\u00fa\u011d\u011d\u00e9\u0161\u0163\u00ed\u0151\u00f1 \u0125\u00e1\u0161 \u0180\u00e9\u00e9\u00f1 \u0161\u00fa\u0180\u0271\u00ed\u0163\u0163\u00e9\u0111. \u0174\u00e9'\u013c\u013c \u0159\u00e9\u1e7d\u00ed\u00e9\u0175 \u00ed\u0163 \u0161\u0125\u0151\u0159\u0163\u013c\u00fd.~~]",
+      "noChangesTitle": "[~~\u00d1\u0151 \u0109\u0125\u00e1\u00f1\u011d\u00e9\u0161~~]",
+      "noChangesBody": "[~~\u1e40\u00e1\u01e9\u00e9 \u00e1\u0163 \u013c\u00e9\u00e1\u0161\u0163 \u0151\u00f1\u00e9 \u0109\u0125\u00e1\u00f1\u011d\u00e9 \u0163\u0151 \u0161\u00fa\u0180\u0271\u00ed\u0163.~~]",
+      "errorTitle": "[~~\u00c9\u0159\u0159\u0151\u0159~~]",
+      "errorBody": "[~~\u0191\u00e1\u00ed\u013c\u00e9\u0111 \u0163\u0151 \u0161\u00fa\u0180\u0271\u00ed\u0163 \u0161\u00fa\u011d\u011d\u00e9\u0161\u0163\u00ed\u0151\u00f1. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]"
     },
     "mediaStrip": {
-      "helpDiscover": "[~~Ĥéļƥ ƒéļļőŵ ĝőļƒéřš đíšĉőṽéř ţĥíš ĉőúřšé — šĥářé ýőúř éẋƥéříéñĉé.~~]",
-      "share": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
-      "seeAll": "[~~Šéé áļļ~~]"
+      "helpDiscover": "[~~\u0124\u00e9\u013c\u01a5 \u0192\u00e9\u013c\u013c\u0151\u0175 \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0111\u00ed\u0161\u0109\u0151\u1e7d\u00e9\u0159 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u2014 \u0161\u0125\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9.~~]",
+      "share": "[~~\u0160\u0125\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u00e9\u1e8b\u01a5\u00e9\u0159\u00ed\u00e9\u00f1\u0109\u00e9~~]",
+      "seeAll": "[~~\u0160\u00e9\u00e9 \u00e1\u013c\u013c~~]"
     },
     "communityScore": {
-      "dashPlaceholder": "[~~–~~]",
-      "beFirst": "[~~Ɓé ţĥé ƒířšţ ţő řáţé ţĥíš ĉőúřšé~~]",
-      "noOneRated": "[~~Ñő őñé'š šĉőřéđ {{courseName}} ýéţ. Ĝíṽé íţ á 0–10 áñđ ĥéļƥ ƒéļļőŵ ĝőļƒéřš đíšĉőṽéř íţ.~~]",
-      "thisCourse": "[~~ţĥíš ĉőúřšé~~]",
-      "rateThis": "[~~Řáţé ţĥíš ĉőúřšé~~]",
-      "basedOn_one": "[~~Ɓášéđ őñ 1 řáţíñĝ~~]",
-      "basedOn_other": "[~~Ɓášéđ őñ {{count}} řáţíñĝš~~]",
-      "onlyYouSuffix": "[~~ · Őñļý ýőú~~]",
-      "categoryScores": "[~~Ĉáţéĝőřý Šĉőřéš~~]",
-      "seeAllReviews": "[~~Šéé áļļ řéṽíéŵš~~]"
+      "dashPlaceholder": "[~~\u2013~~]",
+      "beFirst": "[~~\u0181\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0159\u0161\u0163 \u0163\u0151 \u0159\u00e1\u0163\u00e9 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "noOneRated": "[~~\u00d1\u0151 \u0151\u00f1\u00e9'\u0161 \u0161\u0109\u0151\u0159\u00e9\u0111 {{courseName}} \u00fd\u00e9\u0163. \u011c\u00ed\u1e7d\u00e9 \u00ed\u0163 \u00e1 0\u201310 \u00e1\u00f1\u0111 \u0125\u00e9\u013c\u01a5 \u0192\u00e9\u013c\u013c\u0151\u0175 \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0111\u00ed\u0161\u0109\u0151\u1e7d\u00e9\u0159 \u00ed\u0163.~~]",
+      "thisCourse": "[~~\u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "rateThis": "[~~\u0158\u00e1\u0163\u00e9 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "basedOn_one": "[~~\u0181\u00e1\u0161\u00e9\u0111 \u0151\u00f1 1 \u0159\u00e1\u0163\u00ed\u00f1\u011d~~]",
+      "basedOn_other": "[~~\u0181\u00e1\u0161\u00e9\u0111 \u0151\u00f1 {{count}} \u0159\u00e1\u0163\u00ed\u00f1\u011d\u0161~~]",
+      "onlyYouSuffix": "[~~ \u00b7 \u0150\u00f1\u013c\u00fd \u00fd\u0151\u00fa~~]",
+      "categoryScores": "[~~\u0108\u00e1\u0163\u00e9\u011d\u0151\u0159\u00fd \u0160\u0109\u0151\u0159\u00e9\u0161~~]",
+      "seeAllReviews": "[~~\u0160\u00e9\u00e9 \u00e1\u013c\u013c \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]"
     },
     "handicapCue": {
-      "bannerAction": "[~~Ĉőññéĉţ →~~]",
-      "cardCta": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ →~~]",
-      "cardFootnote": "[~~Ŵőřǩš ŵíţĥ ŴĤŠ ĥáñđíĉáƥš ŵőřļđŵíđé~~]",
+      "bannerAction": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u2192~~]",
+      "cardCta": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u2192~~]",
+      "cardFootnote": "[~~\u0174\u0151\u0159\u01e9\u0161 \u0175\u00ed\u0163\u0125 \u0174\u0124\u0160 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5\u0161 \u0175\u0151\u0159\u013c\u0111\u0175\u00ed\u0111\u00e9~~]",
       "variants": {
         "about": {
-          "benefit": "[~~Šéé ĥőŵ ýőúř ĥáñđíĉáƥ ĉőɱƥářéš ĥéřé~~]",
-          "sub": "[~~Ƒříéñđš, ɱéɱƀéřš áñđ ţĥé ŵőřļđ’š ƀéšţ áţ ţĥíš ĉőúřšé~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u0125\u0151\u0175 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u0109\u0151\u0271\u01a5\u00e1\u0159\u00e9\u0161 \u0125\u00e9\u0159\u00e9~~]",
+          "sub": "[~~\u0191\u0159\u00ed\u00e9\u00f1\u0111\u0161, \u0271\u00e9\u0271\u0180\u00e9\u0159\u0161 \u00e1\u00f1\u0111 \u0163\u0125\u00e9 \u0175\u0151\u0159\u013c\u0111\u2019\u0161 \u0180\u00e9\u0161\u0163 \u00e1\u0163 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]"
         },
         "holes": {
-          "benefit": "[~~Šéé ýőúř šĉőříñĝ őñ éṽéřý ĥőļé~~]",
-          "sub": "[~~Ýőúř áṽéřáĝé ṽš éṽéřýőñé ŵĥő’š ƥļáýéđ {{name}}, ĥőļé ƀý ĥőļé.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u00fd\u0151\u00fa\u0159 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u0151\u00f1 \u00e9\u1e7d\u00e9\u0159\u00fd \u0125\u0151\u013c\u00e9~~]",
+          "sub": "[~~\u00dd\u0151\u00fa\u0159 \u00e1\u1e7d\u00e9\u0159\u00e1\u011d\u00e9 \u1e7d\u0161 \u00e9\u1e7d\u00e9\u0159\u00fd\u0151\u00f1\u00e9 \u0175\u0125\u0151\u2019\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 {{name}}, \u0125\u0151\u013c\u00e9 \u0180\u00fd \u0125\u0151\u013c\u00e9.~~]"
         },
         "champions": {
-          "benefit": "[~~Šéé ŵĥéřé ýőú řáñǩ áţ ţĥíš ĉőúřšé~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ áñđ ýőúř řőúñđš ĵőíñ ţĥé {{name}} ļéáđéřƀőářđ.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u0175\u0125\u00e9\u0159\u00e9 \u00fd\u0151\u00fa \u0159\u00e1\u00f1\u01e9 \u00e1\u0163 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u00e1\u00f1\u0111 \u00fd\u0151\u00fa\u0159 \u0159\u0151\u00fa\u00f1\u0111\u0161 \u0135\u0151\u00ed\u00f1 \u0163\u0125\u00e9 {{name}} \u013c\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111.~~]"
         },
         "progress": {
-          "benefit": "[~~Ƒíļļ íñ ýőúř Ţőƥ 100 áúţőɱáţíĉáļļý~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ áñđ éṽéřý řőúñđ ýőú ƥļáý ĉőúñţš íţšéļƒ — ñő ɱáñúáļ ļőĝĝíñĝ.~~]"
+          "benefit": "[~~\u0191\u00ed\u013c\u013c \u00ed\u00f1 \u00fd\u0151\u00fa\u0159 \u0162\u0151\u01a5 100 \u00e1\u00fa\u0163\u0151\u0271\u00e1\u0163\u00ed\u0109\u00e1\u013c\u013c\u00fd~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u00e1\u00f1\u0111 \u00e9\u1e7d\u00e9\u0159\u00fd \u0159\u0151\u00fa\u00f1\u0111 \u00fd\u0151\u00fa \u01a5\u013c\u00e1\u00fd \u0109\u0151\u00fa\u00f1\u0163\u0161 \u00ed\u0163\u0161\u00e9\u013c\u0192 \u2014 \u00f1\u0151 \u0271\u00e1\u00f1\u00fa\u00e1\u013c \u013c\u0151\u011d\u011d\u00ed\u00f1\u011d.~~]"
         },
         "leaderboard": {
-          "benefit": "[~~Šéé ŵĥéřé ýőú řáñǩ ŵőřļđŵíđé~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ ţő ĵőíñ ţĥé ĉĥáɱƥíőñšĥíƥ áñđ ĉļíɱƀ ţĥé ĝļőƀáļ řáñǩíñĝš.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u0175\u0125\u00e9\u0159\u00e9 \u00fd\u0151\u00fa \u0159\u00e1\u00f1\u01e9 \u0175\u0151\u0159\u013c\u0111\u0175\u00ed\u0111\u00e9~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u0163\u0151 \u0135\u0151\u00ed\u00f1 \u0163\u0125\u00e9 \u0109\u0125\u00e1\u0271\u01a5\u00ed\u0151\u00f1\u0161\u0125\u00ed\u01a5 \u00e1\u00f1\u0111 \u0109\u013c\u00ed\u0271\u0180 \u0163\u0125\u00e9 \u011d\u013c\u0151\u0180\u00e1\u013c \u0159\u00e1\u00f1\u01e9\u00ed\u00f1\u011d\u0161.~~]"
         },
         "discover": {
-          "benefit": "[~~Šéé ŵĥíĉĥ őƒ ţĥéšé ýőú’ṽé ƥļáýéđ~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ ţő šéé ĥőŵ ýőú šĉőřéđ áţ éṽéřý ĉőúřšé.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u0175\u0125\u00ed\u0109\u0125 \u0151\u0192 \u0163\u0125\u00e9\u0161\u00e9 \u00fd\u0151\u00fa\u2019\u1e7d\u00e9 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u0163\u0151 \u0161\u00e9\u00e9 \u0125\u0151\u0175 \u00fd\u0151\u00fa \u0161\u0109\u0151\u0159\u00e9\u0111 \u00e1\u0163 \u00e9\u1e7d\u00e9\u0159\u00fd \u0109\u0151\u00fa\u0159\u0161\u00e9.~~]"
         },
         "tour-venue": {
-          "benefit": "[~~Šéé ĥőŵ ýőú'đ šĉőřé áţ {{name}}~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ŴĤŠ ĥáñđíĉáƥ ţő ĉőɱƥářé ýőúř ĝáɱé ţő ţĥíš ŵééǩ’š ṽéñúé.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u0125\u0151\u0175 \u00fd\u0151\u00fa'\u0111 \u0161\u0109\u0151\u0159\u00e9 \u00e1\u0163 {{name}}~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0174\u0124\u0160 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u0163\u0151 \u0109\u0151\u0271\u01a5\u00e1\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u011d\u00e1\u0271\u00e9 \u0163\u0151 \u0163\u0125\u00ed\u0161 \u0175\u00e9\u00e9\u01e9\u2019\u0161 \u1e7d\u00e9\u00f1\u00fa\u00e9.~~]"
         },
         "tour-holes": {
-          "benefit": "[~~Šéé ýőúř šĉőříñĝ őñ ţĥéšé ĥőļéš ṽš ţĥé ƒíéļđ~~]",
-          "sub": "[~~Ĉőññéĉţ ýőúř ŴĤŠ ĥáñđíĉáƥ ţő ɱéášúřé ýőúř ĝáɱé áĝáíñšţ ţĥé ƥřőš’, ĥőļé ƀý ĥőļé.~~]"
+          "benefit": "[~~\u0160\u00e9\u00e9 \u00fd\u0151\u00fa\u0159 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u0151\u00f1 \u0163\u0125\u00e9\u0161\u00e9 \u0125\u0151\u013c\u00e9\u0161 \u1e7d\u0161 \u0163\u0125\u00e9 \u0192\u00ed\u00e9\u013c\u0111~~]",
+          "sub": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0174\u0124\u0160 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5 \u0163\u0151 \u0271\u00e9\u00e1\u0161\u00fa\u0159\u00e9 \u00fd\u0151\u00fa\u0159 \u011d\u00e1\u0271\u00e9 \u00e1\u011d\u00e1\u00ed\u00f1\u0161\u0163 \u0163\u0125\u00e9 \u01a5\u0159\u0151\u0161\u2019, \u0125\u0151\u013c\u00e9 \u0180\u00fd \u0125\u0151\u013c\u00e9.~~]"
         }
       }
     },
     "about": {
-      "editRating": "[~~Éđíţ ýőúř řáţíñĝ~~]",
-      "locationUnavailable": "[~~Ļőĉáţíőñ đáţá íšñ'ţ áṽáíļáƀļé ýéţ.~~]",
-      "officialWebsite": "[~~Őƒƒíĉíáļ Ĉőúřšé Ŵéƀšíţé~~]"
+      "editRating": "[~~\u00c9\u0111\u00ed\u0163 \u00fd\u0151\u00fa\u0159 \u0159\u00e1\u0163\u00ed\u00f1\u011d~~]",
+      "locationUnavailable": "[~~\u013b\u0151\u0109\u00e1\u0163\u00ed\u0151\u00f1 \u0111\u00e1\u0163\u00e1 \u00ed\u0161\u00f1'\u0163 \u00e1\u1e7d\u00e1\u00ed\u013c\u00e1\u0180\u013c\u00e9 \u00fd\u00e9\u0163.~~]",
+      "officialWebsite": "[~~\u0150\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0108\u0151\u00fa\u0159\u0161\u00e9 \u0174\u00e9\u0180\u0161\u00ed\u0163\u00e9~~]"
     },
     "locationPills": {
-      "separator": "[~~›~~]"
+      "separator": "[~~\u203a~~]"
     },
     "a11y": {
-      "openMediaTab": "[~~Őƥéñ Ṁéđíá ţáƀ~~]",
-      "sections": "[~~Ĉőúřšé Đéţáíļ Šéĉţíőñš~~]"
+      "openMediaTab": "[~~\u0150\u01a5\u00e9\u00f1 \u1e40\u00e9\u0111\u00ed\u00e1 \u0163\u00e1\u0180~~]",
+      "sections": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u0110\u00e9\u0163\u00e1\u00ed\u013c \u0160\u00e9\u0109\u0163\u00ed\u0151\u00f1\u0161~~]"
     },
     "tabs": {
-      "about": "[~~Áƀőúţ~~]",
-      "reviews": "[~~Řéṽíéŵš~~]",
-      "media": "[~~Ṁéđíá~~]",
-      "holes": "[~~Ĥőļéš~~]",
-      "legends": "[~~Ĉĥáɱƥíőñš~~]",
-      "course": "[~~Áƀőúţ~~]",
+      "about": "[~~\u00c1\u0180\u0151\u00fa\u0163~~]",
+      "reviews": "[~~\u0158\u00e9\u1e7d\u00ed\u00e9\u0175\u0161~~]",
+      "media": "[~~\u1e40\u00e9\u0111\u00ed\u00e1~~]",
+      "holes": "[~~\u0124\u0151\u013c\u00e9\u0161~~]",
+      "legends": "[~~\u0108\u0125\u00e1\u0271\u01a5\u00ed\u0151\u00f1\u0161~~]",
+      "course": "[~~\u00c1\u0180\u0151\u00fa\u0163~~]",
       "you": "You"
     },
     "card": {
@@ -657,15 +657,15 @@
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
-      "scaleLabel": "[Ðíffíçûĺţý šçåĺé]",
-      "scaleCaption": "[Ţhíš hôĺé åģåíñšţ évéŕý ôţhéŕ hôĺé ôñ ţhé çôûŕšé — fûŕţhéŕ ŕíģhţ pĺåýš håŕðéŕ.]",
-      "yourGapVsField": "[Ýôûŕ ģåp vš fíéĺð]"
+      "scaleLabel": "[\u00d0\u00edff\u00ed\u00e7\u00fb\u013a\u0163\u00fd \u0161\u00e7\u00e5\u013a\u00e9]",
+      "scaleCaption": "[\u0162h\u00ed\u0161 h\u00f4\u013a\u00e9 \u00e5\u0123\u00e5\u00ed\u00f1\u0161\u0163 \u00e9v\u00e9\u0155\u00fd \u00f4\u0163h\u00e9\u0155 h\u00f4\u013a\u00e9 \u00f4\u00f1 \u0163h\u00e9 \u00e7\u00f4\u00fb\u0155\u0161\u00e9 \u2014 f\u00fb\u0155\u0163h\u00e9\u0155 \u0155\u00ed\u0123h\u0163 p\u013a\u00e5\u00fd\u0161 h\u00e5\u0155\u00f0\u00e9\u0155.]",
+      "yourGapVsField": "[\u00dd\u00f4\u00fb\u0155 \u0123\u00e5p v\u0161 f\u00ed\u00e9\u013a\u00f0]"
     },
     "records": {
       "youHold": "You hold this board",
-      "youValue": "[~~Ýőú {{value}}~~]",
-      "youBehind": "[~~{{gap}} ƀéĥíñđ~~]",
-      "youAhead": "[~~Ļéνéļ ŵíŧĥ ŧĥé ƀőáŕđ~~]",
+      "youValue": "[~~\u00dd\u0151\u00fa {{value}}~~]",
+      "youBehind": "[~~{{gap}} \u0180\u00e9\u0125\u00ed\u00f1\u0111~~]",
+      "youAhead": "[~~\u013b\u00e9\u03bd\u00e9\u013c \u0175\u00ed\u0167\u0125 \u0167\u0125\u00e9 \u0180\u0151\u00e1\u0155\u0111~~]",
       "units": {
         "gross": "Gross",
         "rounds": "Rounds",
@@ -675,7 +675,7 @@
       }
     },
     "you": {
-      "oneToGoHole": "[One to go · hole {{n}}]",
+      "oneToGoHole": "[One to go \u00b7 hole {{n}}]",
       "fieldHere": "[The field here]",
       "gapBetter": "[Better than the field here]",
       "gapWorse": "[Worse than the field here]",
@@ -688,52 +688,52 @@
     }
   },
   "network": {
-    "emojiFlag": "[~~⛳~~]",
-    "viewCourseA11y": "[~~Ṽíéŵ {{name}}~~]",
+    "emojiFlag": "[~~\u26f3~~]",
+    "viewCourseA11y": "[~~\u1e7c\u00ed\u00e9\u0175 {{name}}~~]",
     "badge": {
-      "playedByFriends_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
-      "playedByFriends_other": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđš~~]",
-      "newForNetwork": "[~~Ñéŵ ƒőř ýőúř ñéţŵőřǩ~~]",
-      "topRated": "[~~Ţőƥ řáţéđ~~]",
-      "trending": "[~~Ţřéñđíñĝ~~]"
+      "playedByFriends_one": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0180\u00fd {{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111~~]",
+      "playedByFriends_other": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0180\u00fd {{count}} \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161~~]",
+      "newForNetwork": "[~~\u00d1\u00e9\u0175 \u0192\u0151\u0159 \u00fd\u0151\u00fa\u0159 \u00f1\u00e9\u0163\u0175\u0151\u0159\u01e9~~]",
+      "topRated": "[~~\u0162\u0151\u01a5 \u0159\u00e1\u0163\u00e9\u0111~~]",
+      "trending": "[~~\u0162\u0159\u00e9\u00f1\u0111\u00ed\u00f1\u011d~~]"
     },
-    "unseenReviewsTitle": "[~~🔔 Ñéŵ řéṽíéŵ ƒřőɱ ýőúř ñéţŵőřǩ~~]",
-    "unseenReviewsBody": "[~~<name>{{name}}</name> řéṽíéŵéđ <course>{{course}}</course> · <rating>{{rating}}</rating>~~]",
-    "unseenReviewsMore_one": "[~~ +{{count}} ɱőřé~~]",
-    "unseenReviewsMore_other": "[~~ +{{count}} ɱőřé~~]",
-    "viewArrow": "[~~Ṽíéŵ →~~]",
-    "circleKicker": "[~~ÝŐÚŘ ĈÍŘĈĻÉ~~]",
-    "friendsPlayedTitle": "[~~Ĉőúřšéš ƥļáýéđ ƀý ƒříéñđš~~]"
+    "unseenReviewsTitle": "[~~\ud83d\udd14 \u00d1\u00e9\u0175 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175 \u0192\u0159\u0151\u0271 \u00fd\u0151\u00fa\u0159 \u00f1\u00e9\u0163\u0175\u0151\u0159\u01e9~~]",
+    "unseenReviewsBody": "[~~<name>{{name}}</name> \u0159\u00e9\u1e7d\u00ed\u00e9\u0175\u00e9\u0111 <course>{{course}}</course> \u00b7 <rating>{{rating}}</rating>~~]",
+    "unseenReviewsMore_one": "[~~ +{{count}} \u0271\u0151\u0159\u00e9~~]",
+    "unseenReviewsMore_other": "[~~ +{{count}} \u0271\u0151\u0159\u00e9~~]",
+    "viewArrow": "[~~\u1e7c\u00ed\u00e9\u0175 \u2192~~]",
+    "circleKicker": "[~~\u00dd\u0150\u00da\u0158 \u0108\u00cd\u0158\u0108\u013b\u00c9~~]",
+    "friendsPlayedTitle": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 \u0180\u00fd \u0192\u0159\u00ed\u00e9\u00f1\u0111\u0161~~]"
   },
   "phase5": {
     "statusToggle": {
-      "signInPrompt": "[~~Šíĝñ íñ ţő ţřáĉǩ ţĥíš ĉőúřšé~~]",
-      "signIn": "[~~Šíĝñ íñ~~]",
-      "playedTitle": "[~~Ýőú'ṽé ƥļáýéđ ĥéřé~~]",
-      "playedSub": "[~~Ţáƥ ţő ṽíéŵ őř éđíţ ýőúř řéṽíéŵ~~]",
-      "playedBadge": "[~~Ƥļáýéđ~~]",
-      "notPlayedTitle": "[~~Ƥļáýéđ ĥéřé?~~]",
-      "notPlayedSub": "[~~Ýőúř řáţíñĝ ĥéļƥš ĝőļƒéřš ŵőřļđŵíđé~~]",
-      "rate": "[~~Řáţé~~]",
-      "onBucketList": "[~~Őñ ýőúř ƀúĉǩéţ ļíšţ~~]",
-      "addBucketList": "[~~Áđđ ţő ƀúĉǩéţ ļíšţ~~]",
-      "removedFromBucket": "[~~Řéɱőṽéđ ƒřőɱ ƀúĉǩéţ ļíšţ~~]",
-      "addedToBucket": "[~~Áđđéđ ţő ƀúĉǩéţ ļíšţ~~]"
+      "signInPrompt": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1 \u0163\u0151 \u0163\u0159\u00e1\u0109\u01e9 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "signIn": "[~~\u0160\u00ed\u011d\u00f1 \u00ed\u00f1~~]",
+      "playedTitle": "[~~\u00dd\u0151\u00fa'\u1e7d\u00e9 \u01a5\u013c\u00e1\u00fd\u00e9\u0111 \u0125\u00e9\u0159\u00e9~~]",
+      "playedSub": "[~~\u0162\u00e1\u01a5 \u0163\u0151 \u1e7d\u00ed\u00e9\u0175 \u0151\u0159 \u00e9\u0111\u00ed\u0163 \u00fd\u0151\u00fa\u0159 \u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
+      "playedBadge": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111~~]",
+      "notPlayedTitle": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0111 \u0125\u00e9\u0159\u00e9?~~]",
+      "notPlayedSub": "[~~\u00dd\u0151\u00fa\u0159 \u0159\u00e1\u0163\u00ed\u00f1\u011d \u0125\u00e9\u013c\u01a5\u0161 \u011d\u0151\u013c\u0192\u00e9\u0159\u0161 \u0175\u0151\u0159\u013c\u0111\u0175\u00ed\u0111\u00e9~~]",
+      "rate": "[~~\u0158\u00e1\u0163\u00e9~~]",
+      "onBucketList": "[~~\u0150\u00f1 \u00fd\u0151\u00fa\u0159 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163~~]",
+      "addBucketList": "[~~\u00c1\u0111\u0111 \u0163\u0151 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163~~]",
+      "removedFromBucket": "[~~\u0158\u00e9\u0271\u0151\u1e7d\u00e9\u0111 \u0192\u0159\u0151\u0271 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163~~]",
+      "addedToBucket": "[~~\u00c1\u0111\u0111\u00e9\u0111 \u0163\u0151 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163~~]"
     },
     "personalReview": {
-      "title": "[~~Ýőúř Řáţíñĝ~~]",
-      "reviewedOn": "[~~Ŕéνíéŵéđ őñ {{date}}~~]",
-      "matchesConsensus": "[~~Ṁáţĉĥéš ĉőɱɱúñíţý ĉőñšéñšúš~~]",
-      "aboveAvg": "[~~{{diff}} áƀőṽé ĉőɱɱúñíţý áṽĝ~~]",
-      "belowAvg": "[~~{{diff}} ƀéļőŵ ĉőɱɱúñíţý áṽĝ~~]"
+      "title": "[~~\u00dd\u0151\u00fa\u0159 \u0158\u00e1\u0163\u00ed\u00f1\u011d~~]",
+      "reviewedOn": "[~~\u0154\u00e9\u03bd\u00ed\u00e9\u0175\u00e9\u0111 \u0151\u00f1 {{date}}~~]",
+      "matchesConsensus": "[~~\u1e40\u00e1\u0163\u0109\u0125\u00e9\u0161 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd \u0109\u0151\u00f1\u0161\u00e9\u00f1\u0161\u00fa\u0161~~]",
+      "aboveAvg": "[~~{{diff}} \u00e1\u0180\u0151\u1e7d\u00e9 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd \u00e1\u1e7d\u011d~~]",
+      "belowAvg": "[~~{{diff}} \u0180\u00e9\u013c\u0151\u0175 \u0109\u0151\u0271\u0271\u00fa\u00f1\u00ed\u0163\u00fd \u00e1\u1e7d\u011d~~]"
     },
     "planning": {
-      "title": "[~~Ƥļáññíñĝ~~]",
-      "addBucketList": "[~~Áđđ ţő ƀúĉǩéţ ļíšţ~~]",
-      "privateNote": "[~~Őñļý ýőú ĉáñ šéé ýőúř ƀúĉǩéţ ļíšţ.~~]"
+      "title": "[~~\u01a4\u013c\u00e1\u00f1\u00f1\u00ed\u00f1\u011d~~]",
+      "addBucketList": "[~~\u00c1\u0111\u0111 \u0163\u0151 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163~~]",
+      "privateNote": "[~~\u0150\u00f1\u013c\u00fd \u00fd\u0151\u00fa \u0109\u00e1\u00f1 \u0161\u00e9\u00e9 \u00fd\u0151\u00fa\u0159 \u0180\u00fa\u0109\u01e9\u00e9\u0163 \u013c\u00ed\u0161\u0163.~~]"
     },
-    "videoMomentAlt": "[~~Ṽíđéő ɱőɱéñţ~~]",
-    "courseMomentAlt": "[~~Ĉőúřšé ɱőɱéñţ~~]"
+    "videoMomentAlt": "[~~\u1e7c\u00ed\u0111\u00e9\u0151 \u0271\u0151\u0271\u00e9\u00f1\u0163~~]",
+    "courseMomentAlt": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u0271\u0151\u0271\u00e9\u00f1\u0163~~]"
   },
   "discover": {
     "heroStory": {
@@ -753,7 +753,7 @@
       "ordinal_ordinal_other": "{{count}}th"
     },
     "hero": {
-      "viewScorecard": "[~~ṽíéŵ šĉőŕéĉáŕð~~]"
+      "viewScorecard": "[~~\u1e7d\u00ed\u00e9\u0175 \u0161\u0109\u0151\u0155\u00e9\u0109\u00e1\u0155\u00f0~~]"
     },
     "lens": {
       "suggested": "Suggested",
@@ -780,19 +780,22 @@
       "whenPlayed": "[Played {{when}}]",
       "whenRated": "[Rated {{when}}]",
       "statusNoDate": "[On your card]",
-      "statusFinishNoDate": "[Rated · detail missing]",
+      "statusFinishNoDate": "[Rated \u00b7 detail missing]",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "friendsTitle": "[See your friends' rounds]",
+      "friendsStatus": "[Their scores land here]",
+      "actionFriends": "[FIND]"
     },
     "live": "[Live]",
     "latest": "Latest",
-    "roundThru": "[R{{round}} · thru {{thru}}]",
+    "roundThru": "[R{{round}} \u00b7 thru {{thru}}]",
     "thruOnly": "[Thru {{thru}}]",
     "leader": "[Leader]",
     "tiedLead": "[Tied lead]",
-    "roundFinished": "[R{{round}} · F]",
+    "roundFinished": "[R{{round}} \u00b7 F]",
     "playersTied": "[{{count}} players tied]",
     "playersTied_one": "[{{count}} players tied]",
     "momentsGroupCount": "[{{count}} moments]",
@@ -840,25 +843,48 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "[{{count}} åċēş åńđ åļƀåţŕöşşēş öń ţĥē ƀöåŕđ]",
-    "aroundTheWorld": "[~~Šţáñðőúţ ŕőúñðš~~]"
+    "honoursCaptionCount": "[{{count}} \u00e5\u010b\u0113\u015f \u00e5\u0144\u0111 \u00e5\u013c\u0180\u00e5\u0163\u0155\u00f6\u015f\u015f\u0113\u015f \u00f6\u0144 \u0163\u0125\u0113 \u0180\u00f6\u00e5\u0155\u0111]",
+    "aroundTheWorld": "[~~\u0160\u0163\u00e1\u00f1\u00f0\u0151\u00fa\u0163 \u0155\u0151\u00fa\u00f1\u00f0\u0161~~]",
+    "findGolfers": {
+      "kicker": "[The members]",
+      "title": "[Find golfers]",
+      "count": "[{{shown}} of {{total}} members]",
+      "requestsSent": "[{{count}} requests sent]",
+      "searchPlaceholder": "[Name or handle]",
+      "clear": "[Clear]",
+      "hcp": "[HCP]",
+      "rounds": "[ROUNDS]",
+      "homeClub": "[HOME CLUB]",
+      "addFriend": "[Add friend]",
+      "requested": "[Requested]",
+      "follow": "[Follow]",
+      "following": "[Following]",
+      "groupFollowedBy": "[Followed by]",
+      "groupPlays": "[Plays where you play]",
+      "groupPopular": "[Members to know]",
+      "groupMatch": "[Matches]",
+      "emptyTitle": "[No golfer called \"{{q}}\"]",
+      "emptyBody": "[Try their handle, or invite them to clbhouz]",
+      "inviteQuiet": "[Invite a golfer]",
+      "inviteCta": "[Invite a golfer to clbhouz]"
+    }
   },
   "statBrowse": {
-    "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",
-    "countTracked_other": "[~~ĉőűřšéš ţŕáĉǩéđ~~]",
+    "countTracked_one": "[~~\u0109\u0151\u0171\u0159\u0161\u00e9 \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111~~]",
+    "countTracked_other": "[~~\u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111~~]",
     "countLens": {
-      "toughest_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ƥļáýš ţőűĝĥ éñőűĝĥ ţő ŕáñǩ~~]",
-      "toughest_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ƥļáý ţőűĝĥ éñőűĝĥ ţő ŕáñǩ~~]",
-      "scoreable_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé íš šĉőŕéáɓļé~~]",
-      "scoreable_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš áŕé šĉőŕéáɓļé~~]",
-      "played_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ɓééñ ƥļáýéđ~~]",
-      "played_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ɓééñ ƥļáýéđ~~]",
-      "longest_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ĺéñĝţĥ~~]",
-      "longest_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ĺéñĝţĥ~~]",
-      "rated_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ŕáţíñĝš~~]",
-      "rated_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕáţíñĝš~~]",
-      "chase_one": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšé ĥáš ŕéĉőŕđš ţő ĉĥášé~~]",
-      "chase_other": "[~~{{count}} őƒ {{total}} ţŕáĉǩéđ ĉőűřšéš ĥáṽé ŕéĉőŕđš ţő ĉĥášé~~]"
+      "toughest_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u01a5\u013c\u00e1\u00fd\u0161 \u0163\u0151\u0171\u011d\u0125 \u00e9\u00f1\u0151\u0171\u011d\u0125 \u0163\u0151 \u0155\u00e1\u00f1\u01e9~~]",
+      "toughest_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u01a5\u013c\u00e1\u00fd \u0163\u0151\u0171\u011d\u0125 \u00e9\u00f1\u0151\u0171\u011d\u0125 \u0163\u0151 \u0155\u00e1\u00f1\u01e9~~]",
+      "scoreable_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u00ed\u0161 \u0161\u0109\u0151\u0155\u00e9\u00e1\u0253\u013c\u00e9~~]",
+      "scoreable_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u00e1\u0155\u00e9 \u0161\u0109\u0151\u0155\u00e9\u00e1\u0253\u013c\u00e9~~]",
+      "played_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u0125\u00e1\u0161 \u0253\u00e9\u00e9\u00f1 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+      "played_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u0125\u00e1\u1e7d\u00e9 \u0253\u00e9\u00e9\u00f1 \u01a5\u013c\u00e1\u00fd\u00e9\u0111~~]",
+      "longest_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u0125\u00e1\u0161 \u013a\u00e9\u00f1\u011d\u0163\u0125~~]",
+      "longest_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u0125\u00e1\u1e7d\u00e9 \u013a\u00e9\u00f1\u011d\u0163\u0125~~]",
+      "rated_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u0125\u00e1\u0161 \u0155\u00e1\u0163\u00ed\u00f1\u011d\u0161~~]",
+      "rated_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u0125\u00e1\u1e7d\u00e9 \u0155\u00e1\u0163\u00ed\u00f1\u011d\u0161~~]",
+      "chase_one": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9 \u0125\u00e1\u0161 \u0155\u00e9\u0109\u0151\u0155\u0111\u0161 \u0163\u0151 \u0109\u0125\u00e1\u0161\u00e9~~]",
+      "chase_other": "[~~{{count}} \u0151\u0192 {{total}} \u0163\u0155\u00e1\u0109\u01e9\u00e9\u0111 \u0109\u0151\u0171\u0159\u0161\u00e9\u0161 \u0125\u00e1\u1e7d\u00e9 \u0155\u00e9\u0109\u0151\u0155\u0111\u0161 \u0163\u0151 \u0109\u0125\u00e1\u0161\u00e9~~]"
     },
     "countryCount": "[{{formattedCount}} of {{total}}]"
   },
