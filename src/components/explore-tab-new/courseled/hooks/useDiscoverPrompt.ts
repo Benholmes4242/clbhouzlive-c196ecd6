@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
+import { useFriendIdSet } from './useFriendIdSet';
 
 export type DiscoverPromptKind = 'rate' | 'finish' | 'photo' | 'friends';
 
@@ -192,6 +193,21 @@ export function useDiscoverPrompt(userId: string | undefined): {
         thumbnail: null,
         at: (photoMatch.play_date as string | null) ?? null,
 
+      },
+    };
+  }
+
+  if (friendIds.isLoading) return { prompt: null, resolved: false };
+
+  if ((friendIds.data?.size ?? 0) === 0) {
+    return {
+      resolved: true,
+      prompt: {
+        kind: 'friends',
+        courseId: '',
+        courseName: '',
+        thumbnail: null,
+        at: null,
       },
     };
   }
