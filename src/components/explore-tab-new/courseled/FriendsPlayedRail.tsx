@@ -262,7 +262,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           gap: 8,
                         }}
                       >
-                        <IndexMovement row={r} />
                         <ReactionSlot>
                           {(() => {
                             const st = reactions.stateFor('round', r.score_id);
