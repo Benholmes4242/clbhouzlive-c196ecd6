@@ -43,13 +43,16 @@ export const INSIGHT_CLAMP = {
 export function InsightGlyph() {
   return (
     <ChartNoAxesColumn
-      size={11}
+      size={10}
       strokeWidth={2.5}
       aria-hidden
-      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, display: 'inline-block', verticalAlign: '-1px', transform: 'translateY(0.5px)' }}
+      // Aligned to the first line's CAP HEIGHT, not its baseline: a glyph on the
+      // baseline of a 600-weight line sits visually low.
+      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, display: 'inline-block', verticalAlign: '-0.5px', transform: 'translateY(-0.5px)' }}
     />
   );
 }
+
 
 export function toParFor(row: FriendRoundRow): { text: string; tone: string } | null {
   if (row.gross == null || row.course_par == null) return null;
@@ -90,12 +93,12 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...FIGS, fontSize: 12, fontWeight: 800, color: mv.tone }}>
-        {mv.arrow} {mv.figure}
+      <span style={{ ...FIGS, fontSize: 12.5, fontWeight: 800, color: mv.tone }}>
+        {mv.arrow}{mv.figure}
       </span>
       <span
         style={{
-          fontSize: 8,
+          fontSize: 6.5,
           fontWeight: 800,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
@@ -104,6 +107,7 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
       >
         {t('discover.friendsRail.index', 'HCP')}
       </span>
+
     </span>
   );
 }

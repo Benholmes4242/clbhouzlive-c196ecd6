@@ -29,7 +29,7 @@ import {
   InkAction,
   NUMF,
   SANS,
-  SCRIM_SOFT,
+  
 } from './tokens';
 
 /**
@@ -44,6 +44,11 @@ import {
  */
 
 const RAIL_CAP = 10;
+
+/** Rail scrim — SCRIM_SOFT's hue, stop pulled in for the shorter 88px photo. */
+const RAIL_SCRIM =
+  'linear-gradient(0deg, rgba(10,14,10,0.57) 0%, rgba(10,14,10,0) 55%)';
+
 
 interface Props {
   userId: string | undefined;
@@ -160,9 +165,12 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 courseId={r.course_id}
                 courseName={m?.name ?? r.course_name}
                 imageUrl={m?.imageUrl}
-                style={{ height: 99, flexShrink: 0 }}
+                style={{ height: 88, flexShrink: 0 }}
               >
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM_SOFT }} />
+                {/* A SHORTER PHOTO NEEDS A SHORTER SCRIM, or the course name
+                    sits in a band of darkness. Same hue, stop pulled in. */}
+                <div style={{ position: 'absolute', inset: 0, background: RAIL_SCRIM }} />
+
                 <ImageChip gold={hasAce}>{relativeDay(r.play_date, t)}</ImageChip>
                 <div
                   style={{
@@ -197,18 +205,19 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   <div style={{ padding: '9px 11px 10px' }}>
                     {/* LINE 1 — the gross with its reference point. */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                      <span style={{ ...NUMF, fontSize: 26, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}>
+                      <span style={{ ...NUMF, fontSize: 27, letterSpacing: '-0.035em', color: A.INK, lineHeight: 0.92 }}>
                         {r.gross ?? '\u2014'}
                       </span>
                       {toPar && (
-                        <span style={{ ...NUMF, fontSize: 15, color: toPar.tone, lineHeight: 1 }}>
+                        <span style={{ ...NUMF, fontSize: 14, letterSpacing: '-0.02em', color: toPar.tone, lineHeight: 1 }}>
                           {toPar.text}
                         </span>
                       )}
                       {r.course_par != null && (
                         <span
                           style={{
-                            fontSize: 8,
+                            fontSize: 6.5,
+
                             fontWeight: 800,
                             letterSpacing: '0.13em',
                             textTransform: 'uppercase',
@@ -284,13 +293,14 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         ON EVERY CARD, including cards with no insight at all,
                         so the rail holds one height and every photo sits at the
                         same y. A one-line insight sits at the TOP of the box. */}
+                    {/* NO RULE INSIDE THE CARD — separation is a panel edge or
+                        whitespace, never a hairline drawn inside a panel. */}
                     <div
                       style={{
-                        marginTop: 9,
-                        paddingTop: 9,
-                        borderTop: `1px solid ${A.HAIRLINE}`,
+                        marginTop: 12,
                         minHeight: INSIGHT_TWO_LINE_RESERVE,
                       }}
+
                     >
                       {insight && (
                         <div
