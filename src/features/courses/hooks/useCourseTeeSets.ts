@@ -35,6 +35,15 @@ export interface TeeSet {
 
 const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
+/** null / undefined / non-finite stays null. Absence is not zero. */
+function nullableNum(v: unknown): number | null {
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+
+
 function coerce(raw: any): TeeSet[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((r) => ({
