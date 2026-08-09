@@ -49,6 +49,51 @@ const LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 const HCP_IMPROVING = '#16a34a';
 const HCP_DRIFTING = '#dc2626';
 
+// ---------------------------------------------------------------------------
+// Last-change arrow (BRIEF_CHIP_LAST_CHANGE)
+// ---------------------------------------------------------------------------
+// The chip's arrow describes the member's MOST RECENT index movement — the
+// difference between the current value and the distinct value before it — not a
+// 90-day verdict. A quarter that drifted up must not contradict an index that
+// fell at the weekend.
+//
+// Source: the existing whsKeys.history query with 'all' (already warm in cache
+// from other handicap surfaces), so no new query and no window guesswork on the
+// fetch side. Staleness is applied in memory instead: movements land a median
+// 4.75 days apart (p75 11d, p90 16d), so a 30-day recency window covers an
+// ordinary gap between counting rounds without narrating a dormant season.
+const HCP_MOVE_MAX_AGE_DAYS = 30;
+const HCP_MOVE_EPSILON = 0.05;
+
+type HcpMove = 'improving' | 'drifting' | 'none';
+
+function lastIndexMove(
+  history: { observed_at: string; handicap_index: number }[] | undefined,
+): HcpMove {
+  if (!history || history.length < 2) return 'none';
+  // history is ascending; walk back to the first point that differs from the
+  // latest value — that boundary is the last actual change.
+  const latest = history[history.length - 1];
+  const current = Number(latest.handicap_index);
+  if (!Number.isFinite(current)) return 'none';
+
+  for (let i = history.length - 2; i >= 0; i--) {
+    const prev = Number(history[i].handicap_index);
+    if (!Number.isFinite(prev)) continue;
+    if (Math.abs(prev - current) < HCP_MOVE_EPSILON) continue;
+
+    // The movement happened at history[i + 1] — the first point holding the
+    // current value after the previous one.
+    const movedAt = new Date(history[i + 1].observed_at).getTime();
+    const ageDays = (Date.now() - movedAt) / 86_400_000;
+    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return 'none';
+
+    return current < prev ? 'improving' : 'drifting';
+  }
+
+  return 'none';
+}
+
 function glassStyle(tone: ChromeTone): React.CSSProperties {
   const isLight = tone === 'light';
   return {
