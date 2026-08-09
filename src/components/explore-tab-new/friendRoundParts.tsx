@@ -117,3 +117,231 @@ export function referenceLine(
 
   return null;
 }
+
+// ===========================================================================
+// THE INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET)
+//
+// One line per round, chosen from eleven states in strict precedence: the
+// rarest true thing wins. Every state is a claim we can prove from the round's
+// own stats or the friend's history at that course — nothing is inferred, and a
+// state that cannot be proven is skipped rather than softened.
+//
+// DEDUPLICATION. A rail of five cards all saying "Their best here" reads like a
+// template, so each kind may appear at most twice down one rail; a third
+// occurrence falls through to the next state that resolves. Precedence is
+// unchanged — only repetition is capped.
+// ===========================================================================
+
+export type InsightKind =
+  | 'record'
+  | 'ace'
+  | 'albatross'
+  | 'first_sub_80'
+  | 'best_here'
+  | 'nines'
+  | 'bogey_free'
+  | 'run'
+  | 'haul'
+  | 'vs_avg'
+  | 'first_here';
+
+export interface RoundInsight {
+  kind: InsightKind;
+  text: string;
+}
+
+type T = (k: string, o?: Record<string, unknown>) => string;
+
+/** Max appearances of one kind down a single rail / sheet. */
+const KIND_CAP = 2;
+
+/** The two nines must differ by this many shots before the split is a story. */
+const NINES_MIN_SPREAD = 4;
+
+const BIRDIE_RUN_MIN = 3;
+const PAR_RUN_MIN = 9;
+
+/** "7th", "3rd" — English ordinals for hole numbers inside the copy. */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
+
+/** "Level" / "2 under" / "3 over" — the nine fragment. */
+function nineFragment(toPar: number, t: T): string {
+  if (toPar === 0) return t('discover.friendsRail.insight.parLevel', { defaultValue: 'Level' });
+  return toPar < 0
+    ? t('discover.friendsRail.insight.parUnder', { defaultValue: '{{n}} under', n: Math.abs(toPar) })
+    : t('discover.friendsRail.insight.parOver', { defaultValue: '{{n}} over', n: toPar });
+}
+
+/** Ordered candidate list for one round; the caller picks the first allowed. */
+function candidatesFor(row: FriendRoundRow, t: T): RoundInsight[] {
+  const out: RoundInsight[] = [];
+  const push = (kind: InsightKind, text: string) => out.push({ kind, text });
+
+  // 1. A guarded, current course record.
+  if (row.is_course_record) {
+    push('record', t('discover.friendsRail.insight.record', { defaultValue: 'A new course record here' }));
+  }
+
+  // 2. Hole in one — with the hole when the card tells us which.
+  if (Number(row.holes_in_one ?? 0) >= 1) {
+    push(
+      'ace',
+      row.ace_hole != null
+        ? t('discover.friendsRail.insight.aceAtHole', {
+            defaultValue: 'A hole in one at the {{hole}}',
+            hole: ordinal(row.ace_hole),
+          })
+        : t('discover.friendsRail.insight.ace', { defaultValue: 'A hole in one' }),
+    );
+  }
+
+  // 3. Albatross.
+  if (Number(row.albatrosses ?? 0) >= 1) {
+    push(
+      'albatross',
+      row.albatross_hole != null
+        ? t('discover.friendsRail.insight.albatrossAtHole', {
+            defaultValue: 'An albatross at the {{hole}}',
+            hole: ordinal(row.albatross_hole),
+          })
+        : t('discover.friendsRail.insight.albatross', { defaultValue: 'An albatross' }),
+    );
+  }
+
+  // 4. Their first round under 80, ever.
+  if (row.is_first_sub_80) {
+    push('first_sub_80', t('discover.friendsRail.insight.firstSub80', {
+      defaultValue: 'Their first round under 80',
+    }));
+  }
+
+  // 5. Their best at this course — needs a history to be best OF.
+  if (
+    row.gross != null &&
+    row.best_here != null &&
+    row.rounds_here != null &&
+    row.rounds_here > 1 &&
+    row.gross <= row.best_here
+  ) {
+    push('best_here', t('discover.friendsRail.bestHere', {
+      defaultValue: 'Their best here, of {{count}} rounds',
+      count: row.rounds_here,
+    }));
+  }
+
+  // 6. Two different nines. Only when the spread is wide enough to be a story.
+  if (row.front_nine_to_par != null && row.back_nine_to_par != null) {
+    const spread = Math.abs(row.front_nine_to_par - row.back_nine_to_par);
+    if (spread >= NINES_MIN_SPREAD) {
+      push('nines', t('discover.friendsRail.insight.nines', {
+        defaultValue: '{{front}} after nine, then {{back}} coming home',
+        front: nineFragment(row.front_nine_to_par, t),
+        back: nineFragment(row.back_nine_to_par, t).toLowerCase(),
+      }));
+    }
+  }
+
+  // 7. Bogey free.
+  if (row.clean_card === true) {
+    push('bogey_free', t('discover.friendsRail.insight.bogeyFree', { defaultValue: 'A bogey-free card' }));
+  }
+
+  // 8. A run — birdies first, then a long stretch of par or better.
+  const birdieRun = Number(row.longest_birdie_run ?? 0);
+  const parRun = Number(row.longest_par_or_better_run ?? 0);
+  if (birdieRun >= BIRDIE_RUN_MIN) {
+    push('run', t('discover.friendsRail.insight.birdieRun', {
+      defaultValue: '{{count}} birdies in a row',
+      count: birdieRun,
+    }));
+  } else if (parRun >= PAR_RUN_MIN) {
+    push('run', t('discover.friendsRail.insight.parRun', {
+      defaultValue: '{{count}} holes in par or better',
+      count: parRun,
+    }));
+  }
+
+  // 9. A haul — eagles outrank birdies.
+  const eagles = Number(row.eagles ?? 0);
+  const birdies = Number(row.birdies ?? 0);
+  if (eagles >= 1) {
+    push('haul', t('discover.friendsRail.insight.eagles', {
+      defaultValue: '{{count}} eagles',
+      count: eagles,
+    }));
+  } else if (birdies >= 4) {
+    push('haul', t('discover.friendsRail.insight.birdies', {
+      defaultValue: '{{count}} birdies',
+      count: birdies,
+    }));
+  }
+
+  // 10. Against their own average here.
+  if (row.gross != null && row.avg_gross_here != null && (row.rounds_here ?? 0) > 1) {
+    const d = Math.round((row.avg_gross_here - row.gross) * 10) / 10;
+    if (Math.abs(d) >= 0.05) {
+      const figure = Math.abs(d).toFixed(1);
+      push(
+        'vs_avg',
+        d > 0
+          ? t('discover.friendsRail.betterThanAvg', {
+              defaultValue: '{{figure}} better than their average here',
+              figure,
+            })
+          : t('discover.friendsRail.worseThanAvg', {
+              defaultValue: '{{figure}} worse than their average here',
+              figure,
+            }),
+      );
+    }
+  }
+
+  // 11. Their first visit.
+  if (row.rounds_here === 1) {
+    push('first_here', t('discover.friendsRail.firstHere', { defaultValue: 'Their first round here' }));
+  }
+
+  return out;
+}
+
+/**
+ * Resolve one insight per round across a list, applying the repetition cap in
+ * list order. Rounds with nothing true get no line at all — the caller renders
+ * nothing rather than a dash.
+ */
+export function buildInsightMap(
+  rows: FriendRoundRow[],
+  t: T,
+): Map<string, RoundInsight> {
+  const used = new Map<InsightKind, number>();
+  const out = new Map<string, RoundInsight>();
+  for (const row of rows) {
+    const candidates = candidatesFor(row, t);
+    let chosen = candidates.find((c) => (used.get(c.kind) ?? 0) < KIND_CAP);
+    // Everything this round can say is already saturated — say the rarest
+    // anyway rather than leaving the card mute.
+    if (!chosen && candidates.length > 0) chosen = candidates[0];
+    if (!chosen) continue;
+    used.set(chosen.kind, (used.get(chosen.kind) ?? 0) + 1);
+    out.set(row.round_id, chosen);
+  }
+  return out;
+}
+
+/** Single-row resolution, for surfaces that render one card in isolation. */
+export function insightFor(row: FriendRoundRow, t: T): RoundInsight | null {
+  return candidatesFor(row, t)[0] ?? null;
+}
