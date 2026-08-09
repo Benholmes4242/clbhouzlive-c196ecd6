@@ -293,13 +293,14 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         ON EVERY CARD, including cards with no insight at all,
                         so the rail holds one height and every photo sits at the
                         same y. A one-line insight sits at the TOP of the box. */}
+                    {/* NO RULE INSIDE THE CARD — separation is a panel edge or
+                        whitespace, never a hairline drawn inside a panel. */}
                     <div
                       style={{
-                        marginTop: 9,
-                        paddingTop: 9,
-                        borderTop: `1px solid ${A.HAIRLINE}`,
+                        marginTop: 12,
                         minHeight: INSIGHT_TWO_LINE_RESERVE,
                       }}
+
                     >
                       {insight && (
                         <div
