@@ -1301,7 +1301,7 @@
       "dismiss": "Dismiss"
     },
     "live": "Live",
-    "latest": "Live",
+    "latest": "Latest",
     "roundThru": "R{{round}} · thru {{thru}}",
     "thruOnly": "Thru {{thru}}",
     "leader": "Leader",
@@ -1338,6 +1338,15 @@
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
       }
+    },
+    "tour": {
+      "round": "Round",
+      "thru": "Thru",
+      "thruF": "F",
+      "second": "Second",
+      "clear": "{{count}} clear",
+      "clear_one": "{{count}} clear",
+      "nTied": "{{count}} tied"
     }
   },
   "statBrowse": {

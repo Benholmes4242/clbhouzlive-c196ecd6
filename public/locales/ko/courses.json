@@ -780,7 +780,7 @@
       "dismiss": "Dismiss"
     },
     "live": "라이브",
-    "latest": "라이브",
+    "latest": "Latest",
     "roundThru": "R{{round}} · {{thru}}홀 진행",
     "thruOnly": "{{thru}}홀 진행",
     "leader": "선두",
@@ -823,6 +823,15 @@
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
       }
+    },
+    "tour": {
+      "round": "Round",
+      "thru": "Thru",
+      "thruF": "F",
+      "second": "Second",
+      "clear": "{{count}} clear",
+      "clear_one": "{{count}} clear",
+      "nTied": "{{count}} tied"
     }
   },
   "statBrowse": {
