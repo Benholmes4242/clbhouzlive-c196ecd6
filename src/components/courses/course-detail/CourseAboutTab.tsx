@@ -161,7 +161,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           renders nothing (no tee card, no hole analytics) leaves no gap
           behind it. Fixed spacers used to strand 36px under the pills. */}
       <div style={{ display: 'grid', gap: 24 }}>
-        <CourseCardPanel courseId={course.id} />
+        <CourseCardPanel courseId={course.id} courseName={course.name} />
 
         {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
         <CourseAnalyticsPanels courseId={course.id} />
