@@ -305,15 +305,16 @@ export function ReviewTile({
           />
         </span>
 
-        {/* BOTTOM BLOCK — course name as headline, then byline. */}
-        <div style={{ position: 'absolute', left: 10, right: 10, bottom: 10 }}>
+        {/* BOTTOM BLOCK — course name as headline (two lines maximum, so a long
+            club name cannot crowd the byline), then the byline. */}
+        <div style={{ position: 'absolute', left: 13, right: 13, bottom: 11 }}>
           <div
             style={{
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 800,
               color: '#FFFFFF',
-              letterSpacing: '-0.015em',
-              lineHeight: 1.18,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.12,
               ...clamp(2),
             }}
           >
@@ -321,10 +322,9 @@ export function ReviewTile({
           </div>
           <div
             style={{
+              ...LABEL,
+              fontSize: 7,
               marginTop: 5,
-
-              fontSize: 9.5,
-              fontWeight: 700,
               color: 'rgba(255,255,255,0.62)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -336,6 +336,7 @@ export function ReviewTile({
             <span style={FIGS}>{relativeAge(r.at, t)}</span>
           </div>
         </div>
+
       </CourseImageFallback>
     </button>
   );
