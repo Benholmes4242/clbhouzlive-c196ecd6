@@ -889,13 +889,15 @@
       "slopeLabel": "Slope rating",
       "lengthLabel": "Length",
       "courseRating": "Course rating",
-      "vsStandard": "vs standard course rating of {{standard}}",
-      "playsHarder": "Plays harder than an average course for a scratch golfer.",
-      "playsEasier": "Plays easier than an average course for a scratch golfer.",
-      "playsAverage": "Plays to average difficulty for a scratch golfer.",
+      "vsStandard": "vs standard slope of {{standard}}",
+      "playsHarder": "Higher handicaps give up more strokes here, relative to a scratch golfer, than at an average course.",
+      "playsEasier": "Higher handicaps give up fewer strokes here, relative to a scratch golfer, than at an average course.",
+      "playsAverage": "Higher handicaps give up about as many strokes here, relative to a scratch golfer, as at an average course.",
       "yardsUnit": "yards",
       "ydsUnit": "yds",
-      "seeFullShort": "See the full card"
+      "seeFullShort": "See the full card",
+      "fullCard": "Full card",
+      "standardMark": "Standard {{standard}}"
     },
     "plays": {
       "fieldAvg": "Field avg",
