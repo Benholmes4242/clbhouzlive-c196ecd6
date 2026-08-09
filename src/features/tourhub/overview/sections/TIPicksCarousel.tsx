@@ -1095,7 +1095,8 @@ function AllPicksSheet({
                         score={live.score}
                         position={live.position}
                         positionTied={live.positionTied}
-                        thru={live.thru}
+                        status={live.status}
+
                         status={live.status}
                         align="right"
                       />
