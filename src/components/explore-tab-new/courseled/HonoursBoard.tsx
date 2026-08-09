@@ -122,7 +122,7 @@ export function HonoursRow({
             fontSize: 13.5,
             fontWeight: 800,
             color: A.INK,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.015em',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -133,10 +133,10 @@ export function HonoursRow({
         <span
           style={{
             display: 'block',
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.35,
+            color: A.MUTE,
+            lineHeight: 1.32,
             marginTop: 2,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -148,9 +148,9 @@ export function HonoursRow({
         <span
           style={{
             display: 'block',
-            fontSize: 11,
-            fontWeight: e.isOwn ? 700 : 600,
-            lineHeight: 1.35,
+            fontSize: 11.5,
+            fontWeight: e.isOwn ? 800 : 600,
+            lineHeight: 1.32,
             color: e.isOwn ? A.AMBER_DEEP : A.BODY,
             marginTop: 1,
             overflow: 'hidden',
@@ -162,9 +162,19 @@ export function HonoursRow({
         </span>
       </span>
 
-      <span style={{ ...NUMF, fontSize: 16, color: GOLD_INK, flexShrink: 0 }}>
+      {/* THE YEAR ANCHORS THE CHRONOLOGY, it no longer leads the row. */}
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 9,
+          color: GOLD_INK,
+          flexShrink: 0,
+          fontVariantNumeric: 'tabular-nums lining',
+        }}
+      >
         {formatYearNumeric(e.at)}
       </span>
+
     </button>
   );
 }
