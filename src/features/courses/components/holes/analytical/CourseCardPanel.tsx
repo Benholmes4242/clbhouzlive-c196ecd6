@@ -556,8 +556,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
           }}
         >
           <span style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</span>
-            {t('courses:teeCard.eyebrow')}
-          </span>
           <button
             type="button"
             onClick={openSheet}
