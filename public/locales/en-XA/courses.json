@@ -777,9 +777,10 @@
       "sheetCaption": "{{count}} reviews"
     },
     "prompt": {
-      "statusRate": "[Recently played · not rated yet]",
-      "statusFinish": "[Rated · detail missing]",
-      "statusPhoto": "[Played · add a photo?]",
+      "whenPlayed": "[Played {{when}}]",
+      "whenRated": "[Rated {{when}}]",
+      "statusNoDate": "[On your card]",
+      "statusFinishNoDate": "[Rated · detail missing]",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",

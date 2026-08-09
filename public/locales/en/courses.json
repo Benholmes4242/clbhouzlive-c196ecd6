@@ -1226,7 +1226,6 @@
       "albatross": "Albatross - the {{hole}}, par {{par}}",
       "albatrossTight": "Albatross, {{hole}} - par {{par}}",
       "albatrossNoHole": "Albatross",
-
       "birdieHaul_one": "Birdie haul - {{count}} in a round",
       "birdieHaul_other": "Birdie haul - {{count}} in a round",
       "compactEagle": "Eagle - {{hole}}",
@@ -1257,7 +1256,6 @@
     "mostPlayed": "Most played this week",
     "trackedRounds": "Tracked rounds",
     "roundsLabel": "Rounds",
-
     "vsLastWeek": "+{{count}} vs last week",
     "when": {
       "today": "Today",
@@ -1282,7 +1280,6 @@
     "mostPlayedSheetCaption": "{{count}} courses",
     "honoursSeeAll": "See all {{count}}",
     "honoursSheetCaption": "{{count}} entries",
-
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",
@@ -1309,9 +1306,10 @@
       "actionReview": "Like this review"
     },
     "prompt": {
-      "statusRate": "Recently played · not rated yet",
-      "statusFinish": "Rated · detail missing",
-      "statusPhoto": "Played · add a photo?",
+      "whenPlayed": "Played {{when}}",
+      "whenRated": "Rated {{when}}",
+      "statusNoDate": "On your card",
+      "statusFinishNoDate": "Rated · detail missing",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
