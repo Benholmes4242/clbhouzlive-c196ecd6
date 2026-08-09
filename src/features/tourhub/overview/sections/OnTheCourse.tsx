@@ -51,7 +51,9 @@ interface GroupPlayerShape {
   name?: string;
   photo_url?: string | null;
   headshot_override?: string | null;
+  position?: number | null;
   score?: number | string | null;
+
   today?: number | string | null;
   thru?: number | null;
   status?: string | null;
@@ -73,6 +75,9 @@ interface GroupShape {
  */
 const CARD_MIN_W = 248;
 const CARD_H_EST = 170;
+/** Live dot on a still-out group's status line. */
+const LIVE_DOT = V4.live;
+
 
 /**
  * The "FEATURED GROUP" kicker above the featured cards. It renders through the
