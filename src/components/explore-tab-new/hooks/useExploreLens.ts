@@ -13,6 +13,7 @@ import { useSearchParams } from 'react-router-dom';
  */
 export type ExploreLens = 'suggested' | 'top_100' | 'played' | 'worldwide';
 
+// Validation-only; intentionally not kept in display order (see ScopePills LENS_ORDER).
 const LENSES: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
 
 export const DEFAULT_LENS: ExploreLens = 'suggested';
