@@ -398,7 +398,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   const posText = posNum != null ? `${tied ? 'T' : ''}${posNum}` : '';
 
                   const total = formatScore(lbRow ? lbRow.score : (p.score as number | string | null));
-                  const todayVal = lbRow ? lbRow.today : (p.today as number | string | null);
+                  // Prefer the round-scoped leaderboard figure; fall back to
+                  // the group RPC's own today when the board's is round-gated null.
+                  const todayVal = (lbRow?.today ?? (p.today as number | string | null)) ?? null;
                   const today = formatScore(todayVal);
 
                   return (
