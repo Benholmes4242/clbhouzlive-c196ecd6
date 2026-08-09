@@ -236,7 +236,8 @@
       "axisEasier": "Mas facil",
       "axisHarder": "Mas dificil",
       "finishedLabel": "Finalizado",
-      "todaySuffix": "{{value}} hoy"
+      "todaySuffix": "{{value}} hoy",
+      "fieldAverageWaiting": "Promedio del campo cuando haya {{n}} rondas"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -232,7 +232,8 @@
       "axisEasier": "쉬움",
       "axisHarder": "어려움",
       "finishedLabel": "종료",
-      "todaySuffix": "오늘 {{value}}"
+      "todaySuffix": "오늘 {{value}}",
+      "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
