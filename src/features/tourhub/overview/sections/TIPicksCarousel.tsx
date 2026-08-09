@@ -376,7 +376,6 @@ function CardStateSlot({
           positionTied={live.positionTied}
           status={live.status}
 
-          status={live.status}
           align="left"
         />
       );
