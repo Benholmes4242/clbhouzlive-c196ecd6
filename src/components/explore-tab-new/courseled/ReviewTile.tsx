@@ -6,6 +6,7 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
 import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
