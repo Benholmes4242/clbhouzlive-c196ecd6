@@ -432,49 +432,73 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   })()
                 ) : (
 
-                  cells.length > 0 && (
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-                        alignContent: 'center',
-                        height: STAT_BLOCK_H,
-                        boxSizing: 'border-box',
-                        padding: '7px 11px',
-                      }}
-                    >
-                      {cells.map(([l, v]) => (
-                        <div key={l} style={{ textAlign: 'center' }}>
-                          <div style={LABEL}>{l}</div>
-                          <div style={{ ...NUMF, fontSize: 14.5, color: A.INK, marginTop: 2 }}>{v}</div>
+                  (() => {
+                    // UPCOMING takes the SAME shape as live: a line 1 with the
+                    // headline fact right-aligned, then the three-up. Cells with
+                    // no value are never pushed, so the row rebalances.
+                    const cellsUp: Array<[string, string, string]> = [];
+                    if (e.defendingChampion) {
+                      cellsUp.push([
+                        t('discover.defending', 'Defending'),
+                        surname(e.defendingChampion),
+                        A.INK,
+                      ]);
+                    }
+                    for (const [l, v] of cells) cellsUp.push([l, v, A.INK]);
+                    if (cellsUp.length === 0) return null;
+                    const days = daysUntil(e.startDate);
+                    return (
+                      <div style={{ padding: '12px 14px 13px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
+                          <span
+                            style={{
+                              ...LABEL,
+                              fontSize: 6.5,
+                              fontWeight: 800,
+                              letterSpacing: '0.13em',
+                              color: A.DIM,
+                            }}
+                          >
+                            {t('discover.tour.startsIn', 'Starts in')}
+                          </span>
+                          <span
+                            style={{
+                              ...NUMF,
+                              marginLeft: 'auto',
+                              fontSize: 15,
+                              fontWeight: 800,
+                              letterSpacing: '-0.025em',
+                              color: A.INK,
+                            }}
+                          >
+                            {days <= 0
+                              ? t('discover.tour.startsToday', 'Today')
+                              : t('discover.tour.nDays', {
+                                  defaultValue: '{{count}} days',
+                                  count: days,
+                                })}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  )
+                        <ThreeUp cells={cellsUp} />
+                      </div>
+                    );
+                  })()
                 )}
               </button>
 
               {/* CONDENSE: the footer only takes height when it carries
-                  something. An empty reserved band left a dead gap under the
-                  round / thru / second row on every live card. */}
-              {(((!peek || peek.leaderScore == null) && !!e.defendingChampion) ||
-                (!!courseId && mediaCount > 0)) && (
+                  something. The defending champion now lives in the three-up,
+                  so the footer is the media chip alone. */}
+              {!!courseId && mediaCount > 0 && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  padding: '0 11px 9px',
+                  padding: '0 14px 11px',
                 }}
               >
-                {/* The tour badge over the image already names the tour, so the
-                    white area carries only the defending champion when idle. */}
-                {(!peek || peek.leaderScore == null) && e.defendingChampion && (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {t('discover.defending', 'Defending')} {DOT}{' '}
-                    <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
-                  </span>
-                )}
+
 
 
 
