@@ -102,7 +102,7 @@ export function OneThingRow({ userId }: Props) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 11,
         padding: '0 16px',
         margin: '16px 0 20px',
         fontFamily: SANS,
@@ -110,12 +110,14 @@ export function OneThingRow({ userId }: Props) {
       }}
     >
       {shown.courseId && (
+        // PX RADIUS, not a percentage: 12px is the squircle used everywhere
+        // else, and it does not re-shape itself if the size ever changes.
         <CourseImageFallback
           courseId={shown.courseId}
           courseName={shown.courseName}
           imageUrl={shown.thumbnail}
           initialsSize={12}
-          style={{ width: 38, height: 38, borderRadius: '34%', flexShrink: 0 }}
+          style={{ width: 36, height: 36, borderRadius: 12, flexShrink: 0 }}
         />
       )}
 
@@ -127,6 +129,7 @@ export function OneThingRow({ userId }: Props) {
             fontSize: 13,
             fontWeight: 800,
             lineHeight: 1.3,
+            letterSpacing: '-0.015em',
             color: A.INK,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -135,18 +138,21 @@ export function OneThingRow({ userId }: Props) {
         >
           {shown.courseName}
         </div>
+        {/* A LABEL, so the course name clearly leads the row. */}
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 600,
-            lineHeight: 1.35,
-            color: A.BODY,
+            ...LABEL,
+            fontSize: 6.5,
+            color: A.DIM,
+            marginTop: 4,
             whiteSpace: 'nowrap',
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {status}
         </div>
       </div>
+
 
 
 
