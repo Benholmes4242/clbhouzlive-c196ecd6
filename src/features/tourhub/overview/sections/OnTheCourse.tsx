@@ -64,8 +64,16 @@ interface GroupShape {
   players?: GroupPlayerShape[];
 }
 
-const CARD_MIN_W = 218;
-const CARD_H_EST = 150;
+/**
+ * CARD_MIN_W widened 218 -> 248. The row now carries a 22px position column,
+ * a 32px avatar and a two-line figure stack; at 218 a full tour name
+ * ("Scottie Scheffler") ellipsed after ~7 characters. At 248 the name column
+ * clears ~90px and reads. One tile plus a clear peek of the next still shows
+ * at 390dp, so the rail still announces that it scrolls.
+ */
+const CARD_MIN_W = 248;
+const CARD_H_EST = 170;
+
 /**
  * The "FEATURED GROUP" kicker above the featured cards. It renders through the
  * canonical KICKER token (10 / 700 / 0.16em) in A.MUTE — it is subordinate to
