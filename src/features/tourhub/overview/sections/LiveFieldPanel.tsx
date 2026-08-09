@@ -477,7 +477,6 @@ export function LiveFieldPanel({
             gap: 10,
           }}
         >
-
           <Cell
             label={t('overview.onTheCourse.lowRoundLabel')}
             value={low ? formatToPar(low.toPar) : '—'}
@@ -486,6 +485,7 @@ export function LiveFieldPanel({
           />
           {field && field.count > 0 && (
             <Cell
+              align="right"
               label={t('overview.onTheCourse.underParTodayLabel')}
               value={t('overview.onTheCourse.underParTodayValue', {
                 n: field.underPar,
@@ -496,12 +496,13 @@ export function LiveFieldPanel({
           )}
         </div>
 
-        {/* Ranked hole ladder */}
+        {/* Ranked hole chart */}
         {rows.length > 0 && (
-          <div style={{ marginTop: 12, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}` }}>
+          <div style={{ marginTop: 16, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}` }}>
             <HoleLadder rows={rows} />
           </div>
         )}
+
 
       </div>
     </div>
