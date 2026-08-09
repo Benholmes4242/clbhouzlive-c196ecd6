@@ -827,7 +827,7 @@
       "dismiss": "Dismiss"
     },
     "live": "En directo",
-    "latest": "En directo",
+    "latest": "Latest",
     "roundThru": "R{{round}} · hoyo {{thru}}",
     "thruOnly": "Hoyo {{thru}}",
     "leader": "Líder",
@@ -870,6 +870,15 @@
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
       }
+    },
+    "tour": {
+      "round": "Round",
+      "thru": "Thru",
+      "thruF": "F",
+      "second": "Second",
+      "clear": "{{count}} clear",
+      "clear_one": "{{count}} clear",
+      "nTied": "{{count}} tied"
     }
   },
   "statBrowse": {

@@ -232,7 +232,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         />
                         {peekFresh
                           ? t('discover.live', 'Live')
-                          : t('discover.latest', 'Live')}
+                          : t('discover.latest', 'Latest')}
                       </span>
                     </ImageChip>
                   ) : (
@@ -264,61 +264,134 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   </div>
                 </CourseImageFallback>
 
-                {peek ? (
+                {peek && peek.leaderScore != null ? (
                   (() => {
+                    // ONE SHAPE FOR BOTH STATES (BRIEF_ON_TOUR_TILE_STATE).
+                    // A tie is the more interesting state, so it keeps the
+                    // figure and only swaps the who and margin slots.
                     const tiedCount = peek.leaderTiedExtra + 1;
                     const isTied = tiedCount > 1;
+                    // MARGIN: taken straight off the peek — chasingScore minus
+                    // leaderScore, both to-par, so the difference IS the shots
+                    // clear. Never re-derived from rows.
+                    const margin =
+                      !isTied && peek.chasingScore != null
+                        ? peek.chasingScore - peek.leaderScore
+                        : null;
+                    const thruText =
+                      peek.thru == null
+                        ? null
+                        : peek.thru >= 18
+                          ? t('discover.tour.thruF', 'F')
+                          : String(peek.thru);
+                    const cellsLive: Array<[string, string, string]> = [];
+                    if (peek.round != null) {
+                      // A count, not a score: INK, never the score colours.
+                      cellsLive.push([
+                        t('discover.tour.round', 'Round'),
+                        `R${peek.round}`,
+                        A.INK,
+                      ]);
+                    }
+                    if (thruText) {
+                      cellsLive.push([t('discover.tour.thru', 'Thru'), thruText, A.INK]);
+                    }
+                    if (peek.chasingScore != null) {
+                      // A to-par figure, so it takes the score treatment.
+                      cellsLive.push([
+                        t('discover.tour.second', 'Second'),
+                        fmtScore(peek.chasingScore),
+                        scoreColor(peek.chasingScore),
+                      ]);
+                    }
                     return (
-                      <div
-                        style={{
-                          height: STAT_BLOCK_H,
-                          boxSizing: 'border-box',
-                          padding: '7px 11px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 8,
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ ...LABEL, fontSize: 8.5, color: A.INK }}>
-                            {isTied
-                              ? t('discover.tiedLead', 'Tied lead')
-                              : t('discover.leader', 'Leader')}
-                          </div>
-                          <div
+                      <div style={{ padding: '8px 11px 10px' }}>
+                        {/* LINE 1 — the figure, who holds it, and the margin. */}
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
+                          <span
                             style={{
-                              fontSize: 13,
+                              ...NUMF,
+                              fontSize: 24,
                               fontWeight: 800,
+                              lineHeight: 1,
+                              color: scoreColor(peek.leaderScore),
+                            }}
+                          >
+                            {fmtScore(peek.leaderScore)}
+                          </span>
+                          <span
+                            style={{
+                              flex: 1,
+                              minWidth: 0,
+                              fontSize: 13,
+                              fontWeight: 700,
                               color: A.INK,
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
-                              marginTop: 2,
                             }}
                           >
                             {isTied
-                              ? t('discover.playersTied', {
-                                  defaultValue: '{{count}} players tied',
+                              ? t('discover.tour.nTied', {
+                                  defaultValue: '{{count}} tied',
                                   count: tiedCount,
                                 })
                               : peek.leaderName}
-                          </div>
+                          </span>
+                          {(isTied || margin != null) && (
+                            <span
+                              style={{
+                                ...LABEL,
+                                fontSize: 8,
+                                letterSpacing: '0.13em',
+                                color: A.DIM,
+                                marginLeft: 'auto',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {isTied
+                                ? t('discover.tiedLead', 'Tied lead')
+                                : t('discover.tour.clear', {
+                                    defaultValue: '{{count}} clear',
+                                    count: margin as number,
+                                  })}
+                            </span>
+                          )}
                         </div>
-                        <span
-                          style={{
-                            ...NUMF,
-                            fontSize: 22,
-                            fontWeight: 800,
-                            lineHeight: 1,
-                            color: scoreColor(peek.leaderScore),
-                          }}
-                        >
-                          {fmtScore(peek.leaderScore)}
-                        </span>
+
+                        {/* LINE 2 — does the lead mean anything yet. */}
+                        {cellsLive.length > 0 && (
+                          <div
+                            style={{
+                              marginTop: 11,
+                              paddingTop: 10,
+                              borderTop: `1px solid ${A.HAIRLINE}`,
+                              display: 'grid',
+                              gridTemplateColumns: `repeat(${cellsLive.length}, 1fr)`,
+                            }}
+                          >
+                            {cellsLive.map(([label, value, tone], i) => (
+                              <div
+                                key={label}
+                                style={{ textAlign: i === 0 ? 'left' : 'center' }}
+                              >
+                                <div style={{ ...NUMF, fontSize: 15, fontWeight: 800, color: tone }}>
+                                  {value}
+                                </div>
+                                <div
+                                  style={{ ...LABEL, fontSize: 7.5, color: A.DIM, marginTop: 3 }}
+                                >
+                                  {label}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })()
                 ) : (
+
                   cells.length > 0 && (
                     <div
                       style={{
@@ -352,7 +425,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
               >
                 {/* The tour badge over the image already names the tour, so the
                     white area carries only the defending champion when idle. */}
-                {!peek && e.defendingChampion && (
+                {(!peek || peek.leaderScore == null) && e.defendingChampion && (
                   <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
                     {t('discover.defending', 'Defending')} {DOT}{' '}
                     <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
