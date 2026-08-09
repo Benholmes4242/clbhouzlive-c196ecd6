@@ -1256,6 +1256,8 @@
     "momentsOverline_one": "{{count}} course",
     "mostPlayed": "Most played this week",
     "trackedRounds": "Tracked rounds",
+    "roundsLabel": "Rounds",
+
     "vsLastWeek": "+{{count}} vs last week",
     "when": {
       "today": "Today",
