@@ -668,7 +668,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         open={open}
         onClose={closeSheet}
         variant="light"
-        maxHeight="90dvh"
         ariaLabelledBy="course-card-sheet-title"
         style={{
           height: '75dvh',
@@ -679,22 +678,25 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         }}
       >
         <div style={{ padding: '0 16px 12px' }}>
-          <div style={{ ...LABEL, fontSize: 9, letterSpacing: '0.14em' }}>
-            {t('courses:teeCard.eyebrow')}
-          </div>
+          <div style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</div>
+          {/* The heading names the COURSE - it must not restate the tee pill. */}
           <h2
             id="course-card-sheet-title"
             style={{
               margin: '3px 0 0',
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 800,
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.025em',
+              lineHeight: 1.1,
               color: A.INK,
             }}
           >
-            {t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}
+            {courseName && courseName.trim()
+              ? shortCourseName(courseName)
+              : t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}
           </h2>
         </div>
+
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', fontFamily: SANS, ...FIGS }}>
           <SheetBody courseId={courseId} tees={tees} initialTee={active.tee_label} />
         </div>
