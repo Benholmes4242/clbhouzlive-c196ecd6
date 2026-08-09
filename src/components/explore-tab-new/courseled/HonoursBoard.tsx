@@ -232,7 +232,7 @@ export function HonoursBoard({
               <div
                 style={{
                   ...LABEL,
-                  fontSize: 7,
+                  fontSize: 9,
                   color: A.DIM,
                   marginLeft: 'auto',
                   fontVariantNumeric: 'tabular-nums lining',

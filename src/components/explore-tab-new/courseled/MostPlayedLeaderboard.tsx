@@ -89,7 +89,7 @@ export function MostPlayedLeaderboard({
               <span
                 style={{
                   ...LABEL,
-                  fontSize: 8,
+                  fontSize: 9,
                   color: A.DIM,
                   width: 13,
                   flexShrink: 0,
@@ -129,7 +129,7 @@ export function MostPlayedLeaderboard({
                     style={{
                       ...LABEL,
                       display: 'block',
-                      fontSize: 6.5,
+                      fontSize: 9,
                       color: A.DIM,
                       marginTop: 3,
                       overflow: 'hidden',
@@ -145,7 +145,7 @@ export function MostPlayedLeaderboard({
                     style={{
                       ...LABEL,
                       display: 'block',
-                      fontSize: 6.5,
+                      fontSize: 9,
                       color: A.DIM,
                       marginTop: 2,
                       fontVariantNumeric: 'tabular-nums lining',
@@ -174,7 +174,7 @@ export function MostPlayedLeaderboard({
                   style={{
                     ...LABEL,
                     display: 'block',
-                    fontSize: 6,
+                    fontSize: 9,
                     color: A.DIM,
                     marginTop: 3,
                   }}
