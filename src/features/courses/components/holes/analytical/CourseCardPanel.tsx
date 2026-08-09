@@ -84,6 +84,8 @@ const SCALE_MAX = 155;
 const DOT = 11;
 
 const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
+  const { t } = useTranslation(['courses']);
+
   const pct = (v: number) =>
     ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
   const here = pct(slope);
