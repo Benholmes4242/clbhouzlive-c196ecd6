@@ -24,7 +24,19 @@ export interface DiscoverPrompt {
   courseId: string;
   courseName: string;
   thumbnail: string | null;
+  /**
+   * WHEN the thing happened, so the row can state a fact instead of hedging
+   * with "recently" (BRIEF_ONE_THING_ROW_CRAFT). Every kind already had a date
+   * in the rows it filters on, so NO new fetch was needed:
+   *   rate   — last_played from usePlayedUnratedCourses
+   *   finish — review_date (falling back to created_at) on the rating
+   *   photo  — play_date on the tracked round
+   * Null only when the underlying column is null; the row then keeps a
+   * non-temporal line rather than inventing one.
+   */
+  at: string | null;
 }
+
 
 interface MissingDetailRow {
   course_id: string;
