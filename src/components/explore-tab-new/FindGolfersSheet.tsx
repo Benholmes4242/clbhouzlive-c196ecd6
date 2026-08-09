@@ -267,8 +267,18 @@ function GolferRow({
         ) : null}
       </div>
 
-      {/* THE ACTIONS, inline. NEITHER IS FILLED. */}
-      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+      {/* THE ACTIONS. TWO PILLS INLINE DID NOT FIT: at 320 they left the name
+          129px, under the floor, so Follow drops to the quiet text action
+          beneath Add friend and buys the width back. NEITHER IS FILLED. */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 5,
+          flexShrink: 0,
+        }}
+      >
         <ActionSlot
           settled={requested}
           live={
@@ -286,26 +296,19 @@ function GolferRow({
         <ActionSlot
           settled={!!following}
           live={
-            <Pill
-              border="rgba(14,18,22,0.12)"
-              color={A.BODY}
-              onClick={() => onToggleFollowRow(row, false)}
-            >
+            <TextAction color={A.BODY} onClick={() => onToggleFollowRow(row, false)}>
               {t('discover.findGolfers.follow', 'Follow')}
-            </Pill>
+            </TextAction>
           }
           settledNode={
-            <Pill
-              border={A.BORDER}
-              color={A.MUTE}
-              onClick={() => onToggleFollowRow(row, true)}
-            >
+            <TextAction color={A.MUTE} onClick={() => onToggleFollowRow(row, true)}>
               <Check size={12} strokeWidth={2.6} />
               {t('discover.findGolfers.following', 'Following')}
-            </Pill>
+            </TextAction>
           }
         />
       </div>
+
     </div>
   );
 }
