@@ -71,37 +71,6 @@ export interface PhotoBandProps {
   purse?: number | null;
 }
 
-function statePillText(
-  state: HeroState,
-  t: (k: string, opts?: any) => string,
-): { text: string; tone: 'live' | 'final' | 'upcoming' } {
-  if (state.kind === 'live') {
-    // Round has rolled over but play has not started: show the round only,
-    // with the non-live pill treatment (no LIVE word, no live tint).
-    if (state.roundStatus === 'scheduled') {
-      return {
-        text: `${t('tournament.hero.chip.roundN', { round: state.round, defaultValue: `ROUND ${state.round}` })}`.toUpperCase(),
-        tone: 'upcoming',
-      };
-    }
-    // Platform live marker copy — same string as the leaderboard masthead.
-    return {
-      text: t('tour.roundInProgress', { n: state.round }),
-      tone: 'live',
-    };
-
-  }
-  if (state.kind === 'results') {
-    if (state.variant === 'cancelled') return { text: t('overview.pillState.cancelled'), tone: 'final' };
-    if (state.variant === 'playoff') return { text: t('overview.pillState.playoff'), tone: 'final' };
-    return { text: t('overview.pillState.final'), tone: 'final' };
-  }
-  return {
-    text: state.countdown ? state.countdown.toUpperCase() : t('overview.pillState.upcoming'),
-    tone: 'upcoming',
-  };
-}
-
 function splitTitle(title: string): { main: string; sub: string } {
   // NEVER-KEY: source-derived title tokens (English data fields).
   const m = title.match(/^(.+?(?:CUP|OPEN|CHAMPIONSHIP|INVITATIONAL|CLASSIC))\s+(.+)$/i);
@@ -132,42 +101,7 @@ export function PhotoBand({
   const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
-  const pill = statePillText(state, t);
   const titleSplit = splitTitle(title);
-
-  // Live tone is the platform live marker: a 7px green dot with a soft halo
-  // followed by a plain label. No capsule, no tint, no pulse (broadcast
-  // convention, shared with the leaderboard masthead and the tour menu).
-  const pillTone =
-    pill.tone === 'live'
-      ? {
-          bg: 'transparent',
-          color: 'rgba(255,255,255,0.98)',
-          border: 'transparent',
-          radius: 0,
-          padding: 0,
-          fontSize: 10,
-          letterSpacing: '0.14em',
-        }
-      : pill.tone === 'final'
-        ? {
-            bg: 'rgba(255,255,255,0.14)',
-            color: 'rgba(255,255,255,0.95)',
-            border: 'transparent',
-            radius: 999,
-            padding: '4px 9px',
-            fontSize: 10,
-            letterSpacing: '0.14em',
-          }
-        : {
-            bg: 'rgba(255,255,255,0.14)',
-            color: 'rgba(255,255,255,0.95)',
-            border: 'transparent',
-            radius: 999,
-            padding: '4px 9px',
-            fontSize: 10,
-            letterSpacing: '0.14em',
-          };
 
   return (
     <div
@@ -244,48 +178,6 @@ export function PhotoBand({
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
-        {/* State pill — live is a dot + label, other states keep the capsule */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              padding: pillTone.padding,
-              borderRadius: pillTone.radius,
-              background: pillTone.bg,
-              color: pillTone.color,
-              border: pillTone.border === 'transparent'
-                ? undefined
-                : `1px solid ${pillTone.border}`,
-              fontSize: pillTone.fontSize,
-              fontWeight: 800,
-              letterSpacing: pillTone.letterSpacing,
-              textTransform: 'uppercase',
-              ...NUMERIC_STYLE,
-              backdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
-              WebkitBackdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
-            }}
-          >
-            {pill.tone === 'live' && (
-              <span
-                aria-hidden
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                  background: '#22C55E',
-                  boxShadow: '0 0 0 3px rgba(34,197,94,0.18)',
-                  display: 'inline-block',
-                  flexShrink: 0,
-                }}
-              />
-            )}
-            {pill.text}
-          </span>
-        </div>
-
-
-
-
         {/* Title */}
         <h1
           style={{
