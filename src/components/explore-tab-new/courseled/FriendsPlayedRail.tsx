@@ -29,7 +29,7 @@ import {
   InkAction,
   NUMF,
   SANS,
-  SCRIM_SOFT,
+  
 } from './tokens';
 
 /**
