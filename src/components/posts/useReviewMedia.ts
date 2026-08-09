@@ -29,7 +29,7 @@ export function useReviewMedia(reviewId: string | null | undefined, enabled: boo
       const { data, error } = await supabase
         .from('course_review_media' as any)
         .select('id, media_type, media_url, poster_url, is_cover, created_at')
-        .eq('rating_id', reviewId as string)
+        .eq('review_id', reviewId as string)
         .order('created_at', { ascending: true });
       if (error) throw error;
       return ((data ?? []) as any[])
