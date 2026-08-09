@@ -45,7 +45,7 @@ function fmtRating(n: number | null | undefined): string {
   return n != null && Number.isFinite(n) && n > 0 ? n.toFixed(1) : DASH;
 }
 
-/** Counter cell: figure 17/800 INK over a 7.5/800/0.14em DIM label. */
+/** Counter cell: figure 23/800 INK over a 7.5/800/0.14em DIM label. */
 const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div style={{ textAlign: 'center', minWidth: 0 }}>
     <div
@@ -61,11 +61,11 @@ const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, v
     </div>
     <div
       style={{
-        fontSize: 17,
+        fontSize: 23,
         fontWeight: 800,
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.025em',
         color: A.INK,
-        marginTop: 3,
+        marginTop: 8,
         whiteSpace: 'nowrap',
         ...FIGS,
       }}
@@ -74,6 +74,105 @@ const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, v
     </div>
   </div>
 );
+
+/* ── Slope scale ─────────────────────────────────────────────────────────
+   The full WHS slope range with the 113 standard notched, the span between
+   standard and this course filled, and the course as a ringed ink dot.
+   Neutral ink only - this describes the COURSE, not a score or the member. */
+const SCALE_MIN = 55;
+const SCALE_MAX = 155;
+const DOT = 11;
+
+const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
+  const pct = (v: number) =>
+    ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
+  const here = pct(slope);
+  const std = pct(STANDARD_SLOPE);
+  const left = Math.min(here, std);
+  const width = Math.abs(here - std);
+
+  return (
+    <div style={{ marginTop: 14 }} aria-hidden="true">
+      <div
+        style={{
+          position: 'relative',
+          height: 6,
+          borderRadius: 3,
+          background: 'linear-gradient(90deg, #EEF2F6 0%, #E4E9EF 100%)',
+        }}
+      >
+        {/* Span between standard and this course - works in both directions. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${left}%`,
+            width: `${width}%`,
+            borderRadius: 3,
+            background:
+              'linear-gradient(90deg, rgba(14,18,22,0.30) 0%, rgba(14,18,22,0.62) 100%)',
+          }}
+        />
+        {/* Standard notch, overhanging 3px top and bottom. */}
+        <div
+          style={{
+            position: 'absolute',
+            left: `${std}%`,
+            top: -3,
+            bottom: -3,
+            width: 1.5,
+            marginLeft: -0.75,
+            background: 'rgba(14,18,22,0.28)',
+          }}
+        />
+        {/* This course. Clamped so the dot never hangs off the track. */}
+        <div
+          style={{
+            position: 'absolute',
+            left: `clamp(${DOT / 2}px, ${here}%, calc(100% - ${DOT / 2}px))`,
+            top: '50%',
+            width: DOT,
+            height: DOT,
+            marginLeft: -DOT / 2,
+            marginTop: -DOT / 2,
+            borderRadius: '50%',
+            background: A.INK,
+            border: '2.5px solid #FFFFFF',
+            boxShadow: '0 1px 3px rgba(14,18,22,0.22)',
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+      {/* Range labels. Standard is centred on the notch but kept inside the
+          card, and the range ends hold their own space so nothing overlaps. */}
+      <div
+        style={{
+          position: 'relative',
+          marginTop: 6,
+          display: 'flex',
+          justifyContent: 'space-between',
+          ...LABEL,
+          fontSize: 7,
+        }}
+      >
+        <span>{SCALE_MIN}</span>
+        <span
+          style={{
+            position: 'absolute',
+            left: `clamp(22%, ${std}%, 78%)`,
+            transform: 'translateX(-50%)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {`Standard ${STANDARD_SLOPE}`}
+        </span>
+        <span>{SCALE_MAX}</span>
+      </div>
+    </div>
+  );
+};
+
 
 const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
 
