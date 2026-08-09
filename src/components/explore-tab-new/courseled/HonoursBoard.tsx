@@ -68,17 +68,14 @@ export function HonoursRow({
 }) {
   const { t } = useTranslation('courses');
   const isAce = e.kind === 'ace';
-  const par = e.holePar ?? (isAce ? 3 : 5);
   const tappable = !!onPress && !!e.scoreId;
 
   const feat =
     e.holeNo != null
       ? t(
           isAce ? 'discover.row.aceTight' : 'discover.row.albatrossTight',
-          isAce
-            ? 'Hole in one, {{hole}} - par {{par}}'
-            : 'Albatross, {{hole}} - par {{par}}',
-          { hole: formatOrdinal(e.holeNo), par },
+          isAce ? 'Hole in one, {{hole}} hole' : 'Albatross, {{hole}} hole',
+          { hole: formatOrdinal(e.holeNo) },
         )
       : t(
           isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
@@ -235,7 +232,7 @@ export function HonoursBoard({
               <div
                 style={{
                   ...LABEL,
-                  fontSize: 7,
+                  fontSize: 9,
                   color: A.DIM,
                   marginLeft: 'auto',
                   fontVariantNumeric: 'tabular-nums lining',
