@@ -236,7 +236,8 @@
       "axisEasier": "Leichter",
       "axisHarder": "Schwerer",
       "finishedLabel": "Beendet",
-      "todaySuffix": "{{value}} heute"
+      "todaySuffix": "{{value}} heute",
+      "fieldAverageWaiting": "Feld-Durchschnitt, sobald {{n}} Runden vorliegen"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -232,7 +232,8 @@
       "axisEasier": "[Easier]",
       "axisHarder": "[Harder]",
       "finishedLabel": "[Fïnïshéd]",
-      "todaySuffix": "[{{value}} tódáý]"
+      "todaySuffix": "[{{value}} tódáý]",
+      "fieldAverageWaiting": "[Field average once {{n}} rounds are in]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
