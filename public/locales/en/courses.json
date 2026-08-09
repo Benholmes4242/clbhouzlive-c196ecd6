@@ -1221,9 +1221,12 @@
       "eaglePar": "Eagle - {{hole}} hole, par {{par}}",
       "eagleNoHole": "Eagle",
       "ace": "Hole in one - the {{hole}}, par {{par}}",
+      "aceTight": "Hole in one, {{hole}} - par {{par}}",
       "aceNoHole": "Hole in one",
       "albatross": "Albatross - the {{hole}}, par {{par}}",
+      "albatrossTight": "Albatross, {{hole}} - par {{par}}",
       "albatrossNoHole": "Albatross",
+
       "birdieHaul_one": "Birdie haul - {{count}} in a round",
       "birdieHaul_other": "Birdie haul - {{count}} in a round",
       "compactEagle": "Eagle - {{hole}}",
