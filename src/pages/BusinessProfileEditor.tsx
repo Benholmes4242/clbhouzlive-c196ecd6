@@ -44,6 +44,7 @@ import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { RequestClubModal } from '@/components/business/RequestClubModal';
@@ -746,13 +747,19 @@ export default function BusinessProfileEditor() {
                 onRemove={onCoverRemove}
               />
               <div style={{ position: 'relative', padding: '0 16px 12px', marginTop: -34 }}>
-                <ProfilePhotoCard
-                  variant="bare"
-                  currentUrl={effectiveLogoUrl}
-                  onFileChange={(file) => { if (file) onLogoFile(file); }}
-                  onRemove={onLogoRemove}
-                />
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14 }}>
+                  <div style={{ flexShrink: 0 }}>
+                    <ProfilePhotoCard
+                      variant="bare"
+                      currentUrl={effectiveLogoUrl}
+                      onFileChange={(file) => { if (file) onLogoFile(file); }}
+                      onRemove={onLogoRemove}
+                    />
+                  </div>
+                  <CoverGuidance />
+                </div>
               </div>
+
             </div>
           </div>
 
