@@ -44,6 +44,7 @@ import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { RequestClubModal } from '@/components/business/RequestClubModal';

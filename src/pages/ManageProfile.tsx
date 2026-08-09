@@ -17,6 +17,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { ManageCard, Label, Nudge, PAGE_BG, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
