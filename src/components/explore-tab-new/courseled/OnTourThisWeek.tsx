@@ -232,7 +232,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         />
                         {peekFresh
                           ? t('discover.live', 'Live')
-                          : t('discover.latest', 'Live')}
+                          : t('discover.latest', 'Latest')}
                       </span>
                     </ImageChip>
                   ) : (
