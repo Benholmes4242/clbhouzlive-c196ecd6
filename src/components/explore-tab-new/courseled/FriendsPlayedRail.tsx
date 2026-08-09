@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { IndexMovement, referenceLine, toParFor } from '../friendRoundParts';
+import { IndexMovement, toParFor, buildInsightMap } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
