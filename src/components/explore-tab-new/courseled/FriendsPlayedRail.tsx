@@ -45,6 +45,11 @@ import {
 
 const RAIL_CAP = 10;
 
+/** Rail scrim — SCRIM_SOFT's hue, stop pulled in for the shorter 88px photo. */
+const RAIL_SCRIM =
+  'linear-gradient(0deg, rgba(10,14,10,0.57) 0%, rgba(10,14,10,0) 55%)';
+
+
 interface Props {
   userId: string | undefined;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
