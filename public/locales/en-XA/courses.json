@@ -119,7 +119,9 @@
     "beatFieldVoice": "[{{who}} matched or beat the field average on {{beat}} of {{scored}} holes.]",
     "beatFieldOnPartial": "[You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
     "beatFieldOnTourPartial": "[Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
-    "beatFieldVoicePartial": "[{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]"
+    "beatFieldVoicePartial": "[{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.]",
+    "holeByHole": "[Ĥöłé bý ĥöłé]",
+    "hideHoleByHole": "[Ĥîðé ĥöłé bý ĥöłé]"
   },
   "card": {
     "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",

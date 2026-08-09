@@ -764,7 +764,31 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <Hairline style={{ margin: '18px 0 14px' }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
-                  <span style={TITLE}>{t('courses:scorecard.howItUnfolded')}</span>
+                  <span style={{ ...TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {t('courses:scorecard.howItUnfolded')}
+                  </span>
+                  {/*
+                    The heading row's action slot. This is a TOGGLE - it expands
+                    the card in place - so the copy never promises a destination.
+                  */}
+                  <Action
+                    align="left"
+                    style={{ flexShrink: 0, minHeight: 0 }}
+                    label={showCard
+                      ? t('courses:scorecard.hideHoleByHole')
+                      : t('courses:scorecard.holeByHole')}
+                    onClick={() => {
+                      setShowCard((v) => {
+                        if (!v) {
+                          analyticsEvents.track('scorecard_card_expanded', {
+                            surface,
+                            holes: holes.length,
+                          });
+                        }
+                        return !v;
+                      });
+                    }}
+                  />
                 </div>
 
                 {/*
@@ -802,25 +826,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   </>
                 )}
 
-                <Hairline style={{ margin: '14px 0 0' }} />
-                <div style={{ paddingTop: 4 }}>
-                  <Action
-                    label={showCard
-                      ? t('courses:scorecard.hideCard')
-                      : t('courses:scorecard.seeAllHoles', { count: holes.length })}
-                    onClick={() => {
-                      setShowCard((v) => {
-                        if (!v) {
-                          analyticsEvents.track('scorecard_card_expanded', {
-                            surface,
-                            holes: holes.length,
-                          });
-                        }
-                        return !v;
-                      });
-                    }}
-                  />
-                </div>
+
 
 
                 {showCard && (
