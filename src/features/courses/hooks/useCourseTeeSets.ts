@@ -52,8 +52,9 @@ function coerce(raw: any): TeeSet[] {
       ? r.holes.map((h: any) => ({
           hole_no: Number(h?.hole_no ?? 0),
           par: Number(h?.par ?? 0),
-          si: Number(h?.si ?? 0),
-          yards: Number(h?.yards ?? 0),
+          // Absence must survive the hook: a missing figure is not a zero.
+          si: nullableNum(h?.si),
+          yards: nullableNum(h?.yards),
         }))
       : [],
     rounds_sampled: Number(r?.rounds_sampled ?? 0),
