@@ -156,6 +156,8 @@ export function OneThingRow({ userId }: Props) {
 
 
 
+      {/* BOTH CONTROLS KEEP THEIR 44px TAP TARGET: the glyphs shrink, the
+          targets do not. */}
       <button
         type="button"
         onClick={handleAction}
@@ -169,7 +171,7 @@ export function OneThingRow({ userId }: Props) {
           border: 'none',
           color: A.INK,
           fontFamily: SANS,
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 800,
           letterSpacing: '0.13em',
           flexShrink: 0,
@@ -187,17 +189,19 @@ export function OneThingRow({ userId }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 24,
+          width: 22,
           height: 44,
           padding: 0,
           background: 'none',
           border: 'none',
-          color: A.MUTE,
+          // DIM, so it stops competing with the action it sits beside.
+          color: A.DIM,
           flexShrink: 0,
         }}
       >
-        <X size={13} strokeWidth={2.2} />
+        <X size={14} strokeWidth={2.2} />
       </button>
+
     </div>
   );
 }
