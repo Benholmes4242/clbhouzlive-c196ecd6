@@ -94,6 +94,61 @@ function scoreColor(score: number | null | undefined): string {
   return getScoreColor(score, 'light');
 }
 
+/**
+ * The three-up figure row shared by the LIVE and UPCOMING states, so the rail
+ * reads as one structure as a member scrolls past both. Absent values are never
+ * passed: the row rebalances on however many cells it is given, and the end cell
+ * hugs its own edge exactly as the first does (that mirroring is a property of
+ * the grid, not of the rule that used to sit above it).
+ */
+function ThreeUp({ cells }: { cells: Array<[string, string, string]> }) {
+  if (cells.length === 0) return null;
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+        gap: 4,
+      }}
+    >
+      {cells.map(([label, value, tone], i) => (
+        <div
+          key={label}
+          style={{
+            minWidth: 0,
+            textAlign:
+              i === 0 ? 'left' : i === cells.length - 1 ? 'right' : 'center',
+          }}
+        >
+          <div
+            style={{
+              ...NUMF,
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
+              color: tone,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {value}
+          </div>
+          <div style={{ ...LABEL, fontSize: 6.5, color: A.DIM, marginTop: 4 }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** "Rory McIlroy" -> "McIlroy". The card has room for the label, not the name. */
+function surname(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts.length > 1 ? parts[parts.length - 1] : name.trim();
+}
+
+
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
   const eventsQuery = useTourThisWeek();
