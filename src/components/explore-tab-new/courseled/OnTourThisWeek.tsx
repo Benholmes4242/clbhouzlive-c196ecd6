@@ -217,23 +217,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       <span
                         style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
                       >
-                        {/* The red dot IS the live claim. A stale sync carries
-                            no dot — 'Latest' reads as a neutral, non-live chip
-                            (BRIEF: stale data swaps LIVE for neutral LATEST). */}
-                        {peekFresh && (
-                          <span
-                            className="clbhouz-live-dot"
-                            style={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              background: LIVE_DOT,
-                              animation: !reducedMotion
+                        <span
+                          className="clbhouz-live-dot"
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: '50%',
+                            background: LIVE_DOT,
+                            animation:
+                              peekFresh && !reducedMotion
                                 ? 'clbhouzLiveDotPulse 2s ease-in-out infinite'
                                 : undefined,
-                            }}
-                          />
-                        )}
+                          }}
+                        />
                         {peekFresh
                           ? t('discover.live', 'Live')
                           : t('discover.latest', 'Latest')}
