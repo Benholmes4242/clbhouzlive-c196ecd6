@@ -16,10 +16,9 @@
  * The dots row (rendered by OverviewHero) sits above the wire ticker below.
  */
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { InsightSheet } from './InsightSheet';
 
 import {
   PHOTO_BAND_HEIGHT,
@@ -118,8 +117,6 @@ export function PhotoBand({
   state,
   tourLabel,
   datesString,
-  insight,
-  insightKind = 'course',
   momentLabel,
   momentName,
   momentScore,
@@ -171,39 +168,6 @@ export function PhotoBand({
             fontSize: 10,
             letterSpacing: '0.14em',
           };
-
-
-  // Insight overflow detection — only render "Read more" when the clamped
-  // insight actually overflows its 2-line box. Re-measures on value + resize.
-  const insightRef = useRef<HTMLDivElement>(null);
-  const [truncated, setTruncated] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
-
-  useLayoutEffect(() => {
-    const el = insightRef.current;
-    if (!el || !insight) {
-      setTruncated(false);
-      return;
-    }
-    const measure = () => {
-      setTruncated(el.scrollHeight > el.clientHeight + 1);
-    };
-    measure();
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    ro?.observe(el);
-    return () => ro?.disconnect();
-  }, [insight]);
-
-  useEffect(() => {
-    if (!insight) return;
-    const onResize = () => {
-      const el = insightRef.current;
-      if (!el) return;
-      setTruncated(el.scrollHeight > el.clientHeight + 1);
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [insight]);
 
   return (
     <div
