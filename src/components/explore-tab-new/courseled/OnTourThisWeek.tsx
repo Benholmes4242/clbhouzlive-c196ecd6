@@ -148,6 +148,13 @@ function surname(name: string): string {
   return parts.length > 1 ? parts[parts.length - 1] : name.trim();
 }
 
+/** Whole days from today to the tee-off date; 0 or less reads "Today". */
+function daysUntil(startDate: string): number {
+  const start = new Date(`${startDate}T12:00:00`).getTime();
+  return Math.ceil((start - Date.now()) / 86_400_000);
+}
+
+
 
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
