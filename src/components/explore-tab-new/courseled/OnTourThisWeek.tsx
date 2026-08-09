@@ -84,9 +84,8 @@ function playDays(e: TourWeekEvent): string {
   return e.startDate === e.endDate ? fmt(start) : `${fmt(start)} \u2013 ${fmt(end)}`;
 }
 
-/** Live block and stat grid share one height so the rail stays level.
- *  Condensed to the friends-rail rhythm (was 74). */
-const STAT_BLOCK_H = 56;
+/** Live and upcoming states now share one three-up, so no fixed block height. */
+
 const LIVE_DOT = '#E5484D';
 
 /** Canonical tour convention: under par is RED, over par ink, level neutral. */
