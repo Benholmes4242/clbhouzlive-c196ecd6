@@ -392,7 +392,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
-          padding: 16,
+          padding: '12px 16px',
           fontFamily: SANS,
           ...FIGS,
         }}
@@ -403,7 +403,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             justifyContent: 'space-between',
             alignItems: 'baseline',
             gap: 12,
-            marginBottom: 14,
+            marginBottom: 10,
           }}
         >
           <span style={{ ...KICKER, fontSize: 9, letterSpacing: '0.14em', fontWeight: 800 }}>
