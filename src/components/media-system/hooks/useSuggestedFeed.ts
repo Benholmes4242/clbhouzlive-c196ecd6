@@ -26,6 +26,10 @@ export function useSuggestedFeed(userId: string | undefined) {
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
+      // Page 1 restarts the exclusion set so it can't grow across generations.
+      if (!cursor) seenPostIds.current = new Set();
+
+
       const { data, error } = await supabase.rpc('get_suggested_feed_v3', {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
