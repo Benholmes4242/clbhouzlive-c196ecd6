@@ -85,6 +85,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             <FriendRoundRow
               key={r.round_id}
               row={r}
+              insight={insights.get(r.round_id)?.text ?? null}
               isLast={i === rounds.length - 1}
               onPress={() => {
                 // Do NOT close the sheet — leaving it mounted beneath the
@@ -94,6 +95,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
               }}
             />
           ))
+
         ) : (
           <div style={{ padding: '32px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
             {t('discover.friendsRounds.empty', 'No recent friend rounds yet.')}
