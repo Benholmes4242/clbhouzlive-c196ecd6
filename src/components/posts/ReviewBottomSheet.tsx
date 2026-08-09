@@ -391,62 +391,104 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
               </div>
 
-              {/* 2×2 breakdown grid */}
+              {/* REFERENCE BLOCK — their score against the community (§3a).
+                  Omitted below three ratings: an average of one is not a
+                  reference point. */}
+              {showReference && (
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr',
+                    gap: 8,
+                    alignItems: 'end',
+                  }}
+                >
+                  <RefCell
+                    figure={rating.toFixed(1)}
+                    figureSize={40}
+                    color={reviewLabelColor(rating, 'light')}
+                    label="THEIR SCORE"
+                  />
+                  <RefCell
+                    figure={communityAvg!.toFixed(1)}
+                    figureSize={19}
+                    color={INK}
+                    label={`${ratingCount} RATINGS`}
+                  />
+                  <RefCell
+                    figure={Math.abs(rating - communityAvg!).toFixed(1)}
+                    figureSize={19}
+                    color={INK}
+                    label={rating >= communityAvg! ? 'ABOVE' : 'BELOW'}
+                  />
+                </div>
+              )}
+
+              {/* THE SPREAD — one row of four: figure, bar out of ten, label.
+                  A null category omits its column and the row rebalances. */}
               {breakdownEntries.length > 0 && (
                 <div
                   style={{
                     marginTop: 12,
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 6,
+                    gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
+                    gap: 10,
                   }}
                 >
-                  {breakdownEntries.map(({ key, label, value }) => (
-                    <div
-                      key={key}
-                      style={{
-                        background: PANEL,
-                        border: `1px solid ${BORDER}`,
-                        borderRadius: 14,
-                        padding: '10px 12px',
-                        minHeight: 52,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 8,
-                        minWidth: 0,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 10.5,
-                          fontWeight: 600,
-                          letterSpacing: '0.12em',
-                          color: MUTE,
-                          textTransform: 'uppercase',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {label}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 19,
-                          fontWeight: 300,
-                          color: reviewLabelColor(value, 'light'),
-                          fontVariantNumeric: 'tabular-nums',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {value.toFixed(1)}
-                      </span>
-                    </div>
-
-                  ))}
+                  {breakdownEntries.map(({ key, label, value }) => {
+                    const c = reviewLabelColor(value, 'light');
+                    return (
+                      <div key={key} style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 17,
+                            fontWeight: 300,
+                            color: c,
+                            fontVariantNumeric: 'tabular-nums',
+                            lineHeight: 1.1,
+                          }}
+                        >
+                          {value.toFixed(1)}
+                        </div>
+                        <div
+                          style={{
+                            marginTop: 5,
+                            height: 3,
+                            borderRadius: 2,
+                            background: BORDER,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.max(0, Math.min(100, (value / 10) * 100))}%`,
+                              height: '100%',
+                              background: c,
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            marginTop: 5,
+                            fontSize: 9.5,
+                            fontWeight: 600,
+                            letterSpacing: '0.1em',
+                            color: MUTE,
+                            textTransform: 'uppercase',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {label}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
+
             </div>
 
             {/* ─── SCROLL REGION ──────────────────────────────── */}
