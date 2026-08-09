@@ -293,6 +293,11 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
           {groups.map((g, gi) => {
             const thru = groupThru(g);
             const time = formatTeeTime(g.tee_time);
+            // The card has no "finished" fact — sr_leaderboards.status carries
+            // only active / CUT / WD / DQ / MDF / DNS. Finished is therefore
+            // INFERRED from thru >= 18 (see the brief's report).
+            const finished = thru != null && thru >= 18;
+            const stillOut = thru != null && thru < 18;
             return (
               <div
                 key={g.group_id ?? `f-${gi}`}
@@ -309,29 +314,86 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     border: `0.5px solid ${V4.cardBorder}`,
                     boxShadow: V4.cardShadow,
                     borderRadius: 14,
-                    padding: '12px 12px 10px',
+                    padding: '13px 14px 13px',
                     position: 'relative',
                   }}
                 >
-                <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                  {time ? `TEE ${time}` : ''}
-                  {time && thru != null ? ' · ' : ''}
-                  {thru != null ? `THRU ${thru >= 18 ? 'F' : thru}` : ''}
+                {/* Status line — leads with whatever currently matters. */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    marginBottom: 9,
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                    {stillOut && (
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: 3,
+                          background: LIVE_DOT,
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <span
+                      style={{
+                        fontSize: 8,
+                        fontWeight: 800,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: stillOut ? A.INK : A.MUTE,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {stillOut
+                        ? t('overview.onTheCourse.thruLabel', { value: thru })
+                        : finished
+                          ? t('overview.onTheCourse.finishedLabel')
+                          : time
+                            ? t('overview.onTheCourse.teeTimeLabel', { time })
+                            : ''}
+                    </span>
+                  </span>
+                  {/* The tee time never disappears — it is how a member finds
+                      the group on a tee sheet — it just stops competing. */}
+                  {time && (stillOut || finished) && (
+                    <span
+                      style={{
+                        fontSize: 7,
+                        fontWeight: 800,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: A.DIM,
+                        whiteSpace: 'nowrap',
+                        ...FIGS,
+                      }}
+                    >
+                      {t('overview.onTheCourse.teeTimeLabel', { time })}
+                    </span>
+                  )}
                 </div>
 
-                {(g.players ?? []).slice(0, 3).map((p, pi) => {
+                {/* Every player in the group — no cap. */}
+                {(g.players ?? []).map((p, pi) => {
                   const name = p.full_name || p.name || '';
-                  const status = (p.status || '').toUpperCase();
-                  const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
-                  // Not started the active round -> show TOTAL to par; once out
-                  // on the course -> show TODAY.
                   const lbRow = p.player_id ? leaderboardByPlayerId.get(p.player_id) : undefined;
-                  const roundToday = lbRow ? lbRow.today : null;
-                  const started = lbRow ? roundToday != null : p.today != null;
-                  const displayValue = started
-                    ? (lbRow ? roundToday : (p.today as number | string | null))
-                    : (lbRow ? lbRow.score : (p.score as number | string | null));
-                  const display = formatScore(displayValue) ?? formatScore(p.score) ?? '—';
+                  const status = (lbRow?.status || p.status || '').toUpperCase();
+                  const isCut = status === 'CUT' || status === 'MC' || status === 'WD' || status === 'DQ';
+
+                  const posNum = p.position ?? lbRow?.position ?? null;
+                  const tied = lbRow?.positionTied ?? null;
+                  const posText = posNum != null ? `${tied ? 'T' : ''}${posNum}` : '';
+
+                  const total = formatScore(lbRow ? lbRow.score : (p.score as number | string | null));
+                  const todayVal = lbRow ? lbRow.today : (p.today as number | string | null);
+                  const today = formatScore(todayVal);
+
                   return (
                     <button
                       key={pi}
@@ -341,32 +403,82 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 9,
-                        padding: '6px 0',
-                        minHeight: 40,
+                        gap: 8,
+                        padding: '9px 0',
                         width: '100%',
                         background: 'transparent',
                         border: 'none',
+                        // Hairline between players only, never above the first.
                         borderTop: pi === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                         textAlign: 'left',
                         cursor: p.player_id ? 'pointer' : 'default',
                       }}
                     >
                       <PlayerAvatar
-                        playerId={name}
+                        playerId={p.player_id ?? name}
                         playerName={name}
                         tourCode={tourCode}
                         photoUrl={p.photo_url ?? null}
-                        size="xs"
+                        size="sm"
                         ringColor={LIGHT_HAIRLINE}
                       />
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <span
+                        style={{
+                          width: 22,
+                          flexShrink: 0,
+                          fontSize: 7.5,
+                          fontWeight: 800,
+                          color: A.DIM,
+                          letterSpacing: '0.02em',
+                          ...FIGS,
+                        }}
+                      >
+                        {posText}
+                      </span>
+                      <span
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          letterSpacing: '-0.01em',
+                          color: V4.ink,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
                         {name}
-                      </div>
+                      </span>
                       {isCut ? (
                         <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
                       ) : (
-                        <span style={{ fontSize: 12.5, fontWeight: 800, color: scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+                          <span
+                            style={{
+                              fontSize: 15,
+                              fontWeight: 800,
+                              letterSpacing: '-0.02em',
+                              color: total ? scoreColor(total) : V4.inkFaint,
+                              ...FIGS,
+                            }}
+                          >
+                            {total ?? '—'}
+                          </span>
+                          {today && (
+                            <span
+                              style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                color: A.DIM,
+                                whiteSpace: 'nowrap',
+                                ...FIGS,
+                              }}
+                            >
+                              {t('overview.onTheCourse.todaySuffix', { value: today })}
+                            </span>
+                          )}
+                        </span>
                       )}
                     </button>
                   );
@@ -376,6 +488,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
 
             );
           })}
+
 
           {!expanded && (
             <button
