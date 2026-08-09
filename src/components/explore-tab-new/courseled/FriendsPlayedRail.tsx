@@ -91,6 +91,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
   );
   const reactions = useContentReactions(reactionTargets);
 
+  // THE INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET): resolved for the rail as a
+  // whole, not per card, so the repetition cap can see its neighbours.
+  const insights = useMemo(() => buildInsightMap(rows, t as never), [rows, t]);
+
+
 
   // NEW SINCE: the rail already orders by play_date, so play_date is the
   // arrival stamp this section compares. Not computed before settle — a ring
