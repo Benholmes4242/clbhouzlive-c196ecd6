@@ -57,7 +57,29 @@ export interface FriendRoundRow {
   hcp_delta: number | null;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
+
+  // ---- INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET, part 1) -------------------
+  /** Raw stats the insight states read; nulls simply fail their state. */
+  birdies: number | null;
+  eagles: number | null;
+  albatrosses: number | null;
+  holes_in_one: number | null;
+  clean_card: boolean | null;
+  longest_birdie_run: number | null;
+  longest_par_or_better_run: number | null;
+  sub_80: boolean | null;
+  /** Hole numbers, from the hole rows only. Null = we do not know where. */
+  ace_hole: number | null;
+  albatross_hole: number | null;
+  /** To-par on each nine, from the hole rows. Null = no hole data. */
+  front_nine_to_par: number | null;
+  back_nine_to_par: number | null;
+  /** A current, guarded course record attained with THIS round. */
+  is_course_record: boolean;
+  /** Their first ever sub-80 round. */
+  is_first_sub_80: boolean;
 }
+
 
 
 interface Options {
