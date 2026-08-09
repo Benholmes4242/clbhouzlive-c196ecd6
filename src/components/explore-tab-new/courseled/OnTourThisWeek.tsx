@@ -414,12 +414,16 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 )}
               </button>
 
+              {/* CONDENSE: the footer only takes height when it carries
+                  something. An empty reserved band left a dead gap under the
+                  round / thru / second row on every live card. */}
+              {(((!peek || peek.leaderScore == null) && !!e.defendingChampion) ||
+                (!!courseId && mediaCount > 0)) && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  minHeight: 18,
                   padding: '0 11px 9px',
                 }}
               >
