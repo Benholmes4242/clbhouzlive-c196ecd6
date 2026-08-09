@@ -306,7 +306,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
     }
 
     const indexValue = Number(trendData!.current).toFixed(1);
-    const direction = trend.direction;
+    const direction = lastMove;
     const showArrow = direction === 'improving' || direction === 'drifting';
     const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
     const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
