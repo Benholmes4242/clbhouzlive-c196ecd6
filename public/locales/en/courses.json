@@ -1310,7 +1310,15 @@
     "playersTied": "{{count}} players tied",
     "playersTied_one": "{{count}} players tied",
     "momentsGroupCount": "{{count}} moments",
-    "momentsGroupCount_one": "{{count}} moment"
+    "momentsGroupCount_one": "{{count}} moment",
+    "friendsRail": {
+      "par": "Par {{par}}",
+      "index": "Index",
+      "firstHere": "Their first round here",
+      "bestHere": "Their best here, of {{count}} rounds",
+      "betterThanAvg": "{{figure}} better than their average here",
+      "worseThanAvg": "{{figure}} worse than their average here"
+    }
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
