@@ -82,11 +82,13 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
     );
   }
 
-  if (!connection) {
+  // The flow stays mounted while it is unfinished, even once a connection row
+  // exists - the connected screen is the last thing the member sees.
+  if (!connection || (startedDisconnected.current === true && !flowFinished)) {
     // Own profile and no connection: the full-page connect form lives in
     // Manage -> Handicap (/manage/handicap). Redirect there instead of
     // rendering it inside the dark-chrome /handicap route.
-    if (userId === sessionUser?.id) {
+    if (!connection && userId === sessionUser?.id) {
       return <Navigate to="/manage/handicap" replace />;
     }
 
@@ -94,10 +96,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
     return (
       <WhsConnectScreen
         onConnected={async () => {
-          // Refresh the shared ['whs-connection', userId] cache. Both this
-          // observer and HandicapPage.ownConnection update together, so
-          // isConnectFlow flips false and the dashboard renders — no navigate
-          // needed (user is already on /handicap).
+          // Refresh the shared ['whs-connection', userId] cache.
           let res = await refetch();
           // Guard: server-side propagation lag after callConnectWhs. Retry
           // once after a short delay before giving up.
@@ -105,12 +104,15 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
             await new Promise((r) => setTimeout(r, 500));
             res = await refetch();
           }
+          // Only now is the flow over - fired from the connected screen's CTA.
+          setFlowFinished(true);
         }}
         onDecline={declineHandicapChip}
         layout="embedded"
       />
     );
   }
+
 
   return <HandicapDashboard connection={connection} userId={userId} ownerFirstName={ownerFirstName} />;
 };
