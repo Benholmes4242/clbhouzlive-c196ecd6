@@ -845,7 +845,7 @@
     },
     "friendsRail": {
       "par": "Par {{par}}",
-      "index": "Index",
+      "index": "HCP",
       "firstHere": "Their first round here",
       "bestHere": "Their best here, of {{count}} rounds",
       "betterThanAvg": "{{figure}} better than their average here",

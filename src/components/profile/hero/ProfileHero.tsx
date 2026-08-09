@@ -18,11 +18,12 @@ import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroShell, HeroPill, W_35, W_40 } from './HeroShell';
 
-const GREEN = '#4ADE80';
-const RED = '#F87171';
+const GREEN = INDEX_DELTA.dark.improved;
+const RED = INDEX_DELTA.dark.drifted;
 
 const MS_PER_DAY = 86_400_000;
 

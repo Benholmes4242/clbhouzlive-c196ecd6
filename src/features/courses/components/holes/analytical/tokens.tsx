@@ -13,6 +13,7 @@
  */
 import React from 'react';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
  * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
@@ -33,9 +34,14 @@ export const A = {
   AMBER_DEEP: '#C2620A',
   RED: '#C8372B',
   GREEN: '#0F8F4A',
-  /** Semantic aliases: OVER reads worse, UNDER reads better. */
-  OVER: '#C8372B',
-  UNDER: '#0F8F4A',
+  /**
+   * HANDICAP INDEX MOVEMENT only (not par): IMPROVED = index came down,
+   * DRIFTED = index went up. Sourced from the shared INDEX_DELTA token so one
+   * pair serves every light surface. Nothing to do with the to-par convention,
+   * where UNDER par is TOPAR_RED and OVER par is INK.
+   */
+  IMPROVED: INDEX_DELTA.light.improved,
+  DRIFTED: INDEX_DELTA.light.drifted,
   TRACK: '#E9EDF1',
   /**
    * The ONLY internal rule permitted inside a panel, and only to separate a

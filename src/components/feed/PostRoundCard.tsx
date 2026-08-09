@@ -23,12 +23,13 @@ import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { beadForScore } from '@/features/courses/_shared/beadForScore';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 const INK = '#F4F7F9';
 const MUTE = 'rgba(255,255,255,0.62)';
 const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
-const GREEN = '#34D77F';
+const GREEN = INDEX_DELTA.dark.improved;
 const RED = '#FF6B60';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 

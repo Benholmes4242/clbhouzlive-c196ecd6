@@ -27,7 +27,7 @@ export function toParFor(row: FriendRoundRow): { text: string; tone: string } | 
 
 /**
  * Index movement — coloured GREEN when improved, RED when drifted, matching the
- * light analytical index-delta convention (A.UNDER / A.OVER, as HcpStrip uses).
+ * light analytical index-delta convention (A.IMPROVED / A.DRIFTED, the shared INDEX_DELTA light pair).
  * Null below the 0.05 floor.
  */
 export function movementFor(
@@ -38,7 +38,7 @@ export function movementFor(
   return {
     arrow: d < 0 ? '\u2193' : '\u2191',
     figure: Math.abs(d).toFixed(1),
-    tone: d < 0 ? A.UNDER : A.OVER,
+    tone: d < 0 ? A.IMPROVED : A.DRIFTED,
   };
 }
 
