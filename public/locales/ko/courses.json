@@ -841,7 +841,8 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "보드에 오른 홀인원과 앨버트로스 {{count}}건"
+    "honoursCaptionCount": "보드에 오른 홀인원과 앨버트로스 {{count}}건",
+    "aroundTheWorld": "돋보이는 라운드"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",

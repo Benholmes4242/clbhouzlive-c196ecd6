@@ -195,7 +195,7 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
           shortest-column walk as the live section, so the swap does not move
           the page. Unresolved is not absent. */}
       {(() => {
-        const heights = [206, 168, 146, 130, 122, 116];
+        const heights = [198, 160, 138, 122, 114, 108];
         const cols: number[][] = [[], []];
         const totals = [0, 0];
         heights.forEach((h) => {

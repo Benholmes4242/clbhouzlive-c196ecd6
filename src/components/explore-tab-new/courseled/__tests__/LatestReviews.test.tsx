@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -11,6 +12,12 @@ vi.mock('react-i18next', () => ({
 import { LatestReviews } from '@/components/explore-tab-new/courseled/LatestReviews';
 import { REVIEW_TILE_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+
+/** The mosaic reads reactions through React Query; the tree needs a client. */
+function render(ui: React.ReactElement) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return rtlRender(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+}
 
 function make(i: number, over: Partial<LatestReview> = {}): LatestReview {
   return {

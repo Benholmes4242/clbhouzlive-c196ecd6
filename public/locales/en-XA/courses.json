@@ -839,7 +839,8 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "[{{count}} åċēş åńđ åļƀåţŕöşşēş öń ţĥē ƀöåŕđ]"
+    "honoursCaptionCount": "[{{count}} åċēş åńđ åļƀåţŕöşşēş öń ţĥē ƀöåŕđ]",
+    "aroundTheWorld": "[~~Šţáñðőúţ ŕőúñðš~~]"
   },
   "statBrowse": {
     "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",

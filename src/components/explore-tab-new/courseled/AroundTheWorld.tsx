@@ -95,41 +95,40 @@ function deClashColumns<T extends { g: { courseId: string } }>(columns: T[][]): 
  * Sized by type, a week of five aces would render five identical large tiles.
  * By position the silhouette is stable whatever happened and the largest tile
  * always means "the most notable thing in the last 90 days".
+ *
+ * BRIEF_STANDOUT_ROUNDS §4: every value reduced by 8, the taper preserved.
  */
-export const ATW_PHOTO_HEIGHTS = [206, 168, 146, 130, 122, 116, 112, 109] as const;
+export const ATW_PHOTO_HEIGHTS = [198, 160, 138, 122, 114, 108, 104, 101] as const;
 
 /** A photo at or above this height gets the larger chip and name sizes. */
 const TALL = 180;
 
 const TILE_SCRIM =
-  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 58%)';
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
 
 type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
-
-/**
- * ON-DARK tier tints for the figure chip. These live here and ONLY here — they
- * do not replace the light `A` tokens anywhere else in the app.
- */
-const CHIP_TINT: Record<ChipTier, { fg: string; bg: string }> = {
-  gold: { fg: '#FFE9B8', bg: 'rgba(120,86,10,0.62)' },
-  green: { fg: '#B9F0CF', bg: 'rgba(9,74,40,0.62)' },
-  ink: { fg: '#FFFFFF', bg: 'rgba(10,14,10,0.58)' },
-  rating: { fg: '#FFD9AE', bg: 'rgba(120,62,10,0.60)' },
-};
 
 /**
  * DETERMINISTIC panel-height estimate for the masonry walk. Purely a function
  * of the strings and flags on the tile — no DOM measurement, no refs, no
  * reflow. Same input, same layout, every render.
  *
- *   padding 9 + 10, WHO line 17, WHAT lines 14 each (10.5/1.32), more line 17
+ * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4):
  *
- * The WHAT line count comes from a character threshold at the ~167px inner
- * width (10.5px, ~5.6px/char => ~30 chars a line), clamped at two.
+ *   padding 11 + 12 = 23, WHO line 18 (13/800, one line)
+ *   DETAIL 2 marginTop + 16 a line (12/600 at lineHeight 1.32), max two
+ *   MORE line 15 (6.5 label + 6 marginTop)
+ *
+ * A tile with NO detail line bills ZERO for it (§2) — the line is omitted, not
+ * padded, so the estimate must not charge a minimum of one.
+ *
+ * The DETAIL line count comes from a character threshold at the ~151px inner
+ * width (177px column less 13px side padding either side; 12px, ~6.4px/char
+ * => ~24 chars a line), clamped at two.
  */
 function estimatePanelHeight(detail: string, hasMore: boolean): number {
-  const lines = Math.min(2, Math.max(1, Math.ceil((detail.length || 1) / 30)));
-  return 19 + 17 + 2 + lines * 14 + (hasMore ? 17 : 0);
+  const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
+  return 23 + 18 + (lines > 0 ? 2 + lines * 16 : 0) + (hasMore ? 15 : 0);
 }
 
 /**
@@ -197,6 +196,33 @@ function chipTierFor(kind: WireEvent['kind'] | 'rating'): ChipTier {
   if (kind === 'rating') return 'rating';
   if (kind === 'crown' || kind === 'bogey_free' || kind === 'under_par') return 'green';
   return 'ink';
+}
+
+/**
+ * THE CHIP CARRIES THE FIGURE; THE DETAIL LINE CARRIES WHAT THE FIGURE CANNOT
+ * SAY (BRIEF_STANDOUT_ROUNDS §1). Where the two are one fact told twice the
+ * line is dropped, not reworded:
+ *
+ *   birdie_haul  chip "6 BIRDIES"  line "Birdie haul - 6 in a round"  DROPPED
+ *   bogey_free   chip "0 BOGEYS"   line "Bogey-free round"            DROPPED
+ *   under_par    chip "-1 TO PAR"  line "Round under par"             DROPPED
+ *
+ *   crown        chip is the SCORE, the line is what the score MEANT (a new
+ *                course record) — the figure cannot say that.            KEPT
+ *   ace          chip "1 ACE", the line names the hole and its par.      KEPT
+ *   albatross    as above.                                               KEPT
+ *   eagle        as above (filtered out of this section, kept for the sheet's
+ *                compact wording).                                       KEPT
+ *   rating       chip is the value; the line says the member RATED the course,
+ *                and it is the only wording an unnamed actor leaves.     KEPT
+ *   anything else (actionKey wording) — unknown to the chip.             KEPT
+ *
+ * A drop only applies when the chip actually renders the figure. With no
+ * figure the tile would otherwise say nothing at all.
+ */
+function detailAddsNothing(e: WireEvent, figure: string | null): boolean {
+  if (!figure) return false;
+  return e.kind === 'birdie_haul' || e.kind === 'bogey_free' || e.kind === 'under_par';
 }
 
 /** Legacy on-light figure tone — still used by the Course News sheet entries. */
@@ -650,7 +676,7 @@ export function AroundTheWorld({
         dot={newGroupCount > 0}
         aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
       >
-        {t('discover.aroundTheWorld', 'Around the world')}
+        {t('discover.aroundTheWorld', 'Standout rounds')}
       </Eyebrow>
 
       {pills}
@@ -753,6 +779,16 @@ export function AroundTheWorld({
               g.events.length - (slots.shownPerCourse.get(g.courseId) ?? 1),
             );
 
+            /**
+             * ONE FACT, ONCE (BRIEF_STANDOUT_ROUNDS §1). Where the chip already
+             * carries the whole fact, the detail line is OMITTED rather than
+             * reworded — see `detailAddsNothing`. `detail` is still computed:
+             * with no actor name the panel has nothing else to say and falls
+             * back to the wording (the line below the WHO slot is the
+             * duplicate, not the fallback).
+             */
+            const detailShown = !!detail && !(top && detailAddsNothing(top, figure));
+
             return {
               g,
               m,
@@ -765,10 +801,13 @@ export function AroundTheWorld({
               who,
               isOwn,
               detail,
+              detailShown,
               more,
               reactTo,
               onPress,
-              height: photo + estimatePanelHeight(detail, more > 0),
+              height:
+                photo +
+                estimatePanelHeight(who && detailShown ? detail : '', more > 0),
             };
           });
 
@@ -793,7 +832,6 @@ export function AroundTheWorld({
                 >
                   {col.map((tt) => {
                     const { g, m } = tt;
-                    const tint = CHIP_TINT[tt.tier];
                     return (
                       <div
                         key={tt.slotKey}
@@ -825,9 +863,11 @@ export function AroundTheWorld({
                         >
                           <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
 
-                          {/* FIGURE CHIP — the truncation fix: the figure lives
-                              on the photograph so the panel keeps the full
-                              width for prose. */}
+                          {/* FIGURE CHIP — the reason the tile exists. It stays
+                              a chip (BRIEF_STANDOUT_ROUNDS §3): 10px radius on
+                              a blurred glass substrate rather than a filled
+                              tier pill, so the age beside it can stop
+                              competing. */}
                           {tt.figure && (
                             <span
                               style={{
@@ -837,9 +877,9 @@ export function AroundTheWorld({
                                 display: 'inline-flex',
                                 alignItems: 'baseline',
                                 gap: 4,
-                                padding: tt.tall ? '4px 9px' : '3px 7px',
-                                borderRadius: 999,
-                                background: tint.bg,
+                                padding: '5px 10px',
+                                borderRadius: 10,
+                                background: 'rgba(10,14,10,0.58)',
                                 backdropFilter: 'blur(8px)',
                                 WebkitBackdropFilter: 'blur(8px)',
                               }}
@@ -847,7 +887,8 @@ export function AroundTheWorld({
                               <span
                                 style={{
                                   ...NUMF,
-                                  fontSize: tt.tall ? 15 : 13,
+                                  fontSize: 16,
+                                  letterSpacing: '-0.02em',
                                   lineHeight: 1,
                                   color: '#FFFFFF',
                                 }}
@@ -857,12 +898,12 @@ export function AroundTheWorld({
                               {tt.unit && (
                                 <span
                                   style={{
-                                    fontSize: 7.5,
+                                    fontSize: 6.5,
                                     fontWeight: 800,
                                     letterSpacing: '0.14em',
                                     textTransform: 'uppercase',
                                     lineHeight: 1,
-                                    color: tint.fg,
+                                    color: 'rgba(255,255,255,0.60)',
                                   }}
                                 >
                                   {tt.unit}
@@ -871,37 +912,36 @@ export function AroundTheWorld({
                             </span>
                           )}
 
-                          {/* WHEN CHIP */}
+                          {/* AGE — the least important fact on the tile, so it
+                              is NOT a pill: plain label on the scrim, carried
+                              by a 1px text shadow. */}
                           <span
                             style={{
                               position: 'absolute',
                               top: 8,
-                              right: 8,
-                              fontSize: 7,
+                              right: 10,
+                              fontSize: 6.5,
                               fontWeight: 800,
                               letterSpacing: '0.14em',
                               textTransform: 'uppercase',
-                              color: '#FFFFFF',
-                              background: 'rgba(10,14,10,0.5)',
-                              backdropFilter: 'blur(8px)',
-                              WebkitBackdropFilter: 'blur(8px)',
-                              borderRadius: 999,
-                              padding: '3px 6px',
+                              color: 'rgba(255,255,255,0.72)',
+                              textShadow: '0 1px 2px rgba(10,14,10,0.55)',
                             }}
                           >
                             {relativeWhen(g.at, t)}
                           </span>
+
 
                           <div
                             style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}
                           >
                             <div
                               style={{
-                                fontSize: tt.tall ? 12.5 : 12,
+                                fontSize: 14,
                                 fontWeight: 800,
                                 color: '#fff',
-                                letterSpacing: '-0.015em',
-                                lineHeight: 1.15,
+                                letterSpacing: '-0.025em',
+                                lineHeight: 1.14,
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
@@ -913,10 +953,10 @@ export function AroundTheWorld({
                             {m?.region && (
                               <div
                                 style={{
-                                  fontSize: 10,
-                                  fontWeight: 600,
-                                  color: 'rgba(255,255,255,0.78)',
-                                  marginTop: 2,
+                                  ...LABEL,
+                                  fontSize: 6.5,
+                                  color: 'rgba(255,255,255,0.60)',
+                                  marginTop: 3,
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
@@ -929,15 +969,15 @@ export function AroundTheWorld({
                         </CourseImageFallback>
 
                         {/* TEXT PANEL — no figure here. One figure per tile. */}
-                        <div style={{ padding: '9px 10px 10px' }}>
+                        <div style={{ padding: '11px 13px 12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <div
                               style={{
                                 flex: 1,
                                 minWidth: 0,
-                                fontSize: 12,
-                                fontWeight: 700,
-                                letterSpacing: '-0.005em',
+                                fontSize: 13,
+                                fontWeight: 800,
+                                letterSpacing: '-0.01em',
                                 color: tt.isOwn ? A.AMBER_DEEP : A.INK,
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
@@ -984,7 +1024,7 @@ export function AroundTheWorld({
                             </ReactionSlot>
                           </div>
 
-                          {tt.who && tt.detail && (
+                          {tt.who && tt.detailShown && (
                             <div
                               role={tt.onPress ? 'button' : undefined}
                               onClick={
@@ -996,10 +1036,10 @@ export function AroundTheWorld({
                                   : undefined
                               }
                               style={{
-                                fontSize: 10.5,
+                                fontSize: 12,
                                 fontWeight: 600,
                                 lineHeight: 1.32,
-                                color: A.BODY,
+                                color: A.MUTE,
                                 marginTop: 2,
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
@@ -1015,7 +1055,7 @@ export function AroundTheWorld({
                           {tt.more > 0 && (
                             <div
                               style={{
-                                fontSize: 7.5,
+                                fontSize: 6.5,
                                 fontWeight: 800,
                                 letterSpacing: '0.14em',
                                 textTransform: 'uppercase',
