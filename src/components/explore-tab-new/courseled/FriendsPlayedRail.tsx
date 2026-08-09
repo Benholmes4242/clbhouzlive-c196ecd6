@@ -160,9 +160,12 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 courseId={r.course_id}
                 courseName={m?.name ?? r.course_name}
                 imageUrl={m?.imageUrl}
-                style={{ height: 99, flexShrink: 0 }}
+                style={{ height: 88, flexShrink: 0 }}
               >
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM_SOFT }} />
+                {/* A SHORTER PHOTO NEEDS A SHORTER SCRIM, or the course name
+                    sits in a band of darkness. Same hue, stop pulled in. */}
+                <div style={{ position: 'absolute', inset: 0, background: RAIL_SCRIM }} />
+
                 <ImageChip gold={hasAce}>{relativeDay(r.play_date, t)}</ImageChip>
                 <div
                   style={{
