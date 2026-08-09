@@ -248,7 +248,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 // No border and no new-since ink ring on tour cards.
                 border: 'none',
                 boxShadow: 'none',
-                width: 272,
+                width: 266,
                 flexShrink: 0,
                 fontFamily: SANS,
               }}
