@@ -1001,24 +1001,28 @@ function AllPicksSheet({
               role="button"
               onClick={() => onPick(p)}
               style={{
-                padding: '12px 0',
-                borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+                marginTop: i === 0 ? 0 : 22,
                 cursor: 'pointer',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 800,
-                    color: INK,
-                    fontVariantNumeric: 'tabular-nums lining',
-                    minWidth: 14,
-                    textAlign: 'right',
-                  }}
-                >
-                  {p.rank}
+              {/* Same grammar as the card: the pick with its denominator, then the state */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginBottom: 7,
+                  minHeight: 10,
+                }}
+              >
+                <span style={{ ...PICK_META, color: A.DIM }}>
+                  {t('overview.tiPicks.card.pickOf', { n: p.rank, total })}
                 </span>
+                <PickStatusTag live={live} t={t} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+
                 <div
                   role="link"
                   onClick={(e) => {
