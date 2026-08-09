@@ -2673,7 +2673,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Recent Posts Scroll Container */
   .recent-posts-scroll {
-    max-height: calc(75dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
+    max-height: calc(90dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     padding-bottom: var(--sheet-scroll-pad-bottom);

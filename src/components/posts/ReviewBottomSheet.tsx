@@ -20,10 +20,12 @@ import { formatMonthYearShort } from '@/i18n/format';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { MapPin, Play } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
@@ -73,6 +75,8 @@ export interface ReviewBottomSheetProps {
   } | null;
   reviewDate?: string | null;
   courseSubtitle?: string | null;
+  /** Optional review media, when the calling surface already holds it. */
+  media?: ReviewMediaItem[] | null;
 }
 
 const BREAKDOWN_KEYS = ['design', 'conditions', 'clubhouse', 'facilities'] as const;
@@ -105,6 +109,43 @@ function formatMonthLabel(iso?: string | null): string {
 }
 
 
+/** One cell of the reference block: figure over a small caps label. */
+const RefCell: React.FC<{
+  figure: string;
+  figureSize: number;
+  color: string;
+  label: string;
+}> = ({ figure, figureSize, color, label }) => (
+  <div style={{ minWidth: 0 }}>
+    <div
+      style={{
+        fontSize: figureSize,
+        fontWeight: 300,
+        lineHeight: 1,
+        color,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {figure}
+    </div>
+    <div
+      style={{
+        marginTop: 5,
+        fontSize: 9.5,
+        fontWeight: 600,
+        letterSpacing: '0.1em',
+        color: MUTE,
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {label}
+    </div>
+  </div>
+);
+
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
   onClose,
@@ -120,6 +161,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   breakdown,
   reviewerStats,
   reviewDate,
+  media,
 }) => {
   const navigate = useNavigate();
 
@@ -202,6 +244,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
+  // REFERENCE POINT (§3a) — reuses the shared aggregates hook, so on a page
+  // that already read them (course detail, discover) React Query dedupes and
+  // no extra network call happens. No SQL was needed.
+  const { data: agg } = useCourseRatingAggregates(isOpen ? courseId : undefined);
+  const communityAvg = agg?.avg_overall_score ?? null;
+  const ratingCount = agg?.review_count ?? 0;
+  const showReference =
+    rating != null && communityAvg != null && ratingCount >= 3;
+
+  // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
+  const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
+  const allMedia = (media?.length ? media : fetchedMedia) ?? [];
+  const mediaTotal = allMedia.length;
+  const mediaStrip = allMedia.slice(0, 3);
+
+
   const breakdownEntries = useMemo(() => {
     if (!effectiveBreakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
@@ -270,7 +328,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               bottom: 0,
               zIndex: REVIEW_SHEET_Z + 1,
               width: '100%',
-              maxHeight: '75dvh',
+              maxHeight: '90dvh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
@@ -391,62 +449,104 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
               </div>
 
-              {/* 2×2 breakdown grid */}
+              {/* REFERENCE BLOCK — their score against the community (§3a).
+                  Omitted below three ratings: an average of one is not a
+                  reference point. */}
+              {showReference && (
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr',
+                    gap: 8,
+                    alignItems: 'end',
+                  }}
+                >
+                  <RefCell
+                    figure={rating.toFixed(1)}
+                    figureSize={40}
+                    color={reviewLabelColor(rating, 'light')}
+                    label="THEIR SCORE"
+                  />
+                  <RefCell
+                    figure={communityAvg!.toFixed(1)}
+                    figureSize={19}
+                    color={INK}
+                    label={`${ratingCount} RATINGS`}
+                  />
+                  <RefCell
+                    figure={Math.abs(rating - communityAvg!).toFixed(1)}
+                    figureSize={19}
+                    color={INK}
+                    label={rating >= communityAvg! ? 'ABOVE' : 'BELOW'}
+                  />
+                </div>
+              )}
+
+              {/* THE SPREAD — one row of four: figure, bar out of ten, label.
+                  A null category omits its column and the row rebalances. */}
               {breakdownEntries.length > 0 && (
                 <div
                   style={{
                     marginTop: 12,
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 6,
+                    gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
+                    gap: 10,
                   }}
                 >
-                  {breakdownEntries.map(({ key, label, value }) => (
-                    <div
-                      key={key}
-                      style={{
-                        background: PANEL,
-                        border: `1px solid ${BORDER}`,
-                        borderRadius: 14,
-                        padding: '10px 12px',
-                        minHeight: 52,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 8,
-                        minWidth: 0,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 10.5,
-                          fontWeight: 600,
-                          letterSpacing: '0.12em',
-                          color: MUTE,
-                          textTransform: 'uppercase',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {label}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 19,
-                          fontWeight: 300,
-                          color: reviewLabelColor(value, 'light'),
-                          fontVariantNumeric: 'tabular-nums',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {value.toFixed(1)}
-                      </span>
-                    </div>
-
-                  ))}
+                  {breakdownEntries.map(({ key, label, value }) => {
+                    const c = reviewLabelColor(value, 'light');
+                    return (
+                      <div key={key} style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 17,
+                            fontWeight: 300,
+                            color: c,
+                            fontVariantNumeric: 'tabular-nums',
+                            lineHeight: 1.1,
+                          }}
+                        >
+                          {value.toFixed(1)}
+                        </div>
+                        <div
+                          style={{
+                            marginTop: 5,
+                            height: 3,
+                            borderRadius: 2,
+                            background: BORDER,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${Math.max(0, Math.min(100, (value / 10) * 100))}%`,
+                              height: '100%',
+                              background: c,
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            marginTop: 5,
+                            fontSize: 9.5,
+                            fontWeight: 600,
+                            letterSpacing: '0.1em',
+                            color: MUTE,
+                            textTransform: 'uppercase',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {label}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
+
             </div>
 
             {/* ─── SCROLL REGION ──────────────────────────────── */}
@@ -489,7 +589,78 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 ))
               )}
 
+              {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
+                  NON-INTERACTIVE: opening the fullscreen viewer from here is
+                  the exact z-order case that once put the viewer BEHIND a
+                  sheet on iOS, and it is not verifiable from a sheet that
+                  itself sits at REVIEW_SHEET_Z. Video shows poster + glyph
+                  and never autoplays. */}
+              {mediaStrip.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      color: MUTE,
+                      textTransform: 'uppercase',
+                      marginBottom: 6,
+                    }}
+                  >
+                    {mediaTotal === 1 ? '1 PHOTO' : `${mediaTotal} PHOTOS`}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {mediaStrip.map((m) => (
+                      <div
+                        key={m.id}
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          height: 78,
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          background: BORDER,
+                          position: 'relative',
+                        }}
+                      >
+                        <img
+                          src={m.mediaType === 'video' ? (m.posterUrl ?? m.mediaUrl) : m.mediaUrl}
+                          alt=""
+                          loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                        {m.mediaType === 'video' && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: 999,
+                                background: 'rgba(14,18,22,0.55)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <Play size={12} strokeWidth={2.5} color="#FFFFFF" fill="#FFFFFF" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
             <div

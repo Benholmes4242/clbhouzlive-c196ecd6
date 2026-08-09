@@ -38,8 +38,8 @@ import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW
 /** Deep gold: 8px bright gold fails contrast on a light wash. */
 const GOLD_TEXT = '#A87718';
 
-/** Six courses, one event each (BRIEF_ATW_MASONRY §1). */
-const PAGE = 6;
+/** Eight courses, one event each (BRIEF_SHEET_CAPS_ATW_AND_REVIEW §2). */
+const PAGE = 8;
 
 /**
  * A course may hold at most TWO tiles, and only via backfill when pass 1 left
@@ -96,7 +96,7 @@ function deClashColumns<T extends { g: { courseId: string } }>(columns: T[][]): 
  * By position the silhouette is stable whatever happened and the largest tile
  * always means "the most notable thing in the last 90 days".
  */
-export const ATW_PHOTO_HEIGHTS = [206, 168, 146, 130, 122, 116] as const;
+export const ATW_PHOTO_HEIGHTS = [206, 168, 146, 130, 122, 116, 112, 109] as const;
 
 /** A photo at or above this height gets the larger chip and name sizes. */
 const TALL = 180;

@@ -44,7 +44,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
       ariaLabelledBy="rounds-archive-sheet-title"
       variant="dark"
       surfaceColor={CHART.CANVAS}
-      maxHeight="75dvh"
+      maxHeight="90dvh"
       style={{
         height: '75dvh',
         maxHeight: '75dvh',
