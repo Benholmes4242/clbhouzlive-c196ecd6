@@ -832,7 +832,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "ボード上のホールインワンとアルバトロス {{count}} 件"
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",

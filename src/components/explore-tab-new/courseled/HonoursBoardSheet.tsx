@@ -57,7 +57,7 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
           {t('discover.honoursTitleSentence', 'The honours board')}
         </div>
         <div style={{ fontSize: 10.5, color: GOLD_INK, marginTop: 5, fontWeight: 600 }}>
-          {t('discover.honoursSheetCaption', '{{count}} entries · all time', {
+          {t('discover.honoursSheetCaption', '{{count}} entries', {
             count: events.length,
           })}
         </div>

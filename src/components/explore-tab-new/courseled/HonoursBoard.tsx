@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, InkAction, SANS, NUMF } from './tokens';
 import { GOLD_INK, GOLD_HAIR, HONOURS_SHELL } from './honoursTokens';
@@ -13,36 +14,39 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
  * The only gold-bordered panel on Discover — that is its distinction.
  * Ordering: RARITY GROUP then RECENCY (aces grouped, albatrosses grouped,
  * newest first inside each group).
+ *
+ * THE ROW LEADS WITH THE HOLDER, not a numeral. The old 30x30 gold ring drew
+ * the score on the hole — a "1" on every ace, restating the feat line beside
+ * it. The same 30px now says WHO, which is the only thing a hall of fame is
+ * about.
+ *
+ * AMBER DISCIPLINE: amber/gold means the viewing member. The year keeps gold
+ * (the board's own chronology, and the row's only figure); the feat line is
+ * body ink. On a row the member is in, THEIR NAME is the only amber text.
  */
 
 export { GOLD_INK, GOLD_HAIR, GOLD_BORDER, HONOURS_WASH, HONOURS_SHELL } from './honoursTokens';
 
-/** The mock's ring: one 30x30 gold circle, red tabular numeral. No inner ring. */
-function HonoursRing({ value }: { value: number }) {
+/**
+ * The holder, 30x30. Canonical squircle geometry with the canonical 1px traced
+ * hairline — NO gold border: the tile is the person, not an ornament. With no
+ * photo, SquircleAvatar renders the member's initials on a deterministic
+ * neutral fill; it never falls back to the old numeral ring.
+ */
+function HolderAvatar({ event: e }: { event: WireEvent }) {
   return (
-    <span
-      aria-hidden
-      style={{
-        width: 30,
-        height: 30,
-        flex: '0 0 auto',
-        borderRadius: 999,
-        border: '1.5px solid #D8A93C',
-        background: '#FFFFFF',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 12,
-        fontWeight: 800,
-        color: '#C0392B',
-        fontFamily: SANS,
-        ...NUMF,
-      }}
-    >
-      {value}
+    <span style={{ flex: '0 0 auto', display: 'block' }}>
+      <SquircleAvatar
+        size={30}
+        src={e.actorAvatar}
+        alt={e.actorName}
+        userId={e.userId}
+        hairlineRing
+      />
     </span>
   );
 }
+
 
 export function sortHonours(events: WireEvent[]): WireEvent[] {
   const groupRank = (e: WireEvent) => (e.kind === 'ace' ? 0 : 1);
@@ -64,7 +68,6 @@ export function HonoursRow({
   const { t } = useTranslation('courses');
   const isAce = e.kind === 'ace';
   const par = e.holePar ?? (isAce ? 3 : 5);
-  const strokes = isAce ? 1 : Math.max(1, par - 3);
   const tappable = !!onPress && !!e.scoreId;
 
   const feat =
@@ -108,7 +111,7 @@ export function HonoursRow({
         cursor: tappable ? 'pointer' : 'default',
       }}
     >
-      <HonoursRing value={strokes} />
+      <HolderAvatar event={e} />
 
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
@@ -130,7 +133,7 @@ export function HonoursRow({
             display: 'block',
             fontSize: 11,
             fontWeight: 600,
-            color: GOLD_INK,
+            color: A.BODY,
             lineHeight: 1.35,
             marginTop: 2,
             overflow: 'hidden',
@@ -215,7 +218,16 @@ export function HonoursBoard({
               {t('discover.honoursTitle', 'The honours board')}
             </div>
             <div style={{ fontSize: 10.5, fontWeight: 600, lineHeight: 1.35, color: A.BODY, marginTop: 5 }}>
-              {t('discover.honoursCaption', 'Every ace and albatross in clbhouz history')}
+              {/* COUNT = the whole board (`events`), never `shown` — the page
+                  caps at 5 and the sheet holds the rest. No time claim: the
+                  legendary rail narrows to 30/90/365-day windows once volume
+                  passes 10 entries, so "all time" would eventually be false. */}
+              {t(
+                'discover.honoursCaptionCount',
+                '{{count}} aces and albatrosses on the board',
+                { count: events.length },
+              )}
+
             </div>
           </div>
         ) : null}

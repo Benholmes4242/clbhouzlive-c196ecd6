@@ -879,7 +879,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "{{count}} hoyos en uno y albatros en el cuadro"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

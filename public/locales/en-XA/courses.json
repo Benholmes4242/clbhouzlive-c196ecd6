@@ -830,7 +830,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "[{{count}} åċēş åńđ åļƀåţŕöşşēş öń ţĥē ƀöåŕđ]"
   },
   "statBrowse": {
     "countTracked_one": "[~~ĉőűřšé ţŕáĉǩéđ~~]",
