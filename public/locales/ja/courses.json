@@ -102,7 +102,8 @@
       "legendDouble": "Double+",
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
-      "showLess": "Show less"
+      "showLess": "Show less",
+      "seeAllShort": "全{{count}}"
     }
   },
   "scorecard": {
@@ -657,7 +658,10 @@
     "holes": {
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
-      "yourGap": "Your gap"
+      "yourGap": "Your gap",
+      "scaleLabel": "難易度スケール",
+      "scaleCaption": "コース内の他のホールとの比較 — 右にいくほど難しい。",
+      "yourGapVsField": "フィールドとの差"
     },
     "records": {
       "youHold": "You hold this board",

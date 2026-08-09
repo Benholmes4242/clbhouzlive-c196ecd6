@@ -129,11 +129,18 @@ export const Panel: React.FC<{
   aside?: string;
   footer?: string;
   onOpen?: () => void;
+  /**
+   * Heading-row action (BRIEF_HOLE_BY_HOLE_REFINE §6): the panel's escape hatch
+   * sits on the heading row, right-aligned, not at the foot of the list.
+   */
+  action?: { label: string; onClick: () => void };
+  /** A 12.5/500 MUTE sentence under the heading saying what the panel shows. */
+  subline?: string;
   /** Override the gap beneath the header row (px). Default 16. */
   headerGap?: number;
   children: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ kicker, title, aside, footer, onOpen, headerGap = 16, children, style }) => (
+}> = ({ kicker, title, aside, footer, onOpen, action, subline, headerGap = 16, children, style }) => (
   <section
     style={{
       background: A.PANEL,
@@ -145,21 +152,57 @@ export const Panel: React.FC<{
       ...style,
     }}
   >
-    {(kicker || title || aside) && (
+    {(kicker || title || aside || action) && (
       <header
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'baseline',
           gap: 12,
-          marginBottom: headerGap,
+          marginBottom: subline ? 5 : headerGap,
         }}
       >
         {kicker && <span style={KICKER}>{kicker}</span>}
         {title && !kicker && <span style={TITLE}>{title}</span>}
-        {aside && <span style={{ ...LABEL, textAlign: 'right' }}>{aside}</span>}
+        {aside && !action && <span style={{ ...LABEL, textAlign: 'right' }}>{aside}</span>}
+        {action && (
+          <button
+            type="button"
+            onClick={action.onClick}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontFamily: SANS,
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ ...LABEL, color: A.INK }}>{action.label}</span>
+            <span style={{ fontSize: 11, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+              {'\u203A'}
+            </span>
+          </button>
+        )}
       </header>
     )}
+    {subline && (
+      <p
+        style={{
+          margin: `0 0 ${headerGap}px`,
+          fontSize: 12.5,
+          fontWeight: 500,
+          lineHeight: 1.35,
+          color: A.MUTE,
+        }}
+      >
+        {subline}
+      </p>
+    )}
+
     {children}
     {footer && (
       <button
