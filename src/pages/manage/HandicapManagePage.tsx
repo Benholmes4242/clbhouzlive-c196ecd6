@@ -97,17 +97,23 @@ export default function HandicapManagePage() {
 
   // CONNECT FLOW: immersive. The page owns its single back + title; no app
   // header, and the wash runs through the notch.
-  if (!connection) {
+  //
+  // The flow owns its own completion: a connection row appearing mid-flow must
+  // NOT tear it down before the member has seen (and dismissed) the connected
+  // screen. onConnected fires from that screen's CTA only.
+  if (!connection || (startedDisconnected.current === true && !flowFinished)) {
     return (
       <WhsConnectScreen
         onConnected={async () => {
           invalidateAll();
+          setFlowFinished(true);
           navigate('/handicap', { replace: true });
         }}
         onDecline={declineHandicapChip}
       />
     );
   }
+
 
   return (
     <ManagePageShell
