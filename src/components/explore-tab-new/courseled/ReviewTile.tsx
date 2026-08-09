@@ -6,6 +6,7 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
 import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
@@ -25,13 +26,11 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score chip is WHITE, not band-coloured. This was RE-TESTED
- * (BRIEF_LATEST_REVIEWS_CRAFT_AND_FILTER) against the four live photographs on
- * the dark glass substrate, including a bright sky-heavy one: BAND_GREEN
- * (#047857) all but disappears on rgba(10,14,10,0.58) — a 9.8 reads as a
- * smudge — and the only way to make green legible there is to invent a second,
- * lighter rating green that exists nowhere else in the app. So the chip stays
- * white and the band colour lives in the review sheet. Settled; do not revisit.
+ * The score figure carries the BAND COLOUR, matching the review wizard and the
+ * review sheet. On dark glass it resolves through `reviewLabelColor(rating,
+ * 'dark')` — the app's existing dark-surface band tokens (#5EE9A6 / #F7931E /
+ * #FF6B6B), not the light-surface hexes, which vanish on rgba(10,14,10,0.58).
+ * Same thresholds everywhere: >= 9 green, >= 5 amber, below 5 red.
  *
  * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
  * (a figure on a review tile can only be a rating).
@@ -279,7 +278,7 @@ export function ReviewTile({
             style={{
               fontSize: 16,
               fontWeight: 800,
-              color: '#fff',
+              color: reviewLabelColor(r.rating, 'dark'),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,
