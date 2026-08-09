@@ -494,13 +494,30 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
       {/* Block 3 - Hole by hole */}
       <Panel
         kicker={t('courses:holes.preview.eyebrow')}
-        aside={t('courses:courseDetail.holes.tapHint')}
-        footer={t('courses:holes.preview.seeAll', { count: holes.length })}
-        onOpen={() => setHolesSheetOpen(true)}
+        action={{
+          label: t('courses:holes.preview.seeAllShort', { count: holes.length }),
+          onClick: () => setHolesSheetOpen(true),
+        }}
+        subline={
+          totalRounds > 0
+            ? t('courses:holes.preview.description', {
+                count: totalRounds,
+                holes: t('courses:courseDetail.holes.rankOf', {
+                  rank: holes.length,
+                  total: holes.length,
+                }).includes('of')
+                  ? `${holes.length} holes`
+                  : `${holes.length} holes`,
+                rounds: formatNumber(totalRounds),
+                personal: hasYou ? t('courses:holes.preview.personalClause') : '',
+              })
+            : t('courses:holes.preview.descriptionNoRounds', { holes: `${holes.length} holes` })
+        }
         headerGap={10}
-        style={{ padding: '12px 16px' }}
+        style={{ padding: '18px 16px 12px' }}
       >
         <HoleRampLegend hasYou={hasYou} />
+
         {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
           <HoleRowV2
             key={h.hole_no}
