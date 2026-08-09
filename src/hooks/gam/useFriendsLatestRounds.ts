@@ -420,7 +420,24 @@ export function useFriendsLatestRounds(
           net,
           hcp_delta: hcpDelta,
           feats: featsForRound(r),
+
+          birdies: r.birdies,
+          eagles: r.eagles,
+          albatrosses: r.albatrosses,
+          holes_in_one: r.holes_in_one,
+          clean_card: r.clean_card,
+          longest_birdie_run: r.longest_birdie_run,
+          longest_par_or_better_run: r.longest_par_or_better_run,
+          sub_80: r.sub_80,
+          ace_hole: r.whs_score_id ? aceHoleByScore.get(r.whs_score_id) ?? null : null,
+          albatross_hole: r.whs_score_id ? albatrossHoleByScore.get(r.whs_score_id) ?? null : null,
+          front_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.front ?? null : null,
+          back_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.back ?? null : null,
+          is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
+          is_first_sub_80:
+            r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
         };
+
       });
 
       return out;
