@@ -437,7 +437,8 @@ function SheetShell({
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
           height: '75dvh',
-          maxHeight: '75dvh',
+          maxHeight: '90dvh',
+
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
