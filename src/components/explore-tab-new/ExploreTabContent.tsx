@@ -27,6 +27,7 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { OneThingRow } from './courseled/OneThingRow';
+import { FindGolfersSheet } from './FindGolfersSheet';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
 import { LatestReviews } from './courseled/LatestReviews';
 import { LatestReviewsSheet } from './courseled/LatestReviewsSheet';
@@ -119,6 +120,7 @@ export default function ExploreTabContent({
 
   const [friendsSheet, setFriendsSheet] = useState(false);
   const [momentsSheet, setMomentsSheet] = useState(false);
+  const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
   const [reviewsSheet, setReviewsSheet] = useState(false);
@@ -420,7 +422,7 @@ export default function ExploreTabContent({
 
       {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
           dismissible. Renders nothing when there is nothing to ask. */}
-      <OneThingRow userId={userId} />
+      <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
 
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
@@ -520,6 +522,8 @@ export default function ExploreTabContent({
           else opener.openProfile(uid);
         }}
       />
+
+      <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
 
       <MomentsSheet
         open={momentsSheet}
