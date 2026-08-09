@@ -366,7 +366,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
 
   const yards = active.total_yards ?? null;
   const delta = slope != null ? slope - STANDARD_SLOPE : null;
-  const deltaTone = delta == null || delta === 0 ? A.INK : delta > 0 ? A.RED : A.GREEN;
   const deltaText =
     delta == null
       ? ''
@@ -392,7 +391,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
-          padding: '12px 16px 3px',
+          padding: '18px 16px 3px',
           fontFamily: SANS,
           ...FIGS,
         }}
@@ -403,33 +402,45 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             justifyContent: 'space-between',
             alignItems: 'baseline',
             gap: 12,
-            marginBottom: 10,
+            marginBottom: 16,
           }}
         >
           <span style={{ ...KICKER, fontSize: 9, letterSpacing: '0.14em', fontWeight: 800 }}>
             {t('courses:teeCard.eyebrow')}
           </span>
-          <span
+          <button
+            type="button"
+            onClick={openSheet}
             style={{
-              fontSize: 8,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: A.DIM,
-              textAlign: 'right',
-              ...FIGS,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontFamily: SANS,
             }}
           >
-            {yards != null
-              ? `${active.tee_label} \u00B7 ${t('courses:courseDetail.card.yards', {
-                  count: Math.round(yards),
-                  yards: formatNumber(Math.round(yards)),
-                })}`
-              : active.tee_label}
-          </span>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: A.INK,
+              }}
+            >
+              {t('courses:courseDetail.card.fullCard')}
+            </span>
+            <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+              {'\u203A'}
+            </span>
+          </button>
         </header>
 
-        {/* HEADLINE: slope, or length when the catalogue carries no slope. */}
+        {/* HEADLINE: slope, or length when the catalogue carries no slope.
+            The label carries the TEE - it qualifies every figure beneath it. */}
         <div
           style={{
             fontSize: 8.5,
@@ -439,40 +450,63 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             color: A.DIM,
           }}
         >
-          {slope != null
-            ? t('courses:courseDetail.card.slopeLabel')
-            : t('courses:courseDetail.card.lengthLabel')}
+          {`${
+            slope != null
+              ? t('courses:courseDetail.card.slopeLabel')
+              : t('courses:courseDetail.card.lengthLabel')
+          } \u00B7 ${t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}`}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 2 }}>
-          <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, lineHeight: 1.05 }}>
+          <span
+            style={{
+              fontSize: 46,
+              fontWeight: 800,
+              letterSpacing: '-0.035em',
+              color: A.INK,
+              lineHeight: 0.92,
+            }}
+          >
             {slope != null ? slope : fmtInt(yards)}
           </span>
           {slope != null ? (
             <>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: deltaTone }}>{deltaText}</span>
-              <span style={{ fontSize: 11.5, fontWeight: 600, color: A.BODY }}>
+              {/* Difficulty is neither a score nor the viewing member - no colour. */}
+              <span style={{ fontSize: 16, fontWeight: 800, color: A.INK }}>{deltaText}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: A.MUTE }}>
                 {t('courses:courseDetail.card.vsStandard', { standard: STANDARD_SLOPE })}
               </span>
             </>
           ) : (
-            <span style={{ fontSize: 11.5, fontWeight: 600, color: A.BODY }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: A.MUTE }}>
               {t('courses:courseDetail.card.yardsUnit')}
             </span>
           )}
         </div>
+
+        {/* SLOPE SCALE - only when there is a slope to place. */}
+        {slope != null ? <SlopeScale slope={slope} /> : null}
+
         {slope != null && sentence ? (
-          <p style={{ margin: '5px 0 0', fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
+          <p
+            style={{
+              margin: '15px 0 0',
+              fontSize: 13.5,
+              fontWeight: 500,
+              color: A.BODY,
+              lineHeight: 1.4,
+            }}
+          >
             {sentence}
           </p>
         ) : null}
 
         {/* COUNTER STRIP under a hairline. */}
-        <Hairline style={{ marginTop: 10 }} />
+        <Hairline style={{ marginTop: 16 }} />
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            paddingTop: 8,
+            paddingTop: 15,
           }}
         >
           <Counter label={t('courses:teeCard.stat.par')} value={active.par_total} />
@@ -489,42 +523,8 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             />
           )}
         </div>
-
-        {/* Footer action. */}
-        <button
-          type="button"
-          onClick={openSheet}
-          style={{
-            marginTop: 4,
-            width: '100%',
-            minHeight: 32,
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            padding: 0,
-            fontFamily: SANS,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: A.INK,
-            }}
-          >
-            {t('courses:courseDetail.card.seeFullShort')}
-          </span>
-          <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
-            {'\u203A'}
-          </span>
-        </button>
       </section>
+
 
       <BottomSheet
         open={open}
