@@ -24,6 +24,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
+import { shortCourseName } from '../../../_shared/courseLabel';
 import { resolveDefaultTee, storageKey } from '../CourseTeeCard';
 import { A, FIGS, Hairline, KICKER, LABEL, SANS } from './tokens';
 
@@ -32,9 +33,20 @@ const STANDARD_SLOPE = 113;
 
 interface Props {
   courseId: string | undefined;
+  /** Names the sheet. Falls back to the tee title when absent. */
+  courseName?: string;
 }
 
 const DASH = '\u2014';
+
+/** ONE eyebrow treatment: the panel and its sheet render identically. */
+const SHEET_EYEBROW: React.CSSProperties = {
+  ...KICKER,
+  fontSize: 9.5,
+  letterSpacing: '0.15em',
+  fontWeight: 800,
+};
+
 
 function fmtInt(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return DASH;
