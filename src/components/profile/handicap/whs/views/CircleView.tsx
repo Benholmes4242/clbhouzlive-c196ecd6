@@ -26,7 +26,7 @@ import React from 'react';
 import FriendsLeaderboardSection from '../sections/friends-leaderboard-v2/FriendsLeaderboardSection';
 import RecentlyPlayedFeed from '../sections/recently-played/RecentlyPlayedFeed';
 import CompareEntryPanel from '../sections/compare/CompareEntryPanel';
-import InviteToClbhouzV2 from '../sections/invite-to-clbhouz/InviteToClbhouzV2';
+import CircleInviteAction from '../sections/invite-to-clbhouz/CircleInviteAction';
 
 interface Props {
   userId: string;
@@ -63,8 +63,9 @@ export const CircleView: React.FC<Props> = ({
       {/* 3. Compare - shown in friend view */}
       <CompareEntryPanel />
 
-      {/* 4. Invite - owner only */}
-      {!readOnly && <InviteToClbhouzV2 ownerUserId={userId} />}
+      {/* 4. Invite - owner only. One canonical surface: the action opens
+          InviteFriendsSheet via the app-wide provider. */}
+      {!readOnly && <CircleInviteAction />}
     </div>
   );
 };
