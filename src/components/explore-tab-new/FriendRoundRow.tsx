@@ -37,9 +37,15 @@ interface Props {
   row: FriendRoundRow;
   isLast?: boolean;
   onPress?: () => void;
+  /**
+   * Pre-resolved insight from buildInsightMap. Passed by list surfaces so the
+   * repetition cap applies down the whole list; omitted, the row resolves its
+   * own rarest true line.
+   */
+  insight?: string | null;
 }
 
-export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
+export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props) {
   const {
     display_name,
     profile_photo_url,
@@ -56,7 +62,8 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
   const { t } = useTranslation('courses');
   const relative = formatRelativeMonths(play_date);
   const toPar = toParFor(row);
-  const reference = referenceLine(row, t as never);
+  const reference = insight !== undefined ? insight : insightFor(row, t as never)?.text ?? null;
+
 
 
   return (
