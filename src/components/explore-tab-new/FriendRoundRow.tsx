@@ -5,7 +5,8 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { RoundFeatChips, featChipBase } from './RoundFeatChips';
+import { RoundFeatChips } from './RoundFeatChips';
+import { IndexMovement, referenceLine, toParFor } from './friendRoundParts';
 
 /**
  * FriendRoundRow — Discover "Friends' latest rounds".
@@ -33,8 +34,6 @@ const SUBLINE_SIZE = 12.5;
 const STAT_VALUE_SIZE = 17;
 const STAT_LABEL_SIZE = 9.5;
 
-const chipBase: CSSProperties = featChipBase;
-
 interface Props {
   row: FriendRoundRow;
   isLast?: boolean;
@@ -57,25 +56,10 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
 
 
   const relative = formatRelativeMonths(play_date);
+  const toPar = toParFor(row);
+  const reference = referenceLine(row, ((k: string, o?: Record<string, unknown>) =>
+    (o?.defaultValue as string) ?? k) as never);
 
-
-  // hcp movement — direction inverted: negative delta (lower index) is good.
-  const hcpChip = (() => {
-    if (hcp_delta == null || Math.abs(hcp_delta) < 0.05) return null;
-    const dropped = hcp_delta < 0;
-    const abs = Math.abs(hcp_delta).toFixed(1);
-    return (
-      <span
-        style={{
-          ...chipBase,
-          background: dropped ? 'rgba(14,138,87,0.10)' : 'rgba(210,34,45,0.10)',
-          color: dropped ? LAUREL_INK : RED,
-        }}
-      >
-        {dropped ? '↓' : '↑'} {abs}
-      </span>
-    );
-  })();
 
   return (
     <button
@@ -169,9 +153,19 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
           >
             {course_name ?? ''}
           </span>
+          <IndexMovement row={row} />
         </div>
 
-        {(hcpChip || feats.length > 0) && (
+        {reference && (
+          <div
+            className="tabular-nums"
+            style={{ fontSize: 11.5, fontWeight: 600, color: SLATE_500, lineHeight: 1.2 }}
+          >
+            {reference}
+          </div>
+        )}
+
+        {(feats.length > 0) && (
           <div
             style={{
               display: 'flex',
@@ -181,7 +175,6 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               marginTop: 2,
             }}
           >
-            {hcpChip}
             <RoundFeatChips feats={feats} maxChips={1} />
           </div>
         )}
@@ -196,20 +189,30 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-end',
-            gap: 2,
+            gap: 3,
           }}
         >
-          <div
-            className="tabular-nums"
-            style={{
-              fontSize: STAT_VALUE_SIZE,
-              fontWeight: 700,
-              lineHeight: 1,
-              color: net != null && net < 0 ? TOPAR_UNDER_LIGHT : INK,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {gross}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: STAT_VALUE_SIZE,
+                fontWeight: 700,
+                lineHeight: 1,
+                color: INK,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {gross}
+            </div>
+            {toPar && (
+              <div
+                className="tabular-nums"
+                style={{ fontSize: 12.5, fontWeight: 800, lineHeight: 1, color: toPar.tone }}
+              >
+                {toPar.text}
+              </div>
+            )}
           </div>
           <div
             style={{
@@ -221,7 +224,7 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
               lineHeight: 1,
             }}
           >
-            GROSS
+            {row.course_par != null ? `PAR ${row.course_par}` : 'GROSS'}
           </div>
         </div>
 
