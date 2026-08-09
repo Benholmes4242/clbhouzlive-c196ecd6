@@ -91,7 +91,7 @@ export function InviteFriendsSheet({ open, onClose, source }: Props) {
       maxHeight="90dvh"
       style={{
         height: '75dvh',
-        maxHeight: '75dvh',
+        maxHeight: '90dvh',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -331,13 +331,17 @@ function FriendGroup({
         <span style={KICKER}>{label}</span>
         <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>{rows.length}</span>
       </div>
-      <div style={{ background: '#FFFFFF', borderTop: `0.5px solid ${A.BORDER}` }}>
-        {rows.map((f) => (
+      {/* BRIEF_INVITE_SHEET_SURFACE: no fill here. The rows sit on the sheet's
+          own canvas; the hairline above separates them from the header, and
+          each row after the first carries its own hairline. */}
+      <div style={{ borderTop: `0.5px solid ${A.BORDER}` }}>
+        {rows.map((f, i) => (
           <EGFriendRow
             key={String(f.friend_passport_id)}
             friend={f}
             already={alreadyFor(f)}
             source={source}
+            divider={i > 0}
           />
         ))}
       </div>
@@ -395,10 +399,12 @@ function EGFriendRow({
   friend,
   already,
   source,
+  divider = false,
 }: {
   friend: FriendLeaderboardEntry;
   already?: { created_at: string };
   source: string;
+  divider?: boolean;
 }) {
   const { t } = useTranslation('common');
   const queryClient = useQueryClient();
@@ -459,6 +465,7 @@ function EGFriendRow({
         alignItems: 'center',
         gap: 12,
         padding: '12px 20px',
+        ...(divider ? { borderTop: `0.5px solid ${A.BORDER}` } : null),
       }}
     >
       {avatarSrc ? (
