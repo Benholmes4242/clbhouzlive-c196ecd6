@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, InkAction, SANS, NUMF } from './tokens';
+import { A, InkAction, LABEL, SANS } from './tokens';
 import { GOLD_INK, GOLD_HAIR, HONOURS_SHELL } from './honoursTokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
