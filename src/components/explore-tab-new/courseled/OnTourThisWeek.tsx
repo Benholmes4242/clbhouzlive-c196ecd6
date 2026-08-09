@@ -296,14 +296,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     if (thruText) {
                       cellsLive.push([t('discover.tour.thru', 'Thru'), thruText, A.INK]);
                     }
-                    if (peek.chasingScore != null) {
-                      // A to-par figure, so it takes the score treatment.
+                    // THIRD CELL — never "Second": that figure IS the margin
+                    // printed on line 1, told a second time. Field average today
+                    // is not derivable from this peek (it reads only the top 12
+                    // positions), so the brief's stated fallback applies: holes
+                    // remaining for the leader.
+                    if (peek.thru != null && peek.thru < 18) {
                       cellsLive.push([
-                        t('discover.tour.second', 'Second'),
-                        fmtScore(peek.chasingScore),
-                        scoreColor(peek.chasingScore),
+                        t('discover.tour.holesLeft', 'Holes left'),
+                        String(18 - peek.thru),
+                        A.INK,
                       ]);
                     }
+
                     return (
                       <div style={{ padding: '8px 11px 7px' }}>
                         {/* LINE 1 — the figure, who holds it, and the margin. */}
