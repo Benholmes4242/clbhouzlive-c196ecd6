@@ -833,7 +833,7 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "clbhouz の歴史におけるホールインワンとアルバトロス全 {{count}} 件"
+    "honoursCaptionCount": "ボード上のホールインワンとアルバトロス {{count}} 件"
   },
   "statBrowse": {
     "countTracked_one": "トラック済みコース",
