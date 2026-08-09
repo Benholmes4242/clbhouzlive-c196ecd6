@@ -2,9 +2,15 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp } from 'lucide-react';
 import { getPrimaryScrollElement, scrollPageToTop } from '@/lib/getScrollParent';
+import { useIsFullScreenSurfaceOpen } from '@/stores/fullScreenSurfaceStore';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
+  // A scroll affordance for a scrolling PAGE. While a full-screen surface
+  // covers the page there is nothing to scroll, so the button is ABSENT —
+  // not transparent, not click-through. This is also the fix for the button
+  // (portalled to body) outranking an in-tree surface's confined zIndex.
+  const surfaceOpen = useIsFullScreenSurfaceOpen();
 
   useEffect(() => {
     const target = getPrimaryScrollElement();
@@ -47,6 +53,8 @@ const ScrollToTopGlass = () => {
     e.stopPropagation();
     scrollPageToTop('smooth');
   };
+
+  if (surfaceOpen) return null;
 
   return createPortal(
     <div 

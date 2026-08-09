@@ -6,6 +6,7 @@ import { trackedLazy } from '@/perf/navTiming';
 const lazy = <T extends { default: React.ComponentType<any> }>(factory: () => Promise<T>) =>
   trackedLazy('route', factory);
 import { usePageTracking } from '@/hooks/usePageTracking';
+import { useFullScreenSurface } from '@/stores/fullScreenSurfaceStore';
 
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
