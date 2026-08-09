@@ -143,10 +143,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
         >
           <SectionShell
             eyebrow={t('overview.tiPicks.eyebrow')}
-            subline={t('overview.tiPicks.subline')}
             linkLabel={t('overview.tiPicks.linkLabel')}
             onLinkClick={() => setSheet({ kind: 'index' })}
           >
+            <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+              {t('overview.tiPicks.subline')}
+            </div>
             <div
               style={{
                 display: 'flex',
