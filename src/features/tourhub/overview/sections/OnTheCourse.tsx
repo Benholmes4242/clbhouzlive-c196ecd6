@@ -233,7 +233,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   // consumed by the expanded full-field rail — no extra network fires.
   const leaderboardQuery = useTourLeaderboard(tournamentId ?? '');
   const leaderboardByPlayerId = useMemo(() => {
-    const m = new Map<string, { today: number | null; score: number | null; status: string | null; thru: number | null }>();
+    const m = new Map<string, { today: number | null; score: number | null; status: string | null; thru: number | null; position: number | null; positionTied: boolean | null }>();
     for (const row of (leaderboardQuery.data ?? []) as any[]) {
       const pid = row?.player_id as string | null | undefined;
       if (!pid) continue;
@@ -243,6 +243,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
         score: row?.score ?? null,
         status: (row?.status ?? null) as string | null,
         thru: row?.thru ?? null,
+        position: row?.position ?? null,
+        positionTied: row?.position_tied ?? null,
       });
     }
     return m;
