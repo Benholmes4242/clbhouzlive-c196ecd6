@@ -7,7 +7,7 @@ import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
-import { SANS, FIGS, NEW_CARD_RING } from './tokens';
+import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
