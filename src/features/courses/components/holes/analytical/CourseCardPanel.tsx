@@ -461,18 +461,18 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           )}
         </div>
         {slope != null && sentence ? (
-          <p style={{ margin: '8px 0 0', fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
+          <p style={{ margin: '5px 0 0', fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
             {sentence}
           </p>
         ) : null}
 
         {/* COUNTER STRIP under a hairline. */}
-        <Hairline style={{ marginTop: 14 }} />
+        <Hairline style={{ marginTop: 10 }} />
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            paddingTop: 12,
+            paddingTop: 8,
           }}
         >
           <Counter label={t('courses:teeCard.stat.par')} value={active.par_total} />
