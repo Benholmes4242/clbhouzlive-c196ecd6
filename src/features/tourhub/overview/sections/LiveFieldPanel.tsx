@@ -72,21 +72,23 @@ function Cell({
   value,
   color,
   sub,
+  align = 'left',
 }: {
   label: string;
   value: string;
   color?: string;
   sub?: string | null;
+  align?: 'left' | 'right';
 }) {
   return (
-    <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ flex: 1, minWidth: 0, textAlign: align }}>
       <div
         style={{
-          fontSize: 26,
+          fontSize: 25,
           fontWeight: 800,
           lineHeight: 1,
           color: color ?? A.INK,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.03em',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -111,8 +113,8 @@ function Cell({
         <div
           style={{
             marginTop: 3,
-            fontSize: 10.5,
-            fontWeight: 600,
+            fontSize: 12,
+            fontWeight: 700,
             color: A.BODY,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -125,6 +127,7 @@ function Cell({
     </div>
   );
 }
+
 
 interface LadderRow {
   hole: number;
