@@ -45,6 +45,13 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
           ? (pageParam as { createdAt: string; id: string })
           : undefined;
 
+      // pageParam === undefined means "start from the top": a first page must
+      // never exclude anything, and it restarts the accumulating list so it
+      // cannot grow across refetch generations (delete, invalidate, refocus).
+      if (!cursor) {
+        seenPostIds.current = [];
+      }
+
       const params: Record<string, unknown> = {
         p_user_id: userId ?? null,
         p_actor_type: actorType,
@@ -52,8 +59,9 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         p_viewer_actor_type: activeActor?.type ?? 'personal',
         p_viewer_actor_id: activeActor?.id ?? userId,
         p_page_size: PAGE_SIZE,
-        p_seen_post_ids: seenPostIds.current,
+        p_seen_post_ids: cursor ? seenPostIds.current : [],
       };
+
 
       if (cursor) {
         params.p_cursor = cursor.createdAt;
