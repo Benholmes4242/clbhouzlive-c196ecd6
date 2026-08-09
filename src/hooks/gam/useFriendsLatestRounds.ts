@@ -57,7 +57,29 @@ export interface FriendRoundRow {
   hcp_delta: number | null;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
+
+  // ---- INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET, part 1) -------------------
+  /** Raw stats the insight states read; nulls simply fail their state. */
+  birdies: number | null;
+  eagles: number | null;
+  albatrosses: number | null;
+  holes_in_one: number | null;
+  clean_card: boolean | null;
+  longest_birdie_run: number | null;
+  longest_par_or_better_run: number | null;
+  sub_80: boolean | null;
+  /** Hole numbers, from the hole rows only. Null = we do not know where. */
+  ace_hole: number | null;
+  albatross_hole: number | null;
+  /** To-par on each nine, from the hole rows. Null = no hole data. */
+  front_nine_to_par: number | null;
+  back_nine_to_par: number | null;
+  /** A current, guarded course record attained with THIS round. */
+  is_course_record: boolean;
+  /** Their first ever sub-80 round. */
+  is_first_sub_80: boolean;
 }
+
 
 
 interface Options {
@@ -110,7 +132,7 @@ export function useFriendsLatestRounds(
       const { data: rounds } = await supabase
         .from('gam_round_stats' as never)
         .select(
-          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card',
+          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80',
         )
         .in('user_id', friendIds)
         .gte('play_date', windowStartIso)
@@ -132,7 +154,11 @@ export function useFriendsLatestRounds(
         holes_in_one: number | null;
         beat_par: boolean | null;
         clean_card: boolean | null;
+        longest_birdie_run: number | null;
+        longest_par_or_better_run: number | null;
+        sub_80: boolean | null;
       };
+
 
       const allRounds = ((rounds ?? []) as unknown) as Round[];
       if (allRounds.length === 0) return [];
@@ -259,6 +285,108 @@ export function useFriendsLatestRounds(
         }
       }
 
+      // 7c. INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET) — three cheap reads.
+      //
+      //  i.  HOLE ROWS. State 6 (the nine-by-nine split) and the hole numbers
+      //      on the ace / albatross lines need them. MEASURED: index scan on
+      //      whs_score_holes_score_idx, ~18 rows per score, 3.3ms total for ten
+      //      scores. Affordable, so state 6 is IN and no line guesses where a
+      //      feat fell.
+      const nineByScore = new Map<string, { front: number; back: number }>();
+      const aceHoleByScore = new Map<string, number>();
+      const albatrossHoleByScore = new Map<string, number>();
+      if (scoreIds.length > 0) {
+        const { data: holes } = await supabase
+          .from('whs_score_holes' as never)
+          .select('score_id, hole_no, par, actual_gross')
+          .in('score_id', scoreIds);
+        type Hole = {
+          score_id: string;
+          hole_no: number | null;
+          par: number | null;
+          actual_gross: number | null;
+        };
+        const acc = new Map<string, { fp: number; fg: number; bp: number; bg: number; fn: number; bn: number }>();
+        for (const h of ((holes ?? []) as unknown) as Hole[]) {
+          if (h.hole_no == null || h.par == null || h.actual_gross == null) continue;
+          if (h.actual_gross === 1) aceHoleByScore.set(h.score_id, h.hole_no);
+          else if (h.par - h.actual_gross === 3) albatrossHoleByScore.set(h.score_id, h.hole_no);
+          const a = acc.get(h.score_id) ?? { fp: 0, fg: 0, bp: 0, bg: 0, fn: 0, bn: 0 };
+          if (h.hole_no <= 9) {
+            a.fp += h.par;
+            a.fg += h.actual_gross;
+            a.fn += 1;
+          } else {
+            a.bp += h.par;
+            a.bg += h.actual_gross;
+            a.bn += 1;
+          }
+          acc.set(h.score_id, a);
+        }
+        acc.forEach((a, sid) => {
+          // Both nines must be complete, or the split says nothing true.
+          if (a.fn !== 9 || a.bn !== 9) return;
+          nineByScore.set(sid, { front: a.fg - a.fp, back: a.bg - a.bp });
+        });
+      }
+
+      //  ii. COURSE RECORDS. A record only counts where the legends board has
+      //      three distinct players at the course — the same guard
+      //      create_round_posts applies (see useCourseFieldSizes.ts, which
+      //      counts distinct members on the same view).
+      const RECORD_MIN_PLAYERS = 3;
+      const recordScoreIds = new Set<string>();
+      if (surfacedCourseIds.length > 0) {
+        const { data: legends } = await supabase
+          .from('gam_course_legends_view')
+          .select('course_id, user_id, rank, category, trigger_whs_score_id')
+          .in('course_id', surfacedCourseIds)
+          .eq('is_current', true);
+        const playersByCourse = new Map<string, Set<string>>();
+        const candidates: Array<{ course_id: string; score_id: string }> = [];
+        for (const l of ((legends ?? []) as unknown) as Array<{
+          course_id: string | null;
+          user_id: string | null;
+          rank: number | null;
+          category: string | null;
+          trigger_whs_score_id: string | null;
+        }>) {
+          if (!l.course_id || !l.user_id) continue;
+          const set = playersByCourse.get(l.course_id) ?? new Set<string>();
+          set.add(l.user_id);
+          playersByCourse.set(l.course_id, set);
+          if (
+            l.category === 'lowest_gross_all_time' &&
+            Number(l.rank) === 1 &&
+            l.trigger_whs_score_id &&
+            scoreIds.includes(l.trigger_whs_score_id)
+          ) {
+            candidates.push({ course_id: l.course_id, score_id: l.trigger_whs_score_id });
+          }
+        }
+        for (const c of candidates) {
+          if ((playersByCourse.get(c.course_id)?.size ?? 0) >= RECORD_MIN_PLAYERS) {
+            recordScoreIds.add(c.score_id);
+          }
+        }
+      }
+
+      //  iii. FIRST SUB-80. Earliest sub-80 play_date per surfaced friend.
+      const firstSub80ByUser = new Map<string, string>();
+      if (surfacedFriendIds.length > 0) {
+        const { data: sub80 } = await supabase
+          .from('gam_round_stats' as never)
+          .select('user_id, play_date')
+          .in('user_id', surfacedFriendIds)
+          .eq('holes_played', 18)
+          .eq('sub_80', true);
+        for (const s of ((sub80 ?? []) as unknown) as Array<{ user_id: string; play_date: string }>) {
+          const cur = firstSub80ByUser.get(s.user_id);
+          if (!cur || s.play_date < cur) firstSub80ByUser.set(s.user_id, s.play_date);
+        }
+      }
+
+
       // 8. Assemble rows.
       const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
         const profile = profileById.get(r.user_id);
@@ -292,7 +420,24 @@ export function useFriendsLatestRounds(
           net,
           hcp_delta: hcpDelta,
           feats: featsForRound(r),
+
+          birdies: r.birdies,
+          eagles: r.eagles,
+          albatrosses: r.albatrosses,
+          holes_in_one: r.holes_in_one,
+          clean_card: r.clean_card,
+          longest_birdie_run: r.longest_birdie_run,
+          longest_par_or_better_run: r.longest_par_or_better_run,
+          sub_80: r.sub_80,
+          ace_hole: r.whs_score_id ? aceHoleByScore.get(r.whs_score_id) ?? null : null,
+          albatross_hole: r.whs_score_id ? albatrossHoleByScore.get(r.whs_score_id) ?? null : null,
+          front_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.front ?? null : null,
+          back_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.back ?? null : null,
+          is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
+          is_first_sub_80:
+            r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
         };
+
       });
 
       return out;

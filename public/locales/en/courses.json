@@ -1317,7 +1317,27 @@
       "firstHere": "Their first round here",
       "bestHere": "Their best here, of {{count}} rounds",
       "betterThanAvg": "{{figure}} better than their average here",
-      "worseThanAvg": "{{figure}} worse than their average here"
+      "worseThanAvg": "{{figure}} worse than their average here",
+      "insight": {
+        "record": "A new course record here",
+        "ace": "A hole in one",
+        "aceAtHole": "A hole in one at the {{hole}}",
+        "albatross": "An albatross",
+        "albatrossAtHole": "An albatross at the {{hole}}",
+        "firstSub80": "Their first round under 80",
+        "nines": "{{front}} after nine, then {{back}} coming home",
+        "parLevel": "Level",
+        "parUnder": "{{n}} under",
+        "parOver": "{{n}} over",
+        "bogeyFree": "A bogey-free card",
+        "birdieRun": "{{count}} birdies in a row",
+        "birdieRun_one": "{{count}} birdie in a row",
+        "parRun": "{{count}} holes in par or better",
+        "birdies": "{{count}} birdies",
+        "birdies_one": "{{count}} birdie",
+        "eagles": "{{count}} eagles",
+        "eagles_one": "{{count}} eagle"
+      }
     }
   },
   "statBrowse": {
