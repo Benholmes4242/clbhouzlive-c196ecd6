@@ -13,6 +13,11 @@
 export function relativeDay(
   iso: string,
   t: (k: string, o?: any) => string,
+  /**
+   * The rail prints inside a narrow image chip and keeps 'short'; the one-thing
+   * row has the width for the full weekday. THE ONLY difference between callers.
+   */
+  weekday: 'short' | 'long' = 'short',
 ): string {
   const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
   if (!Number.isFinite(then)) return '';
@@ -20,7 +25,7 @@ export function relativeDay(
   if (days <= 0) return t('discover.when.today', 'Today');
   if (days === 1) return t('discover.when.yesterday', 'Yesterday');
   if (days < 7) {
-    return new Date(then).toLocaleDateString(undefined, { weekday: 'long' });
+    return new Date(then).toLocaleDateString(undefined, { weekday });
   }
   if (days < 14) return t('discover.when.lastWeek', 'Last week');
   return t('discover.when.weeksAgo', {
@@ -28,3 +33,4 @@ export function relativeDay(
     count: Math.floor(days / 7),
   });
 }
+
