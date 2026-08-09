@@ -219,12 +219,15 @@ export function HonoursBoard({
             </div>
             <div style={{ fontSize: 10.5, fontWeight: 600, lineHeight: 1.35, color: A.BODY, marginTop: 5 }}>
               {/* COUNT = the whole board (`events`), never `shown` — the page
-                  caps at 5 and the sheet holds the rest. */}
+                  caps at 5 and the sheet holds the rest. No time claim: the
+                  legendary rail narrows to 30/90/365-day windows once volume
+                  passes 10 entries, so "all time" would eventually be false. */}
               {t(
                 'discover.honoursCaptionCount',
-                'All {{count}} aces and albatrosses in clbhouz history',
+                '{{count}} aces and albatrosses on the board',
                 { count: events.length },
               )}
+
             </div>
           </div>
         ) : null}
