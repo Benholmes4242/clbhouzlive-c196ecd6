@@ -16,10 +16,9 @@
  * The dots row (rendered by OverviewHero) sits above the wire ticker below.
  */
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { InsightSheet } from './InsightSheet';
 
 import {
   PHOTO_BAND_HEIGHT,
@@ -118,8 +117,6 @@ export function PhotoBand({
   state,
   tourLabel,
   datesString,
-  insight,
-  insightKind = 'course',
   momentLabel,
   momentName,
   momentScore,
@@ -171,39 +168,6 @@ export function PhotoBand({
             fontSize: 10,
             letterSpacing: '0.14em',
           };
-
-
-  // Insight overflow detection — only render "Read more" when the clamped
-  // insight actually overflows its 2-line box. Re-measures on value + resize.
-  const insightRef = useRef<HTMLDivElement>(null);
-  const [truncated, setTruncated] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
-
-  useLayoutEffect(() => {
-    const el = insightRef.current;
-    if (!el || !insight) {
-      setTruncated(false);
-      return;
-    }
-    const measure = () => {
-      setTruncated(el.scrollHeight > el.clientHeight + 1);
-    };
-    measure();
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    ro?.observe(el);
-    return () => ro?.disconnect();
-  }, [insight]);
-
-  useEffect(() => {
-    if (!insight) return;
-    const onResize = () => {
-      const el = insightRef.current;
-      if (!el) return;
-      setTruncated(el.scrollHeight > el.clientHeight + 1);
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [insight]);
 
   return (
     <div
@@ -320,72 +284,7 @@ export function PhotoBand({
         </div>
 
 
-        {/* Insight line — labelled editorial line (clamped to 2 lines) */}
-        {insight && (
-          <div>
-            <div
-              style={{
-                fontFamily: FONT,
-                fontSize: 8,
-                fontWeight: 800,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.42)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-                marginBottom: 5,
-              }}
-            >
-              {insightKind === 'result'
-                ? t('overview.photoBand.insightKickerResult', { defaultValue: 'HOW IT FINISHED' })
-                : t('overview.photoBand.insightKickerCourse', { defaultValue: 'COURSE INTELLIGENCE' })}
-            </div>
-            <div
-              ref={insightRef}
-              onClick={truncated ? () => setSheetOpen(true) : undefined}
-              style={{
-                fontFamily: FONT,
-                fontSize: 13,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: 'rgba(255,255,255,0.88)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-                maxWidth: '94%',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                cursor: truncated ? 'pointer' : 'default',
-              }}
-            >
-              {insight}
-            </div>
-            {truncated && (
-              <button
-                type="button"
-                onClick={() => setSheetOpen(true)}
-                aria-expanded={false}
-                aria-haspopup="dialog"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  minHeight: 44,
-                  padding: '10px 0',
-                  marginTop: 5,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 9.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.6)',
-                }}
-              >
-                {t('overview.photoBand.readMore')} {'\u203A'}
-              </button>
-            )}
-          </div>
-        )}
+
 
         {/* Title */}
         <h1
@@ -531,21 +430,6 @@ export function PhotoBand({
           </div>
         )}
       </div>
-      {insight && (
-        <InsightSheet
-          open={sheetOpen}
-          onClose={() => setSheetOpen(false)}
-          insight={insight}
-          venueName={venueName}
-          venueCourseName={venueCourseName}
-          venueCity={venueCity}
-          venueState={venueState}
-          venueCountry={venueCountry}
-          venuePar={venuePar}
-          venueYardage={venueYardage}
-          purse={purse}
-        />
-      )}
     </div>
   );
 }
