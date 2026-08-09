@@ -14,8 +14,10 @@ export type TeeGenderScope = 'ladies' | 'mens' | 'unisex' | 'unknown';
 export interface TeeHole {
   hole_no: number;
   par: number;
-  si: number;
-  yards: number;
+  /** null when the catalogue carries no stroke index for the hole. */
+  si: number | null;
+  /** null when the catalogue carries no yardage for the hole. */
+  yards: number | null;
 }
 
 export interface TeeSet {
@@ -32,6 +34,15 @@ export interface TeeSet {
 }
 
 const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+
+/** null / undefined / non-finite stays null. Absence is not zero. */
+function nullableNum(v: unknown): number | null {
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+
 
 function coerce(raw: any): TeeSet[] {
   if (!Array.isArray(raw)) return [];
@@ -50,8 +61,9 @@ function coerce(raw: any): TeeSet[] {
       ? r.holes.map((h: any) => ({
           hole_no: Number(h?.hole_no ?? 0),
           par: Number(h?.par ?? 0),
-          si: Number(h?.si ?? 0),
-          yards: Number(h?.yards ?? 0),
+          // Absence must survive the hook: a missing figure is not a zero.
+          si: nullableNum(h?.si),
+          yards: nullableNum(h?.yards),
         }))
       : [],
     rounds_sampled: Number(r?.rounds_sampled ?? 0),

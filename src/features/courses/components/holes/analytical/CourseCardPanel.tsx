@@ -24,6 +24,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
+import { shortCourseName } from '../../../_shared/courseLabel';
 import { resolveDefaultTee, storageKey } from '../CourseTeeCard';
 import { A, FIGS, Hairline, KICKER, LABEL, SANS } from './tokens';
 
@@ -32,9 +33,20 @@ const STANDARD_SLOPE = 113;
 
 interface Props {
   courseId: string | undefined;
+  /** Names the sheet. Falls back to the tee title when absent. */
+  courseName?: string;
 }
 
 const DASH = '\u2014';
+
+/** ONE eyebrow treatment: the panel and its sheet render identically. */
+const SHEET_EYEBROW: React.CSSProperties = {
+  ...KICKER,
+  fontSize: 9.5,
+  letterSpacing: '0.15em',
+  fontWeight: 800,
+};
+
 
 function fmtInt(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return DASH;
@@ -179,7 +191,8 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
 const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
 
 /** Fixed, load-bearing grid: HOLE / yards / PAR / SI. No cell sizes to content. */
-const CARD_GRID = '26px 1fr 46px 62px';
+const CARD_GRID = '30px 1fr 46px 46px';
+const CARD_GAP = 10;
 
 const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string }> = ({
   courseId,
@@ -210,47 +223,119 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
   const out = holes.filter((h) => h.hole_no <= 9);
   const inn = holes.filter((h) => h.hole_no > 9);
 
-  const sum = (list: typeof holes, key: 'par' | 'yards') =>
-    list.reduce((s, h) => s + (Number(h[key]) || 0), 0);
+  /** An incomplete total is not a total: one missing hole omits the figure. */
+  const sum = (list: typeof holes, key: 'par' | 'yards'): number | null => {
+    let total = 0;
+    for (const h of list) {
+      const v = h[key];
+      if (v == null || !Number.isFinite(Number(v))) return null;
+      total += Number(v);
+    }
+    return total;
+  };
 
   if (!active) return null;
 
-  const summaryRow = (label: string, list: typeof holes) => (
+  const summaryRow = (label: string, list: typeof holes, figSize: number) => {
+    const y = sum(list, 'yards');
+    const p = sum(list, 'par');
+    return (
+      <div
+        key={label}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: CARD_GRID,
+          alignItems: 'center',
+          gap: CARD_GAP,
+          padding: '9px 0',
+          borderTop: `1px solid ${A.HAIRLINE}`,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: A.INK,
+          }}
+        >
+          {label}
+        </span>
+        <span
+          style={{
+            fontSize: figSize,
+            fontWeight: 800,
+            color: A.INK,
+            textAlign: 'right',
+            ...FIGS,
+          }}
+        >
+          {y == null ? '' : formatNumber(Math.round(y))}
+        </span>
+        <span
+          style={{
+            fontSize: figSize,
+            fontWeight: 800,
+            color: A.INK,
+            textAlign: 'right',
+            ...FIGS,
+          }}
+        >
+          {p == null ? '' : p}
+        </span>
+        <span aria-hidden="true" />
+      </div>
+    );
+  };
+
+  const holeRow = (h: (typeof holes)[number]) => (
     <div
-      key={label}
+      key={h.hole_no}
       style={{
         display: 'grid',
         gridTemplateColumns: CARD_GRID,
         alignItems: 'center',
-        gap: 8,
-        padding: '9px 0',
-        borderTop: `1px solid ${A.HAIRLINE}`,
+        gap: CARD_GAP,
+        padding: '8.5px 0',
       }}
     >
+      <span style={{ fontSize: 13.5, fontWeight: 800, color: A.INK, ...FIGS }}>{h.hole_no}</span>
       <span
-        style={{
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: A.INK,
-        }}
+        style={{ fontSize: 13, fontWeight: 600, color: A.BODY, textAlign: 'right', ...FIGS }}
       >
-        {label}
+        {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
       </span>
-      <span style={{ fontSize: 12, fontWeight: 800, color: A.INK, textAlign: 'right', ...FIGS }}>
-        {fmtInt(sum(list, 'yards'))}
+      <span
+        style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, textAlign: 'right', ...FIGS }}
+      >
+        {h.par}
       </span>
-      <span style={{ fontSize: 13, fontWeight: 800, color: A.INK, textAlign: 'right', ...FIGS }}>
-        {sum(list, 'par')}
+      <span
+        style={{ fontSize: 13, fontWeight: 700, color: A.MUTE, textAlign: 'right', ...FIGS }}
+      >
+        {h.si == null ? '' : h.si}
       </span>
-      <span aria-hidden="true" />
     </div>
   );
 
+  /* Summary panel: only the cells that carry a value, evenly distributed. */
+  const summaryCells = [
+    { label: t('courses:teeCard.stat.par'), value: active.par_total ? active.par_total : null },
+    {
+      label: t('courses:courseDetail.card.courseRating'),
+      value:
+        active.course_rating && active.course_rating > 0 ? active.course_rating.toFixed(1) : null,
+    },
+    {
+      label: t('courses:teeCard.stat.slope'),
+      value: active.slope_rating ? Math.round(active.slope_rating) : null,
+    },
+  ].filter((c) => c.value != null);
+
   return (
     <>
-      {/* Tee pills, each carrying its yardage inline. */}
+      {/* Tee pills, each carrying its yardage inline - the only yardage on open. */}
       <div
         style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 14px' }}
         aria-label={t('courses:teeCard.a11yPills')}
@@ -266,26 +351,26 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
               style={{
                 display: 'inline-flex',
                 alignItems: 'baseline',
-                gap: 6,
+                gap: 7,
                 flexShrink: 0,
                 borderRadius: 999,
-                padding: '8px 13px',
-                minHeight: 34,
+                padding: '9px 14px',
+                minHeight: 36,
                 cursor: 'pointer',
                 fontFamily: SANS,
                 background: on ? A.INK : A.PANEL,
                 border: `1px solid ${on ? A.INK : A.BORDER}`,
+                transition: 'background-color 160ms ease, border-color 160ms ease',
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 800, color: on ? A.PANEL : A.INK }}>
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: on ? A.PANEL : A.INK }}>
                 {tee.tee_label}
               </span>
               <span
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: on ? A.PANEL : A.DIM,
-                  opacity: on ? 0.7 : 1,
+                  color: on ? 'rgba(255,255,255,0.78)' : A.MUTE,
                   ...FIGS,
                 }}
               >
@@ -296,61 +381,63 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
         })}
       </div>
 
-      <div style={{ padding: '0 16px 28px', display: 'grid', gap: 12 }}>
-        {/* Summary panel: PAR / CR / SLOPE / YARDS. */}
-        <div
-          style={{
-            background: A.PANEL,
-            border: `1px solid ${A.BORDER}`,
-            borderRadius: 16,
-            padding: 16,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          }}
-        >
-          {[
-            { label: t('courses:teeCard.stat.par'), value: active.par_total },
-            { label: t('courses:teeCard.stat.cr'), value: fmtRating(active.course_rating) },
-            {
-              label: t('courses:teeCard.stat.slope'),
-              value: active.slope_rating ? Math.round(active.slope_rating) : DASH,
-            },
-            { label: t('courses:teeCard.stat.yards'), value: fmtInt(active.total_yards) },
-          ].map((cell) => (
-            <div key={cell.label} style={SUMMARY_CELL}>
-              <div style={{ ...LABEL, fontSize: 8 }}>{cell.label}</div>
-              <div
-                style={{
-                  fontSize: 19,
-                  fontWeight: 800,
-                  letterSpacing: '-0.02em',
-                  color: A.INK,
-                  marginTop: 4,
-                  whiteSpace: 'nowrap',
-                  ...FIGS,
-                }}
-              >
-                {cell.value}
+      <div style={{ padding: '0 16px 32px', display: 'grid', gap: 12 }}>
+        {/* Summary panel: PAR / COURSE RATING / SLOPE. */}
+        {summaryCells.length > 0 ? (
+          <div
+            style={{
+              background: A.PANEL,
+              border: `1px solid ${A.BORDER}`,
+              borderRadius: 16,
+              padding: '18px 16px',
+              display: 'grid',
+              gridTemplateColumns: `repeat(${summaryCells.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {summaryCells.map((cell) => (
+              <div key={cell.label} style={SUMMARY_CELL}>
+                <div style={{ ...LABEL, fontSize: 8 }}>{cell.label}</div>
+                <div
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                    color: A.INK,
+                    marginTop: 7,
+                    whiteSpace: 'nowrap',
+                    ...FIGS,
+                  }}
+                >
+                  {cell.value}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : null}
 
-        {/* Scorecard table. No zebra striping; hairlines only above the summaries. */}
+        {/* Scorecard table. No zebra striping; hairlines only above the summaries.
+            NOTE: no overflow: hidden here - it would kill the sticky header. */}
         <div
           style={{
             background: A.PANEL,
             border: `1px solid ${A.BORDER}`,
             borderRadius: 16,
-            padding: '12px 16px 6px',
+            padding: '0 16px 14px',
           }}
         >
           <div
             style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              background: A.PANEL,
+              margin: '0 -16px',
+              padding: '14px 16px 10px',
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
               display: 'grid',
               gridTemplateColumns: CARD_GRID,
-              gap: 8,
-              paddingBottom: 8,
+              gap: CARD_GAP,
             }}
           >
             <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:teeCard.col.hole')}</span>
@@ -365,65 +452,27 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
             </span>
           </div>
 
-          {holes.map((h) => (
-            <div
-              key={h.hole_no}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: CARD_GRID,
-                alignItems: 'center',
-                gap: 8,
-                padding: '7px 0',
-              }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 800, color: A.INK, ...FIGS }}>
-                {h.hole_no}
-              </span>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: A.BODY,
-                  textAlign: 'right',
-                  ...FIGS,
-                }}
-              >
-                {fmtInt(h.yards)}
-                <span
-                  style={{
-                    fontSize: 7,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    color: A.DIM,
-                    marginLeft: 3,
-                  }}
-                >
-                  {t('courses:courseDetail.card.ydsUnit')}
-                </span>
-              </span>
-              <span
-                style={{ fontSize: 13, fontWeight: 700, color: A.INK, textAlign: 'right', ...FIGS }}
-              >
-                {h.par}
-              </span>
-              <span
-                style={{ fontSize: 12, fontWeight: 700, color: A.DIM, textAlign: 'right', ...FIGS }}
-              >
-                {h.si || DASH}
-              </span>
-            </div>
-          ))}
+          {out.map(holeRow)}
+          {out.length > 0 && summaryRow(t('courses:teeCard.out'), out, 13)}
 
-          {out.length > 0 && summaryRow(t('courses:teeCard.out'), out)}
-          {inn.length > 0 && summaryRow(t('courses:teeCard.in'), inn)}
-          {summaryRow(t('courses:teeCard.total'), holes)}
+          {inn.length > 0 ? (
+            <>
+              <div style={{ height: 14 }} aria-hidden="true" />
+              {inn.map(holeRow)}
+              {summaryRow(t('courses:teeCard.in'), inn, 13)}
+            </>
+          ) : null}
+
+          <div style={{ height: 6 }} aria-hidden="true" />
+          {summaryRow(t('courses:teeCard.total'), holes, 14)}
         </div>
       </div>
     </>
   );
 };
 
-export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
+
+export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
   const { data } = useCourseTeeSets(courseId);
@@ -506,9 +555,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             marginBottom: 16,
           }}
         >
-          <span style={{ ...KICKER, fontSize: 9, letterSpacing: '0.14em', fontWeight: 800 }}>
-            {t('courses:teeCard.eyebrow')}
-          </span>
+          <span style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</span>
           <button
             type="button"
             onClick={openSheet}
@@ -631,7 +678,6 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         open={open}
         onClose={closeSheet}
         variant="light"
-        maxHeight="90dvh"
         ariaLabelledBy="course-card-sheet-title"
         style={{
           height: '75dvh',
@@ -642,22 +688,25 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         }}
       >
         <div style={{ padding: '0 16px 12px' }}>
-          <div style={{ ...LABEL, fontSize: 9, letterSpacing: '0.14em' }}>
-            {t('courses:teeCard.eyebrow')}
-          </div>
+          <div style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</div>
+          {/* The heading names the COURSE - it must not restate the tee pill. */}
           <h2
             id="course-card-sheet-title"
             style={{
               margin: '3px 0 0',
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 800,
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.025em',
+              lineHeight: 1.1,
               color: A.INK,
             }}
           >
-            {t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}
+            {courseName && courseName.trim()
+              ? shortCourseName(courseName)
+              : t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}
           </h2>
         </div>
+
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', fontFamily: SANS, ...FIGS }}>
           <SheetBody courseId={courseId} tees={tees} initialTee={active.tee_label} />
         </div>
