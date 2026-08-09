@@ -832,7 +832,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "clbhouz 역사상 홀인원과 앨버트로스 전체 {{count}}건"
   },
   "statBrowse": {
     "countTracked_one": "추적된 코스",

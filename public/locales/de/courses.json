@@ -879,7 +879,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "Alle {{count}} Hole-in-One und Albatrosse in der clbhouz-Geschichte"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

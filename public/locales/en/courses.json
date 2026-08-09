@@ -1264,6 +1264,7 @@
     "honoursTitle": "The honours board",
     "honoursTitleSentence": "The honours board",
     "honoursCaption": "Every ace and albatross in clbhouz history",
+    "honoursCaptionCount": "All {{count}} aces and albatrosses in clbhouz history",
     "honoursSeeAll": "See all {{count}}",
     "honoursSheetCaption": "{{count}} entries · all time",
     "lens": {

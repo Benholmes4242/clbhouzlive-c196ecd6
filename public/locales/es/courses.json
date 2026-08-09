@@ -879,7 +879,8 @@
       "clear": "{{count}} clear",
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
-    }
+    },
+    "honoursCaptionCount": "Los {{count}} hoyos en uno y albatros de la historia de clbhouz"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",
