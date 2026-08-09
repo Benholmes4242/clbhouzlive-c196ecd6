@@ -244,48 +244,6 @@ export function PhotoBand({
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
-        {/* State pill — live is a dot + label, other states keep the capsule */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              padding: pillTone.padding,
-              borderRadius: pillTone.radius,
-              background: pillTone.bg,
-              color: pillTone.color,
-              border: pillTone.border === 'transparent'
-                ? undefined
-                : `1px solid ${pillTone.border}`,
-              fontSize: pillTone.fontSize,
-              fontWeight: 800,
-              letterSpacing: pillTone.letterSpacing,
-              textTransform: 'uppercase',
-              ...NUMERIC_STYLE,
-              backdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
-              WebkitBackdropFilter: pill.tone === 'live' ? undefined : 'blur(6px)',
-            }}
-          >
-            {pill.tone === 'live' && (
-              <span
-                aria-hidden
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                  background: '#22C55E',
-                  boxShadow: '0 0 0 3px rgba(34,197,94,0.18)',
-                  display: 'inline-block',
-                  flexShrink: 0,
-                }}
-              />
-            )}
-            {pill.text}
-          </span>
-        </div>
-
-
-
-
         {/* Title */}
         <h1
           style={{
