@@ -12,13 +12,25 @@ import { supabase } from '@/integrations/supabase/client';
  * returning (course_id, rounds_7d, rounds_prev_7d).
  *
  * A cooling-off course shows NO delta — never a red one.
+ *
+ * TWO SUPPRESSIONS, both here so the component never receives a figure it
+ * should not draw:
+ *  - NO PRIOR WEEK: prev = 0 means the course is APPEARING, not growing. The
+ *    delta would equal the count and print the same number twice, so it is
+ *    null.
+ *  - FLOOR: a single round in the window is not a leaderboard position, so
+ *    courses under MIN_ROUNDS are dropped entirely. With none qualifying the
+ *    list is empty and the section renders nothing.
  */
+
+/** A course needs at least this many rounds in the 7-day window to appear. */
+const MIN_ROUNDS = 2;
 
 export interface MostPlayedRow {
   courseId: string;
   courseName: string | null;
   count: number;
-  /** Positive change vs the prior 7 days, or null when flat/negative. */
+  /** Positive change vs the prior 7 days; null when flat, negative, or new. */
   delta: number | null;
 }
 
@@ -56,13 +68,17 @@ export function useMostPlayedThisWeek(limit = 25) {
       }
 
       return [...cur.entries()]
+        .filter(([, count]) => count >= MIN_ROUNDS)
         .map(([courseId, count]) => {
-          const change = count - (prev.get(courseId) ?? 0);
+          const before = prev.get(courseId) ?? 0;
+          const change = count - before;
           return {
             courseId,
             courseName: names.get(courseId) ?? null,
             count,
-            delta: change > 0 ? change : null,
+            // Only a genuine comparison renders: the course must have been
+            // played in the prior seven days too.
+            delta: before > 0 && change > 0 ? change : null,
           };
         })
         .sort((a, b) => b.count - a.count || (a.courseName ?? '').localeCompare(b.courseName ?? ''))

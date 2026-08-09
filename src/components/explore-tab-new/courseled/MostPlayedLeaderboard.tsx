@@ -10,9 +10,10 @@ import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkel
 /**
  * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
  *
- * Frequency is the inclusive metric: every tracked round contributes, not just
- * career weeks. A rising course carries a GREEN delta; a cooling course carries
- * NO delta — never a red one, because a quiet week is not a failure.
+ * Frequency is the inclusive metric: every tracked round contributes. The count
+ * is the point of the section. A delta only appears when the hook found a real
+ * prior-week comparison, and it renders as a PLAIN DIM FIGURE — no capsule, no
+ * tint, no green (green means under par or the viewing member, never volume).
  */
 
 interface Props {
@@ -138,18 +139,13 @@ export function MostPlayedLeaderboard({
                   {r.delta != null && r.delta > 0 && (
                     <span
                       style={{
+                        ...LABEL,
                         flexShrink: 0,
-                        fontSize: 9,
-                        fontWeight: 800,
-                        color: '#0F8F4A',
-                        background: 'rgba(15,143,74,0.10)',
-                        border: '1px solid rgba(15,143,74,0.18)',
-                        borderRadius: 5,
-                        padding: '1.5px 6px',
+                        color: A.DIM,
                         fontVariantNumeric: 'tabular-nums lining',
                       }}
                     >
-                      {t('discover.vsLastWeek', '+{{count}} vs last week', { count: r.delta })}
+                      {`+${formatNumber(r.delta)}`}
                     </span>
                   )}
                 </span>
