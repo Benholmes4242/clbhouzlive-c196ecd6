@@ -101,8 +101,12 @@ function markerLeft(value: number, scaleMax: number): string {
 }
 
 
-/** Legend for the ink ramp. Rendered ONCE per surface, above the rows. */
-export const HoleRampLegend: React.FC<{ hasYou: boolean }> = ({ hasYou }) => {
+/**
+ * Legend for the ink ramp. Rendered ONCE per surface, above the rows.
+ * FOUR items only: the field tick and the member dot no longer sit on the ramp,
+ * so legending them here would describe something the row does not draw.
+ */
+export const HoleRampLegend: React.FC<{ hasYou?: boolean }> = () => {
   const { t } = useTranslation(['courses']);
   const items = [
     { bg: RAMP.birdie, label: t('courses:holes.preview.legendBirdie') },
@@ -123,26 +127,15 @@ export const HoleRampLegend: React.FC<{ hasYou: boolean }> = ({ hasYou }) => {
       {items.map((it) => (
         <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
           <i
-            style={{ width: 10, height: 6, borderRadius: 2, background: it.bg, display: 'block' }}
+            style={{ width: 10, height: 5, borderRadius: 2, background: it.bg, display: 'block' }}
           />
-          <span style={{ ...LABEL, fontSize: 8 }}>{it.label}</span>
+          <span style={{ ...MICRO }}>{it.label}</span>
         </span>
       ))}
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
-        <i style={{ width: 2, height: 10, background: A.BODY, display: 'block' }} />
-        <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:courseDetail.plays.legendField')}</span>
-      </span>
-      {hasYou && (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <i
-            style={{ width: 8, height: 8, borderRadius: 999, background: A.AMBER, display: 'block' }}
-          />
-          <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:courseDetail.plays.legendYou')}</span>
-        </span>
-      )}
     </div>
   );
 };
+
 
 export const HoleRowV2: React.FC<{
   row: CourseHole;
