@@ -555,7 +555,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
             marginBottom: 16,
           }}
         >
-          <span style={{ ...KICKER, fontSize: 9, letterSpacing: '0.14em', fontWeight: 800 }}>
+          <span style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</span>
             {t('courses:teeCard.eyebrow')}
           </span>
           <button
