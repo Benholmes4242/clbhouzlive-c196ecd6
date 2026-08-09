@@ -585,8 +585,7 @@ function CaseSheet({
             style={{
               display: 'flex',
               gap: 12,
-              padding: '11px 0',
-              borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+              marginTop: i === 0 ? 0 : 16,
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 800, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
@@ -602,10 +601,10 @@ function CaseSheet({
             style={{
               display: 'flex',
               gap: 12,
-              padding: '11px 0',
-              borderTop: (pick.reasons?.length ?? 0) > 0 ? `1px solid ${HAIR}` : 'none',
+              marginTop: (pick.reasons?.length ?? 0) > 0 ? 16 : 0,
             }}
           >
+
             <div style={{ fontSize: 15, fontWeight: 800, color: RED_TX, minWidth: 22, lineHeight: 1.2 }}>!</div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
               {pick.concern}
