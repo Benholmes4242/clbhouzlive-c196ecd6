@@ -1271,8 +1271,13 @@
     "honoursTitleSentence": "The honours board",
     "honoursCaption": "Every ace and albatross in clbhouz history",
     "honoursCaptionCount": "{{count}} aces and albatrosses on the board",
+    "honoursOnTheBoard": "{{count}} on the board",
+    "honoursWhatItIs": "Every ace and albatross in clbhouz history",
+    "mostPlayedDelta": "+{{count}} on last week",
+    "mostPlayedSheetCaption": "{{count}} courses",
     "honoursSeeAll": "See all {{count}}",
     "honoursSheetCaption": "{{count}} entries",
+
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",
