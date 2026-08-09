@@ -330,6 +330,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         aside={t('courses:courseDetail.holes.tapHint')}
         footer={t('courses:holes.preview.seeAll', { count: holes.length })}
         onOpen={() => setHolesSheetOpen(true)}
+        headerGap={10}
+        style={{ padding: '12px 16px' }}
       >
         <HoleRampLegend hasYou={hasYou} />
         {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
