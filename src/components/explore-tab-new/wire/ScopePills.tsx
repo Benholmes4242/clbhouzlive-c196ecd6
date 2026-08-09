@@ -11,7 +11,7 @@ import type { ExploreLens } from '../hooks/useExploreLens';
  * region pills it replaces.
  */
 
-export const LENS_ORDER: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
+export const LENS_ORDER: ExploreLens[] = ['suggested', 'worldwide', 'top_100', 'played'];
 
 interface Props {
   lens: ExploreLens;
