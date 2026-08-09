@@ -150,6 +150,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: rateMatch.course_id,
         courseName: rateMatch.name,
         thumbnail: rateMatch.thumbnail_image ?? null,
+        at: rateMatch.last_played ?? null,
+
       },
     };
   }
