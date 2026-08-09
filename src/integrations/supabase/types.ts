@@ -17867,6 +17867,10 @@ export type Database = {
           similarity: number
         }[]
       }
+      find_golfers_v1: {
+        Args: { p_limit?: number; p_query?: string }
+        Returns: Json
+      }
       find_users_featuring_poster: {
         Args: { p_connection_id: string }
         Returns: {
