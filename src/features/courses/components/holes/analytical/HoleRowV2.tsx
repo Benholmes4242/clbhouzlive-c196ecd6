@@ -185,6 +185,8 @@ export const HoleRowV2: React.FC<{
       ? toParParts(mine.avg_to_par - row.avg_to_par)
       : null;
 
+  const lastIdx = segs.length - 1;
+
   return (
     <div>
       <button
@@ -196,7 +198,7 @@ export const HoleRowV2: React.FC<{
           gridTemplateColumns: HOLE_GRID_V2,
           alignItems: 'center',
           gap: 8,
-          padding: '12px 0',
+          padding: '11px 0',
           width: '100%',
           border: 'none',
           background: 'transparent',
@@ -206,93 +208,104 @@ export const HoleRowV2: React.FC<{
           ...FIGS,
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK }}>
-          {row.hole_no}
-        </span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, textAlign: 'center' }}>
-          {row.par}
-        </span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: A.DIM, textAlign: 'center' }}>
-          {row.stroke_index ?? ''}
-        </span>
-
-        <span style={{ display: 'block', minWidth: 0 }}>
-          {/* Ramp bar with the two scale markers on top. */}
-          <span style={{ position: 'relative', display: 'block', paddingTop: 2 }}>
-            <span
-              style={{
-                height: 7,
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                background: A.TRACK,
-              }}
-            >
-              {segs.map((s) => (
-                <i key={s.key} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
-              ))}
-            </span>
-            {Number.isFinite(row.avg_to_par) && (
-              <i
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: -1,
-                  left: markerLeft(row.avg_to_par, scale.scaleMax),
-                  width: 2,
-                  height: 13,
-                  marginLeft: -1,
-                  background: A.BODY,
-                  borderRadius: 1,
-                }}
-              />
-            )}
-            {mine?.avg_to_par != null && (
-              <i
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: 1,
-                  left: markerLeft(mine.avg_to_par, scale.scaleMax),
-                  width: 9,
-                  height: 9,
-                  marginLeft: -4.5,
-                  borderRadius: 999,
-                  background: A.AMBER,
-                  boxShadow: `0 0 0 1.5px ${A.PANEL}`,
-                }}
-              />
-            )}
-          </span>
-
-          {/* Labelled figures. A bare number is never left to explain itself. */}
+        <span style={{ display: 'block' }}>
           <span
             style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 12,
-              marginTop: 6,
-              whiteSpace: 'nowrap',
+              display: 'block',
+              fontSize: 18,
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: A.INK,
+              lineHeight: 1.1,
             }}
           >
-            {field && (
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-                <span style={{ ...LABEL, fontSize: 7.5 }}>
-                  {t('courses:courseDetail.plays.legendField')}
-                </span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: field.tone }}>
-                  {field.text}
-                </span>
-              </span>
-            )}
+            {row.hole_no}
+          </span>
+        </span>
+
+        {/* Par and SI are labelled: a bare numeral is never left to explain itself. */}
+        <span style={{ display: 'block', textAlign: 'center' }}>
+          <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: A.BODY }}>
+            {row.par}
+          </span>
+          <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+            {t('courses:courseDetail.holes.colPar')}
+          </span>
+        </span>
+        <span style={{ display: 'block', textAlign: 'center' }}>
+          <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: A.DIM }}>
+            {row.stroke_index ?? ''}
+          </span>
+          <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+            {t('courses:courseDetail.holes.colSi')}
+          </span>
+        </span>
+
+        {/* The ramp: a pure distribution of rounds. Nothing is plotted on it. */}
+        <span style={{ display: 'block', minWidth: 0 }}>
+          <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
+            {segs.map((s, i) => (
+              <i
+                key={s.key}
+                style={{
+                  width: `${(s.pctValue / total) * 100}%`,
+                  background: s.pctValue > 0 ? s.bg : A.TRACK,
+                  borderRadius:
+                    i === 0
+                      ? '4px 0 0 4px'
+                      : i === lastIdx
+                        ? '0 4px 4px 0'
+                        : 0,
+                }}
+              />
+            ))}
+          </span>
+        </span>
+
+        {/* The figures live on the row's right end as a labelled pair. */}
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12,
+            whiteSpace: 'nowrap',
+            paddingLeft: 2,
+          }}
+        >
+          <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 14,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: field ? field.tone : A.DIM,
+                lineHeight: 1.1,
+              }}
+            >
+              {field ? field.text : ''}
+            </span>
+            <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+              {t('courses:courseDetail.plays.legendField')}
+            </span>
+          </span>
+          {/* Unplayed hole: the slot keeps its width so the column never realigns. */}
+          <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }} aria-hidden={!you}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 14,
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: A.AMBER_DEEP,
+                lineHeight: 1.1,
+              }}
+            >
+              {you ? you.text : ''}
+            </span>
             {you && (
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-                <span style={{ ...LABEL, fontSize: 7.5 }}>
-                  {t('courses:courseDetail.plays.legendYou')}
-                </span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: A.AMBER_DEEP }}>
-                  {you.text}
-                </span>
+              <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+                {t('courses:courseDetail.plays.legendYou')}
               </span>
             )}
           </span>
@@ -301,38 +314,91 @@ export const HoleRowV2: React.FC<{
 
       {open && (
         <div style={{ padding: `0 0 16px ${DETAIL_INSET}px` }}>
-          {/* Proportional bands: each band's width is its own share. */}
-          <div style={{ display: 'grid', gap: 8 }}>
-            {segs.map((s) => {
-              const share = (s.pctValue / total) * 100;
-              return (
-                <div key={s.key} style={{ display: 'grid', gap: 4 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      justifyContent: 'space-between',
-                      gap: 8,
-                    }}
-                  >
-                    <span style={{ ...LABEL, fontSize: 8 }}>{s.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: A.INK, ...FIGS }}>
-                      {Math.round(share)}%
-                    </span>
-                  </div>
-                  <div style={{ height: 4, borderRadius: 2, background: A.TRACK }}>
-                    <div
-                      style={{
-                        width: `${share}%`,
-                        height: '100%',
-                        borderRadius: 2,
-                        background: s.bg,
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+          {/* The four shares as an inline label row - the ramp is not redrawn. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', ...FIGS }}>
+            {segs.map((s) => (
+              <span key={s.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <i
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 2,
+                    background: s.bg,
+                    display: 'block',
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 800, color: A.INK }}>
+                  {Math.round((s.pctValue / total) * 100)}%
+                </span>
+                <span style={{ ...MICRO, fontSize: 8 }}>{s.label}</span>
+              </span>
+            ))}
+          </div>
+
+          <Hairline style={{ margin: '12px 0 10px' }} />
+
+          {/* Its own scale: to-par against scaleMax, shared by every hole. */}
+          <div>
+            <div style={{ ...MICRO, fontSize: 8, marginBottom: 6 }}>
+              {t('courses:courseDetail.holes.scaleLabel')}
+            </div>
+            <div style={{ position: 'relative', height: 12 }}>
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 5,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  borderRadius: 1,
+                  background: A.TRACK,
+                  display: 'block',
+                }}
+              />
+              {Number.isFinite(row.avg_to_par) && (
+                <i
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: markerLeft(row.avg_to_par, scale.scaleMax),
+                    width: 2,
+                    height: 12,
+                    marginLeft: -1,
+                    background: A.BODY,
+                    borderRadius: 1,
+                  }}
+                />
+              )}
+              {mine?.avg_to_par != null && (
+                <i
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    left: markerLeft(mine.avg_to_par, scale.scaleMax),
+                    width: 8,
+                    height: 8,
+                    marginLeft: -4,
+                    borderRadius: 999,
+                    background: A.AMBER,
+                    boxShadow: `0 0 0 1.5px ${A.PANEL}`,
+                  }}
+                />
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 500,
+                lineHeight: 1.35,
+                color: A.MUTE,
+                marginTop: 5,
+              }}
+            >
+              {t('courses:courseDetail.holes.scaleCaption', { total: totalHoles })}
+            </div>
           </div>
 
           <Hairline style={{ margin: '12px 0 10px' }} />
@@ -356,7 +422,7 @@ export const HoleRowV2: React.FC<{
             )}
             {gap && (
               <DetailFigure
-                label={t('courses:courseDetail.holes.yourGap')}
+                label={t('courses:courseDetail.holes.yourGapVsField')}
                 value={gap.text}
                 tone={gap.tone}
               />
@@ -370,6 +436,12 @@ export const HoleRowV2: React.FC<{
   );
 };
 
+/**
+ * A footnote figure: label BEFORE the value, on one baseline, 12.5/700. The
+ * collapsed row's figures are the opposite shape - value above a micro label,
+ * 14/800 - so the amber YOU average and the red YOUR GAP cannot read as one
+ * number changing colour.
+ */
 const DetailFigure: React.FC<{ label: string; value: string; tone?: string }> = ({
   label,
   value,
@@ -377,8 +449,9 @@ const DetailFigure: React.FC<{ label: string; value: string; tone?: string }> = 
 }) => (
   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
     <span style={{ ...LABEL, fontSize: 8 }}>{label}</span>
-    <span style={{ fontSize: 12.5, fontWeight: 800, color: tone }}>{value}</span>
+    <span style={{ fontSize: 12.5, fontWeight: 700, color: tone }}>{value}</span>
   </span>
 );
 
 export default HoleRowV2;
+
