@@ -802,25 +802,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   </>
                 )}
 
-                <Hairline style={{ margin: '14px 0 0' }} />
-                <div style={{ paddingTop: 4 }}>
-                  <Action
-                    label={showCard
-                      ? t('courses:scorecard.hideCard')
-                      : t('courses:scorecard.seeAllHoles', { count: holes.length })}
-                    onClick={() => {
-                      setShowCard((v) => {
-                        if (!v) {
-                          analyticsEvents.track('scorecard_card_expanded', {
-                            surface,
-                            holes: holes.length,
-                          });
-                        }
-                        return !v;
-                      });
-                    }}
-                  />
-                </div>
+
 
 
                 {showCard && (
