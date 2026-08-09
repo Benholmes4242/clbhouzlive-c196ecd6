@@ -11,7 +11,7 @@
  *     publishes --header-h: 64 (10 top gap + 44 island + 10 breathing).
  *
  * Reuses (not forks):
- *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapTrend90d
+ *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapHistory (last change)
  *     (the exact hooks HandicapChip.tsx uses), so index value AND
  *     improving/drifting logic AND visibility rules mirror the pill.
  *   - Avatar cell: useActiveActor + useActorUnreadCounts (the pattern
