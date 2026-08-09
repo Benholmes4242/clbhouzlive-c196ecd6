@@ -29,6 +29,14 @@ export default function HandicapManagePage() {
   const [isWorking, setIsWorking] = useState(false);
   const declineHandicapChip = useDeclineHandicapChip();
 
+  /* Latched at the first resolved render: a page that opened on the connect
+     flow keeps it mounted until the flow reports completion. */
+  const startedDisconnected = useRef<boolean | null>(null);
+  const [flowFinished, setFlowFinished] = useState(false);
+  if (!connectionLoading && startedDisconnected.current === null) {
+    startedDisconnected.current = !connection;
+  }
+
   const invalidateAll = (conn?: WhsConnection | null) => {
     const c = conn ?? connection;
     if (userId) {
