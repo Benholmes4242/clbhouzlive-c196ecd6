@@ -481,6 +481,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   </button>
                 )}
               </div>
+              )}
             </div>
           );
         })}
