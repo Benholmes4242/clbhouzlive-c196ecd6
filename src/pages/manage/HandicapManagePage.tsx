@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,6 +28,14 @@ export default function HandicapManagePage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const declineHandicapChip = useDeclineHandicapChip();
+
+  /* Latched at the first resolved render: a page that opened on the connect
+     flow keeps it mounted until the flow reports completion. */
+  const startedDisconnected = useRef<boolean | null>(null);
+  const [flowFinished, setFlowFinished] = useState(false);
+  if (!connectionLoading && startedDisconnected.current === null) {
+    startedDisconnected.current = !connection;
+  }
 
   const invalidateAll = (conn?: WhsConnection | null) => {
     const c = conn ?? connection;
@@ -97,17 +105,23 @@ export default function HandicapManagePage() {
 
   // CONNECT FLOW: immersive. The page owns its single back + title; no app
   // header, and the wash runs through the notch.
-  if (!connection) {
+  //
+  // The flow owns its own completion: a connection row appearing mid-flow must
+  // NOT tear it down before the member has seen (and dismissed) the connected
+  // screen. onConnected fires from that screen's CTA only.
+  if (!connection || (startedDisconnected.current === true && !flowFinished)) {
     return (
       <WhsConnectScreen
         onConnected={async () => {
           invalidateAll();
+          setFlowFinished(true);
           navigate('/handicap', { replace: true });
         }}
         onDecline={declineHandicapChip}
       />
     );
   }
+
 
   return (
     <ManagePageShell
