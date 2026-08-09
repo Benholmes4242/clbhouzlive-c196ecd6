@@ -10,8 +10,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, X } from 'lucide-react';
 
-import { A, SANS, FIGS } from './tokens';
+import { A, SANS, FIGS, LABEL } from './tokens';
 import CourseImageFallback from './CourseImageFallback';
+import { relativeDay } from './discoverWhen';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import {
