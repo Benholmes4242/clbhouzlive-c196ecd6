@@ -490,13 +490,12 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           )}
         </div>
 
-        {/* Footer action under a second hairline. */}
-        <Hairline style={{ marginTop: 8 }} />
+        {/* Footer action. */}
         <button
           type="button"
           onClick={openSheet}
           style={{
-            marginTop: 0,
+            marginTop: 4,
             width: '100%',
             minHeight: 32,
             border: 'none',
