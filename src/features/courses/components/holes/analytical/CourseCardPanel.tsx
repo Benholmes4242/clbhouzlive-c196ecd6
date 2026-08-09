@@ -392,7 +392,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
-          padding: 16,
+          padding: '12px 16px',
           fontFamily: SANS,
           ...FIGS,
         }}
@@ -403,7 +403,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
             justifyContent: 'space-between',
             alignItems: 'baseline',
             gap: 12,
-            marginBottom: 14,
+            marginBottom: 10,
           }}
         >
           <span style={{ ...KICKER, fontSize: 9, letterSpacing: '0.14em', fontWeight: 800 }}>
@@ -461,18 +461,18 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
           )}
         </div>
         {slope != null && sentence ? (
-          <p style={{ margin: '8px 0 0', fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
+          <p style={{ margin: '5px 0 0', fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
             {sentence}
           </p>
         ) : null}
 
         {/* COUNTER STRIP under a hairline. */}
-        <Hairline style={{ marginTop: 14 }} />
+        <Hairline style={{ marginTop: 10 }} />
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            paddingTop: 12,
+            paddingTop: 8,
           }}
         >
           <Counter label={t('courses:teeCard.stat.par')} value={active.par_total} />
@@ -491,14 +491,14 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId }) => {
         </div>
 
         {/* Footer action under a second hairline. */}
-        <Hairline style={{ marginTop: 12 }} />
+        <Hairline style={{ marginTop: 8 }} />
         <button
           type="button"
           onClick={openSheet}
           style={{
-            marginTop: 4,
+            marginTop: 0,
             width: '100%',
-            minHeight: 40,
+            minHeight: 32,
             border: 'none',
             background: 'transparent',
             cursor: 'pointer',
