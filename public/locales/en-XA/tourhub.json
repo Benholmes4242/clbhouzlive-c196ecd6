@@ -280,7 +280,8 @@
       },
       "card": {
         "theCase": "[~~Thé çášé ›~~]",
-        "pickLabel": "[~~Píçk {{rank}}~~]"
+        "pickLabel": "[~~Píçk {{rank}}~~]",
+        "pickOf": "[Pîçk {{n}} öf {{total}}]"
       },
       "case": {
         "eyebrow": "[~~Thé çášé fór~~]",

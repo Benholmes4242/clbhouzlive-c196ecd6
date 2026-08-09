@@ -280,7 +280,8 @@
       },
       "card": {
         "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}"
+        "pickLabel": "Pick {{rank}}",
+        "pickOf": "픽 {{n}} / {{total}}"
       },
       "case": {
         "eyebrow": "The case for",
