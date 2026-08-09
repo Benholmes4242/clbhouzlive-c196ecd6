@@ -9,6 +9,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { supabase } from '@/integrations/supabase/client';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
@@ -97,28 +99,63 @@ export default function ManageProfile() {
   const [isSkipping, setIsSkipping] = useState(false);
 
   const skipOnboarding = async () => {
-    if (!user?.id || isSkipping) return;
+    analyticsEvents.track('onboarding_skip_tapped', {
+      has_user: !!user?.id,
+      is_skipping: isSkipping,
+    });
+    if (isSkipping) return; // genuine double-tap guard, no toast
+    if (!user?.id) {
+      analyticsEvents.track('onboarding_skip_failed', {
+        reason: 'no_session',
+        code: null,
+        message: 'session not resolved',
+      });
+      toast.error('Still signing you in - please try again in a moment.');
+      return;
+    }
     setIsSkipping(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
         .update({ has_completed_onboarding: true, updated_at: new Date().toISOString() })
-        .eq('id', user.id);
-      if (error) throw error;
-      queryClient.setQueryData(['onboarding-status', user.id], {
-        hasCompletedOnboarding: true,
-        userType: profile?.user_type ?? null,
-      });
-      await queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
-      await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        .eq('id', user.id)
+        .select('id')
+        .single();
+      if (error) {
+        analyticsEvents.track('onboarding_skip_failed', {
+          reason: (error as any).code === 'PGRST116' ? 'zero_rows' : 'update_error',
+          code: (error as any).code ?? null,
+          message: error.message ?? null,
+        });
+        toast.error(error.message || 'Could not skip onboarding. Please try again.');
+        return;
+      }
+      if (!data) {
+        analyticsEvents.track('onboarding_skip_failed', {
+          reason: 'zero_rows',
+          code: null,
+          message: 'update matched no row',
+        });
+        toast.error('Could not skip onboarding. Please try again.');
+        return;
+      }
+      analyticsEvents.track('onboarding_skip_succeeded', { user_id: user.id });
       navigate('/', { replace: true });
+      // Fire and forget - never block navigation on a refetch.
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not skip onboarding. Please try again.';
+      analyticsEvents.track('onboarding_skip_failed', {
+        reason: 'exception',
+        code: null,
+        message: msg,
+      });
       toast.error(msg);
     } finally {
       setIsSkipping(false);
     }
   };
+
 
   const { data: whsConnection } = useWhsConnection(user?.id);
   const hasWhsConnection = !!whsConnection;
