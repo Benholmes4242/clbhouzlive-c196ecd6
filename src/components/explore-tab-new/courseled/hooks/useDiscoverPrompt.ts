@@ -126,6 +126,12 @@ export function useDiscoverPrompt(userId: string | undefined): {
   const rounds = useCareerRounds(needPhoto ? userId : undefined);
   const posted = usePostedCourseIds(userId, needPhoto);
 
+  // 4 friends — LAST, and only on ZERO accepted friendships. A member with
+  // friends who have not played is looking at a data gap they cannot act on;
+  // nagging there would fire every quiet fortnight.
+  const friendIds = useFriendIdSet(userId);
+
+
   const photoMatch = useMemo(() => {
     if (!needPhoto || !rounds.data || !posted.data) return null;
     const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
