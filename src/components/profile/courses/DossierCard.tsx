@@ -236,10 +236,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
                         value: fmtSigned(avgToPar),
                         tone:
                           Math.round(avgToPar * 10) / 10 > 0
-                            ? A.RED
+                            ? A.INK
                             : Math.round(avgToPar * 10) / 10 < 0
-                              ? A.GREEN
-                              : A.INK,
+                              ? TOPAR_RED
+                              : A.MUTE,
                       },
                     ]
                   : []),

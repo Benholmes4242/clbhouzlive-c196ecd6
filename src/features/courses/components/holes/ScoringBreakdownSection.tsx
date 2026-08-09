@@ -64,7 +64,8 @@ function signed(v: number, digits = 1): string {
 function toneFor(v: number, digits = 1): string {
   const f = Math.pow(10, digits);
   const r = Math.round(v * f) / f;
-  return r > 0 ? OVER : r < 0 ? UNDER : A.INK;
+  // BRIEF_UNDER_PAR_RED: under par is red, over par ink, level muted.
+  return r > 0 ? A.INK : r < 0 ? TOPAR_RED : A.MUTE;
 }
 
 interface Props {
