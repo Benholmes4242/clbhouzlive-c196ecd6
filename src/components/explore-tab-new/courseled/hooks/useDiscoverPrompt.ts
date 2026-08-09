@@ -17,10 +17,11 @@ import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 
-export type DiscoverPromptKind = 'rate' | 'finish' | 'photo';
+export type DiscoverPromptKind = 'rate' | 'finish' | 'photo' | 'friends';
 
 export interface DiscoverPrompt {
   kind: DiscoverPromptKind;
+  /** Empty for 'friends' — there is no course behind that ask. */
   courseId: string;
   courseName: string;
   thumbnail: string | null;
@@ -31,11 +32,12 @@ export interface DiscoverPrompt {
    *   rate   — last_played from usePlayedUnratedCourses
    *   finish — review_date (falling back to created_at) on the rating
    *   photo  — play_date on the tracked round
-   * Null only when the underlying column is null; the row then keeps a
-   * non-temporal line rather than inventing one.
+   * Null only when the underlying column is null, and always null for
+   * 'friends', whose line is a promise rather than a date.
    */
   at: string | null;
 }
+
 
 
 interface MissingDetailRow {
