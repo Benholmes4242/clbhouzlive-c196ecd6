@@ -1108,7 +1108,6 @@ function AllPicksSheet({
                 <div
                   style={{
                     marginTop: 7,
-                    paddingLeft: 26,
                     fontSize: 12,
                     fontWeight: 600,
                     color: A.BODY,
@@ -1124,9 +1123,7 @@ function AllPicksSheet({
 
         <div
           style={{
-            marginTop: 14,
-            paddingTop: 12,
-            borderTop: `1px solid ${HAIR}`,
+            marginTop: 26,
             fontSize: 12,
             fontWeight: 600,
             color: A.BODY,
