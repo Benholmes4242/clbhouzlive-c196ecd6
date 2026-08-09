@@ -19,7 +19,7 @@ import { tiVerdict, verdictFromResult, formatTiPosition, formatTiScore, type TiV
 import type { EventState } from '@/features/tourhub/components/overview-v3/useTournamentPulse';
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { TourStatusBlock } from '../../_shared/TourStatusBlock';
+import { TourStatusBlock, TOUR_UNDER } from '../../_shared/TourStatusBlock';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
