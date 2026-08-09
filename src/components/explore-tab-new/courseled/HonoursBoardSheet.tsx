@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { HonoursBoard, GOLD_INK, HONOURS_WASH } from './HonoursBoard';
-import { A, SANS } from './tokens';
+import { A, LABEL, SANS } from './tokens';
 
 /**
  * THE HONOURS BOARD, ALL TIME — the complete legendary set in the same row
