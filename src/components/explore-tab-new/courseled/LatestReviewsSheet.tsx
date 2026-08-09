@@ -157,55 +157,114 @@ export function LatestReviewsSheet({
     >
       <div
         style={{
-          padding: '10px 16px 12px',
+          padding: '10px 0 10px',
           background: A.CANVAS,
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <div style={{ ...KICKER, color: A.DIM, marginBottom: 5, ...FIGS }}>
-          {t('discover.reviews.sheetCaption', {
-            defaultValue: '{{count}} reviews',
-            count: total,
-          })}
+        <div style={{ padding: '0 16px' }}>
+          <div style={{ ...KICKER, color: A.DIM, marginBottom: 5, ...FIGS }}>{caption}</div>
+          <div
+            id="courseled-reviews-title"
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              color: A.INK,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {t('discover.latestReviews', 'Latest reviews')}
+          </div>
         </div>
+
+        {/* REGION PILLS — five pills that partition every review. An empty
+            region KEEPS its pill: hiding it would change the control's shape as
+            data arrives. */}
         <div
-          id="courseled-reviews-title"
+          role="tablist"
+          aria-label={t('discover.reviews.region.aria', 'Filter reviews by region')}
           style={{
-            fontSize: 20,
-            fontWeight: 800,
-            color: A.INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
+            marginTop: 10,
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            padding: '0 16px',
+            scrollbarWidth: 'none',
           }}
         >
-          {t('discover.latestReviews', 'Latest reviews')}
+          {pills.map((p) => {
+            const on = p.key === region;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setRegion(p.key)}
+                style={{
+                  flexShrink: 0,
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  fontFamily: SANS,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  background: on ? A.INK : A.PANEL,
+                  color: on ? A.PANEL : A.BODY,
+                  border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+                }}
+              >
+                {p.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {reviews.map((r) => {
-            const st = reactions.stateFor('review', r.reviewId);
-            const own = !!viewerId && r.userId === viewerId;
-            return (
-              <ReviewTile
-                key={r.reviewId}
-                review={r}
-                isOwn={own}
-                autoplayGroup="reviews-sheet"
-                onPress={onTilePress}
-                reactionHidden={!reactions.viewerId || reactions.unavailable}
-                reactionReadOnly={own}
-                reactionCount={st.count}
-                reacted={st.mine}
-                onToggleReaction={() => reactions.toggle('review', r.reviewId)}
-              />
-            );
-          })}
-        </div>
+        {visible.length === 0 && complete ? (
+          <div style={{ padding: '28px 8px', textAlign: 'center' }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.02em' }}>
+              {t('discover.reviews.region.emptyTitle', {
+                defaultValue: 'No reviews from {{region}} yet',
+                region: activeLabel,
+              })}
+            </div>
+            <div style={{ marginTop: 6, fontSize: 12.5, fontWeight: 500, color: A.MUTE }}>
+              {t(
+                'discover.reviews.region.emptyBody',
+                'Rate a course there and yours will be the first.',
+              )}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {visible.map((r) => {
+              const st = reactions.stateFor('review', r.reviewId);
+              const own = !!viewerId && r.userId === viewerId;
+              return (
+                <ReviewTile
+                  key={r.reviewId}
+                  review={r}
+                  isOwn={own}
+                  autoplayGroup="reviews-sheet"
+                  onPress={onTilePress}
+                  reactionHidden={!reactions.viewerId || reactions.unavailable}
+                  reactionReadOnly={own}
+                  reactionCount={st.count}
+                  reacted={st.mine}
+                  onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+                />
+              );
+            })}
+          </div>
+        )}
 
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
       </div>
+
     </BottomSheet>
   );
 }
