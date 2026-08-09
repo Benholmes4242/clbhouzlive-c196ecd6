@@ -138,14 +138,9 @@ export function MostPlayedLeaderboard({
                   {r.delta != null && r.delta > 0 && (
                     <span
                       style={{
+                        ...LABEL,
                         flexShrink: 0,
-                        fontSize: 9,
-                        fontWeight: 800,
-                        color: '#0F8F4A',
-                        background: 'rgba(15,143,74,0.10)',
-                        border: '1px solid rgba(15,143,74,0.18)',
-                        borderRadius: 5,
-                        padding: '1.5px 6px',
+                        color: A.DIM,
                         fontVariantNumeric: 'tabular-nums lining',
                       }}
                     >
