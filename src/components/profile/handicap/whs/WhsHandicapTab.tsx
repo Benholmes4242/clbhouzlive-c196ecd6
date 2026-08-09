@@ -32,7 +32,20 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
   const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
   const declineHandicapChip = useDeclineHandicapChip();
 
+  /* THE CONNECT FLOW OWNS ITS OWN COMPLETION.
+     A connection row appearing is NOT the end of the flow - the member still
+     has the connected screen to read and its CTA to tap. So the flow latches
+     at first resolved render: if it started without a connection, it stays
+     mounted until it calls onConnected (fired from that CTA only). */
+  const startedDisconnected = useRef<boolean | null>(null);
+  const [flowFinished, setFlowFinished] = useState(false);
+
   if (isLoading) return <SkeletonView />;
+
+  if (startedDisconnected.current === null && !isError) {
+    startedDisconnected.current = !connection;
+  }
+
 
   // Never fall through to WhsConnectScreen when the query errored — an
   // already-connected user would be prompted to reconnect. Show a retry
