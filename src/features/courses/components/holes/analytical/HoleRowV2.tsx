@@ -1,14 +1,17 @@
 /**
  * HoleRowV2 - the hole-by-hole row in the analytical treatment
- * (BRIEF_COURSE_TAB_ANALYTICAL_V2, section 4).
+ * (BRIEF_COURSE_TAB_ANALYTICAL_V2 section 4, BRIEF_HOLE_BY_HOLE_REFINE).
  *
- * The row is a fixed grid: HOLE / PAR / SI / distribution + figures. The bar is
- * a NEUTRAL INK RAMP (light = birdie or better, dark = double or worse); colour
- * is reserved for the two figures beneath it. Two markers sit on the bar: a
- * BODY tick for the field average and, when the viewing member has played the
- * hole, an amber dot for theirs. Both are positioned against ONE shared scale
- * (scaleMax) computed across every hole on the course, so a marker further right
- * always means a harder hole.
+ * The collapsed row is ONE line: HOLE / PAR / SI / distribution ramp / the two
+ * figures. The ramp is a NEUTRAL INK RAMP (light = birdie or better, dark =
+ * double or worse) and its segment widths are proportions of ROUNDS.
+ *
+ * NO MARKERS SIT ON THE RAMP. They used to, positioned against scaleMax (a
+ * to-par domain shared across every hole), which put two unrelated quantities
+ * on one x axis: a member reading "my dot lands where par meets bogey" was
+ * reading a coincidence. scaleMax survives - it now drives a SEPARATE thin
+ * difficulty track inside the expanded detail, where the track is visibly its
+ * own scale and carries a caption saying what it measures.
  *
  * Derivation only - the rows come from get_course_hole_analysis and
  * get_my_hole_performance, both already loaded by the page.
@@ -19,13 +22,24 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { A, FIGS, Hairline, LABEL, RAMP, SANS, toParParts } from './tokens';
 
-/** HOLE / PAR / SI / bar+figures. Load-bearing: columns never size to content. */
-export const HOLE_GRID_V2 = '26px 26px 24px 1fr';
+/** HOLE / PAR / SI / ramp / figures. Load-bearing: columns never size to content. */
+export const HOLE_GRID_V2 = '28px 26px 24px 1fr auto';
 
 export const PREVIEW_COUNT_V2 = 4;
 
-/** Expanded detail is inset to the bar column so it reads as a footnote. */
-const DETAIL_INSET = 66;
+/** Expanded detail is inset to the ramp column so it reads as a footnote. */
+const DETAIL_INSET = 68;
+
+/** Micro label sat beneath a figure. Present enough to answer the question once. */
+const MICRO: React.CSSProperties = {
+  fontSize: 6.5,
+  fontWeight: 700,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+  lineHeight: 1.2,
+};
+
 
 export interface HoleScale {
   /** Upper bound of the shared marker scale (to-par strokes). Never below 0.1. */
