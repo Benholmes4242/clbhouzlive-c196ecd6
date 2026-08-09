@@ -888,7 +888,8 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "{{count}} hoyos en uno y albatros en el cuadro"
+    "honoursCaptionCount": "{{count}} hoyos en uno y albatros en el cuadro",
+    "aroundTheWorld": "Rondas destacadas"
   },
   "statBrowse": {
     "countTracked_one": "curso seguido",

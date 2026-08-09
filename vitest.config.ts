@@ -4,6 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  // The app's i18n init reads the build stamp for locale cache-busting; vite
+  // defines it at build time, so the test run needs its own value.
+  define: { __BUILD_ID__: JSON.stringify('test') },
   test: {
     environment: 'jsdom',
     globals: true,

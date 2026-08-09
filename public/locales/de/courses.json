@@ -888,7 +888,8 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "{{count}} Hole-in-One und Albatrosse auf der Tafel"
+    "honoursCaptionCount": "{{count}} Hole-in-One und Albatrosse auf der Tafel",
+    "aroundTheWorld": "Herausragende Runden"
   },
   "statBrowse": {
     "countTracked_one": "Kurs verfolgt",

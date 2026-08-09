@@ -121,7 +121,7 @@ export function CourseNewsSheet({
             lineHeight: 1.1,
           }}
         >
-          {t('discover.aroundTheWorld', 'Around the world')}
+          {t('discover.aroundTheWorld', 'Standout rounds')}
         </div>
         <div style={{ fontSize: 11.5, color: A.MUTE, marginTop: 4 }}>
           {`${lensLabel} \u00B7 ${t('discover.last90lower', 'last 90 days')}`}
