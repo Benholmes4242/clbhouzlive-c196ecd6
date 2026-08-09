@@ -1,9 +1,8 @@
-import type { CSSProperties } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
+import { useTranslation } from 'react-i18next';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
-import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 import { RoundFeatChips } from './RoundFeatChips';
 import { IndexMovement, referenceLine, toParFor } from './friendRoundParts';
@@ -48,17 +47,16 @@ export function FriendRoundRow({ row, isLast = false, onPress }: Props) {
     play_date,
     course_name,
     gross,
-    net,
     hcp_delta,
     feats,
   } = row;
 
 
 
+  const { t } = useTranslation('courses');
   const relative = formatRelativeMonths(play_date);
   const toPar = toParFor(row);
-  const reference = referenceLine(row, ((k: string, o?: Record<string, unknown>) =>
-    (o?.defaultValue as string) ?? k) as never);
+  const reference = referenceLine(row, t as never);
 
 
   return (
