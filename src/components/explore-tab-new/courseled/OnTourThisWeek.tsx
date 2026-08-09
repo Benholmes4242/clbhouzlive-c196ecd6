@@ -305,7 +305,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       ]);
                     }
                     return (
-                      <div style={{ padding: '8px 11px 10px' }}>
+                      <div style={{ padding: '8px 11px 7px' }}>
                         {/* LINE 1 — the figure, who holds it, and the margin. */}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
                           <span
@@ -363,8 +363,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                         {cellsLive.length > 0 && (
                           <div
                             style={{
-                              marginTop: 11,
-                              paddingTop: 10,
+                              marginTop: 8,
+                              paddingTop: 7,
                               borderTop: `1px solid ${A.HAIRLINE}`,
                               display: 'grid',
                               gridTemplateColumns: `repeat(${cellsLive.length}, 1fr)`,
@@ -379,7 +379,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                                   {value}
                                 </div>
                                 <div
-                                  style={{ ...LABEL, fontSize: 7.5, color: A.DIM, marginTop: 3 }}
+                                  style={{ ...LABEL, fontSize: 7.5, color: A.DIM, marginTop: 2 }}
                                 >
                                   {label}
                                 </div>
