@@ -421,7 +421,19 @@ export function LiveFieldPanel({
     });
   }, [field, tournamentId, round]);
 
-  if (!field && !low && rows.length === 0) return null;
+  /**
+   * The ladder's own gate (three holes with a finite figure) mirrored here, so
+   * the rule above it is never drawn over a HoleLadder that returned null.
+   */
+  const hasLadder = useMemo(
+    () =>
+      rows.filter((r) => Number.isFinite(Number(r.field_avg) - Number(r.par))).length >= 3,
+    [rows],
+  );
+
+  const hasStrip = !!field || !!low;
+
+  if (!field && !low && !hasLadder) return null;
 
   return (
     <div style={{ padding: `0 ${SPACE.pagePadX}px 10px` }}>
@@ -467,38 +479,57 @@ export function LiveFieldPanel({
           </>
         )}
 
-        {/* Counter strip */}
-        <div
-          style={{
-            marginTop: 16,
-            paddingTop: 14,
-            borderTop: `1px solid ${A.HAIRLINE}`,
-            display: 'flex',
-            gap: 10,
-          }}
-        >
-          <Cell
-            label={t('overview.onTheCourse.lowRoundLabel')}
-            value={low ? formatToPar(low.toPar) : '—'}
-            color={low ? tourFigColor(low.toPar) : A.DIM}
-            sub={holders.length > 0 ? holders.join(', ') : null}
-          />
-          {field && field.count > 0 && (
-            <Cell
-              align="right"
-              label={t('overview.onTheCourse.underParTodayLabel')}
-              value={t('overview.onTheCourse.underParTodayValue', {
-                n: field.underPar,
-                m: field.count,
-              })}
-              sub={t('overview.onTheCourse.underParTodaySub')}
-            />
-          )}
-        </div>
+        {/* Counter strip — only when it has a figure of its own to carry. */}
+        {hasStrip && (
+          <>
+            <div
+              style={{
+                // No block above => no rule, and no space reserved for one.
+                marginTop: field ? 16 : 0,
+                paddingTop: field ? 14 : 0,
+                borderTop: field ? `1px solid ${A.HAIRLINE}` : undefined,
+                display: 'flex',
+                gap: 10,
+              }}
+            >
+              {low && (
+                <Cell
+                  label={t('overview.onTheCourse.lowRoundLabel')}
+                  value={formatToPar(low.toPar)}
+                  color={tourFigColor(low.toPar)}
+                  sub={holders.length > 0 ? holders.join(', ') : null}
+                />
+              )}
+              {field && field.count > 0 && (
+                <Cell
+                  // A lone cell takes the row on its own, left-aligned.
+                  align={low ? 'right' : 'left'}
+                  label={t('overview.onTheCourse.underParTodayLabel')}
+                  value={t('overview.onTheCourse.underParTodayValue', {
+                    n: field.underPar,
+                    m: field.count,
+                  })}
+                  sub={t('overview.onTheCourse.underParTodaySub')}
+                />
+              )}
+            </div>
+            {low && !field && (
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500, color: A.MUTE }}>
+                {t('overview.onTheCourse.fieldAverageWaiting', { n: FIELD_GATE })}
+              </div>
+            )}
+          </>
+        )}
 
         {/* Ranked hole chart */}
-        {rows.length > 0 && (
-          <div style={{ marginTop: 16, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}` }}>
+        {hasLadder && (
+          <div
+            style={{
+              marginTop: hasStrip ? 16 : 0,
+              paddingTop: hasStrip ? 4 : 0,
+              borderTop: hasStrip ? `1px solid ${A.HAIRLINE}` : undefined,
+            }}
+          >
             <HoleLadder rows={rows} />
           </div>
         )}
