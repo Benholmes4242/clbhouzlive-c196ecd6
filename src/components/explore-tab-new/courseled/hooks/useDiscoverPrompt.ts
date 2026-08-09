@@ -182,6 +182,8 @@ export function useDiscoverPrompt(userId: string | undefined): {
         courseId: photoMatch.course_id as string,
         courseName: photoMatch.course_name as string,
         thumbnail: null,
+        at: (photoMatch.play_date as string | null) ?? null,
+
       },
     };
   }
