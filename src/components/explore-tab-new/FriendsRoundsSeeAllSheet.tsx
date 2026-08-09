@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
+import { buildInsightMap } from './friendRoundParts';
 import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
