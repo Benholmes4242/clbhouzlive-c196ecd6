@@ -99,6 +99,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   const { data } = useAIPredictions(tournamentId ?? null);
   const [sheet, setSheet] = useState<SheetState>(null);
   const picks = data?.topContenders ?? [];
+  // The denominator is the REAL pick count for this tournament (every contender
+  // the prediction payload holds), not the number of cards the carousel renders.
+  const pickTotal = picks.length;
+
 
   // Hide the floating bottom nav while any TI sheet is open so it doesn't
   // sit on top of the sheet content.
