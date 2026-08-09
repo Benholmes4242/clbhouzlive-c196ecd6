@@ -267,7 +267,8 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
 
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
-  const trend = useHandicapTrend90d(connection?.id);
+  const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
+  const lastMove = lastIndexMove(hcpHistory as any);
 
   if (!user) return null;
   if (isBusinessActor) return null;
