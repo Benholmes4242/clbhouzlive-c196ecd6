@@ -218,6 +218,12 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           {t('discover.friendsRail.par', { defaultValue: 'Par {{par}}', par: r.course_par })}
                         </span>
                       )}
+                      {/* THE INDEX MOVEMENT SITS WITH THE FIGURES, not on the
+                          name row: it is a number about the round, so it holds
+                          the right edge of the score line. */}
+                      <span style={{ marginLeft: 'auto', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                        <IndexMovement row={r} />
+                      </span>
                     </div>
 
                     {/* LINE 2 — who played it, how their index moved, and the
@@ -256,7 +262,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           gap: 8,
                         }}
                       >
-                        <IndexMovement row={r} />
                         <ReactionSlot>
                           {(() => {
                             const st = reactions.stateFor('round', r.score_id);
