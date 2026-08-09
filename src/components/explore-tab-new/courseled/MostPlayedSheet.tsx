@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { MostPlayedLeaderboard } from './MostPlayedLeaderboard';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, KICKER, SANS } from './tokens';
+import { A, LABEL, SANS } from './tokens';
 
 /**
  * MOST PLAYED SHEET — the full frequency table (BRIEF, section 5 "See all").
