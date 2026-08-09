@@ -5,7 +5,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 import { RoundFeatChips } from './RoundFeatChips';
-import { IndexMovement, referenceLine, toParFor } from './friendRoundParts';
+import { IndexMovement, insightFor, toParFor } from './friendRoundParts';
 
 /**
  * FriendRoundRow — Discover "Friends' latest rounds".
