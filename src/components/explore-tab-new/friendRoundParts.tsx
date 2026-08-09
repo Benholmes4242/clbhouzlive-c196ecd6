@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChartNoAxesColumn } from 'lucide-react';
 import { A, TOPAR_RED, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
 
@@ -16,6 +17,39 @@ import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
  */
 
 export const MOVEMENT_FLOOR = 0.05;
+
+/**
+ * INSIGHT LINE TYPE (BRIEF_FRIENDS_CARD_HEIGHT_AND_ROW).
+ * One source for the size/leading so the two-line reserve is COMPUTED from the
+ * type rather than guessed in px, and the card and the sheet row agree.
+ */
+export const INSIGHT_FONT_SIZE = 11.5;
+export const INSIGHT_LINE_HEIGHT = 1.3;
+export const INSIGHT_TWO_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT * 2;
+
+/** Two-line clamp for the insight text — the third line is dropped by design. */
+export const INSIGHT_CLAMP = {
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical' as const,
+  WebkitLineClamp: 2,
+  overflow: 'hidden',
+};
+
+/**
+ * The insight line's CATEGORY MARKER — a single small inline glyph, one for
+ * every insight kind. Not decoration and not a golf motif: the row's other
+ * lines are WHO and WHERE, this one is the analytical line and says so.
+ */
+export function InsightGlyph() {
+  return (
+    <ChartNoAxesColumn
+      size={11}
+      strokeWidth={2.5}
+      aria-hidden
+      style={{ flexShrink: 0, color: A.DIM, marginRight: 6, transform: 'translateY(1px)' }}
+    />
+  );
+}
 
 export function toParFor(row: FriendRoundRow): { text: string; tone: string } | null {
   if (row.gross == null || row.course_par == null) return null;
