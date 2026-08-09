@@ -53,7 +53,11 @@ if (!i18n.isInitialized) {
       react: { useSuspense: false },
       backend: {
         loadPath: '/locales/{{lng}}/{{ns}}.json',
+        // Build-stamped so a device never serves a cached bundle that predates
+        // newly added keys (which would render raw key names to the member).
+        queryStringParams: { v: __BUILD_ID__ },
       },
+
       detection: {
         // Persisted user choice FIRST, then browser/OS, then fallbackLng.
         order: ['localStorage', 'navigator'],

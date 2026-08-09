@@ -314,27 +314,57 @@ export const HoleRowV2: React.FC<{
 
       {open && (
         <div style={{ padding: `0 0 16px ${DETAIL_INSET}px` }}>
-          {/* The four shares as an inline label row - the ramp is not redrawn. */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', ...FIGS }}>
+          {/* The four shares as four EVEN columns, one row: swatch+figure over label. */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', ...FIGS }}>
             {segs.map((s) => (
-              <span key={s.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <i
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 2,
-                    background: s.bg,
-                    display: 'block',
-                    flexShrink: 0,
-                  }}
-                />
-                <span style={{ fontSize: 12, fontWeight: 800, color: A.INK }}>
-                  {Math.round((s.pctValue / total) * 100)}%
+              <span
+                key={s.key}
+                style={{
+                  flex: '1 1 0',
+                  minWidth: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                  <i
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 2,
+                      background: s.bg,
+                      display: 'block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: A.INK,
+                      lineHeight: 1,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {Math.round((s.pctValue / total) * 100)}%
+                  </span>
                 </span>
-                <span style={{ ...MICRO, fontSize: 8 }}>{s.label}</span>
+                <span
+                  style={{
+                    ...MICRO,
+                    fontSize: 6.5,
+                    marginTop: 3,
+                    whiteSpace: 'nowrap',
+                    textAlign: 'center',
+                  }}
+                >
+                  {s.label}
+                </span>
               </span>
             ))}
           </div>
+
 
           <Hairline style={{ margin: '12px 0 10px' }} />
 
