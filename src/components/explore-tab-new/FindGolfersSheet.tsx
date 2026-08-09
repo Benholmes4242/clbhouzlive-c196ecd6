@@ -43,12 +43,47 @@ interface Props {
 /** Local, per-row overrides so a tap settles instantly and never re-orders. */
 type RowState = { friend?: 'requested'; following?: boolean };
 
-const AVATAR = 38;
+const AVATAR = 34;
 const GUTTER = 11;
-const INDENT = AVATAR + GUTTER; // 49 - the figures and the actions share it.
-const FIG_GRID = '54px 62px 1fr';
+/** One row per golfer, so the row holds a floor rather than a fixed height. */
+const ROW_CONTENT_MIN = 46;
 
-function ActionShell({
+/**
+ * ActionSlot — the two states of one control share ONE grid cell.
+ *
+ * The cell is therefore as wide as the WIDER of the two, in whatever language
+ * is loaded, and the settled state cannot resize it. That is the whole point:
+ * at three rows a screen, a tap that re-widened "Add friend" into "Requested"
+ * would slide the next golfer under the thumb that just tapped.
+ */
+function ActionSlot({
+  settled,
+  live,
+  settledNode,
+}: {
+  settled: boolean;
+  live: React.ReactNode;
+  settledNode: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: 'grid', flexShrink: 0 }}>
+      <div
+        style={{ gridArea: '1 / 1', visibility: settled ? 'hidden' : 'visible' }}
+        aria-hidden={settled}
+      >
+        {live}
+      </div>
+      <div
+        style={{ gridArea: '1 / 1', visibility: settled ? 'visible' : 'hidden' }}
+        aria-hidden={!settled}
+      >
+        {settledNode}
+      </div>
+    </div>
+  );
+}
+
+function Pill({
   onClick,
   border,
   color,
@@ -65,8 +100,8 @@ function ActionShell({
       tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
       style={{
-        flex: 1,
-        height: 34,
+        height: 30,
+        padding: '0 11px',
         borderRadius: 999,
         border: `1px solid ${border}`,
         background: 'transparent',
@@ -74,11 +109,12 @@ function ActionShell({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 5,
+        gap: 4,
+        whiteSpace: 'nowrap',
         fontFamily: SANS,
-        fontSize: 10,
+        fontSize: 9.5,
         fontWeight: 800,
-        letterSpacing: '0.11em',
+        letterSpacing: '0.09em',
         textTransform: 'uppercase',
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none',
@@ -89,12 +125,65 @@ function ActionShell({
   );
 }
 
-function Figure({ label, value }: { label: string; value: React.ReactNode }) {
+/**
+ * TextAction — Follow, as a word rather than a pill. Fixed 16px high so the
+ * settled state cannot change the row's height either.
+ */
+function TextAction({
+  onClick,
+  color,
+  children,
+}: {
+  onClick?: () => void;
+  color: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div style={{ minWidth: 0 }}>
-      <div style={{ ...LABEL, fontSize: 9, marginBottom: 3 }}>{label}</div>
-      {value}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      style={{
+        height: 16,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 4,
+        whiteSpace: 'nowrap',
+        color,
+        fontFamily: SANS,
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: '0.09em',
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}
+    >
+      {children}
     </div>
+  );
+}
+
+
+/** A figure and its label, inline. Absent values are not rendered at all. */
+function Fig({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+  return (
+    <>
+      <span style={{ ...LABEL, fontSize: 9, color: A.DIM }}>{label}</span>
+      <span
+        style={{
+          fontSize: 12.5,
+          fontWeight: bold ? 800 : 700,
+          color: bold ? A.INK : A.BODY,
+          letterSpacing: '-0.01em',
+          marginLeft: 4,
+          ...FIGS,
+        }}
+      >
+        {value}
+      </span>
+    </>
   );
 }
 
@@ -120,165 +209,151 @@ function GolferRow({
     row.handicap_index == null ? null : row.handicap_index.toFixed(1);
   const club = row.home_club?.trim() || null;
 
+  // THE FIGURES, on one line now. Same three, same labels, same rule: an
+  // absent value contributes NOTHING - no dash, no orphan label, no separator.
+  const figs: React.ReactNode[] = [];
+  if (hcp) {
+    figs.push(
+      <Fig key="hcp" label={t('discover.findGolfers.hcp', 'HCP')} value={hcp} bold />,
+    );
+  }
+  if (row.rounds_tracked > 0) {
+    figs.push(
+      <Fig
+        key="rounds"
+        label={t('discover.findGolfers.rounds', 'ROUNDS')}
+        value={String(row.rounds_tracked)}
+      />,
+    );
+  }
+  if (club) {
+    figs.push(
+      <span
+        key="club"
+        style={{ fontSize: 12, fontWeight: 600, color: A.BODY }}
+      >
+        {club}
+      </span>,
+    );
+  }
+
   return (
-    <div style={{ padding: '14px 0' }}>
-      {/* LINE 1 — identity. The name is allowed to take a second line. */}
-      <div style={{ display: 'flex', gap: GUTTER, alignItems: 'flex-start' }}>
-        <div style={{ flexShrink: 0 }}>
-          <SquircleAvatar
-            size={AVATAR}
-            src={row.profile_photo_url}
-            alt={name}
-            userId={row.id}
-            hairlineRing
-          />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 800,
-              letterSpacing: '-0.015em',
-              lineHeight: 1.25,
-              color: A.INK,
-              overflowWrap: 'anywhere',
-            }}
-          >
-            {name}
-          </div>
-          {row.username ? (
-            <div
-              style={{
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: A.DIM,
-                marginTop: 2,
-                overflowWrap: 'anywhere',
-              }}
-            >
-              @{row.username}
-            </div>
-          ) : null}
-        </div>
+    <div
+      style={{
+        display: 'flex',
+        gap: GUTTER,
+        alignItems: 'center',
+        padding: '11px 0',
+        minHeight: ROW_CONTENT_MIN,
+      }}
+    >
+      <div style={{ flexShrink: 0 }}>
+        <SquircleAvatar
+          size={AVATAR}
+          src={row.profile_photo_url}
+          alt={name}
+          userId={row.id}
+          hairlineRing
+        />
       </div>
 
-      {/* LINE 2 — the figures, on a fixed grid so they align sheet-wide. */}
-      {hcp || row.rounds_tracked > 0 || club ? (
+      {/* THE NAME NEVER TRUNCATES. It takes a second line instead, and the row
+          grows to hold it - acceptance D holds from 320 to 430. */}
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: FIG_GRID,
-            gap: 8,
-            marginLeft: INDENT,
-            marginTop: 11,
-            alignItems: 'start',
+            fontSize: 14,
+            fontWeight: 800,
+            letterSpacing: '-0.015em',
+            lineHeight: 1.25,
+            color: A.INK,
+            overflowWrap: 'anywhere',
           }}
         >
-          {hcp ? (
-            <Figure
-              label={t('discover.findGolfers.hcp', 'HCP')}
-              value={
-                <span
-                  style={{
-                    fontSize: 14.5,
-                    fontWeight: 800,
-                    color: A.INK,
-                    letterSpacing: '-0.02em',
-                    ...FIGS,
-                  }}
-                >
-                  {hcp}
-                </span>
-              }
-            />
-          ) : (
-            <div />
-          )}
-          {row.rounds_tracked > 0 ? (
-            <Figure
-              label={t('discover.findGolfers.rounds', 'ROUNDS')}
-              value={
-                <span
-                  style={{
-                    fontSize: 14.5,
-                    fontWeight: 700,
-                    color: A.BODY,
-                    letterSpacing: '-0.02em',
-                    ...FIGS,
-                  }}
-                >
-                  {row.rounds_tracked}
-                </span>
-              }
-            />
-          ) : (
-            <div />
-          )}
-          {club ? (
-            <Figure
-              label={t('discover.findGolfers.homeClub', 'HOME CLUB')}
-              value={
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: A.BODY,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {club}
-                </div>
-              }
-            />
-          ) : (
-            <div />
-          )}
+          {name}
         </div>
-      ) : null}
-
-      {/* LINE 3 — the actions. NEITHER IS FILLED. */}
-      <div
-        style={{ display: 'flex', gap: 8, marginLeft: INDENT, marginTop: 12 }}
-      >
-        {requested ? (
-          <ActionShell border={A.BORDER} color={A.MUTE}>
-            <Check size={13} strokeWidth={2.6} />
-            {t('discover.findGolfers.requested', 'Requested')}
-          </ActionShell>
-        ) : (
-          <ActionShell
-            border={A.INK}
-            color={A.INK}
-            onClick={() => onAddFriend(row)}
+        {figs.length ? (
+          // THE META LINE may clip; the name may not.
+          <div
+            style={{
+              marginTop: 3,
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 7,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              minWidth: 0,
+            }}
           >
-            {t('discover.findGolfers.addFriend', 'Add friend')}
-          </ActionShell>
-        )}
-
-        {following ? (
-          <ActionShell
-            border={A.BORDER}
-            color={A.MUTE}
-            onClick={() => onToggleFollowRow(row, true)}
+            {figs.map((f, i) => (
+              <span key={i} style={{ display: 'inline-flex', alignItems: 'baseline', minWidth: 0 }}>
+                {f}
+              </span>
+            ))}
+          </div>
+        ) : row.username ? (
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 500,
+              color: A.DIM,
+              marginTop: 3,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
           >
-            <Check size={13} strokeWidth={2.6} />
-            {t('discover.findGolfers.following', 'Following')}
-          </ActionShell>
-        ) : (
-          <ActionShell
-            border="rgba(14,18,22,0.12)"
-            color={A.BODY}
-            onClick={() => onToggleFollowRow(row, false)}
-          >
-            {t('discover.findGolfers.follow', 'Follow')}
-          </ActionShell>
-        )}
+            @{row.username}
+          </div>
+        ) : null}
       </div>
+
+      {/* THE ACTIONS. TWO PILLS INLINE DID NOT FIT: at 320 they left the name
+          129px, under the floor, so Follow drops to the quiet text action
+          beneath Add friend and buys the width back. NEITHER IS FILLED. */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 5,
+          flexShrink: 0,
+        }}
+      >
+        <ActionSlot
+          settled={requested}
+          live={
+            <Pill border={A.INK} color={A.INK} onClick={() => onAddFriend(row)}>
+              {t('discover.findGolfers.addFriend', 'Add friend')}
+            </Pill>
+          }
+          settledNode={
+            <Pill border={A.BORDER} color={A.MUTE}>
+              <Check size={12} strokeWidth={2.6} />
+              {t('discover.findGolfers.requested', 'Requested')}
+            </Pill>
+          }
+        />
+        <ActionSlot
+          settled={!!following}
+          live={
+            <TextAction color={A.BODY} onClick={() => onToggleFollowRow(row, false)}>
+              {t('discover.findGolfers.follow', 'Follow')}
+            </TextAction>
+          }
+          settledNode={
+            <TextAction color={A.MUTE} onClick={() => onToggleFollowRow(row, true)}>
+              <Check size={12} strokeWidth={2.6} />
+              {t('discover.findGolfers.following', 'Following')}
+            </TextAction>
+          }
+        />
+      </div>
+
     </div>
   );
 }
+
 
 export function FindGolfersSheet({ open, onClose }: Props) {
   const { t } = useTranslation('courses');
