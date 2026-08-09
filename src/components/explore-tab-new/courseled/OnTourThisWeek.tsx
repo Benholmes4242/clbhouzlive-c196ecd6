@@ -84,15 +84,76 @@ function playDays(e: TourWeekEvent): string {
   return e.startDate === e.endDate ? fmt(start) : `${fmt(start)} \u2013 ${fmt(end)}`;
 }
 
-/** Live block and stat grid share one height so the rail stays level.
- *  Condensed to the friends-rail rhythm (was 74). */
-const STAT_BLOCK_H = 56;
+/** Live and upcoming states now share one three-up, so no fixed block height. */
+
 const LIVE_DOT = '#E5484D';
 
 /** Canonical tour convention: under par is RED, over par ink, level neutral. */
 function scoreColor(score: number | null | undefined): string {
   return getScoreColor(score, 'light');
 }
+
+/**
+ * The three-up figure row shared by the LIVE and UPCOMING states, so the rail
+ * reads as one structure as a member scrolls past both. Absent values are never
+ * passed: the row rebalances on however many cells it is given, and the end cell
+ * hugs its own edge exactly as the first does (that mirroring is a property of
+ * the grid, not of the rule that used to sit above it).
+ */
+function ThreeUp({ cells }: { cells: Array<[string, string, string]> }) {
+  if (cells.length === 0) return null;
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+        gap: 4,
+      }}
+    >
+      {cells.map(([label, value, tone], i) => (
+        <div
+          key={label}
+          style={{
+            minWidth: 0,
+            textAlign:
+              i === 0 ? 'left' : i === cells.length - 1 ? 'right' : 'center',
+          }}
+        >
+          <div
+            style={{
+              ...NUMF,
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: '-0.025em',
+              color: tone,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {value}
+          </div>
+          <div style={{ ...LABEL, fontSize: 6.5, color: A.DIM, marginTop: 4 }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** "Rory McIlroy" -> "McIlroy". The card has room for the label, not the name. */
+function surname(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts.length > 1 ? parts[parts.length - 1] : name.trim();
+}
+
+/** Whole days from today to the tee-off date; 0 or less reads "Today". */
+function daysUntil(startDate: string): number {
+  const start = new Date(`${startDate}T12:00:00`).getTime();
+  return Math.ceil((start - Date.now()) / 86_400_000);
+}
+
+
 
 export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPress, onTourHub }: Props) {
   const { t } = useTranslation('courses');
@@ -186,7 +247,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                 // No border and no new-since ink ring on tour cards.
                 border: 'none',
                 boxShadow: 'none',
-                width: 272,
+                width: 266,
                 flexShrink: 0,
                 fontFamily: SANS,
               }}
@@ -241,18 +302,19 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
                     <div
                       style={{
-                        fontSize: 14,
+                        fontSize: 14.5,
                         fontWeight: 800,
                         color: '#fff',
-                        letterSpacing: '-0.015em',
+                        letterSpacing: '-0.02em',
                       }}
                     >
                       {match?.name ?? e.venueName}
                     </div>
                     <div
                       style={{
-                        fontSize: 10.5,
-                        color: 'rgba(255,255,255,0.8)',
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.7)',
                         marginTop: 1,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -262,6 +324,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       {e.name}
                     </div>
                   </div>
+
                 </CourseImageFallback>
 
                 {peek && peek.leaderScore != null ? (
@@ -296,24 +359,30 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     if (thruText) {
                       cellsLive.push([t('discover.tour.thru', 'Thru'), thruText, A.INK]);
                     }
-                    if (peek.chasingScore != null) {
-                      // A to-par figure, so it takes the score treatment.
+                    // THIRD CELL — never "Second": that figure IS the margin
+                    // printed on line 1, told a second time. Field average today
+                    // is not derivable from this peek (it reads only the top 12
+                    // positions), so the brief's stated fallback applies: holes
+                    // remaining for the leader.
+                    if (peek.thru != null && peek.thru < 18) {
                       cellsLive.push([
-                        t('discover.tour.second', 'Second'),
-                        fmtScore(peek.chasingScore),
-                        scoreColor(peek.chasingScore),
+                        t('discover.tour.holesLeft', 'Holes left'),
+                        String(18 - peek.thru),
+                        A.INK,
                       ]);
                     }
+
                     return (
-                      <div style={{ padding: '8px 11px 7px' }}>
+                      <div style={{ padding: '12px 14px 13px' }}>
                         {/* LINE 1 — the figure, who holds it, and the margin. */}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
                           <span
                             style={{
                               ...NUMF,
-                              fontSize: 24,
+                              fontSize: 25,
                               fontWeight: 800,
-                              lineHeight: 1,
+                              lineHeight: 0.92,
+                              letterSpacing: '-0.035em',
                               color: scoreColor(peek.leaderScore),
                             }}
                           >
@@ -323,9 +392,9 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             style={{
                               flex: 1,
                               minWidth: 0,
-                              fontSize: 13,
+                              fontSize: 13.5,
                               fontWeight: 700,
-                              color: A.INK,
+                              color: A.BODY,
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -342,7 +411,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             <span
                               style={{
                                 ...LABEL,
-                                fontSize: 8,
+                                fontSize: 6.5,
+                                fontWeight: 800,
                                 letterSpacing: '0.13em',
                                 color: A.DIM,
                                 marginLeft: 'auto',
@@ -359,94 +429,82 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                           )}
                         </div>
 
-                        {/* LINE 2 — does the lead mean anything yet. */}
-                        {cellsLive.length > 0 && (
-                          <div
-                            style={{
-                              marginTop: 8,
-                              paddingTop: 7,
-                              borderTop: `1px solid ${A.HAIRLINE}`,
-                              display: 'grid',
-                              gridTemplateColumns: `repeat(${cellsLive.length}, 1fr)`,
-                            }}
-                          >
-                            {cellsLive.map(([label, value, tone], i) => (
-                              <div
-                                key={label}
-                                style={{
-                                  // The end cell mirrors the first: it hugs its
-                                  // own edge so "Second" sits the same distance
-                                  // from the right as "Round" does from the
-                                  // left, in line with the margin above it.
-                                  textAlign:
-                                    i === 0
-                                      ? 'left'
-                                      : i === cellsLive.length - 1
-                                        ? 'right'
-                                        : 'center',
-                                }}
-                              >
-
-                                <div style={{ ...NUMF, fontSize: 15, fontWeight: 800, color: tone }}>
-                                  {value}
-                                </div>
-                                <div
-                                  style={{ ...LABEL, fontSize: 7.5, color: A.DIM, marginTop: 2 }}
-                                >
-                                  {label}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {/* LINE 2 — does the lead mean anything yet. No rule
+                            inside a panel: whitespace separates the blocks. */}
+                        <ThreeUp cells={cellsLive} />
                       </div>
                     );
+
                   })()
                 ) : (
 
-                  cells.length > 0 && (
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-                        alignContent: 'center',
-                        height: STAT_BLOCK_H,
-                        boxSizing: 'border-box',
-                        padding: '7px 11px',
-                      }}
-                    >
-                      {cells.map(([l, v]) => (
-                        <div key={l} style={{ textAlign: 'center' }}>
-                          <div style={LABEL}>{l}</div>
-                          <div style={{ ...NUMF, fontSize: 14.5, color: A.INK, marginTop: 2 }}>{v}</div>
+                  (() => {
+                    // UPCOMING takes the SAME shape as live: a line 1 with the
+                    // headline fact right-aligned, then the three-up. Cells with
+                    // no value are never pushed, so the row rebalances.
+                    const cellsUp: Array<[string, string, string]> = [];
+                    if (e.defendingChampion) {
+                      cellsUp.push([
+                        t('discover.defending', 'Defending'),
+                        surname(e.defendingChampion),
+                        A.INK,
+                      ]);
+                    }
+                    for (const [l, v] of cells) cellsUp.push([l, v, A.INK]);
+                    if (cellsUp.length === 0) return null;
+                    const days = daysUntil(e.startDate);
+                    return (
+                      <div style={{ padding: '12px 14px 13px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
+                          <span
+                            style={{
+                              ...LABEL,
+                              fontSize: 6.5,
+                              fontWeight: 800,
+                              letterSpacing: '0.13em',
+                              color: A.DIM,
+                            }}
+                          >
+                            {t('discover.tour.startsIn', 'Starts in')}
+                          </span>
+                          <span
+                            style={{
+                              ...NUMF,
+                              marginLeft: 'auto',
+                              fontSize: 15,
+                              fontWeight: 800,
+                              letterSpacing: '-0.025em',
+                              color: A.INK,
+                            }}
+                          >
+                            {days <= 0
+                              ? t('discover.tour.startsToday', 'Today')
+                              : t('discover.tour.nDays', {
+                                  defaultValue: '{{count}} days',
+                                  count: days,
+                                })}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  )
+                        <ThreeUp cells={cellsUp} />
+                      </div>
+                    );
+                  })()
                 )}
               </button>
 
               {/* CONDENSE: the footer only takes height when it carries
-                  something. An empty reserved band left a dead gap under the
-                  round / thru / second row on every live card. */}
-              {(((!peek || peek.leaderScore == null) && !!e.defendingChampion) ||
-                (!!courseId && mediaCount > 0)) && (
+                  something. The defending champion now lives in the three-up,
+                  so the footer is the media chip alone. */}
+              {!!courseId && mediaCount > 0 && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  padding: '0 11px 9px',
+                  padding: '0 14px 11px',
                 }}
               >
-                {/* The tour badge over the image already names the tour, so the
-                    white area carries only the defending champion when idle. */}
-                {(!peek || peek.leaderScore == null) && e.defendingChampion && (
-                  <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-                    {t('discover.defending', 'Defending')} {DOT}{' '}
-                    <span style={{ fontWeight: 600, color: A.BODY }}>{e.defendingChampion}</span>
-                  </span>
-                )}
+
 
 
 
