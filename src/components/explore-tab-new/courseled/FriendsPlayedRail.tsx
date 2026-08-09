@@ -176,7 +176,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
               {(() => {
                 const toPar = toParFor(r);
-                const reference = referenceLine(r, t as never);
+                const insight = insights.get(r.round_id)?.text ?? null;
                 return (
                   <div style={{ padding: '9px 11px 10px' }}>
                     {/* LINE 1 — the gross with its reference point. */}
