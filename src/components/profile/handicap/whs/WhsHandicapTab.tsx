@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
