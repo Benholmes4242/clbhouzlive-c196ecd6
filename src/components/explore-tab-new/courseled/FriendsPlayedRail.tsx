@@ -205,18 +205,19 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   <div style={{ padding: '9px 11px 10px' }}>
                     {/* LINE 1 — the gross with its reference point. */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                      <span style={{ ...NUMF, fontSize: 26, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}>
+                      <span style={{ ...NUMF, fontSize: 27, letterSpacing: '-0.035em', color: A.INK, lineHeight: 0.92 }}>
                         {r.gross ?? '\u2014'}
                       </span>
                       {toPar && (
-                        <span style={{ ...NUMF, fontSize: 15, color: toPar.tone, lineHeight: 1 }}>
+                        <span style={{ ...NUMF, fontSize: 14, letterSpacing: '-0.02em', color: toPar.tone, lineHeight: 1 }}>
                           {toPar.text}
                         </span>
                       )}
                       {r.course_par != null && (
                         <span
                           style={{
-                            fontSize: 8,
+                            fontSize: 6.5,
+
                             fontWeight: 800,
                             letterSpacing: '0.13em',
                             textTransform: 'uppercase',
