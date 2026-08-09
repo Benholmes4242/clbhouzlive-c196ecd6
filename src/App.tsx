@@ -337,7 +337,10 @@ const ReviewComposerRoute: React.FC = () => (
   </Suspense>
 );
 
-const ReviewComposerOverlay: React.FC = () => (
+const ReviewComposerOverlay: React.FC = () => {
+  // In-tree full-screen surface — body-level affordances stand down.
+  useFullScreenSurface();
+  return (
   <div
     role="dialog"
     aria-modal="true"
@@ -352,7 +355,8 @@ const ReviewComposerOverlay: React.FC = () => (
   >
     <ReviewComposerRoute />
   </div>
-);
+  );
+};
 
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));

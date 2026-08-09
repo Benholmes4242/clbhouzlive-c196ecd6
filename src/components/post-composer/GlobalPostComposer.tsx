@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StageComposer from '@/features/post-v2/StageComposer';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { useFullScreenSurface } from '@/stores/fullScreenSurfaceStore';
 
 export function GlobalPostComposer() {
   const {
@@ -23,6 +24,10 @@ export function GlobalPostComposer() {
     closePostStudio,
   } = usePostStudioStore();
   const navigate = useNavigate();
+
+  // The composer renders in the React tree, so body-level page affordances
+  // (back-to-top) must stand down while it is open.
+  useFullScreenSurface(isOpen);
 
   const handleClose = useCallback(() => {
     closePostStudio();
