@@ -245,7 +245,11 @@ export const HeroShell: React.FC<HeroShellProps> = ({
            `coverBroken` is set by onError after first paint, so gating on it
            would collapse the block post-paint - a worse jump than the one the
            floor removes. A URL that 404s keeps the floor and shows ink. */
+        /* The SHAPE: the cropper takes a 1:1 crop, so the hero holds 1:1 too.
+           Box renders as the larger of width and the floor. */
+        aspectRatio: coverUrl ? '1 / 1' : undefined,
         minHeight: coverUrl ? HERO_MIN_HEIGHT : undefined,
+
 
 
       }}
