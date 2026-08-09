@@ -4,8 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
 import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { RoundFeatChips } from './RoundFeatChips';
-import { IndexMovement, insightFor, toParFor } from './friendRoundParts';
+import {
+  IndexMovement,
+  insightFor,
+  toParFor,
+  InsightGlyph,
+  INSIGHT_FONT_SIZE,
+  INSIGHT_LINE_HEIGHT,
+} from './friendRoundParts';
 
 /**
  * FriendRoundRow — Discover "Friends' latest rounds".
@@ -53,8 +59,6 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
     play_date,
     course_name,
     gross,
-    hcp_delta,
-    feats,
   } = row;
 
 
@@ -158,31 +162,41 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           >
             {course_name ?? ''}
           </span>
-          <IndexMovement row={row} />
         </div>
 
-        {reference && (
+        {/* LINE 3 — the analytical line: the insight, marked by its glyph, with
+            the HCP movement right-aligned beside it. The course name above keeps
+            the full row width. */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+            minWidth: 0,
+          }}
+        >
           <div
             className="tabular-nums"
-            style={{ fontSize: 11.5, fontWeight: 600, color: SLATE_500, lineHeight: 1.2 }}
-          >
-            {reference}
-          </div>
-        )}
-
-        {(feats.length > 0) && (
-          <div
             style={{
+              flex: 1,
+              minWidth: 0,
               display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: 6,
-              marginTop: 2,
+              alignItems: 'baseline',
+              fontSize: INSIGHT_FONT_SIZE,
+              lineHeight: INSIGHT_LINE_HEIGHT,
+              fontWeight: 600,
+              color: SLATE_500,
             }}
           >
-            <RoundFeatChips feats={feats} maxChips={1} />
+            {reference && (
+              <>
+                <InsightGlyph />
+                <span style={{ minWidth: 0 }}>{reference}</span>
+              </>
+            )}
           </div>
-        )}
+          <IndexMovement row={row} />
+        </div>
 
       </div>
 

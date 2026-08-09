@@ -2,7 +2,16 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
-import { IndexMovement, toParFor, buildInsightMap } from '../friendRoundParts';
+import {
+  IndexMovement,
+  toParFor,
+  buildInsightMap,
+  InsightGlyph,
+  INSIGHT_FONT_SIZE,
+  INSIGHT_LINE_HEIGHT,
+  INSIGHT_TWO_LINE_RESERVE,
+  INSIGHT_CLAMP,
+} from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
@@ -134,6 +143,13 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 ...(isNew ? NEW_CARD_RING : null),
                 width: 224,
                 flexShrink: 0,
+                // THE PHOTO STARTS AT THE TOP OF EVERY CARD
+                // (BRIEF_FRIENDS_CARD_HEIGHT_AND_ROW). A stretched button
+                // centres its content by default, which pushed a white band
+                // above the photo on the shorter cards.
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
                 padding: 0,
                 textAlign: 'left',
                 fontFamily: SANS,
@@ -144,7 +160,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 courseId={r.course_id}
                 courseName={m?.name ?? r.course_name}
                 imageUrl={m?.imageUrl}
-                style={{ height: 99 }}
+                style={{ height: 99, flexShrink: 0 }}
               >
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM_SOFT }} />
                 <ImageChip gold={hasAce}>{relativeDay(r.play_date, t)}</ImageChip>
@@ -259,22 +275,34 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       </span>
                     </div>
 
-                    {/* LINE 3 — the insight; absent, never dashed. */}
-                    {insight && (
-                      <div
-                        style={{
-                          marginTop: 9,
-                          paddingTop: 9,
-                          borderTop: `1px solid ${A.HAIRLINE}`,
-                          ...FIGS,
-                          fontSize: 11.5,
-                          fontWeight: 600,
-                          color: A.MUTE,
-                        }}
-                      >
-                        {insight}
-                      </div>
-                    )}
+                    {/* LINE 3 — the insight. TWO LINES OF HEIGHT ARE RESERVED
+                        ON EVERY CARD, including cards with no insight at all,
+                        so the rail holds one height and every photo sits at the
+                        same y. A one-line insight sits at the TOP of the box. */}
+                    <div
+                      style={{
+                        marginTop: 9,
+                        paddingTop: 9,
+                        borderTop: `1px solid ${A.HAIRLINE}`,
+                        minHeight: INSIGHT_TWO_LINE_RESERVE,
+                      }}
+                    >
+                      {insight && (
+                        <div
+                          style={{
+                            ...FIGS,
+                            fontSize: INSIGHT_FONT_SIZE,
+                            lineHeight: INSIGHT_LINE_HEIGHT,
+                            fontWeight: 600,
+                            color: A.MUTE,
+                            ...INSIGHT_CLAMP,
+                          }}
+                        >
+                          <InsightGlyph />
+                          {insight}
+                        </div>
+                      )}
+                    </div>
 
                   </div>
                 );
