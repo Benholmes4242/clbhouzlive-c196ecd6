@@ -202,6 +202,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   const monthLabel = formatMonthLabel(reviewDate ?? null);
 
+  // REFERENCE POINT (§3a) — reuses the shared aggregates hook, so on a page
+  // that already read them (course detail, discover) React Query dedupes and
+  // no extra network call happens. No SQL was needed.
+  const { data: agg } = useCourseRatingAggregates(isOpen ? courseId : undefined);
+  const communityAvg = agg?.avg_overall_score ?? null;
+  const ratingCount = agg?.review_count ?? 0;
+  const showReference =
+    rating != null && communityAvg != null && ratingCount >= 3;
+
+  // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
+  const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
+  const allMedia = (media?.length ? media : fetchedMedia) ?? [];
+  const mediaTotal = allMedia.length;
+  const mediaStrip = allMedia.slice(0, 3);
+
+
   const breakdownEntries = useMemo(() => {
     if (!effectiveBreakdown) return [];
     return BREAKDOWN_KEYS.flatMap((k) => {
