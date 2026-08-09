@@ -110,7 +110,7 @@ export default function MediaStageV2({ item, index, total, onRequestAdd }: Props
     <div ref={stageRef} style={{ flex: 1, background: CT_DARK.surface, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div style={{ ...boxStyle, transition: 'width 250ms cubic-bezier(.2,.8,.2,1), height 250ms cubic-bezier(.2,.8,.2,1)' }}>
         {item.type === 'video' ? (
-          <video src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <video ref={videoRef} src={item.previewUrl} playsInline muted loop autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <CroppedImage item={item} />
         )}
@@ -120,6 +120,46 @@ export default function MediaStageV2({ item, index, total, onRequestAdd }: Props
           {index + 1} / {total}
         </div>
       )}
+      {isVideo && (
+        <button
+          type="button"
+          onClick={() => useSessionAudio.getState().toggle()}
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          style={{
+            position: 'absolute',
+            right: 8,
+            bottom: 8,
+            width: 44,
+            height: 44,
+            padding: 4,
+            border: 'none',
+            background: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <span
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              background: 'rgba(0,0,0,0.55)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isMuted ? (
+              <VolumeX size={18} stroke={CT_DARK.ink} strokeWidth={2} />
+            ) : (
+              <Volume2 size={18} stroke={CT_DARK.ink} strokeWidth={2} />
+            )}
+          </span>
+        </button>
+      )}
+
     </div>
   );
 }
