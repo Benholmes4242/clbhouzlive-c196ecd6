@@ -299,7 +299,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
         {extremes.length > 0 && (
           <>
-            <Hairline style={{ margin: '12px 0' }} />
+            <Hairline style={{ margin: '8px 0' }} />
             <div
               style={{
                 display: 'grid',
