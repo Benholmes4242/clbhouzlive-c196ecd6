@@ -132,8 +132,8 @@ export default function SupportThreadPage() {
           >
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
+                className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                style={{ color: A.DIM }}
               >
                 {cat}
               </span>

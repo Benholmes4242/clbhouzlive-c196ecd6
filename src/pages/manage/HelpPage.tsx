@@ -12,13 +12,11 @@ function AccordionRow({
   expanded,
   onToggle,
   caption,
-  isFirst,
 }: {
   article: HelpArticle;
   expanded: boolean;
   onToggle: () => void;
   caption?: string;
-  isFirst?: boolean;
 }) {
   return (
     <div>
@@ -150,7 +148,6 @@ export default function HelpPage() {
                 caption={a.category}
                 expanded={expanded === a.id}
                 onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
-                isFirst={i === 0}
               />
             ))}
           </div>
@@ -176,8 +173,7 @@ export default function HelpPage() {
                       article={a}
                       expanded={expanded === a.id}
                       onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
-                      isFirst={i === 0}
-                    />
+                          />
                   ))}
                 </div>
               </section>

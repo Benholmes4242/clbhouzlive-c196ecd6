@@ -146,7 +146,7 @@ export default function MyRequestsPage() {
                       <span
                         style={{
                           display: 'block', width: 8, height: 8, borderRadius: '50%',
-                          background: '#B45309',
+                          background: A.INK,
                         }}
                       />
                     )}
@@ -154,8 +154,8 @@ export default function MyRequestsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
+                        className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                        style={{ color: A.DIM }}
                       >
                         {cat}
                       </span>
@@ -191,8 +191,8 @@ export default function MyRequestsPage() {
                       aria-label={confirming ? 'Confirm remove request' : 'Remove request'}
                       className="min-h-[32px] px-2 rounded-md text-[11px] font-semibold inline-flex items-center gap-1"
                       style={{
-                        color: confirming ? '#B45309' : A.MUTE,
-                        background: confirming ? 'rgba(245,158,11,0.12)' : 'transparent',
+                        color: confirming ? A.RED : A.MUTE,
+                        background: 'transparent',
                       }}
                     >
                       {confirming ? 'Remove?' : <Trash2 size={16} />}
