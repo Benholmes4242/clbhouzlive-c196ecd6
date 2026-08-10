@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  * - 4:     clbhouz friend, NOT WHS-synced
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
@@ -80,6 +81,8 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
     isWhsOnlyMode ? null : targetUserId ?? null,
   );
   const { data: rivalries } = useFriendRivalries(viewerUserId);
+  const { t } = useTranslation('common');
+  const { start: startConversation } = useStartConversation();
 
   const rivalry = useMemo(
     () =>
