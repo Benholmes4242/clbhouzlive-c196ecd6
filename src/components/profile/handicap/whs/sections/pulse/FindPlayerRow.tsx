@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Search, ChevronRight } from 'lucide-react';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -7,29 +8,39 @@ interface Props {
   onOpen: () => void;
 }
 
-export const FindPlayerRow: React.FC<Props> = ({ onOpen }) => (
-  <div style={{ padding: '12px 16px 0', fontFamily: FONT }}>
-    <button
-      onClick={onOpen}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        width: '100%',
-        background: 'transparent',
-        border: 'none',
-        padding: '4px',
-        cursor: 'pointer',
-      }}
-    >
-      <Search size={15} color="var(--hcp-t-60)" />
-      <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--hcp-t-100)' }}>
-        Find any player's handicap
-      </span>
-      <ArrowRight size={14} color="var(--hcp-t-60)" />
-    </button>
-  </div>
-);
+/**
+ * Opens PlayerSearchSheet. Treated as a field, not a link: a chevron says
+ * "opens", an arrow would say "go".
+ */
+export const FindPlayerRow: React.FC<Props> = ({ onOpen }) => {
+  const { t } = useTranslation(['common']);
+  return (
+    <div style={{ padding: '10px 16px 0', fontFamily: FONT }}>
+      <button
+        onClick={onOpen}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 9,
+          width: '100%',
+          boxSizing: 'border-box',
+          background: 'var(--hcp-bg-2)',
+          border: '1px solid var(--hcp-line)',
+          borderRadius: 11,
+          padding: '11px 13px',
+          cursor: 'pointer',
+          textAlign: 'left',
+          fontFamily: FONT,
+        }}
+      >
+        <Search size={14} color="var(--hcp-t-40)" style={{ flexShrink: 0 }} />
+        <span style={{ flex: 1, fontSize: 13.5, fontWeight: 400, color: 'var(--hcp-t-60)' }}>
+          {t('common:handicap.pulse.findPlayer')}
+        </span>
+        <ChevronRight size={13} color="var(--hcp-t-40)" style={{ flexShrink: 0 }} />
+      </button>
+    </div>
+  );
+};
 
 export default FindPlayerRow;
