@@ -549,8 +549,60 @@ Deno.serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // ---- V5 SECTION A: revoke access first if the auth delete fails. ----
     const { error: authErr } = await admin.auth.admin.deleteUser(targetId);
-    if (authErr) console.error('[delete-account v3] auth delete failed:', authErr.message);
+    let accessRevoked = false;
+    if (authErr) {
+      console.error('[delete-account v5] auth delete failed:', authErr.message);
+      // 1) Ban the user so no NEW session can be minted (refresh + password
+      //    grant both rejected by GoTrue while banned_until is in the future).
+      try {
+        const { error: banErr } = await admin.auth.admin.updateUserById(targetId, {
+          ban_duration: '876000h', // ~100 years
+        } as any);
+        if (banErr) console.error('[delete-account v5] ban failed:', banErr.message);
+        else accessRevoked = true;
+      } catch (e) { console.error('[delete-account v5] ban threw:', e); }
+
+      // 2) Global sign-out so EXISTING access/refresh tokens die immediately.
+      //    Requires the caller's JWT, which we only hold in self mode.
+      if (callerJwt) {
+        try {
+          const { error: soErr } = await admin.auth.admin.signOut(callerJwt, 'global');
+          if (soErr) console.error('[delete-account v5] global signOut failed:', soErr.message);
+        } catch (e) { console.error('[delete-account v5] global signOut threw:', e); }
+      }
+
+      try {
+        await admin.from('admin_audit_log').insert({
+          admin_user_id: targetId,
+          action: auditAction,
+          target_user_id: targetId,
+          target_email: user.email,
+          details: {
+            phase: 'completed_auth_failed',
+            deleted_at: deletedAt,
+            version: FUNCTION_VERSION,
+            mode,
+            deletionAuditId,
+            deletion_results: results,
+            assetCounts,
+            auth_delete: { ok: false, error: authErr.message, access_revoked: accessRevoked },
+            gdpr_compliant: false,
+          },
+        });
+      } catch (e) { console.error('[delete-account v5] failure audit failed:', e); }
+
+      return new Response(JSON.stringify({
+        error: 'account_deletion_incomplete',
+        stage: 'auth_delete',
+        detail: authErr.message,
+        access_revoked: accessRevoked,
+        deletionAuditId,
+        version: FUNCTION_VERSION,
+      }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
 
     // =========================================================================
     // STEP 5 — Drain the manifest. Failures do NOT fail the request.
@@ -608,6 +660,7 @@ Deno.serve(async (req) => {
           deletionAuditId,
           deletion_results: results,
           assetCounts,
+          auth_delete: { ok: true, error: null, access_revoked: false },
           gdpr_compliant: true,
         },
       });
