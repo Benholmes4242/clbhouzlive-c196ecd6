@@ -140,6 +140,8 @@ function InviteHeader({ sub }: { sub?: string | null }) {
 
 function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: string }) {
   const { t } = useTranslation('common');
+  const [q, setQ] = useState('');
+  const debouncedQ = useDebouncedValue(q, 200);
   // BRIEF_CIRCLE_INVITE_ENTRY: the list derivation lives in one shared hook so
   // this sheet and the Circle entry cannot disagree. Behaviour here is
   // unchanged - same filter, same sort, same grouping.
@@ -157,10 +159,6 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
   const pending = useMemo(() => filtered.filter((f) => !alreadyFor(f)), [filtered, alreadyFor]);
   const invited = useMemo(() => filtered.filter((f) => !!alreadyFor(f)), [filtered, alreadyFor]);
 
-  const invitedTotal = useMemo(
-    () => invitable.filter((f) => !!alreadyFor(f)).length,
-    [invitable, alreadyFor],
-  );
 
   const viewedRef = useRef(false);
   useEffect(() => {
