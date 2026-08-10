@@ -375,7 +375,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
           style={{
             margin: '6px 0 0',
             fontSize: 20,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: CHART.INK,
             ...TABULAR,
@@ -383,11 +383,32 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         >
           {isLoading || isError ? '\u00a0' : headline}
         </h2>
-        {!isLoading && !isError && subLineParts.length > 0 && (
-          <div style={{ ...LABEL, marginTop: 6, ...TABULAR, color: CHART.MUTE }}>
-            {subLineParts.join(' \u00b7 ')}
+        {/* The best-ever record is the most impressive fact here, so it reads
+            as a FIGURE rather than another caps heading. */}
+        {!isLoading && !isError && hasLongest && longest && (
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={LABEL}>{t('streaks.longestEverLabel')}</span>
+            <span
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                color: CHART.INK,
+                ...TABULAR,
+              }}
+            >
+              {longest.best_count}
+            </span>
+            <span style={{ ...LABEL, color: CHART.MUTE }}>
+              {t(`streaks.unit.${STREAK_SHEET_CONFIG[longest.streak_type].unit}`, {
+                count: longest.best_count,
+              })}
+              {' \u00b7 '}
+              {t(`streaks.type.${longest.streak_type}.short`)}
+            </span>
           </div>
         )}
+
       </div>
 
       <div
