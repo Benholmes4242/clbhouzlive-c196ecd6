@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Building2, ChevronRight } from 'lucide-react';
 import { BIZ } from './businessTokens';
+
 
 interface AddBusinessCardProps {
   onClick: () => void;
