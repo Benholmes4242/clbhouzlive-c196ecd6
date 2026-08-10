@@ -342,7 +342,13 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
 
   // Post button vs Save button gating.
-  const canSubmit = !submitting && !saving && (state.caption.trim().length > 0 || state.media.length > 0) && !!activeActor;
+  // Post button vs Save button gating.
+  // CREATE requires media: a wizard post must carry at least one photo or video.
+  // The caption stays OPTIONAL (11% of posts have none).
+  // EDIT is deliberately exempt - posts published before this rule, and round
+  // posts, have no media and must still be saveable.
+  const canSubmit = !submitting && !saving && (isEditMode || state.media.length > 0) && !!activeActor;
+
 
   // Edit-mode: schedule row visible only for still-scheduled posts.
   const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
