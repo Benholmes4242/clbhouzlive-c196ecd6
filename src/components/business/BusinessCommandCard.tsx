@@ -479,54 +479,78 @@ export function BusinessCommandCard({
 }
 
 
-/* ─────────────────────── sub-components ─────────────────────── */
+/* ─────────────────────── sub-components ───────────────────────
+   Both are LOCAL to this file — no other importers. */
 
-function MetricTile({
+/** 6px marks on white fail contrast at BIZ.amber, so the dot deepens. */
+const AMBER_DEEP = '#C2620A';
+
+/**
+ * One metric cell inside the shared inset. Three states, three renderings:
+ * loading -> nothing, null/undefined -> nothing, 0 -> "0", else formatted.
+ * The figure sits in a fixed 26px box so the panel cannot jump on arrival.
+ */
+function MetricCell({
   label,
+  window: windowLabel,
   value,
+  loading,
   onClick,
 }: {
   label: string;
-  value: string;
+  window: string;
+  value: number | null | undefined;
+  loading: boolean;
   onClick?: () => void;
 }) {
-  const isEmpty = value === '-';
+  const figure =
+    loading || value === null || value === undefined ? '' : formatNumber(value);
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="text-left active:opacity-70 transition-opacity"
-      style={{
-        background: BIZ.card,
-        border: `1px solid ${BIZ.hair}`,
-        borderRadius: 12,
-        padding: '12px 12px 11px',
-      }}
+      className="flex flex-col items-center justify-start active:opacity-70 transition-opacity"
+      style={{ background: 'transparent', border: 'none', minHeight: 44 }}
     >
-      <div
-        className="tabular-nums"
+      <span
         style={{
-          color: isEmpty ? BIZ.inkMute : BIZ.ink,
-          fontSize: 20,
+          color: BIZ.inkFaint,
+          fontSize: 8,
           fontWeight: 800,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.1,
-        }}
-      >
-        {value}
-      </div>
-      <div
-        className="mt-1"
-        style={{
-          color: BIZ.inkMute,
-          fontSize: 11,
-          fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.04em',
+          letterSpacing: '0.08em',
+          lineHeight: 1,
         }}
       >
         {label}
-      </div>
+      </span>
+      <span
+        className="tabular-nums flex items-center"
+        style={{
+          height: 26,
+          color: BIZ.ink,
+          fontSize: 21,
+          fontWeight: 800,
+          letterSpacing: '-0.03em',
+          lineHeight: 1,
+          fontFeatureSettings: '"kern" 1, "liga" 1',
+        }}
+      >
+        {figure}
+      </span>
+      <span
+        style={{
+          color: BIZ.inkFaint,
+          fontSize: 7,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          lineHeight: 1,
+        }}
+      >
+        {windowLabel}
+      </span>
     </button>
   );
 }
@@ -537,40 +561,25 @@ function ActionRow({
   onClick,
   badge = false,
   hint,
-  last = false,
 }: {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   onClick: () => void;
   badge?: boolean;
   hint?: string;
-  last?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-3 active:bg-black/[0.03] transition-colors"
-      style={{
-        borderBottom: last ? 'none' : `0.5px solid ${BIZ.hair}`,
-        background: 'transparent',
-        minHeight: 52,
-      }}
+      className="w-full flex items-center gap-2.5 active:opacity-60 transition-opacity"
+      style={{ background: 'transparent', border: 'none', minHeight: 46 }}
     >
-      <span
-        className="shrink-0 flex items-center justify-center"
-        style={{
-          width: 32, height: 32,
-          background: BIZ.fill,
-          border: `1px solid ${BIZ.hair}`,
-          borderRadius: 10,
-        }}
-      >
-        <Icon className="h-4 w-4" style={{ color: BIZ.ink }} />
-      </span>
+      {/* Inline glyph as a category marker — no ornamental tile. */}
+      <Icon className="shrink-0" style={{ width: 15, height: 15, color: BIZ.inkMute }} />
       <span
         className="flex-1 text-left"
-        style={{ color: BIZ.ink, fontSize: 14, fontWeight: 600 }}
+        style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}
       >
         {label}
       </span>
@@ -580,10 +589,14 @@ function ActionRow({
         </span>
       )}
       {badge && (
-        <span className="h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+        <span
+          className="rounded-full shrink-0"
+          style={{ width: 6, height: 6, background: AMBER_DEEP }}
+        />
       )}
-      <ChevronRight className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+      <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />
     </button>
   );
 }
+
 
