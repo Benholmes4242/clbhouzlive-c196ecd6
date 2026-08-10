@@ -192,6 +192,19 @@
         "tooFew": "[Too few impressions yet to compare against anything.]",
         "benchmark": "[Likes and comments as a share of impressions. Above 2 percent is strong.]"
       }
+    },
+    "team": {
+      "member": "Team member",
+      "manage": {
+        "accessRequests": "[Access requests]",
+        "addJobTitle": "[Add job title]",
+        "addJobTitleAria": "[Add job title]",
+        "editJobTitleAria": "[Edit job title]",
+        "hidden": "[Hidden]",
+        "members": "[Members]",
+        "pendingInvites": "[Pending invites]",
+        "public": "[Public]"
+      }
     }
   }
 }

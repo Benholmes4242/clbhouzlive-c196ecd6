@@ -191,6 +191,19 @@
         "tooFew": "Bigyo hagien impeuresyeon i neomu jeokseumnida.",
         "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung. 2 peosenteu isang imyeon useu hapnida."
       }
+    },
+    "team": {
+      "member": "Team member",
+      "manage": {
+        "accessRequests": "Akseseu yocheong",
+        "addJobTitle": "Jikchaek chuga",
+        "addJobTitleAria": "Jikchaek chuga",
+        "editJobTitleAria": "Jikchaek sujeong",
+        "hidden": "Sumgim",
+        "members": "Membeo",
+        "pendingInvites": "Daegi chodae",
+        "public": "Gonggae"
+      }
     }
   }
 }

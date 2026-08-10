@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
-  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Briefcase, Pencil,
+  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,12 +23,14 @@ import {
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTranslation } from 'react-i18next';
+import {
+  A, BIZ_KICKER, BIZ_LABEL, BIZ_BODY, bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
 const HAIR = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const CARD_BG = '#FFFFFF';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
@@ -40,19 +42,16 @@ const ROLE_ICON: Record<BusinessRole, typeof Crown> = {
   analyst: BarChart3,
 };
 
-function RoleChip({ role }: { role: BusinessRole }) {
+/**
+ * The role is a LABEL, not a pill. The ROLE_ICON glyph stays as a category
+ * marker; the tinted capsule and the eleventh amber-deep variant
+ * are gone. Vocabulary is unchanged.
+ */
+function RoleLabel({ role }: { role: BusinessRole }) {
   const Icon = ROLE_ICON[role];
-  const isOwner = role === 'owner';
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold"
-      style={{
-        background: isOwner ? AMBER_SOFT : 'rgba(15,23,42,0.05)',
-        color: isOwner ? '#B4650C' : INK_45,
-        border: `1px solid ${isOwner ? 'rgba(247,147,30,0.22)' : HAIR}`,
-      }}
-    >
-      <Icon size={11} strokeWidth={2.5} />
+    <span className="inline-flex items-center gap-1" style={{ ...BIZ_LABEL, fontSize: 7.5 }}>
+      <Icon size={9} strokeWidth={2.5} />
       {BUSINESS_ROLE_LABELS[role]}
     </span>
   );
@@ -63,9 +62,15 @@ const JOB_TITLE_MAX = 40;
 function JobTitleField({
   initialTitle,
   onSave,
+  addLabel,
+  addAria,
+  editAria,
 }: {
   initialTitle: string;
   onSave: (next: string) => Promise<void>;
+  addLabel: string;
+  addAria: string;
+  editAria: string;
 }) {
   const [savedTitle, setSavedTitle] = useState(initialTitle);
   const [editing, setEditing] = useState(false);
@@ -116,44 +121,57 @@ function JobTitleField({
     }, 250);
   };
 
-  if (!editing && savedTitle) {
+  if (!editing) {
+    // HAS A TITLE -> the title as text with a pencil. Tapping opens the input.
+    if (savedTitle) {
+      return (
+        <button
+          type="button"
+          onClick={beginEdit}
+          className="inline-flex items-center gap-1.5 text-left active:opacity-70"
+          style={{ minHeight: 20, background: 'transparent', border: 0, padding: 0 }}
+          aria-label={editAria}
+        >
+          <span style={{ ...BIZ_BODY, fontWeight: 600, color: A.INK, lineHeight: 1.2 }}>
+            {savedTitle}
+          </span>
+          <Pencil size={11.5} color={A.DIM} strokeWidth={2.25} />
+        </button>
+      );
+    }
+    // NO TITLE -> a quiet text action. A list row is not a form: no bordered
+    // box, no briefcase, no placeholder sitting in a members list.
     return (
       <button
         type="button"
         onClick={beginEdit}
-        className="inline-flex items-center gap-1.5 text-left active:opacity-70"
-        style={{ minHeight: 44, background: 'transparent', border: 0, padding: 0 }}
-        aria-label="Edit job title"
+        className="inline-flex items-center gap-1 text-left active:opacity-70"
+        style={{ minHeight: 20, background: 'transparent', border: 0, padding: 0 }}
+        aria-label={addAria}
       >
-        <span style={{ fontSize: 13.5, fontWeight: 600, color: INK }}>{savedTitle}</span>
-        <Pencil size={14} color={INK_45} strokeWidth={2.25} />
+        <span style={{ ...BIZ_LABEL, fontSize: 7.5 }}>{addLabel}</span>
+        <ChevronRight size={9} color={A.DIM} strokeWidth={2.5} />
       </button>
     );
   }
 
-  const borderColor = editing ? AMBER : 'rgba(15,23,42,0.10)';
-  const borderWidth = editing ? 1.5 : 1;
-  const iconColor = editing ? AMBER : '#94A3B8';
-
   return (
     <div
       ref={wrapRef}
-      onClick={() => !editing && setEditing(true)}
       className="flex items-center gap-2"
       style={{
         background: '#F8FAFC',
-        border: `${borderWidth}px solid ${borderColor}`,
+        border: `1.5px solid ${A.INK}`,
         borderRadius: 10,
         padding: '9px 11px',
       }}
     >
-      <Briefcase size={15} color={iconColor} strokeWidth={2.25} style={{ flexShrink: 0 }} />
       <input
         ref={inputRef}
         type="text"
         value={value}
         maxLength={JOB_TITLE_MAX}
-        placeholder="Add a job title"
+        placeholder={addLabel}
         onChange={(e) => setValue(e.target.value)}
         onFocus={handleFocus}
         onBlur={() => { if (editing) void commit(); }}
@@ -164,16 +182,14 @@ function JobTitleField({
         disabled={saving && !editing}
         className="flex-1 min-w-0 bg-transparent outline-none"
         style={{
-          fontSize: 13.5,
-          color: value ? INK : '#94A3B8',
+          fontSize: 13,
+          color: value ? A.INK : A.DIM,
           fontWeight: value ? 600 : 400,
         }}
       />
-      {editing && (
-        <span className="tabular-nums" style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>
-          {value.length}/{JOB_TITLE_MAX}
-        </span>
-      )}
+      <span className="tabular-nums" style={{ fontSize: 11, color: A.DIM, flexShrink: 0 }}>
+        {value.length}/{JOB_TITLE_MAX}
+      </span>
     </div>
   );
 }
@@ -194,6 +210,7 @@ export default function BusinessTeamPage() {
   const setVisibility = useSetMemberVisibility(businessId || '');
   const setJobTitle = useSetMemberJobTitle(businessId || '');
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('common');
   const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
@@ -217,11 +234,14 @@ export default function BusinessTeamPage() {
     const isSelf = !!currentUserId && m.user_profile_id === currentUserId;
     const canToggleVisibility = canManage || isSelf;
     const canRowManage = canManage && !isOwner;
+    const canEditTitle = canManage || isSelf;
     const isPublic = m.is_public === true;
-    const name = profile?.display_name || profile?.username || 'Team member';
+    const name = profile?.display_name || profile?.username || t('business.team.member');
+    const title = m.job_title?.trim() || '';
 
     return (
-      <div className="flex items-center gap-3 py-3">
+      /* items-START: the avatar belongs beside the NAME, not the job title. */
+      <div className="flex items-start gap-3" style={{ padding: '13px 0' }}>
         <SquircleAvatar
           src={profile?.profile_photo_url || undefined}
           alt={name}
@@ -229,91 +249,113 @@ export default function BusinessTeamPage() {
           hairlineRing
           ringColor={LIGHT_HAIRLINE}
         />
+
+        {/* LEFT COLUMN - identity only */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-[15px] truncate" style={{ color: INK }}>{name}</p>
-            <RoleChip role={m.role} />
+            <p
+              className="truncate"
+              style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}
+            >
+              {name}
+            </p>
+            <RoleLabel role={m.role} />
           </div>
           {profile?.username && (
-            <p className="text-[12px] truncate" style={{ color: INK_45 }}>@{profile.username}</p>
+            <p className="truncate" style={{ fontSize: 11.5, fontWeight: 400, color: A.DIM }}>
+              @{profile.username}
+            </p>
           )}
-          {(() => {
-            const canEditTitle = canManage || isSelf;
-            const title = m.job_title?.trim() || '';
-            if (canEditTitle) {
-              return (
-                <div className="mt-1.5">
-                  <JobTitleField
-                    initialTitle={title}
-                    onSave={async (next) => {
-                      await setJobTitle.mutateAsync({
-                        memberUserId: m.user_profile_id,
-                        jobTitle: next,
-                      });
-                    }}
-                  />
-                </div>
-              );
-            }
-            return title ? (
-              <p className="mt-0.5 truncate" style={{ fontSize: 13.5, color: INK, fontWeight: 600 }}>{title}</p>
-            ) : null;
-          })()}
-          {canToggleVisibility && (
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await setVisibility.mutateAsync({
+          {/* ONE job title slot, fixed min-height so rows stay aligned. */}
+          <div style={{ minHeight: 20, marginTop: 3 }}>
+            {canEditTitle ? (
+              <JobTitleField
+                initialTitle={title}
+                addLabel={t('business.team.manage.addJobTitle')}
+                addAria={t('business.team.manage.addJobTitleAria')}
+                editAria={t('business.team.manage.editJobTitleAria')}
+                onSave={async (next) => {
+                  await setJobTitle.mutateAsync({
                     memberUserId: m.user_profile_id,
-                    isPublic: !isPublic,
+                    jobTitle: next,
                   });
-                } catch { /* toast fired inside mutation */ }
-              }}
-              disabled={setVisibility.isPending}
-              className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] active:opacity-70"
-              style={{ color: isPublic ? '#059669' : INK_45 }}
-              aria-label={isPublic ? 'Hide from public profile' : 'Show on public profile'}
-            >
-              {isPublic ? <Eye size={12} strokeWidth={2.25} /> : <EyeOff size={12} strokeWidth={2.25} />}
-              {isPublic ? 'Shown on public profile' : 'Hidden from public profile'}
-            </button>
-          )}
+                }}
+              />
+            ) : title ? (
+              <p className="truncate" style={{ ...BIZ_BODY, color: A.INK, lineHeight: 1.2 }}>
+                {title}
+              </p>
+            ) : null}
+          </div>
         </div>
-        {canRowManage && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+
+        {/* RIGHT COLUMN - the controls. Same gates, same handlers. */}
+        {(canRowManage || canToggleVisibility) && (
+          <div className="flex flex-col items-end shrink-0" style={{ gap: 4 }}>
+            {canRowManage && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="h-8 w-8 flex items-center justify-center rounded-full active:bg-black/[0.04]"
+                    aria-label="Member actions"
+                  >
+                    <MoreHorizontal size={16} color={A.MUTE} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide" style={{ color: INK_45 }}>
+                    Change role
+                  </div>
+                  {ASSIGNABLE_ROLES.map((r) => (
+                    <DropdownMenuItem
+                      key={r}
+                      onClick={() => updateRole.mutate({ memberUserId: m.user_profile_id, newRole: r })}
+                      disabled={m.role === r}
+                      className="text-sm"
+                    >
+                      {BUSINESS_ROLE_LABELS[r]}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive text-sm"
+                    onClick={() => setRemoveConfirm({ open: true, member: m })}
+                  >
+                    <Trash2 size={14} className="mr-2" />
+                    Remove access
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {canToggleVisibility && (
+              /* Visibility is a STATUS: no colour. The glyph, the handler and
+                 the full aria-label are unchanged. */
               <button
-                className="h-8 w-8 flex items-center justify-center rounded-full active:bg-black/[0.04]"
-                aria-label="Member actions"
+                type="button"
+                onClick={async () => {
+                  try {
+                    await setVisibility.mutateAsync({
+                      memberUserId: m.user_profile_id,
+                      isPublic: !isPublic,
+                    });
+                  } catch { /* toast fired inside mutation */ }
+                }}
+                disabled={setVisibility.isPending}
+                className="inline-flex items-center gap-1 active:opacity-70"
+                style={{
+                  ...BIZ_LABEL,
+                  fontSize: 7.5,
+                  color: isPublic ? A.MUTE : A.DIM,
+                  minHeight: 20,
+                  paddingRight: canRowManage ? 8 : 0,
+                }}
+                aria-label={isPublic ? 'Hide from public profile' : 'Show on public profile'}
               >
-                <MoreHorizontal size={16} color={INK_45} />
+                {isPublic ? <Eye size={11} strokeWidth={2.25} /> : <EyeOff size={11} strokeWidth={2.25} />}
+                {isPublic ? t('business.team.manage.public') : t('business.team.manage.hidden')}
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide" style={{ color: INK_45 }}>
-                Change role
-              </div>
-              {ASSIGNABLE_ROLES.map((r) => (
-                <DropdownMenuItem
-                  key={r}
-                  onClick={() => updateRole.mutate({ memberUserId: m.user_profile_id, newRole: r })}
-                  disabled={m.role === r}
-                  className="text-sm"
-                >
-                  {BUSINESS_ROLE_LABELS[r]}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive text-sm"
-                onClick={() => setRemoveConfirm({ open: true, member: m })}
-              >
-                <Trash2 size={14} className="mr-2" />
-                Remove access
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+          </div>
         )}
       </div>
     );
@@ -323,7 +365,7 @@ export default function BusinessTeamPage() {
     <ManagePageShell title="Manage team">
       <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[13px] leading-relaxed mb-4" style={{ color: INK_45 }}>
+          <p className="mb-4" style={BIZ_BODY}>
             Invite people to help manage this business. Public members appear on your profile's Team tab.
           </p>
 
@@ -345,21 +387,19 @@ export default function BusinessTeamPage() {
             }}
           >
             <div className="pt-3 pb-1 flex items-center justify-between">
-              <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
-                Members
-              </span>
-              <span className="text-[11px] tabular-nums" style={{ color: INK_45 }}>
-                {(team || []).length}
-              </span>
+              <span style={BIZ_KICKER}>{t('business.team.manage.members')}</span>
+              <span style={bizFigure(15)}>{(team || []).length}</span>
             </div>
-            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as string]: 1 } as React.CSSProperties}>
+            {/* No rule between member rows: separation is whitespace. */}
+            <div>
               {teamLoading ? (
                 [0, 1, 2].map(i => (
-                  <div key={i} className="flex items-center gap-3 py-3">
+                  <div key={i} className="flex items-start gap-3" style={{ padding: '13px 0' }}>
                     <Skeleton className="w-11 h-11 rounded-2xl shrink-0" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-1/2" />
                       <Skeleton className="h-3 w-1/3" />
+                      <Skeleton className="h-3 w-1/4" />
                     </div>
                   </div>
                 ))
@@ -374,8 +414,8 @@ export default function BusinessTeamPage() {
                   <button
                     type="button"
                     onClick={() => refetchTeam()}
-                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
-                    style={{ background: AMBER, border: 'none' }}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] text-white active:opacity-90"
+                    style={{ background: A.INK, border: 'none', fontSize: 12.5, fontWeight: 700 }}
                   >
                     Retry
                   </button>
@@ -386,9 +426,7 @@ export default function BusinessTeamPage() {
                 </div>
               ) : (
                 (team || []).map(m => (
-                  <div key={m.id} style={{ borderTopColor: HAIR }}>
-                    <MemberRow m={m} />
-                  </div>
+                  <MemberRow key={m.id} m={m} />
                 ))
               )}
             </div>
@@ -406,12 +444,8 @@ export default function BusinessTeamPage() {
               }}
             >
               <div className="pt-3 pb-1 flex items-center justify-between">
-                <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
-                  Pending invites
-                </span>
-                <span className="text-[11px] tabular-nums" style={{ color: INK_45 }}>
-                  {pendingInvites.length}
-                </span>
+                <span style={BIZ_KICKER}>{t('business.team.manage.pendingInvites')}</span>
+                <span style={bizFigure(15)}>{pendingInvites.length}</span>
               </div>
               {pendingInvites.map((invite) => {
                 const label = invite.invitee_profile?.username
@@ -488,11 +522,11 @@ export default function BusinessTeamPage() {
               onClick={() => navigate(`/business/${businessId}/team/invite`)}
               className="w-full flex items-center justify-center gap-2 active:opacity-90"
               style={{
-                minHeight: 52,
-                borderRadius: 14,
+                minHeight: 50,
+                borderRadius: 999,
                 background: INK,
                 color: '#FFFFFF',
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 border: 'none',

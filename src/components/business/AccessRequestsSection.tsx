@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import { AppLog } from '@/lib/logger';
+import { useTranslation } from 'react-i18next';
+import { A, BIZ_KICKER, BIZ_BODY, bizFigure } from '@/features/courses/components/holes/analytical/tokens';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +54,7 @@ function getRoleLabel(role: string): string {
 
 export function AccessRequestsSection({ businessId, businessName, businessAvatarUrl, canManage }: AccessRequestsSectionProps) {
   const queryClient = useQueryClient();
+  const { t } = useTranslation('common');
   const [confirmApprove, setConfirmApprove] = useState<AccessRequest | null>(null);
   const [confirmDecline, setConfirmDecline] = useState<AccessRequest | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -212,32 +215,29 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
   if (!canManage) return null;
   if (isLoading) return null;
 
-  // Show empty state if no requests (always show section for context)
-  const hasRequests = requests && requests.length > 0;
+  /* ZERO REQUESTS -> NOTHING. Not a heading, not the word "None". Requests
+     arrive as notifications; a placeholder announcing its own absence sat
+     above the only thing on the page that matters. */
+  if (!requests || requests.length === 0) return null;
 
   return (
     <>
-      <section className="p-4 space-y-3">
-        {/* Section header */}
-        <div>
-          <h2 className="text-[15px] font-semibold leading-5 text-foreground">
-            Access requests
-          </h2>
-          {hasRequests && (
-            <p className="text-[13px] font-normal leading-[18px] text-muted-foreground mt-1">
-              Review and manage requests to join this business.
-            </p>
-          )}
+      <section
+        className="mb-6"
+        style={{
+          background: '#FFFFFF',
+          border: `1px solid rgba(15,23,42,0.08)`,
+          borderRadius: 14,
+          padding: '4px 16px',
+        }}
+      >
+        <div className="pt-3 pb-1 flex items-center justify-between">
+          <span style={BIZ_KICKER}>{t('business.team.manage.accessRequests')}</span>
+          <span style={bizFigure(15)}>{requests.length}</span>
         </div>
 
-        {/* Compact empty state — single line */}
-        {!hasRequests && (
-          <p className="text-[13px] text-muted-foreground">None</p>
-        )}
-
         {/* Request cards */}
-        {hasRequests && (
-          <div className="space-y-3">
+        <div className="space-y-3" style={{ paddingBottom: 12 }}>
             {requests.map((request) => {
               const requesterName = request.requester.display_name || request.requester.username || 'A user';
               const roleLabel = getRoleLabel(request.requested_role);
@@ -258,10 +258,10 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       ringColor={LIGHT_HAIRLINE}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[15px] font-semibold leading-5 text-foreground truncate">
+                      <p className="truncate" style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>
                         {requesterName}
                       </p>
-                      <p className="text-[13px] font-normal leading-[18px] text-muted-foreground mt-0.5">
+                      <p style={{ ...BIZ_BODY, marginTop: 2 }}>
                         Requested {roleLabel} access
                       </p>
                     </div>
@@ -315,8 +315,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                 </div>
               );
             })}
-          </div>
-        )}
+        </div>
       </section>
 
       {/* Approve Confirmation Modal */}

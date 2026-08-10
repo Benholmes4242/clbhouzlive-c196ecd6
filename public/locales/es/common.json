@@ -192,6 +192,19 @@
         "tooFew": "Aun hay muy pocas impresiones para comparar.",
         "benchmark": "Me gusta y comentarios sobre las impresiones. Mas del 2 por ciento es fuerte."
       }
+    },
+    "team": {
+      "member": "Team member",
+      "manage": {
+        "accessRequests": "Solicitudes de acceso",
+        "addJobTitle": "Anadir cargo",
+        "addJobTitleAria": "Anadir cargo",
+        "editJobTitleAria": "Editar cargo",
+        "hidden": "Oculto",
+        "members": "Miembros",
+        "pendingInvites": "Invitaciones pendientes",
+        "public": "Publico"
+      }
     }
   }
 }
