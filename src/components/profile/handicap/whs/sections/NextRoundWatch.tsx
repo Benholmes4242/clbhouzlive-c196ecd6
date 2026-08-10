@@ -109,7 +109,9 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     ? t('common:handicap.nextRound.subRise', { cut })
     : t('common:handicap.nextRound.subHold', { cut });
 
-  const counting = last5.filter((v) => v <= cutTarget).length;
+  const beating = last5.filter((v) => v < cutTarget).length;
+  const bestOfFive = last5.length ? Math.min(...last5) : null;
+  const rows = nextRoundScale(currentHandicap, cutTarget, bestOfFive);
 
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
@@ -154,12 +156,75 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         <Last5AgainstTarget
           values={last5}
           cut={cutTarget}
-          targetLabel={t('common:handicap.nextRound.countsAt', { cut })}
-          footLabel={t('common:handicap.nextRound.lastRounds', {
-            count: counting,
+          footLabel={t('common:handicap.nextRound.beatLabel', {
+            count: beating,
             total: last5.length,
+            cut,
           })}
         />
+
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 16,
+            borderTop: `1px solid ${CHART.BORDER}`,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={LABEL}>{t('common:handicap.nextRound.scaleShoot')}</span>
+            <span style={LABEL}>{t('common:handicap.nextRound.scaleBecomes')}</span>
+          </div>
+
+          {rows.map((r, i) => {
+            const moves = !r.noChange;
+            return (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  marginTop: 10,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 14.5,
+                    fontWeight: 600,
+                    color: CHART.INK,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {r.shoot.toFixed(1)}
+                  {r.isBest && (
+                    <span style={{ ...LABEL, marginLeft: 8 }}>
+                      {t('common:handicap.nextRound.yourBest')}
+                    </span>
+                  )}
+                </span>
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span aria-hidden style={{ ...LABEL, letterSpacing: 0 }}>
+                    &rarr;
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      color: moves ? CHART.DOWN : CHART.MUTE,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {r.becomes.toFixed(1)}
+                  </span>
+                  {r.noChange && (
+                    <span style={LABEL}>{t('common:handicap.nextRound.noChange')}</span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
