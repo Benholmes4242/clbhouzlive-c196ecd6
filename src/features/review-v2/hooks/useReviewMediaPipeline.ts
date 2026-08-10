@@ -16,6 +16,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
@@ -25,6 +27,9 @@ import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
 const REVIEW_R2_BUCKET = 'clbhouz-review-images';
+
+/** Per-item cache sweeps are throttled to at most one every 2s. */
+const SWEEP_THROTTLE_MS = 2000;
 
 function nid(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -432,6 +437,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           if (!itemsRef.current.find((c) => c.id === it.id)) continue;
           // eslint-disable-next-line no-await-in-loop
           await uploadOne(it, reviewId);
+          // Item landed (or failed) — let mounted surfaces pick it up.
+          if (itemsRef.current.find((c) => c.id === it.id)?.status === 'ready') sweep(false);
         }
       } finally {
         if (jobId) {
@@ -444,6 +451,9 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
             activeJobRef.current = null;
           }
         }
+        // Final, unthrottled sweep — fires on success, partial failure, or
+        // after the composer has unmounted mid-flight.
+        sweep(true);
       }
     },
     [userId, uploadOne],
