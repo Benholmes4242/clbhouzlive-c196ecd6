@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 import {
@@ -8,6 +9,15 @@ import {
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
+/** Dark LABEL: 7.5/700/0.16em at T40. */
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: 'var(--hcp-t-40)',
+};
 
 interface Props {
   round: WhsLastRound;
