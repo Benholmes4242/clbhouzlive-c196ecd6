@@ -342,7 +342,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
 
   // Post button vs Save button gating.
-  // Post button vs Save button gating.
+
   // CREATE requires media: a wizard post must carry at least one photo or video.
   // The caption stays OPTIONAL (11% of posts have none).
   // EDIT is deliberately exempt - posts published before this rule, and round
