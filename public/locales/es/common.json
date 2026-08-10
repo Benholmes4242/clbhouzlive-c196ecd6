@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas autom\u00e1ticamente",
+      "title": "Publicar mis rondas automáticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -245,6 +245,15 @@
     },
     "records": {
       "emptyHint": "Tus records apareceran aqui cuando publiques rondas."
+    },
+    "form": {
+      "archive": {
+        "gross": "Gross",
+        "playedTo": "Played to",
+        "notInBest8": "Not in your best 8",
+        "roundsTitle_one": "{{count}} round",
+        "roundsTitle_other": "{{count}} rounds"
+      }
     }
   }
 }
