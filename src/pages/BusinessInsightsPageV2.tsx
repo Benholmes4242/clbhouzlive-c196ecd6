@@ -251,7 +251,7 @@ const MetricCell = ({ label, value, prev, loading }: {
 /**
  * THE one chart inset. Every chart region sits in it whether it has data or
  * not, so the page does not change shape as data arrives. No border, and no
- * dashes - a dashed edge says something is missing, and nothing is missing.
+ * dashes - a broken edge says something is missing, and nothing is missing.
  */
 const ChartInset = ({ children, height, center = false }: {
   children: React.ReactNode; height?: number; center?: boolean;
