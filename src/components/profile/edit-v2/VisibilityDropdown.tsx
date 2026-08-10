@@ -3,6 +3,7 @@ import { Lock, Globe, Users, UserCheck, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { createPortal } from 'react-dom';
+import { A, BIZ_LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 export type VisibilityValue = 'public' | 'followers' | 'friends' | 'private';
 
@@ -13,21 +14,24 @@ const VISIBILITY_OPTIONS = [
   { value: 'private' as VisibilityValue, label: 'Only me', icon: Lock },
 ];
 
+/** The sheet still names itself; the CONTROL no longer repeats its own label. */
+const SHEET_TITLE = 'Visible to';
+
 interface VisibilityDropdownProps {
   value: VisibilityValue;
   onChange: (value: VisibilityValue) => void;
-  label?: string;
   disabled?: boolean;
-  size?: 'sm' | 'md';
   className?: string;
 }
 
+/**
+ * A quiet action, not a pill: icon, value, chevron. The words "Visible to"
+ * live in the LABEL beside it - once per section, never inside the control.
+ */
 export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   value,
   onChange,
-  label = 'Visible to',
   disabled = false,
-  size = 'sm',
   className,
 }) => {
   const [open, setOpen] = useState(false);
@@ -45,22 +49,19 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
         <button
           type="button"
           onClick={() => setOpen(true)}
+          aria-label={`${SHEET_TITLE}: ${selectedOption.label}`}
           className={cn(
-            'flex items-center gap-1.5 border border-border/60 bg-muted/60 rounded-full transition-colors active:bg-muted',
-            size === 'sm' ? 'h-7 px-2.5' : 'h-9 px-4',
+            'flex items-center gap-1.5 bg-transparent border-0 p-0',
             disabled && 'opacity-50 pointer-events-none'
           )}
+          style={{ ...BIZ_LABEL, color: A.INK, minHeight: 44, whiteSpace: 'nowrap' }}
         >
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">
-            {label}:
-          </span>
-          <span className="text-xs font-medium text-foreground">
-            {selectedOption.label}
-          </span>
-          <ChevronDown className="h-3 w-3 text-muted-foreground ml-0.5" />
+          <Icon size={9} strokeWidth={3} />
+          <span style={{ ...BIZ_LABEL, color: A.INK }}>{selectedOption.label}</span>
+          <ChevronDown size={9} strokeWidth={3} />
         </button>
       </div>
+
 
       {createPortal(
         <AnimatePresence>
