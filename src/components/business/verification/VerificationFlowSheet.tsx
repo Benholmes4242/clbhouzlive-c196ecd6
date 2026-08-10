@@ -1066,16 +1066,11 @@ const SectionCard = React.forwardRef<
     <div
       ref={ref}
       className="rounded-2xl p-4"
-      style={{ background: BIZ.card, border: `1px solid ${BIZ.hair}` }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
     >
-      <div className="flex items-center gap-2.5 mb-3">
-        <div
-          className="h-6 w-6 rounded-full flex items-center justify-center text-[12px] font-bold"
-          style={{ background: BIZ.ink, color: '#fff' }}
-        >
-          {number}
-        </div>
-        <h3 className="text-[15px] font-semibold" style={{ color: BIZ.ink }}>
+      <div className="flex items-baseline gap-2.5 mb-3">
+        <span style={{ ...BIZ_LABEL, flexShrink: 0 }}>{`Step ${number}`}</span>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: A.INK, margin: 0, letterSpacing: '-0.01em' }}>
           {title}
         </h3>
       </div>
@@ -1089,32 +1084,33 @@ function DetailRow({
   value,
   missing,
   missingMessage,
-  last,
 }: {
   label: string;
   value?: string | null;
   missing?: boolean;
   missingMessage?: string;
+  /** @deprecated rows no longer draw rules; kept so callers need not change. */
   last?: boolean;
 }) {
   return (
     <div
-      className="flex items-start gap-3 py-3"
-      style={last ? undefined : { borderBottom: `0.5px solid ${BIZ.hair}` }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '112px minmax(0,1fr)',
+        alignItems: 'baseline',
+        gap: 12,
+        padding: '8px 0',
+      }}
     >
-      <span className="text-[13px] shrink-0 w-[110px]" style={{ color: BIZ.inkMute }}>
-        {label}
-      </span>
+      <span style={BIZ_LABEL}>{label}</span>
       {missing ? (
-        <span className="text-[12px] text-destructive flex-1 min-w-0 text-right">
-          {missingMessage}
-        </span>
+        <span className="text-[12px] text-destructive min-w-0 text-right">{missingMessage}</span>
       ) : (
         <span
-          className="text-[13px] flex-1 min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{ color: BIZ.ink }}
+          className="min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ fontSize: 13.5, fontWeight: 600, color: A.INK }}
         >
-          {value || '—'}
+          {value || ''}
         </span>
       )}
     </div>
@@ -1123,20 +1119,22 @@ function DetailRow({
 
 function FieldGroup({
   label,
+  hint,
   children,
 }: {
   label: React.ReactNode;
+  hint?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-[13px]" style={{ color: BIZ.ink }}>
-        {label}
-      </Label>
+    <div data-vf-field>
+      <div style={{ ...BIZ_LABEL, marginBottom: 6 }}>{label}</div>
       {children}
+      {hint && <div style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}>{hint}</div>}
     </div>
   );
 }
+
 
 function ConfirmationView({
   requestId,
