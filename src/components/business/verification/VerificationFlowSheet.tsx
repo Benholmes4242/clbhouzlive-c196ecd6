@@ -570,20 +570,49 @@ export default function VerificationFlowSheet({
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Intro strip */}
+              <style>{`
+                [data-vf-field] input,
+                [data-vf-field] textarea,
+                [data-vf-field] button[role="combobox"] {
+                  border: 1px solid ${A.BORDER};
+                  border-radius: 11px;
+                  padding: 12px 13px;
+                  font-size: 14px;
+                  font-weight: 400;
+                  color: ${A.INK};
+                  background: ${A.PANEL};
+                  height: auto;
+                  min-height: 44px;
+                }
+              `}</style>
+
+              {/* Intro figures */}
               <div
-                className="flex items-start gap-3 px-4 py-3 rounded-2xl"
-                style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
+                  gap: 10,
+                  padding: '14px 16px',
+                  borderRadius: 14,
+                  background: A.PANEL,
+                  border: `1px solid ${A.BORDER}`,
+                }}
               >
-                <ShieldCheck className="h-5 w-5 mt-0.5 shrink-0" style={{ color: BIZ.amber }} />
-                <p className="text-[13px] leading-snug" style={{ color: BIZ.ink }}>
-                  Two minutes. We review within a few days and add your badge once approved.
-                </p>
+                <div className="text-center" style={{ minWidth: 0 }}>
+                  <div style={BIZ_LABEL}>To complete</div>
+                  <div style={{ ...bizFigure(19), marginTop: 6 }}>2 min</div>
+                </div>
+                <div className="text-center" style={{ minWidth: 0 }}>
+                  <div style={BIZ_LABEL}>We review in</div>
+                  {/* No SLA exists in the codebase - the existing prose stands rather than
+                      inventing a number the business would be held to. */}
+                  <div style={{ ...bizFigure(15), marginTop: 8 }}>A few days</div>
+                </div>
               </div>
 
               {/* SECTION 1 */}
               <SectionCard ref={detailsRef} number={1} title="Confirm your details">
-                <div className="space-y-0">
+                <div>
                   <DetailRow label="Business name" value={business?.name} />
                   <DetailRow label="Category" value={business?.category} />
                   <DetailRow label="Location" value={business?.location} />
@@ -598,17 +627,23 @@ export default function VerificationFlowSheet({
                     value={business?.email}
                     missing={!business?.email}
                     missingMessage="Contact email required"
-                    last
                   />
                 </div>
+                {missingDetailCount > 0 && (
+                  <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
+                    {missingDetailCount === 1
+                      ? '1 detail is missing. You can still submit, but adding it speeds up review.'
+                      : `${missingDetailCount} details are missing. You can still submit, but adding them speeds up review.`}
+                  </p>
+                )}
                 <div className="pt-3">
                   <Link
                     to={`/business/${businessId}/edit`}
                     onClick={() => onOpenChange(false)}
-                    className="inline-flex items-center gap-1.5 text-[13px] font-medium"
-                    style={{ color: BIZ.amber }}
+                    className="inline-flex items-center gap-1.5"
+                    style={{ ...BIZ_LABEL, color: A.INK, minHeight: 44, alignItems: 'center' }}
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink size={10} strokeWidth={2.5} />
                     Edit business profile
                   </Link>
                 </div>
@@ -616,6 +651,7 @@ export default function VerificationFlowSheet({
                   <p className="text-[12px] text-destructive mt-3">{validationError.message}</p>
                 )}
               </SectionCard>
+
 
               {/* SECTION 2 */}
               <SectionCard ref={proofRef} number={2} title="Prove your business is real">
