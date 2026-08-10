@@ -632,7 +632,7 @@ function ProfileTabBody({
 
           {/* Gender (INK active) */}
           <div className="px-4 pt-3 pb-4">
-            <Label>Gender</Label>
+            <FieldLabel>Gender</FieldLabel>
             <SegToggle
               value={form.gender}
               onChange={(v) => setField('gender', v)}
@@ -818,9 +818,9 @@ function HandicapRow({
   if (state === 'whs') {
     return (
       <div style={{ fontFamily: GEIST }}>
-        <Label>Official handicap</Label>
+        <FieldLabel>Official handicap</FieldLabel>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
-          <span style={{ fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={bizFigure(34, INK)}>
             {value != null ? formatHcp(value) : '-'}
           </span>
           <span style={{
@@ -867,22 +867,20 @@ function HandicapRow({
     return (
       <div style={{ fontFamily: GEIST }}>
         <HandicapInput value={form.handicapIndex} onChange={onChange} />
+        <p style={{ fontSize: 12, color: INK_55, margin: '12px 4px 10px', lineHeight: 1.5 }}>
+          {HELPER_COPY}
+        </p>
         <button
           onClick={onOpenConnect}
           style={{
-            marginTop: 12,
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '12px 16px', borderRadius: 12,
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            minHeight: 46, padding: '12px 16px', borderRadius: 999,
             background: INK, color: '#fff', border: 'none',
-            fontSize: 14, fontWeight: 600, fontFamily: GEIST, cursor: 'pointer',
+            fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
           }}
         >
           Connect official handicap
-          <ArrowRight size={16} strokeWidth={2.4} />
         </button>
-        <p style={{ fontSize: 12, color: INK_55, margin: '8px 4px 0', lineHeight: 1.5 }}>
-          {HELPER_COPY}
-        </p>
       </div>
     );
   }
