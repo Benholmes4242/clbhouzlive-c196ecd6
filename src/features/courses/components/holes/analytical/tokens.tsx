@@ -431,8 +431,10 @@ export const EmptyState: React.FC<{
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {guidance.map((g) => (
             <div key={g.title}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{g.title}</div>
-              <div style={{ fontSize: 12.5, lineHeight: 1.45, color: A.MUTE, marginTop: 2 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: biz ? '-0.01em' : undefined }}>{g.title}</div>
+              <div style={biz
+                ? { ...BIZ_BODY, marginTop: 2 }
+                : { fontSize: 12.5, lineHeight: 1.45, color: A.MUTE, marginTop: 2 }}>
                 {g.body}
               </div>
             </div>
@@ -441,7 +443,9 @@ export const EmptyState: React.FC<{
       </div>
     )}
   </Panel>
-);
+  );
+};
+
 
 /* ────────────────────── THE BUSINESS TYPE SCALE ──────────────────────
    The three business surfaces (Insights, the empty state, the command
