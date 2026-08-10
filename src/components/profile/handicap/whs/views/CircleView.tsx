@@ -4,8 +4,14 @@
  * Composition, in order:
  *   1. ONE leaderboard (FriendsLeaderboardSection)
  *   2. Compare - a panel showing three recent people, each opening the sheet
- *   3. Friends' rounds
- *   4. Invite
+ *   3. Invite - three friends not on clbhouz, plus the wide door to the sheet
+ *   4. Friends' rounds
+ *
+ * BRIEF_CIRCLE_INVITE_ENTRY moved invite ABOVE friends' rounds: the two
+ * ACTIONS sit in the reachable zone and the endless list goes last, which is
+ * where a feed belongs - a member scrolls into it and keeps going. Nothing
+ * beneath a feed is reached.
+
  *
  * THE ORDERING PRINCIPLE: order by the question the previous section leaves
  * open. The leaderboard ends on "I'm 6th of 25" and compare answers it. A feed
