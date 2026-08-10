@@ -260,6 +260,13 @@
         "top": "Top",
         "ofCircleOwner": "of your circle",
         "ofCircleFriend": "of their circle"
+      },
+      "rounds": {
+        "notOnClbhouz_one": "{{count}} Freund ist nicht bei clbhouz",
+        "notOnClbhouz_other": "{{count}} Freunde sind nicht bei clbhouz",
+        "inviteThem": "Einladen",
+        "noHandicap_one": "{{count}} Freund ist bei clbhouz ohne Handicap",
+        "noHandicap_other": "{{count}} Freunde sind bei clbhouz ohne Handicap"
       }
     }
   }

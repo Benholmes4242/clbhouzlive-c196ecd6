@@ -259,6 +259,13 @@
         "top": "Top",
         "ofCircleOwner": "of your circle",
         "ofCircleFriend": "of their circle"
+      },
+      "rounds": {
+        "notOnClbhouz_one": "{{count}} myeong-eun clbhouz mideungnok",
+        "notOnClbhouz_other": "{{count}} myeong-eun clbhouz mideungnok",
+        "inviteThem": "Chodae hagi",
+        "noHandicap_one": "{{count}} myeong-eun handikaep miyeongyeol",
+        "noHandicap_other": "{{count}} myeong-eun handikaep miyeongyeol"
       }
     }
   }
