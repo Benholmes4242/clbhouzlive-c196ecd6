@@ -31,6 +31,7 @@ import { useFriendLeaderboard, useSharedRounds, useSharedRoundCounts, useWhsConn
 import { useEntityPickerSearch } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { useCompareIdentities } from './useCompareIdentities';
+import { useCompareRecent } from './useCompareRecent';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { formatRelativeAgo } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -73,57 +74,13 @@ export const CompareSheet: React.FC<Props> = ({
   );
 
   /**
-   * IDENTITY. Every displayed name and photo for a clbhouz member comes from
-   * user_profiles through useCompareIdentities - never from the leaderboard's
-   * friend_name / friend_thumbnail_url, which are England Golf fields and
-   * surname-first. One batched read covers the whole visible list.
+   * IDENTITY + ORDER. The recent list is built by useCompareRecent, THE ONE
+   * definition shared with the Circle entry panel so the two surfaces cannot
+   * disagree about who "recent" is. Names and photos come from user_profiles,
+   * never from the leaderboard's England Golf friend_name.
    */
-  const recentRows = React.useMemo(
-    () =>
-      (leaderboard ?? [])
-        .filter((e) => !e.is_self && !!e.friend_user_id && e.is_clbhouz_user)
-        .sort((a, b) =>
-          (b.last_round_played_at ?? '').localeCompare(a.last_round_played_at ?? ''),
-        )
-        .slice(0, RECENT_LIMIT),
-    [leaderboard],
-  );
+  const recent = useCompareRecent(viewerUserId, RECENT_LIMIT, open);
 
-  const { data: identities } = useCompareIdentities(
-    recentRows.map((e) => e.friend_user_id as string),
-    open,
-  );
-
-  /** The six most recently played with, self excluded, clbhouz members only. */
-  const recent = React.useMemo<ComparePerson[]>(() => {
-    const rows = (leaderboard ?? [])
-      .filter((e) => !e.is_self && !!e.friend_user_id && e.is_clbhouz_user)
-      .sort((a, b) =>
-        (b.last_round_played_at ?? '').localeCompare(a.last_round_played_at ?? ''),
-      )
-      .slice(0, RECENT_LIMIT);
-    return rows.map((e) => {
-      const id = identities?.[e.friend_user_id as string];
-      return {
-      userId: e.friend_user_id as string,
-      // A resolved clbhouz member is named by their profile. These rows are all
-      // clbhouz members (is_clbhouz_user + friend_user_id), so an unresolved one
-      // holds a shell rather than falling back to the England Golf name.
-      name: id?.name ?? null,
-      avatarUrl: id?.avatarUrl ?? e.friend_profile_photo_url ?? null,
-      index: e.friend_handicap_index,
-      contextLine:
-        [
-          e.last_round_played_at
-            ? formatRelativeAgo(e.last_round_played_at, { yesterday: true })
-            : '',
-          e.last_round_course_name ?? '',
-        ]
-          .filter(Boolean)
-          .join(' . ') || null,
-      };
-    });
-  }, [leaderboard, identities]);
 
   const searching = debouncedQuery.trim().length > 0;
   const { people } = useEntityPickerSearch({

@@ -269,6 +269,14 @@
       "nudge": {
         "draft": "Hi {{name}} - connect your handicap on clbhouz and we can compare rounds and see who's actually playing better."
       }
+    },
+    "compare": {
+      "kicker": "COMPARE",
+      "title": "How you compare",
+      "roundsTogether_one": "{{count}} round together",
+      "roundsTogether_other": "{{count}} rounds together",
+      "playedAgo": "Played {{when}}",
+      "anyone": "Compare against anyone"
     }
   }
 }

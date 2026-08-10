@@ -554,7 +554,11 @@
       "careerFooter": "Every round each of you has posted, at any course - not just the ones you played together",
       "youLeadByWithTies": "You lead by {{n}}, {{ties}} tied",
       "theyLeadByWithTies": "{{name}} leads by {{n}}, {{ties}} tied",
-      "levelAtWithTies": "Level at {{n}}, {{ties}} tied"
+      "levelAtWithTies": "Level at {{n}}, {{ties}} tied",
+      "roundsTogether_one": "{{count}} round together",
+      "roundsTogether_other": "{{count}} rounds together",
+      "playedAgo": "Played {{when}}",
+      "anyone": "Compare against anyone"
     },
     "legends": {
       "window90d": "90 days",
