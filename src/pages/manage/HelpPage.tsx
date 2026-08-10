@@ -4,27 +4,22 @@ import { ChevronDown, Search, LifeBuoy } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHelpArticles, type HelpArticle } from '@/hooks/useHelpArticles';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const CARD_BORDER = 'rgba(15,23,42,0.07)';
 
 function AccordionRow({
   article,
   expanded,
   onToggle,
   caption,
-  isFirst,
 }: {
   article: HelpArticle;
   expanded: boolean;
   onToggle: () => void;
   caption?: string;
-  isFirst?: boolean;
 }) {
   return (
-    <div style={{ borderTop: isFirst ? 'none' : `0.5px solid ${HAIR}` }}>
+    <div>
       <button
         type="button"
         onClick={onToggle}
@@ -34,25 +29,25 @@ function AccordionRow({
           {caption && (
             <div
               className="text-[10px] font-semibold uppercase tracking-[1.4px] mb-1"
-              style={{ color: INK_55 }}
+              style={{ color: A.MUTE }}
             >
               {caption}
             </div>
           )}
-          <span className="text-[15px] font-medium" style={{ color: INK }}>
+          <span className="text-[15px] font-medium" style={{ color: A.INK }}>
             {article.question}
           </span>
         </div>
         <ChevronDown
           size={18}
           className={`shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-          style={{ color: INK_55 }}
+          style={{ color: A.MUTE }}
         />
       </button>
       {expanded && (
         <p
           className="text-[14px] px-4 pb-4 leading-[1.6] whitespace-pre-wrap"
-          style={{ color: INK_55 }}
+          style={{ color: A.MUTE }}
         >
           {article.answer}
         </p>
@@ -85,16 +80,16 @@ export default function HelpPage() {
     <div className="px-4 pb-3">
       <div
         className="flex items-center gap-2 h-11 px-3 rounded-xl"
-        style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+        style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
       >
-        <Search size={16} style={{ color: INK_55 }} className="shrink-0" />
+        <Search size={16} style={{ color: A.MUTE }} className="shrink-0" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search help articles"
           className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#94A3B8]"
-          style={{ color: INK }}
+          style={{ color: A.INK }}
         />
       </div>
     </div>
@@ -115,14 +110,14 @@ export default function HelpPage() {
         {!isLoading && isError && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
-            <p className="text-[15px] font-medium" style={{ color: INK }}>Couldn't load help articles</p>
-            <p className="text-[13px] mt-1 mb-3" style={{ color: INK_55 }}>Check your connection and try again.</p>
+            <p className="text-[15px] font-medium" style={{ color: A.INK }}>Couldn't load help articles</p>
+            <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
             <button
               onClick={() => refetch()}
-              className="text-[13px] font-semibold underline"
-              style={{ color: INK }}
+              className="text-[13px] font-semibold"
+              style={{ color: A.INK }}
             >
               Retry
             </button>
@@ -133,9 +128,9 @@ export default function HelpPage() {
         {!isLoading && searching && matches.length === 0 && (
           <div
             className="rounded-2xl p-4 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
-            <p className="text-[14px]" style={{ color: INK_55 }}>
+            <p className="text-[14px]" style={{ color: A.MUTE }}>
               No articles match that. Try different words, or contact support below.
             </p>
           </div>
@@ -144,7 +139,7 @@ export default function HelpPage() {
         {!isLoading && searching && matches.length > 0 && (
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             {matches.map((a, i) => (
               <AccordionRow
@@ -153,7 +148,6 @@ export default function HelpPage() {
                 caption={a.category}
                 expanded={expanded === a.id}
                 onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
-                isFirst={i === 0}
               />
             ))}
           </div>
@@ -165,13 +159,13 @@ export default function HelpPage() {
               <section key={cat}>
                 <h3
                   className="text-[11px] font-semibold uppercase tracking-[1.6px] mb-2 px-1"
-                  style={{ color: INK_55 }}
+                  style={{ color: A.MUTE }}
                 >
                   {cat}
                 </h3>
                 <div
                   className="rounded-2xl overflow-hidden"
-                  style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+                  style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
                 >
                   {data.grouped[cat].map((a, i) => (
                     <AccordionRow
@@ -179,8 +173,7 @@ export default function HelpPage() {
                       article={a}
                       expanded={expanded === a.id}
                       onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
-                      isFirst={i === 0}
-                    />
+                          />
                   ))}
                 </div>
               </section>
@@ -191,22 +184,22 @@ export default function HelpPage() {
         {/* Still need help footer */}
         <div
           className="rounded-2xl p-4 mt-2"
-          style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
         >
           <div className="flex items-center gap-2 mb-1">
-            <LifeBuoy size={16} style={{ color: INK }} />
-            <h4 className="text-[15px] font-semibold" style={{ color: INK }}>
+            <LifeBuoy size={16} style={{ color: A.INK }} />
+            <h4 className="text-[15px] font-semibold" style={{ color: A.INK }}>
               Still need help?
             </h4>
           </div>
-          <p className="text-[13.5px] leading-relaxed mb-3" style={{ color: INK_55 }}>
+          <p className="text-[13.5px] leading-relaxed mb-3" style={{ color: A.MUTE }}>
             Can't find what you need? Our team is here to help.
           </p>
           <button
             type="button"
             onClick={() => navigate('/manage/contact')}
             className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-            style={{ background: INK }}
+            style={{ background: A.INK }}
           >
             Contact support
           </button>
@@ -214,7 +207,7 @@ export default function HelpPage() {
             type="button"
             onClick={() => navigate('/manage/requests')}
             className="w-full min-h-[44px] mt-2 text-[14px] font-semibold"
-            style={{ color: INK }}
+            style={{ color: A.INK }}
           >
             View my requests
           </button>

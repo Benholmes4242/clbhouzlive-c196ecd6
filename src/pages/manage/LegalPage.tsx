@@ -3,8 +3,8 @@ import { ChevronRight } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLegalDocuments } from '@/hooks/useLegalDocuments';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK_55 = '#64748B';
 
 export default function LegalPage() {
   const { data, isLoading } = useLegalDocuments();
@@ -16,7 +16,7 @@ export default function LegalPage() {
 
         <div
           className="rounded-2xl overflow-hidden"
-          style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
+          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
         >
           {isLoading && (
             <div className="p-4 space-y-3">
@@ -27,7 +27,7 @@ export default function LegalPage() {
 
 
           {!isLoading && docs.length === 0 && (
-            <div className="p-4 text-[14px]" style={{ color: INK_55 }}>
+            <div className="p-4 text-[14px]" style={{ color: A.MUTE }}>
               No legal documents are currently published.
             </div>
           )}
@@ -38,15 +38,13 @@ export default function LegalPage() {
               to={`/legal/${doc.slug}`}
               className="flex items-center justify-between px-4 py-3"
               style={{
-                borderTop: i === 0 ? 'none' : '1px solid rgba(15,23,42,0.06)',
-                textDecoration: 'none',
-                color: 'inherit',
+                                color: 'inherit',
               }}
             >
               <span className="text-[15px] font-medium text-foreground">
                 {doc.title}
               </span>
-              <ChevronRight size={18} style={{ color: INK_55, flexShrink: 0 }} />
+              <ChevronRight size={18} style={{ color: A.MUTE, flexShrink: 0 }} />
             </Link>
           ))}
         </div>

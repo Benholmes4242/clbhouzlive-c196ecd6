@@ -1,7 +1,9 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { IconTheme, iconThemeStyles } from '../settingsTheme';
+import { IconTheme, iconThemeColor } from '../settingsTheme';
+import { SETTINGS_ROW, SettingsGlyph, SettingsTitle, SettingsSubtitle } from './rowParts';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface SettingsToggleRowProps {
   icon?: React.ReactNode;
@@ -11,9 +13,6 @@ interface SettingsToggleRowProps {
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   isLoading?: boolean;
-  isFirst?: boolean;
-  isLast?: boolean;
-  showDivider?: boolean;
   isBeta?: boolean;
   isIndented?: boolean;
   helperNote?: string;
@@ -28,46 +27,34 @@ export function SettingsToggleRow({
   onCheckedChange,
   disabled = false,
   isLoading = false,
-  isFirst = false,
-  isLast = false,
-  showDivider = true,
   isBeta = false,
   isIndented = false,
   helperNote,
   iconTheme = 'default',
 }: SettingsToggleRowProps) {
   const showHelper = helperNote && checked;
-  const theme = iconThemeStyles[iconTheme];
+  const color = iconThemeColor[iconTheme];
 
   return (
     <div className="w-full">
       <div
         className={cn(
-          'relative flex items-center w-full',
-          'min-h-[52px] py-2.5',
-          isIndented ? 'pl-6 pr-4' : 'px-4',
+          'relative flex items-start w-full',
+          isIndented && 'pl-3',
           disabled && 'opacity-50',
           isLoading && 'opacity-75',
         )}
+        style={SETTINGS_ROW}
       >
-        <div className="flex items-center flex-1 min-w-0 gap-3">
-          {icon && (
-            <div className={cn('flex-shrink-0 w-9 h-9 rounded-[10px] flex items-center justify-center', theme.bg)}>
-              <div className={cn('w-[18px] h-[18px]', theme.text)}>{icon}</div>
-            </div>
-          )}
+        <div className="flex items-start flex-1 min-w-0 gap-3">
+          {icon && <SettingsGlyph color={color}>{icon}</SettingsGlyph>}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-[15px] font-medium text-foreground truncate">{title}</span>
-              
-            </div>
-            {subtitle && (
-              <p className="text-[13px] text-muted-foreground leading-snug mt-1">{subtitle}</p>
-            )}
+            <SettingsTitle>{title}</SettingsTitle>
+            {subtitle && <SettingsSubtitle>{subtitle}</SettingsSubtitle>}
           </div>
         </div>
 
-        <div className="flex-shrink-0 ml-3">
+        <div className="flex-shrink-0 ml-3 self-center">
           <Switch
             checked={checked}
             onCheckedChange={onCheckedChange}
@@ -78,19 +65,12 @@ export function SettingsToggleRow({
             )}
           />
         </div>
-
-        {showDivider && !isLast && !showHelper && (
-          <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
-        )}
       </div>
 
       {showHelper && (
-        <div className={cn('px-4 pb-3', isIndented && 'pl-6')}>
-          <p className="text-[12px] text-muted-foreground ml-[52px]">{helperNote}</p>
-          {showDivider && !isLast && (
-            <div style={{ position: 'absolute', bottom: 0, left: 64, right: 0, height: '0.5px', background: 'rgba(15,23,42,0.06)' }} />
-          )}
-        </div>
+        <p style={{ fontSize: 12, color: A.MUTE, paddingBottom: 11, marginTop: -6, lineHeight: 1.45 }}>
+          {helperNote}
+        </p>
       )}
     </div>
   );

@@ -6,8 +6,8 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK_55 = '#64748B';
 
 // Canonical categories. `types` are the notification_preferences.muted_types
 // strings — every DB `type` we emit for that category, so a single toggle
@@ -133,11 +133,11 @@ export default function NotificationsPage() {
         {/* Push (global) */}
         <div
           className="rounded-2xl px-4 py-3 flex items-center justify-between"
-          style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
+          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
         >
           <div className="min-w-0 pr-3">
             <p className="text-[15px] font-medium text-foreground">Push notifications</p>
-            <p className="text-[13px]" style={{ color: INK_55 }}>{pushSubline}</p>
+            <p className="text-[13px]" style={{ color: A.MUTE }}>{pushSubline}</p>
           </div>
           <Switch
             checked={pushSwitchChecked}
@@ -150,13 +150,13 @@ export default function NotificationsPage() {
         <div>
           <p
             className="text-[11px] font-semibold uppercase tracking-[1.5px] px-1 mb-2"
-            style={{ color: INK_55 }}
+            style={{ color: A.MUTE }}
           >
             What you get notified about
           </p>
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             {CATEGORIES.map((c, idx) => (
               <div
@@ -166,7 +166,7 @@ export default function NotificationsPage() {
               >
                 <div className="min-w-0 pr-3">
                   <p className="text-[15px] text-foreground">{c.label}</p>
-                  <p className="text-[13px]" style={{ color: INK_55 }}>{c.sub}</p>
+                  <p className="text-[13px]" style={{ color: A.MUTE }}>{c.sub}</p>
                 </div>
                 <Switch
                   checked={categoryStates[c.key]}
@@ -176,7 +176,7 @@ export default function NotificationsPage() {
               </div>
             ))}
           </div>
-          <p className="text-[12px] px-1 mt-2" style={{ color: INK_55 }}>
+          <p className="text-[12px] px-1 mt-2" style={{ color: A.MUTE }}>
             Turning a type off stops both push alerts and in-app notifications for it.
           </p>
         </div>
@@ -186,13 +186,13 @@ export default function NotificationsPage() {
           <div>
             <p
               className="text-[11px] font-semibold uppercase tracking-[1.5px] px-1 mb-2"
-              style={{ color: INK_55 }}
+              style={{ color: A.MUTE }}
             >
               Muted people
             </p>
             <div
               className="rounded-2xl overflow-hidden"
-              style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
+              style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
             >
               <div
                 className="flex items-center justify-between px-4 py-3 min-h-[52px] cursor-default"
@@ -200,7 +200,7 @@ export default function NotificationsPage() {
                 <p className="text-[15px] text-foreground">Muted accounts</p>
                 <span
                   className="text-[13px] font-semibold rounded-full px-2 py-0.5"
-                  style={{ background: 'rgba(15,23,42,0.06)', color: INK_55 }}
+                  style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
                 >
                   {mutedUserIds.length}
                 </span>

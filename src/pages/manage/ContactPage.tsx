@@ -6,10 +6,8 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const CARD_BORDER = 'rgba(15,23,42,0.07)';
 
 const CATEGORIES = [
   { value: 'bug', label: 'Bug' },
@@ -91,15 +89,15 @@ export default function ContactPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex justify-center mb-3">
               <CheckCircle2 size={40} style={{ color: '#2F6B4F' }} />
             </div>
-            <h3 className="text-[17px] font-semibold mb-1" style={{ color: INK }}>
+            <h3 className="text-[17px] font-semibold mb-1" style={{ color: A.INK }}>
               Request received
             </h3>
-            <p className="text-[14px] leading-relaxed mb-4" style={{ color: INK_55 }}>
+            <p className="text-[14px] leading-relaxed mb-4" style={{ color: A.MUTE }}>
               Thanks - we've received your request and will reply soon. You can view it in
               My requests.
             </p>
@@ -107,7 +105,7 @@ export default function ContactPage() {
               type="button"
               onClick={() => navigate('/manage/requests')}
               className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: INK }}
+              style={{ background: A.INK }}
             >
               Go to my requests
             </button>
@@ -119,7 +117,7 @@ export default function ContactPage() {
                 setMessage('');
               }}
               className="w-full min-h-[44px] mt-2 text-[14px] font-medium"
-              style={{ color: INK_55 }}
+              style={{ color: A.MUTE }}
             >
               Send another request
             </button>
@@ -134,9 +132,9 @@ export default function ContactPage() {
       <div className="px-4 pt-4 space-y-4 pb-0">
         <div
           className="rounded-2xl p-4"
-          style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
         >
-          <p className="text-[13.5px] leading-relaxed" style={{ color: INK_55 }}>
+          <p className="text-[13.5px] leading-relaxed" style={{ color: A.MUTE }}>
             Tell us what's going on and we'll get back to you. Include as much detail as
             possible so we can help fast. We aim to respond to all requests within 24 hours.
           </p>
@@ -146,13 +144,13 @@ export default function ContactPage() {
         <div>
           <label
             className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-2 block px-1"
-            style={{ color: INK_55 }}
+            style={{ color: A.MUTE }}
           >
             Category
           </label>
           <div
             className="rounded-2xl p-2 grid grid-cols-2 gap-2"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             {CATEGORIES.map((c) => {
               const active = c.value === category;
@@ -163,8 +161,8 @@ export default function ContactPage() {
                   onClick={() => setCategory(c.value)}
                   className="min-h-[40px] rounded-lg text-[13.5px] font-medium transition-colors"
                   style={{
-                    background: active ? INK : 'transparent',
-                    color: active ? '#fff' : INK,
+                    background: active ? A.INK : 'transparent',
+                    color: active ? '#fff' : A.INK,
                   }}
                 >
                   {c.label}
@@ -178,7 +176,7 @@ export default function ContactPage() {
         <div>
           <label
             className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-2 block px-1"
-            style={{ color: INK_55 }}
+            style={{ color: A.MUTE }}
           >
             Subject
           </label>
@@ -191,8 +189,8 @@ export default function ContactPage() {
             className="w-full h-12 px-4 rounded-2xl text-[15px] outline-none"
             style={{
               background: '#fff',
-              border: `1px solid ${CARD_BORDER}`,
-              color: INK,
+              border: `1px solid ${A.BORDER}`,
+              color: A.INK,
             }}
           />
         </div>
@@ -201,7 +199,7 @@ export default function ContactPage() {
         <div>
           <label
             className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-2 block px-1"
-            style={{ color: INK_55 }}
+            style={{ color: A.MUTE }}
           >
             Message
           </label>
@@ -213,8 +211,8 @@ export default function ContactPage() {
             className="w-full p-4 rounded-2xl text-[15px] outline-none resize-none leading-relaxed"
             style={{
               background: '#fff',
-              border: `1px solid ${CARD_BORDER}`,
-              color: INK,
+              border: `1px solid ${A.BORDER}`,
+              color: A.INK,
               minHeight: 160,
             }}
           />
@@ -225,7 +223,7 @@ export default function ContactPage() {
           onClick={handleSubmit}
           disabled={!canSubmit}
           className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold text-white transition-opacity"
-          style={{ background: INK, opacity: canSubmit ? 1 : 0.5 }}
+          style={{ background: A.INK, opacity: canSubmit ? 1 : 0.5 }}
         >
           {submitting ? 'Sending...' : 'Send request'}
         </button>

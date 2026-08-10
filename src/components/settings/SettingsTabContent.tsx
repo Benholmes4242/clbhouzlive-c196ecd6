@@ -206,10 +206,9 @@ export function SettingsTabContent() {
         {/* Account */}
         <SettingsSection title="Account">
           <SettingsChevronRow
-            icon={<Mail size={18} />}
+            icon={<Mail size={15} />}
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
-            iconTheme="account"
             onClick={() => navigate('/manage/email')}
           />
         </SettingsSection>
@@ -217,10 +216,10 @@ export function SettingsTabContent() {
         {/* Business */}
         <SettingsSection title="Business">
           <SettingsChevronRow
-            icon={<Briefcase size={18} />}
+            icon={<Briefcase size={15} />}
             title={hasBusinesses ? 'Manage businesses' : 'Set up a business profile'}
             value={hasBusinesses ? String(count) : undefined}
-            iconTheme="account"
+            valueIsFigure
             onClick={() => navigate('/businesses/manage')}
           />
         </SettingsSection>
@@ -228,54 +227,48 @@ export function SettingsTabContent() {
         {/* Privacy */}
         <SettingsSection title="Privacy">
           <SettingsToggleRow
-            icon={<Eye size={18} />}
+            icon={<Eye size={15} />}
             title="Public Profile"
             subtitle="Anyone can view your profile and posts"
-            iconTheme="privacy"
             checked={privacy.isPublic}
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
           />
           <SettingsToggleRow
-            icon={<Eye size={18} />}
+            icon={<Eye size={15} />}
             title="Handicap button"
             subtitle="Show the Connect HCP button in your header"
-            iconTheme="privacy"
             checked={!hideHandicapChip}
             disabled={chipUpdating}
             onCheckedChange={handleToggleHandicapChip}
           />
           <SettingsLevelRow
-            icon={<Shield size={18} />}
+            icon={<Shield size={15} />}
             title="Who can see your handicap"
             subtitle="Controls the handicap number wherever it's shown as yours"
-            iconTheme="privacy"
             value={privacy.handicapVisibility}
             disabled={privacy.isUpdatingHandicapVisibility}
             onChange={privacy.setHandicapVisibilityLevel}
           />
           <SettingsLevelRow
-            icon={<BarChart2 size={18} />}
+            icon={<BarChart2 size={15} />}
             title="Who can see you in leaderboards"
             subtitle="Controls whether you appear in ranked boards, including Course Champions and course records"
-            iconTheme="privacy"
             value={privacy.leaderboardVisibility}
             disabled={privacy.isUpdatingLeaderboardVisibility}
             onChange={privacy.setLeaderboardVisibilityLevel}
           />
           <SettingsToggleRow
-            icon={<Eye size={18} />}
+            icon={<Eye size={15} />}
             title={t('settings.autoPostRounds.title')}
             subtitle={t('settings.autoPostRounds.subtitle')}
-            iconTheme="privacy"
             checked={privacy.autoPostRounds}
             disabled={privacy.isUpdatingAutoPostRounds}
             onCheckedChange={handleToggleAutoPostRounds}
           />
           <SettingsChevronRow
-            icon={<UserX size={18} />}
+            icon={<UserX size={15} />}
             title="Blocked Users"
-            iconTheme="privacy"
             onClick={() => navigate('/manage/blocked')}
           />
         </SettingsSection>
@@ -283,9 +276,8 @@ export function SettingsTabContent() {
         {/* Notifications */}
         <SettingsSection title="Notifications">
           <SettingsChevronRow
-            icon={<Bell size={18} />}
+            icon={<Bell size={15} />}
             title="Notification Preferences"
-            iconTheme="notifications"
             onClick={() => navigate('/manage/notifications')}
           />
         </SettingsSection>
@@ -293,10 +285,9 @@ export function SettingsTabContent() {
         {/* Connections */}
         <SettingsSection title="Connections">
           <SettingsChevronRow
-            icon={<Link2 size={18} />}
+            icon={<Link2 size={15} />}
             title="England Golf"
             subtitle={whsSubtitle}
-            iconTheme="account"
             onClick={() => navigate('/manage/handicap')}
           />
         </SettingsSection>
@@ -304,10 +295,9 @@ export function SettingsTabContent() {
         {/* Friends */}
         <SettingsSection title="Friends">
           <SettingsChevronRow
-            icon={<UserPlus size={18} />}
+            icon={<UserPlus size={15} />}
             title="Invite friends"
             subtitle={"Share your link \u2014 golf's better with your circle"}
-            iconTheme="account"
             onClick={() => openInviteSheet('settings')}
           />
         </SettingsSection>
@@ -315,36 +305,31 @@ export function SettingsTabContent() {
         {/* Support & Legal */}
         <SettingsSection title="Support & Legal">
           <SettingsChevronRow
-            icon={<HelpCircle size={18} />}
+            icon={<HelpCircle size={15} />}
             title="Help Centre"
-            iconTheme="support"
             onClick={() => navigate('/manage/help')}
           />
           <SettingsChevronRow
-            icon={<BadgeCheck size={18} />}
+            icon={<BadgeCheck size={15} />}
             title="Verified accounts"
             subtitle="How verification works"
-            iconTheme="support"
             onClick={() =>
               navigate('/manage/contact?category=account&subject=Verification%20enquiry')
             }
           />
           <SettingsChevronRow
-            icon={<MessageSquare size={18} />}
+            icon={<MessageSquare size={15} />}
             title="Contact Us"
-            iconTheme="support"
             onClick={() => navigate('/manage/contact')}
           />
           <SettingsChevronRow
-            icon={<MessageSquare size={18} />}
+            icon={<MessageSquare size={15} />}
             title="My requests"
-            iconTheme="support"
             onClick={() => navigate('/manage/requests')}
           />
           <SettingsChevronRow
-            icon={<FileText size={18} />}
+            icon={<FileText size={15} />}
             title="Legal & Policies"
-            iconTheme="legal"
             onClick={() => navigate('/manage/legal')}
           />
         </SettingsSection>
@@ -352,13 +337,13 @@ export function SettingsTabContent() {
         {/* Account Actions */}
         <SettingsSection title="Account Actions" variant="danger">
           <SettingsChevronRow
-            icon={<LogOut size={18} />}
+            icon={<LogOut size={15} />}
             title="Sign Out"
             onClick={() => setSignOutOpen(true)}
-            iconTheme="danger"
+            iconTheme="default"
           />
           <SettingsChevronRow
-            icon={<Trash2 size={18} />}
+            icon={<Trash2 size={15} />}
             title="Delete Account"
             onClick={deleteAccount.initiateDelete}
             iconTheme="danger"
