@@ -32,6 +32,19 @@ interface BusinessEmptyStateProps {
 const COUNT_UP_MS = 900;
 
 /**
+ * Grouped figures, tolerant of a malformed language tag: i18n can hand us
+ * values Intl rejects (e.g. "en-US@posix"), and a marketing figure must never
+ * be the thing that throws.
+ */
+function fmt(n: number, locale: string): string {
+  try {
+    return n.toLocaleString(locale);
+  } catch {
+    return n.toLocaleString('en');
+  }
+}
+
+/**
  * Figures ARRIVE at their value rather than scrolling past one: ease-out cubic
  * over 900ms, once per mount (the value is latched in a ref, so a re-render
  * never restarts it). prefers-reduced-motion: reduce renders the final value
@@ -100,7 +113,7 @@ const ReachCell = ({
           minHeight: 28,
         }}
       >
-        {shown == null ? '' : shown.toLocaleString(locale)}
+        {shown == null ? '' : fmt(shown, locale)}
       </div>
       <div style={{ minHeight: 15, marginTop: 1 }}>
         {ready && delta != null && delta > 0 && (
@@ -119,7 +132,7 @@ const ReachCell = ({
             <span aria-hidden style={{ fontSize: 7.5 }}>
               {'\u25B2'}
             </span>
-            {delta.toLocaleString(locale)}
+            {fmt(delta, locale)}
           </span>
         )}
       </div>
