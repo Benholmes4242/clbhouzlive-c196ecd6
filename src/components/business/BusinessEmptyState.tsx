@@ -183,6 +183,7 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
   return (
     <div className="w-full max-w-md mx-auto" style={{ paddingTop: 8, paddingBottom: 24 }}>
       <EmptyState
+        scale="business"
         kicker={t('business.emptyState.kicker')}
         title={t('business.emptyState.title')}
         body={t('business.emptyState.body')}
