@@ -13,10 +13,12 @@
  * The feed RPCs do not project posts.whs_score_id, so the id resolution is a
  * single `in (...)` read over the page's post ids rather than a per-card one.
  *
- * Hole shape: about 5% of rounds have no hole detail. Those return
- * `holeShape: null` so the card renders without the strip instead of a broken
- * chart. RLS decides visibility; a round the viewer may not read simply
- * resolves to nothing and the post renders as it did before C3.
+ * Hole shape: DROP IF PARTIAL. `holeShape` is non-null only when every PLAYED
+ * hole carries a score (and at least one played hole exists), so the card
+ * renders without the strip instead of a broken one. Synced rounds arrive as
+ * 18 rows of pars with no scores and resolve to null. RLS decides visibility;
+ * a round the viewer may not read simply resolves to nothing and the post
+ * renders as it did before C3.
  */
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -79,6 +81,26 @@ function stableIds(ids: (string | null | undefined)[]): string[] {
   return unique;
 }
 
+/**
+ * The hole-strip gate (BRIEF_ROUND_POST_EMPTY_SCORECARD §1-2). Returns the
+ * ordered shape ONLY when it is complete: every played hole scored, at least
+ * one played hole. Anything partial - including a synced round of pars with no
+ * scores - returns null so no consumer (strip, trajectory, analytics) can draw
+ * a scorecard out of nothing.
+ */
+function completeShape(
+  shape: (PostRoundHole & { played: boolean })[] | null,
+): PostRoundHole[] | null {
+  if (!shape || shape.length === 0) return null;
+  const playedHoles = shape.filter((h) => h.played);
+  if (playedHoles.length === 0) return null;
+  if (playedHoles.some((h) => h.gross == null)) return null;
+  return playedHoles
+    .slice()
+    .sort((a, b) => a.holeNo - b.holeNo)
+    .map(({ holeNo, par, gross }) => ({ holeNo, par, gross }));
+}
+
 /** Batched post_id -> whs_score_id for one feed page. */
 export function usePostScoreIds(postIds: string[]): PostScoreIdMapState {
   const ids = useMemo(() => stableIds(postIds), [postIds]);
@@ -132,7 +154,7 @@ export function usePostRounds(scoreIds: string[]): PostRoundMapState {
           .in('whs_score_id', ids),
         supabase
           .from('whs_score_holes')
-          .select('score_id, hole_no, par, actual_gross')
+          .select('score_id, hole_no, par, actual_gross, played')
           .in('score_id', ids)
           .order('hole_no', { ascending: true }),
         supabase.rpc('get_round_crowns', { p_score_ids: ids }),
@@ -163,15 +185,21 @@ export function usePostRounds(scoreIds: string[]): PostRoundMapState {
         });
       }
 
-      const shapes = new Map<string, PostRoundHole[]>();
+      const shapes = new Map<string, (PostRoundHole & { played: boolean })[]>();
       for (const h of (holesRes.data ?? []) as {
         score_id: string;
         hole_no: number;
         par: number | null;
         actual_gross: number | null;
+        played: boolean | null;
       }[]) {
         const list = shapes.get(h.score_id) ?? [];
-        list.push({ holeNo: h.hole_no, par: h.par ?? null, gross: h.actual_gross ?? null });
+        list.push({
+          holeNo: h.hole_no,
+          par: h.par ?? null,
+          gross: h.actual_gross ?? null,
+          played: h.played !== false,
+        });
         shapes.set(h.score_id, list);
       }
 
@@ -193,12 +221,12 @@ export function usePostRounds(scoreIds: string[]): PostRoundMapState {
           cleanCard: (r.clean_card as boolean | null) ?? null,
           slopeRating: (r.slope_rating as number | null) ?? null,
           longestBirdieRun: (r.longest_birdie_run as number | null) ?? null,
-          // Sorted defensively: the `.order` above covers the query, this
-          // covers the grouping.
-          holeShape:
-            shape && shape.length > 0
-              ? [...shape].sort((a, b) => a.holeNo - b.holeNo)
-              : null,
+          // DROP IF PARTIAL: the strip is complete or it does not render.
+          // Every PLAYED hole must carry a score, and at least one played hole
+          // must exist. A synced round has 18 rows of pars with no scores and
+          // resolves to null here; a genuine 9-hole round (9 played + scored,
+          // 9 unplayed) keeps its shape. Sorted defensively.
+          holeShape: completeShape(shape),
           crown: crowns.get(id) ?? null,
         });
       }
