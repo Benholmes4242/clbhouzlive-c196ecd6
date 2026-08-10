@@ -505,14 +505,40 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )}
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        <SelectItem value="all">
-          {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
-        </SelectItem>
-        {regionsForCountry.map((r) => (
-          <SelectItem key={r.region} value={r.region}>
-            {t('statBrowse.regionOption', { region: r.region, count: r.courses })}
+        <SelectGroup>
+          <SelectLabel
+            className="sticky top-0 z-10 flex w-full items-center justify-between py-2 pl-8 pr-2"
+            style={{
+              borderBottom: `1px solid ${HAIRLINE_INK_8}`,
+              backgroundColor: 'hsl(var(--card))',
+            }}
+          >
+            <span style={LABEL}>{t('statBrowse.colRegion')}</span>
+            <span style={LABEL}>{t('statBrowse.colCountsRegion')}</span>
+          </SelectLabel>
+          <SelectItem value="all">
+            <span className="flex w-full items-center gap-2">
+              <span className="flex-1 min-w-0 truncate">
+                {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
+              </span>
+              {countryEntry ? (
+                <span className="shrink-0" style={FIGURE_STYLE}>
+                  {formatNumber(countryEntry.courses)}
+                </span>
+              ) : null}
+            </span>
           </SelectItem>
-        ))}
+          {regionsForCountry.map((r) => (
+            <SelectItem key={r.region} value={r.region}>
+              <span className="flex w-full items-center gap-2">
+                <span className="flex-1 min-w-0 truncate">{r.region}</span>
+                <span className="shrink-0" style={FIGURE_STYLE}>
+                  {formatNumber(r.courses)}
+                </span>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   );
