@@ -82,7 +82,7 @@ export default function MyRequestsPage() {
             <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
             <button
               onClick={() => refetch()}
-              className="text-[13px] font-semibold underline"
+              className="text-[13px] font-semibold"
               style={{ color: A.INK }}
             >
               Retry
@@ -154,13 +154,13 @@ export default function MyRequestsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                        className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
                         style={{ color: A.DIM }}
                       >
                         {cat}
                       </span>
                       <span
-                        className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                        className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
                         style={{ color: status.fg }}
                       >
                         {status.label}

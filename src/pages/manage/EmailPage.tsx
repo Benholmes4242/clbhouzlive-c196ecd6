@@ -205,7 +205,7 @@ export default function EmailPage() {
                 className="text-[13px] font-medium"
                 style={{
                   color: resendCooldown > 0 ? 'rgba(15,23,42,0.35)' : A.INK,
-                  textDecoration: resendCooldown > 0 ? 'none' : 'underline',
+                  
                   cursor: resendCooldown > 0 ? 'default' : 'pointer',
                 }}
               >
@@ -216,7 +216,7 @@ export default function EmailPage() {
                 onClick={() => { setStep('email'); setCode(''); setOtpError(null); }}
                 disabled={submitting}
                 className="text-[13px]"
-                style={{ color: A.MUTE, textDecoration: 'underline', cursor: 'pointer' }}
+                style={{ color: A.MUTE, cursor: 'pointer' }}
               >
                 Use a different email
               </button>

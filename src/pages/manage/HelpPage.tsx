@@ -116,7 +116,7 @@ export default function HelpPage() {
             <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
             <button
               onClick={() => refetch()}
-              className="text-[13px] font-semibold underline"
+              className="text-[13px] font-semibold"
               style={{ color: A.INK }}
             >
               Retry
