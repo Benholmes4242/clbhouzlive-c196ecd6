@@ -31,6 +31,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { MaintenanceGate } from "@/components/maintenance/MaintenanceGate";
 import AuthWrapper from "@/components/auth/AuthWrapper";
+import DeletedAccountGate from "@/components/DeletedAccountGate";
 import BootHold from "@/components/BootHold";
 
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
@@ -986,6 +987,7 @@ const AppInner: React.FC = () => {
                                       <ErrorBoundary>
                                         <MountSignal />
                                         <AuthWrapper>
+                                        <DeletedAccountGate>
                                           <InAppNotificationsMount />
                                           <GenderPromptSheet />
 
@@ -1019,6 +1021,7 @@ const AppInner: React.FC = () => {
                                             <RequestCourseSheetHost />
                                             </InviteSheetProvider>
                                           </FriendSheetProvider>
+                                        </DeletedAccountGate>
                                         </AuthWrapper>
 
                                         <Sonner />

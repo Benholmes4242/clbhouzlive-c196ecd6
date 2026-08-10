@@ -40,21 +40,39 @@ export function useDeleteAccount(userId: string | undefined) {
       const { data: { session }, error: sessionError } = await supabase.auth.refreshSession();
       if (sessionError || !session) throw new Error('Session expired — please log in again');
 
-      const { error } = await supabase.functions.invoke('delete-account', {
+      const { data: fnData, error } = await supabase.functions.invoke('delete-account', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) {
         let serverReason: string | null = null;
+        let parsed: any = null;
         const ctx = (error as any).context;
         if (ctx && typeof ctx.text === 'function') {
-          try { serverReason = (await ctx.text())?.slice(0, 300); } catch {}
+          try {
+            serverReason = (await ctx.text())?.slice(0, 300);
+            parsed = serverReason ? JSON.parse(serverReason) : null;
+          } catch {}
         }
         console.error('[deleteAccount] edge error', {
           name: error.name, message: error.message,
           status: ctx?.status, body: serverReason,
         });
+        // Honest failure: the function now reports an incomplete deletion with
+        // HTTP 500 instead of a false success. Surface it as such.
+        if (parsed?.error === 'account_deletion_incomplete') {
+          throw new Error(
+            parsed.access_revoked
+              ? 'We could not finish deleting your account, so we have locked it and signed you out. Contact support to complete the deletion.'
+              : `We could not finish deleting your account. Contact support (ref ${parsed.deletionAuditId ?? 'unknown'}).`,
+          );
+        }
         throw error;
       }
+      // A 200 can still be an explicit no-op; only treat a real success as done.
+      if (fnData && (fnData as any).success !== true) {
+        throw new Error((fnData as any).error ?? 'Account deletion did not complete.');
+      }
+
       await supabase.auth.signOut();
       queryClient.clear();
       await removePersistedQueryCache();
