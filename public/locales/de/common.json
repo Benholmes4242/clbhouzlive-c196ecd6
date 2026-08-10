@@ -137,6 +137,29 @@
           "tail": "Aufrufe, Follower und Interaktionen"
         }
       }
+    },
+    "card": {
+      "manage": "VERWALTEN",
+      "addAnother": "Weiteres Unternehmen hinzufuegen",
+      "metrics": {
+        "visits": "Besuche",
+        "followers": "Follower",
+        "impressions": "Impressionen",
+        "last7Days": "Letzte 7 Tage",
+        "allTime": "Gesamt"
+      },
+      "verify": {
+        "tail": " - Abzeichen erhalten",
+        "action": "Verifizieren",
+        "notVerified": "Nicht verifiziert"
+      },
+      "actions": {
+        "edit": "Profil bearbeiten",
+        "insights": "Statistiken",
+        "reviews": "Bewertungen",
+        "team": "Team verwalten",
+        "viewProfile": "Live-Profil ansehen"
+      }
     }
   }
 }

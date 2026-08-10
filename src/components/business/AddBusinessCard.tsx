@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Building2, ChevronRight } from 'lucide-react';
 import { BIZ } from './businessTokens';
+
 
 interface AddBusinessCardProps {
   onClick: () => void;
@@ -8,7 +10,9 @@ interface AddBusinessCardProps {
 }
 
 export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardProps) {
+  const { t } = useTranslation('common');
   if (isFirst) {
+
     // Full empty state for zero businesses
     return (
       <motion.div
@@ -48,7 +52,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     );
   }
 
-  // Add another row — dashed card
+  // Add another row — solid panel. A placeholder edge treatment would say
+  // something is missing; this is a real, permanent control, so 1px solid.
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -57,36 +62,22 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     >
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3.5 p-4 transition-colors min-h-[44px]"
+        className="w-full flex items-center gap-2.5 transition-opacity active:opacity-60"
         style={{
           background: BIZ.card,
-          border: `2px dashed ${BIZ.hairDashed}`,
-          borderRadius: BIZ.rCard,
+          border: '1px solid #EDF0F3',
+          borderRadius: 16,
+          padding: '15px 16px',
+          minHeight: 44,
         }}
       >
-        {/* Icon in muted circle */}
-        <div
-          className="w-10 h-10 flex items-center justify-center shrink-0"
-          style={{
-            background: BIZ.hairSoft,
-            border: `1px solid ${BIZ.hair}`,
-            borderRadius: BIZ.rInner,
-          }}
-        >
-          <Plus className="w-5 h-5" style={{ color: BIZ.inkMute }} />
-        </div>
-
-        <div className="flex-1 min-w-0 text-left">
-          <p className="text-[14px] font-semibold" style={{ color: BIZ.ink }}>
-            Add another business
-          </p>
-          <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
-            Create a new business profile
-          </p>
-        </div>
-
-        <ChevronRight className="w-5 h-5 shrink-0" style={{ color: BIZ.inkMute }} />
+        <Plus className="shrink-0" style={{ width: 16, height: 16, color: BIZ.inkMute }} />
+        <span className="flex-1 text-left" style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}>
+          {t('business.card.addAnother')}
+        </span>
+        <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />
       </button>
     </motion.div>
   );
 }
+

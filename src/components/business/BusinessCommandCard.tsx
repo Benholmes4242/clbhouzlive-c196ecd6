@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
@@ -59,7 +61,9 @@ export function BusinessCommandCard({
   onRequestDelete,
 }: BusinessCommandCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
 
 
 
@@ -102,11 +106,9 @@ export function BusinessCommandCard({
   const needsDomainVerification =
     verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // Format stat display — "-" for zero/empty (never fabricate).
-  const formatStat = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '-';
-    return formatNumber(value);
-  };
+  // NOTE: figure rendering lives in `MetricCell`. Loading and absent render
+  // NOTHING; a genuine 0 renders "0" — zero visits is a fact, not a gap.
+
 
   const locationDisplay = getCityCountry({
     city: business.city,
@@ -117,9 +119,12 @@ export function BusinessCommandCard({
 
   const hasPendingRequests = (pendingRequestsCount ?? 0) > 0;
 
-  // Verify-banner label per state.
+  // Status-line label per state. Only the 'none' case changed with the new
+  // anatomy ("Not verified" + " - earn the badge" tail + quiet action); every
+  // other state keeps its existing copy.
   const verifyLabel = (() => {
-    if (verificationState === 'none') return 'Get verified';
+    if (verificationState === 'none') return t('business.card.verify.notVerified');
+
     if (verificationState === 'pending') {
       return needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification';
     }
@@ -351,77 +356,95 @@ export function BusinessCommandCard({
               <div style={{ height: '0.5px', background: BIZ.hair }} />
 
               <div className="p-4 pt-3 space-y-3">
-                {/* Verify banner */}
+                {/* Verify status line — treatment only; copy per state is unchanged.
+                    No gradient, no tint, no bordered tile, no amber chevron. */}
                 {!isVerified && (
                   <button
                     type="button"
                     onClick={() => goto('/verification')}
-                    className="w-full flex items-center gap-3 p-3 active:opacity-90 transition-opacity"
-                    style={{
-                      background: `linear-gradient(90deg, ${BIZ.amberTint} 0%, rgba(247,147,30,0.04) 100%)`,
-                      border: `1px solid ${BIZ.amberHair}`,
-                      borderRadius: BIZ.rInner,
-                    }}
+                    className="w-full flex items-center gap-2 active:opacity-70 transition-opacity"
+                    style={{ background: 'transparent', border: 'none', minHeight: 44 }}
                   >
+                    <ShieldCheck className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute }} />
+                    <span className="flex-1 text-left min-w-0">
+                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 800 }}>
+                        {verifyLabel}
+                      </span>
+                      {verificationState === 'none' && (
+                        <span style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500 }}>
+                          {t('business.card.verify.tail')}
+                        </span>
+                      )}
+                    </span>
                     <span
-                      className="shrink-0 flex items-center justify-center"
+                      className="shrink-0 inline-flex items-center gap-0.5"
                       style={{
-                        width: 32, height: 32,
-                        background: '#fff',
-                        border: `1px solid ${BIZ.amberHair}`,
-                        borderRadius: 10,
+                        color: BIZ.ink,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
                       }}
                     >
-                      <ShieldCheck className="h-4 w-4" style={{ color: BIZ.amber }} />
+                      {t('business.card.verify.action')}
+                      <ChevronRight style={{ width: 11, height: 11 }} />
                     </span>
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="truncate" style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}>
-                        {verifyLabel}
-                      </div>
-                      {verificationState === 'none' && (
-                        <div style={{ color: 'rgba(15,23,42,0.60)', fontSize: 12, fontWeight: 500, marginTop: 2 }}>
-                          Earn the badge and win golfers&apos; trust.
-                        </div>
-                      )}
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 self-center" style={{ color: BIZ.amber }} />
                   </button>
                 )}
 
-                {/* Metrics — 3 tiles */}
-                <div className="grid grid-cols-3 gap-2">
-                  <MetricTile
-                    label="Visits (7d)"
-                    value={statsLoading ? '-' : formatStat(stats?.visits)}
+                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
+                <div
+                  style={{
+                    background: 'rgba(14,18,22,0.035)',
+                    borderRadius: 14,
+                    padding: '14px 12px 12px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+                  }}
+                >
+                  <MetricCell
+                    label={t('business.card.metrics.visits')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.visits}
+                    loading={statsLoading}
                     onClick={() => goto('/insights')}
                   />
-                  <MetricTile
-                    label="Followers"
-                    value={followersLoading ? '-' : formatStat(totalFollowers)}
+                  <MetricCell
+                    label={t('business.card.metrics.followers')}
+                    window={t('business.card.metrics.allTime')}
+                    value={totalFollowers}
+                    loading={followersLoading}
                     onClick={() => goto('/followers')}
                   />
-                  <MetricTile
-                    label="Impressions (7d)"
-                    value={statsLoading ? '-' : formatStat(stats?.impressions)}
+                  <MetricCell
+                    label={t('business.card.metrics.impressions')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.impressions}
+                    loading={statsLoading}
                     onClick={() => goto('/insights')}
                   />
                 </div>
 
-                {/* Action rows */}
-                <div
-                  style={{
-                    background: BIZ.card,
-                    border: `1px solid ${BIZ.hair}`,
-                    borderRadius: BIZ.rInner,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
-                  <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
+                {/* Actions — heading, then rows with no rules and no icon tiles. */}
+                <div>
+                  <div
+                    style={{
+                      color: BIZ.inkFaint,
+                      fontSize: 9,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      marginBottom: 2,
+                    }}
+                  >
+                    {t('business.card.manage')}
+                  </div>
+                  <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
+                  <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
                   {hasCourse && (
                     <ActionRow
                       icon={Star}
-                      label="Reviews"
+                      label={t('business.card.actions.reviews')}
                       onClick={() => goto('/reviews')}
                       hint={
                         avgReviewRating != null
@@ -434,14 +457,15 @@ export function BusinessCommandCard({
                   {canManage && (
                     <ActionRow
                       icon={Users}
-                      label="Manage team"
+                      label={t('business.card.actions.team')}
                       onClick={() => goto('/team')}
                       badge={hasPendingRequests}
                     />
                   )}
-                  <ActionRow icon={Eye} label="View live profile" onClick={() => goto('')} last />
+                  <ActionRow icon={Eye} label={t('business.card.actions.viewProfile')} onClick={() => goto('')} />
                 </div>
               </div>
+
             </motion.div>
           )}
         </AnimatePresence>
@@ -458,54 +482,78 @@ export function BusinessCommandCard({
 }
 
 
-/* ─────────────────────── sub-components ─────────────────────── */
+/* ─────────────────────── sub-components ───────────────────────
+   Both are LOCAL to this file — no other importers. */
 
-function MetricTile({
+/** 6px marks on white fail contrast at BIZ.amber, so the dot deepens. */
+const AMBER_DEEP = '#C2620A';
+
+/**
+ * One metric cell inside the shared inset. Three states, three renderings:
+ * loading -> nothing, null/undefined -> nothing, 0 -> "0", else formatted.
+ * The figure sits in a fixed 26px box so the panel cannot jump on arrival.
+ */
+function MetricCell({
   label,
+  window: windowLabel,
   value,
+  loading,
   onClick,
 }: {
   label: string;
-  value: string;
+  window: string;
+  value: number | null | undefined;
+  loading: boolean;
   onClick?: () => void;
 }) {
-  const isEmpty = value === '-';
+  const figure =
+    loading || value === null || value === undefined ? '' : formatNumber(value);
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="text-left active:opacity-70 transition-opacity"
-      style={{
-        background: BIZ.card,
-        border: `1px solid ${BIZ.hair}`,
-        borderRadius: 12,
-        padding: '12px 12px 11px',
-      }}
+      className="flex flex-col items-center justify-start active:opacity-70 transition-opacity"
+      style={{ background: 'transparent', border: 'none', minHeight: 44 }}
     >
-      <div
-        className="tabular-nums"
+      <span
         style={{
-          color: isEmpty ? BIZ.inkMute : BIZ.ink,
-          fontSize: 20,
+          color: BIZ.inkFaint,
+          fontSize: 8,
           fontWeight: 800,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.1,
-        }}
-      >
-        {value}
-      </div>
-      <div
-        className="mt-1"
-        style={{
-          color: BIZ.inkMute,
-          fontSize: 11,
-          fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.04em',
+          letterSpacing: '0.08em',
+          lineHeight: 1,
         }}
       >
         {label}
-      </div>
+      </span>
+      <span
+        className="tabular-nums flex items-center"
+        style={{
+          height: 26,
+          color: BIZ.ink,
+          fontSize: 21,
+          fontWeight: 800,
+          letterSpacing: '-0.03em',
+          lineHeight: 1,
+          fontFeatureSettings: '"kern" 1, "liga" 1',
+        }}
+      >
+        {figure}
+      </span>
+      <span
+        style={{
+          color: BIZ.inkFaint,
+          fontSize: 7,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          lineHeight: 1,
+        }}
+      >
+        {windowLabel}
+      </span>
     </button>
   );
 }
@@ -516,40 +564,25 @@ function ActionRow({
   onClick,
   badge = false,
   hint,
-  last = false,
 }: {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   onClick: () => void;
   badge?: boolean;
   hint?: string;
-  last?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-3 active:bg-black/[0.03] transition-colors"
-      style={{
-        borderBottom: last ? 'none' : `0.5px solid ${BIZ.hair}`,
-        background: 'transparent',
-        minHeight: 52,
-      }}
+      className="w-full flex items-center gap-2.5 active:opacity-60 transition-opacity"
+      style={{ background: 'transparent', border: 'none', minHeight: 46 }}
     >
-      <span
-        className="shrink-0 flex items-center justify-center"
-        style={{
-          width: 32, height: 32,
-          background: BIZ.fill,
-          border: `1px solid ${BIZ.hair}`,
-          borderRadius: 10,
-        }}
-      >
-        <Icon className="h-4 w-4" style={{ color: BIZ.ink }} />
-      </span>
+      {/* Inline glyph as a category marker — no ornamental tile. */}
+      <Icon className="shrink-0" style={{ width: 15, height: 15, color: BIZ.inkMute }} />
       <span
         className="flex-1 text-left"
-        style={{ color: BIZ.ink, fontSize: 14, fontWeight: 600 }}
+        style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}
       >
         {label}
       </span>
@@ -559,10 +592,14 @@ function ActionRow({
         </span>
       )}
       {badge && (
-        <span className="h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+        <span
+          className="rounded-full shrink-0"
+          style={{ width: 6, height: 6, background: AMBER_DEEP }}
+        />
       )}
-      <ChevronRight className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+      <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />
     </button>
   );
 }
+
 

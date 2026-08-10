@@ -339,6 +339,29 @@
           "tail": "views, follows and engagement"
         }
       }
+    },
+    "card": {
+      "manage": "MANAGE",
+      "addAnother": "Add another business",
+      "metrics": {
+        "visits": "Visits",
+        "followers": "Followers",
+        "impressions": "Impressions",
+        "last7Days": "Last 7 days",
+        "allTime": "All time"
+      },
+      "verify": {
+        "tail": " - earn the badge",
+        "action": "Get verified",
+        "notVerified": "Not verified"
+      },
+      "actions": {
+        "edit": "Edit profile",
+        "insights": "Insights",
+        "reviews": "Reviews",
+        "team": "Manage team",
+        "viewProfile": "View live profile"
+      }
     }
   },
   "handicap": {
