@@ -892,7 +892,7 @@ export default function VerificationFlowSheet({
                       </div>
                     );
                   })}
-                </RadioGroup>
+                </div>
 
                 {exclusivityError && (
                   <p className="text-[12px] text-destructive bg-destructive/10 p-3 rounded-lg mt-3">
