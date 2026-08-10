@@ -135,8 +135,13 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         marginRight: -SIDE,
         paddingLeft: SIDE,
         paddingRight: SIDE,
+        // width must grow by BOTH insets, otherwise `width: 100%` measures the
+        // parent's content box: the wash reaches the left edge but stops 16px
+        // short on the right, and every column shifts left with it.
+        width: `calc(100% + ${SIDE * 2}px)`,
       }
     : {};
+
 
   return (
     <Tag
