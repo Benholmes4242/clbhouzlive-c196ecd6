@@ -889,35 +889,27 @@ function HandicapRow({
 
   return (
     <div style={{ fontFamily: GEIST }}>
-      <Label>Handicap</Label>
+      <FieldLabel>Handicap</FieldLabel>
+      {/* The helper reads BEFORE the button - it explains why you would tap it. */}
+      <p style={{ fontSize: 12, color: INK_55, margin: '0 4px 12px', lineHeight: 1.5 }}>
+        {HELPER_COPY}
+      </p>
       <button
         onClick={onOpenConnect}
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          padding: '12px 16px', borderRadius: 12,
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          minHeight: 46, padding: '12px 16px', borderRadius: 999,
           background: INK, color: '#fff', border: 'none',
-          fontSize: 15, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
+          fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
         }}
       >
         Connect official handicap
-        <ArrowRight size={18} strokeWidth={2.4} />
       </button>
-      <p style={{ fontSize: 12, color: INK_55, margin: '10px 4px 14px', lineHeight: 1.5 }}>
-        {HELPER_COPY}
-      </p>
-      <p style={{ fontSize: 13, color: INK_55, margin: '4px 4px 0', lineHeight: 1.5, textAlign: 'center' }}>
-        Don't have an official WHS handicap?{' '}
-        <button
-          onClick={onToggleManualEntry}
-          style={{
-            background: 'transparent', border: 'none', padding: 0,
-            fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST,
-            cursor: 'pointer', textDecoration: 'underline',
-          }}
-        >
-          {showManualEntry ? 'Hide manual entry' : 'Enter yours manually'}
-        </button>
-      </p>
+      <div style={{ marginTop: 4 }}>
+        <QuietAction center onClick={onToggleManualEntry}>
+          {showManualEntry ? 'Hide manual entry' : 'Enter a handicap manually'}
+        </QuietAction>
+      </div>
       {showManualEntry && (
         <div style={{ marginTop: 12 }}>
           <HandicapInput value={form.handicapIndex} onChange={onChange} />
@@ -925,4 +917,5 @@ function HandicapRow({
       )}
     </div>
   );
+
 }
