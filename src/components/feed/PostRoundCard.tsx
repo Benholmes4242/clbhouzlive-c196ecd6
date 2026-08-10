@@ -282,7 +282,6 @@ export const PostRoundCard: React.FC<Props> = ({
   // transparent and never applies a backdrop filter of its own.
   const panelStyle: React.CSSProperties = {
     background: 'transparent',
-    borderTop: `1px solid ${HAIRLINE}`,
     padding: '14px 14px 16px',
   };
 

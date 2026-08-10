@@ -437,7 +437,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         overflow: 'hidden',
         marginInline: 0,
         position: 'relative',
-        borderTop: `1px solid ${LINE}`,
+        // The first card continues the header zone's surface — a rule there
+        // would read as a seam under the island. Later cards keep the hairline
+        // above them (paired with the inter-post gap).
+        borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
       }}
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}

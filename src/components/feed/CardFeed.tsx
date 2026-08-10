@@ -38,8 +38,13 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
+import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
 
 const CANVAS = '#05070A';
+/** Post slab colour (FeedCard CARD). The resting header zone paints this so
+ *  the safe area, the island's surroundings and the first post are ONE
+ *  continuous surface — no step, no seam. */
+const SLAB = '#10151C';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -479,6 +484,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       const inst = Math.abs(dy) / dt;
       scrollVelocityRef.current = scrollVelocityRef.current * 0.5 + inst * 0.5;
       if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
+      // Island edge signal — reuses THIS listener (see islandEdge.ts).
+      setIslandEdgeScrolled(st > 8);
       lastScrollTopRef.current = st;
       lastScrollTsRef.current = now;
       if (raf) return;
@@ -773,7 +780,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
   const components = useMemo(
     () => ({
-      Header: () => <div style={{ height: 0, paddingTop: topPadding }} />,
+      Header: () => (
+        <div style={{ height: 0, paddingTop: topPadding, background: SLAB }} />
+      ),
       Footer: () => (
         <>
           {isFetchingNextPage && (
