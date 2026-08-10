@@ -317,6 +317,16 @@ export default function VerificationFlowSheet({
     setDocKind(null);
   }
 
+  /** How many of the five confirmed details the business has not set. */
+  const missingDetailCount = [
+    business?.name,
+    business?.category,
+    business?.location,
+    business?.website,
+    business?.email,
+  ].filter((v) => !v || !String(v).trim()).length;
+
+
   /** Proof selection. Unchanged behaviour from the previous RadioGroup handler. */
   function chooseProof(v: ProofMethod) {
     setSelectedProof(v);
