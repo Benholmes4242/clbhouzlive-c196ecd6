@@ -200,36 +200,43 @@ const StreakRowView: React.FC<{
           <div
             style={{
               fontSize: 13.5,
-              fontWeight: 700,
+              fontWeight: 600,
               color: CHART.INK,
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.015em',
               lineHeight: 1.3,
             }}
           >
             {t(`streaks.type.${type}.label`)}
           </div>
-          <div style={{ marginTop: 3, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, lineHeight: 1.4 }}>
+          <div style={{ ...LABEL, marginTop: 4, fontSize: 7, letterSpacing: '0.14em', lineHeight: 1.5 }}>
             {t(`streaks.type.${type}.explainer`)}
           </div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: figureColour,
-              ...TABULAR,
-            }}
-          >
-            {current}
+          {/* The one comparison the row exists for, as ONE figure pair. */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 3 }}>
+            <span
+              style={{
+                fontSize: 19,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                color: figureColour,
+                ...TABULAR,
+              }}
+            >
+              {current}
+            </span>
+            {best > 0 && (
+              <span style={{ fontSize: 12, fontWeight: 400, color: CHART.DIM, ...TABULAR }}>
+                / {best}
+              </span>
+            )}
           </div>
           <div style={{ ...LABEL, marginTop: 2 }}>{unitLabel(current)}</div>
         </div>
       </div>
 
-      {/* A streak IS the relationship between now and the record, so the row
-          shows it as progress rather than two unrelated figures. */}
+      {/* current / best - where you stand against your own record. */}
       {state === 'active' && best > 0 && (
         <div style={{ marginTop: 10 }}>
           <Bar pct={(current / best) * 100} color={atBest ? CHART.DOWN : CHART.AMBER} />
@@ -246,21 +253,23 @@ const StreakRowView: React.FC<{
               ? settingItNow
                 ? t('streaks.settingItNow')
                 : t('streaks.atYourBest')
-              : t('streaks.fromYourBest', { n: best - current, best })}
-
+              : t('streaks.moreToBeatIt', { n: best - current + 1 })}
           </div>
         </div>
       )}
 
       {state === 'lapsed' && (
-        <div style={{ marginTop: 8, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, ...TABULAR }}>
-          {row?.best_ended_at
-            ? t('streaks.brokenLine', {
-                n: best,
-                unit: unitLabel(best),
-                when: relativeTime(row.best_ended_at),
-              })
-            : t('streaks.bestLine', { n: best, unit: unitLabel(best) })}
+        <div style={{ marginTop: 10 }}>
+          <RecordTrack />
+          <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, ...TABULAR }}>
+            {row?.best_ended_at
+              ? t('streaks.brokenLine', {
+                  n: best,
+                  unit: unitLabel(best),
+                  when: relativeTime(row.best_ended_at),
+                })
+              : t('streaks.bestLine', { n: best, unit: unitLabel(best) })}
+          </div>
         </div>
       )}
 
@@ -269,6 +278,7 @@ const StreakRowView: React.FC<{
           {t('streaks.notStartedYet')}
         </div>
       )}
+
 
       {/* Freezes are a number, not a badge. They auto-apply on a missed week. */}
       {freeze > 0 && (
