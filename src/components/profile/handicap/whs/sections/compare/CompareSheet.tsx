@@ -490,7 +490,7 @@ export const CompareSheet: React.FC<Props> = ({
         justifyContent: 'center',
         color: CHART.INK,
         fontSize: 15,
-        fontWeight: 800,
+        fontWeight: 700,
         flexShrink: 0,
       }}
     >
@@ -584,7 +584,7 @@ export const CompareSheet: React.FC<Props> = ({
               style={{
                 marginTop: 3,
                 fontSize: 17,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: CHART.INK,
                 letterSpacing: '-0.01em',
               }}
