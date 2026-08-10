@@ -119,9 +119,12 @@ export function BusinessCommandCard({
 
   const hasPendingRequests = (pendingRequestsCount ?? 0) > 0;
 
-  // Verify-banner label per state.
+  // Status-line label per state. Only the 'none' case changed with the new
+  // anatomy ("Not verified" + " - earn the badge" tail + quiet action); every
+  // other state keeps its existing copy.
   const verifyLabel = (() => {
-    if (verificationState === 'none') return 'Get verified';
+    if (verificationState === 'none') return t('business.card.verify.notVerified');
+
     if (verificationState === 'pending') {
       return needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification';
     }
