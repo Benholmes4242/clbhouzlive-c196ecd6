@@ -22,7 +22,9 @@
  * - With no recent unlocks the rows section renders NOTHING - the Panel is the
  *   figures row plus the Action. There is no empty state.
  * - TITLES self-hides at zero and the figures row rebalances.
- * - The chase line renders NOTHING when there is no live chase.
+ * - The chase line renders NOTHING when there is no live chase. A zero gap is
+ *   a TIE, described as such, and only shown when no real chase exists. The
+ *   chosen row rotates daily from the closest five.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +38,7 @@ import { useLegendPulse, type LegendPulseRow } from '@/hooks/gam/useLegendPulse'
 import { formatLegendGap } from '@/lib/gam/visuals';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { openGamAchievements, openAllStreaks } from '../gam/events';
-import { CHART, CHART_FONT, LABEL_STYLE } from '../charts';
+import { CHART, CHART_FONT } from '../charts';
 import { formatRelativeAgo } from '@/i18n/format';
 
 const MAX_ROWS = 3;
@@ -47,14 +49,64 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
+/**
+ * Dark-surface variant of the business type scale. LOCAL on purpose: the shared
+ * chart LABEL_STYLE renders at weight 800 and 0.13em, and nothing in this tile
+ * renders at 800. CHART tokens are used, never repointed.
+ */
+const KICKER: React.CSSProperties = {
+  fontFamily: CHART_FONT,
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.19em',
+  textTransform: 'uppercase',
+  color: CHART.INK,
+};
+
+const LABEL: React.CSSProperties = {
+  fontFamily: CHART_FONT,
+  fontSize: 8,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: CHART.DIM,
+};
+
+const BODY: React.CSSProperties = {
+  fontFamily: CHART_FONT,
+  fontSize: 12.5,
+  fontWeight: 400,
+  lineHeight: 1.45,
+  color: CHART.MUTE,
+};
+
 const figureStyle: React.CSSProperties = {
-  fontSize: 28,
-  fontWeight: 800,
+  fontSize: 30,
+  fontWeight: 700,
   lineHeight: 1,
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.04em',
   color: CHART.INK,
   fontVariantNumeric: 'tabular-nums',
 };
+
+/**
+ * djb2. There is no exported seed helper in the app - the only other daily
+ * seed (useHoleMedia) keeps its own local copy - so this is a second local one
+ * rather than a new shared module for one call site.
+ */
+function djb2(input: string): number {
+  let h = 5381;
+  for (let i = 0; i < input.length; i++) h = ((h << 5) + h + input.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+/** Local calendar day, so the row is stable within a day and moves at midnight. */
+function todayKey(d: Date = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+const CHASE_POOL = 5;
 
 /**
  * MOVED from the deleted LegendPulseTicker. `formatLegendGap` returns a
@@ -91,15 +143,42 @@ export const AchievementsPanel: React.FC<Props> = ({
   // the viewer's business and the RPC is viewer-scoped.
   const { data: pulse } = useLegendPulse(isFriend ? undefined : userId);
 
-  const nearestChase = React.useMemo(() => {
-    const chases = (pulse ?? []).filter(
-      (p) => p.kind === 'chase' && p.gap_to_first != null,
+  /**
+   * D1 - a zero gap is a TIE, not a chase. Two disjoint sets:
+   *   chase = gap_to_first > 0   (actionable, always preferred)
+   *   level = gap_to_first === 0 (the consolation, only when no chase exists)
+   * Null gaps and viewer_rank 1 are discarded here as well as in the RPC.
+   *
+   * D3 - the closest FIVE chases form a pool and ONE is picked from a seed of
+   * the member id and the local date, so the line rotates daily and is
+   * identical on every render within a day. A pool of one is a no-op.
+   */
+  const chaseState = React.useMemo(() => {
+    const eligible = (pulse ?? []).filter(
+      (p) =>
+        p.kind === 'chase' &&
+        p.gap_to_first != null &&
+        p.viewer_rank !== 1,
     );
-    if (chases.length === 0) return null;
-    return [...chases].sort(
-      (a, b) => Math.abs(a.gap_to_first ?? 0) - Math.abs(b.gap_to_first ?? 0),
-    )[0];
-  }, [pulse]);
+    const chases = eligible
+      .filter((p) => Math.abs(p.gap_to_first ?? 0) > 0)
+      .sort((a, b) => Math.abs(a.gap_to_first ?? 0) - Math.abs(b.gap_to_first ?? 0))
+      .slice(0, CHASE_POOL);
+
+    if (chases.length > 0) {
+      const idx = djb2(`${userId}-${todayKey()}`) % chases.length;
+      return { mode: 'chase' as const, row: chases[idx] };
+    }
+
+    const level = eligible
+      .filter((p) => Math.abs(p.gap_to_first ?? 0) === 0)
+      .slice(0, CHASE_POOL);
+    if (level.length > 0) {
+      const idx = djb2(`${userId}-${todayKey()}`) % level.length;
+      return { mode: 'level' as const, row: level[idx] };
+    }
+    return null;
+  }, [pulse, userId]);
 
   const trophies = React.useMemo(
     () => (achievements ?? []).filter((b) => b.is_earned).length,
@@ -115,6 +194,7 @@ export const AchievementsPanel: React.FC<Props> = ({
   }, [streaks]);
 
   const rows = (unlocks ?? []).slice(0, MAX_ROWS);
+  const titlesVisible = (titlesHeld ?? 0) > 0;
 
   const kicker = isFriend
     ? ownerFirstName
@@ -143,7 +223,7 @@ export const AchievementsPanel: React.FC<Props> = ({
             gap: 12,
           }}
         >
-          <span style={{ ...LABEL_STYLE, color: CHART.MUTE }}>{kicker}</span>
+          <span style={KICKER}>{kicker}</span>
           <button
             type="button"
             onClick={() => openGamAchievements()}
@@ -156,8 +236,8 @@ export const AchievementsPanel: React.FC<Props> = ({
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              ...LABEL_STYLE,
-              color: CHART.AMBER,
+              ...KICKER,
+              color: CHART.INK,
             }}
           >
             {t('handicap.achievements.trophyRoom')}
@@ -165,11 +245,18 @@ export const AchievementsPanel: React.FC<Props> = ({
           </button>
         </div>
 
-        {/* Figures */}
-        <div style={{ display: 'flex', gap: 32, marginTop: 14 }}>
+        {/* Figures - a real grid so the digits and their labels align (D5). */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${titlesVisible ? 3 : 2}, minmax(0, 1fr))`,
+            gap: 12,
+            marginTop: 14,
+          }}
+        >
           <div>
             <div style={figureStyle}>{trophies}</div>
-            <div style={{ ...LABEL_STYLE, marginTop: 6 }}>{t('handicap.trophies.label')}</div>
+            <div style={{ ...LABEL, marginTop: 8 }}>{t('handicap.trophies.label')}</div>
           </div>
           {bestStreak != null && (
             <button
@@ -186,33 +273,33 @@ export const AchievementsPanel: React.FC<Props> = ({
               }}
             >
               <div style={figureStyle}>{bestStreak}</div>
-              <div style={{ ...LABEL_STYLE, marginTop: 6 }}>{t('handicap.achievements.streak')}</div>
+              <div style={{ ...LABEL, marginTop: 8 }}>{t('handicap.achievements.streak')}</div>
             </button>
           )}
           {/* B1 - TITLES. Self-hides at zero; the row rebalances to two. */}
-          {(titlesHeld ?? 0) > 0 && (
+          {titlesVisible && (
             <div>
               <div style={figureStyle}>{titlesHeld}</div>
-              <div style={{ ...LABEL_STYLE, marginTop: 6 }}>
+              <div style={{ ...LABEL, marginTop: 8 }}>
                 {t('handicap.achievements.titles')}
               </div>
             </div>
           )}
         </div>
 
-        {/* B2 - the nearest chase. ONE line, or nothing at all. */}
-        {nearestChase && (
+        {/* B2 - Tied / Behind / nothing at all. No rule inside the tile (D6). */}
+        {chaseState && (
           <button
             type="button"
             onClick={() => {
               analyticsEvents.track('handicap_chase_tapped', {
-                course_id: nearestChase.course_id,
-                category: nearestChase.category,
+                course_id: chaseState.row.course_id,
+                category: chaseState.row.category,
               });
-              navigate(`/courses/${nearestChase.course_id}`);
+              navigate(`/courses/${chaseState.row.course_id}`);
             }}
             style={{
-              marginTop: 14,
+              marginTop: 20,
               width: '100%',
               display: 'flex',
               alignItems: 'center',
@@ -220,33 +307,51 @@ export const AchievementsPanel: React.FC<Props> = ({
               gap: 10,
               background: 'none',
               border: 'none',
-              borderTop: `1px solid ${CHART.BORDER}`,
-              padding: '12px 0 0',
+              padding: 0,
               textAlign: 'left',
               cursor: 'pointer',
               fontFamily: CHART_FONT,
             }}
           >
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: CHART.INK,
-                letterSpacing: '-0.005em',
-                lineHeight: 1.3,
-                minWidth: 0,
-              }}
-            >
-              {t('handicap.achievements.chase', {
-                n: buildChaseHeadline(nearestChase).n,
-                unit: buildChaseHeadline(nearestChase).unit,
-                course: nearestChase.course_name,
-              })}
+            <span style={{ minWidth: 0 }}>
+              <span style={{ ...LABEL, display: 'block' }}>
+                {chaseState.mode === 'level'
+                  ? t('handicap.achievements.levelKicker')
+                  : t('handicap.achievements.chaseKicker')}
+              </span>
+              {chaseState.mode === 'chase' && (
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 5,
+                    marginTop: 6,
+                  }}
+                >
+                  <span style={figureStyle}>{buildChaseHeadline(chaseState.row).n}</span>
+                  <span style={{ ...LABEL, color: CHART.MUTE }}>
+                    {buildChaseHeadline(chaseState.row).unit}
+                  </span>
+                </span>
+              )}
+              <span style={{ ...BODY, display: 'block', marginTop: 6 }}>
+                {t(
+                  chaseState.mode === 'level'
+                    ? 'handicap.achievements.levelLine'
+                    : 'handicap.achievements.chaseLine',
+                  {
+                    name:
+                      chaseState.row.counterparty_name ||
+                      t('handicap.achievements.leaderFallback'),
+                    course: chaseState.row.course_name,
+                  },
+                )}
+              </span>
             </span>
             <ChevronRight
               size={15}
               strokeWidth={2.4}
-              color={CHART.AMBER}
+              color={CHART.DIM}
               style={{ flexShrink: 0 }}
             />
           </button>
@@ -272,7 +377,7 @@ export const AchievementsPanel: React.FC<Props> = ({
               >
                 <div style={{ minWidth: 0 }}>
                   {i === 0 && (
-                    <div style={{ ...LABEL_STYLE, color: CHART.AMBER, marginBottom: 4 }}>
+                    <div style={{ ...LABEL, color: CHART.INK, marginBottom: 4 }}>
                       {t('handicap.achievements.justUnlocked')}
                     </div>
                   )}
@@ -287,19 +392,12 @@ export const AchievementsPanel: React.FC<Props> = ({
                   >
                     {u.title}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: CHART.MUTE,
-                      marginTop: 2,
-                      lineHeight: 1.35,
-                    }}
-                  >
+                  <div style={{ ...BODY, marginTop: 2 }}>
                     {u.description}
                   </div>
-                  <div style={{ ...LABEL_STYLE, marginTop: 6 }}>{u.rarity}</div>
+                  <div style={{ ...LABEL, marginTop: 8 }}>{u.rarity}</div>
                 </div>
-                <span style={{ ...LABEL_STYLE, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                <span style={{ ...LABEL, flexShrink: 0, whiteSpace: 'nowrap' }}>
                   {formatRelativeAgo(u.occurred_at, { yesterday: true })}
                 </span>
               </div>
