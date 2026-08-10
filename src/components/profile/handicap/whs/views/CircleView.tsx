@@ -71,12 +71,12 @@ export const CircleView: React.FC<Props> = ({
       {/* 2. Compare - shown in friend view, where it carries no rows */}
       <CompareEntryPanel viewerUserId={userId} readOnly={readOnly} />
 
-      {/* 3. Friends' rounds - owner only */}
-      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
+      {/* 3. Invite - owner only. Three friends invited directly; "See all"
+          opens the canonical InviteFriendsSheet via the app-wide provider. */}
+      {!readOnly && <CircleInviteAction ownerUserId={userId} />}
 
-      {/* 4. Invite - owner only. One canonical surface: the action opens
-          InviteFriendsSheet via the app-wide provider. */}
-      {!readOnly && <CircleInviteAction />}
+      {/* 4. Friends' rounds - owner only. The endless list goes last. */}
+      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
     </div>
   );
 };
