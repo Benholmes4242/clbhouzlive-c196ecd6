@@ -125,11 +125,22 @@ export function useMemberTapResolver() {
       if (state.kind === 'clbhouz_not_synced') {
         // ALREADY A MEMBER, just no official handicap connected. An
         // invite-to-clbhouz sheet here would be telling an existing member
-        // to join, so this is the nudge instead.
-        const handle = snapshot.profile.username ?? targetUserId;
-        navigate(`/profile/${handle}?compose=nudge_sync`);
+        // to join, so this opens a direct thread with an editable draft
+        // instead. The draft is never sent automatically.
+        //
+        // THE SENDER IS FORCED PERSONAL. The member may be acting as a
+        // business elsewhere in the app; a nudge about someone's handicap can
+        // only come from the person.
+        await startConversation(
+          { actorType: 'personal', actorId: targetUserId },
+          t('handicap.circle.nudge.draft', {
+            name: getFirstName(snapshot.profile.display_name ?? snapshot.profile.username ?? ''),
+          }),
+          { asActor: { actorType: 'personal', actorId: viewerId } },
+        );
         return;
       }
+
 
       navigate(compareRouteFor(targetUserId));
     },
