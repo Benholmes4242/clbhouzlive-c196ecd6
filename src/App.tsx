@@ -683,6 +683,7 @@ function AppRoutes() {
         <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
 
 
+        <Route path="/__fr" element={<FRHarness />} />
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
