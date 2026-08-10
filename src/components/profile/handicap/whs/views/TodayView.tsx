@@ -6,7 +6,6 @@ import TodayGreeting from '../sections/TodayGreeting';
 import AchievementsPanel from '../sections/AchievementsPanel';
 import LastRoundCard from '../sections/LastRoundCard';
 
-import Pattern14Card from '../sections/Pattern14Card';
 
 
 import NextRoundWatch from '../sections/NextRoundWatch';
