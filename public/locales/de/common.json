@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -261,12 +261,11 @@
         "ofCircleOwner": "of your circle",
         "ofCircleFriend": "of their circle"
       },
-      "rounds": {
-        "notOnClbhouz_one": "{{count}} Freund ist nicht bei clbhouz",
-        "notOnClbhouz_other": "{{count}} Freunde sind nicht bei clbhouz",
-        "inviteThem": "Einladen",
-        "noHandicap_one": "{{count}} Freund ist bei clbhouz ohne Handicap",
-        "noHandicap_other": "{{count}} Freunde sind bei clbhouz ohne Handicap"
+      "round": {
+        "invite": "Invite",
+        "askToSync": "Ask to sync",
+        "notOnClbhouz": "Not on clbhouz",
+        "noHandicap": "No handicap"
       }
     }
   }
