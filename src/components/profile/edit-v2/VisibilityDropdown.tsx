@@ -91,7 +91,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
 
                 {/* Title */}
                 <p className="text-sm font-semibold text-foreground text-center py-2">
-                  {label}
+                  {SHEET_TITLE}
                 </p>
 
                 {/* Options */}
