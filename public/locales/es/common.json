@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas autom\u00e1ticamente",
+      "title": "Publicar mis rondas automáticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -205,6 +205,15 @@
         "pendingInvites": "Invitaciones pendientes",
         "public": "Publico"
       }
+    }
+  },
+  "handicap": {
+    "achievements": {
+      "chaseKicker": "Al alcance",
+      "levelKicker": "Igualado con el #1",
+      "chaseLine": "por detras de {{name}} en {{course}}",
+      "levelLine": "Igualado con {{name}} en {{course}}",
+      "leaderFallback": "el lider"
     }
   }
 }
