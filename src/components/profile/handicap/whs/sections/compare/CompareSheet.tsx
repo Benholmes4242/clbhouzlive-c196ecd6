@@ -519,40 +519,12 @@ export const CompareSheet: React.FC<Props> = ({
   );
 
   /**
-   * The standing line, from the GROSS record.
-   *
-   * LEADER-FIRST: the record was always built viewer-first, so an opponent lead
-   * read "Danny leads by 2-4" - the leader's own figure second, as though they
-   * were losing. The record is now built from the leader's perspective.
-   *
-   * TIES RENDER WHEN THERE ARE ANY, and are omitted entirely when there are
-   * none - never a trailing "-0". Without them a record of 2-4 did not
-   * reconcile with the "7 rounds played" stated two rows below. An all-ties
-   * record is the LEVEL branch.
+   * standingLine() IS GONE. BRIEF_COMPARE_SHEET_DUEL fix 1: the sentence is
+   * replaced by CompareScoreboard, which states the same GROSS record - leader
+   * figures unchanged, ties still rendered when non-zero - as a fixture result.
    */
-  const standingLine = (): string => {
-    if (!h2h) return t('handicap.compare.noShared');
-    const { grossWins: wins, grossLosses: losses, grossTies: ties } = h2h;
-    const hasTies = ties > 0;
-    if (wins > losses) {
-      const n = `${wins}-${losses}`;
-      return hasTies
-        ? t('handicap.compare.youLeadByWithTies', { n, ties })
-        : t('handicap.compare.youLeadBy', { n });
-    }
-    if (losses > wins) {
-      // Leader's figure first.
-      const n = `${losses}-${wins}`;
-      const name = target?.name ?? '';
-      return hasTies
-        ? t('handicap.compare.theyLeadByWithTies', { name, n, ties })
-        : t('handicap.compare.theyLeadBy', { name, n });
-    }
-    const n = `${wins}-${losses}`;
-    return hasTies
-      ? t('handicap.compare.levelAtWithTies', { n, ties })
-      : t('handicap.compare.levelAt', { n });
-  };
+
+
 
   return (
     <BottomSheet
