@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,32 +81,61 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "ラウンドを自動的に投稿",
-      "subtitle": "記録したラウンドはクラブハウスに表示されます。特筆すべきラウンドのみ、フォロワー以外にも届きます。"
+      "title": "\u30e9\u30a6\u30f3\u30c9\u3092\u81ea\u52d5\u7684\u306b\u6295\u7a3f",
+      "subtitle": "\u8a18\u9332\u3057\u305f\u30e9\u30a6\u30f3\u30c9\u306f\u30af\u30e9\u30d6\u30cf\u30a6\u30b9\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002\u7279\u7b46\u3059\u3079\u304d\u30e9\u30a6\u30f3\u30c9\u306e\u307f\u3001\u30d5\u30a9\u30ed\u30ef\u30fc\u4ee5\u5916\u306b\u3082\u5c4a\u304d\u307e\u3059\u3002"
     }
   },
   "feed": {
     "crownCategory": {
-      "lowest_gross_all_time": "最少グロス",
-      "best_score_diff_all_time": "最高スコアディファレンシャル",
-      "best_stableford_all_time": "最高ステーブルフォード",
-      "most_aces_all_time": "ホールインワン最多",
-      "most_albatrosses_all_time": "アルバトロス最多",
-      "most_eagles_all_time": "イーグル最多",
-      "most_birdies_all_time": "バーディー最多"
+      "lowest_gross_all_time": "\u6700\u5c11\u30b0\u30ed\u30b9",
+      "best_score_diff_all_time": "\u6700\u9ad8\u30b9\u30b3\u30a2\u30c7\u30a3\u30d5\u30a1\u30ec\u30f3\u30b7\u30e3\u30eb",
+      "best_stableford_all_time": "\u6700\u9ad8\u30b9\u30c6\u30fc\u30d6\u30eb\u30d5\u30a9\u30fc\u30c9",
+      "most_aces_all_time": "\u30db\u30fc\u30eb\u30a4\u30f3\u30ef\u30f3\u6700\u591a",
+      "most_albatrosses_all_time": "\u30a2\u30eb\u30d0\u30c8\u30ed\u30b9\u6700\u591a",
+      "most_eagles_all_time": "\u30a4\u30fc\u30b0\u30eb\u6700\u591a",
+      "most_birdies_all_time": "\u30d0\u30fc\u30c7\u30a3\u30fc\u6700\u591a"
     }
   },
   "business": {
     "hero": {
-      "communityRating": "コミュニティ評価",
-      "ratings": "{{count}} 件の評価",
-      "edit": "編集",
-      "follow": "フォロー",
-      "following": "フォロー中",
-      "manage": "管理",
-      "verified": "認証済み",
-      "readMore": "続きを読む",
-      "readLess": "閉じる"
+      "communityRating": "\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u8a55\u4fa1",
+      "ratings": "{{count}} \u4ef6\u306e\u8a55\u4fa1",
+      "edit": "\u7de8\u96c6",
+      "follow": "\u30d5\u30a9\u30ed\u30fc",
+      "following": "\u30d5\u30a9\u30ed\u30fc\u4e2d",
+      "manage": "\u7ba1\u7406",
+      "verified": "\u8a8d\u8a3c\u6e08\u307f",
+      "readMore": "\u7d9a\u304d\u3092\u8aad\u3080",
+      "readLess": "\u9589\u3058\u308b"
+    },
+    "emptyState": {
+      "kicker": "FOR BUSINESSES",
+      "title": "clbhouz ni bijinesu wo tsuika",
+      "body": "Gorufa ga sudeni iru basho de todokimasu.",
+      "cta": "Bijinesu purofiru wo sakusei",
+      "footnote": "Muryo de setto appu. Yaku ippun desu.",
+      "guidanceHeading": "ERARERU MONO",
+      "reach": {
+        "courses": "COURSES",
+        "rounds": "ROUNDS",
+        "reviews": "REVIEWS",
+        "footnote": "MIDORI NO SUJI WA KAKO 30 NICHI",
+        "up": "kako 30 nichi de {{count}} zoka"
+      },
+      "benefits": {
+        "discoverable": {
+          "claim": "Mitsukete morau",
+          "tail": "kensaku to direkutori de"
+        },
+        "trust": {
+          "claim": "Shinrai wo kizuku",
+          "tail": "jissai no gorufa no rebyu de"
+        },
+        "reach": {
+          "claim": "Riichi wo miru",
+          "tail": "hyoji, forou, engejimento"
+        }
+      }
     }
   }
 }

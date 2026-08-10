@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas automáticamente",
+      "title": "Publicar mis rondas autom\u00e1ticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -108,6 +108,35 @@
       "verified": "Verificado",
       "readMore": "Leer mas",
       "readLess": "Leer menos"
+    },
+    "emptyState": {
+      "kicker": "PARA EMPRESAS",
+      "title": "Pon tu negocio en clbhouz",
+      "body": "Llega a los golfistas donde ya estan.",
+      "cta": "Crear perfil de empresa",
+      "footnote": "Gratis. Se tarda un minuto.",
+      "guidanceHeading": "QUE OBTIENES",
+      "reach": {
+        "courses": "CAMPOS",
+        "rounds": "RONDAS",
+        "reviews": "RESENAS",
+        "footnote": "LAS CIFRAS VERDES SON LOS ULTIMOS 30 DIAS",
+        "up": "mas {{count}} en los ultimos 30 dias"
+      },
+      "benefits": {
+        "discoverable": {
+          "claim": "Hazte visible",
+          "tail": "en la busqueda y el directorio"
+        },
+        "trust": {
+          "claim": "Genera confianza",
+          "tail": "con resenas de golfistas reales"
+        },
+        "reach": {
+          "claim": "Mide tu alcance",
+          "tail": "vistas, seguidores e interaccion"
+        }
+      }
     }
   }
 }

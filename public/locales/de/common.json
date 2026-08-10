@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -108,6 +108,35 @@
       "verified": "Verifiziert",
       "readMore": "Mehr lesen",
       "readLess": "Weniger lesen"
+    },
+    "emptyState": {
+      "kicker": "FUER UNTERNEHMEN",
+      "title": "Bringen Sie Ihr Unternehmen auf clbhouz",
+      "body": "Erreichen Sie Golfer dort, wo sie bereits sind.",
+      "cta": "Unternehmensprofil erstellen",
+      "footnote": "Kostenlos. Dauert etwa eine Minute.",
+      "guidanceHeading": "DAS ERHALTEN SIE",
+      "reach": {
+        "courses": "PLAETZE",
+        "rounds": "RUNDEN",
+        "reviews": "BEWERTUNGEN",
+        "footnote": "GRUENE ZAHLEN SIND DIE LETZTEN 30 TAGE",
+        "up": "plus {{count}} in den letzten 30 Tagen"
+      },
+      "benefits": {
+        "discoverable": {
+          "claim": "Gefunden werden",
+          "tail": "in der Suche und im Verzeichnis"
+        },
+        "trust": {
+          "claim": "Vertrauen aufbauen",
+          "tail": "mit Bewertungen echter Golfer"
+        },
+        "reach": {
+          "claim": "Reichweite sehen",
+          "tail": "Aufrufe, Follower und Interaktionen"
+        }
+      }
     }
   }
 }
