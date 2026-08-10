@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -205,6 +205,15 @@
         "pendingInvites": "Offene Einladungen",
         "public": "Oeffentlich"
       }
+    }
+  },
+  "handicap": {
+    "achievements": {
+      "chaseKicker": "In Reichweite",
+      "levelKicker": "Gleichauf mit #1",
+      "chaseLine": "hinter {{name}} auf {{course}}",
+      "levelLine": "Gleichauf mit {{name}} auf {{course}}",
+      "leaderFallback": "dem Spitzenreiter"
     }
   }
 }
