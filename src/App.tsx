@@ -1,4 +1,3 @@
-import FRHarness from '@/__FRHarness';
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
@@ -684,7 +683,6 @@ function AppRoutes() {
         <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
 
 
-        <Route path="/__fr" element={<FRHarness />} />
 
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
