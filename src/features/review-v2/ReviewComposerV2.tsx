@@ -383,8 +383,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const calibration = calibrationRank(composer.state.overall, myRatedQ.data);
 
 
-  const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const step = composer.step;
