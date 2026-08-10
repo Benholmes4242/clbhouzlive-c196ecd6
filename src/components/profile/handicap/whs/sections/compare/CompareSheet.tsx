@@ -31,6 +31,7 @@ import { useFriendLeaderboard, useSharedRounds, useSharedRoundCounts, useWhsConn
 import { useEntityPickerSearch } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { useCompareIdentities } from './useCompareIdentities';
+import { useCompareRecent } from './useCompareRecent';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { formatRelativeAgo } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
