@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
-import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
-import { Label } from '@/components/manage/ui';
+import { VisibilityRow, type VisibilityValue } from './VisibilityDropdown';
+import { FieldLabel } from '@/components/manage/fieldTreatment';
 
 interface Props {
   clubs: ClubEntry[];

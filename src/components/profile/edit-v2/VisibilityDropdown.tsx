@@ -132,3 +132,26 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
 
 export const visibilityLabel = (v: VisibilityValue) =>
   VISIBILITY_OPTIONS.find(o => o.value === v)?.label || 'Everyone';
+
+/**
+ * The visibility ROW: LABEL "Visible to" on the left, the quiet control on the
+ * right. This is what keeps the heading and the value on one line each.
+ */
+export const VisibilityRow: React.FC<{
+  value: VisibilityValue;
+  onChange: (v: VisibilityValue) => void;
+  disabled?: boolean;
+}> = ({ value, onChange, disabled }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      minHeight: 44,
+    }}
+  >
+    <span style={BIZ_LABEL}>{SHEET_TITLE}</span>
+    <VisibilityDropdown value={value} onChange={onChange} disabled={disabled} />
+  </div>
+);
