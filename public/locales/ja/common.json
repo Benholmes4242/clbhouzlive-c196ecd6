@@ -259,6 +259,13 @@
         "top": "Top",
         "ofCircleOwner": "of your circle",
         "ofCircleFriend": "of their circle"
+      },
+      "rounds": {
+        "notOnClbhouz_one": "{{count}} nin ha clbhouz mimeitoroku",
+        "notOnClbhouz_other": "{{count}} nin ha clbhouz mimeitoroku",
+        "inviteThem": "Shotai suru",
+        "noHandicap_one": "{{count}} nin ha handicap miren kei",
+        "noHandicap_other": "{{count}} nin ha handicap miren kei"
       }
     }
   }
