@@ -251,8 +251,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
   // Tapping Post opens page 1 immediately in its AWAITING state while the OS
   // source menu floats above it. Files chosen -> page 1 comes alive; picker
-  // cancelled -> page 2, caption-only. Edit / draft / course-prefill entries
-  // land straight on page 2.
+  // CANCELLED -> the member stays on the page-1 EMPTY STATE and can pick again
+  // or close. There is no route to page 2 without media on a fresh create.
+  // Edit / draft / course-prefill entries land straight on page 2.
+
   const isFreshCreate = !editPostId && !draftId;
   const [page, setPage] = useState<1 | 2>(
     isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
@@ -285,9 +287,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     }
   }, [isEditMode, draftId, initialMedia, addFiles]);
 
-  // Page 1 with no media is no longer a dark void: it renders the designed empty
-  // state, which owns both pick paths and a words-only escape. So there is no
-  // auto-fallthrough to page 2 on picker cancel any more.
+  // Page 1 with no media renders the designed empty state, which owns the two
+  // pick paths - camera and library - and NOTHING ELSE. A wizard post requires
+  // media, so there is no words-only escape and no fallthrough to page 2 on
+  // picker cancel: the member stays here until they choose files or close.
+
   const emptyStage = state.media.length === 0;
 
 
@@ -342,7 +346,13 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
 
   // Post button vs Save button gating.
-  const canSubmit = !submitting && !saving && (state.caption.trim().length > 0 || state.media.length > 0) && !!activeActor;
+
+  // CREATE requires media: a wizard post must carry at least one photo or video.
+  // The caption stays OPTIONAL (11% of posts have none).
+  // EDIT is deliberately exempt - posts published before this rule, and round
+  // posts, have no media and must still be saveable.
+  const canSubmit = !submitting && !saving && (isEditMode || state.media.length > 0) && !!activeActor;
+
 
   // Edit-mode: schedule row visible only for still-scheduled posts.
   const showScheduleRow = !isEditMode || editStatus?.status === 'scheduled';
@@ -835,12 +845,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   style={anchoredInputStyle}
                 />
               </div>
-              <button
-                onClick={() => setPage(2)}
-                style={{ background: 'transparent', border: 0, padding: '6px 0 0', fontSize: 12, fontWeight: 700, color: CT_DARK.mute, cursor: 'pointer' }}
-              >
-                Just write something
-              </button>
             </div>
           </div>
 

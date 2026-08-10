@@ -1,7 +1,9 @@
 // usePostSubmit - orchestrates create_post_v2 and hands media uploads to
 // the module-level postUploadController, which OUTLIVES the composer.
 //
-// Text-only:  one create_post_v2(has_media:false) round trip and we're done.
+// Text-only:  UNREACHABLE from the wizard since media became mandatory. The
+//             has_media:false branch is kept only for legacy/scheduled rows.
+
 // With media: create_post_v2(has_media:true) -> addPending/attachPostId ->
 //             startPostUpload(...) fires and returns synchronously so the
 //             composer can dismiss instantly. Controller finalizes later.
