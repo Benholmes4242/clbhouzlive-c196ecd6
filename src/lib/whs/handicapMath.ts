@@ -119,3 +119,51 @@ export function isReasonableGross(s: { adjusted_gross: number | null }): boolean
 export function isReasonableDiff(s: { handicap_differential: number | null }): boolean {
   return s.handicap_differential != null && s.handicap_differential >= MIN_REASONABLE_DIFF;
 }
+
+// ─── The comes-down-to scale ────────────────────────────────────────────────
+// A NEW DERIVATION from projectNextRound's outputs. It does not alter either
+// cutTarget or settleAt.
+//
+// A round better than the break-even target enters the top 8, so
+//   newIndex = (sumTop7 + newDiff) / 8 = current - (cutTarget - newDiff) / 8
+// The formula holds ONLY while the new round is inside the top 8, i.e. for
+// anything at or better than cutTarget. Never run it for a worse round.
+
+export interface ScaleRow {
+  /** The differential the member would shoot. */
+  shoot: number;
+  /** Resulting handicap index. */
+  becomes: number;
+  /** True when the index does not move (break-even row). */
+  noChange: boolean;
+  /** True when this row is the member's best of their last five. */
+  isBest: boolean;
+}
+
+/** Index after a round of `shoot`, valid only for shoot <= cutTarget. */
+export function indexAfter(current: number, cutTarget: number, shoot: number): number {
+  return current - (cutTarget - shoot) / 8;
+}
+
+/**
+ * Three rows: break-even first (so the target visibly does nothing), then a
+ * DERIVED midpoint, then the member's best of five. When their best does not
+ * beat the target, fall back to fixed offsets and drop the "your best" tag.
+ */
+export function nextRoundScale(
+  current: number,
+  cutTarget: number,
+  bestOfFive: number | null,
+): ScaleRow[] {
+  const usesBest = bestOfFive != null && Number.isFinite(bestOfFive) && bestOfFive < cutTarget;
+  const shoots = usesBest
+    ? [cutTarget, Number(((cutTarget + (bestOfFive as number)) / 2).toFixed(1)), bestOfFive as number]
+    : [cutTarget, cutTarget - 1, cutTarget - 2];
+
+  return shoots.map((shoot, i) => ({
+    shoot,
+    becomes: indexAfter(current, cutTarget, shoot),
+    noChange: i === 0,
+    isBest: usesBest && i === 2,
+  }));
+}
