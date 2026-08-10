@@ -289,7 +289,21 @@
       "roundsTogether_one": "{{count}} round together",
       "roundsTogether_other": "{{count}} rounds together",
       "playedAgo": "Played {{when}}",
-      "anyone": "Compare against anyone"
+      "anyone": "Compare against anyone",
+      "you": "Tu",
+      "tiedCount_one": "{{count}} empatada",
+      "tiedCount_other": "{{count}} empatadas",
+      "oldest": "Mas antigua",
+      "formSample_one": "{{count}} ronda compartida",
+      "formSample_other": "{{count}} rondas compartidas",
+      "formTruncated": "Ultimas {{shown}} de {{total}}",
+      "youLeadOf": "Lideras {{n}} de {{total}}",
+      "group": {
+        "volume": "VOLUMEN",
+        "scoring": "PUNTUACION",
+        "rare": "RARO",
+        "best": "MEJOR DE SIEMPRE"
+      }
     }
   }
 }

@@ -77,7 +77,7 @@ export const ComparePersonRow: React.FC<Props> = ({
           color: CHART.INK,
           flexShrink: 0,
           fontSize: 12,
-          fontWeight: 800,
+          fontWeight: 700,
         }}
       >
         {person.avatarUrl ? (
@@ -151,7 +151,7 @@ export const ComparePersonRow: React.FC<Props> = ({
       <span
         style={{
           fontSize: 15,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.02em',
           color: CHART.INK,
           fontVariantNumeric: 'tabular-nums lining-nums',

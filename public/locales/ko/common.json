@@ -288,7 +288,21 @@
       "roundsTogether_one": "{{count}} round together",
       "roundsTogether_other": "{{count}} rounds together",
       "playedAgo": "Played {{when}}",
-      "anyone": "Compare against anyone"
+      "anyone": "Compare against anyone",
+      "you": "You",
+      "tiedCount_one": "{{count}} tied",
+      "tiedCount_other": "{{count}} tied",
+      "oldest": "Oldest",
+      "formSample_one": "{{count}} shared round",
+      "formSample_other": "{{count}} shared rounds",
+      "formTruncated": "Last {{shown}} of {{total}}",
+      "youLeadOf": "You lead {{n}} of {{total}}",
+      "group": {
+        "volume": "VOLUME",
+        "scoring": "SCORING",
+        "rare": "RARE",
+        "best": "BEST EVER"
+      }
     }
   }
 }
