@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
+import { Clock, XCircle, Mail, AlertCircle } from 'lucide-react';
 import {
   A,
   BIZ_KICKER,

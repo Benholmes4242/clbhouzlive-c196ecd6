@@ -23,7 +23,6 @@ import {
   FileText,
   Image as ImageIcon,
   Loader2,
-  ShieldCheck,
   Upload,
   X,
 } from 'lucide-react';
@@ -33,7 +32,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
