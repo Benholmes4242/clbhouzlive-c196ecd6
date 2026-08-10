@@ -73,28 +73,31 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
         }}
       >
         <div style={{ minWidth: 0 }}>
+          {/* Kicker names the thing; the TITLE is the count. */}
           <div style={{ ...LABEL_STYLE, color: CHART.MUTE }}>
-            {total != null
-              ? t('handicap.form.nRoundsSample', { count: total })
-              : t('handicap.form.archive.roundsLabel')}
+            {viewMode === 'friend'
+              ? ownerFirstName
+                ? t('handicap.form.archive.postedHistoryOwned', { name: ownerFirstName })
+                : t('handicap.form.archive.postedHistoryOwnedUnknown')
+              : t('handicap.form.archive.postedHistory')}
           </div>
           <div
             id="rounds-archive-sheet-title"
             style={{
               marginTop: 3,
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               color: CHART.INK,
               letterSpacing: '-0.01em',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {viewMode === 'friend'
-              ? ownerFirstName
-                ? t('handicap.form.archive.postedHistoryOwned', { name: ownerFirstName })
-                : t('handicap.form.archive.postedHistoryOwnedUnknown')
-              : t('handicap.form.archive.yourPostedHistory')}
+            {total != null
+              ? t('handicap.form.archive.roundsTitle', { count: total })
+              : t('handicap.form.archive.rounds')}
           </div>
         </div>
+
         <button
           type="button"
           onClick={onClose}

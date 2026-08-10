@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { formatMonthYearLongGB } from '@/i18n/format';
 
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
+// DARK_ROW_TITLE is the ONE definition shared with Records / Your courses.
+import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { Skeleton } from '@/components/ui/skeleton';
+
 
 
 interface Props {
@@ -47,19 +50,17 @@ const INITIAL_COUNT = 30;
 const LOAD_MORE_COUNT = 15;
 
 // ─── Format helpers ─────────────────────────────────────────────────
+// Absent renders NOTHING - the column keeps its width via the label beneath.
 const fmtDiff = (d: number | null | undefined): string => {
-  if (d === null || d === undefined) return '—';
+  if (d === null || d === undefined) return '';
   if (d > 0) return `+${d.toFixed(1)}`;
   if (d < 0) return `\u2212${Math.abs(d).toFixed(1)}`;
   return '0.0';
 };
 
-const diffColor = (d: number | null | undefined): string => {
-  if (d === null || d === undefined) return T.inkMute;
-  if (d < 0) return 'var(--hcp-good-deep)';
-  if (d > 0) return 'var(--hcp-t-60)';
-  return T.inkSoft;
-};
+// The differential is a signed, ARROWLESS figure - a score, not a movement.
+// It renders in ink. The only coloured thing on a row is the HCP arrow.
+
 
 /**
  * Trim noisy suffixes from course names for compact chip display.
@@ -119,11 +120,22 @@ const fmtMonth = (iso: string): string => {
 type FilterKey = 'all' | 'counters' | string;
 
 export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
+  const { t } = useTranslation('common');
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [displayedCount, setDisplayedCount] = useState<number>(INITIAL_COUNT);
+
+  const rowLabels = useMemo(
+    () => ({
+      gross: t('handicap.form.archive.gross'),
+      playedTo: t('handicap.form.archive.playedTo'),
+      notInBest8: t('handicap.form.archive.notInBest8'),
+    }),
+    [t],
+  );
+
 
   const rounds = useMemo(
     () => (allRounds ? computeRoundDeltas(allRounds, trend?.current ?? null) : []),
@@ -224,20 +236,21 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
               <MonthDivider month={month} count={monthRounds.length} />
               <div
                 style={{
-                  marginTop: 8,
+                  marginTop: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 8,
                 }}
               >
                 {monthRounds.map((round) => (
                   <FeedCard
                     key={round.id}
                     round={round}
+                    labels={rowLabels}
                     onTap={() => setOpenScoreId(round.id)}
                   />
                 ))}
               </div>
+
             </div>
           ))}
 
@@ -399,18 +412,17 @@ const FilterChip: React.FC<{
       background: active ? T.ink : T.ink04,
       color: active ? 'var(--hcp-bg-1)' : T.ink,
       fontFamily: FONT,
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: '-0.005em',
       cursor: 'pointer',
-      whiteSpace: 'nowrap',
-      maxWidth: 200,
+      maxWidth: 190,
+      overflow: 'hidden',
     }}
   >
+    {/* A chip may clip at 190; it must never ellipsise at 160. */}
     <span
       style={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
+        fontSize: 12.5,
+        fontWeight: 600,
+        letterSpacing: '-0.005em',
         whiteSpace: 'nowrap',
       }}
     >
@@ -420,6 +432,7 @@ const FilterChip: React.FC<{
       style={{
         fontSize: 11,
         fontWeight: 700,
+        fontVariantNumeric: 'tabular-nums',
         opacity: active ? 0.7 : 0.5,
       }}
     >
@@ -428,16 +441,17 @@ const FilterChip: React.FC<{
   </button>
 );
 
-// ─── Month divider ──────────────────────────────────────────────────
+// ─── Month header ───────────────────────────────────────────────────
+// Label left, count right, nothing between.
 const MonthDivider: React.FC<{ month: string; count: number }> = ({
   month,
   count,
 }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
     <span
       style={{
-        fontSize: 10,
-        fontWeight: 800,
+        fontSize: 7.5,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: T.inkMute,
         textTransform: 'uppercase',
@@ -447,16 +461,12 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
     </span>
     <span
       style={{
-        flex: 1,
-        height: 1,
-        background: `linear-gradient(to right, ${T.hairline}, transparent)`,
-      }}
-    />
-    <span
-      style={{
-        fontSize: 10,
+        fontSize: 7.5,
         fontWeight: 700,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
         color: T.inkFaded,
+        fontVariantNumeric: 'tabular-nums',
       }}
     >
       {count} {count === 1 ? 'round' : 'rounds'}
@@ -465,20 +475,39 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
 );
 
 
-// ─── Feed card ──────────────────────────────────────────────────────
+
+// ─── Feed row ───────────────────────────────────────────────────────
+// A row is three columns and nothing else: a 42px right-aligned GROSS
+// column, the course and its meta, and a 52px right-aligned PLAYED TO
+// column. No border, no tile, no capsule - the two figure columns must
+// align down the whole archive, which is the only thing an archive is for.
 interface FeedCardProps {
   round: RoundWithDelta;
   onTap: () => void;
+  labels: { gross: string; playedTo: string; notInBest8: string };
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
+const FIGURE_LABEL: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: T.inkFaded,
+  marginTop: 4,
+  whiteSpace: 'nowrap',
+};
+
+const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
-  const isCounter = round.is_counter;
+  const diffText = fmtDiff(round.handicap_differential);
 
   const d = new Date(round.play_date);
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
+
+  // ONE statement about the index per row. Never both, never "counts".
+  const showNotCounted = !deltaInfo && !round.is_counter;
 
   return (
     <button
@@ -487,72 +516,38 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
       data-feedrow="true"
       style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 12,
+        alignItems: 'flex-start',
+        gap: 13,
         width: '100%',
-        padding: '12px 14px',
-        background: T.cardBg,
-        border: '1px solid var(--hcp-line)',
-        borderRadius: 14,
+        padding: '13px 0',
+        background: 'transparent',
+        border: 'none',
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
       }}
     >
-      {/* Score-first hero tile */}
-      <div
-        style={{
-          width: 50,
-          height: 50,
-          borderRadius: 12,
-          flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: isCounter ? 'rgba(5,150,105,0.10)' : 'var(--hcp-bg-2)',
-          border: isCounter ? '1px solid rgba(5,150,105,0.30)' : '1px solid transparent',
-        }}
-      >
-        <span
+      {/* Gross - a figure, not a tile. No colour when the round counts. */}
+      <div style={{ width: 42, flexShrink: 0, textAlign: 'right' }}>
+        <div
           style={{
             fontSize: 21,
-            fontWeight: 800,
-            color: isCounter ? 'var(--hcp-good-deep)' : T.ink,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em',
+            fontWeight: 700,
+            letterSpacing: '-0.045em',
+            color: T.ink,
             lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            minHeight: 21,
           }}
         >
-          {round.adjusted_gross ?? '\u2014'}
-        </span>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.06em',
-            color: isCounter ? 'var(--hcp-good-deep)' : T.inkFaded,
-            marginTop: 2,
-          }}
-        >
-          GROSS
-        </span>
+          {round.adjusted_gross ?? ''}
+        </div>
+        <div style={FIGURE_LABEL}>{labels.gross}</div>
       </div>
 
       {/* Course + meta */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: T.ink,
-            letterSpacing: '-0.005em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: 1.15,
-          }}
-        >
+        <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
           {courseName}
         </div>
         <div
@@ -560,67 +555,76 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             fontSize: 11,
             fontWeight: 600,
             color: T.inkMute,
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             gap: 5,
             flexWrap: 'wrap',
             lineHeight: 1.2,
-            marginTop: 2,
+            marginTop: 3,
           }}
         >
           <span>{weekday} {dayOfMonth}</span>
-          {isCounter && (
-            <>
-              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
-              <span style={{ color: 'var(--hcp-good-deep)', fontWeight: 700 }}>counts</span>
-            </>
-          )}
           {deltaInfo && (
             <>
               <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
-              <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em', textShadow: deltaInfo.glow }}>
+              <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em' }}>
                 HCP {deltaInfo.sign} {deltaInfo.value}
+              </span>
+            </>
+          )}
+          {showNotCounted && (
+            <>
+              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+              <span
+                style={{
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: T.inkFaded,
+                }}
+              >
+                {labels.notInBest8}
               </span>
             </>
           )}
         </div>
       </div>
 
-      {/* Differential pill */}
-      <span
-        style={{
-          flexShrink: 0,
-          fontSize: 13,
-          fontWeight: 800,
-          color: diffColor(round.handicap_differential),
-          background:
-            round.handicap_differential != null && round.handicap_differential < 0
-              ? 'rgba(5,150,105,0.10)'
-              : 'rgba(255,255,255,0.045)',
-          fontVariantNumeric: 'tabular-nums',
-          padding: '6px 10px',
-          borderRadius: 999,
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {fmtDiff(round.handicap_differential)}
-      </span>
+      {/* Played to - a figure in ink. No pill, no tint, no green. */}
+      <div style={{ width: 52, flexShrink: 0, textAlign: 'right' }}>
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
+            color: T.ink,
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            minHeight: 15,
+          }}
+        >
+          {diffText}
+        </div>
+        <div style={FIGURE_LABEL}>{labels.playedTo}</div>
+      </div>
     </button>
   );
 };
 
+
 // ─── Skeleton ───────────────────────────────────────────────────────
+// Shape follows the new row: no border, no card - a flat 46px band.
 const SkeletonStack: React.FC = () => (
-  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-    {Array.from({ length: 5 }).map((_, i) => (
-      <Skeleton
-        key={i}
-        variant="dark"
-        style={{ height: 72, borderRadius: 12, border: `1px solid ${T.hairline}` }}
-      />
+  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column' }}>
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} style={{ padding: '13px 0' }}>
+        <Skeleton variant="dark" style={{ height: 34, borderRadius: 8 }} />
+      </div>
     ))}
   </div>
 );
+
 
 // ─── Empty states ───────────────────────────────────────────────────
 const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: string | null }> = ({
@@ -639,7 +643,7 @@ const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: str
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 6 }}>
         No rounds yet
       </div>
       <div style={{ fontSize: 12, color: T.inkMute, lineHeight: 1.5 }}>
