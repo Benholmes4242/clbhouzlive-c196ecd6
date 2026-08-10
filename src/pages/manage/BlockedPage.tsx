@@ -7,8 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK_55 = '#64748B';
 
 type BlockedUserRow = {
   blocked_id: string;
@@ -58,7 +58,7 @@ export default function BlockedPage() {
     <ManagePageShell title="Blocked users">
       <div className="px-4 pt-4">
         {isLoading ? (
-          <div className="rounded-2xl p-2" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
+          <div className="rounded-2xl p-2" style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}>
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3 p-3">
                 <Skeleton className="w-10 h-10 rounded-full" />
@@ -72,17 +72,17 @@ export default function BlockedPage() {
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
             <p className="text-[15px] font-medium text-foreground">Couldn't load blocked users</p>
-            <p className="text-[13px]" style={{ color: INK_55 }}>Check your connection and try again.</p>
+            <p className="text-[13px]" style={{ color: A.MUTE }}>Check your connection and try again.</p>
             <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
           </div>
         ) : blocked.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <UserX size={36} className="mb-3" style={{ color: INK_55 }} />
+            <UserX size={36} className="mb-3" style={{ color: A.MUTE }} />
             <p className="text-[15px] font-medium text-foreground">No blocked users</p>
-            <p className="text-[13px] mt-1" style={{ color: INK_55 }}>Users you block will appear here.</p>
+            <p className="text-[13px] mt-1" style={{ color: A.MUTE }}>Users you block will appear here.</p>
           </div>
         ) : (
-          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}>
             {blocked.map((item, idx) => {
               const p = item.user_profiles;
               return (
@@ -103,7 +103,7 @@ export default function BlockedPage() {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-medium text-foreground truncate">{p?.full_name ?? 'Unknown'}</p>
-                    <p className="text-[13px] truncate" style={{ color: INK_55 }}>@{p?.username ?? '\u2014'}</p>
+                    <p className="text-[13px] truncate" style={{ color: A.MUTE }}>@{p?.username ?? '\u2014'}</p>
                   </div>
                   <Button
                     variant="outline"

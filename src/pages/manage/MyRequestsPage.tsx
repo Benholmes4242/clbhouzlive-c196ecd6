@@ -6,11 +6,8 @@ import { LifeBuoy, ChevronRight, Trash2 } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyRequestsList, useHideMyRequest, type MyRequestStatus } from '@/hooks/useMyRequests';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const CARD_BORDER = 'rgba(15,23,42,0.07)';
-const HAIR = 'rgba(15,23,42,0.08)';
 
 const CATEGORY_LABELS: Record<string, string> = {
   bug: 'Bug',
@@ -24,8 +21,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 function statusStyle(s: MyRequestStatus): { label: string; bg: string; fg: string } {
   if (s === 'open') return { label: 'Open', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
   if (s === 'in_progress') return { label: 'In progress', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
-  if (s === 'resolved') return { label: 'Resolved', bg: 'rgba(15,23,42,0.06)', fg: INK_55 };
-  return { label: 'Closed', bg: 'rgba(15,23,42,0.06)', fg: INK_55 };
+  if (s === 'resolved') return { label: 'Resolved', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
+  return { label: 'Closed', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
 }
 
 function relTime(iso: string): string {
@@ -76,14 +73,14 @@ export default function MyRequestsPage() {
         {!isLoading && isError && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
-            <p className="text-[15px] font-medium" style={{ color: INK }}>Couldn't load your requests</p>
-            <p className="text-[13px] mt-1 mb-3" style={{ color: INK_55 }}>Check your connection and try again.</p>
+            <p className="text-[15px] font-medium" style={{ color: A.INK }}>Couldn't load your requests</p>
+            <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
             <button
               onClick={() => refetch()}
               className="text-[13px] font-semibold underline"
-              style={{ color: INK }}
+              style={{ color: A.INK }}
             >
               Retry
             </button>
@@ -94,22 +91,22 @@ export default function MyRequestsPage() {
         {!isLoading && !isError && tickets.length === 0 && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex justify-center mb-3">
-              <LifeBuoy size={32} style={{ color: INK }} />
+              <LifeBuoy size={32} style={{ color: A.INK }} />
             </div>
-            <h3 className="text-[16px] font-semibold mb-1" style={{ color: INK }}>
+            <h3 className="text-[16px] font-semibold mb-1" style={{ color: A.INK }}>
               No requests yet
             </h3>
-            <p className="text-[13.5px] leading-relaxed mb-4" style={{ color: INK_55 }}>
+            <p className="text-[13.5px] leading-relaxed mb-4" style={{ color: A.MUTE }}>
               Need help? Contact support and we'll get back to you.
             </p>
             <button
               type="button"
               onClick={() => navigate('/manage/contact')}
               className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: INK }}
+              style={{ background: A.INK }}
             >
               Contact support
             </button>
@@ -119,7 +116,7 @@ export default function MyRequestsPage() {
         {!isLoading && tickets.length > 0 && (
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             {tickets.map((t, i) => {
               const status = statusStyle(t.status);
@@ -139,7 +136,7 @@ export default function MyRequestsPage() {
                     }
                   }}
                   className="w-full text-left flex items-start gap-3 px-4 py-3 cursor-pointer"
-                  style={{ borderTop: i === 0 ? 'none' : `0.5px solid ${HAIR}` }}
+                  style={{ borderTop: i === 0 ? 'none' : `0.5px solid ${A.HAIRLINE}` }}
                 >
                   <div className="mt-1.5 shrink-0" style={{ width: 8, height: 8 }}>
                     {unread && (
@@ -155,7 +152,7 @@ export default function MyRequestsPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <span
                         className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(15,23,42,0.06)', color: INK_55 }}
+                        style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
                       >
                         {cat}
                       </span>
@@ -168,19 +165,19 @@ export default function MyRequestsPage() {
                     </div>
                     <div
                       className="text-[15px] font-semibold truncate"
-                      style={{ color: INK }}
+                      style={{ color: A.INK }}
                     >
                       {t.subject}
                     </div>
                     {t.snippet && (
                       <div
                         className="text-[13px] mt-0.5 line-clamp-1"
-                        style={{ color: INK_55 }}
+                        style={{ color: A.MUTE }}
                       >
                         {t.snippet}
                       </div>
                     )}
-                    <div className="text-[12px] mt-1" style={{ color: INK_55 }}>
+                    <div className="text-[12px] mt-1" style={{ color: A.MUTE }}>
                       Updated {relTime(t.last_message_at)}
                     </div>
                   </div>
@@ -191,13 +188,13 @@ export default function MyRequestsPage() {
                       aria-label={confirming ? 'Confirm remove request' : 'Remove request'}
                       className="min-h-[32px] px-2 rounded-md text-[11px] font-semibold inline-flex items-center gap-1"
                       style={{
-                        color: confirming ? '#B45309' : INK_55,
+                        color: confirming ? '#B45309' : A.MUTE,
                         background: confirming ? 'rgba(245,158,11,0.12)' : 'transparent',
                       }}
                     >
                       {confirming ? 'Remove?' : <Trash2 size={16} />}
                     </button>
-                    <ChevronRight size={16} style={{ color: INK_55 }} />
+                    <ChevronRight size={16} style={{ color: A.MUTE }} />
                   </div>
                 </div>
               );

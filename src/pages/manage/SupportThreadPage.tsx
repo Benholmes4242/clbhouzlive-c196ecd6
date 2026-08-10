@@ -7,14 +7,12 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import {
+import { A } from '@/features/courses/components/holes/analytical/tokens';
   useMyRequestThread,
   useMyRequestReply,
   type MyRequestStatus,
 } from '@/hooks/useMyRequests';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const CARD_BORDER = 'rgba(15,23,42,0.07)';
 
 const CATEGORY_LABELS: Record<string, string> = {
   bug: 'Bug',
@@ -28,7 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 function statusStyle(s: MyRequestStatus): { label: string; bg: string; fg: string } {
   if (s === 'open' || s === 'in_progress')
     return { label: s === 'open' ? 'Open' : 'In progress', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
-  return { label: s === 'resolved' ? 'Resolved' : 'Closed', bg: 'rgba(15,23,42,0.06)', fg: INK_55 };
+  return { label: s === 'resolved' ? 'Resolved' : 'Closed', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
 }
 
 export default function SupportThreadPage() {
@@ -71,18 +69,18 @@ export default function SupportThreadPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
-            <h3 className="text-[16px] font-semibold mb-1" style={{ color: INK }}>
+            <h3 className="text-[16px] font-semibold mb-1" style={{ color: A.INK }}>
               Couldn't load this request
             </h3>
-            <p className="text-[13px] mt-1 mb-3" style={{ color: INK_55 }}>
+            <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>
               Check your connection and try again.
             </p>
             <button
               onClick={() => refetch()}
               className="text-[13px] font-semibold underline"
-              style={{ color: INK }}
+              style={{ color: A.INK }}
             >
               Retry
             </button>
@@ -98,19 +96,19 @@ export default function SupportThreadPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
-            <h3 className="text-[16px] font-semibold mb-1" style={{ color: INK }}>
+            <h3 className="text-[16px] font-semibold mb-1" style={{ color: A.INK }}>
               Request not found
             </h3>
-            <p className="text-[13.5px] leading-relaxed mb-4" style={{ color: INK_55 }}>
+            <p className="text-[13.5px] leading-relaxed mb-4" style={{ color: A.MUTE }}>
               This request may have been removed, or you may not have access to it.
             </p>
             <button
               type="button"
               onClick={() => navigate('/manage/requests')}
               className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: INK }}
+              style={{ background: A.INK }}
             >
               Back to my requests
             </button>
@@ -130,12 +128,12 @@ export default function SupportThreadPage() {
         {ticket && (
           <div
             className="rounded-2xl p-4"
-            style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
+            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                style={{ background: 'rgba(15,23,42,0.06)', color: INK_55 }}
+                style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
               >
                 {cat}
               </span>
@@ -146,7 +144,7 @@ export default function SupportThreadPage() {
                 {status.label}
               </span>
             </div>
-            <div className="mt-2 text-[15px] font-semibold" style={{ color: INK }}>
+            <div className="mt-2 text-[15px] font-semibold" style={{ color: A.INK }}>
               {ticket.subject}
             </div>
           </div>
@@ -171,7 +169,7 @@ export default function SupportThreadPage() {
               >
                 <div
                   className="text-[11px] mb-1 px-1"
-                  style={{ color: INK_55 }}
+                  style={{ color: A.MUTE }}
                 >
                   {mine ? 'You' : 'Clbhouz Support'}
                   <span className="mx-1">.</span>
@@ -183,9 +181,9 @@ export default function SupportThreadPage() {
                     maxWidth: '85%',
                     padding: '10px 14px',
                     borderRadius: 16,
-                    background: mine ? INK : '#fff',
-                    color: mine ? '#fff' : INK,
-                    border: mine ? 'none' : `1px solid ${CARD_BORDER}`,
+                    background: mine ? A.INK : '#fff',
+                    color: mine ? '#fff' : A.INK,
+                    border: mine ? 'none' : `1px solid ${A.BORDER}`,
                   }}
                 >
                   {m.body}
@@ -210,7 +208,7 @@ export default function SupportThreadPage() {
         >
           <div className="mx-auto w-full md:max-w-[440px] px-4 pt-3">
             {isClosed && (
-              <div className="text-[11.5px] mb-2 px-1" style={{ color: INK_55 }}>
+              <div className="text-[11.5px] mb-2 px-1" style={{ color: A.MUTE }}>
                 This request was closed. Replying will reopen it.
               </div>
             )}
@@ -223,8 +221,8 @@ export default function SupportThreadPage() {
                 className="flex-1 p-3 rounded-2xl text-[14.5px] outline-none resize-none leading-relaxed"
                 style={{
                   background: '#fff',
-                  border: `1px solid ${CARD_BORDER}`,
-                  color: INK,
+                  border: `1px solid ${A.BORDER}`,
+                  color: A.INK,
                   minHeight: 48,
                   maxHeight: 160,
                 }}
@@ -235,7 +233,7 @@ export default function SupportThreadPage() {
                 disabled={!body.trim() || sending}
                 className="inline-flex items-center gap-1.5 rounded-2xl text-white font-semibold text-[13.5px]"
                 style={{
-                  background: INK,
+                  background: A.INK,
                   padding: '0 14px',
                   minHeight: 44,
                   opacity: !body.trim() || sending ? 0.5 : 1,

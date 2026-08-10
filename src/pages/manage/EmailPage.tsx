@@ -9,15 +9,9 @@ import { Label } from '@/components/ui/label';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-// Direction A tokens
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const FIELD_FILL = '#F1F5F9';
-const HAIRLINE = '1px solid rgba(15,23,42,0.07)';
-const CARD_BG = '#FFFFFF';
-const GREEN = '#059669';
-const GREEN_SOFT = 'rgba(5,150,105,0.10)';
+const HAIRLINE = `1px solid ${A.BORDER}`;
 const DANGER = '#B91C1C';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -122,19 +116,19 @@ export default function EmailPage() {
         {step === 'email' && (
           <>
             {/* Current email */}
-            <div className="rounded-2xl p-4" style={{ background: CARD_BG, border: HAIRLINE }}>
-              <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
+            <div className="rounded-2xl p-4" style={{ background: A.PANEL, border: HAIRLINE }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: A.MUTE }}>
                 Current email
               </p>
-              <p className="text-[15px] font-medium mt-1.5" style={{ color: INK }}>
+              <p className="text-[15px] font-medium mt-1.5" style={{ color: A.INK }}>
                 {user?.email ? maskEmail(user.email) : '\u2014'}
               </p>
             </div>
 
             {/* New email */}
-            <div className="rounded-2xl p-4 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
+            <div className="rounded-2xl p-4 space-y-4" style={{ background: A.PANEL, border: HAIRLINE }}>
               <div className="space-y-1.5">
-                <Label className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
+                <Label className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: A.MUTE }}>
                   New email
                 </Label>
                 <Input
@@ -146,39 +140,39 @@ export default function EmailPage() {
                   autoCapitalize="none"
                   autoComplete="email"
                   spellCheck={false}
-                  style={{ background: FIELD_FILL, border: 'none' }}
+                  style={{ background: A.BORDER, border: 'none' }}
                 />
               </div>
               <Button
                 className="w-full min-h-[44px] font-semibold"
                 disabled={!emailValid || submitting}
                 onClick={handleSendInitial}
-                style={{ background: INK, color: '#fff' }}
+                style={{ background: A.INK, color: '#fff' }}
               >
                 {submitting ? 'Sending\u2026' : 'Send verification code'}
               </Button>
             </div>
 
-            <p className="text-[12px] leading-relaxed px-1" style={{ color: INK_55 }}>
+            <p className="text-[12px] leading-relaxed px-1" style={{ color: A.MUTE }}>
               We will send a 6-digit code to your new address. Your account email only changes once you enter that code. No password needed.
             </p>
           </>
         )}
 
         {step === 'code' && (
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: A.PANEL, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
               <div
                 className="flex items-center justify-center rounded-2xl"
-                style={{ width: 56, height: 56, background: GREEN_SOFT }}
+                style={{ width: 56, height: 56, background: A.GREEN }}
               >
-                <Mail size={26} style={{ color: GREEN }} />
+                <Mail size={26} style={{ color: A.GREEN }} />
               </div>
               <div>
-                <p className="text-[17px] font-semibold" style={{ color: INK }}>
+                <p className="text-[17px] font-semibold" style={{ color: A.INK }}>
                   Enter verification code
                 </p>
-                <p className="text-[13px] mt-1" style={{ color: INK_55 }}>
+                <p className="text-[13px] mt-1" style={{ color: A.MUTE }}>
                   We sent a 6-digit code to {newEmail}
                 </p>
               </div>
@@ -216,7 +210,7 @@ export default function EmailPage() {
                 disabled={resendCooldown > 0 || submitting}
                 className="text-[13px] font-medium"
                 style={{
-                  color: resendCooldown > 0 ? 'rgba(15,23,42,0.35)' : INK,
+                  color: resendCooldown > 0 ? 'rgba(15,23,42,0.35)' : A.INK,
                   textDecoration: resendCooldown > 0 ? 'none' : 'underline',
                   cursor: resendCooldown > 0 ? 'default' : 'pointer',
                 }}
@@ -228,7 +222,7 @@ export default function EmailPage() {
                 onClick={() => { setStep('email'); setCode(''); setOtpError(null); }}
                 disabled={submitting}
                 className="text-[13px]"
-                style={{ color: INK_55, textDecoration: 'underline', cursor: 'pointer' }}
+                style={{ color: A.MUTE, textDecoration: 'underline', cursor: 'pointer' }}
               >
                 Use a different email
               </button>
@@ -237,19 +231,19 @@ export default function EmailPage() {
         )}
 
         {step === 'success' && (
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: A.PANEL, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
               <div
                 className="flex items-center justify-center rounded-2xl"
-                style={{ width: 56, height: 56, background: GREEN_SOFT }}
+                style={{ width: 56, height: 56, background: A.GREEN }}
               >
-                <Check size={28} style={{ color: GREEN }} strokeWidth={2.5} />
+                <Check size={28} style={{ color: A.GREEN }} strokeWidth={2.5} />
               </div>
               <div>
-                <p className="text-[17px] font-semibold" style={{ color: INK }}>
+                <p className="text-[17px] font-semibold" style={{ color: A.INK }}>
                   Email updated
                 </p>
-                <p className="text-[13px] mt-1 leading-relaxed" style={{ color: INK_55 }}>
+                <p className="text-[13px] mt-1 leading-relaxed" style={{ color: A.MUTE }}>
                   Your account email is now {newEmail}. Use it next time you sign in.
                 </p>
               </div>
@@ -257,7 +251,7 @@ export default function EmailPage() {
             <Button
               className="w-full min-h-[44px] font-semibold"
               onClick={() => navigate(-1)}
-              style={{ background: INK, color: '#fff' }}
+              style={{ background: A.INK, color: '#fff' }}
             >
               Done
             </Button>
