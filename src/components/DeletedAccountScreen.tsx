@@ -8,11 +8,14 @@ const SUPPORT_EMAIL = 'support@clbhouz.com';
 /**
  * Terminal screen for an account whose user_profiles.deleted_at is non-null.
  * Rendered by DeletedAccountGate (global, one place) after the session has been
- * signed out. ONE action only: contact support. There is deliberately no
+ * signed out. Two actions: contact support, and a route back to /auth so the
+ * member is not pinned here for the rest of the session. There is deliberately no
  * "restore my account" — the deletion sweeps cannot be undone by anything in
  * this codebase, so such a button would promise what the system cannot deliver.
  */
-const DeletedAccountScreen: React.FC = () => (
+const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
+  onSignInDifferent,
+}) => (
   <div
     role="alert"
     style={{
@@ -62,6 +65,22 @@ const DeletedAccountScreen: React.FC = () => (
       >
         Contact support
       </a>
+
+      {onSignInDifferent && (
+        <button
+          type="button"
+          onClick={onSignInDifferent}
+          style={{
+            display: 'block', width: '100%', textAlign: 'center', marginTop: 10,
+            padding: '15px 18px', borderRadius: 12,
+            background: 'transparent', color: INK,
+            border: '1px solid #EDF0F3',
+            fontSize: 15, fontWeight: 600, fontFamily: FONT,
+          }}
+        >
+          Sign in with a different account
+        </button>
+      )}
     </div>
   </div>
 );

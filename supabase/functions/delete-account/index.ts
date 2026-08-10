@@ -452,8 +452,10 @@ Deno.serve(async (req) => {
       ['profile_analytics_events','profile_analytics_events','user_id'],
       ['user_courses','user_courses','user_id'],
       ['user_top100_courses','user_top100_courses','user_id'],
-      // NOTE: business_team_members.created_by is deliberately NOT swept — see
-      // BRIEF_DELETE_ACCOUNT_V5 fix 6 (report-and-stop; SET NULL is preferred).
+      // NOTE: business_team_members.created_by is deliberately NOT swept. The
+      // decision is taken: that FK becomes ON DELETE SET NULL via a separate
+      // migration, so the database handles it and adding a sweep here would
+      // destroy team rows created by the departing member.
     ] as const) {
       await bounded(label, async () => await admin.from(table as any)
         .delete({ count: 'exact' }).eq(col as any, targetId));
