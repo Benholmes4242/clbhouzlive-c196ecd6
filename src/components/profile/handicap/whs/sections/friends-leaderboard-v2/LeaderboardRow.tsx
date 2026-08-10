@@ -3,6 +3,8 @@ import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
+import { DARK_ROW_TITLE } from '../_shared/darkAtoms';
+
 import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
 
 interface Props {
@@ -50,8 +52,11 @@ const StalePill: React.FC = () => (
       padding: '1px 5px',
       borderRadius: 4,
       fontSize: 9,
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: '0.14em',
+      flexShrink: 0,
+      overflowWrap: 'normal',
+      whiteSpace: 'nowrap',
     }}
   >
     STALE
@@ -72,7 +77,7 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale, ha
       <span
         style={{
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           color: T.amber,
           background: T.amberSoft,
           padding: '1px 5px',
@@ -86,15 +91,15 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale, ha
   }
   // Unknown movement — leave the slot empty (nothing, not a dash).
   if (!hasDelta) return null;
-  if (delta == null || delta === 0) {
-    return <span style={{ fontSize: 11, color: 'rgba(242,244,247,0.22)', fontWeight: 800 }}>—</span>;
-  }
+  // A HELD position renders nothing either: the slot stays empty so the
+  // columns keep their alignment.
+  if (delta == null || delta === 0) return null;
   const climbed = delta > 0;
   return (
     <span
       style={{
         fontSize: 11,
-        fontWeight: 800,
+        fontWeight: 700,
         color: climbed ? T.good : T.inkMute,
         ...NUM,
         letterSpacing: '-0.01em',
@@ -119,18 +124,19 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     entry.handicap_30d_delta <= -0.5;
   const Tag: React.ElementType = onClick ? 'button' : 'div';
 
-  const selfFrame: React.CSSProperties = isYou
+  /* The member is marked by a WASH, not a frame. The negative horizontal
+     margin is matched by equal padding so the wash reaches the container's
+     sides whatever its own padding is. No row carries a border or a rule. */
+  const SIDE = 16;
+  const wash: React.CSSProperties = isYou
     ? {
-        border: '1px solid rgba(247,147,30,0.45)',
-        borderRadius: 13,
-        margin: '6px 6px',
-        padding: '9px 14px',
+        background: 'rgba(247,147,30,0.07)',
+        marginLeft: -SIDE,
+        marginRight: -SIDE,
+        paddingLeft: SIDE,
+        paddingRight: SIDE,
       }
-    : {
-        border: 'none',
-        borderBottom: `1px solid ${T.hairlineSoft}`,
-        padding: '10px 16px',
-      };
+    : {};
 
   return (
     <Tag
@@ -141,144 +147,131 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
       style={{
         position: 'relative',
         display: 'flex',
-        alignItems: 'center',
-        width: isYou ? 'calc(100% - 12px)' : '100%',
+        alignItems: 'flex-start',
+        gap: 11,
+        width: '100%',
+        padding: '11px 0',
         textAlign: 'left',
         background: 'transparent',
+        border: 'none',
         opacity: isStaleRow ? 0.6 : 1,
         cursor: onClick ? 'pointer' : 'default',
         font: 'inherit',
         color: 'inherit',
-        ...selfFrame,
+        ...wash,
       }}
     >
-      {/* Rank */}
+      {/* Rank — the one place amber belongs on this row */}
       <div
         style={{
-          width: 22,
-          textAlign: 'center',
+          width: 16,
           flexShrink: 0,
           fontSize: 13,
-          fontWeight: 800,
+          fontWeight: 700,
+          lineHeight: '30px',
           color: isYou ? T.amber : T.inkFaded,
           ...NUM,
         }}
       >
-        {rank ?? '\u2014'}
+        {rank ?? ''}
       </div>
 
-      {/* Avatar + name + home club */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          flex: 1,
-          minWidth: 0,
-          paddingLeft: 6,
-        }}
-      >
-        {(() => {
-          const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
-          const fbBg = getAvatarFallbackColor(
-            entry.friend_user_id ?? (entry as { friend_row_id?: string | null }).friend_row_id ?? entry.friend_name
-          );
-          return (
+      {/* Avatar */}
+      {(() => {
+        const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
+        const fbBg = getAvatarFallbackColor(
+          entry.friend_user_id ?? (entry as { friend_row_id?: string | null }).friend_row_id ?? entry.friend_name
+        );
+        return (
+          <div
+            style={{
+              position: 'relative',
+              width: 30,
+              height: 30,
+              borderRadius: 10,
+              overflow: 'hidden',
+              background: avatarSrc ? T.bg3 : fbBg,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              flexShrink: 0,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
+            )}
+            {/* Traced hairline overlay — dark surface canon */}
             <div
+              aria-hidden
               style={{
-                position: 'relative',
-                width: 33,
-                height: 33,
-                borderRadius: '34%',
-                overflow: 'hidden',
-                background: avatarSrc ? T.bg3 : fbBg,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                flexShrink: 0,
-                fontSize: 12,
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 10,
+                border: '1px solid rgba(255,255,255,0.22)',
+                pointerEvents: 'none',
               }}
-            >
-              {avatarSrc ? (
-                <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
-              )}
-              {/* Traced hairline overlay -- dark surface canon; self-frame amber wraps row, not avatar */}
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  borderRadius: '34%',
-                  border: '1px solid rgba(255,255,255,0.22)',
-                  pointerEvents: 'none',
-                }}
-              />
-            </div>
-          );
-        })()}
-
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: isYou ? 700 : 600,
-                color: T.ink,
-                letterSpacing: '-0.01em',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                minWidth: 0,
-              }}
-            >
-              {displayName}
-            </p>
-            {showFlame && <FlameIcon />}
+            />
           </div>
+        );
+      })()}
+
+      {/* Name + club — both WRAP, neither truncates */}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, minWidth: 0 }}>
           <p
             style={{
-              margin: '2px 0 0',
-              fontSize: 10,
-              fontWeight: 600,
+              ...DARK_ROW_TITLE,
+              // DARK_ROW_TITLE's colour is a var(--hcp-*) token, which does
+              // not resolve in the portalled sheet. Numbers are shared; the
+              // colour is literal.
+              color: T.ink,
+              margin: 0,
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {displayName}
+          </p>
+          {showFlame && <FlameIcon />}
+        </div>
+        {(isStaleRow || entry.friend_home_club || isYou) && (
+          <p
+            style={{
+              margin: '3px 0 0',
+              fontSize: 7,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              lineHeight: 1.5,
               color: isStaleRow ? T.amberInk : T.inkMute,
-              letterSpacing: '0.02em',
               display: 'flex',
               alignItems: 'center',
               gap: 5,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              overflowWrap: 'anywhere',
             }}
           >
             {isStaleRow && <StalePill />}
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                minWidth: 0,
-              }}
-            >
+            <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               {entry.friend_home_club ?? (isYou ? 'No home club set' : '')}
             </span>
           </p>
-        </div>
+        )}
       </div>
 
       {/* 30D movement slot */}
       <div
         style={{
-          width: 32,
+          width: 26,
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
+          minHeight: 30,
         }}
       >
         <RankDeltaChip
@@ -290,14 +283,14 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
       </div>
 
       {/* HCP */}
-      <div style={{ width: 56, textAlign: 'right', flexShrink: 0 }}>
+      <div style={{ width: 42, textAlign: 'right', flexShrink: 0, lineHeight: '30px' }}>
         <span
           style={{
             fontSize: 15,
             fontWeight: 700,
             color: isYou ? T.amber : T.ink,
             ...NUM,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.03em',
           }}
         >
           {fmtHcp(hcp)}
@@ -306,5 +299,6 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     </Tag>
   );
 };
+
 
 export default LeaderboardRow;

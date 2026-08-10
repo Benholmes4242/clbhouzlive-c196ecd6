@@ -21,13 +21,14 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 // Hardcoded dark tokens — BottomSheet portals outside .hcp-dark scope.
 const DIM = 'rgba(242,244,247,0.55)';
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 800,
+  fontSize: 7.5,
+  fontWeight: 700,
   letterSpacing: '0.16em',
   color: DIM,
   textTransform: 'uppercase',
   margin: 0,
 };
+
 
 export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
   open,
@@ -80,83 +81,97 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: '12px 16px 8px',
+            gap: 11,
+            padding: '12px 16px 4px',
           }}
         >
           <p style={{ ...LABEL_STYLE, flex: 1 }}>ALL ACTIVE · {cohorts.totalActive}</p>
-          <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center' }}>30D</p>
-          <div style={{ width: 56 }} />
+          <p style={{ ...LABEL_STYLE, width: 26, textAlign: 'right' }}>30D</p>
+          <div style={{ width: 42 }} />
         </div>
 
-        {cohorts.active.map((entry, idx) => {
-          const rank = idx + 1;
-          const delta = entry.friend_row_id
-            ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-            : undefined;
-          return (
-            <LeaderboardRow
-              key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-              entry={entry}
-              rank={rank}
-              isStaleRow={false}
-              rankDelta={delta}
-              onClick={entry.is_self ? undefined : () => onRowClick(entry)}
-            />
-          );
-        })}
+        {/* 16px horizontal padding matches the row's negative margin, so the
+            self row's wash reaches both sheet edges. */}
+        <div style={{ padding: '0 16px' }}>
+          {cohorts.active.map((entry, idx) => {
+            const rank = idx + 1;
+            const delta = entry.friend_row_id
+              ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+              : undefined;
+            return (
+              <LeaderboardRow
+                key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                entry={entry}
+                rank={rank}
+                isStaleRow={false}
+                rankDelta={delta}
+                onClick={entry.is_self ? undefined : () => onRowClick(entry)}
+              />
+            );
+          })}
 
-        {cohorts.totalInactive > 0 && (
-          <>
-            {showInactive ? (
-              <>
-                <div style={{ padding: '16px 16px 8px' }}>
-                  <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
-                </div>
-                {cohorts.inactive.map((entry) => {
-                  const delta = entry.friend_row_id
-                    ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-                    : undefined;
-                  return (
-                    <LeaderboardRow
-                      key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                      entry={entry}
-                      rank={null}
-                      isStaleRow={true}
-                      rankDelta={delta}
-                      onClick={() => onRowClick(entry)}
-                    />
-                  );
-                })}
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowInactive(true)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 5,
-                  width: 'calc(100% - 40px)',
-                  margin: '12px 16px 16px',
-                  padding: '10px 16px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: DIM,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  fontFamily: FONT,
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                Show {cohorts.totalInactive} inactive friend
-                {cohorts.totalInactive === 1 ? '' : 's'}
-                <ChevronDown size={14} strokeWidth={2} />
-              </button>
-            )}
-          </>
+          {cohorts.totalInactive > 0 && showInactive && (
+            <>
+              <div style={{ padding: '16px 0 4px' }}>
+                <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
+              </div>
+              {cohorts.inactive.map((entry) => {
+                const delta = entry.friend_row_id
+                  ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+                  : undefined;
+                return (
+                  <LeaderboardRow
+                    key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                    entry={entry}
+                    rank={null}
+                    isStaleRow={true}
+                    rankDelta={delta}
+                    onClick={() => onRowClick(entry)}
+                  />
+                );
+              })}
+            </>
+          )}
+        </div>
+
+        {cohorts.totalInactive > 0 && !showInactive && (
+          <button
+            type="button"
+            onClick={() => setShowInactive(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              margin: '12px 16px 16px',
+              padding: 0,
+              background: 'transparent',
+              border: 'none',
+              color: DIM,
+              fontSize: 7.5,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              fontFamily: FONT,
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                color: 'rgba(242,244,247,0.96)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {cohorts.totalInactive}
+            </span>
+            Inactive
+            <ChevronDown size={12} strokeWidth={2} />
+          </button>
         )}
+
       </div>
     </BottomSheet>
   );
