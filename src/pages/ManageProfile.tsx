@@ -1,7 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2, Check } from 'lucide-react';
+import { A, bizFigure } from '@/features/courses/components/holes/analytical/tokens';
+import {
+  FIELD_LABEL,
+  FIELD_HINT,
+  FIELD_INPUT_CLASS,
+  FIELD_INPUT_STYLE,
+  FIELD_PLACEHOLDER_CLASS,
+  FIELD_COUNTER,
+  FieldLabel,
+  LOCKED_CLASS,
+  LOCKED_STYLE,
+  QuietAction,
+} from '@/components/manage/fieldTreatment';
+
 import { toast } from '@/lib/toast';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { useProfileData } from '@/hooks/useProfileData';
