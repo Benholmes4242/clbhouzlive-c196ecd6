@@ -286,8 +286,13 @@ const InviteRow: React.FC<{
     fontFamily: FONT,
     textAlign: 'left',
     background: 'none',
-    border: 'none',
-    ...(divider ? { borderTop: '1px solid var(--hcp-line)' } : null),
+    // Longhand only: mixing `border` with a conditional `borderTop` made React
+    // warn about shorthand/non-shorthand conflicts on every rerender.
+    borderLeft: 'none',
+    borderRight: 'none',
+    borderBottom: 'none',
+    borderTop: divider ? '1px solid var(--hcp-line)' : 'none',
+
   };
 
   if (alreadySent) return <div style={style}>{body}</div>;
