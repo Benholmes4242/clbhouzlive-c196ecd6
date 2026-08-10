@@ -708,7 +708,10 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes cache for better performance
       gcTime: 10 * 60 * 1000, // 10 minutes garbage collection (reduced from 15)
-      refetchOnMount: false,
+      // `true` (not 'always'): honours staleTime, but DOES refetch when a query
+      // mounts holding data an invalidation already marked stale. Without this,
+      // invalidateQueries only ever refreshed on-screen queries.
+      refetchOnMount: true,
       refetchOnReconnect: false,
       networkMode: 'online',
     } : {
@@ -716,7 +719,8 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: 60_000, // 1 minute — safe fallback, never 0 at scale
       gcTime: 5 * 60 * 1000,
-      refetchOnMount: false,
+      // See note above: honours staleTime, acts on invalidations after remount.
+      refetchOnMount: true,
       refetchOnReconnect: 'always',
       networkMode: 'always'
     },

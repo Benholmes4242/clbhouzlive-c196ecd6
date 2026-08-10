@@ -50,7 +50,7 @@ export function useCourseRatingsRealtime() {
               exact: false 
             });
             // Refetch even if the query is currently inactive (e.g. user updates a rating on a course page,
-            // then navigates back to profile). Our app often uses refetchOnMount=false for perf.
+            // then navigates back to profile), so inactive entries update without waiting for remount.
             void queryClient.refetchQueries({ 
               queryKey: ['user-course-ratings-breakdown', userId], 
               exact: false,
@@ -87,7 +87,7 @@ export function useCourseRatingsRealtime() {
           queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
           queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
 
-          // Force-refresh any currently visible feeds (perf-tuning sets refetchOnMount=false)
+          // Force-refresh any currently visible feeds immediately (belt-and-braces alongside invalidate)
           void queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
           void queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
           void queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });

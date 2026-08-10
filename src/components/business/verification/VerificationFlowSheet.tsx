@@ -181,7 +181,6 @@ export default function VerificationFlowSheet({
     queryKey: ['business-verification-wizard', businessId],
     enabled: !!businessId && open && mode !== 'domain',
     staleTime: 0,
-    refetchOnMount: 'always',
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_accounts')

@@ -25,11 +25,10 @@ export function useThread(conversationId: string | null) {
     queryKey,
     enabled: !!conversationId && !!actor,
     initialPageParam: null as string | null,
-    // Per-query overrides (FIX 1): opening a thread must always show current
-    // messages. Global QueryClient defaults (perfTuning) keep 5m staleTime
-    // and refetchOnMount:false, which is why this must be scoped here.
+    // Per-query overrides: opening a thread must always show current messages,
+    // so drop the global 5m staleTime. refetchOnMount now comes from the global
+    // default (true), which refetches this permanently-stale query on mount.
     staleTime: 0,
-    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase.rpc('get_thread', {
