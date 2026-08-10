@@ -350,9 +350,26 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
   //   - all items ready → removeJob (card disappears)
   //   - any item failed → markFailed (Retry primed via reviewRetryRegistry)
   const flushToReview = useCallback(
-    async (reviewId: string, opts?: { caption?: string }) => {
+    async (
+      reviewId: string,
+      opts?: { caption?: string; queryClient?: QueryClient },
+    ) => {
       const pending = itemsRef.current.filter((i) => i.status === 'pending' || i.status === 'failed');
       if (pending.length === 0) return;
+
+      // Cache sweeps: the composer hands us the QueryClient explicitly so the
+      // reference survives its unmount (flushToReview is fire-and-forget).
+      // Per-item sweep throttled to one every 2s; final sweep in finally().
+      const qc = opts?.queryClient ?? null;
+      let lastSweepAt = 0;
+      const sweep = (force: boolean) => {
+        if (!qc) return;
+        const now = Date.now();
+        if (!force && now - lastSweepAt < SWEEP_THROTTLE_MS) return;
+        lastSweepAt = now;
+        invalidateCourseRatingCaches(qc);
+      };
+
 
       const store = usePendingPostsStore.getState();
       const ident = identityRef.current;
