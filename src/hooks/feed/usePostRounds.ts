@@ -132,7 +132,7 @@ export function usePostRounds(scoreIds: string[]): PostRoundMapState {
           .in('whs_score_id', ids),
         supabase
           .from('whs_score_holes')
-          .select('score_id, hole_no, par, actual_gross')
+          .select('score_id, hole_no, par, actual_gross, played')
           .in('score_id', ids)
           .order('hole_no', { ascending: true }),
         supabase.rpc('get_round_crowns', { p_score_ids: ids }),
@@ -163,15 +163,21 @@ export function usePostRounds(scoreIds: string[]): PostRoundMapState {
         });
       }
 
-      const shapes = new Map<string, PostRoundHole[]>();
+      const shapes = new Map<string, (PostRoundHole & { played: boolean })[]>();
       for (const h of (holesRes.data ?? []) as {
         score_id: string;
         hole_no: number;
         par: number | null;
         actual_gross: number | null;
+        played: boolean | null;
       }[]) {
         const list = shapes.get(h.score_id) ?? [];
-        list.push({ holeNo: h.hole_no, par: h.par ?? null, gross: h.actual_gross ?? null });
+        list.push({
+          holeNo: h.hole_no,
+          par: h.par ?? null,
+          gross: h.actual_gross ?? null,
+          played: h.played !== false,
+        });
         shapes.set(h.score_id, list);
       }
 
