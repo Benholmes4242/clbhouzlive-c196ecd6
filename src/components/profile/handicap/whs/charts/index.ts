@@ -17,6 +17,8 @@ export { MiniRing, sharedMax } from './MiniRing';
 
 export { NextRoundBand } from './NextRoundBand';
 
+export { Last5AgainstTarget } from './Last5AgainstTarget';
+
 export { ThirdsChart } from './ThirdsChart';
 export type { Third } from './ThirdsChart';
 

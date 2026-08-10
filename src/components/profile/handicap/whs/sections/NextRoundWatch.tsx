@@ -1,16 +1,18 @@
 /**
- * NextRoundWatch - what the next round does to the index.
+ * NextRoundWatch - what the next round does to the index, in golf English.
  *
- * Carries THREE things, in this order and nothing else:
- *   1. the verdict state label plus its "why" sentence
- *   2. the NextRoundBand
- *   3. the explanation line
+ * TWO states only. The index cannot fall on its own: settleAt is the mean of
+ * the best 8 of the REMAINING 19, so dropping the oldest round either leaves
+ * the top 8 untouched (settleAt === current) or replaces a counter with a
+ * worse round (settleAt > current). It can never be lower.
  *
- * Renders NOTHING when fewer than 20 rounds exist or the projection is not
- * usable. No empty container, no placeholder band.
+ *   cannot rise -> "Your handicap can't go up next round."
+ *   will rise   -> "Your handicap goes up to {settle} next round" + sub.
  *
- * Direction is never decided here: it goes through indexTone(), so the
- * handicap inversion (index up = red) stays owned by the chart tokens.
+ * The card carries ONE sentence and ONE chart. No state label, no explanation
+ * paragraph, no raise threshold - none is computed.
+ *
+ * Renders NOTHING below 20 rounds or when the projection is unusable.
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,10 +20,18 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useAllScores } from '@/lib/whs/hooks';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
-import { NextRoundBand, CHART, CHART_FONT, LABEL_STYLE, indexTone, toneColor } from '../charts';
+import { Last5AgainstTarget } from '../charts/Last5AgainstTarget';
+import { CHART, CHART_FONT, indexTone } from '../charts';
 
 const MIN_ROUNDS = 20;
-const SCALE_PAD = 6;
+const KICKER = {
+  fontFamily: CHART_FONT,
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.19em',
+  textTransform: 'uppercase' as const,
+  color: CHART.DIM,
+};
 
 interface Props {
   connectionId: string;
@@ -37,17 +47,17 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     return projectNextRound(allScores.slice(0, 20), currentHandicap);
   }, [allScores, currentHandicap]);
 
-  const last5Avg = useMemo(() => {
-    if (!allScores) return null;
-    const diffs = allScores
+  /** Last five differentials, OLDEST FIRST for the chart. */
+  const last5 = useMemo(() => {
+    if (!allScores) return [];
+    return allScores
       .slice(0, 5)
       .map((r) => r.handicap_differential)
-      .filter((d): d is number => typeof d === 'number');
-    if (diffs.length === 0) return null;
-    return diffs.reduce((a, b) => a + b, 0) / diffs.length;
+      .filter((d): d is number => typeof d === 'number' && !Number.isNaN(d))
+      .reverse();
   }, [allScores]);
 
-  // Fire once per mount when the band is actually rendered. Never awaited.
+  // Fire once per mount when the card is actually rendered. Never awaited.
   const firedRef = useRef(false);
   const shownPayload = useMemo(() => {
     if (!projection || !projection.hasData || currentHandicap == null) return null;
@@ -66,55 +76,46 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
     analyticsEvents.track('handicap_next_round_shown', shownPayload);
   }, [shownPayload]);
 
+  const tone =
+    projection && currentHandicap != null
+      ? indexTone(currentHandicap, projection.settleAtRaw)
+      : null;
+
+  // Should be unreachable: a falling index means the stored value is stale.
+  const impossibleRef = useRef(false);
+  useEffect(() => {
+    if (tone !== 'down' || impossibleRef.current || !projection || currentHandicap == null) return;
+    impossibleRef.current = true;
+    analyticsEvents.track('handicap_next_round_impossible_state', {
+      settle: projection.settleAt,
+      cut: projection.cutTarget,
+      current: currentHandicap,
+    });
+  }, [tone, projection, currentHandicap]);
+
   if (isLoading || !projection || !projection.hasData || currentHandicap == null) return null;
 
-  const { cutTarget, settleAt, settleAtRaw, counterDropping } = projection;
+  const { cutTarget, settleAt, settleAtRaw } = projection;
   if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
 
-  // Direction of travel of the INDEX if the next round does not count.
-  const tone = indexTone(currentHandicap, settleAtRaw);
-  const color = toneColor(tone);
-
-  const stateLabel =
-    tone === 'up'
-      ? t('common:handicap.nextRound.stateUp')
-      : tone === 'down'
-        ? t('common:handicap.nextRound.stateDown')
-        : t('common:handicap.nextRound.stateFlat');
-
-  const settle = settleAt.toFixed(1);
+  const willRise = tone === 'up';
   const cut = cutTarget.toFixed(1);
+  const settle = settleAt.toFixed(1);
 
-  const why =
-    tone === 'up'
-      ? counterDropping
-        ? t('common:handicap.nextRound.whyUpCounterDropping', { settle, cut })
-        : t('common:handicap.nextRound.whyUp', { settle, cut })
-      : tone === 'down'
-        ? t('common:handicap.nextRound.whyDown', { settle })
-        : t('common:handicap.nextRound.whyFlat', { settle });
+  const line = willRise
+    ? t('common:handicap.nextRound.lineRise', { settle })
+    : t('common:handicap.nextRound.lineHold');
+  const sub = willRise
+    ? t('common:handicap.nextRound.subRise', { cut })
+    : t('common:handicap.nextRound.subHold', { cut });
 
-  // The band scale is centred on the cut target. A red zone only exists when
-  // the index actually rises without a counter.
-  const lo = cutTarget - SCALE_PAD;
-  const hi = cutTarget + SCALE_PAD;
-  const rise = tone === 'up' ? cutTarget : hi;
-
-  const explanation =
-    last5Avg != null
-      ? last5Avg <= cutTarget
-        ? t('common:handicap.nextRound.explainInside', { avg: last5Avg.toFixed(1) })
-        : t('common:handicap.nextRound.explainOutside', {
-            avg: last5Avg.toFixed(1),
-            gap: (last5Avg - cutTarget).toFixed(1),
-          })
-      : t('common:handicap.nextRound.explainFallback');
+  const counting = last5.filter((v) => v <= cutTarget).length;
 
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
       <DarkSectionHeader
         eyebrow={t('common:handicap.nextRound.eyebrow')}
-        right={<span style={{ ...LABEL_STYLE }}>{t('common:handicap.nextRound.sample')}</span>}
+        right={<span style={KICKER}>{t('common:handicap.nextRound.sample')}</span>}
       />
 
       <div
@@ -126,34 +127,39 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
           padding: 16,
         }}
       >
-        {/* 1. verdict state label + why */}
-        <div style={{ ...LABEL_STYLE, color }}>{stateLabel}</div>
         <p
           style={{
-            fontSize: 14,
-            fontWeight: 600,
+            fontSize: 17,
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
             color: CHART.INK,
-            lineHeight: 1.35,
-            margin: '8px 0 16px',
+            lineHeight: 1.25,
+            margin: 0,
           }}
         >
-          {why}
+          {line}
         </p>
-
-        {/* 2. the band */}
-        <NextRoundBand cut={cutTarget} rise={rise} lo={lo} hi={hi} />
-
-        {/* 3. explanation line */}
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13.5,
+            fontWeight: 400,
             color: CHART.MUTE,
-            lineHeight: 1.4,
-            margin: '14px 0 0',
+            lineHeight: 1.45,
+            margin: '6px 0 18px',
           }}
         >
-          {explanation}
+          {sub}
         </p>
+
+        <Last5AgainstTarget
+          values={last5}
+          cut={cutTarget}
+          targetLabel={t('common:handicap.nextRound.countsAt', { cut })}
+          footLabel={t('common:handicap.nextRound.lastRounds', {
+            count: counting,
+            total: last5.length,
+          })}
+        />
       </div>
     </section>
   );
