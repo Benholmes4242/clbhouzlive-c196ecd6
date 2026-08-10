@@ -179,158 +179,116 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
     <div
       style={{
         position: 'relative',
-        margin: '0 16px',
-        padding: '18px 18px 16px',
+        height: '100%',
+        boxSizing: 'border-box',
+        padding: '16px 16px 14px',
         borderRadius: 16,
         overflow: 'hidden',
-        minHeight: 230,
+        minHeight: 172,
         display: 'flex',
         flexDirection: 'column',
-        background: tokens.cardSweep,
+        background: 'var(--hcp-bg-1)',
         border: `1px solid ${tokens.cardBorder}`,
-        boxShadow: tokens.outerGlow ?? undefined,
         fontFamily: FONT,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {tokens.topStripe && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: tokens.topStripe,
-          }}
-        />
-      )}
-
-      {/* Calm: decorative watermark removed for legibility */}
-
-
-      {/* Chip */}
-      <div
-        style={{
-          alignSelf: 'flex-start',
-          padding: '4px 8px',
-          borderRadius: 999,
-          background: tokens.chipBg,
-          border: `1px solid ${tokens.chipBorder}`,
-          marginBottom: 14,
-          position: 'relative',
-          zIndex: 1,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        {tokens.chipPulse && (
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 999,
-              background: AMBER,
-              animation: 'streakChipPulse 1.6s ease-in-out infinite',
-            }}
-          />
-        )}
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: tokens.chipColor,
-            textTransform: 'uppercase',
-          }}
-        >
-          {tokens.chipLabel}
-        </span>
-      </div>
-
-      {/* Icon + title + description */}
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: tokens.iconBg,
-            border: `1px solid ${tokens.iconRing}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 1,
-            opacity: tokens.iconOpacity,
-            filter: tokens.iconFilter ?? 'none',
-            color: tokens.iconColor,
-          }}
-        >
-          <entry.Icon size={28} strokeWidth={2} />
-        </div>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: 'var(--hcp-t-100)',
-              lineHeight: 1.15,
-              marginBottom: 3,
-            }}
-          >
-            {entry.label}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: 'var(--hcp-t-60)',
-              lineHeight: 1.35,
-            }}
-          >
-            {entry.description}
-          </div>
-        </div>
-      </div>
-
-      {/* Hero number */}
+      {/* Glyph + state + meta */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
-          gap: 5,
-          position: 'relative',
-          zIndex: 1,
-          marginTop: 'auto',
+          alignItems: 'center',
+          gap: 6,
           marginBottom: 10,
         }}
       >
         <span
           style={{
-            fontSize: 44,
-            fontWeight: 800,
-            color: tokens.heroNumColor,
-            textShadow: tokens.heroNumShadow ?? 'none',
-            lineHeight: 1,
-            letterSpacing: '-0.04em',
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"kern" 1, "liga" 1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            color: tokens.glyphColor,
+            flexShrink: 0,
           }}
         >
-          {current}
+          <entry.Icon size={13} strokeWidth={2} />
         </span>
-        <span style={{ fontSize: 13, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
-          {entry.unit}
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: tokens.stateLabelColor,
+          }}
+        >
+          {tokens.stateLabel}
         </span>
+        {meta && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              fontSize: 8,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-40)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {meta}
+          </span>
+        )}
       </div>
 
-      {/* Progress bar */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Title */}
+      <div
+        style={{
+          fontSize: 14.5,
+          fontWeight: 700,
+          letterSpacing: '-0.025em',
+          color: 'var(--hcp-t-100)',
+          lineHeight: 1.2,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {entry.label}
+      </div>
+
+      {/* Bottom block: figure + bar + labels */}
+      <div style={{ marginTop: 'auto' }}>
         <div
           style={{
-            height: 4,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 5,
+            marginTop: 12,
+            marginBottom: 10,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 34,
+              fontWeight: 700,
+              color: tokens.figureColor,
+              lineHeight: 1,
+              letterSpacing: '-0.045em',
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+            }}
+          >
+            {current}
+          </span>
+          <span style={{ fontSize: 13, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
+            {entry.unit}
+          </span>
+        </div>
+
+        <div
+          style={{
+            height: 3,
             background: 'var(--hcp-bg-3)',
             borderRadius: 999,
             overflow: 'hidden',
@@ -350,55 +308,22 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: 10,
+            gap: 8,
+            fontSize: 7.5,
             fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             color: 'var(--hcp-t-60)',
-            letterSpacing: '0.04em',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
           <span>{progressLeft}</span>
-          <span style={{ color: 'var(--hcp-t-40)' }}>{progressRight}</span>
+          <span style={{ color: 'var(--hcp-t-40)', textAlign: 'right' }}>{progressRight}</span>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          marginTop: 12,
-          paddingTop: 10,
-          borderTop: '1px solid var(--hcp-line)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            color: tokens.hintColor,
-            fontWeight: tokens.hintFontWeight,
-          }}
-        >
-          {hintCopy}
-        </span>
-        {meta && (
-          <span
-            style={{
-              fontSize: 11,
-              color: 'var(--hcp-t-40)',
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {meta}
-          </span>
-        )}
       </div>
     </div>
   );
+
 };
 
 // ──────────────────────────────────────────────────────────────────
