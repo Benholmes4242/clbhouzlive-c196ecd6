@@ -87,8 +87,7 @@ export const PostRoundShell: React.FC = () => (
       <div
         style={{
           background: 'transparent',
-          borderTop: `1px solid ${HAIRLINE}`,
-          padding: '14px 14px 16px',
+                padding: '14px 14px 16px',
         }}
       >
         {/* Date kicker */}
