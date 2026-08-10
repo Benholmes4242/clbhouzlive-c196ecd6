@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
-import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
-import { Label } from '@/components/manage/ui';
+import { VisibilityRow, type VisibilityValue } from './VisibilityDropdown';
+import { FieldLabel } from '@/components/manage/fieldTreatment';
 
 interface Props {
   clubName: string;
@@ -64,9 +64,10 @@ export function HomeClubCard({
   if (clubId) {
     return (
       <div className="space-y-3">
-        <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
-          Home club
-        </Label>
+        <div>
+          <FieldLabel>Home club</FieldLabel>
+          <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+        </div>
 
         <div
           className="w-full flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
@@ -96,9 +97,10 @@ export function HomeClubCard({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
-        Home club
-      </Label>
+      <div>
+        <FieldLabel>Home club</FieldLabel>
+        <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+      </div>
       <div ref={containerRef} className="relative">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

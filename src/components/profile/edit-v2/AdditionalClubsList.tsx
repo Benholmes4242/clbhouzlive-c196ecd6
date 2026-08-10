@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
-import { VisibilityDropdown, type VisibilityValue } from './VisibilityDropdown';
-import { Label } from '@/components/manage/ui';
+import { VisibilityRow, type VisibilityValue } from './VisibilityDropdown';
+import { FieldLabel } from '@/components/manage/fieldTreatment';
 
 interface Props {
   clubs: ClubEntry[];
@@ -31,9 +31,13 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
-        Additional clubs
-      </Label>
+      {/* The kicker gets its own line; visibility gets its own row beneath. */}
+      <div>
+        <FieldLabel>Additional clubs</FieldLabel>
+        <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+      </div>
+
+
 
 
       {clubs.length > 0 && (

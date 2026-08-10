@@ -15,13 +15,14 @@ import { MapPreview } from '@/components/map/MapPreview';
 import { SelectedClub } from '@/components/business/ClubSearchDropdown';
 
 import {
-  INPUT_CLASS,
-  INPUT_STYLE,
+  FIELD_INPUT_CLASS,
+  FIELD_PLACEHOLDER_CLASS,
+  FIELD_INPUT_STYLE,
   LOCKED_CLASS,
   LOCKED_STYLE,
   LABEL_CLASS,
   HINT_CLASS,
-} from './editorStyles';
+} from '@/components/manage/fieldTreatment';
 import {
   DAYS_ORDER,
   Day,
@@ -209,8 +210,8 @@ export function LocationContactSection({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contact@business.com"
-                className={INPUT_CLASS}
-                style={INPUT_STYLE}
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={FIELD_INPUT_STYLE}
               />
             </div>
             <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
@@ -221,8 +222,8 @@ export function LocationContactSection({
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://yourwebsite.com"
-                className={INPUT_CLASS}
-                style={INPUT_STYLE}
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={FIELD_INPUT_STYLE}
               />
             </div>
           </div>

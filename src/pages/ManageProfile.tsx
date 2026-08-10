@@ -1,7 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2, Check } from 'lucide-react';
+import { A, bizFigure } from '@/features/courses/components/holes/analytical/tokens';
+import {
+  FIELD_LABEL,
+  FIELD_HINT,
+  FIELD_INPUT_CLASS,
+  FIELD_INPUT_STYLE,
+  FIELD_PLACEHOLDER_CLASS,
+  FIELD_COUNTER,
+  FieldLabel,
+  LOCKED_CLASS,
+  LOCKED_STYLE,
+  QuietAction,
+} from '@/components/manage/fieldTreatment';
+
 import { toast } from '@/lib/toast';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -516,100 +530,109 @@ function ProfileTabBody({
         <ManageCard padding={0}>
           {/* Name */}
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label>Name</Label>
+            <FieldLabel>Name</FieldLabel>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={form.firstName}
                 onChange={(e) => setField('firstName', e.target.value)}
                 placeholder="First name"
-                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={{ ...FIELD_INPUT_STYLE, width: '50%' }}
               />
               <input
                 type="text"
                 value={form.lastName}
                 onChange={(e) => setField('lastName', e.target.value)}
                 placeholder="Last name"
-                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={{ ...FIELD_INPUT_STYLE, width: '50%' }}
               />
             </div>
           </div>
 
           {/* Display Name */}
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label right={
-              <span className="text-[11px] text-muted-foreground/60">
-                {form.displayName.length}/{DISPLAY_NAME_MAX}
-              </span>
-            }>
+            <FieldLabel
+              right={
+                <span style={FIELD_COUNTER}>
+                  {form.displayName.length}/{DISPLAY_NAME_MAX}
+                </span>
+              }
+            >
               Display name
-            </Label>
+            </FieldLabel>
             <input
               type="text"
               value={form.displayName}
               maxLength={DISPLAY_NAME_MAX}
               onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
               placeholder="Your full name"
-              className="w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+              className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+              style={FIELD_INPUT_STYLE}
             />
             {errors.displayName && (
               <p className="text-[12px] text-destructive mt-1">{errors.displayName}</p>
             )}
           </div>
 
-          {/* Username */}
+          {/* Username. Locked reads as locked: the quiet inset, and its
+              explanation sits in the hint slot beneath where it has room. */}
           <div className="px-4 pt-3 pb-4" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label right={
-              usernameIsLocked ? (
-                <span className="text-[11px] text-muted-foreground/60">
-                  Contact{' '}
-                  <a href="mailto:support@clbhouz.co.uk" className="underline text-muted-foreground/60">
-                    support@clbhouz.co.uk
-                  </a>{' '}to change
-                </span>
-              ) : undefined
-            }>
-              Username
-            </Label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
-              <input
-                type="text"
-                value={form.username}
-                maxLength={USERNAME_MAX}
-                readOnly={usernameIsLocked}
-                onChange={(e) => {
-                  if (usernameIsLocked) return;
-                  setField('username', e.target.value.toLowerCase());
-                }}
-                placeholder="choose a username"
-                className={`w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              />
-              {!usernameIsLocked && isNewUser && form.username.trim().length > 0 && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
-                  {usernameStatus === 'checking' && (
-                    <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
-                  )}
-                  {usernameStatus === 'available' && (
-                    <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <CheckCircle2 size={14} strokeWidth={2.25} /> available
+            <FieldLabel>Username</FieldLabel>
+            {usernameIsLocked ? (
+              <>
+                <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
+                  <span>@{form.username}</span>
+                </div>
+                <p style={FIELD_HINT}>Contact support@clbhouz.co.uk to change</p>
+              </>
+            ) : (
+              <>
+                <div className="relative">
+                  <span
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                    style={{ fontSize: 14, color: A.DIM }}
+                  >
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    value={form.username}
+                    maxLength={USERNAME_MAX}
+                    onChange={(e) => setField('username', e.target.value.toLowerCase())}
+                    placeholder="choose a username"
+                    className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} pl-8 pr-24`}
+                    style={FIELD_INPUT_STYLE}
+                  />
+                  {isNewUser && form.username.trim().length > 0 && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
+                      {usernameStatus === 'checking' && (
+                        <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+                      )}
+                      {usernameStatus === 'available' && (
+                        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle2 size={14} strokeWidth={2.25} /> available
+                        </span>
+                      )}
+                      {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
+                      {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
                     </span>
                   )}
-                  {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
-                  {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
-                </span>
-              )}
-            </div>
-            {!usernameIsLocked && isNewUser && (
-              <p className="text-[12px] text-muted-foreground mt-1.5">
-                3-20 characters - lowercase letters, numbers, underscores, periods
-              </p>
+                </div>
+                {isNewUser && (
+                  <p style={FIELD_HINT}>
+                    3-20 characters - lowercase letters, numbers, underscores, periods
+                  </p>
+                )}
+              </>
             )}
           </div>
 
+
           {/* Gender (INK active) */}
           <div className="px-4 pt-3 pb-4">
-            <Label>Gender</Label>
+            <FieldLabel>Gender</FieldLabel>
             <SegToggle
               value={form.gender}
               onChange={(v) => setField('gender', v)}
@@ -719,29 +742,53 @@ function ProfileTabBody({
         )}
       </div>
 
-      {/* Save (INK primary) */}
+      {/*
+        THE SAVE CONTROL SPLITS IN TWO. A completion state is not a control:
+        clean and not saving renders a line, not a dead slab. What SAVES is
+        untouched - isDirty / isSaving / isDisabled / handleSave all unchanged.
+      */}
       <div className="px-4 pt-6 pb-2">
-        <Button
-          onClick={handleSave}
-          disabled={isDisabled}
-          className="w-full min-h-[52px] rounded-[13px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
-          style={{
-            background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
-            color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
-            fontFamily: GEIST,
-          }}
-        >
-          {isSaving ? (
-            <><Loader2 size={18} className="animate-spin mr-2" /> Saving...</>
-          ) : isNewUser ? (
-            'Save & continue'
-          ) : isDirty ? (
-            'Save changes'
-          ) : (
-            'All Saved'
-          )}
-        </Button>
+        {isDirty || isSaving ? (
+          <Button
+            onClick={handleSave}
+            disabled={isDisabled}
+            className="w-full border-0 active:opacity-90 transition-opacity"
+            style={{
+              minHeight: 50,
+              borderRadius: 999,
+              fontSize: 14.5,
+              fontWeight: 700,
+              background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
+              color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
+              fontFamily: GEIST,
+            }}
+          >
+            {isSaving ? (
+              <><Loader2 size={18} className="animate-spin mr-2" /> Saving...</>
+            ) : isNewUser ? (
+              'Save & continue'
+            ) : (
+              'Save changes'
+            )}
+          </Button>
+        ) : (
+          <div
+            style={{
+              height: 22,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 5,
+              ...FIELD_LABEL,
+              color: A.MUTE,
+            }}
+          >
+            <Check size={11} strokeWidth={3} />
+            All changes saved
+          </div>
+        )}
       </div>
+
     </>
   );
 }
@@ -771,9 +818,9 @@ function HandicapRow({
   if (state === 'whs') {
     return (
       <div style={{ fontFamily: GEIST }}>
-        <Label>Official handicap</Label>
+        <FieldLabel>Official handicap</FieldLabel>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
-          <span style={{ fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={bizFigure(34, INK)}>
             {value != null ? formatHcp(value) : '-'}
           </span>
           <span style={{
@@ -820,57 +867,47 @@ function HandicapRow({
     return (
       <div style={{ fontFamily: GEIST }}>
         <HandicapInput value={form.handicapIndex} onChange={onChange} />
+        <p style={{ fontSize: 12, color: INK_55, margin: '12px 4px 10px', lineHeight: 1.5 }}>
+          {HELPER_COPY}
+        </p>
         <button
           onClick={onOpenConnect}
           style={{
-            marginTop: 12,
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '12px 16px', borderRadius: 12,
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            minHeight: 46, padding: '12px 16px', borderRadius: 999,
             background: INK, color: '#fff', border: 'none',
-            fontSize: 14, fontWeight: 600, fontFamily: GEIST, cursor: 'pointer',
+            fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
           }}
         >
           Connect official handicap
-          <ArrowRight size={16} strokeWidth={2.4} />
         </button>
-        <p style={{ fontSize: 12, color: INK_55, margin: '8px 4px 0', lineHeight: 1.5 }}>
-          {HELPER_COPY}
-        </p>
       </div>
     );
   }
 
   return (
     <div style={{ fontFamily: GEIST }}>
-      <Label>Handicap</Label>
+      <FieldLabel>Handicap</FieldLabel>
+      {/* The helper reads BEFORE the button - it explains why you would tap it. */}
+      <p style={{ fontSize: 12, color: INK_55, margin: '0 4px 12px', lineHeight: 1.5 }}>
+        {HELPER_COPY}
+      </p>
       <button
         onClick={onOpenConnect}
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          padding: '12px 16px', borderRadius: 12,
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          minHeight: 46, padding: '12px 16px', borderRadius: 999,
           background: INK, color: '#fff', border: 'none',
-          fontSize: 15, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
+          fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
         }}
       >
         Connect official handicap
-        <ArrowRight size={18} strokeWidth={2.4} />
       </button>
-      <p style={{ fontSize: 12, color: INK_55, margin: '10px 4px 14px', lineHeight: 1.5 }}>
-        {HELPER_COPY}
-      </p>
-      <p style={{ fontSize: 13, color: INK_55, margin: '4px 4px 0', lineHeight: 1.5, textAlign: 'center' }}>
-        Don't have an official WHS handicap?{' '}
-        <button
-          onClick={onToggleManualEntry}
-          style={{
-            background: 'transparent', border: 'none', padding: 0,
-            fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST,
-            cursor: 'pointer', textDecoration: 'underline',
-          }}
-        >
-          {showManualEntry ? 'Hide manual entry' : 'Enter yours manually'}
-        </button>
-      </p>
+      <div style={{ marginTop: 4 }}>
+        <QuietAction center onClick={onToggleManualEntry}>
+          {showManualEntry ? 'Hide manual entry' : 'Enter a handicap manually'}
+        </QuietAction>
+      </div>
       {showManualEntry && (
         <div style={{ marginTop: 12 }}>
           <HandicapInput value={form.handicapIndex} onChange={onChange} />
@@ -878,4 +915,5 @@ function HandicapRow({
       )}
     </div>
   );
+
 }

@@ -72,6 +72,9 @@ import {
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 import type { Database, Json } from '@/integrations/supabase/types';
+import { Check } from 'lucide-react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_LABEL } from '@/components/manage/fieldTreatment';
 
 /* ─────────────────────── constants ─────────────────────── */
 
@@ -907,29 +910,54 @@ export default function BusinessProfileEditor() {
 
 
 
-          {/* Inline Save — bottom, matches personal Edit Profile */}
+          {/*
+            THE SAVE CONTROL SPLITS IN TWO, same as the personal editor: a
+            completion state is not a control. Edit mode with nothing dirty
+            renders a line, never a dead slab. What SAVES is unchanged.
+          */}
           <div className="px-4 pt-6 pb-2">
-            <button
-              onClick={handleSave}
-              disabled={!saveEnabled}
-              className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 active:opacity-90 transition-opacity flex items-center justify-center"
-              style={{
-                background: (saveEnabled || saving) ? BIZ.amber : 'rgba(15,23,42,0.06)',
-                color: (saveEnabled || saving) ? '#fff' : 'rgba(15,23,42,0.45)',
-                boxShadow: (saveEnabled || saving) ? '0 4px 16px rgba(247,147,30,0.28)' : 'none',
-              }}
-            >
-              {saving ? (
-                <>
-                  <Loader2 size={18} className="animate-spin mr-2" /> Saving…
-                </>
-              ) : mode === 'create' ? (
-                'Create business'
-              ) : (
-                'Save changes'
-              )}
-            </button>
+            {mode === 'edit' && !isDirty && !saving ? (
+              <div
+                style={{
+                  height: 22,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  ...FIELD_LABEL,
+                  color: A.MUTE,
+                }}
+              >
+                <Check size={11} strokeWidth={3} />
+                All changes saved
+              </div>
+            ) : (
+              <button
+                onClick={handleSave}
+                disabled={!saveEnabled}
+                className="w-full border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 active:opacity-90 transition-opacity flex items-center justify-center"
+                style={{
+                  minHeight: 50,
+                  borderRadius: 999,
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                  background: (saveEnabled || saving) ? A.INK : 'rgba(15,23,42,0.06)',
+                  color: (saveEnabled || saving) ? '#fff' : 'rgba(15,23,42,0.45)',
+                }}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin mr-2" /> Saving...
+                  </>
+                ) : mode === 'create' ? (
+                  'Create business'
+                ) : (
+                  'Save changes'
+                )}
+              </button>
+            )}
           </div>
+
         </div>
       </ManagePageShell>
 

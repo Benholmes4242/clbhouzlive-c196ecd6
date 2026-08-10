@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
-import { HINT_CLASS } from './editorStyles';
+import { HINT_CLASS } from '@/components/manage/fieldTreatment';
 import { getFacilitiesForCategory } from './editorTypes';
 
 interface Props {
