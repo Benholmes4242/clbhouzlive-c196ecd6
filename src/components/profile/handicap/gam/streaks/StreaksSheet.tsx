@@ -19,9 +19,9 @@ const FONT = CHART_FONT;
 
 const LABEL: React.CSSProperties = {
   fontFamily: FONT,
-  fontSize: 9.5,
-  fontWeight: 800,
-  letterSpacing: '0.13em',
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
   textTransform: 'uppercase',
   color: CHART.DIM,
 };
@@ -33,6 +33,7 @@ const TABULAR: React.CSSProperties = {
 
 const BAR_HEIGHT = 4;
 
+/** current / best. THE formula: where you stand against your own record. */
 const Bar: React.FC<{ pct: number; color: string }> = ({ pct, color }) => (
   <div
     style={{
@@ -47,6 +48,33 @@ const Bar: React.FC<{ pct: number; color: string }> = ({ pct, color }) => (
         width: `${Math.max(0, Math.min(100, pct))}%`,
         height: '100%',
         background: color,
+      }}
+    />
+  </div>
+);
+
+/**
+ * A broken streak still HAS a record - the closing line promises exactly that.
+ * The track renders empty with the best marked at its right end.
+ */
+const RecordTrack: React.FC = () => (
+  <div
+    style={{
+      height: BAR_HEIGHT,
+      borderRadius: BAR_HEIGHT / 2,
+      background: 'rgba(255,255,255,0.16)',
+      position: 'relative',
+    }}
+  >
+    <div
+      style={{
+        position: 'absolute',
+        right: 0,
+        top: -2,
+        width: 2,
+        height: BAR_HEIGHT + 4,
+        borderRadius: 1,
+        background: CHART.DIM,
       }}
     />
   </div>
@@ -68,6 +96,21 @@ function deriveState(row: StreakRow | null): StreakState {
   if (best > 0) return 'lapsed';
   return 'new';
 }
+
+/** Rows live inside one panel per section; the section label sits outside it. */
+const Panel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      margin: '0 16px',
+      background: CHART.PANEL,
+      border: `1px solid ${CHART.BORDER}`,
+      borderRadius: 14,
+      overflow: 'hidden',
+    }}
+  >
+    {children}
+  </div>
+);
 
 const SectionHeader: React.FC<{ label: string; count: number }> = ({ label, count }) => (
   <div style={{ ...LABEL, padding: '20px 16px 8px', display: 'flex', gap: 6 }}>
@@ -96,8 +139,7 @@ const CollapsedSection: React.FC<{
           width: '100%',
           background: 'transparent',
           border: 'none',
-          borderTop: `1px solid ${CHART.BORDER}`,
-          padding: '18px 16px 14px',
+          padding: '20px 16px 8px',
           cursor: 'pointer',
           ...LABEL,
         }}
@@ -115,10 +157,11 @@ const CollapsedSection: React.FC<{
           aria-hidden
         />
       </button>
-      {open && children}
+      {open && <Panel>{children}</Panel>}
     </div>
   );
 };
+
 
 const StreakRowView: React.FC<{
   type: StreakType;
@@ -157,36 +200,43 @@ const StreakRowView: React.FC<{
           <div
             style={{
               fontSize: 13.5,
-              fontWeight: 700,
+              fontWeight: 600,
               color: CHART.INK,
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.015em',
               lineHeight: 1.3,
             }}
           >
             {t(`streaks.type.${type}.label`)}
           </div>
-          <div style={{ marginTop: 3, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, lineHeight: 1.4 }}>
+          <div style={{ ...LABEL, marginTop: 4, fontSize: 7, letterSpacing: '0.14em', lineHeight: 1.5 }}>
             {t(`streaks.type.${type}.explainer`)}
           </div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: figureColour,
-              ...TABULAR,
-            }}
-          >
-            {current}
+          {/* The one comparison the row exists for, as ONE figure pair. */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 3 }}>
+            <span
+              style={{
+                fontSize: 19,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                color: figureColour,
+                ...TABULAR,
+              }}
+            >
+              {current}
+            </span>
+            {best > 0 && (
+              <span style={{ fontSize: 12, fontWeight: 400, color: CHART.DIM, ...TABULAR }}>
+                / {best}
+              </span>
+            )}
           </div>
           <div style={{ ...LABEL, marginTop: 2 }}>{unitLabel(current)}</div>
         </div>
       </div>
 
-      {/* A streak IS the relationship between now and the record, so the row
-          shows it as progress rather than two unrelated figures. */}
+      {/* current / best - where you stand against your own record. */}
       {state === 'active' && best > 0 && (
         <div style={{ marginTop: 10 }}>
           <Bar pct={(current / best) * 100} color={atBest ? CHART.DOWN : CHART.AMBER} />
@@ -203,21 +253,23 @@ const StreakRowView: React.FC<{
               ? settingItNow
                 ? t('streaks.settingItNow')
                 : t('streaks.atYourBest')
-              : t('streaks.fromYourBest', { n: best - current, best })}
-
+              : t('streaks.moreToBeatIt', { n: best - current + 1 })}
           </div>
         </div>
       )}
 
       {state === 'lapsed' && (
-        <div style={{ marginTop: 8, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, ...TABULAR }}>
-          {row?.best_ended_at
-            ? t('streaks.brokenLine', {
-                n: best,
-                unit: unitLabel(best),
-                when: relativeTime(row.best_ended_at),
-              })
-            : t('streaks.bestLine', { n: best, unit: unitLabel(best) })}
+        <div style={{ marginTop: 10 }}>
+          <RecordTrack />
+          <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: CHART.MUTE, ...TABULAR }}>
+            {row?.best_ended_at
+              ? t('streaks.brokenLine', {
+                  n: best,
+                  unit: unitLabel(best),
+                  when: relativeTime(row.best_ended_at),
+                })
+              : t('streaks.bestLine', { n: best, unit: unitLabel(best) })}
+          </div>
         </div>
       )}
 
@@ -226,6 +278,7 @@ const StreakRowView: React.FC<{
           {t('streaks.notStartedYet')}
         </div>
       )}
+
 
       {/* Freezes are a number, not a badge. They auto-apply on a missed week. */}
       {freeze > 0 && (
@@ -286,20 +339,10 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         ? t('streaks.headlineOne')
         : t('streaks.headlineMany', { count: active.length });
 
-  const subLineParts: string[] = [];
-  if (longest && (longest.best_count ?? 0) > 0) {
-    subLineParts.push(
-      t('streaks.longestEver', {
-        n: longest.best_count,
-        unit: t(`streaks.unit.${STREAK_SHEET_CONFIG[longest.streak_type].unit}`, {
-          count: longest.best_count,
-        }),
-        name: t(`streaks.type.${longest.streak_type}.short`),
-      }),
-    );
-  }
+  const hasLongest = !!longest && (longest.best_count ?? 0) > 0;
   // Freezes are deliberately NOT totalled here: they are seeded only for
   // round_played, so a header total reads as a pool covering every streak.
+
 
 
   return (
@@ -332,7 +375,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
           style={{
             margin: '6px 0 0',
             fontSize: 20,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: CHART.INK,
             ...TABULAR,
@@ -340,11 +383,32 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         >
           {isLoading || isError ? '\u00a0' : headline}
         </h2>
-        {!isLoading && !isError && subLineParts.length > 0 && (
-          <div style={{ ...LABEL, marginTop: 6, ...TABULAR, color: CHART.MUTE }}>
-            {subLineParts.join(' \u00b7 ')}
+        {/* The best-ever record is the most impressive fact here, so it reads
+            as a FIGURE rather than another caps heading. */}
+        {!isLoading && !isError && hasLongest && longest && (
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={LABEL}>{t('streaks.longestEverLabel')}</span>
+            <span
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                color: CHART.INK,
+                ...TABULAR,
+              }}
+            >
+              {longest.best_count}
+            </span>
+            <span style={{ ...LABEL, color: CHART.MUTE }}>
+              {t(`streaks.unit.${STREAK_SHEET_CONFIG[longest.streak_type].unit}`, {
+                count: longest.best_count,
+              })}
+              {' \u00b7 '}
+              {t(`streaks.type.${longest.streak_type}.short`)}
+            </span>
           </div>
         )}
+
       </div>
 
       <div
@@ -375,16 +439,19 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
             {active.length > 0 && (
               <>
                 <SectionHeader label={t('streaks.sectionRunning')} count={active.length} />
-                {active.map((type, i) => (
-                  <StreakRowView
-                    key={type}
-                    type={type}
-                    row={byType.get(type) ?? null}
-                    state="active"
-                    last={i === active.length - 1}
-                  />
-                ))}
+                <Panel>
+                  {active.map((type, i) => (
+                    <StreakRowView
+                      key={type}
+                      type={type}
+                      row={byType.get(type) ?? null}
+                      state="active"
+                      last={i === active.length - 1}
+                    />
+                  ))}
+                </Panel>
               </>
+
             )}
 
             <CollapsedSection label={t('streaks.sectionBroken')} count={lapsed.length}>
