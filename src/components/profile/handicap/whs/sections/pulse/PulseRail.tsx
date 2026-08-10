@@ -16,7 +16,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch, findRow }) =>
 
   if (isLoading) {
     return (
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: 40 }}>
         <SectionHeader surface="dark" role="section" kicker="PULSE" paddingX={16} />
         {findRow}
         <div
@@ -48,7 +48,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch, findRow }) =>
 
   if (friends.length === 0) {
     return (
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: 40 }}>
         <SectionHeader surface="dark" role="section" kicker="PULSE" paddingX={16} />
         {findRow}
         <PulseEmpty onOpenSearch={onOpenSearch} />
@@ -57,7 +57,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch, findRow }) =>
   }
 
   return (
-    <div style={{ marginTop: 16 }}>
+    <div style={{ marginTop: 40 }}>
       <SectionHeader
         surface="dark"
         role="section"
