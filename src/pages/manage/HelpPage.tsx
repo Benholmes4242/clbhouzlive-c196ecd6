@@ -21,7 +21,7 @@ function AccordionRow({
   isFirst?: boolean;
 }) {
   return (
-    <div style={{ borderTop: isFirst ? 'none' : `0.5px solid ${A.HAIRLINE}` }}>
+    <div>
       <button
         type="button"
         onClick={onToggle}

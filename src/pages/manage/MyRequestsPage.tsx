@@ -18,11 +18,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Other',
 };
 
-function statusStyle(s: MyRequestStatus): { label: string; bg: string; fg: string } {
-  if (s === 'open') return { label: 'Open', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
-  if (s === 'in_progress') return { label: 'In progress', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
-  if (s === 'resolved') return { label: 'Resolved', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
-  return { label: 'Closed', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
+/* Status reads as text, not a tinted capsule. Open and In progress are
+   deliberately the SAME weight - they are identical today and nothing in the
+   data distinguishes them. */
+function statusStyle(s: MyRequestStatus): { label: string; fg: string } {
+  if (s === 'open') return { label: 'Open', fg: A.INK };
+  if (s === 'in_progress') return { label: 'In progress', fg: A.INK };
+  if (s === 'resolved') return { label: 'Resolved', fg: A.DIM };
+  return { label: 'Closed', fg: A.DIM };
 }
 
 function relTime(iso: string): string {
@@ -157,15 +160,15 @@ export default function MyRequestsPage() {
                         {cat}
                       </span>
                       <span
-                        className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                        style={{ background: status.bg, color: status.fg }}
+                        className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                        style={{ color: status.fg }}
                       >
                         {status.label}
                       </span>
                     </div>
                     <div
-                      className="text-[15px] font-semibold truncate"
-                      style={{ color: A.INK }}
+                      className="text-[15px] font-semibold"
+                      style={{ color: A.INK, lineHeight: 1.3 }}
                     >
                       {t.subject}
                     </div>

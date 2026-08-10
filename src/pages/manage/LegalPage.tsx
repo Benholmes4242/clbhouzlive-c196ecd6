@@ -38,9 +38,7 @@ export default function LegalPage() {
               to={`/legal/${doc.slug}`}
               className="flex items-center justify-between px-4 py-3"
               style={{
-                borderTop: i === 0 ? 'none' : '1px solid rgba(15,23,42,0.06)',
-                textDecoration: 'none',
-                color: 'inherit',
+                                color: 'inherit',
               }}
             >
               <span className="text-[15px] font-medium text-foreground">

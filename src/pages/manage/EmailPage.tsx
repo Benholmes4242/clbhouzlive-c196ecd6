@@ -162,12 +162,6 @@ export default function EmailPage() {
         {step === 'code' && (
           <div className="rounded-2xl p-6 space-y-4" style={{ background: A.PANEL, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
-              <div
-                className="flex items-center justify-center rounded-2xl"
-                style={{ width: 56, height: 56, background: A.GREEN }}
-              >
-                <Mail size={26} style={{ color: A.GREEN }} />
-              </div>
               <div>
                 <p className="text-[17px] font-semibold" style={{ color: A.INK }}>
                   Enter verification code
@@ -233,12 +227,7 @@ export default function EmailPage() {
         {step === 'success' && (
           <div className="rounded-2xl p-6 space-y-4" style={{ background: A.PANEL, border: HAIRLINE }}>
             <div className="flex flex-col items-center text-center gap-3">
-              <div
-                className="flex items-center justify-center rounded-2xl"
-                style={{ width: 56, height: 56, background: A.GREEN }}
-              >
-                <Check size={28} style={{ color: A.GREEN }} strokeWidth={2.5} />
-              </div>
+              <Check size={15} style={{ color: A.GREEN }} strokeWidth={2.5} />
               <div>
                 <p className="text-[17px] font-semibold" style={{ color: A.INK }}>
                   Email updated

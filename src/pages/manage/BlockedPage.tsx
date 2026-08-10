@@ -90,7 +90,7 @@ export default function BlockedPage() {
                   key={item.blocked_id}
                   className="flex items-center gap-3 px-4 py-3"
                   style={{
-                    borderTop: idx === 0 ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
+                    borderTop: idx === 0 ? 'none' : `0.5px solid ${A.BORDER}`,
                   }}
                 >
                   <SquircleAvatar
@@ -102,8 +102,10 @@ export default function BlockedPage() {
                     ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-foreground truncate">{p?.full_name ?? 'Unknown'}</p>
-                    <p className="text-[13px] truncate" style={{ color: A.MUTE }}>@{p?.username ?? '\u2014'}</p>
+                    <p className="text-[15px] font-medium text-foreground" style={{ lineHeight: 1.3 }}>{p?.full_name ?? 'Unknown'}</p>
+                    {p?.username && (
+                      <p className="text-[13px]" style={{ color: A.MUTE, lineHeight: 1.35 }}>@{p.username}</p>
+                    )}
                   </div>
                   <Button
                     variant="outline"

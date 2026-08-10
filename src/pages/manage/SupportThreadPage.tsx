@@ -23,10 +23,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Other',
 };
 
-function statusStyle(s: MyRequestStatus): { label: string; bg: string; fg: string } {
+function statusStyle(s: MyRequestStatus): { label: string; fg: string } {
   if (s === 'open' || s === 'in_progress')
-    return { label: s === 'open' ? 'Open' : 'In progress', bg: 'rgba(245,158,11,0.14)', fg: '#B45309' };
-  return { label: s === 'resolved' ? 'Resolved' : 'Closed', bg: 'rgba(15,23,42,0.06)', fg: A.MUTE };
+    return { label: s === 'open' ? 'Open' : 'In progress', fg: A.INK };
+  return { label: s === 'resolved' ? 'Resolved' : 'Closed', fg: A.DIM };
 }
 
 export default function SupportThreadPage() {
@@ -79,7 +79,7 @@ export default function SupportThreadPage() {
             </p>
             <button
               onClick={() => refetch()}
-              className="text-[13px] font-semibold underline"
+              className="text-[13px] font-semibold"
               style={{ color: A.INK }}
             >
               Retry
@@ -138,8 +138,8 @@ export default function SupportThreadPage() {
                 {cat}
               </span>
               <span
-                className="text-[10px] font-semibold uppercase tracking-[1.2px] px-1.5 py-0.5 rounded"
-                style={{ background: status.bg, color: status.fg }}
+                className="text-[8px] font-bold uppercase tracking-[0.16em]"
+                style={{ color: status.fg }}
               >
                 {status.label}
               </span>
