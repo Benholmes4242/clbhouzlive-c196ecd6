@@ -917,30 +917,43 @@ export default function VerificationFlowSheet({
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={docUploading}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-medium"
-                      style={{
-                        border: `1px dashed ${BIZ.hairDashed}`,
-                        color: BIZ.inkMute,
-                        background: BIZ.card,
-                      }}
-                    >
-                      {docUploading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading…
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4" />
-                          Attach document (image or PDF, max 10MB)
-                        </>
-                      )}
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={docUploading}
+                        className="w-full flex items-center justify-center gap-2"
+                        style={{
+                          minHeight: 44,
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          border: 'none',
+                          background: 'rgba(14,18,22,0.028)',
+                          ...BIZ_LABEL,
+                          color: A.INK,
+                        }}
+                      >
+                        {docUploading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Uploading
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={13} strokeWidth={2.25} />
+                            Attach image or PDF
+                          </>
+                        )}
+                      </button>
+                      <div
+                        className="text-center"
+                        style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}
+                      >
+                        Max 10MB
+                      </div>
+                    </div>
                   )}
+
                   <input
                     ref={fileInputRef}
                     type="file"
