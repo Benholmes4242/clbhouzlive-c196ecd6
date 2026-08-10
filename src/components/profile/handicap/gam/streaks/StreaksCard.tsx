@@ -29,92 +29,41 @@ interface Props {
 type StreakState = 'atpb' | 'active' | 'dormant';
 
 interface StreakStateToken {
-  cardSweep: string;
   cardBorder: string;
-  topStripe: string | null;
-  outerGlow: string | null;
-  iconBg: string;
-  iconRing: string;
-  iconColor: string;
-  iconOpacity: number;
-  iconFilter: string | null;
-  chipBg: string;
-  chipBorder: string;
-  chipColor: string;
-  chipPulse: boolean;
-  chipLabel: string;
-  heroNumColor: string;
-  heroNumShadow: string | null;
+  glyphColor: string;
+  stateLabel: string;
+  stateLabelColor: string;
+  figureColor: string;
   progressFill: string;
-  hintColor: string;
-  hintFontWeight: number;
 }
 
 const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
   atpb: {
-    cardSweep: 'var(--hcp-bg-1)',
     cardBorder: 'var(--hcp-line)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(247,147,30,0.22)',
-    iconRing: 'rgba(247,147,30,0.65)',
-    iconColor: AMBER,
-    iconOpacity: 1,
-    iconFilter: null,
-    chipBg: 'rgba(247,147,30,0.20)',
-    chipBorder: AMBER,
-    chipColor: AMBER_DEEP,
-    chipPulse: true,
-    chipLabel: 'AT YOUR PB',
-    heroNumColor: 'var(--hcp-t-100)',
-    heroNumShadow: null,
-    progressFill: `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`,
-    hintColor: AMBER_DEEP,
-    hintFontWeight: 700,
+    glyphColor: AMBER,
+    stateLabel: 'AT YOUR PB',
+    stateLabelColor: 'var(--hcp-t-60)',
+    figureColor: AMBER,
+    progressFill: AMBER,
   },
   active: {
-    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(247,147,30,0.14) 100%)`,
-    cardBorder: 'rgba(247,147,30,0.32)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(247,147,30,0.14)',
-    iconRing: 'rgba(247,147,30,0.42)',
-    iconColor: AMBER,
-    iconOpacity: 1,
-    iconFilter: null,
-    chipBg: 'rgba(247,147,30,0.16)',
-    chipBorder: 'rgba(247,147,30,0.40)',
-    chipColor: AMBER_DEEP,
-    chipPulse: true,
-    chipLabel: 'ACTIVE',
-    heroNumColor: AMBER,
-    heroNumShadow: null,
-    progressFill: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
-    hintColor: 'var(--hcp-t-60)',
-    hintFontWeight: 600,
+    cardBorder: 'var(--hcp-line)',
+    glyphColor: AMBER,
+    stateLabel: 'ACTIVE',
+    stateLabelColor: 'var(--hcp-t-60)',
+    figureColor: 'var(--hcp-t-100)',
+    progressFill: AMBER,
   },
   dormant: {
-    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(148,163,184,0.08) 100%)`,
-    cardBorder: 'rgba(148,163,184,0.22)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(148,163,184,0.10)',
-    iconRing: 'rgba(148,163,184,0.25)',
-    iconColor: 'var(--hcp-t-40)',
-    iconOpacity: 0.7,
-    iconFilter: 'grayscale(80%)',
-    chipBg: 'var(--hcp-bg-2)',
-    chipBorder: 'var(--hcp-line)',
-    chipColor: 'var(--hcp-t-40)',
-    chipPulse: false,
-    chipLabel: 'DORMANT',
-    heroNumColor: 'var(--hcp-t-40)',
-    heroNumShadow: null,
-    progressFill: 'rgba(148,163,184,0.30)',
-    hintColor: 'var(--hcp-t-60)',
-    hintFontWeight: 600,
+    cardBorder: 'var(--hcp-line)',
+    glyphColor: 'var(--hcp-t-40)',
+    stateLabel: 'DORMANT',
+    stateLabelColor: 'var(--hcp-t-40)',
+    figureColor: 'var(--hcp-t-100)',
+    progressFill: 'rgba(255,255,255,0.20)',
   },
 };
+
 
 function streakStateFor(row: StreakRow | null | undefined): StreakState {
   if (!row) return 'dormant';
