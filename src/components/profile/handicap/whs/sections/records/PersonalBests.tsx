@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { WhsScore } from '@/lib/whs/types';
 import { formatDay2MonthYearShortGB, formatMonthYearLongGB } from '@/i18n/format';
@@ -24,7 +25,7 @@ const D_T60 = 'var(--hcp-t-60)';
 
 interface Tile {
   eyebrow: string;
-  value: string;
+  value: string | null;
   caption: string | null;
   valueColor?: string;
 }
@@ -46,11 +47,12 @@ function monthLabel(yyyyMm: string): string {
 }
 
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
   const { data: scores, isLoading, isError, refetch } = useAllScores(connectionId);
 
   const tiles: Tile[] = useMemo(() => {
     const list = scores ?? [];
-    const empty = (eyebrow: string): Tile => ({ eyebrow, value: '—', caption: null });
+    const empty = (eyebrow: string): Tile => ({ eyebrow, value: null, caption: null });
 
     if (list.length === 0) {
       return [
@@ -151,6 +153,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth];
   }, [scores, currentHandicap]);
+
+  const allEmpty = tiles.every((x) => x.value == null);
 
   if (isError && !isLoading) {
     return (
