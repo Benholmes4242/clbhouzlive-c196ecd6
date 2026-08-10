@@ -343,6 +343,43 @@ export const CompareSheet: React.FC<Props> = ({
       />
     ));
 
+  /**
+   * BRIEF_COMPARE_SHEET_DUEL fix 7: the career block splits into labelled
+   * groups. Same rows, same order within each group - only the headings are
+   * new, and they are what stops BEST GROSS reading as one figure stated twice.
+   */
+  const CAREER_GROUPS: { id: string; label: string; keys: string[] }[] = [
+    { id: 'volume', label: t('handicap.compare.group.volume'), keys: ['rounds', 'top100'] },
+    {
+      id: 'scoring',
+      label: t('handicap.compare.group.scoring'),
+      keys: ['birdies', 'eagles', 'subPar', 'sub80'],
+    },
+    { id: 'rare', label: t('handicap.compare.group.rare'), keys: ['albatrosses', 'aces'] },
+    {
+      id: 'best',
+      label: t('handicap.compare.group.best'),
+      keys: ['bestGross', 'bestStableford'],
+    },
+  ];
+
+  const renderCareerGroups = (rows: typeof careerRows): React.ReactNode =>
+    CAREER_GROUPS.map((g) => {
+      const mine = g.keys
+        .map((k) => rows.find((r) => r.key === k))
+        .filter(Boolean) as typeof careerRows;
+      if (mine.length === 0) return null;
+      return (
+        <div key={g.id} style={{ padding: '4px 0' }}>
+          <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, color: CHART.DIM, padding: '8px 0 2px' }}>
+            {g.label}
+          </div>
+          {renderCareerRows(mine)}
+        </div>
+      );
+    });
+
+
 
   /** Derived head-to-head figures, from the shared-round results only. */
   const h2h = React.useMemo(() => {
