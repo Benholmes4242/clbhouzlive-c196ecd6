@@ -24,6 +24,8 @@ interface Props {
 }
 
 
+// This palette only resolves inside a `.hcp-dark` ancestor - any host that
+// portals this component (e.g. a BottomSheet) MUST re-apply className="hcp-dark".
 const T = {
   ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
