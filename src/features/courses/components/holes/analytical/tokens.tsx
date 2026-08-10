@@ -422,3 +422,69 @@ export const EmptyState: React.FC<{
     )}
   </Panel>
 );
+
+/* ────────────────────── THE BUSINESS TYPE SCALE ──────────────────────
+   The three business surfaces (Insights, the empty state, the command
+   card) read heavy because too many elements sit at maximum weight. This
+   scale is FEWER BOLD ELEMENTS WITH MORE SPACE BETWEEN THEM: the figure
+   is the heaviest thing in its block and nothing else needs to be.
+
+   These are NEW exports, deliberately not a repoint of KICKER / LABEL /
+   TITLE - those three have ~120 consumers across the course tab and the
+   tour hub, and moving them would drag every one of those surfaces.
+   Nothing on a business surface renders at weight 800. */
+
+export const BIZ_KICKER: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.19em',
+  textTransform: 'uppercase',
+  color: A.INK,
+};
+
+export const BIZ_LABEL: React.CSSProperties = {
+  fontSize: 8,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+};
+
+export const BIZ_TITLE: React.CSSProperties = {
+  fontSize: 17,
+  fontWeight: 700,
+  letterSpacing: '-0.032em',
+  lineHeight: 1.2,
+  color: A.INK,
+};
+
+export const BIZ_BODY: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 400,
+  lineHeight: 1.55,
+  color: A.MUTE,
+};
+
+/** Figures get bigger and TIGHTER, never heavier: 700 with -0.04em. */
+export const bizFigure = (
+  fontSize: number,
+  color: string = A.INK,
+): React.CSSProperties => ({
+  fontSize,
+  fontWeight: 700,
+  letterSpacing: '-0.04em',
+  lineHeight: 1,
+  color,
+  ...FIGS,
+  fontFeatureSettings: '"kern" 1, "liga" 1',
+});
+
+/** The one inset every business chart region sits in, populated or not. */
+export const BIZ_INSET: React.CSSProperties = {
+  background: 'rgba(14,18,22,0.028)',
+  borderRadius: 13,
+  border: 'none',
+};
+
+/** 5px bar track. Business traffic is neither a score nor a member. */
+export const BIZ_TRACK_H = 5;
