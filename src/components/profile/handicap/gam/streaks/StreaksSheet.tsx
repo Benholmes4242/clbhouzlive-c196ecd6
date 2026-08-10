@@ -439,16 +439,19 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
             {active.length > 0 && (
               <>
                 <SectionHeader label={t('streaks.sectionRunning')} count={active.length} />
-                {active.map((type, i) => (
-                  <StreakRowView
-                    key={type}
-                    type={type}
-                    row={byType.get(type) ?? null}
-                    state="active"
-                    last={i === active.length - 1}
-                  />
-                ))}
+                <Panel>
+                  {active.map((type, i) => (
+                    <StreakRowView
+                      key={type}
+                      type={type}
+                      row={byType.get(type) ?? null}
+                      state="active"
+                      last={i === active.length - 1}
+                    />
+                  ))}
+                </Panel>
               </>
+
             )}
 
             <CollapsedSection label={t('streaks.sectionBroken')} count={lapsed.length}>
