@@ -990,20 +990,14 @@ export default function VerificationFlowSheet({
                       </SelectContent>
                     </Select>
                     {role === 'owner' && (
-                      <p className="text-[10px] font-medium" style={{ color: BIZ.amber }}>
+                      <p style={{ ...BIZ_LABEL, fontSize: 7.5, color: A.MUTE, margin: '6px 0 0' }}>
                         Owners are typically verified fastest.
                       </p>
                     )}
                   </FieldGroup>
                   <FieldGroup
-                    label={
-                      <>
-                        How are you connected to this business?{' '}
-                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
-                          (max 500)
-                        </span>
-                      </>
-                    }
+                    label="How are you connected to this business?"
+                    hint="Max 500 characters"
                   >
                     <Textarea
                       value={notes}
@@ -1013,6 +1007,7 @@ export default function VerificationFlowSheet({
                       className="resize-none text-sm"
                     />
                   </FieldGroup>
+
                 </div>
                 <p
                   className="text-[11px] mt-4 pt-3"
