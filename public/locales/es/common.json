@@ -225,6 +225,13 @@
       "countsAt": "Counts at {{cut}}",
       "lastRounds_one": "Your last {{total}} rounds - {{count}} of {{total}} would count",
       "lastRounds_other": "Your last {{total}} rounds - {{count}} of {{total}} would count"
+    },
+    "pulse": {
+      "findPlayer": "Find any player's handicap",
+      "handicap": "Handicap",
+      "ninetyDays": "90 days",
+      "toHcp": "{{n}} of {{m}} to hcp",
+      "noRecent": "No recent rounds"
     }
   }
 }
