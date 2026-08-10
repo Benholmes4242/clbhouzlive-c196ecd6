@@ -38,7 +38,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 import ComparePersonRow, { type ComparePerson } from './ComparePersonRow';
 import CompareStatRow from './CompareStatRow';
+import CompareScoreboard from './CompareScoreboard';
+import CompareFormStrip from './CompareFormStrip';
+import { deriveCompareRanges } from './compareRanges';
+import { whoLeads, type H2HStatFormat } from './h2hStats';
 import { useCompareStats } from './useCompareStats';
+
 import type { CompareSource } from './events';
 
 const RECENT_LIMIT = 6;
