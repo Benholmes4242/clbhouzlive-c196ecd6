@@ -1458,7 +1458,7 @@ export type Database = {
         Row: {
           business_id: string
           created_at: string
-          created_by: string
+          created_by: string | null
           display_title: string | null
           id: string
           role: Database["public"]["Enums"]["business_team_role"]
@@ -1467,7 +1467,7 @@ export type Database = {
         Insert: {
           business_id: string
           created_at?: string
-          created_by: string
+          created_by?: string | null
           display_title?: string | null
           id?: string
           role?: Database["public"]["Enums"]["business_team_role"]
@@ -1476,7 +1476,7 @@ export type Database = {
         Update: {
           business_id?: string
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           display_title?: string | null
           id?: string
           role?: Database["public"]["Enums"]["business_team_role"]
@@ -3268,7 +3268,7 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string | null
-          suggested_by: string
+          suggested_by: string | null
           suggested_value: string
         }
         Insert: {
@@ -3282,7 +3282,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
-          suggested_by: string
+          suggested_by?: string | null
           suggested_value: string
         }
         Update: {
@@ -3296,7 +3296,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string | null
-          suggested_by?: string
+          suggested_by?: string | null
           suggested_value?: string
         }
         Relationships: [
@@ -9230,7 +9230,7 @@ export type Database = {
           edited_at: string | null
           id: string
           is_deleted: boolean
-          responded_by: string
+          responded_by: string | null
           response_text: string
           review_id: string
           updated_at: string
@@ -9241,7 +9241,7 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_deleted?: boolean
-          responded_by: string
+          responded_by?: string | null
           response_text: string
           review_id: string
           updated_at?: string
@@ -9252,7 +9252,7 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_deleted?: boolean
-          responded_by?: string
+          responded_by?: string | null
           response_text?: string
           review_id?: string
           updated_at?: string
@@ -19607,6 +19607,17 @@ export type Database = {
           peak_dau: number
           trend: Json
           wau: number
+        }[]
+      }
+      get_platform_reach: {
+        Args: never
+        Returns: {
+          courses_delta: number
+          courses_total: number
+          reviews_delta: number
+          reviews_total: number
+          rounds_delta: number
+          rounds_total: number
         }[]
       }
       get_played_unrated_courses: {
