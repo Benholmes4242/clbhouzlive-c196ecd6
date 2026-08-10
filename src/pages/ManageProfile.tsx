@@ -530,96 +530,105 @@ function ProfileTabBody({
         <ManageCard padding={0}>
           {/* Name */}
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label>Name</Label>
+            <FieldLabel>Name</FieldLabel>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={form.firstName}
                 onChange={(e) => setField('firstName', e.target.value)}
                 placeholder="First name"
-                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={{ ...FIELD_INPUT_STYLE, width: '50%' }}
               />
               <input
                 type="text"
                 value={form.lastName}
                 onChange={(e) => setField('lastName', e.target.value)}
                 placeholder="Last name"
-                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                style={{ ...FIELD_INPUT_STYLE, width: '50%' }}
               />
             </div>
           </div>
 
           {/* Display Name */}
           <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label right={
-              <span className="text-[11px] text-muted-foreground/60">
-                {form.displayName.length}/{DISPLAY_NAME_MAX}
-              </span>
-            }>
+            <FieldLabel
+              right={
+                <span style={FIELD_COUNTER}>
+                  {form.displayName.length}/{DISPLAY_NAME_MAX}
+                </span>
+              }
+            >
               Display name
-            </Label>
+            </FieldLabel>
             <input
               type="text"
               value={form.displayName}
               maxLength={DISPLAY_NAME_MAX}
               onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
               placeholder="Your full name"
-              className="w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+              className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+              style={FIELD_INPUT_STYLE}
             />
             {errors.displayName && (
               <p className="text-[12px] text-destructive mt-1">{errors.displayName}</p>
             )}
           </div>
 
-          {/* Username */}
+          {/* Username. Locked reads as locked: the quiet inset, and its
+              explanation sits in the hint slot beneath where it has room. */}
           <div className="px-4 pt-3 pb-4" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
-            <Label right={
-              usernameIsLocked ? (
-                <span className="text-[11px] text-muted-foreground/60">
-                  Contact{' '}
-                  <a href="mailto:support@clbhouz.co.uk" className="underline text-muted-foreground/60">
-                    support@clbhouz.co.uk
-                  </a>{' '}to change
-                </span>
-              ) : undefined
-            }>
-              Username
-            </Label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
-              <input
-                type="text"
-                value={form.username}
-                maxLength={USERNAME_MAX}
-                readOnly={usernameIsLocked}
-                onChange={(e) => {
-                  if (usernameIsLocked) return;
-                  setField('username', e.target.value.toLowerCase());
-                }}
-                placeholder="choose a username"
-                className={`w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              />
-              {!usernameIsLocked && isNewUser && form.username.trim().length > 0 && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
-                  {usernameStatus === 'checking' && (
-                    <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
-                  )}
-                  {usernameStatus === 'available' && (
-                    <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <CheckCircle2 size={14} strokeWidth={2.25} /> available
+            <FieldLabel>Username</FieldLabel>
+            {usernameIsLocked ? (
+              <>
+                <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
+                  <span>@{form.username}</span>
+                </div>
+                <p style={FIELD_HINT}>Contact support@clbhouz.co.uk to change</p>
+              </>
+            ) : (
+              <>
+                <div className="relative">
+                  <span
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                    style={{ fontSize: 14, color: A.DIM }}
+                  >
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    value={form.username}
+                    maxLength={USERNAME_MAX}
+                    onChange={(e) => setField('username', e.target.value.toLowerCase())}
+                    placeholder="choose a username"
+                    className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} pl-8 pr-24`}
+                    style={FIELD_INPUT_STYLE}
+                  />
+                  {isNewUser && form.username.trim().length > 0 && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
+                      {usernameStatus === 'checking' && (
+                        <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+                      )}
+                      {usernameStatus === 'available' && (
+                        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle2 size={14} strokeWidth={2.25} /> available
+                        </span>
+                      )}
+                      {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
+                      {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
                     </span>
                   )}
-                  {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
-                  {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
-                </span>
-              )}
-            </div>
-            {!usernameIsLocked && isNewUser && (
-              <p className="text-[12px] text-muted-foreground mt-1.5">
-                3-20 characters - lowercase letters, numbers, underscores, periods
-              </p>
+                </div>
+                {isNewUser && (
+                  <p style={FIELD_HINT}>
+                    3-20 characters - lowercase letters, numbers, underscores, periods
+                  </p>
+                )}
+              </>
             )}
           </div>
+
 
           {/* Gender (INK active) */}
           <div className="px-4 pt-3 pb-4">
