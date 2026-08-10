@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
@@ -59,7 +61,9 @@ export function BusinessCommandCard({
   onRequestDelete,
 }: BusinessCommandCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
 
 
 
@@ -102,11 +106,9 @@ export function BusinessCommandCard({
   const needsDomainVerification =
     verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // Format stat display — "-" for zero/empty (never fabricate).
-  const formatStat = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '-';
-    return formatNumber(value);
-  };
+  // NOTE: figure rendering lives in `MetricCell`. Loading and absent render
+  // NOTHING; a genuine 0 renders "0" — zero visits is a fact, not a gap.
+
 
   const locationDisplay = getCityCountry({
     city: business.city,
