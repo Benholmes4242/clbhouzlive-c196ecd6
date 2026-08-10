@@ -13,10 +13,12 @@
  * The feed RPCs do not project posts.whs_score_id, so the id resolution is a
  * single `in (...)` read over the page's post ids rather than a per-card one.
  *
- * Hole shape: about 5% of rounds have no hole detail. Those return
- * `holeShape: null` so the card renders without the strip instead of a broken
- * chart. RLS decides visibility; a round the viewer may not read simply
- * resolves to nothing and the post renders as it did before C3.
+ * Hole shape: DROP IF PARTIAL. `holeShape` is non-null only when every PLAYED
+ * hole carries a score (and at least one played hole exists), so the card
+ * renders without the strip instead of a broken one. Synced rounds arrive as
+ * 18 rows of pars with no scores and resolve to null. RLS decides visibility;
+ * a round the viewer may not read simply resolves to nothing and the post
+ * renders as it did before C3.
  */
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
