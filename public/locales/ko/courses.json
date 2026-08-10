@@ -888,7 +888,10 @@
       "chase_one": "{{total}}\uac1c \ucf54\uc2a4 \uc911 {{count}}\uac1c \ucf54\uc2a4\uc5d0 \uae68\uc9c0\uc9c0 \uc54a\uc740 \uae30\ub85d\uc774 \uc788\uc2b5\ub2c8\ub2e4",
       "chase_other": "{{total}}\uac1c \ucf54\uc2a4 \uc911 {{count}}\uac1c \ucf54\uc2a4\uc5d0 \uae68\uc9c0\uc9c0 \uc54a\uc740 \uae30\ub85d\uc774 \uc788\uc2b5\ub2c8\ub2e4"
     },
-    "countryCount": "{{formattedCount}} of {{total}}"
+    "colArea": "\uc9c0\uc5ed",
+    "colRegion": "\uc9c0\ubc29",
+    "colCountsCountry": "\ub77c\uc6b4\ub4dc \uc788\uc74c / \ub514\ub809\ud1a0\ub9ac",
+    "colCountsRegion": "\ub77c\uc6b4\ub4dc \uc788\uc74c"
   },
   "directorySheet": {
     "placeholder": "Search all courses",
