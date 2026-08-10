@@ -139,3 +139,10 @@
 .safe-right {
   padding-right: calc(var(--page-gutter) + var(--safe-right));
 }
+
+/* Review sheet photo strip — visible keyboard focus ring on the tile buttons
+   (BRIEF_REVIEW_SHEET_PHOTOS_AND_FOOTER, Part 1 / acceptance D). */
+.review-photo-tile:focus-visible {
+  outline: 2px solid #F7931E;
+  outline-offset: 2px;
+}
