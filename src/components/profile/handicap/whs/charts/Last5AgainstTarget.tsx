@@ -1,33 +1,42 @@
 /**
- * Last5AgainstTarget - the member's last five rounds against the target that
- * would count towards the index.
+ * Last5AgainstTarget - the member's last five differentials, oldest left.
  *
- * A LOWER differential is better, so a bar at or below the target is green
- * (CHART.DOWN). That is the documented handicap inversion, not a mistake.
+ * ZERO is the only horizontal line, and it is drawn ONLY when at least one
+ * value is negative. Positive bars grow up from zero, negative bars grow down.
+ *
+ * A LOWER differential is better, so a bar that BEATS the target (strictly
+ * below it) is green (CHART.DOWN). That is the documented handicap inversion,
+ * not a mistake. Equal to the target is NOT a beat.
+ *
+ * No target line, no shaded band.
  *
  * Renders NOTHING when there is no round to draw.
  */
 import React from 'react';
-import { CHART, CHART_FONT, LABEL_STYLE } from './tokens';
+import { CHART, CHART_FONT } from './tokens';
 
 interface Props {
   /** Differentials, oldest first. Up to five. */
   values: number[];
-  /** At or below this value the round counts. */
+  /** Beat this value (strictly) and the round counts towards the index. */
   cut: number;
-  /** "Counts at {cut}" label. */
-  targetLabel: string;
-  /** "Your last 5 rounds - n of 5 would count" label. */
+  /** "{n} of your last 5 beat {cut}" label. */
   footLabel: string;
   height?: number;
 }
 
-const PLOT_PAD_TOP = 14;
+const VALUE_STYLE = {
+  fontFamily: CHART_FONT,
+  fontSize: 7,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase' as const,
+  fontVariantNumeric: 'tabular-nums' as const,
+};
 
 export const Last5AgainstTarget: React.FC<Props> = ({
   values,
   cut,
-  targetLabel,
   footLabel,
   height = 96,
 }) => {
@@ -35,69 +44,55 @@ export const Last5AgainstTarget: React.FC<Props> = ({
   if (clean.length === 0) return null;
   if (!(typeof cut === 'number' && !Number.isNaN(cut))) return null;
 
-  const scaleMax = Math.max(...clean, cut) + 1;
-  if (!(scaleMax > 0)) return null;
+  const maxPos = Math.max(0, ...clean);
+  const minNeg = Math.min(0, ...clean);
+  const hasNeg = minNeg < 0;
+  const span = maxPos - minNeg;
+  if (!(span > 0)) return null;
 
-  const pct = (v: number) => Math.min(100, Math.max(0, (v / scaleMax) * 100));
-  const cutPct = pct(cut);
+  // Share of the plot height given to the area above zero.
+  const upShare = maxPos / span;
+  const upPx = Math.round(height * upShare);
+  const downPx = height - upPx;
 
   return (
     <div style={{ fontFamily: CHART_FONT }}>
-      <div style={{ position: 'relative', height, paddingTop: PLOT_PAD_TOP }}>
-        {/* target line */}
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: `${cutPct}%`,
-            height: 1,
-            background: CHART.FAINT,
-          }}
-        />
-        <span
-          style={{
-            position: 'absolute',
-            right: 0,
-            bottom: `calc(${cutPct}% + 4px)`,
-            ...LABEL_STYLE,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            fontSize: 8,
-            color: CHART.MUTE,
-          }}
-        >
-          {targetLabel}
-        </span>
+      <div style={{ position: 'relative', height }}>
+        {hasNeg && (
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: upPx,
+              height: 1,
+              background: CHART.FAINT,
+            }}
+          />
+        )}
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            gap: 10,
-            height: '100%',
-          }}
-        >
+        <div style={{ display: 'flex', gap: 10, height: '100%' }}>
           {clean.map((v, i) => {
-            const counts = v <= cut;
+            const beats = v < cut;
+            const up = v >= 0;
+            const px = up
+              ? maxPos > 0
+                ? Math.max(2, Math.round((v / maxPos) * upPx))
+                : 0
+              : Math.max(2, Math.round((Math.abs(v) / Math.abs(minNeg)) * downPx));
             return (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  height: '100%',
-                }}
-              >
+              <div key={i} style={{ flex: 1, height: '100%', position: 'relative' }}>
                 <span
                   aria-hidden
                   style={{
-                    height: `${pct(v)}%`,
-                    background: counts ? CHART.DOWN : 'rgba(255,255,255,0.16)',
-                    borderRadius: '3px 3px 1px 1px',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    ...(up
+                      ? { top: upPx - px, height: px, borderRadius: '3px 3px 1px 1px' }
+                      : { top: upPx, height: px, borderRadius: '1px 1px 3px 3px' }),
+                    background: beats ? CHART.DOWN : 'rgba(255,255,255,0.18)',
                   }}
                 />
               </div>
@@ -114,13 +109,8 @@ export const Last5AgainstTarget: React.FC<Props> = ({
             style={{
               flex: 1,
               textAlign: 'center',
-              fontFamily: CHART_FONT,
-              fontSize: 7,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              fontVariantNumeric: 'tabular-nums',
-              color: v <= cut ? CHART.DOWN : CHART.DIM,
+              ...VALUE_STYLE,
+              color: v < cut ? CHART.DOWN : CHART.DIM,
             }}
           >
             {v.toFixed(1)}
