@@ -72,6 +72,9 @@ import {
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 import type { Database, Json } from '@/integrations/supabase/types';
+import { Check } from 'lucide-react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_LABEL } from '@/components/manage/fieldTreatment';
 
 /* ─────────────────────── constants ─────────────────────── */
 
