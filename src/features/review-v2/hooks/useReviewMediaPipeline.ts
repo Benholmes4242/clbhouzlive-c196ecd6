@@ -428,6 +428,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
             reviewRetryRegistry.unregister(jobId!);
             activeJobRef.current = null;
           }
+          sweep(true);
         });
       }
 
