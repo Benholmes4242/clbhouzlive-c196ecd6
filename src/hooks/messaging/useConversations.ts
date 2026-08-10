@@ -17,11 +17,10 @@ export function useConversations() {
   const query = useQuery<InboxConversation[]>({
     queryKey: ['messaging', 'inbox', actorType, actorId],
     enabled: !!actor,
-    // Per-query overrides (FIX 4): the Messages tab must always reflect
-    // reality on open. 10s staleTime dampens rapid tab flips without
-    // starving the list.
+    // Per-query override: the Messages tab must reflect reality on open.
+    // 10s staleTime dampens rapid tab flips without starving the list; the
+    // global refetchOnMount: true then refetches once that window lapses.
     staleTime: 10_000,
-    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
     queryFn: async () => {
       if (!actorType || !actorId) return [];

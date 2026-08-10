@@ -47,7 +47,6 @@ export default function BusinessVerificationPage() {
     queryKey: ['business-account-verification-status', id],
     enabled: !!id && !!user,
     staleTime: 0,
-    refetchOnMount: 'always',
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_accounts')

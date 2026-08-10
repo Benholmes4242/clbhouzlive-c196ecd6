@@ -27,7 +27,6 @@ export function useBusinessPendingRequestsCount(businessId: string | undefined) 
       return count || 0;
     },
     staleTime: 30 * 1000, // 30 seconds
-    refetchOnMount: 'always', // Force refetch when component mounts (ensures dot clears after decline on other page)
     refetchOnWindowFocus: true,
   });
 }

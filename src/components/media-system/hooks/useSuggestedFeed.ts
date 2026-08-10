@@ -95,9 +95,8 @@ export function useSuggestedFeed(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 0,
     // Persisted (see queryPersister.ts): hold 24h so restored entries survive
-    // hydrate, and revalidate on mount so SW-R kicks after paint.
+    // hydrate. Revalidation on mount comes from the global default.
     gcTime: 24 * 60 * 60 * 1000,
-    refetchOnMount: true,
   });
 
   const allPosts = useMemo(

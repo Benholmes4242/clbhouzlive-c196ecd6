@@ -92,6 +92,7 @@ export function useUserCourseReviews(params: {
       if (error) throw error;
       return (data as any as UserCourseReview[]) || [];
     },
+    // Always stale: with the global refetchOnMount: true this refetches on every mount.
     staleTime: 0,
   });
 }

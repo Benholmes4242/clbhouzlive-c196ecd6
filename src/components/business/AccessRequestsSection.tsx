@@ -105,9 +105,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       })) as AccessRequest[];
     },
     enabled: canManage,
-    // Ensure fresh data when navigating to the page
+    // Ensure fresh data when navigating to the page (global refetchOnMount: true)
     staleTime: 0,
-    refetchOnMount: 'always',
   });
 
   // Handle approve via Edge Function

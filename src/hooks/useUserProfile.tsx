@@ -113,7 +113,7 @@ export const useUserProfile = (userId: string | undefined | null) => {
       return (publicData as UserProfile | null);
     },
     enabled: !!userId,
-    staleTime: 0, // Always refetch after invalidation
+    staleTime: 0, // Always stale: with the global refetchOnMount: true this refetches on every mount
     gcTime: 10 * 60 * 1000,
   });
 };
