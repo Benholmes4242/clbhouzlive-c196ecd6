@@ -378,6 +378,7 @@ export const EmptyState: React.FC<{
           {body}
         </p>
       )}
+      {slot && <div style={{ width: '100%' }}>{slot}</div>}
       {primary && (
         <button
           type="button"
