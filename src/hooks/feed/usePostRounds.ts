@@ -79,6 +79,26 @@ function stableIds(ids: (string | null | undefined)[]): string[] {
   return unique;
 }
 
+/**
+ * The hole-strip gate (BRIEF_ROUND_POST_EMPTY_SCORECARD §1-2). Returns the
+ * ordered shape ONLY when it is complete: every played hole scored, at least
+ * one played hole. Anything partial - including a synced round of pars with no
+ * scores - returns null so no consumer (strip, trajectory, analytics) can draw
+ * a scorecard out of nothing.
+ */
+function completeShape(
+  shape: (PostRoundHole & { played: boolean })[] | null,
+): PostRoundHole[] | null {
+  if (!shape || shape.length === 0) return null;
+  const playedHoles = shape.filter((h) => h.played);
+  if (playedHoles.length === 0) return null;
+  if (playedHoles.some((h) => h.gross == null)) return null;
+  return playedHoles
+    .slice()
+    .sort((a, b) => a.holeNo - b.holeNo)
+    .map(({ holeNo, par, gross }) => ({ holeNo, par, gross }));
+}
+
 /** Batched post_id -> whs_score_id for one feed page. */
 export function usePostScoreIds(postIds: string[]): PostScoreIdMapState {
   const ids = useMemo(() => stableIds(postIds), [postIds]);
