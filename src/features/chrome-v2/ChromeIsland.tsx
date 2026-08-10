@@ -497,33 +497,10 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   if (suppressed) return null;
 
   const tone = spec.tone;
-  // The edge is EARNED: at scroll top there is no rule and no scrim, so the
-  // island reads as a pill on one continuous surface. Once content is actually
-  // passing beneath it, a hairline fades in and the blur reads as blur.
-  const showEdge = spec.bleed && !spec.scrollAway && edgeScrolled;
-  const dividerColor =
-    tone === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)';
 
   return (
     <>
-      {spec.bleed && !spec.scrollAway && (
-        <div
-          aria-hidden
-          style={{
-            position: 'fixed',
-            top: 'calc(var(--sat, 0px) + 10px + 44px + 10px)',
-            left: 0,
-            right: 0,
-            height: 1,
-            background:
-              tone === 'light' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
-            opacity: showEdge ? 1 : 0,
-            transition: 'opacity 120ms linear',
-            zIndex: Z.header - 1,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+
       <div
         data-chrome="island"
         style={{
