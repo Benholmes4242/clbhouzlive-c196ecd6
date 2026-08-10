@@ -462,9 +462,11 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
         className="gam-no-scrollbar"
         style={{
           display: 'flex',
+          gap: 12,
           overflowX: 'auto',
           overflowY: 'hidden',
           scrollSnapType: 'x mandatory',
+          scrollPaddingLeft: 16,
           WebkitOverflowScrolling: 'touch',
           paddingLeft: 16,
           paddingRight: 16,
