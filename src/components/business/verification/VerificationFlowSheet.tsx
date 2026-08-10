@@ -315,6 +315,20 @@ export default function VerificationFlowSheet({
     setDocKind(null);
   }
 
+  /** Proof selection. Unchanged behaviour from the previous RadioGroup handler. */
+  function chooseProof(v: ProofMethod) {
+    setSelectedProof(v);
+    setExclusivityError('');
+    // If user picks a different method, drop OTP progress so it doesn't
+    // leak into the wrong proof - the row stays and can be updated on submit.
+    if (v !== 'business_email') {
+      setOtpEmailVerified(false);
+      setOtpSent(false);
+      setOtpCode('');
+    }
+  }
+
+
   // ---- OTP flow (business_email) ----
   async function ensureOtpRequest(): Promise<string | null> {
     if (otpRequestId) return otpRequestId;
