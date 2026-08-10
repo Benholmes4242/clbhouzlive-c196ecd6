@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Flame } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
@@ -14,8 +14,6 @@ const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday:
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
-const GOLD = '#FBBC2E';
 
 interface Props {
   userId: string;
@@ -29,92 +27,41 @@ interface Props {
 type StreakState = 'atpb' | 'active' | 'dormant';
 
 interface StreakStateToken {
-  cardSweep: string;
   cardBorder: string;
-  topStripe: string | null;
-  outerGlow: string | null;
-  iconBg: string;
-  iconRing: string;
-  iconColor: string;
-  iconOpacity: number;
-  iconFilter: string | null;
-  chipBg: string;
-  chipBorder: string;
-  chipColor: string;
-  chipPulse: boolean;
-  chipLabel: string;
-  heroNumColor: string;
-  heroNumShadow: string | null;
+  glyphColor: string;
+  stateLabel: string;
+  stateLabelColor: string;
+  figureColor: string;
   progressFill: string;
-  hintColor: string;
-  hintFontWeight: number;
 }
 
 const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
   atpb: {
-    cardSweep: 'var(--hcp-bg-1)',
     cardBorder: 'var(--hcp-line)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(247,147,30,0.22)',
-    iconRing: 'rgba(247,147,30,0.65)',
-    iconColor: AMBER,
-    iconOpacity: 1,
-    iconFilter: null,
-    chipBg: 'rgba(247,147,30,0.20)',
-    chipBorder: AMBER,
-    chipColor: AMBER_DEEP,
-    chipPulse: true,
-    chipLabel: 'AT YOUR PB',
-    heroNumColor: 'var(--hcp-t-100)',
-    heroNumShadow: null,
-    progressFill: `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`,
-    hintColor: AMBER_DEEP,
-    hintFontWeight: 700,
+    glyphColor: AMBER,
+    stateLabel: 'AT YOUR PB',
+    stateLabelColor: 'var(--hcp-t-60)',
+    figureColor: AMBER,
+    progressFill: AMBER,
   },
   active: {
-    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(247,147,30,0.14) 100%)`,
-    cardBorder: 'rgba(247,147,30,0.32)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(247,147,30,0.14)',
-    iconRing: 'rgba(247,147,30,0.42)',
-    iconColor: AMBER,
-    iconOpacity: 1,
-    iconFilter: null,
-    chipBg: 'rgba(247,147,30,0.16)',
-    chipBorder: 'rgba(247,147,30,0.40)',
-    chipColor: AMBER_DEEP,
-    chipPulse: true,
-    chipLabel: 'ACTIVE',
-    heroNumColor: AMBER,
-    heroNumShadow: null,
-    progressFill: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
-    hintColor: 'var(--hcp-t-60)',
-    hintFontWeight: 600,
+    cardBorder: 'var(--hcp-line)',
+    glyphColor: AMBER,
+    stateLabel: 'ACTIVE',
+    stateLabelColor: 'var(--hcp-t-60)',
+    figureColor: 'var(--hcp-t-100)',
+    progressFill: AMBER,
   },
   dormant: {
-    cardSweep: `linear-gradient(135deg, var(--hcp-bg-1) 0%, var(--hcp-bg-2) 50%, rgba(148,163,184,0.08) 100%)`,
-    cardBorder: 'rgba(148,163,184,0.22)',
-    topStripe: null,
-    outerGlow: null,
-    iconBg: 'rgba(148,163,184,0.10)',
-    iconRing: 'rgba(148,163,184,0.25)',
-    iconColor: 'var(--hcp-t-40)',
-    iconOpacity: 0.7,
-    iconFilter: 'grayscale(80%)',
-    chipBg: 'var(--hcp-bg-2)',
-    chipBorder: 'var(--hcp-line)',
-    chipColor: 'var(--hcp-t-40)',
-    chipPulse: false,
-    chipLabel: 'DORMANT',
-    heroNumColor: 'var(--hcp-t-40)',
-    heroNumShadow: null,
-    progressFill: 'rgba(148,163,184,0.30)',
-    hintColor: 'var(--hcp-t-60)',
-    hintFontWeight: 600,
+    cardBorder: 'var(--hcp-line)',
+    glyphColor: 'var(--hcp-t-40)',
+    stateLabel: 'DORMANT',
+    stateLabelColor: 'var(--hcp-t-40)',
+    figureColor: 'var(--hcp-t-100)',
+    progressFill: 'rgba(255,255,255,0.20)',
   },
 };
+
 
 function streakStateFor(row: StreakRow | null | undefined): StreakState {
   if (!row) return 'dormant';
@@ -194,21 +141,8 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         ? Math.min(100, (current / progressTarget) * 100)
         : 0;
 
-  const hintCopy: React.ReactNode =
-    state === 'atpb'
-      ? (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <Flame size={13} strokeWidth={2} />
-          At your personal best
-        </span>
-      )
-      : state === 'active'
-        ? best > 0
-          ? `PB · ${best}`
-          : 'First streak — keep going'
-        : best > 0
-          ? `Beat your record of ${best}`
-          : `${entry.actionVerb} to start`;
+  // Hint copy removed: the state label and progress labels already say it once.
+
 
   const meta =
     state === 'atpb' || state === 'active'
@@ -243,158 +177,116 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
     <div
       style={{
         position: 'relative',
-        margin: '0 16px',
-        padding: '18px 18px 16px',
+        height: '100%',
+        boxSizing: 'border-box',
+        padding: '16px 16px 14px',
         borderRadius: 16,
         overflow: 'hidden',
-        minHeight: 230,
+        minHeight: 172,
         display: 'flex',
         flexDirection: 'column',
-        background: tokens.cardSweep,
+        background: 'var(--hcp-bg-1)',
         border: `1px solid ${tokens.cardBorder}`,
-        boxShadow: tokens.outerGlow ?? undefined,
         fontFamily: FONT,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {tokens.topStripe && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: tokens.topStripe,
-          }}
-        />
-      )}
-
-      {/* Calm: decorative watermark removed for legibility */}
-
-
-      {/* Chip */}
-      <div
-        style={{
-          alignSelf: 'flex-start',
-          padding: '4px 8px',
-          borderRadius: 999,
-          background: tokens.chipBg,
-          border: `1px solid ${tokens.chipBorder}`,
-          marginBottom: 14,
-          position: 'relative',
-          zIndex: 1,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        {tokens.chipPulse && (
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 999,
-              background: AMBER,
-              animation: 'streakChipPulse 1.6s ease-in-out infinite',
-            }}
-          />
-        )}
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: tokens.chipColor,
-            textTransform: 'uppercase',
-          }}
-        >
-          {tokens.chipLabel}
-        </span>
-      </div>
-
-      {/* Icon + title + description */}
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: tokens.iconBg,
-            border: `1px solid ${tokens.iconRing}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 1,
-            opacity: tokens.iconOpacity,
-            filter: tokens.iconFilter ?? 'none',
-            color: tokens.iconColor,
-          }}
-        >
-          <entry.Icon size={28} strokeWidth={2} />
-        </div>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: 'var(--hcp-t-100)',
-              lineHeight: 1.15,
-              marginBottom: 3,
-            }}
-          >
-            {entry.label}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: 'var(--hcp-t-60)',
-              lineHeight: 1.35,
-            }}
-          >
-            {entry.description}
-          </div>
-        </div>
-      </div>
-
-      {/* Hero number */}
+      {/* Glyph + state + meta */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
-          gap: 5,
-          position: 'relative',
-          zIndex: 1,
-          marginTop: 'auto',
+          alignItems: 'center',
+          gap: 6,
           marginBottom: 10,
         }}
       >
         <span
           style={{
-            fontSize: 44,
-            fontWeight: 800,
-            color: tokens.heroNumColor,
-            textShadow: tokens.heroNumShadow ?? 'none',
-            lineHeight: 1,
-            letterSpacing: '-0.04em',
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"kern" 1, "liga" 1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            color: tokens.glyphColor,
+            flexShrink: 0,
           }}
         >
-          {current}
+          <entry.Icon size={13} strokeWidth={2} />
         </span>
-        <span style={{ fontSize: 13, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
-          {entry.unit}
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: tokens.stateLabelColor,
+          }}
+        >
+          {tokens.stateLabel}
         </span>
+        {meta && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              fontSize: 8,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-40)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {meta}
+          </span>
+        )}
       </div>
 
-      {/* Progress bar */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Title */}
+      <div
+        style={{
+          fontSize: 14.5,
+          fontWeight: 700,
+          letterSpacing: '-0.025em',
+          color: 'var(--hcp-t-100)',
+          lineHeight: 1.2,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {entry.label}
+      </div>
+
+      {/* Bottom block: figure + bar + labels */}
+      <div style={{ marginTop: 'auto' }}>
         <div
           style={{
-            height: 4,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 5,
+            marginTop: 12,
+            marginBottom: 10,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 34,
+              fontWeight: 700,
+              color: tokens.figureColor,
+              lineHeight: 1,
+              letterSpacing: '-0.045em',
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+            }}
+          >
+            {current}
+          </span>
+          <span style={{ fontSize: 13, color: 'var(--hcp-t-60)', fontWeight: 600 }}>
+            {entry.unit}
+          </span>
+        </div>
+
+        <div
+          style={{
+            height: 3,
             background: 'var(--hcp-bg-3)',
             borderRadius: 999,
             overflow: 'hidden',
@@ -414,60 +306,39 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: 10,
+            gap: 8,
+            fontSize: 7.5,
             fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             color: 'var(--hcp-t-60)',
-            letterSpacing: '0.04em',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
           <span>{progressLeft}</span>
-          <span style={{ color: 'var(--hcp-t-40)' }}>{progressRight}</span>
+          <span style={{ color: 'var(--hcp-t-40)', textAlign: 'right' }}>{progressRight}</span>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          marginTop: 12,
-          paddingTop: 10,
-          borderTop: '1px solid var(--hcp-line)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            color: tokens.hintColor,
-            fontWeight: tokens.hintFontWeight,
-          }}
-        >
-          {hintCopy}
-        </span>
-        {meta && (
-          <span
-            style={{
-              fontSize: 11,
-              color: 'var(--hcp-t-40)',
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {meta}
-          </span>
-        )}
       </div>
     </div>
   );
+
 };
 
 // ──────────────────────────────────────────────────────────────────
 // Section
 // ──────────────────────────────────────────────────────────────────
+
+/**
+ * Distance from one snap child's start to the next: measured from the two
+ * children's offsetLeft so a track `gap` is included automatically.
+ */
+function childStride(el: HTMLElement): number {
+  const first = el.children[0] as HTMLElement | undefined;
+  if (!first) return el.clientWidth;
+  const second = el.children[1] as HTMLElement | undefined;
+  if (second) return second.offsetLeft - first.offsetLeft;
+  return first.clientWidth || el.clientWidth;
+}
 
 export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const { data, isLoading } = useUserStreaks(userId);
@@ -518,17 +389,16 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el || el.clientWidth <= 0) return;
-    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
-    if (childWidth <= 0) return;
-    const newPage = Math.round(el.scrollLeft / childWidth);
+    const stride = childStride(el);
+    if (stride <= 0) return;
+    const newPage = Math.round(el.scrollLeft / stride);
     if (newPage !== page) setPage(newPage);
   }, [page]);
 
   const handlePagerChange = useCallback((n: number) => {
     const el = scrollRef.current;
     if (!el) return;
-    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
-    el.scrollTo({ left: childWidth * n, behavior: 'smooth' });
+    el.scrollTo({ left: childStride(el) * n, behavior: 'smooth' });
     setPage(n);
   }, []);
 
@@ -540,7 +410,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow={eyebrowText} />
         <div style={{ padding: '4px 20px 12px' }}>
-          <Skeleton height={230} radius={16} />
+          <Skeleton height={172} radius={16} />
         </div>
       </section>
     );
@@ -558,10 +428,6 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   return (
     <section ref={sectionRef} style={{ marginTop: 32, fontFamily: FONT }}>
       <style>{`
-        @keyframes streakChipPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.5); }
-        }
         .gam-no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
 
@@ -584,7 +450,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
                 cursor: 'pointer',
                 color: 'var(--hcp-t-60)',
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 padding: '4px 6px',
               }}
@@ -601,9 +467,11 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
         className="gam-no-scrollbar"
         style={{
           display: 'flex',
+          gap: 12,
           overflowX: 'auto',
           overflowY: 'hidden',
           scrollSnapType: 'x mandatory',
+          scrollPaddingLeft: 16,
           WebkitOverflowScrolling: 'touch',
           paddingLeft: 16,
           paddingRight: 16,
