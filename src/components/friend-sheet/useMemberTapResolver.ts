@@ -25,6 +25,7 @@
  */
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
@@ -36,6 +37,8 @@ import {
   friendHybridSnapshotKey,
   type FriendHybridSnapshot,
 } from '@/lib/whs/hooks/useFriendHybridSnapshot';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
+import { getFirstName } from './parts/_shared/formatName';
 import {
   deriveSheetStateFromSnapshot,
   deriveSheetStateFromWhsEntry,
@@ -57,6 +60,8 @@ export function useMemberTapResolver() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
+  const { t } = useTranslation('common');
+  const { start: startConversation } = useStartConversation();
   const viewerId = user?.id ?? null;
 
   const invite = useCallback(async (entry: FriendLeaderboardEntry) => {
@@ -144,7 +149,7 @@ export function useMemberTapResolver() {
 
       navigate(compareRouteFor(targetUserId));
     },
-    [invite, navigate, queryClient, viewerId],
+    [invite, navigate, queryClient, startConversation, t, viewerId],
   );
 
   return { resolve };
