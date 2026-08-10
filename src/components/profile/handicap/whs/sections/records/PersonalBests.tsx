@@ -27,7 +27,6 @@ interface Tile {
   eyebrow: string;
   value: string | null;
   caption: string | null;
-  valueColor?: string;
 }
 
 function fmtCourseDate(s: WhsScore | null): string | null {
@@ -89,7 +88,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best Diff',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
-        valueColor: '#55BD8B',
       };
     }
 
@@ -123,7 +121,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
-        valueColor: '#55BD8B',
       };
     }
 
