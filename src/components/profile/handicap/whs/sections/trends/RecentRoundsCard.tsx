@@ -397,18 +397,17 @@ const FilterChip: React.FC<{
       background: active ? T.ink : T.ink04,
       color: active ? 'var(--hcp-bg-1)' : T.ink,
       fontFamily: FONT,
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: '-0.005em',
       cursor: 'pointer',
-      whiteSpace: 'nowrap',
-      maxWidth: 200,
+      maxWidth: 190,
+      overflow: 'hidden',
     }}
   >
+    {/* A chip may clip at 190; it must never ellipsise at 160. */}
     <span
       style={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
+        fontSize: 12.5,
+        fontWeight: 600,
+        letterSpacing: '-0.005em',
         whiteSpace: 'nowrap',
       }}
     >
@@ -418,6 +417,7 @@ const FilterChip: React.FC<{
       style={{
         fontSize: 11,
         fontWeight: 700,
+        fontVariantNumeric: 'tabular-nums',
         opacity: active ? 0.7 : 0.5,
       }}
     >
@@ -426,16 +426,17 @@ const FilterChip: React.FC<{
   </button>
 );
 
-// ─── Month divider ──────────────────────────────────────────────────
+// ─── Month header ───────────────────────────────────────────────────
+// Label left, count right, nothing between.
 const MonthDivider: React.FC<{ month: string; count: number }> = ({
   month,
   count,
 }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
     <span
       style={{
-        fontSize: 10,
-        fontWeight: 800,
+        fontSize: 7.5,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: T.inkMute,
         textTransform: 'uppercase',
@@ -445,22 +446,19 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
     </span>
     <span
       style={{
-        flex: 1,
-        height: 1,
-        background: `linear-gradient(to right, ${T.hairline}, transparent)`,
-      }}
-    />
-    <span
-      style={{
-        fontSize: 10,
+        fontSize: 7.5,
         fontWeight: 700,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
         color: T.inkFaded,
+        fontVariantNumeric: 'tabular-nums',
       }}
     >
       {count} {count === 1 ? 'round' : 'rounds'}
     </span>
   </div>
 );
+
 
 
 // ─── Feed row ───────────────────────────────────────────────────────
