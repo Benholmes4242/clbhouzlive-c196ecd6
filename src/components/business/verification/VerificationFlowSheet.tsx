@@ -603,48 +603,96 @@ export default function VerificationFlowSheet({
 
               {/* SECTION 2 */}
               <SectionCard ref={proofRef} number={2} title="Prove your business is real">
-                <RadioGroup
-                  value={selectedProof}
-                  onValueChange={(v) => {
-                    setSelectedProof(v as ProofMethod);
-                    setExclusivityError('');
-                    // If user picks a different method, drop OTP progress so it doesn't
-                    // leak into the wrong proof — the row stays and can be updated on submit.
-                    if (v !== 'business_email') {
-                      setOtpEmailVerified(false);
-                      setOtpSent(false);
-                      setOtpCode('');
-                    }
+                <div
+                  role="radiogroup"
+                  aria-label="How you want to prove your business"
+                  onKeyDown={(e) => {
+                    const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'];
+                    if (!keys.includes(e.key)) return;
+                    e.preventDefault();
+                    const idx = PROOF_OPTIONS.findIndex((o) => o.id === selectedProof);
+                    const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1;
+                    const next =
+                      PROOF_OPTIONS[
+                        (((idx < 0 ? 0 : idx + step) % PROOF_OPTIONS.length) +
+                          PROOF_OPTIONS.length) %
+                          PROOF_OPTIONS.length
+                      ];
+                    chooseProof(next.id);
+                    const el = e.currentTarget.querySelector<HTMLElement>(
+                      `[data-proof="${next.id}"]`,
+                    );
+                    el?.focus();
                   }}
-                  className="space-y-3"
                 >
                   {PROOF_OPTIONS.map((option) => {
                     const isSelected = selectedProof === option.id;
                     const Icon = option.icon;
                     return (
                       <div key={option.id}>
-                        <label
-                          className="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors"
-                          style={
-                            isSelected
-                              ? { borderColor: BIZ.amber, background: BIZ.amberTint }
-                              : { borderColor: BIZ.hair, background: BIZ.card }
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          data-proof={option.id}
+                          tabIndex={
+                            isSelected || (!selectedProof && option.id === PROOF_OPTIONS[0].id)
+                              ? 0
+                              : -1
                           }
+                          onClick={() => chooseProof(option.id)}
+                          className="w-full flex items-start gap-3 text-left"
+                          style={{
+                            minHeight: 44,
+                            padding: '10px 0',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
                         >
-                          <RadioGroupItem
-                            value={option.id}
-                            className="mt-0.5 [&]:border-[#F7931E] [&]:text-[#F7931E]"
-                          />
-                          <Icon className="h-4 w-4 mt-0.5 shrink-0" style={{ color: BIZ.inkMute }} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-medium" style={{ color: BIZ.ink }}>
+                          <span
+                            aria-hidden
+                            className="flex items-center justify-center shrink-0"
+                            style={{
+                              width: 15,
+                              height: 15,
+                              marginTop: 2,
+                              borderRadius: '50%',
+                              background: isSelected ? A.INK : 'transparent',
+                              border: isSelected ? 'none' : '1.5px solid #CBD2DA',
+                            }}
+                          >
+                            {isSelected && (
+                              <Check size={9} strokeWidth={3.25} style={{ color: '#FFFFFF' }} />
+                            )}
+                          </span>
+                          <Icon size={14} className="shrink-0" style={{ color: A.MUTE, marginTop: 2 }} />
+                          <span className="flex-1 min-w-0">
+                            <span
+                              style={{
+                                display: 'block',
+                                fontSize: 13.5,
+                                fontWeight: isSelected ? 700 : 600,
+                                color: A.INK,
+                                lineHeight: 1.3,
+                              }}
+                            >
                               {option.label}
-                            </p>
-                            <p className="text-[12px]" style={{ color: BIZ.inkMute }}>
+                            </span>
+                            <span
+                              style={{
+                                display: 'block',
+                                fontSize: 12.5,
+                                fontWeight: 400,
+                                color: A.MUTE,
+                                lineHeight: 1.35,
+                              }}
+                            >
                               {option.subtitle}
-                            </p>
-                          </div>
-                        </label>
+                            </span>
+                          </span>
+                        </button>
+
                         {isSelected && (
                           <div className="mt-3 pl-7">
                             {option.id === 'official_website' && (
