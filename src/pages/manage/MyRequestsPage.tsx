@@ -76,7 +76,7 @@ export default function MyRequestsPage() {
         {!isLoading && isError && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <p className="text-[15px] font-medium" style={{ color: A.INK }}>Couldn't load your requests</p>
             <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
@@ -94,7 +94,7 @@ export default function MyRequestsPage() {
         {!isLoading && !isError && tickets.length === 0 && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex justify-center mb-3">
               <LifeBuoy size={32} style={{ color: A.INK }} />
@@ -119,7 +119,7 @@ export default function MyRequestsPage() {
         {!isLoading && tickets.length > 0 && (
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             {tickets.map((t, i) => {
               const status = statusStyle(t.status);
@@ -154,14 +154,14 @@ export default function MyRequestsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
-                        style={{ color: A.DIM }}
+                        className="text-[8px] uppercase tracking-[0.16em]"
+                        style={{ fontWeight: 700, color: A.DIM }}
                       >
                         {cat}
                       </span>
                       <span
-                        className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
-                        style={{ color: status.fg }}
+                        className="text-[8px] uppercase tracking-[0.16em]"
+                        style={{ fontWeight: 700, color: status.fg }}
                       >
                         {status.label}
                       </span>

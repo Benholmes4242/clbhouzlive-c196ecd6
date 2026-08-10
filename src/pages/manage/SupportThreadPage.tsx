@@ -69,7 +69,7 @@ export default function SupportThreadPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <h3 className="text-[16px] font-semibold mb-1" style={{ color: A.INK }}>
               Couldn't load this request
@@ -96,7 +96,7 @@ export default function SupportThreadPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <h3 className="text-[16px] font-semibold mb-1" style={{ color: A.INK }}>
               Request not found
@@ -128,18 +128,18 @@ export default function SupportThreadPage() {
         {ticket && (
           <div
             className="rounded-2xl p-4"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
-                style={{ color: A.DIM }}
+                className="text-[8px] uppercase tracking-[0.16em]"
+                style={{ fontWeight: 700, color: A.DIM }}
               >
                 {cat}
               </span>
               <span
-                className="text-[8px] uppercase tracking-[0.16em]" style={{ fontWeight: 700 }}
-                style={{ color: status.fg }}
+                className="text-[8px] uppercase tracking-[0.16em]"
+                style={{ fontWeight: 700, color: status.fg }}
               >
                 {status.label}
               </span>
@@ -220,7 +220,7 @@ export default function SupportThreadPage() {
                 rows={2}
                 className="flex-1 p-3 rounded-2xl text-[14.5px] outline-none resize-none leading-relaxed"
                 style={{
-                  background: '#fff',
+                  background: A.PANEL,
                   border: `1px solid ${A.BORDER}`,
                   color: A.INK,
                   minHeight: 48,
