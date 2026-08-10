@@ -18,7 +18,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useAllScores } from '@/lib/whs/hooks';
-import { projectNextRound } from '@/lib/whs/handicapMath';
+import { projectNextRound, nextRoundScale } from '@/lib/whs/handicapMath';
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { Last5AgainstTarget } from '../charts/Last5AgainstTarget';
 import { CHART, CHART_FONT, indexTone } from '../charts';
@@ -29,6 +29,14 @@ const KICKER = {
   fontSize: 9,
   fontWeight: 700,
   letterSpacing: '0.19em',
+  textTransform: 'uppercase' as const,
+  color: CHART.DIM,
+};
+const LABEL = {
+  fontFamily: CHART_FONT,
+  fontSize: 8,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
   color: CHART.DIM,
 };
