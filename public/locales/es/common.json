@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas automáticamente",
+      "title": "Publicar mis rondas autom\u00e1ticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -270,6 +270,14 @@
       "nudge": {
         "draft": "Hi {{name}} - connect your handicap on clbhouz and we can compare rounds and see who's actually playing better."
       }
+    },
+    "compare": {
+      "kicker": "COMPARE",
+      "title": "How you compare",
+      "roundsTogether_one": "{{count}} round together",
+      "roundsTogether_other": "{{count}} rounds together",
+      "playedAgo": "Played {{when}}",
+      "anyone": "Compare against anyone"
     }
   }
 }

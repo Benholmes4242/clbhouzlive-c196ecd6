@@ -98,7 +98,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -115,8 +115,8 @@
   "connectGhost": {
     "eyebrow": "THIS COULD BE YOURS",
     "cta": "Connect your handicap",
-    "footnote": "TAKES 30 SECONDS · WE NEVER POST ON YOUR BEHALF",
-    "slimCta": "Connect →",
+    "footnote": "TAKES 30 SECONDS \u00b7 WE NEVER POST ON YOUR BEHALF",
+    "slimCta": "Connect \u2192",
     "dismissA11y": "Dismiss",
     "holes": {
       "headline": "See exactly where your shots go here",
@@ -142,7 +142,7 @@
   "verifiedAccounts": {
     "title": "Verified accounts",
     "body": "We verify golfers and professionals ourselves - there's nothing to apply for. If you're seeking verification, contact support and we'll take a look. If you represent a club, brand or business, set up a business page and you can request verification there.",
-    "cta": "Contact support →",
+    "cta": "Contact support \u2192",
     "dismissA11y": "Dismiss",
     "settingsRowTitle": "Verified accounts",
     "settingsRowSubtitle": "How verification works"
@@ -554,7 +554,11 @@
       "careerFooter": "Every round each of you has posted, at any course - not just the ones you played together",
       "youLeadByWithTies": "You lead by {{n}}, {{ties}} tied",
       "theyLeadByWithTies": "{{name}} leads by {{n}}, {{ties}} tied",
-      "levelAtWithTies": "Level at {{n}}, {{ties}} tied"
+      "levelAtWithTies": "Level at {{n}}, {{ties}} tied",
+      "roundsTogether_one": "{{count}} round together",
+      "roundsTogether_other": "{{count}} rounds together",
+      "playedAgo": "Played {{when}}",
+      "anyone": "Compare against anyone"
     },
     "legends": {
       "window90d": "90 days",
@@ -584,14 +588,14 @@
     "count_one": "{{count}} comment",
     "count_other": "{{count}} comments",
     "emptyLine": "What's on your mind?",
-    "placeholder": "Add a comment…",
-    "replyPlaceholder": "Reply to {{name}}…",
+    "placeholder": "Add a comment\u2026",
+    "replyPlaceholder": "Reply to {{name}}\u2026",
     "replyingTo": "Replying to",
     "reply": "Reply",
     "viewMoreReplies_one": "View {{count}} more reply",
     "viewMoreReplies_other": "View {{count}} more replies",
     "viewEarlier": "VIEW EARLIER COMMENTS",
-    "loading": "Loading…",
+    "loading": "Loading\u2026",
     "edited": "edited",
     "business": "BUSINESS",
     "like": "Like",

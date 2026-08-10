@@ -1,88 +1,88 @@
 {
   "action": {
-    "apply": "[~~Áƥƥļý~~]",
-    "back": "[~~Ɓáĉǩ~~]",
-    "cancel": "[~~Ĉáñĉéļ~~]",
-    "change": "[~~Ĉĥáñĝé~~]",
-    "clear": "[~~Ĉļéář~~]",
-    "close": "[~~Ĉļőšé~~]",
-    "confirm": "[~~Ĉőñƒířɱ~~]",
-    "continue": "[~~Ĉőñţíñúé~~]",
-    "copy": "[~~Ĉőƥý~~]",
-    "create": "[~~Ĉřéáţé~~]",
-    "delete": "[~~Đéļéţé~~]",
-    "dismiss": "[~~Đíšɱíšš~~]",
-    "done": "[~~Đőñé~~]",
-    "edit": "[~~Éđíţ~~]",
-    "follow": "[~~Ƒőļļőŵ~~]",
-    "manage": "[~~Ṁáñáĝé~~]",
-    "next": "[~~Ñéẋţ~~]",
-    "ok": "[~~ŐǨ~~]",
-    "open": "[~~Őƥéñ~~]",
-    "post": "[~~Ƥőšţ~~]",
-    "prev": "[~~Ƥřéṽ~~]",
-    "reload": "[~~Řéļőáđ~~]",
-    "remove": "[~~Řéɱőṽé~~]",
-    "reset": "[~~Řéšéţ~~]",
-    "retry": "[~~Řéţřý~~]",
-    "save": "[~~Šáṽé~~]",
-    "saveChanges": "[~~Šáṽé ĉĥáñĝéš~~]",
-    "search": "[~~Šéářĉĥ~~]",
-    "seeAll": "[~~Šéé áļļ~~]",
-    "select": "[~~Šéļéĉţ~~]",
-    "send": "[~~Šéñđ~~]",
-    "share": "[~~Šĥářé~~]",
-    "submit": "[~~Šúƀɱíţ~~]",
-    "tapToRetry": "[~~Ţáƥ ţő řéţřý~~]",
-    "tryAgain": "[~~Ţřý áĝáíñ~~]",
-    "unfollow": "[~~Úñƒőļļőŵ~~]",
-    "update": "[~~Úƥđáţé~~]",
-    "viewAll": "[~~Ṽíéŵ áļļ~~]"
+    "apply": "[~~\u00c1\u01a5\u01a5\u013c\u00fd~~]",
+    "back": "[~~\u0181\u00e1\u0109\u01e9~~]",
+    "cancel": "[~~\u0108\u00e1\u00f1\u0109\u00e9\u013c~~]",
+    "change": "[~~\u0108\u0125\u00e1\u00f1\u011d\u00e9~~]",
+    "clear": "[~~\u0108\u013c\u00e9\u00e1\u0159~~]",
+    "close": "[~~\u0108\u013c\u0151\u0161\u00e9~~]",
+    "confirm": "[~~\u0108\u0151\u00f1\u0192\u00ed\u0159\u0271~~]",
+    "continue": "[~~\u0108\u0151\u00f1\u0163\u00ed\u00f1\u00fa\u00e9~~]",
+    "copy": "[~~\u0108\u0151\u01a5\u00fd~~]",
+    "create": "[~~\u0108\u0159\u00e9\u00e1\u0163\u00e9~~]",
+    "delete": "[~~\u0110\u00e9\u013c\u00e9\u0163\u00e9~~]",
+    "dismiss": "[~~\u0110\u00ed\u0161\u0271\u00ed\u0161\u0161~~]",
+    "done": "[~~\u0110\u0151\u00f1\u00e9~~]",
+    "edit": "[~~\u00c9\u0111\u00ed\u0163~~]",
+    "follow": "[~~\u0191\u0151\u013c\u013c\u0151\u0175~~]",
+    "manage": "[~~\u1e40\u00e1\u00f1\u00e1\u011d\u00e9~~]",
+    "next": "[~~\u00d1\u00e9\u1e8b\u0163~~]",
+    "ok": "[~~\u0150\u01e8~~]",
+    "open": "[~~\u0150\u01a5\u00e9\u00f1~~]",
+    "post": "[~~\u01a4\u0151\u0161\u0163~~]",
+    "prev": "[~~\u01a4\u0159\u00e9\u1e7d~~]",
+    "reload": "[~~\u0158\u00e9\u013c\u0151\u00e1\u0111~~]",
+    "remove": "[~~\u0158\u00e9\u0271\u0151\u1e7d\u00e9~~]",
+    "reset": "[~~\u0158\u00e9\u0161\u00e9\u0163~~]",
+    "retry": "[~~\u0158\u00e9\u0163\u0159\u00fd~~]",
+    "save": "[~~\u0160\u00e1\u1e7d\u00e9~~]",
+    "saveChanges": "[~~\u0160\u00e1\u1e7d\u00e9 \u0109\u0125\u00e1\u00f1\u011d\u00e9\u0161~~]",
+    "search": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125~~]",
+    "seeAll": "[~~\u0160\u00e9\u00e9 \u00e1\u013c\u013c~~]",
+    "select": "[~~\u0160\u00e9\u013c\u00e9\u0109\u0163~~]",
+    "send": "[~~\u0160\u00e9\u00f1\u0111~~]",
+    "share": "[~~\u0160\u0125\u00e1\u0159\u00e9~~]",
+    "submit": "[~~\u0160\u00fa\u0180\u0271\u00ed\u0163~~]",
+    "tapToRetry": "[~~\u0162\u00e1\u01a5 \u0163\u0151 \u0159\u00e9\u0163\u0159\u00fd~~]",
+    "tryAgain": "[~~\u0162\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1~~]",
+    "unfollow": "[~~\u00da\u00f1\u0192\u0151\u013c\u013c\u0151\u0175~~]",
+    "update": "[~~\u00da\u01a5\u0111\u00e1\u0163\u00e9~~]",
+    "viewAll": "[~~\u1e7c\u00ed\u00e9\u0175 \u00e1\u013c\u013c~~]"
   },
   "empty": {
     "leaderboard": {
-      "body": "[~~Ļéáđéřƀőářđ đáţá ŵíļļ áƥƥéář őñĉé šĉőříñĝ ƀéĝíñš.~~]",
-      "title": "[~~Ñő Ļéáđéřƀőářđ Áṽáíļáƀļé~~]"
+      "body": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111 \u0111\u00e1\u0163\u00e1 \u0175\u00ed\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u0151\u00f1\u0109\u00e9 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d \u0180\u00e9\u011d\u00ed\u00f1\u0161.~~]",
+      "title": "[~~\u00d1\u0151 \u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111 \u00c1\u1e7d\u00e1\u00ed\u013c\u00e1\u0180\u013c\u00e9~~]"
     },
     "players": {
-      "body": "[~~Ƥļáýéř đáţá íš ƀéíñĝ ļőáđéđ.~~]",
-      "title": "[~~Ñő Ƥļáýéřš Ƒőúñđ~~]"
+      "body": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0159 \u0111\u00e1\u0163\u00e1 \u00ed\u0161 \u0180\u00e9\u00ed\u00f1\u011d \u013c\u0151\u00e1\u0111\u00e9\u0111.~~]",
+      "title": "[~~\u00d1\u0151 \u01a4\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0191\u0151\u00fa\u00f1\u0111~~]"
     },
     "schedule": {
-      "body": "[~~Ţőúřñáɱéñţ šĉĥéđúļé ŵíļļ áƥƥéář áš éṽéñţš ářé áññőúñĉéđ.~~]",
-      "title": "[~~Ñő Éṽéñţš Šĉĥéđúļéđ~~]"
+      "body": "[~~\u0162\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163 \u0161\u0109\u0125\u00e9\u0111\u00fa\u013c\u00e9 \u0175\u00ed\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u00e1\u0161 \u00e9\u1e7d\u00e9\u00f1\u0163\u0161 \u00e1\u0159\u00e9 \u00e1\u00f1\u00f1\u0151\u00fa\u00f1\u0109\u00e9\u0111.~~]",
+      "title": "[~~\u00d1\u0151 \u00c9\u1e7d\u00e9\u00f1\u0163\u0161 \u0160\u0109\u0125\u00e9\u0111\u00fa\u013c\u00e9\u0111~~]"
     }
   },
   "errors": {
-    "coursesLoadBody": "[~~Ŵé éñĉőúñţéřéđ áñ éřřőř ļőáđíñĝ ţĥé ĉőúřšéš ƥáĝé. Ţĥíš ɱíĝĥţ ƀé á ţéɱƥőřářý íššúé.~~]",
-    "coursesLoadTitle": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ~~]",
-    "genericBody": "[~~Ŵé ĉőúļđñ'ţ ļőáđ ţĥíš ĉőñţéñţ. Ƥļéášé ţřý áĝáíñ.~~]",
-    "sectionLoadFailed": "[~~Ĉőúļđñ'ţ ļőáđ {{section}}.~~]"
+    "coursesLoadBody": "[~~\u0174\u00e9 \u00e9\u00f1\u0109\u0151\u00fa\u00f1\u0163\u00e9\u0159\u00e9\u0111 \u00e1\u00f1 \u00e9\u0159\u0159\u0151\u0159 \u013c\u0151\u00e1\u0111\u00ed\u00f1\u011d \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9\u0161 \u01a5\u00e1\u011d\u00e9. \u0162\u0125\u00ed\u0161 \u0271\u00ed\u011d\u0125\u0163 \u0180\u00e9 \u00e1 \u0163\u00e9\u0271\u01a5\u0151\u0159\u00e1\u0159\u00fd \u00ed\u0161\u0161\u00fa\u00e9.~~]",
+    "coursesLoadTitle": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d~~]",
+    "genericBody": "[~~\u0174\u00e9 \u0109\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0163\u0125\u00ed\u0161 \u0109\u0151\u00f1\u0163\u00e9\u00f1\u0163. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]",
+    "sectionLoadFailed": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 {{section}}.~~]"
   },
-  "smoke": "[~~őǩ~~]",
+  "smoke": "[~~\u0151\u01e9~~]",
   "state": {
-    "copied": "[~~Ĉőƥíéđ~~]",
-    "empty": "[~~Ñőţĥíñĝ ĥéřé ýéţ~~]",
-    "error": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ~~]",
-    "loading": "[~~Ļőáđíñĝ...~~]",
-    "loadingEllipsis": "[~~Ļőáđíñĝ…~~]",
-    "noResults": "[~~Ñő řéšúļţš~~]",
-    "offline": "[~~Ýőú'řé őƒƒļíñé~~]",
-    "posting": "[~~Ƥőšţíñĝ...~~]",
-    "processing": "[~~Ƥřőĉéššíñĝ~~]",
-    "reloadPage": "[~~Řéļőáđ Ƥáĝé~~]",
-    "saved": "[~~Šáṽéđ~~]",
-    "saving": "[~~Šáṽíñĝ...~~]",
-    "sending": "[~~Šéñđíñĝ...~~]",
-    "somethingWentWrong": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ~~]",
-    "tryAgainLater": "[~~Ƥļéášé ţřý áĝáíñ ļáţéř.~~]",
-    "updated": "[~~Úƥđáţéđ~~]",
-    "uploading": "[~~Úƥļőáđíñĝ...~~]"
+    "copied": "[~~\u0108\u0151\u01a5\u00ed\u00e9\u0111~~]",
+    "empty": "[~~\u00d1\u0151\u0163\u0125\u00ed\u00f1\u011d \u0125\u00e9\u0159\u00e9 \u00fd\u00e9\u0163~~]",
+    "error": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d~~]",
+    "loading": "[~~\u013b\u0151\u00e1\u0111\u00ed\u00f1\u011d...~~]",
+    "loadingEllipsis": "[~~\u013b\u0151\u00e1\u0111\u00ed\u00f1\u011d\u2026~~]",
+    "noResults": "[~~\u00d1\u0151 \u0159\u00e9\u0161\u00fa\u013c\u0163\u0161~~]",
+    "offline": "[~~\u00dd\u0151\u00fa'\u0159\u00e9 \u0151\u0192\u0192\u013c\u00ed\u00f1\u00e9~~]",
+    "posting": "[~~\u01a4\u0151\u0161\u0163\u00ed\u00f1\u011d...~~]",
+    "processing": "[~~\u01a4\u0159\u0151\u0109\u00e9\u0161\u0161\u00ed\u00f1\u011d~~]",
+    "reloadPage": "[~~\u0158\u00e9\u013c\u0151\u00e1\u0111 \u01a4\u00e1\u011d\u00e9~~]",
+    "saved": "[~~\u0160\u00e1\u1e7d\u00e9\u0111~~]",
+    "saving": "[~~\u0160\u00e1\u1e7d\u00ed\u00f1\u011d...~~]",
+    "sending": "[~~\u0160\u00e9\u00f1\u0111\u00ed\u00f1\u011d...~~]",
+    "somethingWentWrong": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d~~]",
+    "tryAgainLater": "[~~\u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1 \u013c\u00e1\u0163\u00e9\u0159.~~]",
+    "updated": "[~~\u00da\u01a5\u0111\u00e1\u0163\u00e9\u0111~~]",
+    "uploading": "[~~\u00da\u01a5\u013c\u0151\u00e1\u0111\u00ed\u00f1\u011d...~~]"
   },
   "settings": {
     "autoPostRounds": {
-      "title": "[Pöst mý röünds äütömätïcällý]",
-      "subtitle": "[Ýöür röünds äppëär ïn thë Clübhöüsë whën ýöü lög thëm. Önlý ständöüt röünds rëäch mëmbërs whö dö nöt föllöw ýöü.]"
+      "title": "[P\u00f6st m\u00fd r\u00f6\u00fcnds \u00e4\u00fct\u00f6m\u00e4t\u00efc\u00e4ll\u00fd]",
+      "subtitle": "[\u00dd\u00f6\u00fcr r\u00f6\u00fcnds \u00e4pp\u00eb\u00e4r \u00efn th\u00eb Cl\u00fcbh\u00f6\u00fcs\u00eb wh\u00ebn \u00fd\u00f6\u00fc l\u00f6g th\u00ebm. \u00d6nl\u00fd st\u00e4nd\u00f6\u00fct r\u00f6\u00fcnds r\u00eb\u00e4ch m\u00ebmb\u00ebrs wh\u00f6 d\u00f6 n\u00f6t f\u00f6ll\u00f6w \u00fd\u00f6\u00fc.]"
     }
   },
   "feed": {
@@ -98,16 +98,16 @@
   },
   "business": {
     "hero": {
-      "communityRating": "[Cømmúnïtý ráƭïñg]",
-      "ratings": "[{{count}} ráƭïñgs]",
-      "ratings_one": "[{{count}} ráƭïñg]",
-      "edit": "[Édïƭ]",
-      "follow": "[Følløw]",
-      "following": "[Følløwïñg]",
-      "manage": "[Máñágé]",
-      "verified": "[Vérïfïéd]",
-      "readMore": "[Réád møré]",
-      "readLess": "[Réád léss]"
+      "communityRating": "[C\u00f8mm\u00fan\u00eft\u00fd r\u00e1\u01ad\u00ef\u00f1g]",
+      "ratings": "[{{count}} r\u00e1\u01ad\u00ef\u00f1gs]",
+      "ratings_one": "[{{count}} r\u00e1\u01ad\u00ef\u00f1g]",
+      "edit": "[\u00c9d\u00ef\u01ad]",
+      "follow": "[F\u00f8ll\u00f8w]",
+      "following": "[F\u00f8ll\u00f8w\u00ef\u00f1g]",
+      "manage": "[M\u00e1\u00f1\u00e1g\u00e9]",
+      "verified": "[V\u00e9r\u00eff\u00ef\u00e9d]",
+      "readMore": "[R\u00e9\u00e1d m\u00f8r\u00e9]",
+      "readLess": "[R\u00e9\u00e1d l\u00e9ss]"
     },
     "emptyState": {
       "kicker": "[FOR BUSINESSES]",
@@ -270,6 +270,14 @@
       "nudge": {
         "draft": "Hi {{name}} - connect your handicap on clbhouz and we can compare rounds and see who's actually playing better."
       }
+    },
+    "compare": {
+      "kicker": "COMPARE",
+      "title": "How you compare",
+      "roundsTogether_one": "{{count}} round together",
+      "roundsTogether_other": "{{count}} rounds together",
+      "playedAgo": "Played {{when}}",
+      "anyone": "Compare against anyone"
     }
   }
 }
