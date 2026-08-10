@@ -657,6 +657,7 @@ function AppRoutes() {
         <Route path="/nearby" element={<Navigate to="/clubhouse" replace />} />
         
         {/* Tour Hub routes */}
+        <Route path="/__board_probe" element={<Suspense fallback={null}><BoardProbe /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         
