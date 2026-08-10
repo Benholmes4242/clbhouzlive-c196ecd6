@@ -491,7 +491,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       composer.clearDraft();
       media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
-      setSuccess({ ratingId, shareToFeed });
+      onSuccess({
+        ratingId,
+        shareToFeed,
+        overall: composer.state.overall,
+        scores: composer.state.scores,
+      });
+
       // review_submitted
       analyticsEvents.track('review_submitted', {
         course_id: course.id,
