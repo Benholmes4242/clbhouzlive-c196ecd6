@@ -2,6 +2,7 @@
   "career": {
     "achieved": "Achieved",
     "everyThreshold": "Every threshold achieved",
+    "toGoTo": "{{n}} to go to {{target}}",
     "moreForTier": "{{n}} more for tier {{tier}}",
     "toGo": "to go",
     "maxedOf": "{{n}} maxed of {{total}}",
