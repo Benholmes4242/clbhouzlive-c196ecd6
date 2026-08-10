@@ -853,24 +853,17 @@ export default function VerificationFlowSheet({
                 )}
 
                 {/* Supporting document uploader */}
-                <div
-                  className="mt-4 pt-4"
-                  style={{ borderTop: `0.5px solid ${BIZ.hair}` }}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold" style={{ color: BIZ.ink }}>
-                        Supporting document{' '}
-                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
-                          (optional)
-                        </span>
-                      </p>
-                      <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
-                        Attach a document that proves your business (e.g. registration certificate, licence).
-                        Strengthens your request.
-                      </p>
-                    </div>
+                <div className="mt-4">
+                  <div className="mb-2">
+                    <p style={{ fontSize: 13, fontWeight: 700, color: A.INK, margin: 0 }}>
+                      Supporting document{' '}
+                      <span style={{ fontWeight: 400, color: A.MUTE }}>(optional)</span>
+                    </p>
+                    <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '2px 0 0' }}>
+                      A registration certificate or licence strengthens your request.
+                    </p>
                   </div>
+
 
                   {docPath ? (
                     <div
