@@ -591,7 +591,6 @@ function AppRoutes() {
 
         
         {/* Business routes */}
-        <Route path="/__biz_probe" element={<BizProbe />} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
         <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
