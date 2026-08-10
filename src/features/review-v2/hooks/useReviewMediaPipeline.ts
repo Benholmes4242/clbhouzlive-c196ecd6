@@ -16,6 +16,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
@@ -25,6 +27,9 @@ import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 
 const REVIEW_R2_BUCKET = 'clbhouz-review-images';
+
+/** Per-item cache sweeps are throttled to at most one every 2s. */
+const SWEEP_THROTTLE_MS = 2000;
 
 function nid(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -350,9 +355,26 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
   //   - all items ready → removeJob (card disappears)
   //   - any item failed → markFailed (Retry primed via reviewRetryRegistry)
   const flushToReview = useCallback(
-    async (reviewId: string, opts?: { caption?: string }) => {
+    async (
+      reviewId: string,
+      opts?: { caption?: string; queryClient?: QueryClient },
+    ) => {
       const pending = itemsRef.current.filter((i) => i.status === 'pending' || i.status === 'failed');
       if (pending.length === 0) return;
+
+      // Cache sweeps: the composer hands us the QueryClient explicitly so the
+      // reference survives its unmount (flushToReview is fire-and-forget).
+      // Per-item sweep throttled to one every 2s; final sweep in finally().
+      const qc = opts?.queryClient ?? null;
+      let lastSweepAt = 0;
+      const sweep = (force: boolean) => {
+        if (!qc) return;
+        const now = Date.now();
+        if (!force && now - lastSweepAt < SWEEP_THROTTLE_MS) return;
+        lastSweepAt = now;
+        invalidateCourseRatingCaches(qc);
+      };
+
 
       const store = usePendingPostsStore.getState();
       const ident = identityRef.current;
@@ -406,6 +428,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
             reviewRetryRegistry.unregister(jobId!);
             activeJobRef.current = null;
           }
+          sweep(true);
         });
       }
 
@@ -415,6 +438,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           if (!itemsRef.current.find((c) => c.id === it.id)) continue;
           // eslint-disable-next-line no-await-in-loop
           await uploadOne(it, reviewId);
+          // Item landed (or failed) — let mounted surfaces pick it up.
+          if (itemsRef.current.find((c) => c.id === it.id)?.status === 'ready') sweep(false);
         }
       } finally {
         if (jobId) {
@@ -427,6 +452,9 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
             activeJobRef.current = null;
           }
         }
+        // Final, unthrottled sweep — fires on success, partial failure, or
+        // after the composer has unmounted mid-flight.
+        sweep(true);
       }
     },
     [userId, uploadOne],

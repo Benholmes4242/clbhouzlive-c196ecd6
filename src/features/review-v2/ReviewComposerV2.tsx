@@ -489,7 +489,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       });
       submittedRef.current = true;
       composer.clearDraft();
-      media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
+      media.flushToReview(ratingId, { caption: composer.state.reviewText, queryClient: qc }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
       onSuccess({
         ratingId,
