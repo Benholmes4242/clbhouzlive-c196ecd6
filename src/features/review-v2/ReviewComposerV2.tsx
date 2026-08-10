@@ -550,6 +550,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     if (!existing) return;
     try {
       await submit.remove(existing.id);
+      // review_removed - fired only after the removal actually succeeded.
+      analyticsEvents.track('review_removed', {
+        course_id: course.id,
+        rating_id: existing.id,
+        had_text: (existing.review ?? '').trim().length > 0,
+        media_count: existingMedia.length,
+      });
       invalidateCourseRatingCaches(qc);
       if (existingMedia.length > 0) {
         supabase.functions
@@ -570,25 +577,11 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't remove your review");
     }
-  }, [existing, submit, existingMedia, onExit, qc]);
+  }, [existing, submit, existingMedia, onExit, qc, course.id]);
 
-  // ---- confirmation ----------------------------------------------------
-  if (success) {
-    return (
-      <ReviewReceipt
-        ratingId={success.ratingId}
-        course={course}
-        overall={composer.state.overall}
-        scores={composer.state.scores}
-        shareToFeed={success.shareToFeed}
-        onClubhouse={() => navigate('/clubhouse')}
-        onBack={() => navigate(`/courses/${course.id}`, { replace: true })}
-        onNextCourse={(nextId) => {
-          navigate(`/courses/${nextId}/review`, { replace: true });
-        }}
-      />
-    );
-  }
+  // The confirmation receipt renders in the parent (InnerComposer) so it
+  // outlives this instance across the create-to-edit remount.
+
 
   // ---- gates and label -------------------------------------------------
   const gateMet = step === 0 ? composer.step0Gate : step === 1 ? composer.step1Gate : true;
