@@ -411,7 +411,8 @@
       "tot": "TOT",
       "thru": "THRU",
       "today": "TODAY",
-      "round": "Ronda"
+      "round": "Ronda",
+      "mov": "MOV"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",

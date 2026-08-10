@@ -43,6 +43,21 @@ function fmtDateRange(start: string | null, end: string | null): string | null {
   return formatTournamentDateRange(start, end);
 }
 
+/**
+ * Pill label for the event switcher. The h1 is the statement; the pills are a
+ * control, and the active pill must not restate the headline word for word or
+ * clip off the right edge. Deterministic stripping only — a trailing
+ * " Championship" and any " presented by ..." clause. There is NO short-name
+ * field on sr_tournaments and this deliberately invents no abbreviations.
+ */
+function shortEventName(name: string): string {
+  let s = (name || '').trim();
+  s = s.replace(/\s+(presented|driven|sponsored)\s+by\s+.*$/i, '');
+  s = s.replace(/\s+Championship$/i, '');
+  return s.trim() || name;
+}
+
+
 
 /**
  * Live state marker. A 7px green dot + halo is a broadcast convention and
@@ -134,11 +149,11 @@ function StatCell({
       <div style={{ ...LABEL }}>{label}</div>
       <div
         style={{
-          marginTop: 5,
+          marginTop: 7,
           fontFamily: F,
-          fontSize: 20,
+          fontSize: 22,
           fontWeight: 800,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.025em',
           color: A.INK,
           ...FIGS,
         }}
@@ -463,7 +478,11 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* STAT ROW - par / yards / field average. */}
+        {/* STAT ROW - par / yards / field average.
+            A FIXED GRID, never space-around: a two-stat event and a
+            three-stat event are one pill-tap apart, and PAR must not move
+            horizontally between them. Cells with no value are omitted and
+            the grid rebalances evenly. */}
         {(par != null || yardage != null || field != null) && (
           <div
             style={{
@@ -471,12 +490,19 @@ export function LeaderboardTab() {
               background: A.PANEL,
               border: `1px solid ${A.BORDER}`,
               borderRadius: 16,
-              padding: 16,
+              padding: '18px 16px',
               fontFamily: F,
               ...FIGS,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around', gap: 12 }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${[par != null, yardage != null, field != null].filter(Boolean).length}, minmax(0,1fr))`,
+                alignItems: 'flex-start',
+                gap: 12,
+              }}
+            >
               {par != null && <StatCell label={t('tour.par')} value={String(par)} />}
               {yardage != null && (
                 <StatCell label={t('tour.yards')} value={yardage.toLocaleString()} />
@@ -524,14 +550,15 @@ export function LeaderboardTab() {
                   padding: '9px 15px',
                   cursor: 'pointer',
                   fontFamily: F,
-                  fontSize: 13,
-                  fontWeight: 700,
+                  fontSize: 12.5,
+                  fontWeight: 800,
                   color: active ? '#FFFFFF' : A.MUTE,
                   whiteSpace: 'nowrap',
                 }}
                 aria-pressed={active}
+                aria-label={tt.name}
               >
-                {tt.name}
+                {shortEventName(tt.name)}
               </button>
             );
           })}
@@ -547,6 +574,7 @@ export function LeaderboardTab() {
           zIndex: 2,
           display: 'grid',
           gridTemplateColumns: boardGridTemplate(headerCols),
+          gap: 8,
           alignItems: 'center',
           padding: '8px 16px',
           background: SURFACE,
@@ -560,10 +588,9 @@ export function LeaderboardTab() {
         }}
       >
         <div style={{ whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
-        <div style={{ minWidth: 0, paddingLeft: 4, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
+        <div style={{ minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
         <BoardHeaderCells
           columns={headerCols}
-          thruLabel={t('board.columns.thru')}
           totLabel={t('board.columns.tot')}
         />
       </div>

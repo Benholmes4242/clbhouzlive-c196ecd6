@@ -120,7 +120,6 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
               <div style={{ minWidth: 0, paddingLeft: 4 }}>{t('board.columns.player')}</div>
               <BoardHeaderCells
                 columns={cols}
-                thruLabel={t('board.columns.thru')}
                 totLabel={t('board.columns.tot')}
               />
             </div>
