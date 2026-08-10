@@ -306,47 +306,42 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             overflow: 'hidden',
           }}
         >
-          {/* stats row */}
-          <div style={{ display: 'flex', padding: '12px 14px', alignItems: 'flex-end' }}>
+          {/* stats row — equal columns, one figure size, no internal rules.
+              An absent value renders NO figure; the fixed 22px slot keeps the
+              cells aligned. */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+              padding: '12px 14px',
+            }}
+          >
             {(
               [
-                ['Score diff', diffDisplay, diffColor, 1.2, 22],
-                ['Gross', gross != null ? String(gross) : '\u2014', 'var(--hcp-t-100)', 1, 17],
+                [t('common:handicap.lastRound.playedTo'), playedTo, diffColor],
                 [
-                  'Stableford',
-                  stableford != null ? String(stableford) : '\u2014',
+                  t('common:handicap.lastRound.gross'),
+                  gross != null ? String(gross) : null,
                   'var(--hcp-t-100)',
-                  1,
-                  17,
+                ],
+                [
+                  t('common:handicap.lastRound.stableford'),
+                  stableford != null ? String(stableford) : null,
+                  'var(--hcp-t-100)',
                 ],
               ] as const
-            ).map(([label, value, color, flex, valueSize], i) => (
-              <div
-                key={label}
-                style={{
-                  flex,
-                  borderLeft: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                  paddingLeft: i === 0 ? 0 : 14,
-                }}
-              >
+            ).map(([label, value, color]) => (
+              <div key={label} style={{ minWidth: 0 }}>
+                <div style={{ ...LABEL_STYLE, marginBottom: 5 }}>{label}</div>
                 <div
                   style={{
-                    fontSize: 10,
+                    height: 22,
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    fontSize: 21,
                     fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: 'var(--hcp-t-40)',
-                    marginBottom: 4,
-                  }}
-                >
-                  {label}
-                </div>
-                <div
-                  style={{
-                    fontSize: valueSize,
-                    fontWeight: 800,
                     color,
-                    letterSpacing: '-0.01em',
+                    letterSpacing: '-0.04em',
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
                   }}
@@ -357,14 +352,6 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             ))}
           </div>
 
-          {/* internal hairline */}
-          <div
-            style={{
-              height: 1,
-              background: 'var(--hcp-line, rgba(255,255,255,0.08))',
-              margin: '0 14px',
-            }}
-          />
 
           {/* consequence row */}
           <div
