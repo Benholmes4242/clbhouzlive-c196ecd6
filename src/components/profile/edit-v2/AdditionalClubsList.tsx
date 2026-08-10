@@ -31,9 +31,13 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <Label right={<VisibilityDropdown value={visibility as VisibilityValue} onChange={onVisibilityChange} />}>
-        Additional clubs
-      </Label>
+      {/* The kicker gets its own line; visibility gets its own row beneath. */}
+      <div>
+        <FieldLabel>Additional clubs</FieldLabel>
+        <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+      </div>
+
+
 
 
       {clubs.length > 0 && (
