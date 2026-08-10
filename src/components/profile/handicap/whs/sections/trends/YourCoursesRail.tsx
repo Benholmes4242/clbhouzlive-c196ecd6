@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -69,6 +69,7 @@ export const YourCoursesRail: React.FC<Props> = ({ readOnly = false }) => {
           display: 'flex',
           gap: 10,
           padding: '4px 18px 4px',
+          alignItems: 'stretch',
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
@@ -81,6 +82,7 @@ export const YourCoursesRail: React.FC<Props> = ({ readOnly = false }) => {
             onClick={() => navigate(`/courses/${c.course_id}?tab=holes`)}
             style={{
               flex: '0 0 168px',
+              height: '100%',
               minHeight: 76,
               padding: '12px 14px',
               background: 'var(--hcp-surface-2, rgba(255,255,255,0.04))',
@@ -95,36 +97,36 @@ export const YourCoursesRail: React.FC<Props> = ({ readOnly = false }) => {
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <div
-              style={{
-                fontSize: 13.5,
-                fontWeight: 700,
-                color: 'var(--hcp-t-100)',
-                letterSpacing: '-0.005em',
-                lineHeight: 1.25,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
+            <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
               {c.course_name}
             </div>
-            <div
-              style={{
-                marginTop: 8,
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--hcp-t-60)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {t('holes.yourCourses.nRounds', {
-                count: c.rounds_count,
-                rounds: c.rounds_count,
-              })}
+            {/* labelled figure, not a string - marginTop auto lands the count
+                on the same line across every card when a name wraps */}
+            <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+              <div
+                style={{
+                  fontSize: 19,
+                  fontWeight: 700,
+                  letterSpacing: '-0.04em',
+                  color: 'var(--hcp-t-100)',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                }}
+              >
+                {c.rounds_count}
+              </div>
+              <div
+                style={{
+                  marginTop: 4,
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: 'var(--hcp-t-40)',
+                }}
+              >
+                {t('holes.yourCourses.roundsLabel')}
+              </div>
             </div>
           </button>
         ))}
