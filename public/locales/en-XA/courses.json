@@ -104,6 +104,9 @@
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
       "seeAllShort": "[\u00c0\u013a\u013a {{count}}]"
+    },
+    "yourCourses": {
+      "roundsLabel": "[Rounds]"
     }
   },
   "scorecard": {

@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -242,6 +242,9 @@
       "index": "Handicap",
       "indexHeldAt": "Handicap bleibt bei",
       "notBest8": "nicht unter deinen besten 8"
+    },
+    "records": {
+      "emptyHint": "Deine Rekorde erscheinen hier, sobald Runden eingetragen sind."
     }
   }
 }

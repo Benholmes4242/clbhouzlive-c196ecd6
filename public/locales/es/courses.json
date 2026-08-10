@@ -94,7 +94,8 @@
       "eyebrow": "Course by course",
       "title": "Your courses",
       "nRounds_one": "{{count}} round",
-      "nRounds_other": "{{count}} rounds"
+      "nRounds_other": "{{count}} rounds",
+      "roundsLabel": "Rondas"
     },
     "preview": {
       "eyebrow": "Hole by hole",
