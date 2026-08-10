@@ -463,20 +463,38 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
 );
 
 
-// ─── Feed card ──────────────────────────────────────────────────────
+// ─── Feed row ───────────────────────────────────────────────────────
+// A row is three columns and nothing else: a 42px right-aligned GROSS
+// column, the course and its meta, and a 52px right-aligned PLAYED TO
+// column. No border, no tile, no capsule - the two figure columns must
+// align down the whole archive, which is the only thing an archive is for.
 interface FeedCardProps {
   round: RoundWithDelta;
   onTap: () => void;
+  labels: { gross: string; playedTo: string; notInBest8: string };
 }
 
-const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
+const FIGURE_LABEL: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: T.inkFaded,
+  marginTop: 4,
+  whiteSpace: 'nowrap',
+};
+
+const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
-  const isCounter = round.is_counter;
+  const diffText = fmtDiff(round.handicap_differential);
 
   const d = new Date(round.play_date);
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
+
+  // ONE statement about the index per row. Never both, never "counts".
+  const showNotCounted = !deltaInfo && !round.is_counter;
 
   return (
     <button
@@ -485,72 +503,38 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
       data-feedrow="true"
       style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 12,
+        alignItems: 'flex-start',
+        gap: 13,
         width: '100%',
-        padding: '12px 14px',
-        background: T.cardBg,
-        border: '1px solid var(--hcp-line)',
-        borderRadius: 14,
+        padding: '13px 0',
+        background: 'transparent',
+        border: 'none',
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
       }}
     >
-      {/* Score-first hero tile */}
-      <div
-        style={{
-          width: 50,
-          height: 50,
-          borderRadius: 12,
-          flexShrink: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: isCounter ? 'rgba(5,150,105,0.10)' : 'var(--hcp-bg-2)',
-          border: isCounter ? '1px solid rgba(5,150,105,0.30)' : '1px solid transparent',
-        }}
-      >
-        <span
+      {/* Gross - a figure, not a tile. No colour when the round counts. */}
+      <div style={{ width: 42, flexShrink: 0, textAlign: 'right' }}>
+        <div
           style={{
             fontSize: 21,
-            fontWeight: 800,
-            color: isCounter ? 'var(--hcp-good-deep)' : T.ink,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em',
+            fontWeight: 700,
+            letterSpacing: '-0.045em',
+            color: T.ink,
             lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            minHeight: 21,
           }}
         >
-          {round.adjusted_gross ?? '\u2014'}
-        </span>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.06em',
-            color: isCounter ? 'var(--hcp-good-deep)' : T.inkFaded,
-            marginTop: 2,
-          }}
-        >
-          GROSS
-        </span>
+          {round.adjusted_gross ?? ''}
+        </div>
+        <div style={FIGURE_LABEL}>{labels.gross}</div>
       </div>
 
       {/* Course + meta */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 800,
-            color: T.ink,
-            letterSpacing: '-0.005em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: 1.15,
-          }}
-        >
+        <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
           {courseName}
         </div>
         <div
@@ -558,54 +542,63 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
             fontSize: 11,
             fontWeight: 600,
             color: T.inkMute,
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             gap: 5,
             flexWrap: 'wrap',
             lineHeight: 1.2,
-            marginTop: 2,
+            marginTop: 3,
           }}
         >
           <span>{weekday} {dayOfMonth}</span>
-          {isCounter && (
-            <>
-              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
-              <span style={{ color: 'var(--hcp-good-deep)', fontWeight: 700 }}>counts</span>
-            </>
-          )}
           {deltaInfo && (
             <>
               <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
-              <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em', textShadow: deltaInfo.glow }}>
+              <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em' }}>
                 HCP {deltaInfo.sign} {deltaInfo.value}
+              </span>
+            </>
+          )}
+          {showNotCounted && (
+            <>
+              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+              <span
+                style={{
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: T.inkFaded,
+                }}
+              >
+                {labels.notInBest8}
               </span>
             </>
           )}
         </div>
       </div>
 
-      {/* Differential pill */}
-      <span
-        style={{
-          flexShrink: 0,
-          fontSize: 13,
-          fontWeight: 800,
-          color: diffColor(round.handicap_differential),
-          background:
-            round.handicap_differential != null && round.handicap_differential < 0
-              ? 'rgba(5,150,105,0.10)'
-              : 'rgba(255,255,255,0.045)',
-          fontVariantNumeric: 'tabular-nums',
-          padding: '6px 10px',
-          borderRadius: 999,
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {fmtDiff(round.handicap_differential)}
-      </span>
+      {/* Played to - a figure in ink. No pill, no tint, no green. */}
+      <div style={{ width: 52, flexShrink: 0, textAlign: 'right' }}>
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
+            color: T.ink,
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            minHeight: 15,
+          }}
+        >
+          {diffText}
+        </div>
+        <div style={FIGURE_LABEL}>{labels.playedTo}</div>
+      </div>
     </button>
   );
 };
+
 
 // ─── Skeleton ───────────────────────────────────────────────────────
 // Shape follows the new row: no border, no card - a flat 46px band.
