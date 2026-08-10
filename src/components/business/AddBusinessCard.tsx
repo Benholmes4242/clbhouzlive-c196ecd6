@@ -33,7 +33,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
           <Building2 className="w-8 h-8" style={{ color: BIZ.amber }} />
         </div>
 
-        <h2 className="text-[18px] font-bold mb-2" style={{ color: BIZ.ink }}>
+        <h2 className="text-[17px] font-semibold mb-2" style={{ color: BIZ.ink }}>
           No business profiles yet
         </h2>
 
@@ -72,7 +72,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         }}
       >
         <Plus className="shrink-0" style={{ width: 16, height: 16, color: BIZ.inkMute }} />
-        <span className="flex-1 text-left" style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}>
+        <span className="flex-1 text-left" style={{ color: BIZ.ink, fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em' }}>
           {t('business.card.addAnother')}
         </span>
         <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />

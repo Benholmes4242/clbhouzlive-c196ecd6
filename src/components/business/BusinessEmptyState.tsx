@@ -103,9 +103,9 @@ const ReachCell = ({
       <div
         style={{
           marginTop: 5,
-          fontSize: 23,
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
+          fontSize: 25,
+          fontWeight: 700,
+          letterSpacing: '-0.04em',
           color: A.INK,
           fontVariantNumeric: 'tabular-nums',
           // The query is a claim about the platform: while it is in flight the
@@ -124,7 +124,7 @@ const ReachCell = ({
               alignItems: 'center',
               gap: 2,
               fontSize: 10.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: A.GREEN,
               fontVariantNumeric: 'tabular-nums',
             }}
