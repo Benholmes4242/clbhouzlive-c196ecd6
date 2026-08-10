@@ -30,12 +30,20 @@ interface Props {
 }
 
 const FIGURE: React.CSSProperties = {
-  fontSize: 28,
-  fontWeight: 800,
+  fontSize: 24,
+  fontWeight: 700,
   lineHeight: 1,
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.045em',
   color: CHART.INK,
   fontVariantNumeric: 'tabular-nums lining-nums',
+};
+
+// Local LABEL: the shared chart token is 9/800; this surface is 7.5/700.
+const LBL: React.CSSProperties = {
+  ...LABEL_STYLE,
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
 };
 
 const Figure: React.FC<{ label: string; value: string; sub?: string | null }> = ({
@@ -45,15 +53,13 @@ const Figure: React.FC<{ label: string; value: string; sub?: string | null }> = 
 }) => (
   <div style={{ minWidth: 0 }}>
     <div style={FIGURE}>{value}</div>
-    <div style={{ ...LABEL_STYLE, marginTop: 6, color: CHART.MUTE }}>{label}</div>
+    <div style={{ ...LBL, marginTop: 6, color: CHART.MUTE }}>{label}</div>
     {sub && (
       <div
         style={{
-          ...LABEL_STYLE,
+          ...LBL,
           marginTop: 3,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          overflowWrap: 'anywhere',
         }}
       >
         {sub}
@@ -61,6 +67,7 @@ const Figure: React.FC<{ label: string; value: string; sub?: string | null }> = 
     )}
   </div>
 );
+
 
 export const StandingFigures: React.FC<Props> = ({
   selfRow,
@@ -92,8 +99,9 @@ export const StandingFigures: React.FC<Props> = ({
   return (
     <div
       style={{
-        display: 'flex',
-        gap: 28,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: 12,
         padding: '16px 16px 14px',
         fontFamily: CHART_FONT,
       }}
@@ -105,8 +113,9 @@ export const StandingFigures: React.FC<Props> = ({
       />
       {percentileTop != null && (
         <Figure
-          label={t('handicap.circle.standing.percentile')}
+          label={t('handicap.circle.standing.top')}
           value={`${percentileTop}%`}
+
           sub={
             isFriend
               ? t('handicap.circle.standing.ofCircleFriend')

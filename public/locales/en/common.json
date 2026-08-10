@@ -475,10 +475,10 @@
         "rankOwnedUnknown": "Their rank",
         "rank": "Your rank",
         "ofTotal": "of {{count}}",
-        "percentile": "Percentile",
         "ofCircleFriend": "of their circle",
         "ofCircleOwner": "of your circle",
-        "toCatch": "To catch"
+        "toCatch": "To catch",
+        "top": "Top"
       },
       "round": {
         "unknownCourse": "Unknown course",

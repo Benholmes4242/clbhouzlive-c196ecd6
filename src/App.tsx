@@ -489,6 +489,7 @@ function AppRoutes() {
         <Route path="/" element={null} />
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
 
+
         
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />

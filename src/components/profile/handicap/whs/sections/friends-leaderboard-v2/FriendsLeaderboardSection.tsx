@@ -28,11 +28,13 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const LABEL_STYLE: React.CSSProperties = {
   margin: 0,
-  fontSize: 10,
-  fontWeight: 800,
+  fontSize: 7.5,
+  fontWeight: 700,
   color: 'var(--hcp-t-40)',
   letterSpacing: '0.16em',
+  textTransform: 'uppercase',
 };
+
 
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data, isLoading, isError, refetch } = useFriendLeaderboard(userId);
@@ -62,21 +64,15 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
     ? Math.max(5, Math.min(95, Math.ceil((cohorts.selfActiveRank! / cohorts.totalActive) * 20) * 5))
     : null;
 
-  const tail = `${cohorts.totalActive} active${
-    cohorts.totalInactive > 0 ? `, ${cohorts.totalInactive} inactive` : ''
-  }`;
-
   const isFriend = viewMode === 'friend';
   const possessive = ownerFirstName ? `${ownerFirstName}'s` : 'Their';
-  const subjectIs = ownerFirstName ? `${ownerFirstName} is` : 'They are';
+  void possessive;
 
-  const subLine = isLoading
-    ? 'Loading…'
-    : circlePercentile != null
-      ? isFriend
-        ? `${subjectIs} top ${circlePercentile}% of ${ownerFirstName ? `${ownerFirstName}'s` : 'their'} circle · ${tail}`
-        : `You're top ${circlePercentile}% of your circle · ${tail}`
-      : `Ranked by current handicap · ${tail}`;
+  /* THE HEADER STOPS REPEATING ITSELF. The old sentence ("You're top n% of
+     your circle - a active, b inactive") restated every figure beneath it.
+     The figures are the sentence, so there is no sub-line. */
+
+
 
 
   /**
@@ -101,8 +97,8 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
             ? (ownerFirstName ? `${ownerFirstName} vs their circle` : 'Vs their circle')
             : 'You vs your circle'
         }
-        sub={subLine}
       />
+
 
       {isError && !isLoading && (
         <div
@@ -179,152 +175,157 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           />
         )}
 
-        {/* Divider + TOP 5 / 30D label row (tinted strip) */}
+        {/* Column labels. Widths match the row: 26 movement, 42 index. */}
         {!isLoading && (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              padding: '12px 16px 8px',
+              gap: 11,
+              padding: '12px 16px 4px',
               background: 'var(--hcp-bg-2)',
               borderTop: '1px solid var(--hcp-line-2)',
             }}
           >
             <p style={{ ...LABEL_STYLE, flex: 1, margin: 0 }}>Top of your circle</p>
-            <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center', margin: 0 }}>30D</p>
-            <div style={{ width: 56 }} />
+            <p style={{ ...LABEL_STYLE, width: 26, textAlign: 'right', margin: 0 }}>30D</p>
+            <div style={{ width: 42 }} />
           </div>
         )}
 
-        {/* Rows */}
-        {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              variant="dark"
-              style={{ margin: '0 0 1px', height: 54, width: '100%', borderRadius: 0 }}
-            />
-          ))
-        ) : (
-          (() => {
-
-
-            return cohorts.topFive.map((entry) => {
+        {/* Rows — no rules, no borders. The self row's wash bleeds to the
+            card edges via the row's matched negative margin. */}
+        <div style={{ padding: '2px 16px 6px' }}>
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                variant="dark"
+                style={{ margin: '0 0 8px', height: 44, width: '100%', borderRadius: 8 }}
+              />
+            ))
+          ) : (
+            cohorts.topFive.map((entry) => {
               const activeIdx = cohorts.active.findIndex((e) => e === entry);
               const rank = activeIdx >= 0 ? activeIdx + 1 : null;
               const delta = entry.friend_row_id
                 ? deltasData?.byFriendRowId.get(entry.friend_row_id)
                 : undefined;
-
-              /* The member's row is a GROUP BOUNDARY: an amber rule above it.
-                 This is the one permitted internal line on this surface. The
-                 gap to the player above is already stated as the TO CATCH
-                 figure, so it is not repeated here. */
               return (
-                <React.Fragment key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}>
-                  {entry.is_self && (
-                    <div
-                      aria-hidden
-                      style={{ height: 1, background: 'rgba(247,147,30,0.45)', margin: '6px 0 0' }}
-                    />
-                  )}
-                  <LeaderboardRow
-                    entry={entry}
-                    rank={rank}
-                    isStaleRow={false}
-                    rankDelta={delta}
-                    onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
-                  />
-                </React.Fragment>
+                <LeaderboardRow
+                  key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                  entry={entry}
+                  rank={rank}
+                  isStaleRow={false}
+                  rankDelta={delta}
+                  onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
+                />
               );
-            });
-          })()
-        )}
+            })
+          )}
+        </div>
 
-
-        {/* See all — now the card's footer */}
+        {/* ONE footer row, ONE treatment: see-all left, inactive right. */}
         {!isLoading && cohorts.totalActive > 0 && (
-          <button
-            type="button"
-            onClick={() => setFullLeaderboardOpen(true)}
+          <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              width: '100%',
-              padding: '12px 16px',
+              justifyContent: 'space-between',
+              gap: 12,
+              padding: '10px 16px 12px',
               background: 'var(--hcp-bg-1)',
-              border: 'none',
-              borderTop: '1px solid var(--hcp-line-2)',
-              color: 'var(--hcp-t-80)',
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontFamily: FONT,
             }}
           >
-            See all {cohorts.totalActive} active
-            <span style={{ fontSize: 14, color: 'var(--hcp-t-60)' }}>›</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setFullLeaderboardOpen(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: 0,
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hcp-t-80)',
+                fontFamily: FONT,
+                fontSize: 7.5,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              See all {cohorts.totalActive} active
+              <span style={{ fontSize: 11, color: 'var(--hcp-t-60)' }}>›</span>
+            </button>
+
+            {cohorts.totalInactive > 0 && !showInactive && (
+              <button
+                type="button"
+                onClick={() => setShowInactive(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: 0,
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--hcp-t-60)',
+                  fontFamily: FONT,
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    letterSpacing: '-0.03em',
+                    color: 'var(--hcp-t-100)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {cohorts.totalInactive}
+                </span>
+                Inactive
+                <ChevronDown size={12} strokeWidth={2} />
+              </button>
+            )}
+          </div>
         )}
+
       </div>
       )}
       {/* ===== END CARD ===== */}
 
-      {/* Inactive section */}
-      {!isLoading && !isError && cohorts.totalInactive > 0 && (
-        <>
-          {showInactive ? (
-            <>
-              <div style={{ padding: '16px 16px 8px' }}>
-                <p style={LABEL_STYLE}>INACTIVE · {cohorts.totalInactive}</p>
-              </div>
-              {cohorts.inactive.map((entry) => {
-                const delta = entry.friend_row_id
-                  ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-                  : undefined;
-                return (
-                  <LeaderboardRow
-                    key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                    entry={entry}
-                    rank={null}
-                    isStaleRow={true}
-                    rankDelta={delta}
-                    onClick={() => handleRowClick(entry)}
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowInactive(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 5,
-                width: 'calc(100% - 40px)',
-                margin: '4px 16px 16px',
-                padding: '8px 16px',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--hcp-t-60)',
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontFamily: FONT,
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              Show {cohorts.totalInactive} inactive friend
-              {cohorts.totalInactive === 1 ? '' : 's'}
-              <ChevronDown size={14} strokeWidth={2} />
-            </button>
-          )}
-        </>
+      {/* Inactive list — opened from the footer control, no second sentence */}
+      {!isLoading && !isError && showInactive && cohorts.totalInactive > 0 && (
+        <div style={{ padding: '12px 16px 16px' }}>
+          <p style={{ ...LABEL_STYLE, marginBottom: 4 }}>Inactive · {cohorts.totalInactive}</p>
+          {cohorts.inactive.map((entry) => {
+            const delta = entry.friend_row_id
+              ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+              : undefined;
+            return (
+              <LeaderboardRow
+                key={`inactive-${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                entry={entry}
+                rank={null}
+                isStaleRow={true}
+                rankDelta={delta}
+                onClick={() => handleRowClick(entry)}
+              />
+            );
+          })}
+        </div>
       )}
+
 
       <FullLeaderboardSheet
         open={fullLeaderboardOpen}

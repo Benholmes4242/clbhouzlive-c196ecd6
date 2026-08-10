@@ -254,6 +254,13 @@
         "roundsTitle_one": "{{count}} round",
         "roundsTitle_other": "{{count}} rounds"
       }
+    },
+    "circle": {
+      "standing": {
+        "top": "[Top]",
+        "ofCircleOwner": "of your circle",
+        "ofCircleFriend": "of their circle"
+      }
     }
   }
 }
