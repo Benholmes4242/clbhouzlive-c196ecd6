@@ -935,7 +935,10 @@
       "chase_one": "{{count}} de {{total}} curso seguido tiene r\u00e9cords por batir",
       "chase_other": "{{count}} de {{total}} cursos seguidos tienen r\u00e9cords por batir"
     },
-    "countryCount": "{{formattedCount}} of {{total}}"
+    "colArea": "Zona",
+    "colRegion": "Regi\u00f3n",
+    "colCountsCountry": "Con vueltas / en el directorio",
+    "colCountsRegion": "Con vueltas"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

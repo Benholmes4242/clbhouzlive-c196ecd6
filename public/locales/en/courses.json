@@ -1411,8 +1411,7 @@
     "allAreas": "All areas",
     "allRegions": "All regions",
     "allOf": "All of {{country}}",
-    "regionOption": "{{region}} ({{count}})",
-    "selectCountryA11y": "Select country",
+    "selectCountryA11y": "Select area",
     "selectRegionA11y": "Select region",
     "selectLensA11y": "Sort courses",
     "inCountry": " In {{country}}.",
@@ -1481,7 +1480,10 @@
       "cta": "Browse the full directory"
     },
     "loadingMore": "Loading more courses...",
-    "countryCount": "{{formattedCount}} of {{total}}"
+    "colArea": "Area",
+    "colRegion": "Region",
+    "colCountsCountry": "With rounds / in directory",
+    "colCountsRegion": "With rounds"
   },
   "directorySheet": {
     "placeholder": "Search all courses",

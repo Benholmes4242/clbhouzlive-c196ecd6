@@ -935,7 +935,10 @@
       "chase_one": "{{count}} von {{total}} verfolgtem Kurs hat offene Rekorde",
       "chase_other": "{{count}} von {{total}} verfolgten Kursen haben offene Rekorde"
     },
-    "countryCount": "{{formattedCount}} of {{total}}"
+    "colArea": "Gebiet",
+    "colRegion": "Region",
+    "colCountsCountry": "Mit Runden / im Verzeichnis",
+    "colCountsRegion": "Mit Runden"
   },
   "directorySheet": {
     "placeholder": "Search all courses",
