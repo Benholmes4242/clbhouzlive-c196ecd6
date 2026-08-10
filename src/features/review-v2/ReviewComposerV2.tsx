@@ -263,6 +263,26 @@ function InnerComposer() {
     );
   }
 
+  // The receipt lives HERE, above the keyed <Composer />, so it survives the
+  // create-to-edit remount caused by invalidateCourseRatingCaches refetching
+  // existingQ (the key flips from ":new" to ":<rating id>").
+  if (success && courseQ.data) {
+    return (
+      <ReviewReceipt
+        ratingId={success.ratingId}
+        course={courseQ.data}
+        overall={success.overall}
+        scores={success.scores}
+        shareToFeed={success.shareToFeed}
+        onClubhouse={() => navigate('/clubhouse')}
+        onBack={() => navigate(`/courses/${courseQ.data!.id}`, { replace: true })}
+        onNextCourse={(nextId) => {
+          navigate(`/courses/${nextId}/review`, { replace: true });
+        }}
+      />
+    );
+  }
+
   if (!ready) {
     return <RateCoursePageSkeleton />;
   }
@@ -274,6 +294,11 @@ function InnerComposer() {
       userId={userId}
       existing={existingQ.data}
       existingMedia={existingMediaQ.data ?? []}
+      submittedRef={submittedRef}
+      onSuccess={(payload) => {
+        submittedRef.current = true;
+        setSuccess(payload);
+      }}
       author={{
         displayName:
           profileQ.data?.display_name ||
@@ -295,6 +320,7 @@ function InnerComposer() {
     />
   );
 }
+
 
 interface ComposerProps {
   course: ReviewV2Course;
