@@ -152,6 +152,13 @@
         "tail": " - [earn the badge]",
         "action": "[Get verified]",
         "notVerified": "[Not verified]"
+      },
+      "actions": {
+        "edit": "[Edit profile]",
+        "insights": "[Insights]",
+        "reviews": "[Reviews]",
+        "team": "[Manage team]",
+        "viewProfile": "[View live profile]"
       }
     }
   }

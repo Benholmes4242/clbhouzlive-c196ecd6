@@ -152,6 +152,13 @@
         "tail": " - Abzeichen erhalten",
         "action": "Verifizieren",
         "notVerified": "Nicht verifiziert"
+      },
+      "actions": {
+        "edit": "Profil bearbeiten",
+        "insights": "Statistiken",
+        "reviews": "Bewertungen",
+        "team": "Team verwalten",
+        "viewProfile": "Live-Profil ansehen"
       }
     }
   }

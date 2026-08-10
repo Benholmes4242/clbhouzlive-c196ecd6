@@ -152,6 +152,13 @@
         "tail": " - consigue la insignia",
         "action": "Verificar",
         "notVerified": "No verificado"
+      },
+      "actions": {
+        "edit": "Editar perfil",
+        "insights": "Estadisticas",
+        "reviews": "Resenas",
+        "team": "Gestionar equipo",
+        "viewProfile": "Ver perfil publico"
       }
     }
   }

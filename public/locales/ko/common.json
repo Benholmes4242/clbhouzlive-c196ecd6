@@ -151,6 +151,13 @@
         "tail": " - baeji hwakbo",
         "action": "Injeung batgi",
         "notVerified": "Mi injeung"
+      },
+      "actions": {
+        "edit": "Peuropil sujeong",
+        "insights": "Insaiteu",
+        "reviews": "Ribyu",
+        "team": "Tim gwanri",
+        "viewProfile": "Gonggae peuropil bogi"
       }
     }
   }
