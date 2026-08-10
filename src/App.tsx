@@ -1,4 +1,3 @@
-import TeamProbe from './pages/__TeamProbe';
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
@@ -592,7 +591,6 @@ function AppRoutes() {
 
         
         {/* Business routes */}
-        <Route path="/__team_probe" element={<TeamProbe />} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
         <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
