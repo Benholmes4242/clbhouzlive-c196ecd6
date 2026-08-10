@@ -197,7 +197,7 @@ const Triangle = ({ up, color }: { up: boolean; color: string }) => (
  *   prev >= DELTA_MIN_BASE -> percentage, as before
  *   value === prev         -> nothing at all, never "0%"
  */
-const Delta = ({ value, prev }: { value: number; prev: number }) => {
+export const Delta = ({ value, prev }: { value: number; prev: number }) => {
   if (value == null || prev == null) return null;
   if (value === prev) return null;
 
@@ -232,7 +232,7 @@ const Delta = ({ value, prev }: { value: number; prev: number }) => {
  * nothing the label does not. The delta sits in a FIXED-height box so cells
  * without one stay aligned with cells that have one.
  */
-const MetricCell = ({ label, value, prev, loading }: {
+export const MetricCell = ({ label, value, prev, loading }: {
   label: string; value: number; prev: number; loading: boolean;
 }) => (
   <div className="flex flex-col items-center text-center gap-1.5">
