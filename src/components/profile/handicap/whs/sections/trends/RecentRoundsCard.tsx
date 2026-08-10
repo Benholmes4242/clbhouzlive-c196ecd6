@@ -643,7 +643,7 @@ const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: str
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 6 }}>
         No rounds yet
       </div>
       <div style={{ fontSize: 12, color: T.inkMute, lineHeight: 1.5 }}>
