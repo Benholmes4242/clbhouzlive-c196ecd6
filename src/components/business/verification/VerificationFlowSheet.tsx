@@ -15,13 +15,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
+  Check,
   CheckCircle2,
+
   ChevronLeft,
   ExternalLink,
   FileText,
   Image as ImageIcon,
   Loader2,
-  ShieldCheck,
   Upload,
   X,
 } from 'lucide-react';
@@ -31,7 +32,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
@@ -44,6 +44,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { BIZ } from '@/components/business/businessTokens';
+import {
+  A,
+  BIZ_LABEL,
+  BIZ_BODY,
+  bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
 import {
   PROOF_OPTIONS,
@@ -309,6 +315,30 @@ export default function VerificationFlowSheet({
     setDocKind(null);
   }
 
+  /** How many of the five confirmed details the business has not set. */
+  const missingDetailCount = [
+    business?.name,
+    business?.category,
+    business?.location,
+    business?.website,
+    business?.email,
+  ].filter((v) => !v || !String(v).trim()).length;
+
+
+  /** Proof selection. Unchanged behaviour from the previous RadioGroup handler. */
+  function chooseProof(v: ProofMethod) {
+    setSelectedProof(v);
+    setExclusivityError('');
+    // If user picks a different method, drop OTP progress so it doesn't
+    // leak into the wrong proof - the row stays and can be updated on submit.
+    if (v !== 'business_email') {
+      setOtpEmailVerified(false);
+      setOtpSent(false);
+      setOtpCode('');
+    }
+  }
+
+
   // ---- OTP flow (business_email) ----
   async function ensureOtpRequest(): Promise<string | null> {
     if (otpRequestId) return otpRequestId;
@@ -548,20 +578,49 @@ export default function VerificationFlowSheet({
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Intro strip */}
+              <style>{`
+                [data-vf-field] input,
+                [data-vf-field] textarea,
+                [data-vf-field] button[role="combobox"] {
+                  border: 1px solid ${A.BORDER};
+                  border-radius: 11px;
+                  padding: 12px 13px;
+                  font-size: 14px;
+                  font-weight: 400;
+                  color: ${A.INK};
+                  background: ${A.PANEL};
+                  height: auto;
+                  min-height: 44px;
+                }
+              `}</style>
+
+              {/* Intro figures */}
               <div
-                className="flex items-start gap-3 px-4 py-3 rounded-2xl"
-                style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
+                  gap: 10,
+                  padding: '14px 16px',
+                  borderRadius: 14,
+                  background: A.PANEL,
+                  border: `1px solid ${A.BORDER}`,
+                }}
               >
-                <ShieldCheck className="h-5 w-5 mt-0.5 shrink-0" style={{ color: BIZ.amber }} />
-                <p className="text-[13px] leading-snug" style={{ color: BIZ.ink }}>
-                  Two minutes. We review within a few days and add your badge once approved.
-                </p>
+                <div className="text-center" style={{ minWidth: 0 }}>
+                  <div style={BIZ_LABEL}>To complete</div>
+                  <div style={{ ...bizFigure(19), marginTop: 6 }}>2 min</div>
+                </div>
+                <div className="text-center" style={{ minWidth: 0 }}>
+                  <div style={BIZ_LABEL}>We review in</div>
+                  {/* No SLA exists in the codebase - the existing prose stands rather than
+                      inventing a number the business would be held to. */}
+                  <div style={{ ...bizFigure(15), marginTop: 8 }}>A few days</div>
+                </div>
               </div>
 
               {/* SECTION 1 */}
               <SectionCard ref={detailsRef} number={1} title="Confirm your details">
-                <div className="space-y-0">
+                <div>
                   <DetailRow label="Business name" value={business?.name} />
                   <DetailRow label="Category" value={business?.category} />
                   <DetailRow label="Location" value={business?.location} />
@@ -576,17 +635,23 @@ export default function VerificationFlowSheet({
                     value={business?.email}
                     missing={!business?.email}
                     missingMessage="Contact email required"
-                    last
                   />
                 </div>
+                {missingDetailCount > 0 && (
+                  <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
+                    {missingDetailCount === 1
+                      ? '1 detail is missing. You can still submit, but adding it speeds up review.'
+                      : `${missingDetailCount} details are missing. You can still submit, but adding them speeds up review.`}
+                  </p>
+                )}
                 <div className="pt-3">
                   <Link
                     to={`/business/${businessId}/edit`}
                     onClick={() => onOpenChange(false)}
-                    className="inline-flex items-center gap-1.5 text-[13px] font-medium"
-                    style={{ color: BIZ.amber }}
+                    className="inline-flex items-center gap-1.5"
+                    style={{ ...BIZ_LABEL, color: A.INK, minHeight: 44, alignItems: 'center' }}
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink size={10} strokeWidth={2.5} />
                     Edit business profile
                   </Link>
                 </div>
@@ -595,50 +660,99 @@ export default function VerificationFlowSheet({
                 )}
               </SectionCard>
 
+
               {/* SECTION 2 */}
               <SectionCard ref={proofRef} number={2} title="Prove your business is real">
-                <RadioGroup
-                  value={selectedProof}
-                  onValueChange={(v) => {
-                    setSelectedProof(v as ProofMethod);
-                    setExclusivityError('');
-                    // If user picks a different method, drop OTP progress so it doesn't
-                    // leak into the wrong proof — the row stays and can be updated on submit.
-                    if (v !== 'business_email') {
-                      setOtpEmailVerified(false);
-                      setOtpSent(false);
-                      setOtpCode('');
-                    }
+                <div
+                  role="radiogroup"
+                  aria-label="How you want to prove your business"
+                  onKeyDown={(e) => {
+                    const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'];
+                    if (!keys.includes(e.key)) return;
+                    e.preventDefault();
+                    const idx = PROOF_OPTIONS.findIndex((o) => o.id === selectedProof);
+                    const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1;
+                    const next =
+                      PROOF_OPTIONS[
+                        (((idx < 0 ? 0 : idx + step) % PROOF_OPTIONS.length) +
+                          PROOF_OPTIONS.length) %
+                          PROOF_OPTIONS.length
+                      ];
+                    chooseProof(next.id);
+                    const el = e.currentTarget.querySelector<HTMLElement>(
+                      `[data-proof="${next.id}"]`,
+                    );
+                    el?.focus();
                   }}
-                  className="space-y-3"
                 >
                   {PROOF_OPTIONS.map((option) => {
                     const isSelected = selectedProof === option.id;
                     const Icon = option.icon;
                     return (
                       <div key={option.id}>
-                        <label
-                          className="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors"
-                          style={
-                            isSelected
-                              ? { borderColor: BIZ.amber, background: BIZ.amberTint }
-                              : { borderColor: BIZ.hair, background: BIZ.card }
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          data-proof={option.id}
+                          tabIndex={
+                            isSelected || (!selectedProof && option.id === PROOF_OPTIONS[0].id)
+                              ? 0
+                              : -1
                           }
+                          onClick={() => chooseProof(option.id)}
+                          className="w-full flex items-start gap-3 text-left"
+                          style={{
+                            minHeight: 44,
+                            padding: '10px 0',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
                         >
-                          <RadioGroupItem
-                            value={option.id}
-                            className="mt-0.5 [&]:border-[#F7931E] [&]:text-[#F7931E]"
-                          />
-                          <Icon className="h-4 w-4 mt-0.5 shrink-0" style={{ color: BIZ.inkMute }} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-medium" style={{ color: BIZ.ink }}>
+                          <span
+                            aria-hidden
+                            className="flex items-center justify-center shrink-0"
+                            style={{
+                              width: 15,
+                              height: 15,
+                              marginTop: 2,
+                              borderRadius: '50%',
+                              background: isSelected ? A.INK : 'transparent',
+                              border: isSelected ? 'none' : '1.5px solid #CBD2DA',
+                            }}
+                          >
+                            {isSelected && (
+                              <Check size={9} strokeWidth={3.25} style={{ color: '#FFFFFF' }} />
+                            )}
+                          </span>
+                          <Icon size={14} className="shrink-0" style={{ color: A.MUTE, marginTop: 2 }} />
+                          <span className="flex-1 min-w-0">
+                            <span
+                              style={{
+                                display: 'block',
+                                fontSize: 13.5,
+                                fontWeight: isSelected ? 700 : 600,
+                                color: A.INK,
+                                lineHeight: 1.3,
+                              }}
+                            >
                               {option.label}
-                            </p>
-                            <p className="text-[12px]" style={{ color: BIZ.inkMute }}>
+                            </span>
+                            <span
+                              style={{
+                                display: 'block',
+                                fontSize: 12.5,
+                                fontWeight: 400,
+                                color: A.MUTE,
+                                lineHeight: 1.35,
+                              }}
+                            >
                               {option.subtitle}
-                            </p>
-                          </div>
-                        </label>
+                            </span>
+                          </span>
+                        </button>
+
                         {isSelected && (
                           <div className="mt-3 pl-7">
                             {option.id === 'official_website' && (
@@ -790,15 +904,18 @@ export default function VerificationFlowSheet({
                                         key={t}
                                         type="button"
                                         onClick={() => setCreatorContactType(t)}
-                                        className="px-4 py-2 text-[13px] font-medium rounded-lg min-h-[40px]"
-                                        style={
-                                          active
-                                            ? { background: BIZ.amber, color: '#fff' }
-                                            : { background: BIZ.fill, color: BIZ.inkMute }
-                                        }
+                                        aria-pressed={active}
+                                        className="px-1 text-[13px] min-h-[44px]"
+                                        style={{
+                                          background: 'transparent',
+                                          border: 'none',
+                                          fontWeight: active ? 700 : 500,
+                                          color: active ? A.INK : A.MUTE,
+                                        }}
                                       >
                                         {t === 'email' ? 'Email' : 'Phone'}
                                       </button>
+
                                     );
                                   })}
                                 </div>
@@ -838,7 +955,7 @@ export default function VerificationFlowSheet({
                       </div>
                     );
                   })}
-                </RadioGroup>
+                </div>
 
                 {exclusivityError && (
                   <p className="text-[12px] text-destructive bg-destructive/10 p-3 rounded-lg mt-3">
@@ -847,24 +964,17 @@ export default function VerificationFlowSheet({
                 )}
 
                 {/* Supporting document uploader */}
-                <div
-                  className="mt-4 pt-4"
-                  style={{ borderTop: `0.5px solid ${BIZ.hair}` }}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold" style={{ color: BIZ.ink }}>
-                        Supporting document{' '}
-                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
-                          (optional)
-                        </span>
-                      </p>
-                      <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
-                        Attach a document that proves your business (e.g. registration certificate, licence).
-                        Strengthens your request.
-                      </p>
-                    </div>
+                <div className="mt-4">
+                  <div className="mb-2">
+                    <p style={{ fontSize: 13, fontWeight: 700, color: A.INK, margin: 0 }}>
+                      Supporting document{' '}
+                      <span style={{ fontWeight: 400, color: A.MUTE }}>(optional)</span>
+                    </p>
+                    <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '2px 0 0' }}>
+                      A registration certificate or licence strengthens your request.
+                    </p>
                   </div>
+
 
                   {docPath ? (
                     <div
@@ -911,30 +1021,43 @@ export default function VerificationFlowSheet({
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={docUploading}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-medium"
-                      style={{
-                        border: `1px dashed ${BIZ.hairDashed}`,
-                        color: BIZ.inkMute,
-                        background: BIZ.card,
-                      }}
-                    >
-                      {docUploading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading…
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4" />
-                          Attach document (image or PDF, max 10MB)
-                        </>
-                      )}
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={docUploading}
+                        className="w-full flex items-center justify-center gap-2"
+                        style={{
+                          minHeight: 44,
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          border: 'none',
+                          background: 'rgba(14,18,22,0.028)',
+                          ...BIZ_LABEL,
+                          color: A.INK,
+                        }}
+                      >
+                        {docUploading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Uploading
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={13} strokeWidth={2.25} />
+                            Attach image or PDF
+                          </>
+                        )}
+                      </button>
+                      <div
+                        className="text-center"
+                        style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}
+                      >
+                        Max 10MB
+                      </div>
+                    </div>
                   )}
+
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -984,20 +1107,14 @@ export default function VerificationFlowSheet({
                       </SelectContent>
                     </Select>
                     {role === 'owner' && (
-                      <p className="text-[10px] font-medium" style={{ color: BIZ.amber }}>
+                      <p style={{ ...BIZ_LABEL, fontSize: 7.5, color: A.MUTE, margin: '6px 0 0' }}>
                         Owners are typically verified fastest.
                       </p>
                     )}
                   </FieldGroup>
                   <FieldGroup
-                    label={
-                      <>
-                        How are you connected to this business?{' '}
-                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
-                          (max 500)
-                        </span>
-                      </>
-                    }
+                    label="How are you connected to this business?"
+                    hint="Max 500 characters"
                   >
                     <Textarea
                       value={notes}
@@ -1007,6 +1124,7 @@ export default function VerificationFlowSheet({
                       className="resize-none text-sm"
                     />
                   </FieldGroup>
+
                 </div>
                 <p
                   className="text-[11px] mt-4 pt-3"
@@ -1066,16 +1184,11 @@ const SectionCard = React.forwardRef<
     <div
       ref={ref}
       className="rounded-2xl p-4"
-      style={{ background: BIZ.card, border: `1px solid ${BIZ.hair}` }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
     >
-      <div className="flex items-center gap-2.5 mb-3">
-        <div
-          className="h-6 w-6 rounded-full flex items-center justify-center text-[12px] font-bold"
-          style={{ background: BIZ.ink, color: '#fff' }}
-        >
-          {number}
-        </div>
-        <h3 className="text-[15px] font-semibold" style={{ color: BIZ.ink }}>
+      <div className="flex items-baseline gap-2.5 mb-3">
+        <span style={{ ...BIZ_LABEL, flexShrink: 0 }}>{`Step ${number}`}</span>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: A.INK, margin: 0, letterSpacing: '-0.01em' }}>
           {title}
         </h3>
       </div>
@@ -1089,32 +1202,33 @@ function DetailRow({
   value,
   missing,
   missingMessage,
-  last,
 }: {
   label: string;
   value?: string | null;
   missing?: boolean;
   missingMessage?: string;
+  /** @deprecated rows no longer draw rules; kept so callers need not change. */
   last?: boolean;
 }) {
   return (
     <div
-      className="flex items-start gap-3 py-3"
-      style={last ? undefined : { borderBottom: `0.5px solid ${BIZ.hair}` }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '112px minmax(0,1fr)',
+        alignItems: 'baseline',
+        gap: 12,
+        padding: '8px 0',
+      }}
     >
-      <span className="text-[13px] shrink-0 w-[110px]" style={{ color: BIZ.inkMute }}>
-        {label}
-      </span>
+      <span style={BIZ_LABEL}>{label}</span>
       {missing ? (
-        <span className="text-[12px] text-destructive flex-1 min-w-0 text-right">
-          {missingMessage}
-        </span>
+        <span className="text-[12px] text-destructive min-w-0 text-right">{missingMessage}</span>
       ) : (
         <span
-          className="text-[13px] flex-1 min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{ color: BIZ.ink }}
+          className="min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ fontSize: 13.5, fontWeight: 600, color: A.INK }}
         >
-          {value || '—'}
+          {value || ''}
         </span>
       )}
     </div>
@@ -1123,20 +1237,22 @@ function DetailRow({
 
 function FieldGroup({
   label,
+  hint,
   children,
 }: {
   label: React.ReactNode;
+  hint?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-[13px]" style={{ color: BIZ.ink }}>
-        {label}
-      </Label>
+    <div data-vf-field>
+      <div style={{ ...BIZ_LABEL, marginBottom: 6 }}>{label}</div>
       {children}
+      {hint && <div style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}>{hint}</div>}
     </div>
   );
 }
+
 
 function ConfirmationView({
   requestId,

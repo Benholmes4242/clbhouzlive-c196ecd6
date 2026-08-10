@@ -2,7 +2,15 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight, Check, FileCheck } from 'lucide-react';
+import { Clock, XCircle, Mail, AlertCircle } from 'lucide-react';
+import {
+  A,
+  BIZ_KICKER,
+  BIZ_LABEL,
+  BIZ_TITLE,
+  BIZ_BODY,
+  bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 import { formatMonthDayYearShort } from '@/i18n/format';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -124,11 +132,19 @@ export default function BusinessVerificationPage() {
   );
 }
 
-function NoneState({ onStart }: { onStart: () => void }) {
-  const MUTED = 'rgba(15,23,42,0.55)';
-  const MUTED_LIGHT = 'rgba(15,23,42,0.45)';
-  const MUTED_FAINT = 'rgba(15,23,42,0.35)';
+const BENEFITS: Array<{ claim: string; tail: string }> = [
+  { claim: 'Build trust', tail: 'golfers can see the business is legitimate' },
+  { claim: 'Stand out in search', tail: 'verified businesses rank higher in discovery' },
+  { claim: 'Professional presence', tail: 'alongside other verified clubs and coaches' },
+];
 
+const HOW_IT_WORKS: Array<{ label: string; sub: string }> = [
+  { label: 'Submit', sub: 'with proof' },
+  { label: 'We review', sub: 'a few days' },
+  { label: 'Verified', sub: 'badge added' },
+];
+
+function NoneState({ onStart }: { onStart: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -136,173 +152,68 @@ function NoneState({ onStart }: { onStart: () => void }) {
       className="flex flex-col"
       style={{ minHeight: '100%' }}
     >
-      {/* Scrollable content */}
       <div className="flex-1" style={{ paddingBottom: 24 }}>
-        {/* Badge Hero */}
-        <div className="flex flex-col items-center" style={{ paddingTop: 8, gap: 12 }}>
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: 84,
-              height: 84,
-              borderRadius: 26,
-              background: BIZ.amberTint,
-              boxShadow: '0 0 0 6px rgba(247,147,30,0.06)',
-            }}
-          >
-            <BadgeCheck size={40} color={BIZ.amber} strokeWidth={2} />
-          </div>
-          <h2
-            className="text-center"
-            style={{
-              fontSize: 23,
-              fontWeight: 800,
-              color: BIZ.ink,
-              lineHeight: 1.15,
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Get verified on clbhouz
-          </h2>
-          <p
-            className="text-center"
-            style={{
-              fontSize: 14,
-              lineHeight: 1.45,
-              color: MUTED,
-              maxWidth: 300,
-              margin: 0,
-            }}
-          >
+        {/* Title block — the kicker says which surface this is. */}
+        <div style={{ paddingTop: 8 }}>
+          <div style={{ ...BIZ_KICKER, marginBottom: 8 }}>Verification</div>
+          <h2 style={{ ...BIZ_TITLE, fontSize: 21, margin: 0 }}>Get verified on clbhouz</h2>
+          <p style={{ ...BIZ_BODY, margin: '8px 0 0', maxWidth: '30em' }}>
             The verified badge tells golfers your business is authentic and trusted.
           </p>
         </div>
 
-        {/* Benefit Cards */}
-        <div className="flex flex-col" style={{ gap: 10, marginTop: 24 }}>
-          {[
-            { title: 'Build trust', desc: 'A verified badge shows golfers your business is legitimate.' },
-            { title: 'Stand out in search', desc: 'Verified businesses are more visible in search and discovery.' },
-            { title: 'Professional presence', desc: 'Join other verified clubs, coaches, and brands on clbhouz.' },
-          ].map(({ title, desc }) => (
-            <div
-              key={title}
-              className="flex items-start"
-              style={{
-                background: '#FFFFFF',
-                border: `1px solid ${BIZ.hair}`,
-                borderRadius: 14,
-                padding: '12px 16px',
-                gap: 12,
-              }}
-            >
-              <div
-                className="flex items-center justify-center flex-shrink-0"
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  background: 'rgba(5,150,105,0.10)',
-                  marginTop: 1,
-                }}
-              >
-                <Check size={14} color="#059669" strokeWidth={2.5} />
-              </div>
-              <div className="flex-1 min-w-0" style={{ paddingTop: 1 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 700, color: BIZ.ink, lineHeight: 1.25, marginBottom: 2 }}>
-                  {title}
-                </div>
-                <div style={{ fontSize: 13, lineHeight: 1.4, color: MUTED }}>
-                  {desc}
-                </div>
-              </div>
-            </div>
-          ))}
+        {/* What the badge does — one panel, one line each. */}
+        <div
+          style={{
+            marginTop: 24,
+            background: A.PANEL,
+            border: `1px solid ${A.BORDER}`,
+            borderRadius: 14,
+            padding: '14px 16px',
+          }}
+        >
+          <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>What the badge does</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {BENEFITS.map(({ claim, tail }) => (
+              <p key={claim} style={{ margin: 0, fontSize: 13, lineHeight: 1.45 }}>
+                <span style={{ fontWeight: 700, color: A.INK }}>{claim}</span>
+                <span style={{ fontWeight: 400, color: A.MUTE }}>{` \u2014 ${tail}`}</span>
+              </p>
+            ))}
+          </div>
         </div>
 
-        {/* Stepper */}
-        <div style={{ marginTop: 32 }}>
-          <div
-            className="text-center"
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: MUTED_FAINT,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              marginBottom: 16,
-            }}
-          >
-            THREE SIMPLE STEPS
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-            {/* Node 1 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  background: BIZ.amber,
-                }}
-              >
-                <FileCheck size={18} color="#FFFFFF" strokeWidth={2.5} />
+        {/* How it works — the order is the information. Nothing reads as current. */}
+        <div
+          style={{
+            marginTop: 12,
+            background: A.PANEL,
+            border: `1px solid ${A.BORDER}`,
+            borderRadius: 14,
+            padding: '14px 16px',
+          }}
+        >
+          <div style={{ ...BIZ_LABEL, marginBottom: 12 }}>How it works</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10 }}>
+            {HOW_IT_WORKS.map(({ label, sub }, i) => (
+              <div key={label} style={{ minWidth: 0 }}>
+                <div style={bizFigure(19)}>{i + 1}</div>
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    color: A.INK,
+                    marginTop: 8,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {label}
+                </div>
+                <div style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 4, lineHeight: 1.3 }}>
+                  {sub}
+                </div>
               </div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
-                Submit
-              </div>
-              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
-                with proof
-              </div>
-            </div>
-            {/* Line 1-2 */}
-            <div style={{ flex: 1, height: 1, background: BIZ.hair, marginTop: 19, minWidth: 16 }} />
-            {/* Node 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  background: '#FFFFFF',
-                  border: `1.5px solid ${BIZ.hair}`,
-                }}
-              >
-                <Clock size={18} color={MUTED_FAINT} strokeWidth={2} />
-              </div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
-                We review
-              </div>
-              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
-                a few days
-              </div>
-            </div>
-            {/* Line 2-3 */}
-            <div style={{ flex: 1, height: 1, background: BIZ.hair, marginTop: 19, minWidth: 16 }} />
-            {/* Node 3 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  background: '#FFFFFF',
-                  border: `1.5px solid ${BIZ.hair}`,
-                }}
-              >
-                <BadgeCheck size={18} color={MUTED_FAINT} strokeWidth={2} />
-              </div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
-                Verified
-              </div>
-              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
-                badge added
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
@@ -340,33 +251,25 @@ function NoneState({ onStart }: { onStart: () => void }) {
           style={{
             minHeight: 54,
             borderRadius: BIZ.rInner,
-            background: BIZ.ink,
+            background: A.INK,
             color: '#FFFFFF',
             fontSize: 16,
             fontWeight: 700,
-            gap: 8,
             border: 'none',
             cursor: 'pointer',
           }}
         >
           Start verification
-          <ArrowRight size={18} strokeWidth={2.25} />
         </button>
-        <p
-          className="text-center"
-          style={{
-            fontSize: 11.5,
-            color: MUTED_LIGHT,
-            margin: '10px 0 0',
-          }}
-        >
-          Verification is optional and not required to use clbhouz.
+        <p className="text-center" style={{ fontSize: 11.5, color: A.MUTE, margin: '10px 0 0' }}>
+          Verification is optional
         </p>
       </div>
 
     </motion.div>
   );
 }
+
 
 function PendingState({
   requestedAt,
