@@ -450,7 +450,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
                 cursor: 'pointer',
                 color: 'var(--hcp-t-60)',
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 padding: '4px 6px',
               }}
