@@ -419,10 +419,6 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   return (
     <section ref={sectionRef} style={{ marginTop: 32, fontFamily: FONT }}>
       <style>{`
-        @keyframes streakChipPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.5); }
-        }
         .gam-no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
 
