@@ -3,9 +3,14 @@
  *
  * Composition, in order:
  *   1. ONE leaderboard (FriendsLeaderboardSection)
- *   2. Friends' rounds
- *   3. Compare entry - one panel opening the compare sheet
+ *   2. Compare - a panel showing three recent people, each opening the sheet
+ *   3. Friends' rounds
  *   4. Invite
+ *
+ * THE ORDERING PRINCIPLE: order by the question the previous section leaves
+ * open. The leaderboard ends on "I'm 6th of 25" and compare answers it. A feed
+ * leaves no question open, so nothing follows Friends' rounds - which is why
+ * compare no longer sits beneath it, structurally unreachable.
  *
  * The Rivalries section and the Course Champions section are GONE, not hidden.
  * Rivalries required the member to manage a fixed set of slots to get one
@@ -57,11 +62,11 @@ export const CircleView: React.FC<Props> = ({
         />
       )}
 
-      {/* 2. Friends' rounds - owner only */}
-      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
+      {/* 2. Compare - shown in friend view, where it carries no rows */}
+      <CompareEntryPanel viewerUserId={userId} readOnly={readOnly} />
 
-      {/* 3. Compare - shown in friend view */}
-      <CompareEntryPanel />
+      {/* 3. Friends' rounds - owner only */}
+      {!readOnly && <RecentlyPlayedFeed ownerUserId={userId} />}
 
       {/* 4. Invite - owner only. One canonical surface: the action opens
           InviteFriendsSheet via the app-wide provider. */}
