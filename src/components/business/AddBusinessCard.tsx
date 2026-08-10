@@ -52,8 +52,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     );
   }
 
-  // Add another row — solid panel. A dashed edge is a placeholder motif; this
-  // is a real, permanent control, so it carries a solid 1px border.
+  // Add another row — solid panel. A placeholder edge treatment would say
+  // something is missing; this is a real, permanent control, so 1px solid.
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
