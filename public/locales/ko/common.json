@@ -136,6 +136,21 @@
           "tail": "jyohoe, palrou, chamyeo"
         }
       }
+    },
+    "card": {
+      "manage": "GWANRI",
+      "addAnother": "Bijeuniseu chugahagi",
+      "metrics": {
+        "visits": "Bangmun",
+        "followers": "Palrowo",
+        "impressions": "Impeuresyeon",
+        "last7Days": "Choegeun 7 il",
+        "allTime": "Jeonche gigan"
+      },
+      "verify": {
+        "tail": " - baeji hwakbo",
+        "action": "Injeung batgi"
+      }
     }
   }
 }

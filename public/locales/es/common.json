@@ -137,6 +137,21 @@
           "tail": "vistas, seguidores e interaccion"
         }
       }
+    },
+    "card": {
+      "manage": "GESTIONAR",
+      "addAnother": "Anadir otro negocio",
+      "metrics": {
+        "visits": "Visitas",
+        "followers": "Seguidores",
+        "impressions": "Impresiones",
+        "last7Days": "Ultimos 7 dias",
+        "allTime": "Total"
+      },
+      "verify": {
+        "tail": " - consigue la insignia",
+        "action": "Verificar"
+      }
     }
   }
 }

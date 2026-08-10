@@ -136,6 +136,21 @@
           "tail": "hyoji, forou, engejimento"
         }
       }
+    },
+    "card": {
+      "manage": "KANRI",
+      "addAnother": "Bijinesu wo tsuika",
+      "metrics": {
+        "visits": "Homon",
+        "followers": "Forowa",
+        "impressions": "Inpuresshon",
+        "last7Days": "Kako 7 nichi",
+        "allTime": "Zenkikan"
+      },
+      "verify": {
+        "tail": " - bajji wo kakutoku",
+        "action": "Ninsho wo uketoru"
+      }
     }
   }
 }
