@@ -25,7 +25,7 @@
  */
 
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatMonthYearShort } from '@/i18n/format';
 
 import { createPortal } from 'react-dom';
@@ -40,6 +40,7 @@ import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
+import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
@@ -213,6 +214,30 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   // Scope drag to header only so the middle scrolls without dismissing.
   const dragControls = useDragControls();
+
+  /* FOOTER TAP PROBE (D2) — flag-gated on-device hit-test drift logger.
+     Raw pointer coords vs. the button's rect, plus ms-since-open so a cluster
+     inside the entry spring (~300ms) can be told apart from scroller drift.
+     Reads NOTHING from elementFromPoint: see footerTapProbe.ts for why that
+     read cannot detect drift. Zero cost unless the flag is set. */
+  const footerRef = useRef<HTMLDivElement | null>(null);
+  const openedAtRef = useRef<number>(0);
+  useEffect(() => {
+    if (isOpen) openedAtRef.current = performance.now();
+  }, [isOpen]);
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!footerTapProbeEnabled()) return;
+    const footer = footerRef.current;
+    if (!footer) return;
+    const onDown = (e: PointerEvent) => {
+      try { recordFooterTap(e, footer, openedAtRef.current); } catch {}
+    };
+    // Capture phase + passive: observes without altering dispatch, so the
+    // buttons' own onClick behaviour is untouched while the probe is on.
+    footer.addEventListener('pointerdown', onDown, { capture: true, passive: true });
+    return () => footer.removeEventListener('pointerdown', onDown, { capture: true } as any);
+  }, [isOpen]);
 
   // Also dismiss the fullscreen viewer (if this sheet was opened from it)
   // so the destination route is actually visible.
@@ -701,6 +726,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* ─── PINNED FOOTER ─────────────────────────────── */}
             <div
+              ref={footerRef}
               style={{
                 flex: '0 0 auto',
                 padding: '10px 18px calc(env(safe-area-inset-bottom, 0px) + 14px)',
