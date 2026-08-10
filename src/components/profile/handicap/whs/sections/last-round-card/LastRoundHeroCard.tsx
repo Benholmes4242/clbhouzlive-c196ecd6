@@ -131,9 +131,9 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
       >
         <div
           style={{
-            fontSize: 18,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
+            fontSize: 20,
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
             lineHeight: 1.15,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
