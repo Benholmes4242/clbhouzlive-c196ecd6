@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas autom\u00e1ticamente",
+      "title": "Publicar mis rondas automáticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -218,13 +218,15 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
-      "lineHold": "Your handicap can't go up next round.",
-      "subHold": "Play to {{cut}} or better and it comes down.",
-      "lineRise": "Your handicap goes up to {{settle}} next round",
-      "subRise": "unless you play to {{cut}} or better.",
-      "countsAt": "Counts at {{cut}}",
-      "lastRounds_one": "Your last {{total}} rounds - {{count}} of {{total}} would count",
-      "lastRounds_other": "Your last {{total}} rounds - {{count}} of {{total}} would count"
+      "lineHold": "Tu handicap no puede subir en la proxima vuelta.",
+      "subHold": "Supera {{cut}} y bajara.",
+      "lineRise": "Tu handicap subira a {{settle}} en la proxima vuelta",
+      "subRise": "salvo que superes {{cut}}.",
+      "beatLabel": "{{count}} de tus ultimas {{total}} superan {{cut}}",
+      "scaleShoot": "Resultado",
+      "scaleBecomes": "El handicap pasa a",
+      "noChange": "sin cambio",
+      "yourBest": "tu mejor"
     },
     "pulse": {
       "findPlayer": "Find any player's handicap",
