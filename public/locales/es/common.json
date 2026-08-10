@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas automáticamente",
+      "title": "Publicar mis rondas autom\u00e1ticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -261,12 +261,11 @@
         "ofCircleOwner": "of your circle",
         "ofCircleFriend": "of their circle"
       },
-      "rounds": {
-        "notOnClbhouz_one": "{{count}} amigo no esta en clbhouz",
-        "notOnClbhouz_other": "{{count}} amigos no estan en clbhouz",
-        "inviteThem": "Invitarlos",
-        "noHandicap_one": "{{count}} amigo esta en clbhouz sin handicap",
-        "noHandicap_other": "{{count}} amigos estan en clbhouz sin handicap"
+      "round": {
+        "invite": "Invite",
+        "askToSync": "Ask to sync",
+        "notOnClbhouz": "Not on clbhouz",
+        "noHandicap": "No handicap"
       }
     }
   }
