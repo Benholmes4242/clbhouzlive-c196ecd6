@@ -339,20 +339,10 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         ? t('streaks.headlineOne')
         : t('streaks.headlineMany', { count: active.length });
 
-  const subLineParts: string[] = [];
-  if (longest && (longest.best_count ?? 0) > 0) {
-    subLineParts.push(
-      t('streaks.longestEver', {
-        n: longest.best_count,
-        unit: t(`streaks.unit.${STREAK_SHEET_CONFIG[longest.streak_type].unit}`, {
-          count: longest.best_count,
-        }),
-        name: t(`streaks.type.${longest.streak_type}.short`),
-      }),
-    );
-  }
+  const hasLongest = !!longest && (longest.best_count ?? 0) > 0;
   // Freezes are deliberately NOT totalled here: they are seeded only for
   // round_played, so a header total reads as a pool covering every streak.
+
 
 
   return (
