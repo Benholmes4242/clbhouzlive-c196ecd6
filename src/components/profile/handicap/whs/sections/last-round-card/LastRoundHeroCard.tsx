@@ -181,66 +181,84 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
   if (slope != null) metaParts.push(`SL ${slope}`);
   const meta = metaParts.length ? metaParts.join(' \u00b7 ') : null;
 
-  const diffDisplay = diff == null ? '\u2014' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+  // "Played to" — the same quantity the Next round card expresses as "beat n".
+  // Absent renders NOTHING (no dash); the label still names the slot.
+  const playedTo = diff == null ? null : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+
+  // Three-way, so exactly 0.0 can never fall into the good branch. The figure
+  // is INK today (colour lives on the index move), but the neutral case must
+  // exist so a later colour decision cannot reintroduce the fault.
   const diffColor =
-    diff == null ? 'var(--hcp-t-100)' : diff > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)';
+    diff == null || diff === 0
+      ? 'var(--hcp-t-100)'
+      : diff > 0
+        ? 'var(--hcp-t-100)'
+        : 'var(--hcp-t-100)';
 
   // ---- consequence line ----
-  // Order matters: non-counting first, then no-previous-index, then move/hold.
-  const dim: React.CSSProperties = {
-    fontSize: 12,
-    fontWeight: 600,
-    color: 'var(--hcp-t-60)',
-    fontVariantNumeric: 'tabular-nums',
-  };
-  const strong: React.CSSProperties = {
-    color: 'var(--hcp-t-100)',
-    fontWeight: 800,
-    fontVariantNumeric: 'tabular-nums',
-  };
-  let consequence: React.ReactNode;
-  if (!round.is_counter) {
-    consequence = <span style={dim}>No effect on your index</span>;
-  } else if (handicapDelta == null || indexAfter == null) {
-    consequence =
-      indexAfter != null ? (
-        <span style={dim}>
-          index <span style={strong}>{indexAfter.toFixed(1)}</span>
-        </span>
-      ) : (
-        <span />
-      );
-  } else if (Math.abs(handicapDelta) < 0.05) {
-    consequence = (
-      <span style={dim}>
-        index holds at <span style={strong}>{indexAfter.toFixed(1)}</span>
-      </span>
-    );
-  } else {
-    const up = handicapDelta > 0;
-    consequence = (
-      <span
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: up ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {up ? '\u2191' : '\u2193'} {Math.abs(handicapDelta).toFixed(1)}{' '}
+  // Built from handicap_delta ALWAYS. is_counter is a REASON appended to it,
+  // never a substitute: a non-counting round still drops the oldest of the 20,
+  // so the index can move while the new round did not count.
+  const moved = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const rose = (handicapDelta ?? 0) > 0;
+
+  const indexStatement: React.ReactNode =
+    indexAfter == null ? null : moved && indexBefore != null ? (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={LABEL_STYLE}>{t('common:handicap.lastRound.index')}</span>
         <span
           style={{
-            color: 'var(--hcp-t-60)',
+            fontSize: 13,
             fontWeight: 600,
+            color: 'var(--hcp-t-60)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {'\u00b7'} index {up ? 'climbs' : 'drops'} to{' '}
-          <span style={strong}>{indexAfter.toFixed(1)}</span>
+          {indexBefore.toFixed(1)}
+        </span>
+        <span aria-hidden style={{ ...LABEL_STYLE, letterSpacing: 0 }}>
+          &rarr;
+        </span>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: rose ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexAfter.toFixed(1)}
+        </span>
+      </span>
+    ) : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={LABEL_STYLE}>{t('common:handicap.lastRound.indexHeldAt')}</span>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: 'var(--hcp-t-100)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexAfter.toFixed(1)}
         </span>
       </span>
     );
-  }
+
+  const consequence =
+    indexStatement == null ? (
+      <span />
+    ) : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+        {indexStatement}
+        {!round.is_counter && (
+          <span style={{ ...LABEL_STYLE, color: 'var(--hcp-t-40)' }}>
+            {'\u00b7'} {t('common:handicap.lastRound.notBest8')}
+          </span>
+        )}
+      </span>
+    );
 
   return (
     <button
