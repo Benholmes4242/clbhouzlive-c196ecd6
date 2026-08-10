@@ -1,177 +1,197 @@
-import { ArrowRight, Building2, Search, Star, TrendingUp, type LucideIcon } from 'lucide-react';
-
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
-const AMBER_DEEP = '#c97a10';
+/**
+ * BusinessEmptyState - the "no businesses yet" surface on MyBusinessesPage.
+ *
+ * ANALYTICAL TREATMENT, NOT A BESPOKE PANEL. The layout, the kicker, the INK
+ * pill and the guidance rows all come from the shared EmptyState in
+ * analytical/tokens.tsx. No icon tile at any size, no tinted surface, no
+ * filled amber, no shadow, no per-benefit card.
+ *
+ * THE ARGUMENT IS THE FIGURES. The strongest thing the platform can say to a
+ * business is its actual scale, so three LIVE figures from get_platform_reach()
+ * sit where three sentences of adjectives used to. Member count is deliberately
+ * absent: it is the one figure a business would most want and the one that does
+ * not yet argue for us.
+ *
+ * DELTA COLOUR RULE. Each delta is an up triangle plus a figure in A.GREEN - a
+ * figure with an ARROW is a MOVEMENT and takes the improvement convention
+ * (green better). A figure with a sign or an "E" would be a SCORE and take the
+ * tour convention (under par red). The arrow is what tells a reader which one
+ * they are looking at, so it is not optional. A zero or missing delta renders
+ * NOTHING: a flat month must read as "no news", never as "stalled".
+ */
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { A, LABEL, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
+import { usePlatformReach } from '@/hooks/usePlatformReach';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface BusinessEmptyStateProps {
   onCreate: () => void;
 }
 
-interface Benefit {
-  icon: LucideIcon;
-  title: string;
-  body: string;
+const COUNT_UP_MS = 900;
+
+/**
+ * Figures ARRIVE at their value rather than scrolling past one: ease-out cubic
+ * over 900ms, once per mount (the value is latched in a ref, so a re-render
+ * never restarts it). prefers-reduced-motion: reduce renders the final value
+ * immediately with no frames at all.
+ */
+function useCountUp(value: number | null, enabled: boolean): number | null {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [shown, setShown] = useState<number | null>(null);
+  const startedFor = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!enabled || value == null) return;
+    if (startedFor.current === value) return;
+    startedFor.current = value;
+
+    if (prefersReducedMotion) {
+      setShown(value);
+      return;
+    }
+
+    let raf = 0;
+    let t0 = 0;
+    const tick = (ts: number) => {
+      if (!t0) t0 = ts;
+      const p = Math.min(1, (ts - t0) / COUNT_UP_MS);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setShown(Math.round(value * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [enabled, value, prefersReducedMotion]);
+
+  return shown;
 }
 
-const BENEFITS: Benefit[] = [
-  {
-    icon: Search,
-    title: 'Be discoverable',
-    body: 'Show up in search and the business directory where golfers are already looking.',
-  },
-  {
-    icon: Star,
-    title: 'Build trust',
-    body: 'Collect reviews and show real social proof from the community.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Understand your reach',
-    body: 'See how many golfers view, follow and engage with your profile.',
-  },
-];
-
-export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
+const ReachCell = ({
+  label,
+  total,
+  delta,
+  ready,
+  locale,
+  upLabel,
+}: {
+  label: string;
+  total: number | null;
+  delta: number | null;
+  ready: boolean;
+  locale: string;
+  upLabel: (n: number) => string;
+}) => {
+  const shown = useCountUp(total, ready);
   return (
-    <div
-      className="w-full max-w-md mx-auto flex flex-col items-center"
-      style={{
-        fontFamily: 'Geist, system-ui, sans-serif',
-        paddingTop: 32,
-        paddingBottom: 48,
-        paddingLeft: 20,
-        paddingRight: 20,
-        gap: 28,
-      }}
-    >
-      {/* Hero */}
-      <div className="flex flex-col items-center" style={{ gap: 14 }}>
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: 18,
-            background: AMBER_SOFT,
-          }}
-        >
-          <Building2 size={30} color={AMBER_DEEP} strokeWidth={2} />
-        </div>
-        <h1
-          className="text-center"
-          style={{
-            fontSize: 23,
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            color: INK,
-            lineHeight: 1.15,
-            margin: 0,
-          }}
-        >
-          Put your business on clbhouz
-        </h1>
-        <p
-          className="text-center"
-          style={{
-            fontSize: 14.5,
-            lineHeight: 1.45,
-            color: INK_45,
-            maxWidth: 300,
-            margin: 0,
-          }}
-        >
-          Create a profile for your golf club, academy or brand and reach golfers where they already are.
-        </p>
+    <div style={{ minWidth: 0, textAlign: 'center' }}>
+      <div style={{ ...LABEL, fontSize: 8 }}>{label}</div>
+      <div
+        style={{
+          marginTop: 5,
+          fontSize: 23,
+          fontWeight: 800,
+          letterSpacing: '-0.03em',
+          color: A.INK,
+          fontVariantNumeric: 'tabular-nums',
+          // The query is a claim about the platform: while it is in flight the
+          // cell renders NOTHING, never a zero. The box holds its height.
+          minHeight: 28,
+        }}
+      >
+        {shown == null ? '' : shown.toLocaleString(locale)}
       </div>
-
-      {/* Benefit cards */}
-      <div className="w-full flex flex-col" style={{ gap: 10 }}>
-        {BENEFITS.map(({ icon: Icon, title, body }) => (
-          <div
-            key={title}
-            className="flex items-start"
+      <div style={{ minHeight: 15, marginTop: 1 }}>
+        {ready && delta != null && delta > 0 && (
+          <span
+            aria-label={upLabel(delta)}
             style={{
-              background: '#FFFFFF',
-              border: `1px solid ${HAIR}`,
-              borderRadius: 14,
-              padding: '14px 15px',
-              gap: 12,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontSize: 10.5,
+              fontWeight: 800,
+              color: A.GREEN,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
-            <div
-              className="flex items-center justify-center flex-shrink-0"
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 11,
-                background: AMBER_SOFT,
-              }}
-            >
-              <Icon size={19} color={AMBER_DEEP} strokeWidth={2} />
-            </div>
-            <div className="flex-1 min-w-0" style={{ paddingTop: 1 }}>
-              <div
-                style={{
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  color: INK,
-                  lineHeight: 1.25,
-                  marginBottom: 2,
-                }}
-              >
-                {title}
-              </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  lineHeight: 1.4,
-                  color: INK_45,
-                }}
-              >
-                {body}
-              </div>
-            </div>
-          </div>
-        ))}
+            <span aria-hidden style={{ fontSize: 7.5 }}>
+              {'\u25B2'}
+            </span>
+            {delta.toLocaleString(locale)}
+          </span>
+        )}
       </div>
+    </div>
+  );
+};
 
-      {/* CTA */}
-      <div className="w-full flex flex-col items-center" style={{ gap: 10 }}>
-        <button
-          type="button"
-          onClick={onCreate}
-          className="w-full flex items-center justify-center active:opacity-90 transition-opacity"
-          style={{
-            minHeight: 54,
-            borderRadius: 14,
-            background: AMBER,
-            color: '#FFFFFF',
-            fontSize: 16,
-            fontWeight: 700,
-            gap: 8,
-            boxShadow: '0 6px 18px -6px rgba(247,147,30,0.45)',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          Create business profile
-          <ArrowRight size={18} strokeWidth={2.25} />
-        </button>
-        <p
-          className="text-center"
-          style={{
-            fontSize: 12.5,
-            color: INK_45,
-            margin: 0,
-          }}
-        >
-          Free to set up. Takes about a minute.
-        </p>
+export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
+  const { t, i18n } = useTranslation('common');
+  const { data, isSuccess } = usePlatformReach();
+  const locale = i18n.language || 'en';
+  const upLabel = (n: number) => t('business.emptyState.reach.up', { count: n });
+
+  const reach = (
+    <div style={{ width: '100%', marginTop: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 8 }}>
+        <ReachCell
+          label={t('business.emptyState.reach.courses')}
+          total={data?.coursesTotal ?? null}
+          delta={data?.coursesDelta ?? null}
+          ready={isSuccess}
+          locale={locale}
+          upLabel={upLabel}
+        />
+        <ReachCell
+          label={t('business.emptyState.reach.rounds')}
+          total={data?.roundsTotal ?? null}
+          delta={data?.roundsDelta ?? null}
+          ready={isSuccess}
+          locale={locale}
+          upLabel={upLabel}
+        />
+        <ReachCell
+          label={t('business.emptyState.reach.reviews')}
+          total={data?.reviewsTotal ?? null}
+          delta={data?.reviewsDelta ?? null}
+          ready={isSuccess}
+          locale={locale}
+          upLabel={upLabel}
+        />
       </div>
+      <div style={{ ...LABEL, fontSize: 7.5, textAlign: 'center', marginTop: 10 }}>
+        {t('business.emptyState.reach.footnote')}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full max-w-md mx-auto" style={{ paddingTop: 8, paddingBottom: 24 }}>
+      <EmptyState
+        kicker={t('business.emptyState.kicker')}
+        title={t('business.emptyState.title')}
+        body={t('business.emptyState.body')}
+        slot={reach}
+        primary={{ label: t('business.emptyState.cta'), onClick: onCreate }}
+        footnote={t('business.emptyState.footnote')}
+        guidanceHeading={t('business.emptyState.guidanceHeading')}
+        guidance={[
+          {
+            title: t('business.emptyState.benefits.discoverable.claim'),
+            body: t('business.emptyState.benefits.discoverable.tail'),
+          },
+          {
+            title: t('business.emptyState.benefits.trust.claim'),
+            body: t('business.emptyState.benefits.trust.tail'),
+          },
+          {
+            title: t('business.emptyState.benefits.reach.claim'),
+            body: t('business.emptyState.benefits.reach.tail'),
+          },
+        ]}
+      />
     </div>
   );
 }
