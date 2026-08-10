@@ -145,11 +145,8 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
         {meta && (
           <div
             style={{
-              marginTop: 3,
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              marginTop: 4,
+              ...LABEL_STYLE,
               color: 'rgba(255,255,255,0.82)',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -293,7 +290,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
       <MediaBand src={round.course_thumbnail_image ?? null} course={courseName} meta={meta} />
 
       {/* Floating glass tray — overlaps the photo seam by 22px, holds the
-          stats and consequence rows separated by a single internal hairline. */}
+          stats and consequence rows separated by whitespace only. */}
       <div style={{ padding: '0 10px 10px', marginTop: -22 }}>
         <div
           style={{

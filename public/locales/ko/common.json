@@ -233,6 +233,14 @@
       "ninetyDays": "90 days",
       "toHcp": "{{n}} of {{m}} to hcp",
       "noRecent": "No recent rounds"
+    },
+    "lastRound": {
+      "playedTo": "플레이 기록",
+      "gross": "그로스",
+      "stableford": "스테이블포드",
+      "index": "핸디캡",
+      "indexHeldAt": "핸디캡 유지",
+      "notBest8": "상위 8개에 포함되지 않음"
     }
   }
 }

@@ -6,8 +6,8 @@ export const CinemaCardSkeleton: React.FC = () => (
     variant="dark"
     style={{
       width: '100%',
-      height: 384,
-      borderRadius: 24,
+      height: 244,
+      borderRadius: 16,
       border: '0.5px solid rgba(255,255,255,0.07)',
     }}
   />
