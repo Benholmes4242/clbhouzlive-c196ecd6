@@ -452,7 +452,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <span style={LABEL}>{t('statBrowse.colArea')}</span>
             <span style={LABEL}>{t('statBrowse.colCountsCountry')}</span>
           </SelectLabel>
-          <SelectItem value="all">
+          <SelectItem value="all" className="[&>span:last-child]:w-full">
             <span className="flex w-full items-center gap-2">
               <Globe {...DD_ICON} />
               <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
@@ -470,7 +470,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           {/* Numerator is courses with rounds logged, denominator the whole
               directory; the sticky header row is what labels the column. */}
           {(facets?.countries ?? []).map((c) => (
-            <SelectItem key={c.sub_country} value={c.sub_country}>
+            <SelectItem key={c.sub_country} value={c.sub_country} className="[&>span:last-child]:w-full">
               <span className="flex w-full items-center gap-2">
                 <CountryFlag country={c.sub_country} size="sm" />
                 <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
@@ -516,7 +516,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <span style={LABEL}>{t('statBrowse.colRegion')}</span>
             <span style={LABEL}>{t('statBrowse.colCountsRegion')}</span>
           </SelectLabel>
-          <SelectItem value="all">
+          <SelectItem value="all" className="[&>span:last-child]:w-full">
             <span className="flex w-full items-center gap-2">
               <span className="flex-1 min-w-0 truncate">
                 {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
@@ -529,7 +529,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </span>
           </SelectItem>
           {regionsForCountry.map((r) => (
-            <SelectItem key={r.region} value={r.region}>
+            <SelectItem key={r.region} value={r.region} className="[&>span:last-child]:w-full">
               <span className="flex w-full items-center gap-2">
                 <span className="flex-1 min-w-0 truncate">{r.region}</span>
                 <span className="shrink-0" style={FIGURE_STYLE}>
