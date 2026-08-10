@@ -19,9 +19,9 @@ const FONT = CHART_FONT;
 
 const LABEL: React.CSSProperties = {
   fontFamily: FONT,
-  fontSize: 9.5,
-  fontWeight: 800,
-  letterSpacing: '0.13em',
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
   textTransform: 'uppercase',
   color: CHART.DIM,
 };
@@ -33,6 +33,7 @@ const TABULAR: React.CSSProperties = {
 
 const BAR_HEIGHT = 4;
 
+/** current / best. THE formula: where you stand against your own record. */
 const Bar: React.FC<{ pct: number; color: string }> = ({ pct, color }) => (
   <div
     style={{
@@ -47,6 +48,33 @@ const Bar: React.FC<{ pct: number; color: string }> = ({ pct, color }) => (
         width: `${Math.max(0, Math.min(100, pct))}%`,
         height: '100%',
         background: color,
+      }}
+    />
+  </div>
+);
+
+/**
+ * A broken streak still HAS a record - the closing line promises exactly that.
+ * The track renders empty with the best marked at its right end.
+ */
+const RecordTrack: React.FC = () => (
+  <div
+    style={{
+      height: BAR_HEIGHT,
+      borderRadius: BAR_HEIGHT / 2,
+      background: 'rgba(255,255,255,0.16)',
+      position: 'relative',
+    }}
+  >
+    <div
+      style={{
+        position: 'absolute',
+        right: 0,
+        top: -2,
+        width: 2,
+        height: BAR_HEIGHT + 4,
+        borderRadius: 1,
+        background: CHART.DIM,
       }}
     />
   </div>
@@ -68,6 +96,21 @@ function deriveState(row: StreakRow | null): StreakState {
   if (best > 0) return 'lapsed';
   return 'new';
 }
+
+/** Rows live inside one panel per section; the section label sits outside it. */
+const Panel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      margin: '0 16px',
+      background: CHART.PANEL,
+      border: `1px solid ${CHART.BORDER}`,
+      borderRadius: 14,
+      overflow: 'hidden',
+    }}
+  >
+    {children}
+  </div>
+);
 
 const SectionHeader: React.FC<{ label: string; count: number }> = ({ label, count }) => (
   <div style={{ ...LABEL, padding: '20px 16px 8px', display: 'flex', gap: 6 }}>
@@ -96,8 +139,7 @@ const CollapsedSection: React.FC<{
           width: '100%',
           background: 'transparent',
           border: 'none',
-          borderTop: `1px solid ${CHART.BORDER}`,
-          padding: '18px 16px 14px',
+          padding: '20px 16px 8px',
           cursor: 'pointer',
           ...LABEL,
         }}
@@ -115,10 +157,11 @@ const CollapsedSection: React.FC<{
           aria-hidden
         />
       </button>
-      {open && children}
+      {open && <Panel>{children}</Panel>}
     </div>
   );
 };
+
 
 const StreakRowView: React.FC<{
   type: StreakType;
