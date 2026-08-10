@@ -234,6 +234,14 @@
       "ninetyDays": "90 days",
       "toHcp": "{{n}} of {{m}} to hcp",
       "noRecent": "No recent rounds"
+    },
+    "lastRound": {
+      "playedTo": "Jugado a",
+      "gross": "Bruto",
+      "stableford": "Stableford",
+      "index": "Handicap",
+      "indexHeldAt": "El handicap se mantiene en",
+      "notBest8": "no esta entre tus 8 mejores"
     }
   }
 }

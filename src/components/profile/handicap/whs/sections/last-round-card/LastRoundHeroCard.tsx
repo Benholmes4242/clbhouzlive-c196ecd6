@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 import {
@@ -8,6 +9,15 @@ import {
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+
+/** Dark LABEL: 7.5/700/0.16em at T40. */
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 7.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: 'var(--hcp-t-40)',
+};
 
 interface Props {
   round: WhsLastRound;
@@ -121,9 +131,9 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
       >
         <div
           style={{
-            fontSize: 18,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
+            fontSize: 20,
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
             lineHeight: 1.15,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -135,11 +145,8 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
         {meta && (
           <div
             style={{
-              marginTop: 3,
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              marginTop: 4,
+              ...LABEL_STYLE,
               color: 'rgba(255,255,255,0.82)',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -153,6 +160,7 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
 };
 
 const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
+  const { t } = useTranslation(['common']);
   const courseName = round.course?.name ?? 'Unknown course';
   const { data: detail } = useFriendRoundDetail(round.id);
 
@@ -181,66 +189,84 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
   if (slope != null) metaParts.push(`SL ${slope}`);
   const meta = metaParts.length ? metaParts.join(' \u00b7 ') : null;
 
-  const diffDisplay = diff == null ? '\u2014' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+  // "Played to" — the same quantity the Next round card expresses as "beat n".
+  // Absent renders NOTHING (no dash); the label still names the slot.
+  const playedTo = diff == null ? null : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+
+  // Three-way, so exactly 0.0 can never fall into the good branch. The figure
+  // is INK today (colour lives on the index move), but the neutral case must
+  // exist so a later colour decision cannot reintroduce the fault.
   const diffColor =
-    diff == null ? 'var(--hcp-t-100)' : diff > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)';
+    diff == null || diff === 0
+      ? 'var(--hcp-t-100)'
+      : diff > 0
+        ? 'var(--hcp-t-100)'
+        : 'var(--hcp-t-100)';
 
   // ---- consequence line ----
-  // Order matters: non-counting first, then no-previous-index, then move/hold.
-  const dim: React.CSSProperties = {
-    fontSize: 12,
-    fontWeight: 600,
-    color: 'var(--hcp-t-60)',
-    fontVariantNumeric: 'tabular-nums',
-  };
-  const strong: React.CSSProperties = {
-    color: 'var(--hcp-t-100)',
-    fontWeight: 800,
-    fontVariantNumeric: 'tabular-nums',
-  };
-  let consequence: React.ReactNode;
-  if (!round.is_counter) {
-    consequence = <span style={dim}>No effect on your index</span>;
-  } else if (handicapDelta == null || indexAfter == null) {
-    consequence =
-      indexAfter != null ? (
-        <span style={dim}>
-          index <span style={strong}>{indexAfter.toFixed(1)}</span>
-        </span>
-      ) : (
-        <span />
-      );
-  } else if (Math.abs(handicapDelta) < 0.05) {
-    consequence = (
-      <span style={dim}>
-        index holds at <span style={strong}>{indexAfter.toFixed(1)}</span>
-      </span>
-    );
-  } else {
-    const up = handicapDelta > 0;
-    consequence = (
-      <span
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: up ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {up ? '\u2191' : '\u2193'} {Math.abs(handicapDelta).toFixed(1)}{' '}
+  // Built from handicap_delta ALWAYS. is_counter is a REASON appended to it,
+  // never a substitute: a non-counting round still drops the oldest of the 20,
+  // so the index can move while the new round did not count.
+  const moved = handicapDelta != null && Math.abs(handicapDelta) >= 0.05;
+  const rose = (handicapDelta ?? 0) > 0;
+
+  const indexStatement: React.ReactNode =
+    indexAfter == null ? null : moved && indexBefore != null ? (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={LABEL_STYLE}>{t('common:handicap.lastRound.index')}</span>
         <span
           style={{
-            color: 'var(--hcp-t-60)',
+            fontSize: 13,
             fontWeight: 600,
+            color: 'var(--hcp-t-60)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {'\u00b7'} index {up ? 'climbs' : 'drops'} to{' '}
-          <span style={strong}>{indexAfter.toFixed(1)}</span>
+          {indexBefore.toFixed(1)}
+        </span>
+        <span aria-hidden style={{ ...LABEL_STYLE, letterSpacing: 0 }}>
+          &rarr;
+        </span>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: rose ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexAfter.toFixed(1)}
+        </span>
+      </span>
+    ) : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={LABEL_STYLE}>{t('common:handicap.lastRound.indexHeldAt')}</span>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: 'var(--hcp-t-100)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {indexAfter.toFixed(1)}
         </span>
       </span>
     );
-  }
+
+  const consequence =
+    indexStatement == null ? (
+      <span />
+    ) : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+        {indexStatement}
+        {!round.is_counter && (
+          <span style={{ ...LABEL_STYLE, color: 'var(--hcp-t-40)' }}>
+            {'\u00b7'} {t('common:handicap.lastRound.notBest8')}
+          </span>
+        )}
+      </span>
+    );
 
   return (
     <button
@@ -264,7 +290,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
       <MediaBand src={round.course_thumbnail_image ?? null} course={courseName} meta={meta} />
 
       {/* Floating glass tray — overlaps the photo seam by 22px, holds the
-          stats and consequence rows separated by a single internal hairline. */}
+          stats and consequence rows separated by whitespace only. */}
       <div style={{ padding: '0 10px 10px', marginTop: -22 }}>
         <div
           style={{
@@ -278,47 +304,42 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             overflow: 'hidden',
           }}
         >
-          {/* stats row */}
-          <div style={{ display: 'flex', padding: '12px 14px', alignItems: 'flex-end' }}>
+          {/* stats row — equal columns, one figure size, no internal rules.
+              An absent value renders NO figure; the fixed 22px slot keeps the
+              cells aligned. */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+              padding: '12px 14px',
+            }}
+          >
             {(
               [
-                ['Score diff', diffDisplay, diffColor, 1.2, 22],
-                ['Gross', gross != null ? String(gross) : '\u2014', 'var(--hcp-t-100)', 1, 17],
+                [t('common:handicap.lastRound.playedTo'), playedTo, diffColor],
                 [
-                  'Stableford',
-                  stableford != null ? String(stableford) : '\u2014',
+                  t('common:handicap.lastRound.gross'),
+                  gross != null ? String(gross) : null,
                   'var(--hcp-t-100)',
-                  1,
-                  17,
+                ],
+                [
+                  t('common:handicap.lastRound.stableford'),
+                  stableford != null ? String(stableford) : null,
+                  'var(--hcp-t-100)',
                 ],
               ] as const
-            ).map(([label, value, color, flex, valueSize], i) => (
-              <div
-                key={label}
-                style={{
-                  flex,
-                  borderLeft: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                  paddingLeft: i === 0 ? 0 : 14,
-                }}
-              >
+            ).map(([label, value, color]) => (
+              <div key={label} style={{ minWidth: 0 }}>
+                <div style={{ ...LABEL_STYLE, marginBottom: 5 }}>{label}</div>
                 <div
                   style={{
-                    fontSize: 10,
+                    height: 22,
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    fontSize: 21,
                     fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: 'var(--hcp-t-40)',
-                    marginBottom: 4,
-                  }}
-                >
-                  {label}
-                </div>
-                <div
-                  style={{
-                    fontSize: valueSize,
-                    fontWeight: 800,
                     color,
-                    letterSpacing: '-0.01em',
+                    letterSpacing: '-0.04em',
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
                   }}
@@ -329,25 +350,17 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             ))}
           </div>
 
-          {/* internal hairline */}
-          <div
-            style={{
-              height: 1,
-              background: 'var(--hcp-line, rgba(255,255,255,0.08))',
-              margin: '0 14px',
-            }}
-          />
-
-          {/* consequence row */}
+          {/* consequence row — separated on whitespace, no rule in the tray */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '0 14px',
-              minHeight: 44,
+              padding: '0 14px 12px',
+              marginTop: 16,
             }}
           >
+
             {consequence}
             <ChevronRight
               size={18}

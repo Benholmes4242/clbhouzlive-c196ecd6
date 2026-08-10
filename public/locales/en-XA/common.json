@@ -234,6 +234,14 @@
       "ninetyDays": "90 days",
       "toHcp": "{{n}} of {{m}} to hcp",
       "noRecent": "No recent rounds"
+    },
+    "lastRound": {
+      "playedTo": "Played to",
+      "gross": "Gross",
+      "stableford": "Stableford",
+      "index": "Index",
+      "indexHeldAt": "Index held at",
+      "notBest8": "not one of your best 8"
     }
   }
 }

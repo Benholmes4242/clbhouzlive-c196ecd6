@@ -233,6 +233,14 @@
       "ninetyDays": "90 days",
       "toHcp": "{{n}} of {{m}} to hcp",
       "noRecent": "No recent rounds"
+    },
+    "lastRound": {
+      "playedTo": "プレー値",
+      "gross": "グロス",
+      "stableford": "ステーブルフォード",
+      "index": "ハンディキャップ",
+      "indexHeldAt": "ハンディキャップは",
+      "notBest8": "ベスト8には入っていません"
     }
   }
 }
