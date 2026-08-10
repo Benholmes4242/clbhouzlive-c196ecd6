@@ -140,37 +140,10 @@ function InviteHeader({ sub }: { sub?: string | null }) {
 
 function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: string }) {
   const { t } = useTranslation('common');
-  const { data: friends } = useFriendLeaderboard(ownerUserId);
-  const { data: sent } = useSentInvites();
-  const [q, setQ] = useState('');
-  const debouncedQ = useDebouncedValue(q, 200);
-
-  const invitable = useMemo(
-    () =>
-      (friends ?? [])
-        .filter((f) => !f.is_clbhouz_user && f.friend_passport_id != null)
-        .sort((a, b) => {
-          const aT = a.last_round_played_at ? new Date(a.last_round_played_at).getTime() : -Infinity;
-          const bT = b.last_round_played_at ? new Date(b.last_round_played_at).getTime() : -Infinity;
-          if (aT !== bT) return bT - aT;
-          return (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99);
-        }),
-    [friends],
-  );
-
-  const sentByPassportId = useMemo(() => {
-    const map = new Map<string, { created_at: string }>();
-    (sent ?? []).forEach((s: WhsInviteStatus) => {
-      if (s.invitee_passport_id) map.set(String(s.invitee_passport_id), { created_at: s.sent_at });
-    });
-    return map;
-  }, [sent]);
-
-  const alreadyFor = useCallback(
-    (f: FriendLeaderboardEntry) =>
-      f.friend_passport_id != null ? sentByPassportId.get(String(f.friend_passport_id)) : undefined,
-    [sentByPassportId],
-  );
+  // BRIEF_CIRCLE_INVITE_ENTRY: the list derivation lives in one shared hook so
+  // this sheet and the Circle entry cannot disagree. Behaviour here is
+  // unchanged - same filter, same sort, same grouping.
+  const { invitable, alreadyFor, invitedTotal } = useInvitableFriends(ownerUserId);
 
   // Filter on the DISPLAY name, not the raw feed name.
   const filtered = useMemo(() => {
