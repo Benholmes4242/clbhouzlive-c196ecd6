@@ -150,7 +150,10 @@ export const Action: React.FC<{ onClick: () => void; children: React.ReactNode }
       fontSize: 11.5,
       fontWeight: 700,
       letterSpacing: '0.02em',
-      color: REC.AMBER,
+      // A quiet CTA is not a threshold passed: amber on this surface means a
+      // tier reached, a record held, or the viewing member. Every "Show all"
+      // on the sheet reads ink because of this one line.
+      color: REC.INK,
       cursor: 'pointer',
     }}
   >
