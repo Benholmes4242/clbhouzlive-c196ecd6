@@ -23,6 +23,12 @@ const MAX_HEIGHT = MIN_HEIGHT + LINE_HEIGHT * (MAX_LINES - 1);
 interface Props {
   conversationId: string;
   disabled?: boolean;
+  /**
+   * Seeds the composer ONCE on mount (e.g. the handicap sync nudge). It is
+   * fully editable and is never sent automatically. Deliberately not synced on
+   * later renders, or the member could not delete the text.
+   */
+  initialText?: string;
   onHeightChange?: (heightPx: number) => void;
   onAfterSend?: () => void;
 }
@@ -42,6 +48,7 @@ const nextPendingId = () => `pending-${Date.now()}-${++pendingSeq}`;
 export const Composer: React.FC<Props> = ({
   conversationId,
   disabled,
+  initialText,
   onHeightChange,
   onAfterSend,
 }) => {
@@ -50,7 +57,7 @@ export const Composer: React.FC<Props> = ({
   const { send, sendMedia } = useSendMessage(conversationId);
   const [picking, setPicking] = useState(false);
   const keyboardHeight = useKeyboardHeight();
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText ?? '');
   const [pending, setPending] = useState<PendingAttachment[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
