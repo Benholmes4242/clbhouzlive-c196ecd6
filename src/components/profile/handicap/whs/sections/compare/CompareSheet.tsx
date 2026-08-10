@@ -745,51 +745,132 @@ export const CompareSheet: React.FC<Props> = ({
 
         {target && (
           <>
-            {/* Heads row */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                padding: '16px 16px 14px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                {avatar(
-                  selfEntry?.friend_name ?? '',
-                  pickAvatarSrc(
-                    selfEntry?.friend_thumbnail_url ?? null,
-                    selfEntry?.friend_profile_photo_url ?? null,
-                  ),
-                  viewerUserId,
-                  true,
-                )}
-                <div style={{ minWidth: 0 }}>
-                  <div style={LABEL_STYLE}>
-                    {isSharedMode
-                      ? t('handicap.compare.headToHead')
-                      : t('handicap.compare.thisSeason')}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 3,
-                      fontSize: 13,
-                      fontWeight: 800,
-                      color: CHART.INK,
-                      letterSpacing: '-0.005em',
-                    }}
-                  >
-                    {target.name || h2h == null || h2h.grossLosses <= h2h.grossWins
-                      ? standingLine()
-                      : ''}
+            {/* THE SCOREBOARD replaces the standing sentence in shared mode.
+                Season mode keeps a plain heads row - there is no fixture to
+                report. */}
+            {isSharedMode && h2h ? (
+              <>
+                <CompareScoreboard
+                  meAvatar={avatar(
+                    selfEntry?.friend_name ?? '',
+                    pickAvatarSrc(
+                      selfEntry?.friend_thumbnail_url ?? null,
+                      selfEntry?.friend_profile_photo_url ?? null,
+                    ),
+                    viewerUserId,
+                    true,
+                  )}
+                  themAvatar={avatar(target.name, target.avatarUrl, target.userId, false)}
+                  themFirstName={(target.name ?? '').split(' ')[0] || ''}
+                  wins={h2h.grossWins}
+                  losses={h2h.grossLosses}
+                  ties={h2h.grossTies}
+                />
+                <CompareFormStrip rounds={shared?.shared_round_results ?? []} />
+              </>
+            ) : (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '16px 16px 14px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  {avatar(
+                    selfEntry?.friend_name ?? '',
+                    pickAvatarSrc(
+                      selfEntry?.friend_thumbnail_url ?? null,
+                      selfEntry?.friend_profile_photo_url ?? null,
+                    ),
+                    viewerUserId,
+                    true,
+                  )}
+                  <div style={{ minWidth: 0 }}>
+                    <div style={LABEL_STYLE}>{t('handicap.compare.thisSeason')}</div>
+                    <div
+                      style={{
+                        marginTop: 3,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: CHART.INK,
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {target.name ? t('handicap.compare.youAnd', { name: target.name }) : ''}
+                    </div>
                   </div>
                 </div>
+                {avatar(target.name, target.avatarUrl, target.userId, false)}
               </div>
-              {avatar(target.name, target.avatarUrl, target.userId, false)}
-            </div>
+            )}
 
             <div style={{ padding: '0 16px 16px' }}>
+              {/* THE KICKER AND THE CATEGORY TALLY. */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  marginBottom: 6,
+                }}
+              >
+                <div style={{ ...LABEL_STYLE, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', color: CHART.MUTE }}>
+                  {isSharedMode
+                    ? t('handicap.compare.headToHead')
+                    : t('handicap.compare.thisSeason')}
+                </div>
+                {isSharedMode && h2hTally && (
+                  <div
+                    style={{
+                      ...LABEL_STYLE,
+                      fontSize: 7.5,
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
+                      color: CHART.AMBER,
+                    }}
+                  >
+                    {t('handicap.compare.youLeadOf', {
+                      n: h2hTally.mine,
+                      total: h2hTally.total,
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* THE SAMPLE LINE SITS ABOVE THE FIGURES so the scope is read
+                  before the numbers - that is what stops BEST GROSS reading as
+                  one figure stated twice against the career block below. */}
+              <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', color: CHART.DIM, marginBottom: 10, lineHeight: 1.5 }}>
+                {isSharedMode
+                  ? t('handicap.compare.sharedFooter', { count: sharedCount })
+                  : t('handicap.compare.neverFooter')}
+              </div>
+
+              {/* THE COLUMNS ARE NAMED ONCE. Amber is the member, here and
+                  nowhere else on the sheet. */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '58px 1fr 58px',
+                  gap: 8,
+                  marginBottom: 4,
+                  ...LABEL_STYLE,
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                }}
+              >
+                <span style={{ color: CHART.AMBER }}>{t('handicap.compare.you')}</span>
+                <span />
+                <span style={{ color: CHART.DIM, textAlign: 'right' }}>
+                  {(target.name ?? '').split(' ')[0] || ''}
+                </span>
+              </div>
+
               <div
                 style={{
                   background: CHART.PANEL,
@@ -809,12 +890,14 @@ export const CompareSheet: React.FC<Props> = ({
                       meValue={h2h.grossWins}
                       themValue={h2h.grossLosses}
                       format="count"
+                      range={ranges.wins}
                     />
                     <CompareStatRow
                       label={t('handicap.compare.stat.stablefordWins')}
                       meValue={h2h.wins}
                       themValue={h2h.losses}
                       format="count"
+                      range={ranges.wins}
                     />
                     <CompareStatRow
                       label={t('handicap.compare.stat.avgGross')}
@@ -822,6 +905,7 @@ export const CompareSheet: React.FC<Props> = ({
                       themValue={h2h.themAvgGross}
                       format="low_better"
                       decimals={1}
+                      range={ranges.gross}
                     />
                     <CompareStatRow
                       label={t('handicap.compare.stat.avgStableford')}
@@ -829,12 +913,14 @@ export const CompareSheet: React.FC<Props> = ({
                       themValue={h2h.themAvgSt}
                       format="high_better"
                       decimals={1}
+                      range={ranges.stableford}
                     />
                     <CompareStatRow
                       label={t('handicap.compare.stat.bestGross')}
                       meValue={h2h.meBestGross}
                       themValue={h2h.themBestGross}
                       format="low_better"
+                      range={ranges.gross}
                     />
                     {/* Best margin is computed from STABLEFORD POINTS, so with
                         gross leading the panel the label must carry the unit. */}
@@ -843,6 +929,7 @@ export const CompareSheet: React.FC<Props> = ({
                       meValue={h2h.meBestMargin}
                       themValue={h2h.themBestMargin}
                       format="high_better"
+                      range={ranges.stableford}
                     />
                   </>
                 ) : (
@@ -879,16 +966,9 @@ export const CompareSheet: React.FC<Props> = ({
                         panel that would repeat them. */}
                     {careerAvailable && renderCareerRows(seasonCareerRows)}
                   </>
-
                 )}
               </div>
 
-              {/* The footnote states the sample, always. */}
-              <div style={{ ...LABEL_STYLE, marginTop: 10, lineHeight: 1.5 }}>
-                {isSharedMode
-                  ? t('handicap.compare.sharedFooter', { count: sharedCount })
-                  : t('handicap.compare.neverFooter')}
-              </div>
               {!isSharedMode && (
                 <div
                   style={{
@@ -905,11 +985,15 @@ export const CompareSheet: React.FC<Props> = ({
               {/* CAREER - a SECOND panel, because it is a SECOND population:
                   every round each member has posted, not the shared ones. Read
                   as one list with the head-to-head rows above, "birdies 31-47"
-                  would be taken for a head-to-head figure, which it is not. */}
+                  would be taken for a head-to-head figure, which it is not.
+                  Grouped, so BEST EVER is plainly a different scope. */}
               {isSharedMode && careerAvailable && careerRows.length > 0 && (
                 <>
-                  <div style={{ ...LABEL_STYLE, marginTop: 18, color: CHART.MUTE }}>
+                  <div style={{ ...LABEL_STYLE, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', marginTop: 18, color: CHART.MUTE }}>
                     {t('handicap.compare.career')}
+                  </div>
+                  <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', marginTop: 6, color: CHART.DIM, lineHeight: 1.5 }}>
+                    {t('handicap.compare.careerFooter')}
                   </div>
                   <div
                     style={{
@@ -917,18 +1001,14 @@ export const CompareSheet: React.FC<Props> = ({
                       background: CHART.PANEL,
                       border: `1px solid ${CHART.BORDER}`,
                       borderRadius: 16,
-                      // Rows carry 11px of their own vertical padding, so 4px here
-                  // puts the first and last row 15px from each panel edge.
-                  padding: '4px 14px 4px',
+                      padding: '4px 14px 4px',
                     }}
                   >
-                    {renderCareerRows(careerRows)}
-                  </div>
-                  <div style={{ ...LABEL_STYLE, marginTop: 10, lineHeight: 1.5 }}>
-                    {t('handicap.compare.careerFooter')}
+                    {renderCareerGroups(careerRows)}
                   </div>
                 </>
               )}
+
             </div>
           </>
         )}
