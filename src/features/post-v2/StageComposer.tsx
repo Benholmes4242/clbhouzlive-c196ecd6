@@ -835,12 +835,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   style={anchoredInputStyle}
                 />
               </div>
-              <button
-                onClick={() => setPage(2)}
-                style={{ background: 'transparent', border: 0, padding: '6px 0 0', fontSize: 12, fontWeight: 700, color: CT_DARK.mute, cursor: 'pointer' }}
-              >
-                Just write something
-              </button>
             </div>
           </div>
 
