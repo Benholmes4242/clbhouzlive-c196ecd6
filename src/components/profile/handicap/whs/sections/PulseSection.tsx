@@ -12,8 +12,13 @@ export const PulseSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <>
-      <FindPlayerRow onOpen={() => setSearchOpen(true)} />
-      <PulseRail userId={userId} onOpenSearch={() => setSearchOpen(true)} />
+      {/* The header comes first: PulseRail owns it, so the find row is passed
+          in and rendered between the header and the rail in every state. */}
+      <PulseRail
+        userId={userId}
+        onOpenSearch={() => setSearchOpen(true)}
+        findRow={<FindPlayerRow onOpen={() => setSearchOpen(true)} />}
+      />
       <PlayerSearchSheet open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
