@@ -143,21 +143,8 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         ? Math.min(100, (current / progressTarget) * 100)
         : 0;
 
-  const hintCopy: React.ReactNode =
-    state === 'atpb'
-      ? (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <Flame size={13} strokeWidth={2} />
-          At your personal best
-        </span>
-      )
-      : state === 'active'
-        ? best > 0
-          ? `PB · ${best}`
-          : 'First streak — keep going'
-        : best > 0
-          ? `Beat your record of ${best}`
-          : `${entry.actionVerb} to start`;
+  // Hint copy removed: the state label and progress labels already say it once.
+
 
   const meta =
     state === 'atpb' || state === 'active'
