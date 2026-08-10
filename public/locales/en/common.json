@@ -297,6 +297,16 @@
         "admin": "Manager",
         "editor": "Editor",
         "analyst": "Analyst"
+      },
+      "manage": {
+        "accessRequests": "Access requests",
+        "addJobTitle": "Add job title",
+        "addJobTitleAria": "Add job title",
+        "editJobTitleAria": "Edit job title",
+        "hidden": "Hidden",
+        "members": "Members",
+        "pendingInvites": "Pending invites",
+        "public": "Public"
       }
     },
     "hero": {

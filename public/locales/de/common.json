@@ -192,6 +192,19 @@
         "tooFew": "Noch zu wenige Impressionen fuer einen Vergleich.",
         "benchmark": "Likes und Kommentare im Verhaeltnis zu Impressionen. Ueber 2 Prozent ist stark."
       }
+    },
+    "team": {
+      "member": "Team member",
+      "manage": {
+        "accessRequests": "Zugriffsanfragen",
+        "addJobTitle": "Position hinzufuegen",
+        "addJobTitleAria": "Position hinzufuegen",
+        "editJobTitleAria": "Position bearbeiten",
+        "hidden": "Verborgen",
+        "members": "Mitglieder",
+        "pendingInvites": "Offene Einladungen",
+        "public": "Oeffentlich"
+      }
     }
   }
 }

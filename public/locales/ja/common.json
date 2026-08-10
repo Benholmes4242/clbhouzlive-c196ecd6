@@ -191,6 +191,19 @@
         "tooFew": "Hikaku suru ni wa inpuresshon ga sukunasugimasu.",
         "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai. 2 pasento ijou wa kyoryoku desu."
       }
+    },
+    "team": {
+      "member": "Team member",
+      "manage": {
+        "accessRequests": "Akusesu rikuesuto",
+        "addJobTitle": "Yakushoku o tsuika",
+        "addJobTitleAria": "Yakushoku o tsuika",
+        "editJobTitleAria": "Yakushoku o henshu",
+        "hidden": "Hihyouji",
+        "members": "Menba",
+        "pendingInvites": "Shoutai machi",
+        "public": "Koukai"
+      }
     }
   }
 }
