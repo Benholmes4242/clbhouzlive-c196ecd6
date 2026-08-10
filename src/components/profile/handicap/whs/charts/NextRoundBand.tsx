@@ -76,8 +76,9 @@ export const NextRoundBand: React.FC<Props> = ({ cut, rise, lo, hi, height = 14 
           ...LABEL_STYLE,
         }}
       >
-        <span style={{ color: CHART.DOWN }}>Cuts at {cut.toFixed(1)} or better</span>
-        <span style={{ color: CHART.UP }}>Raises at {rise.toFixed(1)}+</span>
+        {/* cut is BREAK-EVEN: at exactly this value nothing happens. */}
+        <span style={{ color: CHART.DOWN }}>Beat {cut.toFixed(1)}</span>
+        <span style={{ color: CHART.UP }}>{rise.toFixed(1)}</span>
       </div>
     </div>
   );
