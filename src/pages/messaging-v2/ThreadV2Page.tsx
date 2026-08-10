@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
@@ -175,6 +175,20 @@ const ThreadV2Page: React.FC = () => {
   const { t } = useTranslation(['messaging', 'common']);
   const { conversationId = '' } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // A draft handed over by useStartConversation (e.g. the handicap sync
+  // nudge). Read ONCE into a ref, then clear the history entry's state so a
+  // back-navigation or a refresh cannot re-seed a message the member has
+  // already edited or sent.
+  const seededDraftRef = useRef<string | undefined>(
+    (location.state as { draft?: string } | null)?.draft,
+  );
+  useEffect(() => {
+    if (!(location.state as { draft?: string } | null)?.draft) return;
+    navigate(location.pathname, { replace: true, state: {} });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const actor = useMessagingActor();
   const { conversations } = useConversations();
   const conv = useMemo(
@@ -547,6 +561,7 @@ const ThreadV2Page: React.FC = () => {
 
       <Composer
         conversationId={conversationId}
+        initialText={seededDraftRef.current}
         onHeightChange={setComposerHeight}
         onAfterSend={scrollToBottom}
       />
