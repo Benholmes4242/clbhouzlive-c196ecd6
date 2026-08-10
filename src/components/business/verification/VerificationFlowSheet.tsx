@@ -906,15 +906,18 @@ export default function VerificationFlowSheet({
                                         key={t}
                                         type="button"
                                         onClick={() => setCreatorContactType(t)}
-                                        className="px-4 py-2 text-[13px] font-medium rounded-lg min-h-[40px]"
-                                        style={
-                                          active
-                                            ? { background: BIZ.amber, color: '#fff' }
-                                            : { background: BIZ.fill, color: BIZ.inkMute }
-                                        }
+                                        aria-pressed={active}
+                                        className="px-1 text-[13px] min-h-[44px]"
+                                        style={{
+                                          background: 'transparent',
+                                          border: 'none',
+                                          fontWeight: active ? 700 : 500,
+                                          color: active ? A.INK : A.MUTE,
+                                        }}
                                       >
                                         {t === 'email' ? 'Email' : 'Phone'}
                                       </button>
+
                                     );
                                   })}
                                 </div>
