@@ -486,7 +486,6 @@ function AppRoutes() {
       
       <Routes location={routesLocation}>
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
-        <Route path="/__fr-harness" element={<React.Suspense fallback={null}>{React.createElement(React.lazy(() => import("./pages/__FRHarness")))}</React.Suspense>} />
         <Route path="/" element={null} />
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
 
