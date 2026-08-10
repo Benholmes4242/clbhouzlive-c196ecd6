@@ -397,7 +397,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   // ---- instrumentation -------------------------------------------------
   const mountedAtRef = useRef(Date.now());
   const stepEnteredAtRef = useRef(Date.now());
-  const submittedRef = useRef(false);
+  // submittedRef comes from the parent - it must survive this instance.
+
   const abandonRef = useRef({ step: 0, hasOverall: false, catsSet: 0 });
   abandonRef.current = {
     step,
