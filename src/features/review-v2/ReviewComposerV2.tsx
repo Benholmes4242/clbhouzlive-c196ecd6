@@ -342,9 +342,13 @@ interface ComposerProps {
   existingMedia: ExistingMedia[];
   author: { displayName: string; avatarUrl: string | null; username: string | null };
   onExit: () => void;
+  /** Shared across remounts: true once any instance submitted successfully. */
+  submittedRef: React.MutableRefObject<boolean>;
+  onSuccess: (payload: ReceiptState) => void;
 }
 
-function Composer({ course, userId, existing, existingMedia, author, onExit }: ComposerProps) {
+function Composer({ course, userId, existing, existingMedia, author, onExit, submittedRef, onSuccess }: ComposerProps) {
+
   const isEditMode = !!existing;
   const mode = isEditMode ? 'edit' : 'new';
   const { t } = useTranslation('courses');
