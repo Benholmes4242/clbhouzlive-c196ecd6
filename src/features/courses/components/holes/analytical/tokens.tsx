@@ -352,8 +352,15 @@ export const EmptyState: React.FC<{
   guidanceHeading?: string;
   /** Quiet reassurance under the primary (e.g. "Takes about 30 seconds"). */
   footnote?: string;
+  /**
+   * ONE optional escape hatch: a band of the surface's own content between the
+   * body and the primary (e.g. the platform reach figures on the business
+   * empty state). Not a style hook - the caller renders its own nodes and this
+   * component's own treatment is unchanged.
+   */
+  slot?: React.ReactNode;
   style?: React.CSSProperties;
-}> = ({ kicker, title, body, primary, action, guidance, guidanceHeading, footnote, style }) => (
+}> = ({ kicker, title, body, primary, action, guidance, guidanceHeading, footnote, slot, style }) => (
   <Panel style={style}>
     <div
       style={{
