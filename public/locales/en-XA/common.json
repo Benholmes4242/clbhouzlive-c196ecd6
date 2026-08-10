@@ -160,6 +160,38 @@
         "team": "[Manage team]",
         "viewProfile": "[View live profile]"
       }
+    },
+    "insights": {
+      "metric": {
+        "profileViews": "[Profile views]",
+        "uniqueVisitors": "[Unique visitors]",
+        "directoryImpressions": "[Directory impressions]",
+        "clickOuts": "[Click-outs]",
+        "newFollowers": "[New followers]",
+        "messageClicks": "[Message clicks]"
+      },
+      "deltaCaption": "[Change vs the previous {{range}}]",
+      "audience": {
+        "locked": "[Locked]",
+        "visitorsLabel": "[Unique visitors so far]",
+        "body": "[Handicap ranges and top locations need a bigger audience first. A breakdown of this few people would identify them.]"
+      },
+      "followers": {
+        "total": "[Total]"
+      },
+      "empty": {
+        "visits": "[No visits yet in this period.]",
+        "discovery": "[No discovery data yet in this period.]",
+        "followersTitle": "[Follower growth]",
+        "followersBody": "[Follower activity will appear here as it happens.]",
+        "posts": "[No posts published in this period.]"
+      },
+      "rate": {
+        "from": "[From {{n}} impressions]",
+        "none": "[Publish posts and gather impressions to see your engagement rate.]",
+        "tooFew": "[Too few impressions yet to compare against anything.]",
+        "benchmark": "[Likes and comments as a share of impressions. Above 2 percent is strong.]"
+      }
     }
   }
 }

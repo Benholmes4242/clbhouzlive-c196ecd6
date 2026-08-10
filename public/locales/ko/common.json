@@ -159,6 +159,38 @@
         "team": "Tim gwanri",
         "viewProfile": "Gonggae peuropil bogi"
       }
+    },
+    "insights": {
+      "metric": {
+        "profileViews": "Peuropil joyoe",
+        "uniqueVisitors": "Sunbangmunja",
+        "directoryImpressions": "Dirrekteori impeuresyeon",
+        "clickOuts": "Oebu keurik",
+        "newFollowers": "Sinkyu palrowo",
+        "messageClicks": "Mesiji keurik"
+      },
+      "deltaCaption": "Ijeon {{range}} daebi byeonhwa",
+      "audience": {
+        "locked": "Jamgim",
+        "visitorsLabel": "Jigeumkkaji sunbangmunja",
+        "body": "Haendikaep gugan gwa juyo jiyeok eun deo mahn eun dokja ga piryohapnida. Ireon soosu ro neun gaein i teukjeong doelsu itgi ttaemune borryu hapnida."
+      },
+      "followers": {
+        "total": "Jeonche"
+      },
+      "empty": {
+        "visits": "I gigan e bangmun i eopseumnida.",
+        "discovery": "I gigan e balgyeon deiteo ga eopseumnida.",
+        "followersTitle": "Palrowo seongjang",
+        "followersBody": "Palrowo hwaldong eun balsaeng hal ttae yeogi e pyosi dwimnida.",
+        "posts": "I gigan e geusi ga eopseumnida."
+      },
+      "rate": {
+        "from": "Impeuresyeon {{n}} gi jun",
+        "none": "Geusi reul olligo impeuresyeon i moimyeon chamyeoyul i pyosi dwimnida.",
+        "tooFew": "Bigyo hagien impeuresyeon i neomu jeokseumnida.",
+        "benchmark": "Impeuresyeon daebi joayo wa daetgeul bijung. 2 peosenteu isang imyeon useu hapnida."
+      }
     }
   }
 }

@@ -160,6 +160,38 @@
         "team": "Gestionar equipo",
         "viewProfile": "Ver perfil publico"
       }
+    },
+    "insights": {
+      "metric": {
+        "profileViews": "Visitas al perfil",
+        "uniqueVisitors": "Visitantes unicos",
+        "directoryImpressions": "Impresiones en el directorio",
+        "clickOuts": "Clics salientes",
+        "newFollowers": "Nuevos seguidores",
+        "messageClicks": "Clics en mensajes"
+      },
+      "deltaCaption": "Cambio frente a los {{range}} anteriores",
+      "audience": {
+        "locked": "Bloqueado",
+        "visitorsLabel": "Visitantes unicos hasta ahora",
+        "body": "Los rangos de handicap y las ubicaciones principales necesitan mas audiencia. Con tan pocas personas el desglose las identificaria, asi que lo reservamos."
+      },
+      "followers": {
+        "total": "Total"
+      },
+      "empty": {
+        "visits": "Aun no hay visitas en este periodo.",
+        "discovery": "Aun no hay datos de descubrimiento en este periodo.",
+        "followersTitle": "Crecimiento de seguidores",
+        "followersBody": "La actividad de seguidores aparecera aqui cuando ocurra.",
+        "posts": "No se publicaron publicaciones en este periodo."
+      },
+      "rate": {
+        "from": "De {{n}} impresiones",
+        "none": "Publica y acumula impresiones para ver tu tasa de interaccion.",
+        "tooFew": "Aun hay muy pocas impresiones para comparar.",
+        "benchmark": "Me gusta y comentarios sobre las impresiones. Mas del 2 por ciento es fuerte."
+      }
     }
   }
 }
