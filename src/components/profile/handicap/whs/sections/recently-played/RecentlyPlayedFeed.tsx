@@ -1,9 +1,9 @@
 /**
  * RecentlyPlayedFeed - friends' rounds, as rows.
  *
- * No card per row, no rule between rows, no paged carousel: one house row per
- * round with fixed figure columns. The rows sit inside a single panel so the
- * section still reads as one object.
+ * One house row per round, two lines each, inside a single panel. The action
+ * for an unconnected friend lives on the row itself (in the columns their
+ * round leaves empty), so there is no footer restating it.
  *
  * Renders NOTHING when there are no rounds.
  */
@@ -17,29 +17,6 @@ import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { CHART } from '../../charts';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
-import { useInviteSheet } from '@/hooks/useInviteSheet';
-import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
-
-/** This surface's dark LABEL: 7/700/0.16em. */
-const FOOT_LABEL: React.CSSProperties = {
-  fontSize: 7,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  lineHeight: 1.4,
-  margin: 0,
-};
-
-/** DISTINCT friends, not rows - the same friend appears on every round they
- *  post, which is exactly why the per-row action repeated five or six times. */
-const friendKey = (a: WhsFriendActivityWithImage): string =>
-  String(a.friend_passport_id ?? a.friend_row_id ?? a.friend_name);
-
-const countDistinct = (
-  items: WhsFriendActivityWithImage[],
-  variant: FriendRoundVariant,
-): number => new Set(items.filter((i) => variantFor(i) === variant).map(friendKey)).size;
 
 interface Props {
   ownerUserId: string;
@@ -72,8 +49,6 @@ const variantFor = (a: WhsFriendActivityWithImage): FriendRoundVariant =>
       : 'eg-only';
 
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
-  const { t } = useTranslation('common');
-  const { openInviteSheet } = useInviteSheet();
   const { data, isLoading } = useFriendsActivity(ownerUserId);
   const [sheetActivity, setSheetActivity] =
     useState<WhsFriendActivityWithImage | null>(null);
@@ -101,8 +76,6 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   };
 
   const items = data ?? [];
-  const egOnly = countDistinct(items, 'eg-only');
-  const notSynced = countDistinct(items, 'clbhouz-not-synced');
 
   // Nothing at all when the fortnight is empty.
   if (!isLoading && items.length === 0) return null;
@@ -120,7 +93,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
             <Skeleton
               key={i}
               variant="dark"
-              style={{ height: 58, borderRadius: 0, marginBottom: 1 }}
+              style={{ height: 74, borderRadius: 0, marginBottom: 1 }}
             />
           ))}
         </div>
@@ -145,56 +118,6 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
               onClick={() => handleOpen(item)}
             />
           ))}
-        </div>
-      )}
-
-      {/* Beneath the list: the two unconnected states, stated once each.
-          They are NOT the same fact and they do not share a destination -
-          'eg-only' friends are not on clbhouz (invite), 'clbhouz-not-synced'
-          friends are here already with no handicap connected (nothing to
-          invite them to, so the line states and does not act). */}
-      {!isLoading && (egOnly > 0 || notSynced > 0) && (
-        <div style={{ padding: '0 16px', marginTop: 10 }}>
-          {egOnly > 0 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                padding: '6px 0',
-              }}
-            >
-              <p style={{ ...FOOT_LABEL, color: 'var(--hcp-t-60)' }}>
-                {t('handicap.circle.rounds.notOnClbhouz', { count: egOnly })}
-              </p>
-              <button
-                type="button"
-                onClick={() => openInviteSheet('handicap_circle')}
-                style={{
-                  ...FOOT_LABEL,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  padding: 0,
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--hcp-t-100)',
-                  fontFamily: 'inherit',
-                  cursor: 'pointer',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                {t('handicap.circle.rounds.inviteThem')}
-                <ChevronRight size={11} strokeWidth={2.6} />
-              </button>
-            </div>
-          )}
-          {notSynced > 0 && (
-            <p style={{ ...FOOT_LABEL, color: 'var(--hcp-t-60)', padding: '6px 0' }}>
-              {t('handicap.circle.rounds.noHandicap', { count: notSynced })}
-            </p>
-          )}
         </div>
       )}
 
