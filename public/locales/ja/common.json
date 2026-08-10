@@ -159,6 +159,38 @@
         "team": "Chimu kanri",
         "viewProfile": "Kokai purofiru wo hyoji"
       }
+    },
+    "insights": {
+      "metric": {
+        "profileViews": "Purofiru hyoji",
+        "uniqueVisitors": "Yuniku homonsha",
+        "directoryImpressions": "Direkutori inpuresshon",
+        "clickOuts": "Gaibu kurikku",
+        "newFollowers": "Shinki forowa",
+        "messageClicks": "Messeji kurikku"
+      },
+      "deltaCaption": "Zenkai no {{range}} to no hikaku",
+      "audience": {
+        "locked": "Rokku chu",
+        "visitorsLabel": "Genzai no yuniku homonsha",
+        "body": "Handi no han-i to jouyou chiiki wa motto ookina dokusha ga hitsuyou desu. Kono ninzu de wa kojin ga tokutei sareru tame hyoji shimasen."
+      },
+      "followers": {
+        "total": "Gokei"
+      },
+      "empty": {
+        "visits": "Kono kikan no homon wa arimasen.",
+        "discovery": "Kono kikan no hakken deta wa arimasen.",
+        "followersTitle": "Forowa no suii",
+        "followersBody": "Forowa no ugoki wa hassei shidai koko ni hyoji sarema su.",
+        "posts": "Kono kikan ni toko wa arimasen."
+      },
+      "rate": {
+        "from": "{{n}} inpuresshon kara",
+        "none": "Toko shite inpuresshon ga tamaru to engejimento ritsu ga hyoji sarema su.",
+        "tooFew": "Hikaku suru ni wa inpuresshon ga sukunasugimasu.",
+        "benchmark": "Inpuresshon ni taisuru ii ne to komento no wariai. 2 pasento ijou wa kyoryoku desu."
+      }
     }
   }
 }

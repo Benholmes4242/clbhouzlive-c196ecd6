@@ -359,8 +359,16 @@ export const EmptyState: React.FC<{
    * component's own treatment is unchanged.
    */
   slot?: React.ReactNode;
+  /**
+   * Opt IN to the BUSINESS TYPE SCALE (17/700 title, -0.032em, 13/400 body,
+   * 14.5/700 pill). Default keeps the original treatment so the course and
+   * tour consumers of this component do not move.
+   */
+  scale?: 'default' | 'business';
   style?: React.CSSProperties;
-}> = ({ kicker, title, body, primary, action, guidance, guidanceHeading, footnote, slot, style }) => (
+}> = ({ kicker, title, body, primary, action, guidance, guidanceHeading, footnote, slot, scale = 'default', style }) => {
+  const biz = scale === 'business';
+  return (
   <Panel style={style}>
     <div
       style={{
@@ -368,13 +376,21 @@ export const EmptyState: React.FC<{
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
-        gap: 8,
+        gap: biz ? 10 : 8,
       }}
     >
-      {kicker && <span style={KICKER}>{kicker}</span>}
-      <div style={{ fontSize: 16, fontWeight: 800, color: A.INK, lineHeight: 1.25 }}>{title}</div>
+      {kicker && <span style={biz ? BIZ_KICKER : KICKER}>{kicker}</span>}
+      <div
+        style={biz
+          ? BIZ_TITLE
+          : { fontSize: 16, fontWeight: 800, color: A.INK, lineHeight: 1.25 }}
+      >
+        {title}
+      </div>
       {body && (
-        <p style={{ fontSize: 13.5, lineHeight: 1.5, color: A.MUTE, margin: 0, maxWidth: '34em' }}>
+        <p style={biz
+          ? { ...BIZ_BODY, margin: 0, maxWidth: '34em' }
+          : { fontSize: 13.5, lineHeight: 1.5, color: A.MUTE, margin: 0, maxWidth: '34em' }}>
           {body}
         </p>
       )}
@@ -389,9 +405,10 @@ export const EmptyState: React.FC<{
             background: A.INK,
             color: A.PANEL,
             borderRadius: 999,
-            padding: '12px 22px',
-            fontSize: 13.5,
-            fontWeight: 800,
+            padding: biz ? '13px 24px' : '12px 22px',
+            fontSize: biz ? 14.5 : 13.5,
+            fontWeight: biz ? 700 : 800,
+            letterSpacing: biz ? '-0.01em' : undefined,
             fontFamily: SANS,
             cursor: 'pointer',
           }}
@@ -401,18 +418,23 @@ export const EmptyState: React.FC<{
       )}
       {action && <Action label={action.label} onClick={action.onClick} />}
       {footnote && (
-        <div style={{ fontSize: 12, fontWeight: 600, color: A.DIM }}>{footnote}</div>
+        <div style={biz
+          ? { fontSize: 12, fontWeight: 500, color: A.DIM }
+          : { fontSize: 12, fontWeight: 600, color: A.DIM }}>{footnote}</div>
       )}
     </div>
 
     {guidance && guidance.length > 0 && (
-      <div style={{ marginTop: 18, textAlign: 'left' }}>
-        {guidanceHeading && <div style={{ ...LABEL, marginBottom: 12 }}>{guidanceHeading}</div>}
+      <div style={{ marginTop: biz ? 22 : 18, textAlign: 'left' }}>
+        {guidanceHeading && <div style={{ ...(biz ? BIZ_LABEL : LABEL), marginBottom: 12 }}>{guidanceHeading}</div>}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {guidance.map((g) => (
             <div key={g.title}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{g.title}</div>
-              <div style={{ fontSize: 12.5, lineHeight: 1.45, color: A.MUTE, marginTop: 2 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: biz ? '-0.01em' : undefined }}>{g.title}</div>
+              <div style={biz
+                ? { ...BIZ_BODY, marginTop: 2 }
+                : { fontSize: 12.5, lineHeight: 1.45, color: A.MUTE, marginTop: 2 }}>
                 {g.body}
               </div>
             </div>
@@ -421,4 +443,72 @@ export const EmptyState: React.FC<{
       </div>
     )}
   </Panel>
-);
+  );
+};
+
+
+/* ────────────────────── THE BUSINESS TYPE SCALE ──────────────────────
+   The three business surfaces (Insights, the empty state, the command
+   card) read heavy because too many elements sit at maximum weight. This
+   scale is FEWER BOLD ELEMENTS WITH MORE SPACE BETWEEN THEM: the figure
+   is the heaviest thing in its block and nothing else needs to be.
+
+   These are NEW exports, deliberately not a repoint of KICKER / LABEL /
+   TITLE - those three have ~120 consumers across the course tab and the
+   tour hub, and moving them would drag every one of those surfaces.
+   Nothing on a business surface renders at weight 800. */
+
+export const BIZ_KICKER: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.19em',
+  textTransform: 'uppercase',
+  color: A.INK,
+};
+
+export const BIZ_LABEL: React.CSSProperties = {
+  fontSize: 8,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: A.DIM,
+};
+
+export const BIZ_TITLE: React.CSSProperties = {
+  fontSize: 17,
+  fontWeight: 700,
+  letterSpacing: '-0.032em',
+  lineHeight: 1.2,
+  color: A.INK,
+};
+
+export const BIZ_BODY: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 400,
+  lineHeight: 1.55,
+  color: A.MUTE,
+};
+
+/** Figures get bigger and TIGHTER, never heavier: 700 with -0.04em. */
+export const bizFigure = (
+  fontSize: number,
+  color: string = A.INK,
+): React.CSSProperties => ({
+  fontSize,
+  fontWeight: 700,
+  letterSpacing: '-0.04em',
+  lineHeight: 1,
+  color,
+  ...FIGS,
+  fontFeatureSettings: '"kern" 1, "liga" 1',
+});
+
+/** The one inset every business chart region sits in, populated or not. */
+export const BIZ_INSET: React.CSSProperties = {
+  background: 'rgba(14,18,22,0.028)',
+  borderRadius: 13,
+  border: 'none',
+};
+
+/** 5px bar track. Business traffic is neither a score nor a member. */
+export const BIZ_TRACK_H = 5;

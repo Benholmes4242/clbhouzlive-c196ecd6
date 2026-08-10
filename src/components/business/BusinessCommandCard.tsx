@@ -178,7 +178,7 @@ export function BusinessCommandCard({
             {business.logo_url ? (
               <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[18px] font-bold" style={{ color: BIZ.inkMute }}>
+              <span className="text-[18px] font-semibold" style={{ color: BIZ.inkMute }}>
                 {business.name.charAt(0).toUpperCase()}
               </span>
             )}
@@ -195,7 +195,7 @@ export function BusinessCommandCard({
             <div className="flex items-center gap-1.5">
               <span
                 className="truncate leading-tight"
-                style={{ color: BIZ.ink, fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em' }}
+                style={{ color: BIZ.ink, fontSize: 17, fontWeight: 700, letterSpacing: '-0.032em' }}
               >
                 {business.name}
               </span>
@@ -367,7 +367,7 @@ export function BusinessCommandCard({
                   >
                     <ShieldCheck className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute }} />
                     <span className="flex-1 text-left min-w-0">
-                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 800 }}>
+                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 700 }}>
                         {verifyLabel}
                       </span>
                       {verificationState === 'none' && (
@@ -381,7 +381,7 @@ export function BusinessCommandCard({
                       style={{
                         color: BIZ.ink,
                         fontSize: 9,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em',
                       }}
@@ -431,7 +431,7 @@ export function BusinessCommandCard({
                     style={{
                       color: BIZ.inkFaint,
                       fontSize: 9,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       marginBottom: 2,
@@ -520,9 +520,9 @@ function MetricCell({
         style={{
           color: BIZ.inkFaint,
           fontSize: 8,
-          fontWeight: 800,
+          fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          letterSpacing: '0.16em',
           lineHeight: 1,
         }}
       >
@@ -533,9 +533,9 @@ function MetricCell({
         style={{
           height: 26,
           color: BIZ.ink,
-          fontSize: 21,
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: '-0.04em',
           lineHeight: 1,
           fontFeatureSettings: '"kern" 1, "liga" 1',
         }}
@@ -545,8 +545,8 @@ function MetricCell({
       <span
         style={{
           color: BIZ.inkFaint,
-          fontSize: 7,
-          fontWeight: 800,
+          fontSize: 7.5,
+          fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
           lineHeight: 1,
@@ -582,7 +582,7 @@ function ActionRow({
       <Icon className="shrink-0" style={{ width: 15, height: 15, color: BIZ.inkMute }} />
       <span
         className="flex-1 text-left"
-        style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}
+        style={{ color: BIZ.ink, fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em' }}
       >
         {label}
       </span>

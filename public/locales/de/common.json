@@ -160,6 +160,38 @@
         "team": "Team verwalten",
         "viewProfile": "Live-Profil ansehen"
       }
+    },
+    "insights": {
+      "metric": {
+        "profileViews": "Profilaufrufe",
+        "uniqueVisitors": "Eindeutige Besucher",
+        "directoryImpressions": "Verzeichnis-Impressionen",
+        "clickOuts": "Klicks nach aussen",
+        "newFollowers": "Neue Follower",
+        "messageClicks": "Nachrichten-Klicks"
+      },
+      "deltaCaption": "Veraenderung zu den vorherigen {{range}}",
+      "audience": {
+        "locked": "Gesperrt",
+        "visitorsLabel": "Eindeutige Besucher bisher",
+        "body": "Handicap-Bereiche und Top-Standorte brauchen zuerst ein groesseres Publikum. Bei so wenigen Personen waere die Aufschluesselung zuordenbar, deshalb halten wir sie zurueck."
+      },
+      "followers": {
+        "total": "Gesamt"
+      },
+      "empty": {
+        "visits": "In diesem Zeitraum noch keine Besuche.",
+        "discovery": "In diesem Zeitraum noch keine Daten zur Auffindbarkeit.",
+        "followersTitle": "Follower-Wachstum",
+        "followersBody": "Follower-Aktivitaet erscheint hier, sobald sie passiert.",
+        "posts": "In diesem Zeitraum keine Beitraege veroeffentlicht."
+      },
+      "rate": {
+        "from": "Aus {{n}} Impressionen",
+        "none": "Veroeffentliche Beitraege und sammle Impressionen, um deine Interaktionsrate zu sehen.",
+        "tooFew": "Noch zu wenige Impressionen fuer einen Vergleich.",
+        "benchmark": "Likes und Kommentare im Verhaeltnis zu Impressionen. Ueber 2 Prozent ist stark."
+      }
     }
   }
 }
