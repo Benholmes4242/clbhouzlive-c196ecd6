@@ -6,15 +6,26 @@
  *   2. Fullscreen viewer "read review ›" chrome
  * Both open through useReviewSheetStore + ReviewBottomSheetPortal.
  *
- * Stacking is centralized in @/lib/zLayers so this sheet always renders
- * above FullscreenFeedOverlay (see REVIEW_SHEET_Z > FS_OVERLAY_Z).
+ * STACKING (BRIEF_REVIEW_SHEET_PHOTOS_AND_FOOTER). Two directions exist and a
+ * single pair of numbers cannot express both:
+ *   viewer → sheet:  the viewer's "read review ›" chrome opens THIS sheet while
+ *                    the viewer stays open, so the sheet must paint ABOVE it —
+ *                    REVIEW_SHEET_Z (240) > FS_OVERLAY_Z (200). Unchanged.
+ *   sheet → viewer:  tapping a photo in the strip below opens the media viewer,
+ *                    which must paint ABOVE this sheet. That is NOT the feed
+ *                    overlay: it is MediaPreviewViewer, body-portaled at
+ *                    MEDIA_PREVIEW_Z (9999), i.e. above every sheet in the
+ *                    registry. The sheet stays mounted underneath and keeps its
+ *                    scroll position; nothing in @/lib/zLayers is inverted.
+ * Both overlays portal to document.body, so this panel's translateZ(0) and the
+ * scroller's -webkit-overflow-scrolling cannot clamp either of them.
  *
  * No blur anywhere: the panel is opaque #F8FAFC so the dark page beneath
  * cannot muddy it. The scrim stays a plain rgba dim.
  */
 
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { formatMonthYearShort } from '@/i18n/format';
 
 import { createPortal } from 'react-dom';
@@ -29,6 +40,8 @@ import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z } from '@/lib/zLayers';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -258,6 +271,21 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const allMedia = (media?.length ? media : fetchedMedia) ?? [];
   const mediaTotal = allMedia.length;
   const mediaStrip = allMedia.slice(0, 3);
+
+  /* PHOTO TAP (§Part 1). The strip shows the first three; the viewer receives
+     ALL items so a 4-photo review stays fully reachable from the third tile. */
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const viewerItems: OrderedMediaItem[] = useMemo(
+    () =>
+      allMedia.map((m, i) => ({
+        id: m.id,
+        type: m.mediaType,
+        previewUrl: m.mediaUrl,
+        thumbnailUrl: m.posterUrl ?? undefined,
+        order: i,
+      })),
+    [allMedia],
+  );
 
 
   const breakdownEntries = useMemo(() => {
@@ -590,11 +618,11 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               )}
 
               {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
-                  NON-INTERACTIVE: opening the fullscreen viewer from here is
-                  the exact z-order case that once put the viewer BEHIND a
-                  sheet on iOS, and it is not verifiable from a sheet that
-                  itself sits at REVIEW_SHEET_Z. Video shows poster + glyph
-                  and never autoplays. */}
+                  INTERACTIVE: each tile is a real button that opens
+                  MediaPreviewViewer (body-portaled, z 9999) at that index over
+                  this sheet, with the sheet left mounted so its scroll position
+                  survives the round trip. Video shows poster + glyph and never
+                  autoplays here. */}
               {mediaStrip.length > 0 && (
                 <div style={{ marginTop: 16 }}>
                   <div
@@ -610,18 +638,27 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     {mediaTotal === 1 ? '1 PHOTO' : `${mediaTotal} PHOTOS`}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    {mediaStrip.map((m) => (
-                      <div
+                    {mediaStrip.map((m, i) => (
+                      <button
                         key={m.id}
+                        type="button"
+                        aria-label={`Photo ${i + 1} of ${mediaTotal}`}
+                        onClick={() => setViewerIndex(i)}
                         style={{
                           flex: 1,
                           minWidth: 0,
                           height: 78,
+                          padding: 0,
+                          border: 'none',
                           borderRadius: 12,
                           overflow: 'hidden',
                           background: BORDER,
                           position: 'relative',
+                          cursor: 'pointer',
+                          appearance: 'none',
+                          WebkitTapHighlightColor: 'transparent',
                         }}
+                        className="review-photo-tile"
                       >
                         <img
                           src={m.mediaType === 'video' ? (m.posterUrl ?? m.mediaUrl) : m.mediaUrl}
@@ -654,7 +691,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             </div>
                           </div>
                         )}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -765,6 +802,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               </div>
             </div>
           </motion.div>
+
+          {/* Photo viewer — portals to <body> at z 9999, so it sits above this
+              sheet (REVIEW_SHEET_Z 240) on device, not just in preview. The
+              sheet is deliberately NOT closed: closing costs the scroll
+              position and was rejected on the Moments path. */}
+          {viewerIndex != null && viewerItems.length > 0 && (
+            <MediaPreviewViewer
+              items={viewerItems}
+              initialIndex={viewerIndex}
+              onClose={() => setViewerIndex(null)}
+            />
+          )}
         </>
       )}
     </AnimatePresence>
