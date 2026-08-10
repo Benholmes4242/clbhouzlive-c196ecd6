@@ -70,6 +70,14 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
+/** One figure treatment for the labelled count column in both dropdowns. */
+const FIGURE_STYLE: React.CSSProperties = {
+  fontSize: 13.5,
+  fontWeight: 700,
+  color: INK,
+  fontVariantNumeric: 'tabular-nums lining',
+};
+
 /**
  * Scanning aid inside the dropdowns only - never in the headline copy.
  * Icons follow the MEANING of each lens: toughest / scoreable are opposites
