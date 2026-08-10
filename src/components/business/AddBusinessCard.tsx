@@ -10,7 +10,9 @@ interface AddBusinessCardProps {
 }
 
 export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardProps) {
+  const { t } = useTranslation('common');
   if (isFirst) {
+
     // Full empty state for zero businesses
     return (
       <motion.div
