@@ -44,6 +44,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { BIZ } from '@/components/business/businessTokens';
+import {
+  A,
+  BIZ_LABEL,
+  BIZ_BODY,
+  bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
 import {
   PROOF_OPTIONS,
