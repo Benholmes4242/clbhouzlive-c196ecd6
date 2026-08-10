@@ -6,6 +6,11 @@
  * chips and month groups move across UNCHANGED - only the section header and
  * the outer margin are suppressed.
  *
+ * className="hcp-dark" is LOAD-BEARING, not decoration: BottomSheet portals to
+ * document.body, outside the .hcp-dark scope, and RecentRoundsCard's palette is
+ * entirely var(--hcp-*) - without the class those tokens resolve to nothing and
+ * the list renders invisible.
+ *
  * Pinned header, one scroller beneath it.
  */
 import React from 'react';
