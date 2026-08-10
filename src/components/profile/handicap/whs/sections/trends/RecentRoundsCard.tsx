@@ -47,19 +47,17 @@ const INITIAL_COUNT = 30;
 const LOAD_MORE_COUNT = 15;
 
 // ─── Format helpers ─────────────────────────────────────────────────
+// Absent renders NOTHING - the column keeps its width via the label beneath.
 const fmtDiff = (d: number | null | undefined): string => {
-  if (d === null || d === undefined) return '—';
+  if (d === null || d === undefined) return '';
   if (d > 0) return `+${d.toFixed(1)}`;
   if (d < 0) return `\u2212${Math.abs(d).toFixed(1)}`;
   return '0.0';
 };
 
-const diffColor = (d: number | null | undefined): string => {
-  if (d === null || d === undefined) return T.inkMute;
-  if (d < 0) return 'var(--hcp-good-deep)';
-  if (d > 0) return 'var(--hcp-t-60)';
-  return T.inkSoft;
-};
+// The differential is a signed, ARROWLESS figure - a score, not a movement.
+// It renders in ink. The only coloured thing on a row is the HCP arrow.
+
 
 /**
  * Trim noisy suffixes from course names for compact chip display.
