@@ -719,29 +719,53 @@ function ProfileTabBody({
         )}
       </div>
 
-      {/* Save (INK primary) */}
+      {/*
+        THE SAVE CONTROL SPLITS IN TWO. A completion state is not a control:
+        clean and not saving renders a line, not a dead slab. What SAVES is
+        untouched - isDirty / isSaving / isDisabled / handleSave all unchanged.
+      */}
       <div className="px-4 pt-6 pb-2">
-        <Button
-          onClick={handleSave}
-          disabled={isDisabled}
-          className="w-full min-h-[52px] rounded-[13px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
-          style={{
-            background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
-            color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
-            fontFamily: GEIST,
-          }}
-        >
-          {isSaving ? (
-            <><Loader2 size={18} className="animate-spin mr-2" /> Saving...</>
-          ) : isNewUser ? (
-            'Save & continue'
-          ) : isDirty ? (
-            'Save changes'
-          ) : (
-            'All Saved'
-          )}
-        </Button>
+        {isDirty || isSaving ? (
+          <Button
+            onClick={handleSave}
+            disabled={isDisabled}
+            className="w-full border-0 active:opacity-90 transition-opacity"
+            style={{
+              minHeight: 50,
+              borderRadius: 999,
+              fontSize: 14.5,
+              fontWeight: 700,
+              background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
+              color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
+              fontFamily: GEIST,
+            }}
+          >
+            {isSaving ? (
+              <><Loader2 size={18} className="animate-spin mr-2" /> Saving...</>
+            ) : isNewUser ? (
+              'Save & continue'
+            ) : (
+              'Save changes'
+            )}
+          </Button>
+        ) : (
+          <div
+            style={{
+              height: 22,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 5,
+              ...FIELD_LABEL,
+              color: A.MUTE,
+            }}
+          >
+            <Check size={11} strokeWidth={3} />
+            All changes saved
+          </div>
+        )}
       </div>
+
     </>
   );
 }
