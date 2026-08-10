@@ -150,7 +150,8 @@
       },
       "verify": {
         "tail": " - consigue la insignia",
-        "action": "Verificar"
+        "action": "Verificar",
+        "notVerified": "No verificado"
       }
     }
   }

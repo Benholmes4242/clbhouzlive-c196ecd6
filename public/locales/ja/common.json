@@ -149,7 +149,8 @@
       },
       "verify": {
         "tail": " - bajji wo kakutoku",
-        "action": "Ninsho wo uketoru"
+        "action": "Ninsho wo uketoru",
+        "notVerified": "Minshonin"
       }
     }
   }

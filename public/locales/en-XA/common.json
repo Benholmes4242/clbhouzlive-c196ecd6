@@ -150,7 +150,8 @@
       },
       "verify": {
         "tail": " - [earn the badge]",
-        "action": "[Get verified]"
+        "action": "[Get verified]",
+        "notVerified": "[Not verified]"
       }
     }
   }

@@ -149,7 +149,8 @@
       },
       "verify": {
         "tail": " - baeji hwakbo",
-        "action": "Injeung batgi"
+        "action": "Injeung batgi",
+        "notVerified": "Mi injeung"
       }
     }
   }

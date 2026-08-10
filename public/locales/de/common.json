@@ -150,7 +150,8 @@
       },
       "verify": {
         "tail": " - Abzeichen erhalten",
-        "action": "Verifizieren"
+        "action": "Verifizieren",
+        "notVerified": "Nicht verifiziert"
       }
     }
   }
