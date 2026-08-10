@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -266,6 +266,9 @@
         "askToSync": "Ask to sync",
         "notOnClbhouz": "Not on clbhouz",
         "noHandicap": "No handicap"
+      },
+      "nudge": {
+        "draft": "Hi {{name}} - connect your handicap on clbhouz and we can compare rounds and see who's actually playing better."
       }
     }
   }

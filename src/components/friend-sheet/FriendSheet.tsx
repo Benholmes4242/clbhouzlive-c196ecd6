@@ -51,6 +51,7 @@ import {
   type SheetState,
 } from './parts/_shared/deriveSheetState';
 import { formatFriendName, getFirstName } from './parts/_shared/formatName';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 export interface FriendSheetProps {
   viewerUserId: string;
@@ -138,13 +139,16 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
   };
   const handleNudgeSync = async () => {
     if (state?.kind !== 'clbhouz_not_synced') return;
-    // CHECKPOINT: compose=nudge_sync query param is not yet wired on the
-    // profile page; this navigates to the profile and lets the viewer
-    // message manually. Follow-up brief needed to pre-fill compose.
-    const handle = snapshot?.profile.username ?? targetUserId;
-    if (!handle) return;
+    if (!targetUserId) return;
     onClose();
-    navigate(`/profile/${handle}?compose=nudge_sync`);
+    // Opens a direct thread with an EDITABLE draft; nothing is sent until the
+    // member presses send. The sender is forced personal: a nudge about
+    // someone's handicap cannot come from a business account.
+    await startConversation(
+      { actorType: 'personal', actorId: targetUserId },
+      t('handicap.circle.nudge.draft', { name: state.firstName }),
+      { asActor: { actorType: 'personal', actorId: viewerUserId } },
+    );
   };
   const handleOpenPost = (postId: string) => {
     onClose();
