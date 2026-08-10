@@ -10,13 +10,14 @@ import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSear
 import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
 
 import {
-  INPUT_CLASS,
-  INPUT_STYLE,
+  FIELD_INPUT_CLASS,
+  FIELD_PLACEHOLDER_CLASS,
+  FIELD_INPUT_STYLE,
   LOCKED_CLASS,
   LOCKED_STYLE,
   LABEL_CLASS,
   HINT_CLASS,
-} from './editorStyles';
+} from '@/components/manage/fieldTreatment';
 
 export interface IdentitySectionProps {
   mode: 'create' | 'edit';
@@ -89,9 +90,9 @@ export function IdentitySection({
                     setSelectedClub(null);
                     setSelectedCollege(null);
                   }}
-                  className={`${INPUT_CLASS} appearance-none cursor-pointer`}
+                  className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} appearance-none cursor-pointer`}
                   style={{
-                    ...INPUT_STYLE,
+                    ...FIELD_INPUT_STYLE,
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'right 16px center',
@@ -187,8 +188,8 @@ export function IdentitySection({
                     : 'e.g., Royal Golf Club'
                 }
                 disabled={mode === 'create' && !category}
-                className={`${INPUT_CLASS} disabled:opacity-50`}
-                style={INPUT_STYLE}
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} disabled:opacity-50`}
+                style={FIELD_INPUT_STYLE}
               />
             )}
             <p className={HINT_CLASS}>Shown publicly on your profile and in search.</p>
@@ -209,8 +210,8 @@ export function IdentitySection({
               onChange={(e) => setDescription(e.target.value.slice(0, 2500))}
               placeholder="Tell golfers about your business…"
               rows={5}
-              className={`${INPUT_CLASS} resize-none`}
-              style={INPUT_STYLE}
+              className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} resize-none`}
+              style={FIELD_INPUT_STYLE}
             />
             <p className={HINT_CLASS}>
               Mention facilities, coaching style, atmosphere, events, or what makes you different.
@@ -229,8 +230,8 @@ export function IdentitySection({
               placeholder="e.g., 1985"
               min={1800}
               max={new Date().getFullYear()}
-              className={INPUT_CLASS}
-              style={INPUT_STYLE}
+              className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+              style={FIELD_INPUT_STYLE}
             />
             <p className={HINT_CLASS}>Shown on your About tab.</p>
           </div>

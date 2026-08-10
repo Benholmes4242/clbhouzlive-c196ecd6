@@ -1,6 +1,6 @@
 import React from 'react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
-import { HINT_CLASS } from './editorStyles';
+import { HINT_CLASS } from '@/components/manage/fieldTreatment';
 import { PRIMARY_ACTION_OPTIONS, PrimaryActionKey } from './editorTypes';
 
 interface Props {
