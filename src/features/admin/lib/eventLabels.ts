@@ -186,6 +186,8 @@ export const EVENT_LABELS: Record<string, string> = {
   review_step_viewed: 'Review step viewed',
   review_step_completed: 'Review step completed',
   review_submitted: 'Review submitted',
+  review_removed: 'Review removed',
+
   review_receipt_viewed: 'Review receipt viewed',
   review_receipt_action: 'Review receipt action tapped',
   review_next_course_tapped: 'Review next course tapped',
