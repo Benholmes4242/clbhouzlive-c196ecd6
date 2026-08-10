@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { formatMonthYearLongGB } from '@/i18n/format';
 
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
+// DARK_ROW_TITLE is the ONE definition shared with Records / Your courses.
+import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { Skeleton } from '@/components/ui/skeleton';
+
 
 
 interface Props {
