@@ -25,6 +25,22 @@ import React from 'react';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
+/**
+ * DARK_ROW_TITLE — the identity line of a dark row or card.
+ *
+ * ONE definition, shared by the record name (Records to break) and the
+ * course name (Your courses). Two sections that are meant to match will
+ * drift the moment either is touched, so never copy these numbers.
+ */
+export const DARK_ROW_TITLE: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 600,
+  letterSpacing: '-0.015em',
+  color: 'var(--hcp-t-100)',
+  lineHeight: 1.3,
+};
+
+
 // ── Type guards ────────────────────────────────────────────────────
 
 export type Verdict = 'good' | 'bad' | 'mid' | 'neutral';

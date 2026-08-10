@@ -26,10 +26,10 @@ interface Props {
 }
 
 const figureStyle: React.CSSProperties = {
-  fontSize: 28,
-  fontWeight: 800,
+  fontSize: 24,
+  fontWeight: 700,
   lineHeight: 1,
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.04em',
   color: CHART.INK,
   fontVariantNumeric: 'tabular-nums lining-nums',
 };
@@ -110,7 +110,7 @@ export const RoundsArchivePanel: React.FC<Props> = ({
                 padding: 0,
                 cursor: 'pointer',
                 ...LABEL_STYLE,
-                color: CHART.AMBER,
+                color: CHART.INK,
               }}
             >
               {t('handicap.form.archive.allRounds')}
@@ -118,7 +118,13 @@ export const RoundsArchivePanel: React.FC<Props> = ({
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: 32, marginTop: 14 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+              marginTop: 14,
+            }}
+          >
             {figures.map((f) => (
               <div key={f.label}>
                 <div style={figureStyle}>{f.value}</div>

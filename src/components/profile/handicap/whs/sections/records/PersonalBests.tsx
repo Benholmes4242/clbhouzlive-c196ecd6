@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
-import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { WhsScore } from '@/lib/whs/types';
 import { formatDay2MonthYearShortGB, formatMonthYearLongGB } from '@/i18n/format';
@@ -24,9 +25,8 @@ const D_T60 = 'var(--hcp-t-60)';
 
 interface Tile {
   eyebrow: string;
-  value: string;
+  value: string | null;
   caption: string | null;
-  valueColor?: string;
 }
 
 function fmtCourseDate(s: WhsScore | null): string | null {
@@ -46,11 +46,12 @@ function monthLabel(yyyyMm: string): string {
 }
 
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
   const { data: scores, isLoading, isError, refetch } = useAllScores(connectionId);
 
   const tiles: Tile[] = useMemo(() => {
     const list = scores ?? [];
-    const empty = (eyebrow: string): Tile => ({ eyebrow, value: '—', caption: null });
+    const empty = (eyebrow: string): Tile => ({ eyebrow, value: null, caption: null });
 
     if (list.length === 0) {
       return [
@@ -87,7 +88,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best Diff',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
-        valueColor: '#55BD8B',
       };
     }
 
@@ -121,7 +121,6 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
-        valueColor: '#55BD8B',
       };
     }
 
@@ -151,6 +150,8 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
     return [bestDiff, bestGross, bestSF, bestVsHcp, mostMonth];
   }, [scores, currentHandicap]);
+
+  const allEmpty = tiles.every((x) => x.value == null);
 
   if (isError && !isLoading) {
     return (
@@ -214,99 +215,100 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         }
       />
       <div style={{ padding: '0 16px 8px' }}>
-
+        {/* ONE panel of aligned rows. The figures share a right edge, which is
+            what makes five records comparable. No per-row rule, no span. */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 12,
+            background: D_BG,
+            border: `1px solid ${D_LINE}`,
+            borderRadius: 16,
+            padding: '3px 14px',
           }}
         >
           {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => {
             const tile = t as Tile;
-            const isEmpty = !isLoading && tile.value === '—';
-            // Last card spans full width when there's an odd count (5 → last is full-width)
-            const isOddLast = isLoading
-              ? i === 4  // loading renders 5 tiles; the 5th spans, matching the loaded layout
-              : i === tiles.length - 1 && tiles.length % 2 === 1;
-
             return (
               <div
                 key={i}
                 style={{
-                  gridColumn: isOddLast ? '1 / -1' : 'auto',
-                  background: D_BG,
-                  border: `1px solid ${D_LINE}`,
-                  borderRadius: 16,
-                  padding: 12,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  minWidth: 0,
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(0,1fr) 68px',
+                  gap: 12,
+                  alignItems: 'baseline',
+                  padding: '13px 0',
                 }}
               >
                 {isLoading ? (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <Skeleton variant="dark" style={{ width: 44, height: 26, borderRadius: 4 }} />
+                    <div style={{ minWidth: 0 }}>
+                      <Skeleton variant="dark" style={{ height: 13, width: '58%', borderRadius: 2 }} />
+                      <Skeleton
+                        variant="dark"
+                        style={{ height: 12, width: '80%', borderRadius: 2, marginTop: 5 }}
+                      />
                     </div>
-                    <Skeleton variant="dark" style={{ height: 13, width: '70%', borderRadius: 2, marginTop: 12 }} />
-                    <Skeleton variant="dark" style={{ height: 10.5, width: '85%', borderRadius: 2, marginTop: 6 }} />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <Skeleton variant="dark" style={{ height: 20, width: 44, borderRadius: 2 }} />
+                    </div>
                   </>
                 ) : (
                   <>
-                    {/* the figure. No icon tile - the figure is the record. */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                      <span
-                        style={{
-                          fontSize: 30,
-                          fontWeight: 300,
-                          color: isEmpty ? 'var(--hcp-t-30)' : (tile.valueColor ?? D_T100),
-                          fontVariantNumeric: 'tabular-nums',
-                          letterSpacing: '-0.04em',
-                          lineHeight: 0.85,
-                        }}
-                      >
-                        {tile.value}
-                      </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
+                        {tile.eyebrow}
+                      </div>
+                      {tile.caption && (
+                        <div
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 400,
+                            color: D_T60,
+                            lineHeight: 1.35,
+                            marginTop: 3,
+                            overflowWrap: 'anywhere',
+                          }}
+                        >
+                          {tile.caption}
+                        </div>
+                      )}
                     </div>
-
-                    {/* label */}
+                    {/* Absent renders NOTHING; the slot keeps its height so the
+                        rows above and below stay aligned. */}
                     <div
                       style={{
-                        fontSize: 13,
-                        fontWeight: 800,
+                        minHeight: 20,
+                        textAlign: 'right',
+                        fontSize: 20,
+                        fontWeight: 700,
+                        letterSpacing: '-0.04em',
                         color: D_T100,
-                        letterSpacing: '-0.005em',
-                        marginTop: 12,
+                        fontVariantNumeric: 'tabular-nums',
+                        lineHeight: 1,
                       }}
                     >
-                      {tile.eyebrow}
+                      {tile.value}
                     </div>
-
-                    {/* context (course · date) */}
-                    {tile.caption && (
-                      <div
-                        style={{
-                          fontSize: 10.5,
-                          color: D_T60,
-                          marginTop: 2,
-                          fontWeight: 600,
-                          lineHeight: 1.2,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {tile.caption}
-                      </div>
-                    )}
                   </>
                 )}
               </div>
             );
           })}
+
+          {!isLoading && allEmpty && (
+            <div
+              style={{
+                fontSize: 12,
+                color: D_T60,
+                lineHeight: 1.4,
+                padding: '0 0 13px',
+              }}
+            >
+              {t('common:handicap.records.emptyHint')}
+            </div>
+          )}
         </div>
       </div>
+
     </section>
   );
 };

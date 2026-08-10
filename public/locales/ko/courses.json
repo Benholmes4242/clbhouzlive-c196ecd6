@@ -104,6 +104,9 @@
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
       "seeAllShort": "\uc804\uccb4 {{count}}"
+    },
+    "yourCourses": {
+      "roundsLabel": "Raundeu"
     }
   },
   "scorecard": {
