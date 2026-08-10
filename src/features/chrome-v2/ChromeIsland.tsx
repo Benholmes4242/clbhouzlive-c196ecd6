@@ -497,6 +497,9 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   if (suppressed) return null;
 
   const tone = spec.tone;
+  const dividerColor =
+    tone === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)';
+
 
   return (
     <>
