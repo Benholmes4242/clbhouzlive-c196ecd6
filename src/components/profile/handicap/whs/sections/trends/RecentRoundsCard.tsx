@@ -608,17 +608,17 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
 };
 
 // ─── Skeleton ───────────────────────────────────────────────────────
+// Shape follows the new row: no border, no card - a flat 46px band.
 const SkeletonStack: React.FC = () => (
-  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-    {Array.from({ length: 5 }).map((_, i) => (
-      <Skeleton
-        key={i}
-        variant="dark"
-        style={{ height: 72, borderRadius: 12, border: `1px solid ${T.hairline}` }}
-      />
+  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column' }}>
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} style={{ padding: '13px 0' }}>
+        <Skeleton variant="dark" style={{ height: 34, borderRadius: 8 }} />
+      </div>
     ))}
   </div>
 );
+
 
 // ─── Empty states ───────────────────────────────────────────────────
 const EmptyState: React.FC<{ viewMode?: 'owner' | 'friend'; ownerFirstName?: string | null }> = ({
