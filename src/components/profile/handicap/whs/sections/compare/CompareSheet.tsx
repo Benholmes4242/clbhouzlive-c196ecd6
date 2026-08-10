@@ -413,6 +413,38 @@ export const CompareSheet: React.FC<Props> = ({
     };
   }, [shared]);
 
+  /**
+   * THE BAR'S SCALE, derived - never a constant chosen by feel. See
+   * compareRanges.ts for what is and is not derivable here.
+   */
+  const ranges = React.useMemo(
+    () => deriveCompareRanges(shared?.shared_round_results),
+    [shared],
+  );
+
+  /**
+   * THE CATEGORY TALLY beside the "Head to head" kicker, derived from the rows
+   * already on screen - no query.
+   *
+   * TIES COUNT FOR NEITHER SIDE AND ARE INCLUDED IN {total}. Do not quietly
+   * change that: "You lead 2 of 6" must reconcile with six visible rows.
+   */
+  const h2hTally = React.useMemo(() => {
+    if (!h2h) return null;
+    const pairs: { format: H2HStatFormat; me: number | null; them: number | null }[] = [
+      { format: 'count', me: h2h.grossWins, them: h2h.grossLosses },
+      { format: 'count', me: h2h.wins, them: h2h.losses },
+      { format: 'low_better', me: h2h.meAvgGross, them: h2h.themAvgGross },
+      { format: 'high_better', me: h2h.meAvgSt, them: h2h.themAvgSt },
+      { format: 'low_better', me: h2h.meBestGross, them: h2h.themBestGross },
+      { format: 'high_better', me: h2h.meBestMargin, them: h2h.themBestMargin },
+    ];
+    const mine = pairs.filter((p) => whoLeads(p.format, p.me, p.them).winner === 'me').length;
+    return { mine, total: pairs.length };
+  }, [h2h]);
+
+
+
   const handleSelect = (person: ComparePerson, sharedRounds: number) => {
     analyticsEvents.track('handicap_compare_player_picked', {
       target_user_id: person.userId,
