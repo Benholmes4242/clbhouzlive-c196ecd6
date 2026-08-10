@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
-  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Briefcase, Pencil,
+  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,12 +23,14 @@ import {
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTranslation } from 'react-i18next';
+import {
+  A, BIZ_KICKER, BIZ_LABEL, BIZ_BODY, bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
 const HAIR = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const CARD_BG = '#FFFFFF';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
@@ -40,19 +42,16 @@ const ROLE_ICON: Record<BusinessRole, typeof Crown> = {
   analyst: BarChart3,
 };
 
-function RoleChip({ role }: { role: BusinessRole }) {
+/**
+ * The role is a LABEL, not a pill. The ROLE_ICON glyph stays as a category
+ * marker; the tinted capsule and the eleventh amber-deep variant (#B4650C)
+ * are gone. Vocabulary is unchanged.
+ */
+function RoleLabel({ role }: { role: BusinessRole }) {
   const Icon = ROLE_ICON[role];
-  const isOwner = role === 'owner';
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold"
-      style={{
-        background: isOwner ? AMBER_SOFT : 'rgba(15,23,42,0.05)',
-        color: isOwner ? '#B4650C' : INK_45,
-        border: `1px solid ${isOwner ? 'rgba(247,147,30,0.22)' : HAIR}`,
-      }}
-    >
-      <Icon size={11} strokeWidth={2.5} />
+    <span className="inline-flex items-center gap-1" style={{ ...BIZ_LABEL, fontSize: 7.5 }}>
+      <Icon size={9} strokeWidth={2.5} />
       {BUSINESS_ROLE_LABELS[role]}
     </span>
   );
@@ -63,9 +62,15 @@ const JOB_TITLE_MAX = 40;
 function JobTitleField({
   initialTitle,
   onSave,
+  addLabel,
+  addAria,
+  editAria,
 }: {
   initialTitle: string;
   onSave: (next: string) => Promise<void>;
+  addLabel: string;
+  addAria: string;
+  editAria: string;
 }) {
   const [savedTitle, setSavedTitle] = useState(initialTitle);
   const [editing, setEditing] = useState(false);
@@ -116,44 +121,57 @@ function JobTitleField({
     }, 250);
   };
 
-  if (!editing && savedTitle) {
+  if (!editing) {
+    // HAS A TITLE -> the title as text with a pencil. Tapping opens the input.
+    if (savedTitle) {
+      return (
+        <button
+          type="button"
+          onClick={beginEdit}
+          className="inline-flex items-center gap-1.5 text-left active:opacity-70"
+          style={{ minHeight: 20, background: 'transparent', border: 0, padding: 0 }}
+          aria-label={editAria}
+        >
+          <span style={{ ...BIZ_BODY, fontWeight: 600, color: A.INK, lineHeight: 1.2 }}>
+            {savedTitle}
+          </span>
+          <Pencil size={11.5} color={A.DIM} strokeWidth={2.25} />
+        </button>
+      );
+    }
+    // NO TITLE -> a quiet text action. A list row is not a form: no bordered
+    // box, no briefcase, no placeholder sitting in a members list.
     return (
       <button
         type="button"
         onClick={beginEdit}
-        className="inline-flex items-center gap-1.5 text-left active:opacity-70"
-        style={{ minHeight: 44, background: 'transparent', border: 0, padding: 0 }}
-        aria-label="Edit job title"
+        className="inline-flex items-center gap-1 text-left active:opacity-70"
+        style={{ minHeight: 20, background: 'transparent', border: 0, padding: 0 }}
+        aria-label={addAria}
       >
-        <span style={{ fontSize: 13.5, fontWeight: 600, color: INK }}>{savedTitle}</span>
-        <Pencil size={14} color={INK_45} strokeWidth={2.25} />
+        <span style={{ ...BIZ_LABEL, fontSize: 7.5 }}>{addLabel}</span>
+        <ChevronRight size={9} color={A.DIM} strokeWidth={2.5} />
       </button>
     );
   }
 
-  const borderColor = editing ? AMBER : 'rgba(15,23,42,0.10)';
-  const borderWidth = editing ? 1.5 : 1;
-  const iconColor = editing ? AMBER : '#94A3B8';
-
   return (
     <div
       ref={wrapRef}
-      onClick={() => !editing && setEditing(true)}
       className="flex items-center gap-2"
       style={{
         background: '#F8FAFC',
-        border: `${borderWidth}px solid ${borderColor}`,
+        border: `1.5px solid ${A.INK}`,
         borderRadius: 10,
         padding: '9px 11px',
       }}
     >
-      <Briefcase size={15} color={iconColor} strokeWidth={2.25} style={{ flexShrink: 0 }} />
       <input
         ref={inputRef}
         type="text"
         value={value}
         maxLength={JOB_TITLE_MAX}
-        placeholder="Add a job title"
+        placeholder={addLabel}
         onChange={(e) => setValue(e.target.value)}
         onFocus={handleFocus}
         onBlur={() => { if (editing) void commit(); }}
@@ -164,16 +182,14 @@ function JobTitleField({
         disabled={saving && !editing}
         className="flex-1 min-w-0 bg-transparent outline-none"
         style={{
-          fontSize: 13.5,
-          color: value ? INK : '#94A3B8',
+          fontSize: 13,
+          color: value ? A.INK : A.DIM,
           fontWeight: value ? 600 : 400,
         }}
       />
-      {editing && (
-        <span className="tabular-nums" style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0 }}>
-          {value.length}/{JOB_TITLE_MAX}
-        </span>
-      )}
+      <span className="tabular-nums" style={{ fontSize: 11, color: A.DIM, flexShrink: 0 }}>
+        {value.length}/{JOB_TITLE_MAX}
+      </span>
     </div>
   );
 }
