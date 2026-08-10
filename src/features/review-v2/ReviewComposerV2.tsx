@@ -138,11 +138,24 @@ function TeeChipRow({
   );
 }
 
+interface ReceiptState {
+  ratingId: string;
+  shareToFeed: boolean;
+  overall: number | null;
+  scores: Record<CategoryKey, number | null>;
+}
+
 function InnerComposer() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id ?? null;
+
+  // Receipt + submitted flag live in this outer instance so they outlive the
+  // keyed <Composer /> remount that follows a successful submit.
+  const [success, setSuccess] = useState<ReceiptState | null>(null);
+  const submittedRef = useRef(false);
+
 
   const courseQ = useQuery({
     queryKey: ['rv2-course', courseId],
