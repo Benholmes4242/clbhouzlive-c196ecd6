@@ -58,6 +58,11 @@ export const ReviewBottomSheetPortal: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
+  // TEMP D2 DIAGNOSTIC HOOK — removed after the footer hit-test run.
+  if (import.meta.env.DEV && typeof window !== 'undefined') {
+    (window as any).__rs = useReviewSheetStore.getState();
+  }
+
   if (!payload) return null;
 
   return (
