@@ -225,20 +225,21 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
               <MonthDivider month={month} count={monthRounds.length} />
               <div
                 style={{
-                  marginTop: 8,
+                  marginTop: 4,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 8,
                 }}
               >
                 {monthRounds.map((round) => (
                   <FeedCard
                     key={round.id}
                     round={round}
+                    labels={rowLabels}
                     onTap={() => setOpenScoreId(round.id)}
                   />
                 ))}
               </div>
+
             </div>
           ))}
 
