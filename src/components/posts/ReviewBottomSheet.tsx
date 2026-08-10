@@ -802,6 +802,18 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               </div>
             </div>
           </motion.div>
+
+          {/* Photo viewer — portals to <body> at z 9999, so it sits above this
+              sheet (REVIEW_SHEET_Z 240) on device, not just in preview. The
+              sheet is deliberately NOT closed: closing costs the scroll
+              position and was rejected on the Moments path. */}
+          {viewerIndex != null && viewerItems.length > 0 && (
+            <MediaPreviewViewer
+              items={viewerItems}
+              initialIndex={viewerIndex}
+              onClose={() => setViewerIndex(null)}
+            />
+          )}
         </>
       )}
     </AnimatePresence>
