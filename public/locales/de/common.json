@@ -289,7 +289,21 @@
       "roundsTogether_one": "{{count}} round together",
       "roundsTogether_other": "{{count}} rounds together",
       "playedAgo": "Played {{when}}",
-      "anyone": "Compare against anyone"
+      "anyone": "Compare against anyone",
+      "you": "Du",
+      "tiedCount_one": "{{count}} geteilt",
+      "tiedCount_other": "{{count}} geteilt",
+      "oldest": "Aelteste",
+      "formSample_one": "{{count}} gemeinsame Runde",
+      "formSample_other": "{{count}} gemeinsame Runden",
+      "formTruncated": "Letzte {{shown}} von {{total}}",
+      "youLeadOf": "Du fuehrst {{n}} von {{total}}",
+      "group": {
+        "volume": "UMFANG",
+        "scoring": "SCORING",
+        "rare": "SELTEN",
+        "best": "BESTE JE"
+      }
     }
   }
 }
