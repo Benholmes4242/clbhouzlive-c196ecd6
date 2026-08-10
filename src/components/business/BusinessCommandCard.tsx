@@ -351,77 +351,95 @@ export function BusinessCommandCard({
               <div style={{ height: '0.5px', background: BIZ.hair }} />
 
               <div className="p-4 pt-3 space-y-3">
-                {/* Verify banner */}
+                {/* Verify status line — treatment only; copy per state is unchanged.
+                    No gradient, no tint, no bordered tile, no amber chevron. */}
                 {!isVerified && (
                   <button
                     type="button"
                     onClick={() => goto('/verification')}
-                    className="w-full flex items-center gap-3 p-3 active:opacity-90 transition-opacity"
-                    style={{
-                      background: `linear-gradient(90deg, ${BIZ.amberTint} 0%, rgba(247,147,30,0.04) 100%)`,
-                      border: `1px solid ${BIZ.amberHair}`,
-                      borderRadius: BIZ.rInner,
-                    }}
+                    className="w-full flex items-center gap-2 active:opacity-70 transition-opacity"
+                    style={{ background: 'transparent', border: 'none', minHeight: 44 }}
                   >
+                    <ShieldCheck className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute }} />
+                    <span className="flex-1 text-left min-w-0">
+                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 800 }}>
+                        {verifyLabel}
+                      </span>
+                      {verificationState === 'none' && (
+                        <span style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500 }}>
+                          {t('business.card.verify.tail')}
+                        </span>
+                      )}
+                    </span>
                     <span
-                      className="shrink-0 flex items-center justify-center"
+                      className="shrink-0 inline-flex items-center gap-0.5"
                       style={{
-                        width: 32, height: 32,
-                        background: '#fff',
-                        border: `1px solid ${BIZ.amberHair}`,
-                        borderRadius: 10,
+                        color: BIZ.ink,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
                       }}
                     >
-                      <ShieldCheck className="h-4 w-4" style={{ color: BIZ.amber }} />
+                      {t('business.card.verify.action')}
+                      <ChevronRight style={{ width: 11, height: 11 }} />
                     </span>
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="truncate" style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}>
-                        {verifyLabel}
-                      </div>
-                      {verificationState === 'none' && (
-                        <div style={{ color: 'rgba(15,23,42,0.60)', fontSize: 12, fontWeight: 500, marginTop: 2 }}>
-                          Earn the badge and win golfers&apos; trust.
-                        </div>
-                      )}
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 self-center" style={{ color: BIZ.amber }} />
                   </button>
                 )}
 
-                {/* Metrics — 3 tiles */}
-                <div className="grid grid-cols-3 gap-2">
-                  <MetricTile
-                    label="Visits (7d)"
-                    value={statsLoading ? '-' : formatStat(stats?.visits)}
+                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
+                <div
+                  style={{
+                    background: 'rgba(14,18,22,0.035)',
+                    borderRadius: 14,
+                    padding: '14px 12px 12px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+                  }}
+                >
+                  <MetricCell
+                    label={t('business.card.metrics.visits')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.visits}
+                    loading={statsLoading}
                     onClick={() => goto('/insights')}
                   />
-                  <MetricTile
-                    label="Followers"
-                    value={followersLoading ? '-' : formatStat(totalFollowers)}
+                  <MetricCell
+                    label={t('business.card.metrics.followers')}
+                    window={t('business.card.metrics.allTime')}
+                    value={totalFollowers}
+                    loading={followersLoading}
                     onClick={() => goto('/followers')}
                   />
-                  <MetricTile
-                    label="Impressions (7d)"
-                    value={statsLoading ? '-' : formatStat(stats?.impressions)}
+                  <MetricCell
+                    label={t('business.card.metrics.impressions')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.impressions}
+                    loading={statsLoading}
                     onClick={() => goto('/insights')}
                   />
                 </div>
 
-                {/* Action rows */}
-                <div
-                  style={{
-                    background: BIZ.card,
-                    border: `1px solid ${BIZ.hair}`,
-                    borderRadius: BIZ.rInner,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
-                  <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
+                {/* Actions — heading, then rows with no rules and no icon tiles. */}
+                <div>
+                  <div
+                    style={{
+                      color: BIZ.inkFaint,
+                      fontSize: 9,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      marginBottom: 2,
+                    }}
+                  >
+                    {t('business.card.manage')}
+                  </div>
+                  <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
+                  <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
                   {hasCourse && (
                     <ActionRow
                       icon={Star}
-                      label="Reviews"
+                      label={t('business.card.actions.reviews')}
                       onClick={() => goto('/reviews')}
                       hint={
                         avgReviewRating != null
@@ -434,14 +452,15 @@ export function BusinessCommandCard({
                   {canManage && (
                     <ActionRow
                       icon={Users}
-                      label="Manage team"
+                      label={t('business.card.actions.team')}
                       onClick={() => goto('/team')}
                       badge={hasPendingRequests}
                     />
                   )}
-                  <ActionRow icon={Eye} label="View live profile" onClick={() => goto('')} last />
+                  <ActionRow icon={Eye} label={t('business.card.actions.viewProfile')} onClick={() => goto('')} />
                 </div>
               </div>
+
             </motion.div>
           )}
         </AnimatePresence>
