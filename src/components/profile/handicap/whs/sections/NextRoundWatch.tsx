@@ -24,9 +24,6 @@ import { Last5AgainstTarget } from '../charts/Last5AgainstTarget';
 import { CHART, CHART_FONT, indexTone } from '../charts';
 
 const MIN_ROUNDS = 20;
-/** Chart scale headroom only. Never shown to the member. */
-const SCALE_PAD = 1;
-
 const KICKER = {
   fontFamily: CHART_FONT,
   fontSize: 9,

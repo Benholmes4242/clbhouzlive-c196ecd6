@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading…",
+    "loadingEllipsis": "Loading\u2026",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -214,6 +214,17 @@
       "chaseLine": "hinter {{name}} auf {{course}}",
       "levelLine": "Gleichauf mit {{name}} auf {{course}}",
       "leaderFallback": "dem Spitzenreiter"
+    },
+    "nextRound": {
+      "eyebrow": "Next round",
+      "sample": "Last 20 rounds",
+      "lineHold": "Your handicap can't go up next round.",
+      "subHold": "Play to {{cut}} or better and it comes down.",
+      "lineRise": "Your handicap goes up to {{settle}} next round",
+      "subRise": "unless you play to {{cut}} or better.",
+      "countsAt": "Counts at {{cut}}",
+      "lastRounds_one": "Your last {{total}} rounds - {{count}} of {{total}} would count",
+      "lastRounds_other": "Your last {{total}} rounds - {{count}} of {{total}} would count"
     }
   }
 }
