@@ -6,7 +6,6 @@ import TodayGreeting from '../sections/TodayGreeting';
 import AchievementsPanel from '../sections/AchievementsPanel';
 import LastRoundCard from '../sections/LastRoundCard';
 
-import Pattern14Card from '../sections/Pattern14Card';
 
 
 import NextRoundWatch from '../sections/NextRoundWatch';
@@ -91,8 +90,7 @@ export const TodayView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 7. Last 14 Rounds */}
-      <Pattern14Card connectionId={connectionId} userId={userId} />
+
 
       {!readOnly && <StreaksSheetMount />}
       <LaunchSheetMount userId={userId} />
