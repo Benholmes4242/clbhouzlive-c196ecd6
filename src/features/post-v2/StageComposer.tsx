@@ -251,8 +251,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // Two-page wizard. Page 1 = media (dark), page 2 = words (light).
   // Tapping Post opens page 1 immediately in its AWAITING state while the OS
   // source menu floats above it. Files chosen -> page 1 comes alive; picker
-  // cancelled -> page 2, caption-only. Edit / draft / course-prefill entries
-  // land straight on page 2.
+  // CANCELLED -> the member stays on the page-1 EMPTY STATE and can pick again
+  // or close. There is no route to page 2 without media on a fresh create.
+  // Edit / draft / course-prefill entries land straight on page 2.
+
   const isFreshCreate = !editPostId && !draftId;
   const [page, setPage] = useState<1 | 2>(
     isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
