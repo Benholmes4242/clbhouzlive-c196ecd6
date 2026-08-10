@@ -1,21 +1,26 @@
 /**
- * FriendRoundRow - a friend's posted round as a HOUSE ROW.
+ * FriendRoundRow - a friend's posted round as a HOUSE ROW, in TWO LINES.
  *
- * THE COLUMNS ACTUALLY LINE UP NOW. Every row renders the same trailing
- * group - GROSS, STBL, DIFF and a chevron - on every variant. Where a value
- * is absent the cell is EMPTY: the label still renders and the column keeps
- * its width, so a friend with no stableford does not shove their gross 67px
- * right of everybody else's.
+ * LINE 1: identity (name + date) | GROSS | STBL | DIFF | chevron.
+ * LINE 2: the COURSE, spanning the full row width.
  *
- * The per-row INVITE / ASK TO SYNC action is GONE, not hidden. The whole row
- * was already the invite: the feed's handleOpen routes every variant on a
- * whole-row tap. The label was a second affordance for a tap the row already
- * performed, and it spent amber to do it. The count of unconnected friends
- * now sits once beneath the list.
+ * The course used to live in a ~140px column and needed ~150, which is why
+ * every club read as "SUND...". It now has the whole row.
  *
- * The ENGLAND GOLF badge stays. It is a fact about the friend - their round
- * arrived from the governing body with no clbhouz account behind it - not
- * decoration.
+ * ALL THREE FIGURE COLUMNS RENDER ON EVERY VARIANT. Where a value is absent
+ * the cell is EMPTY - the label still renders and the column keeps its width,
+ * so GROSS never moves between variants. No em dashes.
+ *
+ * THE ACTION USES THE DEAD COLUMNS. On an unconnected friend STBL and DIFF
+ * carry no figures, so the action occupies exactly that span (100px): a LABEL
+ * in INK with a chevron, plus a 7px DIM sub-label naming the state. Never
+ * amber.
+ *
+ * THE ENGLAND GOLF BADGE IS DELETED. The sub-label states the same fact, in
+ * the place where it explains the empty columns beside it.
+ *
+ * RHYTHM: a label belongs to its figure and a date belongs to its name.
+ * Tightening those pairs is what separates the blocks.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,8 +43,14 @@ interface Props {
 const COL_GROSS = 44;
 const COL_STBL = 40;
 const COL_DIFF = 48;
+const GAP = 12;
 
-/** Dark LABEL, this surface's scale: 7/700/0.16em. Not the 9/800 chart token. */
+/** Rhythm, named so it cannot drift. Pairs are tight; blocks separate. */
+const GAP_NAME_TO_DATE = 3;
+const GAP_DATE_TO_CLUB = 3;
+const GAP_FIGURE_TO_LABEL = 3;
+
+/** Dark LABEL, this surface's scale: 7/700/0.16em. */
 const LABEL: React.CSSProperties = {
   fontSize: 7,
   fontWeight: 700,
@@ -48,6 +59,15 @@ const LABEL: React.CSSProperties = {
   color: CHART.MUTE,
   lineHeight: 1.4,
   margin: 0,
+};
+
+/** ONE treatment for the date and the course. Defined once, used twice. */
+const SECONDARY: React.CSSProperties = {
+  fontSize: 11.5,
+  fontWeight: 400,
+  lineHeight: 1.35,
+  color: 'var(--hcp-t-60)',
+  overflowWrap: 'anywhere',
 };
 
 const Cell: React.FC<{ label: string; width: number; children?: React.ReactNode }> = ({
@@ -70,7 +90,7 @@ const Cell: React.FC<{ label: string; width: number; children?: React.ReactNode 
     >
       {children}
     </div>
-    <div style={{ ...LABEL, marginTop: 5 }}>{label}</div>
+    <div style={{ ...LABEL, marginTop: GAP_FIGURE_TO_LABEL }}>{label}</div>
   </div>
 );
 
@@ -81,10 +101,7 @@ export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) 
   const diff = activity.last_round_differential;
   const course = activity.last_round_course_name ?? t('handicap.circle.round.unknownCourse');
   const played = fmtAbsoluteDate(activity.last_round_played_at);
-
-  // Date and course only. Whether their round counted toward THEIR index is
-  // not something the viewer can act on.
-  const meta = [played, course].filter(Boolean).join(' \u00B7 ');
+  const unconnected = variant !== 'clbhouz-synced';
 
   return (
     <div
@@ -98,59 +115,78 @@ export const FriendRoundRow: React.FC<Props> = ({ activity, variant, onClick }) 
         }
       }}
       style={{
-        display: 'flex',
-        // flex-start: a wrapped name must not drag the figures down with it.
-        alignItems: 'flex-start',
-        gap: 8,
         padding: '13px 16px',
         fontFamily: CHART_FONT,
         cursor: 'pointer',
       }}
     >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Name and badge wrap as a group; the name itself never truncates. */}
-        <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 6 }}>
-          <span style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
+      {/* LINE 1 - flex-start so a wrapped name cannot drag the figures down. */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: GAP }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>
             {displayName(activity.friend_name)}
-          </span>
-          {variant === 'eg-only' && (
-            <span style={{ ...LABEL, whiteSpace: 'nowrap' }}>
-              {t('handicap.circle.round.englandGolf')}
-            </span>
-          )}
+          </div>
+          <div style={{ ...SECONDARY, marginTop: GAP_NAME_TO_DATE }}>{played}</div>
         </div>
-        {/* Sentence case, wraps. Six courses read as six courses. */}
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 11.5,
-            fontWeight: 400,
-            lineHeight: 1.4,
-            color: 'var(--hcp-t-60)',
-            overflowWrap: 'anywhere',
-          }}
-        >
-          {meta}
-        </div>
+
+        <Cell label={t('handicap.circle.round.gross')} width={COL_GROSS}>
+          {gross ?? null}
+        </Cell>
+
+        {unconnected ? (
+          // The dead columns, used: STBL + DIFF + the gap between them.
+          <div
+            style={{
+              width: COL_STBL + COL_DIFF + GAP,
+              flexShrink: 0,
+              textAlign: 'right',
+            }}
+          >
+            <div
+              style={{
+                height: 15,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: 3,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                color: 'var(--hcp-t-100)',
+              }}
+            >
+              {variant === 'eg-only'
+                ? t('handicap.circle.round.invite')
+                : t('handicap.circle.round.askToSync')}
+              <ChevronRight size={10} strokeWidth={2.6} />
+            </div>
+            <div style={{ ...LABEL, color: CHART.DIM, marginTop: GAP_FIGURE_TO_LABEL }}>
+              {variant === 'eg-only'
+                ? t('handicap.circle.round.notOnClbhouz')
+                : t('handicap.circle.round.noHandicap')}
+            </div>
+          </div>
+        ) : (
+          <>
+            <Cell label={t('handicap.circle.round.stbl')} width={COL_STBL}>
+              {stableford ?? null}
+            </Cell>
+            <Cell label={t('handicap.circle.round.diff')} width={COL_DIFF}>
+              {diff != null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : null}
+            </Cell>
+          </>
+        )}
+
+        <ChevronRight
+          size={15}
+          strokeWidth={2.2}
+          color={CHART.DIM}
+          style={{ flexShrink: 0, marginTop: 1 }}
+        />
       </div>
 
-      <Cell label={t('handicap.circle.round.gross')} width={COL_GROSS}>
-        {gross ?? null}
-      </Cell>
-      <Cell label={t('handicap.circle.round.stbl')} width={COL_STBL}>
-        {stableford ?? null}
-      </Cell>
-      <Cell label={t('handicap.circle.round.diff')} width={COL_DIFF}>
-        {diff != null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : null}
-      </Cell>
-
-      {/* Every row is tappable and every tap resolves somewhere. */}
-      <ChevronRight
-        size={15}
-        strokeWidth={2.2}
-        color={CHART.DIM}
-        style={{ flexShrink: 0, marginTop: 1 }}
-      />
+      {/* LINE 2 - the course, full row width, same treatment as the date. */}
+      <div style={{ ...SECONDARY, marginTop: GAP_DATE_TO_CLUB }}>{course}</div>
     </div>
   );
 };
