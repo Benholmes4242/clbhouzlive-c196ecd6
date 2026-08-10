@@ -17,7 +17,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
 
-export const FUNCTION_VERSION = '2026-07-23T04:45:00Z-v4-admin-consolidated';
+export const FUNCTION_VERSION = '2026-08-10T06:10:00Z-v5-revoke-first';
 
 
 // -------- URL parsing helpers (public storage URL convention). ----------
@@ -90,6 +90,7 @@ Deno.serve(async (req) => {
     let targetId: string;
     let targetEmail: string | undefined;
     let mode: 'self' | 'admin' = 'self';
+    let callerJwt: string | null = null;
 
     const rawBody = await req.clone().json().catch(() => null) as any;
     if (rawBody?.action === 'admin_delete') {
@@ -125,6 +126,8 @@ Deno.serve(async (req) => {
       }
       targetId = user.id;
       targetEmail = user.email ?? undefined;
+      // Kept for revocation: admin.auth.admin.signOut() needs the caller's JWT.
+      callerJwt = authHeader.replace(/^Bearer\s+/i, '');
     }
 
     // Shim so downstream code that referenced `user.id` / `user.email` keeps working.
@@ -137,14 +140,26 @@ Deno.serve(async (req) => {
 
 
     // ---------- Double-submit guard ----------
+    // Only idempotent when BOTH the profile is soft-deleted AND the auth user
+    // is gone. A soft-deleted profile whose auth user still exists is a
+    // half-deleted account: RESUME rather than reporting a false success.
     try {
       const { data: existing } = await admin.from('user_profiles')
         .select('deleted_at').eq('id', targetId).maybeSingle();
       if (existing?.deleted_at) {
-        return new Response(JSON.stringify({ success: true, idempotent: true }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        let authUserStillExists = false;
+        try {
+          const { data: lookup } = await admin.auth.admin.getUserById(targetId);
+          authUserStillExists = !!lookup?.user?.id;
+        } catch (_) { authUserStillExists = false; }
+        if (!authUserStillExists) {
+          return new Response(JSON.stringify({ success: true, idempotent: true, version: FUNCTION_VERSION }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+        console.warn(`[delete-account v5] resuming half-deleted account ${targetId}`);
       }
     } catch (_) { /* non-fatal */ }
+
 
     try {
       const twoMinAgo = new Date(Date.now() - 120_000).toISOString();
@@ -429,6 +444,16 @@ Deno.serve(async (req) => {
       ['user_blocks_blocker','user_blocks','blocker_id'],
       ['user_blocks_blocked','user_blocks','blocked_id'],
       ['profile_media','profile_media','user_id'],
+      // V5: restored / added sweeps for NO ACTION FKs to auth.users that a live
+      // session can still write to (regressed out of the list after v2).
+      ['post_views','post_views','viewer_id'],
+      ['business_analytics_events','business_analytics_events','user_id'],
+      ['creator_profile_events','creator_profile_events','user_id'],
+      ['profile_analytics_events','profile_analytics_events','user_id'],
+      ['user_courses','user_courses','user_id'],
+      ['user_top100_courses','user_top100_courses','user_id'],
+      // NOTE: business_team_members.created_by is deliberately NOT swept — see
+      // BRIEF_DELETE_ACCOUNT_V5 fix 6 (report-and-stop; SET NULL is preferred).
     ] as const) {
       await bounded(label, async () => await admin.from(table as any)
         .delete({ count: 'exact' }).eq(col as any, targetId));
