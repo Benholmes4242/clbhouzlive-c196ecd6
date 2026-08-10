@@ -353,17 +353,17 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             ))}
           </div>
 
-
-          {/* consequence row */}
+          {/* consequence row — separated on whitespace, no rule in the tray */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '0 14px',
-              minHeight: 44,
+              padding: '0 14px 12px',
+              marginTop: 16,
             }}
           >
+
             {consequence}
             <ChevronRight
               size={18}
