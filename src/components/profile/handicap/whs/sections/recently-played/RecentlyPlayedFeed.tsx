@@ -34,7 +34,7 @@ const FOOT_LABEL: React.CSSProperties = {
 /** DISTINCT friends, not rows - the same friend appears on every round they
  *  post, which is exactly why the per-row action repeated five or six times. */
 const friendKey = (a: WhsFriendActivityWithImage): string =>
-  a.friend_passport_id ?? a.friend_row_id ?? a.friend_name;
+  String(a.friend_passport_id ?? a.friend_row_id ?? a.friend_name);
 
 const countDistinct = (
   items: WhsFriendActivityWithImage[],
