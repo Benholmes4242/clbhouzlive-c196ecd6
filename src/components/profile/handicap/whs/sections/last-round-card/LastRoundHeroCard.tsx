@@ -163,6 +163,7 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
 };
 
 const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
+  const { t } = useTranslation(['common']);
   const courseName = round.course?.name ?? 'Unknown course';
   const { data: detail } = useFriendRoundDetail(round.id);
 
