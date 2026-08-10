@@ -138,11 +138,24 @@ function TeeChipRow({
   );
 }
 
+interface ReceiptState {
+  ratingId: string;
+  shareToFeed: boolean;
+  overall: number | null;
+  scores: Record<CategoryKey, number | null>;
+}
+
 function InnerComposer() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id ?? null;
+
+  // Receipt + submitted flag live in this outer instance so they outlive the
+  // keyed <Composer /> remount that follows a successful submit.
+  const [success, setSuccess] = useState<ReceiptState | null>(null);
+  const submittedRef = useRef(false);
+
 
   const courseQ = useQuery({
     queryKey: ['rv2-course', courseId],
@@ -263,6 +276,26 @@ function InnerComposer() {
     );
   }
 
+  // The receipt lives HERE, above the keyed <Composer />, so it survives the
+  // create-to-edit remount caused by invalidateCourseRatingCaches refetching
+  // existingQ (the key flips from ":new" to ":<rating id>").
+  if (success && courseQ.data) {
+    return (
+      <ReviewReceipt
+        ratingId={success.ratingId}
+        course={courseQ.data}
+        overall={success.overall}
+        scores={success.scores}
+        shareToFeed={success.shareToFeed}
+        onClubhouse={() => navigate('/clubhouse')}
+        onBack={() => navigate(`/courses/${courseQ.data!.id}`, { replace: true })}
+        onNextCourse={(nextId) => {
+          navigate(`/courses/${nextId}/review`, { replace: true });
+        }}
+      />
+    );
+  }
+
   if (!ready) {
     return <RateCoursePageSkeleton />;
   }
@@ -274,6 +307,11 @@ function InnerComposer() {
       userId={userId}
       existing={existingQ.data}
       existingMedia={existingMediaQ.data ?? []}
+      submittedRef={submittedRef}
+      onSuccess={(payload) => {
+        submittedRef.current = true;
+        setSuccess(payload);
+      }}
       author={{
         displayName:
           profileQ.data?.display_name ||
@@ -296,6 +334,7 @@ function InnerComposer() {
   );
 }
 
+
 interface ComposerProps {
   course: ReviewV2Course;
   userId: string | null;
@@ -303,9 +342,13 @@ interface ComposerProps {
   existingMedia: ExistingMedia[];
   author: { displayName: string; avatarUrl: string | null; username: string | null };
   onExit: () => void;
+  /** Shared across remounts: true once any instance submitted successfully. */
+  submittedRef: React.MutableRefObject<boolean>;
+  onSuccess: (payload: ReceiptState) => void;
 }
 
-function Composer({ course, userId, existing, existingMedia, author, onExit }: ComposerProps) {
+function Composer({ course, userId, existing, existingMedia, author, onExit, submittedRef, onSuccess }: ComposerProps) {
+
   const isEditMode = !!existing;
   const mode = isEditMode ? 'edit' : 'new';
   const { t } = useTranslation('courses');
@@ -340,8 +383,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   const calibration = calibrationRank(composer.state.overall, myRatedQ.data);
 
 
-  const [success, setSuccess] = useState<{ ratingId: string; shareToFeed: boolean } | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
+
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
 
   const step = composer.step;
@@ -354,7 +397,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
   // ---- instrumentation -------------------------------------------------
   const mountedAtRef = useRef(Date.now());
   const stepEnteredAtRef = useRef(Date.now());
-  const submittedRef = useRef(false);
+  // submittedRef comes from the parent - it must survive this instance.
+
   const abandonRef = useRef({ step: 0, hasOverall: false, catsSet: 0 });
   abandonRef.current = {
     step,
@@ -447,7 +491,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
       composer.clearDraft();
       media.flushToReview(ratingId, { caption: composer.state.reviewText }).catch(() => { /* per-item errors surfaced in tray */ });
       invalidateCourseRatingCaches(qc);
-      setSuccess({ ratingId, shareToFeed });
+      onSuccess({
+        ratingId,
+        shareToFeed,
+        overall: composer.state.overall,
+        scores: composer.state.scores,
+      });
+
       // review_submitted
       analyticsEvents.track('review_submitted', {
         course_id: course.id,
@@ -500,6 +550,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     if (!existing) return;
     try {
       await submit.remove(existing.id);
+      // review_removed - fired only after the removal actually succeeded.
+      analyticsEvents.track('review_removed', {
+        course_id: course.id,
+        rating_id: existing.id,
+        had_text: (existing.review ?? '').trim().length > 0,
+        media_count: existingMedia.length,
+      });
       invalidateCourseRatingCaches(qc);
       if (existingMedia.length > 0) {
         supabase.functions
@@ -520,25 +577,11 @@ function Composer({ course, userId, existing, existingMedia, author, onExit }: C
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't remove your review");
     }
-  }, [existing, submit, existingMedia, onExit, qc]);
+  }, [existing, submit, existingMedia, onExit, qc, course.id]);
 
-  // ---- confirmation ----------------------------------------------------
-  if (success) {
-    return (
-      <ReviewReceipt
-        ratingId={success.ratingId}
-        course={course}
-        overall={composer.state.overall}
-        scores={composer.state.scores}
-        shareToFeed={success.shareToFeed}
-        onClubhouse={() => navigate('/clubhouse')}
-        onBack={() => navigate(`/courses/${course.id}`, { replace: true })}
-        onNextCourse={(nextId) => {
-          navigate(`/courses/${nextId}/review`, { replace: true });
-        }}
-      />
-    );
-  }
+  // The confirmation receipt renders in the parent (InnerComposer) so it
+  // outlives this instance across the create-to-edit remount.
+
 
   // ---- gates and label -------------------------------------------------
   const gateMet = step === 0 ? composer.step0Gate : step === 1 ? composer.step1Gate : true;
