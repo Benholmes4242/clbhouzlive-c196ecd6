@@ -120,11 +120,22 @@ const fmtMonth = (iso: string): string => {
 type FilterKey = 'all' | 'counters' | string;
 
 export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null, viewMode = 'owner', ownerFirstName = null, variant = 'section' }) => {
+  const { t } = useTranslation('common');
   const { data: allRounds, isLoading } = useAllScores(connectionId);
   const { data: trend } = useHandicapTrend(connectionId);
   const [openScoreId, setOpenScoreId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [displayedCount, setDisplayedCount] = useState<number>(INITIAL_COUNT);
+
+  const rowLabels = useMemo(
+    () => ({
+      gross: t('handicap.form.archive.gross'),
+      playedTo: t('handicap.form.archive.playedTo'),
+      notInBest8: t('handicap.form.archive.notInBest8'),
+    }),
+    [t],
+  );
+
 
   const rounds = useMemo(
     () => (allRounds ? computeRoundDeltas(allRounds, trend?.current ?? null) : []),
