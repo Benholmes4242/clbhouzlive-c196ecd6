@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Flame } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { DarkSectionHeader } from '../../whs/sections/_shared/darkAtoms';
 import { Skeleton } from '../_shared/GamAtoms';
 import { useUserStreaks } from '@/hooks/gam/useUserStreaks';
@@ -14,8 +14,6 @@ const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday:
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97211';
-const GOLD = '#FBBC2E';
 
 interface Props {
   userId: string;
@@ -330,6 +328,18 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
 // Section
 // ──────────────────────────────────────────────────────────────────
 
+/**
+ * Distance from one snap child's start to the next: measured from the two
+ * children's offsetLeft so a track `gap` is included automatically.
+ */
+function childStride(el: HTMLElement): number {
+  const first = el.children[0] as HTMLElement | undefined;
+  if (!first) return el.clientWidth;
+  const second = el.children[1] as HTMLElement | undefined;
+  if (second) return second.offsetLeft - first.offsetLeft;
+  return first.clientWidth || el.clientWidth;
+}
+
 export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const { data, isLoading } = useUserStreaks(userId);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -379,17 +389,16 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el || el.clientWidth <= 0) return;
-    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
-    if (childWidth <= 0) return;
-    const newPage = Math.round(el.scrollLeft / childWidth);
+    const stride = childStride(el);
+    if (stride <= 0) return;
+    const newPage = Math.round(el.scrollLeft / stride);
     if (newPage !== page) setPage(newPage);
   }, [page]);
 
   const handlePagerChange = useCallback((n: number) => {
     const el = scrollRef.current;
     if (!el) return;
-    const childWidth = el.firstElementChild?.clientWidth ?? el.clientWidth;
-    el.scrollTo({ left: childWidth * n, behavior: 'smooth' });
+    el.scrollTo({ left: childStride(el) * n, behavior: 'smooth' });
     setPage(n);
   }, []);
 
@@ -401,7 +410,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow={eyebrowText} />
         <div style={{ padding: '4px 20px 12px' }}>
-          <Skeleton height={230} radius={16} />
+          <Skeleton height={172} radius={16} />
         </div>
       </section>
     );
