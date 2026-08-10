@@ -549,6 +549,13 @@
     "legends": {
       "window90d": "90 days",
       "windowAllTime": "All time"
+    },
+    "pulse": {
+      "findPlayer": "Find any player's handicap",
+      "handicap": "Handicap",
+      "ninetyDays": "90 days",
+      "toHcp": "{{n}} of {{m}} to hcp",
+      "noRecent": "No recent rounds"
     }
   },
   "comments": {
