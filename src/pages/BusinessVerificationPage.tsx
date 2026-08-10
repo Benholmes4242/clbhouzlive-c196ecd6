@@ -2,7 +2,15 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight, Check, FileCheck } from 'lucide-react';
+import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
+import {
+  A,
+  BIZ_KICKER,
+  BIZ_LABEL,
+  BIZ_TITLE,
+  BIZ_BODY,
+  bizFigure,
+} from '@/features/courses/components/holes/analytical/tokens';
 import { formatMonthDayYearShort } from '@/i18n/format';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
