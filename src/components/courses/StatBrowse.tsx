@@ -784,7 +784,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
         </div>
-      ) : showEmpty && areaHasTracked === null ? null : showEmpty && areaHasTracked ? (
+      ) : showEmpty && areaHasTracked === null ? null : showEmpty &&
+        areaHasTracked &&
+        lens !== 'played' ? (
+
         /* Case (b): the area HAS tracked courses, none satisfies this lens.
            No Connect CTA — the handicap is what produced the tracked round. */
         <div className="mt-6 text-center">
