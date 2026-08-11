@@ -742,8 +742,49 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
         </div>
+      ) : showEmpty && areaHasTracked === null ? null : showEmpty && areaHasTracked ? (
+        /* Case (b): the area HAS tracked courses, none satisfies this lens.
+           No Connect CTA — the handicap is what produced the tracked round. */
+        <div className="mt-6 text-center">
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: INK }}>
+            {t('statBrowse.empty.lensTitle', { lens: t(`statBrowse.lens.${lens}.label`) })}
+          </h3>
+          <p
+            style={{
+              fontSize: 13,
+              color: INK_MUTE,
+              marginTop: 4,
+              lineHeight: 1.5,
+              maxWidth: 320,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            {country
+              ? t('statBrowse.empty.lensBody', {
+                  count: trackedInArea ?? 0,
+                  formatted: formatNumber(trackedInArea ?? 0),
+                  country,
+                })
+              : t('statBrowse.empty.lensBodyAll', {
+                  count: trackedInArea ?? 0,
+                  formatted: formatNumber(trackedInArea ?? 0),
+                })}
+          </p>
+          {country ? (
+            <button
+              type="button"
+              onClick={() => openDirectory(country, 'empty_state')}
+              className="w-full mt-4 h-11 rounded-xl text-[14px] font-semibold"
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+            >
+              {t('statBrowse.empty.browse', { country })}
+            </button>
+          ) : null}
+        </div>
       ) : showEmpty ? (
         country ? (
+
           <div
             className="mt-4 p-5"
             style={{
