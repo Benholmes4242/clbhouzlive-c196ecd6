@@ -14,14 +14,14 @@
     "uploadFailedFallback": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ - ýőúř ƥőšţ ŵáš ñőţ ƥúƀļíšĥéđ.~~]",
     "uploadingBody": "[~~Úƥļőáđíñĝ - ŵé'ļļ ţáǩé íţ ƒřőɱ ĥéřé. Ýőú ĉáñ ǩééƥ úšíñĝ ţĥé áƥƥ.~~]",
     "uploadingScheduledBody": "[~~Úƥļőáđíñĝ - íţ'ļļ ĝő őúţ {{when}}.~~]",
-    "liveKicker": "[~~Ļívé ín ţĥé ċļúƀĥóúšé~~]",
-    "uploadingKicker": "[~~Úpļóádíñg . {{n}}%~~]",
-    "scheduledKicker": "[~~Šċĥédúļíñg . {{n}}%~~]",
-    "statGross": "[~~Gróšš~~]",
-    "statToPar": "[~~Tó pár~~]",
-    "statBirdies": "[~~Bírdíéš~~]",
-    "statPhotos": "[~~Pĥóţóš~~]",
-    "statVideos": "[~~Vídéóš~~]"
+    "liveKicker": "[~~Ļíṽé íñ ţĥé ĉļúƀĥőúšé~~]",
+    "uploadingKicker": "[~~Úƥļőáđíñĝ . {{n}}%~~]",
+    "scheduledKicker": "[~~Šĉĥéđúļíñĝ . {{n}}%~~]",
+    "statGross": "[~~Ĝřőšš~~]",
+    "statToPar": "[~~Ţő ƥář~~]",
+    "statBirdies": "[~~Ɓířđíéš~~]",
+    "statPhotos": "[~~Ƥĥőţőš~~]",
+    "statVideos": "[~~Ṽíđéőš~~]"
   },
   "emptyState": {
     "headline": "[~~Ƥúţ íţ őñ ţĥé ŵáļļ~~]",
@@ -29,24 +29,30 @@
     "ctaLabel": "[~~Áđđ ƥĥőţőš őř ṽíđéő~~]",
     "microcopy": "[~~Úƥ ţő 10 · ƥĥőţőš, ṽíđéő, őř ƀőţĥ~~]",
     "phrases": [
-      "[~~ţĥáţ ĝřééñ ýőú júšţ šţúĉǩ~~]",
+      "[~~ţĥáţ ĝřééñ ýőú ĵúšţ šţúĉǩ~~]",
       "[~~ţĥé ƒőúřƀáļļ őñ ţĥé ƒířšţ ţéé~~]",
       "[~~ýőúř ĉářđ ƒřőɱ ţĥíš ɱőřñíñĝ~~]",
       "[~~ţĥé ṽíéŵ ƒřőɱ ţĥé 18ţĥ~~]"
     ],
-    "limitKicker": "[~~UP TO {{count}} PHOTOS OR CLIPS~~]",
-    "prompt": "[~~What happened out there?~~]",
-    "promptEdit": "[~~Add to this post~~]",
-    "nextStep": "[~~Photos and clips now. The round and the course come on the next step.~~]"
+    "limitKicker": "[~~ÚƤ ŢŐ {{count}} ƤĤŐŢŐŠ ŐŘ ĈĻÍƤŠ~~]",
+    "prompt": "[~~Ŵĥáţ ĥáƥƥéñéđ őúţ ţĥéřé?~~]",
+    "promptEdit": "[~~Áđđ ţő ţĥíš ƥőšţ~~]",
+    "nextStep": "[~~Ƥĥőţőš áñđ ĉļíƥš ñőŵ. Ţĥé řőúñđ áñđ ţĥé ĉőúřšé ĉőɱé őñ ţĥé ñéẋţ šţéƥ.~~]"
+  },
+  "attachRound": {
+    "row": "[~~Áţţáĉĥ á řőúñđ~~]",
+    "title": "[~~Áţţáĉĥ á řőúñđ~~]",
+    "none": "[~~Ñőñé~~]",
+    "attached": "[~~Řőúñđ áţţáĉĥéđ~~]"
   },
   "drafts": {
-    "footerNote": "[~~Ďřáƒţš ǩééƥ ýőúř ŵőřđš, ţáĝš áñđ šéţţíñĝš. Ƥĥőţőš áñđ ṽíđéő ářé ñőţ šáṽéđ.~~]"
+    "footerNote": "[~~Đřáƒţš ǩééƥ ýőúř ŵőřđš, ţáĝš áñđ šéţţíñĝš. Ƥĥőţőš áñđ ṽíđéő ářé ñőţ šáṽéđ.~~]"
   },
   "closeGuard": {
     "mediaNotSaved_one": "[~~{{count}} ƥĥőţő ŵíļļ ñőţ ƀé šáṽéđ~~]",
     "mediaNotSaved_other": "[~~{{count}} ƥĥőţőš ŵíļļ ñőţ ƀé šáṽéđ~~]"
   },
   "detailRows": {
-    "optional": "Optional"
+    "optional": "[~~Őƥţíőñáļ~~]"
   }
 }
