@@ -206,7 +206,11 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     ];
     const courseName = p.course_id ? courseMap.get(p.course_id)?.name : undefined;
     if (courseName) meta.push(courseName);
-    if (p.visibility && p.visibility !== 'public') meta.push('Friends only');
+    // post_visibility is ('anyone' | 'followers' | 'private') - 'anyone' IS
+    // public. 'private' is named as itself rather than mislabelled "friends".
+    if (p.visibility === 'followers') meta.push('Friends only');
+    else if (p.visibility === 'private') meta.push('Private');
+
     items.push({
       id: `post:${p.id}`,
       kind: 'post',
