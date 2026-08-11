@@ -40,11 +40,12 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   const { data: analyticsCourses } = useUserAnalyticsCourses({ enabled: isOwnProfile });
   const scoringByCourseId = useMemo(() => {
     const m = new Map<string, UserAnalyticsCourse>();
+    if (!isOwnProfile) return m;
     for (const row of analyticsCourses ?? []) {
       if (row?.course_id) m.set(row.course_id, row);
     }
     return m;
-  }, [analyticsCourses]);
+  }, [isOwnProfile, analyticsCourses]);
 
   const { data: top100Progress } = useTop100ProgressForUser(userId);
 

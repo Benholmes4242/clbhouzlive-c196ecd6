@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 export interface UserAnalyticsCourse {
   course_id: string;
@@ -51,14 +52,17 @@ export interface UserAnalyticsCourse {
  * Courses the signed-in user has imported rounds at, sourced from the same
  * WHS tables the Analytics tab reads. Ordered by rounds desc.
  *
- * The RPC uses auth.uid() server-side — no user id needed on the client.
+ * The RPC uses auth.uid() server-side, but the signed-in user id IS carried in
+ * the query key so a cached result can never be read by a page about somebody
+ * else, and so account switching cannot surface the previous member's rows.
  * Shared with the Phase C rail and Phase E chip provider — additive fields
  * only; do not rename or remove existing keys.
  */
 export function useUserAnalyticsCourses(options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true;
+  const { user } = useSupabaseSession();
   return useQuery({
-    queryKey: ['gam', 'user-analytics-courses'],
+    queryKey: ['gam', 'user-analytics-courses', user?.id ?? null],
     enabled,
     staleTime: 60_000,
     queryFn: async (): Promise<UserAnalyticsCourse[]> => {

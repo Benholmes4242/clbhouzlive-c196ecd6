@@ -340,9 +340,10 @@ const ProfilePageV2Content: React.FC = () => {
   const { totalCoursesPlayed: shellCoursesPlayed } = useUserCourseSummary(profileUserId ?? undefined);
   const { data: shellAnalyticsCourses } = useUserAnalyticsCourses({ enabled: !!isSelf });
   const shellRoundsCount = React.useMemo(() => {
+    if (!isSelf) return null;
     if (!shellAnalyticsCourses) return null;
     return shellAnalyticsCourses.reduce((sum, r) => sum + (r.rounds_count ?? 0), 0) || null;
-  }, [shellAnalyticsCourses]);
+  }, [isSelf, shellAnalyticsCourses]);
   const followingCount = socialCounts?.following ?? 0;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
   
