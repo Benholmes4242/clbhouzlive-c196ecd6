@@ -4,6 +4,10 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { corsFor } from '../_shared/cors.ts';
+
+// Module scope: helpers below the handler spread this, so it must NOT be
+// handler-scoped. Reassigned per request as the first line of the handler.
+let corsHeaders: Record<string, string> = corsFor(null);
 function json(data: unknown, status = 200, cacheSeconds = 60) {
   return new Response(JSON.stringify(data), {
     status,
@@ -127,7 +131,7 @@ function normalizeLeaders(leaders: unknown[]): NormalizedLeader[] {
 }
 
 serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

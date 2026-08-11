@@ -4,6 +4,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { normalizeError } from '../_shared/normalize-error.ts';
 
 import { corsFor } from '../_shared/cors.ts';
+
+// Module scope: helpers below the handler spread this, so it must NOT be
+// handler-scoped. Reassigned per request as the first line of the handler.
+let corsHeaders: Record<string, string> = corsFor(null);
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -22,7 +26,7 @@ interface CompressionOptions {
 }
 
 serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

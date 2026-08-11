@@ -3,6 +3,10 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 import { corsFor } from '../_shared/cors.ts';
+
+// Module scope: helpers below the handler spread this, so it must NOT be
+// handler-scoped. Reassigned per request as the first line of the handler.
+let corsHeaders: Record<string, string> = corsFor(null);
 const LIVEGOLF_BASE_URL = "https://use.livegolfapi.com/v1";
 const API_KEY = Deno.env.get("GOLF_API_KEY") || "";
 
@@ -63,7 +67,7 @@ async function fetchFromLiveGolf(
 }
 
 serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
