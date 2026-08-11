@@ -887,12 +887,16 @@ const AppInner: React.FC = () => {
 
   // ── Analytics: session start + page tracking ──
   useEffect(() => {
-    const sessionId = crypto.randomUUID();
-    sessionStorage.setItem('session_id', sessionId);
-    import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
-      analyticsEvents.track('session_start', {
-        session_id: sessionId,
-        referrer: document.referrer || 'direct',
+    // The session id is owned by getSessionId(): localStorage plus a 30 minute
+    // inactivity timeout. Boot must NOT mint one, or an app reopen would again
+    // start a new "session" and the metric would keep counting app opens.
+    import('@/utils/analyticsSession').then(({ getSessionId }) => {
+      const sessionId = getSessionId();
+      import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+        analyticsEvents.track('session_start', {
+          session_id: sessionId,
+          referrer: document.referrer || 'direct',
+        });
       });
     });
   }, []);
