@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
-} from 'recharts';
-import {
-  AlertTriangle, ChevronRight, Activity, Bell, Cpu, ShieldCheck,
-  MessageSquare, UserPlus, Star, RefreshCcw, Radio,
-} from 'lucide-react';
+import { ChevronRight, MessageSquare, UserPlus, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
@@ -26,13 +20,16 @@ import {
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
   computeErrorsChip,
-  toneColor, type ChipState,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
 import { useOpsHealth } from '../hooks/useOpsHealth';
-import { ClientSplitPanel, OpsErrorsPanel } from '../components/OpsPanels';
+import { useRetention } from '../hooks/useRetention';
+import { SystemPanel, ActivationPanel, PipelinePanel } from '../components/SystemPanels';
+import { RightNowPanel, RetentionPanel, ActiveMembersPanel } from '../components/ChartPanels';
+import { OpsErrorsPanel } from '../components/OpsPanels';
 import type { OpsHealth } from '../hooks/useOpsHealth';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
