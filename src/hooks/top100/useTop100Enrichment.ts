@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { top100Keys, viewerId } from '@/lib/queryKeys';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -57,7 +58,7 @@ export function useTop100Enrichment(
   const previousRef = useRef<Map<string, Top100Enrichment>>(EMPTY);
 
   const { data } = useQuery({
-    queryKey: ['top100-enrichment', scopeKey, userId ?? 'anon', courseIds.length],
+    queryKey: top100Keys.enrichment(scopeKey, viewerId(userId), courseIds.length),
     placeholderData: keepPreviousData,
     enabled,
     staleTime: 5 * 60 * 1000,

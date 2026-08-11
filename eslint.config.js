@@ -7,6 +7,83 @@ import i18next from "eslint-plugin-i18next";
 
 // Wave 3b.iii — single source of truth for the i18next/no-literal-string
 // options (project-wide WARN + scope-dir ERROR overrides).
+
+/**
+ * ─── QUERY KEY RATCHET ───────────────────────────────────────────────────────
+ * Enforces the REACHABILITY TEST from src/lib/queryKeys.ts: a query key must
+ * not be derived from the CONTENTS of an id array. Such a key churns on every
+ * pagination page, `data` goes undefined for a paint, and everything rendered
+ * from it unmounts mid-scroll.
+ *
+ * WARN globally today (a large migration, landing per vertical), ERROR per
+ * directory as each vertical clears — same ratchet the i18n waves used.
+ *
+ * Limits, by design: this rule is SYNTACTIC. It cannot tell whether a key
+ * SHOULD be viewer-scoped (that is the factory's typed `ViewerId` parameter),
+ * and it can never detect the third defect class — rendering a viewer-scoped
+ * query on another member's page, which only a render guard prevents. See the
+ * header of src/lib/queryKeys.ts.
+ */
+const queryKeyPlugin = {
+  rules: {
+    "no-array-derived-key": {
+      meta: {
+        type: "problem",
+        docs: { description: "Query keys must not be derived from id-array contents." },
+        schema: [],
+        messages: {
+          arrayDerived:
+            "Query key derived from array contents ({{ what }}). Keys state the identity of the ANSWER, not the shape of the request — use a builder from src/lib/queryKeys.ts (batchKey: scope + viewer + loadedCount).",
+        },
+      },
+      create(context) {
+        const filename = context.filename ?? context.getFilename();
+        if (filename.replace(/\\/g, "/").endsWith("src/lib/queryKeys.ts")) return {};
+
+        const describe = (node) => {
+          if (node.type === "Identifier") return node.name;
+          if (node.type === "MemberExpression" && node.property && node.property.name) return node.property.name;
+          if (node.type === "CallExpression") {
+            const c = node.callee;
+            if (c.type === "MemberExpression" && c.property && c.property.name === "join") return ".join(...)";
+            if (c.type === "MemberExpression" && c.object && c.object.name === "JSON" && c.property.name === "stringify") return "JSON.stringify(...)";
+            if (c.type === "Identifier" && /^(keyFor|hash)/.test(c.name)) return c.name + "(...)";
+          }
+          return null;
+        };
+
+        const suspicious = (node) => {
+          const label = describe(node);
+          if (!label) return null;
+          if (label === ".join(...)" || label === "JSON.stringify(...)" || /\(\.\.\.\)$/.test(label)) return label;
+          // Identifier / member access that names a collection of ids.
+          if (/(^|[a-z])[Ii]ds$/.test(label) || /^ids$/.test(label)) return label;
+          return null;
+        };
+
+        return {
+          Property(node) {
+            const keyName = node.key && (node.key.name || node.key.value);
+            if (keyName !== "queryKey") return;
+            const value = node.value;
+            const candidates =
+              value.type === "ArrayExpression"
+                ? value.elements.filter(Boolean)
+                : [value];
+            for (const el of candidates) {
+              const what = suspicious(el.type === "SpreadElement" ? el.argument : el);
+              if (what) {
+                context.report({ node: el, messageId: "arrayDerived", data: { what } });
+                return;
+              }
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
 const i18nLiteralOptions = {
   mode: "jsx-text-only",
   "should-validate-template": false,
@@ -253,6 +330,15 @@ export default tseslint.config(
     rules: {
       "i18next/no-literal-string": ["error", i18nLiteralOptions],
       "no-restricted-syntax": ["error", literalAttrSyntax, ...toLocaleSyntax],
+    },
+  },
+  // ─── QUERY KEY RATCHET — warn globally, error per vertical as it clears ───
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/**/*.test.{ts,tsx}", "src/test/**", "src/mocks/**"],
+    plugins: { querykeys: queryKeyPlugin },
+    rules: {
+      "querykeys/no-array-derived-key": "warn",
     },
   }
 
