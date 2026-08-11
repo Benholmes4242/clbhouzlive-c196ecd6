@@ -492,32 +492,35 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )}
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        <SelectGroup>
-          <SelectLabel
-            className="sticky top-0 z-10 flex w-full items-center py-2 pl-8 pr-2"
-            style={{
-              borderBottom: `1px solid ${HAIRLINE_INK_8}`,
-              backgroundColor: 'hsl(var(--card))',
-            }}
-          >
-            <span style={LABEL}>{t('statBrowse.colArea')}</span>
-          </SelectLabel>
-          <SelectItem value="all" className="[&>span:last-child]:w-full">
-            <span className="flex w-full items-center gap-2">
-              <Globe {...DD_ICON} />
-              <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
-            </span>
-          </SelectItem>
-          {(facets?.countries ?? []).map((c) => (
-            <SelectItem key={c.sub_country} value={c.sub_country} className="[&>span:last-child]:w-full">
-              <span className="flex w-full items-center gap-2">
-                <CountryFlag country={c.sub_country} size="sm" />
-                <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
-              </span>
-            </SelectItem>
-          ))}
-        </SelectGroup>
+        <SelectItem value="all" className="[&>span:last-child]:w-full">
+          <span className="flex w-full items-center gap-2">
+            <Globe {...DD_ICON} />
+            <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
+          </span>
+        </SelectItem>
+        {countryGroups.map((g) => (
+          <SelectGroup key={g.country || '__ungrouped'}>
+            {g.country ? (
+              <SelectLabel className="flex w-full items-center py-2 pl-8 pr-2">
+                <span style={LABEL}>{g.country}</span>
+              </SelectLabel>
+            ) : null}
+            {g.entries.map((c) => (
+              <SelectItem
+                key={c.sub_country}
+                value={c.sub_country}
+                className="[&>span:last-child]:w-full"
+              >
+                <span className="flex w-full items-center gap-2">
+                  <CountryFlag country={c.sub_country} size="sm" />
+                  <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        ))}
       </SelectContent>
+
     </Select>
   );
 
