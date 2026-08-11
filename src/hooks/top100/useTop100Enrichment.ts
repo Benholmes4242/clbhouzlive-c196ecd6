@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -35,23 +36,29 @@ export interface Top100Enrichment {
 
 const EMPTY = new Map<string, Top100Enrichment>();
 
-function keyFor(ids: string[]): string {
-  // Stable, order-independent, bounded-length cache key.
-  const sorted = [...ids].sort();
-  let hash = 0;
-  for (const id of sorted) {
-    for (let i = 0; i < id.length; i += 1) {
-      hash = (hash * 31 + id.charCodeAt(i)) | 0;
-    }
-  }
-  return `${sorted.length}:${hash}`;
-}
-
-export function useTop100Enrichment(courseIds: string[], userId: string | undefined) {
+/**
+ * QUERY KEY CONTRACT — do not key on the id set.
+ *
+ * The old key hashed the whole loaded id array. Every pagination page produced
+ * a brand-new key, so `data` went undefined for one paint and EVERY rendered
+ * enrichment block unmounted, collapsing rows above the viewport by 118-162px
+ * each. The key is now a STABLE SCOPE (list slug / search term, supplied by the
+ * caller) plus the viewer id, with the loaded count as a monotonic page marker
+ * and `keepPreviousData` so already-fetched rows never blank out mid-scroll.
+ * Results are merged over the previous map, so values only ever get added.
+ */
+export function useTop100Enrichment(
+  courseIds: string[],
+  userId: string | undefined,
+  /** Stable scope: the active list slug, plus any filter that changes the set. */
+  scopeKey: string = 'default',
+) {
   const enabled = courseIds.length > 0;
+  const previousRef = useRef<Map<string, Top100Enrichment>>(EMPTY);
 
   const { data } = useQuery({
-    queryKey: ['top100-enrichment', keyFor(courseIds), userId ?? 'anon'],
+    queryKey: ['top100-enrichment', scopeKey, userId ?? 'anon', courseIds.length],
+    placeholderData: keepPreviousData,
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -123,9 +130,14 @@ export function useTop100Enrichment(courseIds: string[], userId: string | undefi
         if (entry) entry.ratedByYou = true;
       }
 
-      return map;
+      // Merge over what we already had: a row that has a block keeps it.
+      const merged = new Map(previousRef.current);
+      map.forEach((value, id) => merged.set(id, value));
+      return merged;
     },
   });
+
+  if (data && data !== previousRef.current) previousRef.current = data;
 
   return data ?? EMPTY;
 }

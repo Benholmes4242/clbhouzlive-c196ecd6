@@ -190,7 +190,12 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   // One batched fetch for the whole loaded page set — never per card.
   const verdictConfig = useTop100Config();
   const courseIds = React.useMemo(() => allCourses.map((c) => c.id), [allCourses]);
-  const enrichment = useTop100Enrichment(courseIds, user?.id);
+  const enrichment = useTop100Enrichment(
+    courseIds,
+    user?.id,
+    // Stable scope, never a hash of the id set: list slug + active search.
+    `${selectedList}|${searchTerm.trim().toLowerCase()}`,
+  );
   const { data: progressLists = [] } = useUserTop100Progress(user?.id);
 
   const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
