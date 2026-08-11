@@ -816,7 +816,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                   formatted: formatNumber(trackedInArea ?? 0),
                 })}
           </p>
+          {/* 'played' has no eligibility filter, so it is guaranteed to have
+              rows whenever the area has tracked courses. */}
+          <button
+            type="button"
+            onClick={() => onLensChange('played')}
+            className="w-full mt-4 h-11 rounded-xl text-[14px] font-bold text-white"
+            style={{ background: INK }}
+          >
+            {country
+              ? t('statBrowse.empty.lensSwitch', { country })
+              : t('statBrowse.empty.lensSwitchAll')}
+          </button>
           {country ? (
+
             <button
               type="button"
               onClick={() => openDirectory(country, 'empty_state')}
