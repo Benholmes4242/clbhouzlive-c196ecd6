@@ -36,6 +36,7 @@ import {
   UNMATCHED_COURSES_KEY,
   ignoreUnmatchedCourse,
   linkUnmatchedCourse,
+  markUnmatchedNeedsCatalogue,
   type UnmatchedCourseRow,
 } from '../hooks/useUnmatchedCourses';
 
@@ -702,6 +703,19 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     }
   };
 
+  const doNeedsCatalogue = async () => {
+    setBusy(true); setErr(null);
+    try {
+      await markUnmatchedNeedsCatalogue(row.whs_course_id);
+      refresh();
+      onClose();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Update failed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const doIgnore = async () => {
     setBusy(true); setErr(null);
     try {
@@ -728,6 +742,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button onClick={() => setConfirmIgnore(true)} disabled={busy} style={btnGhost()}>Ignore</button>
+          <button onClick={doNeedsCatalogue} disabled={busy} style={btnGhost()}>Not in the catalogue</button>
           <button onClick={doLink} disabled={busy || !chosen} style={btnPrimary(busy || !chosen)}>
             {busy ? 'Working...' : 'Link to course'}
           </button>
@@ -735,6 +750,15 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {row.status === 'needs_catalogue' && (
+          <div style={{
+            alignSelf: 'flex-start', padding: '3px 9px', borderRadius: 999,
+            background: t.neutralSoft, color: t.inkMuted,
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+          }}>
+            Needs catalogue entry
+          </div>
+        )}
         <div style={{ fontSize: 12, color: t.inkMuted }}>
           Waiting {relTime(row.first_seen_at)}
           {row.last_tier_tried ? ` - last tier: ${row.last_tier_tried}` : ''}
