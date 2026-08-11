@@ -45,7 +45,7 @@ export const ManageScreen: React.FC<Props> = ({
       {health.needsAttention ? (
         // SCREEN 7 - reauth. Two variants, split by cause. Never branch on
         // last_sync_error: it is free text and may only be shown as detail.
-        <Panel kicker={bodyName} aside="not syncing">
+        <Panel kicker={bodyName} aside="sync paused">
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
             <Dot color={BAD} />
             <div style={{ fontSize: 15, fontWeight: 700, color: INK }}>
@@ -72,7 +72,7 @@ export const ManageScreen: React.FC<Props> = ({
           ) : null}
         </Panel>
       ) : (
-        <Panel kicker={bodyName} aside="syncing">
+        <Panel kicker={bodyName} aside="sync on">
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
             <Dot color={GOOD} />
             <div style={{ fontSize: 15, fontWeight: 700, color: INK }}>
