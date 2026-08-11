@@ -53,7 +53,13 @@ export interface StatBrowseRow {
 }
 
 export interface StatBrowseFacets {
-  countries: Array<{ sub_country: string; courses: number; directory_total: number }>;
+  countries: Array<{
+    /** Macro-region (golf_courses.country). '' when a cached payload predates it. */
+    country: string;
+    sub_country: string;
+    courses: number;
+    directory_total: number;
+  }>;
   regions: Array<{ sub_country: string; region: string; courses: number }>;
   played_total: number;
   directory_total: number;
