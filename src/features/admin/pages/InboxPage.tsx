@@ -647,6 +647,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
   const [searching, setSearching] = useState(false);
   const [chosen, setChosen] = useState<CourseHit | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmIgnore, setConfirmIgnore] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const qc = useQueryClient();
 
