@@ -387,10 +387,10 @@ function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<type
 function ActiveMembersChart({
   data, loading, isError, onRetry,
 }: {
-  data: { date: string; d1: number; d7: number; d28: number }[];
+  data: { date: string; d1: number }[];
   loading: boolean; isError: boolean; onRetry: () => void;
 }) {
-  const empty = !loading && !isError && data.every(d => !d.d1 && !d.d7 && !d.d28);
+  const empty = !loading && !isError && data.every(d => !d.d1);
   return (
     <section
       style={{
@@ -401,7 +401,7 @@ function ActiveMembersChart({
     >
       <div>
         <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Active members</div>
-        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Last 28 days - 1 day, 7 day, 28 day rolling</div>
+        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Last 28 days - daily active members</div>
       </div>
 
       {loading ? (
@@ -423,8 +423,6 @@ function ActiveMembersChart({
               <YAxis stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
               <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="d28" name="28-day" stroke={t.inkFaint} strokeWidth={1.5} dot={false} isAnimationActive={false} />
-              <Line type="monotone" dataKey="d7" name="7-day" stroke={t.ink} strokeWidth={1.5} dot={false} isAnimationActive={false} />
               <Line type="monotone" dataKey="d1" name="1-day" stroke={t.brand} strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>

@@ -79,10 +79,6 @@ function buildDailyBuckets(rows: { created_at: string }[], days: number): KpiTre
   return Object.entries(buckets).map(([date, value]) => ({ date, value }));
 }
 
-function uniqueCount(rows: { user_id: string }[]): number {
-  return new Set(rows.map(r => r.user_id)).size;
-}
-
 function calcDelta(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0;
   return Math.round(((current - previous) / previous) * 100 * 10) / 10;
@@ -92,22 +88,20 @@ function calcDelta(current: number, previous: number): number {
 
 async function fetchKpis(): Promise<DashboardKpis> {
   const now          = new Date();
-  const oneDayAgo    = new Date(now.getTime() - 24  * 3600_000);
-  const twoDaysAgo   = new Date(now.getTime() - 48  * 3600_000);
   const fourteenAgo  = new Date(now.getTime() - 14  * 24 * 3600_000);
   const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
   const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
 
   const [
     totalUsersRes, todayUsersRes, yesterdayUsersRes, usersLast14d,
-    active24h, activePrev24h, postsToday, postsYesterday,
+    activityRes, postsToday, postsYesterday,
   ] = await Promise.all([
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', startOfToday.toISOString()),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', startOfYesterday.toISOString()).lt('created_at', startOfToday.toISOString()),
     supabase.from('user_profiles').select('created_at').gte('created_at', fourteenAgo.toISOString()).is('deleted_at', null),
-    supabase.from('analytics_events').select('user_id').gte('created_at', oneDayAgo.toISOString()).not('user_id', 'is', null),
-    supabase.from('analytics_events').select('user_id').gte('created_at', twoDaysAgo.toISOString()).lt('created_at', oneDayAgo.toISOString()).not('user_id', 'is', null),
+    // Distinct-user counting is an aggregation: it runs in the database.
+    supabase.rpc('get_platform_activity', { p_days: 2 }),
     supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', startOfToday.toISOString()),
     supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', startOfYesterday.toISOString()).lt('created_at', startOfToday.toISOString()),
   ]);
@@ -116,8 +110,10 @@ async function fetchKpis(): Promise<DashboardKpis> {
   const todayUsers     = todayUsersRes.count ?? 0;
   const yesterdayUsers = yesterdayUsersRes.count ?? 0;
   const trend          = buildDailyBuckets(usersLast14d.data ?? [], 14);
-  const active24hCount     = uniqueCount((active24h.data ?? []) as { user_id: string }[]);
-  const activePrev24hCount = uniqueCount((activePrev24h.data ?? []) as { user_id: string }[]);
+  const activity           = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
+  const activityTrend      = Array.isArray(activity?.trend) ? (activity!.trend as unknown as { date: string; value: number }[]) : [];
+  const active24hCount     = activity?.dau_today ?? 0;
+  const activePrev24hCount = activityTrend.length >= 2 ? (activityTrend[activityTrend.length - 2]?.value ?? 0) : 0;
   const postsTodayCount    = postsToday.count ?? 0;
   const postsYestCount     = postsYesterday.count ?? 0;
 

@@ -7,7 +7,7 @@ function startOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); re
 function daysAgo(n: number) { return new Date(Date.now() - n * DAY); }
 function dayKey(d: Date) { return d.toISOString().slice(0, 10); }
 
-type EventRow = { user_id: string | null; created_at: string };
+type TrendPoint = { date: string; value: number };
 
 // ─── RIGHT NOW: live count (distinct users in last 5 min) ─────────────────────
 // Shared source for the Dashboard Right-Now strip AND the Analytics Live tab.
@@ -122,21 +122,11 @@ function bucketByDay(rows: { created_at: string }[], days: number): number[] {
   return Object.values(buckets);
 }
 
-function bucketUniquesByDay(rows: EventRow[], days: number): number[] {
-  const buckets: Record<string, Set<string>> = {};
-  for (let i = days - 1; i >= 0; i--) buckets[dayKey(daysAgo(i))] = new Set();
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = dayKey(new Date(r.created_at));
-    if (k in buckets) buckets[k].add(r.user_id);
-  }
-  return Object.values(buckets).map(s => s.size);
-}
-
 async function fetchMetrics(): Promise<MetricsBundle> {
   const since14 = daysAgo(14).toISOString();
-  const [eventsRes, sessionsRes, signupsRes, postsRes, reviewsRes, totalRes] = await Promise.all([
-    supabase.from('analytics_events').select('user_id, created_at').gte('created_at', since14).not('user_id', 'is', null).limit(50000),
+  const [activityRes, sessionsRes, signupsRes, postsRes, reviewsRes, totalRes] = await Promise.all([
+    // Distinct-user counting is an aggregation: it runs in the database.
+    supabase.rpc('get_platform_activity', { p_days: 14 }),
     supabase.from('analytics_events').select('created_at').eq('name', 'session_start').gte('created_at', since14).limit(20000),
     supabase.from('user_profiles').select('created_at').is('deleted_at', null).gte('created_at', since14).limit(20000),
     supabase.from('posts').select('created_at').gte('created_at', since14).limit(20000),
@@ -144,7 +134,10 @@ async function fetchMetrics(): Promise<MetricsBundle> {
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
   ]);
 
-  const dauDaily = bucketUniquesByDay((eventsRes.data as EventRow[]) ?? [], 14);
+
+  const activity = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
+  const activityTrend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
+  const dauDaily = activityTrend.map(p => p.value);
   const sessionsDaily = bucketByDay((sessionsRes.data as { created_at: string }[]) ?? [], 14);
   const signupsDaily = bucketByDay((signupsRes.data as { created_at: string }[]) ?? [], 14);
   const postsDaily = bucketByDay((postsRes.data as { created_at: string }[]) ?? [], 14);
@@ -183,48 +176,21 @@ export function useOverviewMetrics() {
   });
 }
 
-// ─── ACTIVE MEMBERS: 1d / 7d / 28d rolling over the last 28 days ───────────────
+// ─── ACTIVE MEMBERS: daily actives over the last 28 days ───────────────────────
+// Sourced from get_platform_activity, the same aggregation the Engagement card
+// uses. Rolling 7-day / 28-day unique unions are NOT derivable from a per-day
+// trend, so those lines were removed rather than approximated — see the report.
 
-export interface ActivePoint { date: string; d1: number; d7: number; d28: number }
+export interface ActivePoint { date: string; d1: number }
 
 async function fetchActiveMembers28d(): Promise<ActivePoint[]> {
-  const since = daysAgo(56).toISOString();
-  const { data, error } = await supabase
-    .from('analytics_events')
-    .select('user_id, created_at')
-    .gte('created_at', since)
-    .not('user_id', 'is', null)
-    .limit(50000);
+  const { data, error } = await supabase.rpc('get_platform_activity', { p_days: 28 });
   if (error) throw error;
-
-  const rows = (data as EventRow[]) ?? [];
-  // Group user_ids by day
-  const byDay: Map<string, Set<string>> = new Map();
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = dayKey(new Date(r.created_at));
-    if (!byDay.has(k)) byDay.set(k, new Set());
-    byDay.get(k)!.add(r.user_id);
-  }
-
-  const points: ActivePoint[] = [];
-  for (let i = 27; i >= 0; i--) {
-    const target = daysAgo(i);
-    const targetKey = dayKey(target);
-    const d1 = byDay.get(targetKey)?.size ?? 0;
-    const s7 = new Set<string>();
-    const s28 = new Set<string>();
-    for (let j = 0; j < 28; j++) {
-      const k = dayKey(new Date(target.getTime() - j * DAY));
-      const bucket = byDay.get(k);
-      if (!bucket) continue;
-      if (j < 7) for (const u of bucket) s7.add(u);
-      for (const u of bucket) s28.add(u);
-    }
-    points.push({ date: targetKey, d1, d7: s7.size, d28: s28.size });
-  }
-  return points;
+  const activity = Array.isArray(data) ? data[0] : undefined;
+  const trend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
+  return trend.map(p => ({ date: p.date, d1: p.value }));
 }
+
 
 export function useActiveMembers28d() {
   return useQuery({
