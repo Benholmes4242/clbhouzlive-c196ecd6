@@ -100,7 +100,10 @@ export default function HandicapManagePage() {
     }
   };
 
-  if (connectionLoading) {
+  // Session gate + query gate. While EITHER is outstanding we paint the loading
+  // state - never the connect flow (which would be a claim about data we do not
+  // have yet) and never the connected view.
+  if (!settled) {
     // No header here: the resolved surface may be immersive (connect flow) or
     // shelled (connected). Painting a header now would flash a bar that then
     // disappears.
