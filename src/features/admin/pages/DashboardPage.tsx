@@ -29,6 +29,8 @@ import {
   toneColor, type ChipState,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
+import { useOpsHealth } from '../hooks/useOpsHealth';
+import { ClientSplitPanel, OpsErrorsPanel } from '../components/OpsPanels';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const num = (n: number) => n.toLocaleString();
@@ -210,6 +212,7 @@ export default function DashboardPage() {
   const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const errors = useErrorCount24h();
+  const ops = useOpsHealth(7);
   const errorsChip = useMemo(
     () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
     [errors.data, errors.isLoading, errors.isError],
@@ -250,7 +253,11 @@ export default function DashboardPage() {
         onRetry={() => feed.refetch()}
       />
 
+      <ClientSplitPanel data={ops.data} loading={ops.isLoading} />
+
       <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} errorsChip={errorsChip} />
+
+      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
 
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
