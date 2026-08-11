@@ -526,8 +526,9 @@ export async function fetchFriendsActivity(
       friend_handicap_index: f.friend_handicap_index ?? null,
       is_counter: !!s.is_counter,
       handicap_index_at_time: s.handicap_index_at_time ?? null,
-      viewer_has_reacted: viewerReactedSet.has(s.id),
-      reaction_count: reactionCounts[s.id] ?? 0,
+      viewer_has_reacted: false,
+      reaction_count: 0,
+
     });
   }
 
