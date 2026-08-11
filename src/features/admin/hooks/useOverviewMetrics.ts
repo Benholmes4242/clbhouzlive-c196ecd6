@@ -122,27 +122,18 @@ function bucketByDay(rows: { created_at: string }[], days: number): number[] {
   return Object.values(buckets);
 }
 
-function bucketUniquesByDay(rows: EventRow[], days: number): number[] {
-  const buckets: Record<string, Set<string>> = {};
-  for (let i = days - 1; i >= 0; i--) buckets[dayKey(daysAgo(i))] = new Set();
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = dayKey(new Date(r.created_at));
-    if (k in buckets) buckets[k].add(r.user_id);
-  }
-  return Object.values(buckets).map(s => s.size);
-}
-
 async function fetchMetrics(): Promise<MetricsBundle> {
   const since14 = daysAgo(14).toISOString();
-  const [eventsRes, sessionsRes, signupsRes, postsRes, reviewsRes, totalRes] = await Promise.all([
-    supabase.from('analytics_events').select('user_id, created_at').gte('created_at', since14).not('user_id', 'is', null).limit(50000),
+  const [activityRes, sessionsRes, signupsRes, postsRes, reviewsRes, totalRes] = await Promise.all([
+    // Distinct-user counting is an aggregation: it runs in the database.
+    supabase.rpc('get_platform_activity', { p_days: 14 }),
     supabase.from('analytics_events').select('created_at').eq('name', 'session_start').gte('created_at', since14).limit(20000),
     supabase.from('user_profiles').select('created_at').is('deleted_at', null).gte('created_at', since14).limit(20000),
     supabase.from('posts').select('created_at').gte('created_at', since14).limit(20000),
     supabase.from('course_ratings').select('created_at').gte('created_at', since14).limit(20000),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
   ]);
+
 
   const dauDaily = bucketUniquesByDay((eventsRes.data as EventRow[]) ?? [], 14);
   const sessionsDaily = bucketByDay((sessionsRes.data as { created_at: string }[]) ?? [], 14);
