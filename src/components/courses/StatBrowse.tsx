@@ -28,7 +28,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
