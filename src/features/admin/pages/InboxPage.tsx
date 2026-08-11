@@ -18,6 +18,7 @@ import SupportTicketDrawer from '../components/SupportTicketDrawer';
 import ApprovalDetailDrawer from '../components/ApprovalDetailDrawer';
 import AdminSheet from '../components/AdminSheet';
 import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
+import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import { usePanelRole } from '@/hooks/usePanelRole';
@@ -646,6 +647,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
   const [searching, setSearching] = useState(false);
   const [chosen, setChosen] = useState<CourseHit | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmIgnore, setConfirmIgnore] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const qc = useQueryClient();
 
@@ -713,15 +715,19 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     }
   };
 
+  const rounds = `${row.round_count} round${row.round_count === 1 ? '' : 's'}`;
+  const members = `${row.member_count} member${row.member_count === 1 ? '' : 's'}`;
+
   return (
+    <>
     <AdminSheet
       open={row !== null}
       onClose={onClose}
       title={row.whs_course_name ?? 'Unnamed WHS course'}
-      subtitle={`${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`}
+      subtitle={`${rounds} from ${members}`}
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={doIgnore} disabled={busy} style={btnGhost()}>Ignore</button>
+          <button onClick={() => setConfirmIgnore(true)} disabled={busy} style={btnGhost()}>Ignore</button>
           <button onClick={doLink} disabled={busy || !chosen} style={btnPrimary(busy || !chosen)}>
             {busy ? 'Working...' : 'Link to course'}
           </button>
@@ -790,6 +796,17 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
         )}
       </div>
     </AdminSheet>
+    <ConfirmDialog
+      open={confirmIgnore}
+      onClose={() => setConfirmIgnore(false)}
+      onConfirm={() => { setConfirmIgnore(false); void doIgnore(); }}
+      title="Ignore this course?"
+      description={`Ignoring means this WHS course is never linked to a course in the catalogue. ${rounds} played here by ${members} will not appear in any member's course analytics, and will stay hidden until someone links the course. This is not housekeeping - it discards those rounds from every gam surface.`}
+      confirmLabel="Ignore anyway"
+      tone="danger"
+      busy={busy}
+    />
+    </>
   );
 }
 
