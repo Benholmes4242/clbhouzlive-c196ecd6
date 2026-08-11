@@ -14,32 +14,17 @@ export function useLikeMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, userId, actorId, actorType, isLiked }: LikeMutationParams) => {
-      if (isLiked) {
-        const { error } = await supabase
-          .from('post_likes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('actor_id', actorId)
-          .eq('actor_type', actorType);
-        if (error) throw error;
-      } else {
-        // Idempotent upsert — guarantees a row exists for this actor after success.
-        // Avoids the 409 unique-violation that previously got swallowed as success
-        // while no row was actually written (likes "lost" on refresh).
-        const { error } = await supabase
-          .from('post_likes')
-          .upsert(
-            {
-              post_id: postId,
-              user_id: userId,
-              actor_id: actorId,
-              actor_type: actorType,
-            },
-            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true },
-          );
-        if (error) throw error;
-      }
+    mutationFn: async ({ postId, actorId, actorType, isLiked }: LikeMutationParams) => {
+      // Canonical write path. The server decides the store: posts created from a
+      // synced round record into content_reactions (target_type='round'),
+      // everything else into post_likes. Idempotent in both directions.
+      const { error } = await supabase.rpc('toggle_post_like', {
+        p_post_id: postId,
+        p_liked: !isLiked,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
+      });
+      if (error) throw error;
     },
     onError: (error) => {
       console.error('[Like] Mutation failed:', error);
