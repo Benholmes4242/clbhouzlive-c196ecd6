@@ -716,14 +716,19 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
   };
 
   return (
+  const rounds = `${row.round_count} round${row.round_count === 1 ? '' : 's'}`;
+  const members = `${row.member_count} member${row.member_count === 1 ? '' : 's'}`;
+
+  return (
+    <>
     <AdminSheet
       open={row !== null}
       onClose={onClose}
       title={row.whs_course_name ?? 'Unnamed WHS course'}
-      subtitle={`${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`}
+      subtitle={`${rounds} from ${members}`}
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={doIgnore} disabled={busy} style={btnGhost()}>Ignore</button>
+          <button onClick={() => setConfirmIgnore(true)} disabled={busy} style={btnGhost()}>Ignore</button>
           <button onClick={doLink} disabled={busy || !chosen} style={btnPrimary(busy || !chosen)}>
             {busy ? 'Working...' : 'Link to course'}
           </button>
