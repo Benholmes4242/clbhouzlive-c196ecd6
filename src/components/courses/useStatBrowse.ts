@@ -102,6 +102,7 @@ export function useStatBrowseFacets() {
       const d = (data ?? {}) as Record<string, unknown>;
       return {
         countries: ((d.countries as StatBrowseFacets['countries']) ?? []).map((c) => ({
+          country: String(c.country ?? ''),
           sub_country: c.sub_country,
           courses: Number(c.courses),
           directory_total: Number(c.directory_total),
