@@ -48,15 +48,41 @@ export interface OpsActivity {
   daily: { date: string; n: number }[];
 }
 
+/**
+ * Handicap connection is activation: without it a member gets no rounds, no
+ * scorecards, no crowns and no stat browse.
+ */
+export interface OpsActivation {
+  members_total: number;
+  connected: number;
+  synced: number;
+  syncing: number;
+  failing: number;
+  connected_in_window: number;
+}
+
+/** gam_evaluation_queue. EG sync green means data ARRIVED, not that it was processed. */
+export interface OpsPipeline {
+  unprocessed: number;
+  oldest_wait_sec: number;
+  median_process_sec: number;
+  retrying: number;
+  errored: number;
+  by_status: Record<string, number>;
+}
+
 export interface OpsHealth {
   /** Sorted by members DESC then sessions DESC by the RPC. Render as given. */
   clients: OpsClientRow[];
   traffic: OpsTraffic;
   errors: OpsErrors;
   activity: OpsActivity;
+  activation: OpsActivation;
+  pipeline: OpsPipeline;
   window_days: number;
   computed_at: string;
 }
+
 
 export function useOpsHealth(days = 7) {
   return useQuery<OpsHealth>({

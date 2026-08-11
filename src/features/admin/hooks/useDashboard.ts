@@ -1,29 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { KpiTrendPoint } from '../components/KpiCard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface DashboardKpis {
-  totalUsers:      { value: number; delta: number; trend: KpiTrendPoint[] };
-  newUsersToday:   { value: number; delta: number };
-  activeUsers24h:  { value: number; delta: number };
-  postsToday:      { value: number; delta: number };
-}
-
-export interface ActionQueue {
-  pendingVerifications: number;
-  pendingInvites:       number;
-  expiringAccess:       number;
-  pendingCourseClaims:  number;
-}
-
-export interface ActivityTrendDay {
-  date:    string;
-  users:   number;
-  posts:   number;
-  reviews: number;
-}
 
 export interface RecentAuditEntry {
   id:          string;
@@ -58,116 +36,7 @@ export interface TodayGlance {
   topActiveUsers: TopActiveUser[];
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toDateKey(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-}
-
-function buildDailyBuckets(rows: { created_at: string }[], days: number): KpiTrendPoint[] {
-  const buckets: Record<string, number> = {};
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    buckets[toDateKey(d.toISOString())] = 0;
-  }
-  for (const row of rows) {
-    const key = toDateKey(row.created_at);
-    if (key in buckets) buckets[key]++;
-  }
-  return Object.entries(buckets).map(([date, value]) => ({ date, value }));
-}
-
-function calcDelta(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return Math.round(((current - previous) / previous) * 100 * 10) / 10;
-}
-
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
-
-async function fetchKpis(): Promise<DashboardKpis> {
-  const now          = new Date();
-  const fourteenAgo  = new Date(now.getTime() - 14  * 24 * 3600_000);
-  const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
-  const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
-
-  const [
-    totalUsersRes, todayUsersRes, yesterdayUsersRes, usersLast14d,
-    activityRes, postsToday, postsYesterday,
-  ] = await Promise.all([
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', startOfToday.toISOString()),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', startOfYesterday.toISOString()).lt('created_at', startOfToday.toISOString()),
-    supabase.from('user_profiles').select('created_at').gte('created_at', fourteenAgo.toISOString()).is('deleted_at', null),
-    // Distinct-user counting is an aggregation: it runs in the database.
-    supabase.rpc('get_platform_activity', { p_days: 2 }),
-    supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', startOfToday.toISOString()),
-    supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', startOfYesterday.toISOString()).lt('created_at', startOfToday.toISOString()),
-  ]);
-
-  const totalCount     = totalUsersRes.count ?? 0;
-  const todayUsers     = todayUsersRes.count ?? 0;
-  const yesterdayUsers = yesterdayUsersRes.count ?? 0;
-  const trend          = buildDailyBuckets(usersLast14d.data ?? [], 14);
-  const activity           = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
-  const activityTrend      = Array.isArray(activity?.trend) ? (activity!.trend as unknown as { date: string; value: number }[]) : [];
-  const active24hCount     = activity?.dau_today ?? 0;
-  const activePrev24hCount = activityTrend.length >= 2 ? (activityTrend[activityTrend.length - 2]?.value ?? 0) : 0;
-  const postsTodayCount    = postsToday.count ?? 0;
-  const postsYestCount     = postsYesterday.count ?? 0;
-
-  return {
-    totalUsers:     { value: totalCount, delta: calcDelta(totalCount, totalCount - todayUsers), trend },
-    newUsersToday:  { value: todayUsers, delta: calcDelta(todayUsers, yesterdayUsers) },
-    activeUsers24h: { value: active24hCount, delta: calcDelta(active24hCount, activePrev24hCount) },
-    postsToday:     { value: postsTodayCount, delta: calcDelta(postsTodayCount, postsYestCount) },
-  };
-}
-
-async function fetchActionQueue(): Promise<ActionQueue> {
-  const now = new Date();
-  const in7d = new Date(now.getTime() + 7 * 24 * 3600_000);
-
-  const [bizVerif, golferVerif, invites, expiring, courseClaims] = await Promise.all([
-    supabase.from('business_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('golfer_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('admin_invitations').select('id', { count: 'exact', head: true }).is('accepted_at', null).gte('expires_at', now.toISOString()),
-    supabase.from('admin_memberships').select('user_id', { count: 'exact', head: true }).not('expires_at', 'is', null).lte('expires_at', in7d.toISOString()).gte('expires_at', now.toISOString()),
-    supabase.from('course_claim_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-  ]);
-
-  return {
-    pendingVerifications: (bizVerif.count ?? 0) + (golferVerif.count ?? 0),
-    pendingInvites:       invites.count ?? 0,
-    expiringAccess:       expiring.count ?? 0,
-    pendingCourseClaims:  courseClaims.count ?? 0,
-  };
-}
-
-async function fetchActivityTrend(days = 14): Promise<ActivityTrendDay[]> {
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
-  const iso = startDate.toISOString();
-
-  const [users, posts, reviews] = await Promise.all([
-    supabase.from('user_profiles').select('created_at').gte('created_at', iso).is('deleted_at', null).limit(5000),
-    supabase.from('posts').select('created_at').gte('created_at', iso).limit(5000),
-    supabase.from('course_ratings').select('created_at').gte('created_at', iso).limit(5000),
-  ]);
-
-  const buckets: Record<string, ActivityTrendDay> = {};
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const key = toDateKey(d.toISOString());
-    buckets[key] = { date: key, users: 0, posts: 0, reviews: 0 };
-  }
-  for (const r of users.data ?? [])   { const k = toDateKey(r.created_at); if (buckets[k]) buckets[k].users++; }
-  for (const r of posts.data ?? [])   { const k = toDateKey(r.created_at); if (buckets[k]) buckets[k].posts++; }
-  for (const r of reviews.data ?? []) { const k = toDateKey(r.created_at); if (buckets[k]) buckets[k].reviews++; }
-
-  return Object.values(buckets);
-}
 
 async function fetchTodayGlance(): Promise<TodayGlance> {
   const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
@@ -220,6 +89,10 @@ async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
   return data as EgSyncHealth;
 }
 
+/**
+ * Retained but UNREFERENCED: it answers "what did I do", not "how is the
+ * platform", so it is no longer part of useDashboard's return.
+ */
 async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
   const { data, error } = await supabase
     .from('admin_audit_log')
@@ -239,23 +112,15 @@ async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
 export function useDashboard() {
   const results = useQueries({
     queries: [
-      { queryKey: ['admin-v2', 'dashboard', 'kpis'],   queryFn: fetchKpis,         staleTime: 60_000,  refetchInterval: 120_000 },
-      { queryKey: ['admin-v2', 'dashboard', 'queue'],  queryFn: fetchActionQueue,  staleTime: 30_000,  refetchInterval: 60_000  },
-      { queryKey: ['admin-v2', 'dashboard', 'trend'],  queryFn: () => fetchActivityTrend(14), staleTime: 5*60_000, refetchInterval: 10*60_000 },
-      { queryKey: ['admin-v2', 'dashboard', 'audit'],  queryFn: fetchRecentAudit,  staleTime: 30_000,  refetchInterval: 60_000  },
       { queryKey: ['admin-v2', 'dashboard', 'glance'], queryFn: fetchTodayGlance,  staleTime: 2*60_000, refetchInterval: 5*60_000 },
       { queryKey: ['admin-v2', 'dashboard', 'eg'],     queryFn: fetchEgSyncHealth, staleTime: 60_000,  refetchInterval: 120_000 },
     ],
   });
 
-  const [kpisQ, queueQ, trendQ, auditQ, glanceQ, egQ] = results;
+  const [glanceQ, egQ] = results;
 
   return {
-    kpis:   { data: kpisQ.data as DashboardKpis | undefined,    isLoading: kpisQ.isLoading },
-    queue:  { data: queueQ.data as ActionQueue | undefined,     isLoading: queueQ.isLoading },
-    trend:  { data: trendQ.data as ActivityTrendDay[] | undefined, isLoading: trendQ.isLoading },
-    audit:  { data: auditQ.data as RecentAuditEntry[] | undefined, isLoading: auditQ.isLoading },
-    glance: { data: glanceQ.data as TodayGlance | undefined,    isLoading: glanceQ.isLoading },
+    glance: { data: glanceQ.data as TodayGlance | undefined, isLoading: glanceQ.isLoading },
     egSyncHealth: {
       data: egQ.data as EgSyncHealth | undefined,
       isLoading: egQ.isLoading,

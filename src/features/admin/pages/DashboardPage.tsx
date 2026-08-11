@@ -1,13 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line,
-} from 'recharts';
-import {
-  AlertTriangle, ChevronRight, Activity, Bell, Cpu, ShieldCheck,
-  MessageSquare, UserPlus, Star, RefreshCcw, Radio,
-} from 'lucide-react';
+import { ChevronRight, MessageSquare, UserPlus, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
@@ -26,13 +20,16 @@ import {
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
   computeErrorsChip,
-  toneColor, type ChipState,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
 import { useOpsHealth } from '../hooks/useOpsHealth';
-import { ClientSplitPanel, OpsErrorsPanel } from '../components/OpsPanels';
+import { useRetention } from '../hooks/useRetention';
+import { SystemPanel, ActivationPanel, PipelinePanel } from '../components/SystemPanels';
+import { RightNowPanel, RetentionPanel, ActiveMembersPanel } from '../components/ChartPanels';
+import { OpsErrorsPanel } from '../components/OpsPanels';
 import type { OpsHealth } from '../hooks/useOpsHealth';
 import { stripMentionMarkup } from '@/lib/mentions/format';
+
 
 const num = (n: number) => n.toLocaleString();
 function relTime(iso: string): string {
@@ -214,6 +211,8 @@ export default function DashboardPage() {
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const errors = useErrorCount24h();
   const ops = useOpsHealth(7);
+  const retention = useRetention(56);
+
   const errorsChip = useMemo(
     () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
     [errors.data, errors.isLoading, errors.isError],
@@ -225,27 +224,42 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      <AlertBannerRow
-        triage={triage.data}
-        pushRed={push.data?.status === 'red'}
+      {/* Status first: an admin opens this to find out whether anything is
+          broken, so system state leads and vanity metrics follow. */}
+      <SystemPanel
+        chips={{ eg: egChip, cron: cronChip, echo: echoChip, push: pushChip, errors: errorsChip }}
         nonOkChips={nonOkChips}
+        triage={triage}
+        ops={ops.data}
+        opsLoading={ops.isLoading}
+        eg={eg.data}
       />
 
-      <RightNowStrip
+      <ActivationPanel ops={ops.data} loading={ops.isLoading} />
+
+      <PipelinePanel ops={ops.data} loading={ops.isLoading} />
+
+      <RightNowPanel
         live={live.data?.count ?? null}
-        loading={live.isLoading}
+        liveLoading={live.isLoading}
         intraday={intraday.data ?? []}
         intradayLoading={intraday.isLoading}
+        topUsers={dashboard.glance.data?.topActiveUsers}
+        topUsersLoading={dashboard.glance.isLoading}
       />
 
       <MetricGrid loading={loading} data={m} ops={ops.data} opsLoading={ops.isLoading} />
 
-      <ActiveMembersChart
+      <RetentionPanel data={retention.data} loading={retention.isLoading} />
+
+      <ActiveMembersPanel
         data={actives.data ?? []}
         loading={actives.isLoading}
         isError={actives.isError}
         onRetry={() => actives.refetch()}
       />
+
+      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
 
       <LatestInClubhouse
         items={feed.data ?? []}
@@ -254,84 +268,12 @@ export default function DashboardPage() {
         onRetry={() => feed.refetch()}
       />
 
-      <ClientSplitPanel data={ops.data} loading={ops.isLoading} />
-
-      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} errorsChip={errorsChip} />
-
-      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
-
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
 }
 
-// ─── RIGHT NOW ────────────────────────────────────────────────────────────────
 
-function RightNowStrip({
-  live, loading, intraday, intradayLoading,
-}: {
-  live: number | null; loading: boolean;
-  intraday: { hour: number; today: number | null; last: number | null }[];
-  intradayLoading: boolean;
-}) {
-  return (
-    <section
-      style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 22, boxShadow: t.shadowCard,
-        padding: 16, display: 'flex', flexDirection: 'column', gap: 12,
-        position: 'relative', overflow: 'hidden',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span aria-hidden style={{
-          width: 8, height: 8, borderRadius: 999, background: t.ok,
-          animation: 'admin-pulse-dot 1.6s ease-in-out infinite', flexShrink: 0,
-        }} />
-        <span style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-          Right now
-        </span>
-        <span style={{ flex: 1 }} />
-        <Radio size={14} color={t.inkFaint} />
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <span style={{
-          color: t.ink, fontSize: 32, fontWeight: 800, lineHeight: 1,
-          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-        }}>
-          {loading || live === null ? '-' : num(live)}
-        </span>
-        <span style={{ color: t.inkMuted, fontSize: 13, fontWeight: 500 }}>
-          member{(live ?? 0) === 1 ? '' : 's'} active in last 5 min
-        </span>
-      </div>
-
-      <div style={{ height: 120, marginLeft: -8, marginRight: -8 }}>
-        {intradayLoading ? (
-          <div style={{ height: '100%', background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-        ) : intraday.length < 2 ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: t.inkFaint, fontSize: 12 }}>
-            Not enough data yet
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={intraday} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke={t.line} vertical={false} />
-              <XAxis dataKey="hour" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
-                tickFormatter={(h: number) => `${h}h`} />
-              <YAxis stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
-              <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop }} />
-              <Line type="monotone" dataKey="last" name="Last week" stroke={t.inkFaint} strokeWidth={1.5} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
-              <Line type="monotone" dataKey="today" name="Today" stroke={t.brand} strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </div>
-    </section>
-  );
-}
 
 // ─── Metric grid ──────────────────────────────────────────────────────────────
 
@@ -413,111 +355,6 @@ function MetricGrid({ loading, data, ops, opsLoading }: {
   );
 }
 
-// ─── Active members chart ─────────────────────────────────────────────────────
-
-function ActiveMembersChart({
-  data, loading, isError, onRetry,
-}: {
-  data: { date: string; d1: number }[];
-  loading: boolean; isError: boolean; onRetry: () => void;
-}) {
-  const empty = !loading && !isError && data.every(d => !d.d1);
-  return (
-    <section
-      style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, boxShadow: t.shadowCard,
-        padding: 16, display: 'flex', flexDirection: 'column', gap: 8,
-      }}
-    >
-      <div>
-        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Active members</div>
-        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>Last 28 days - daily active members</div>
-      </div>
-
-      {loading ? (
-        <div style={{ height: 200, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-      ) : isError ? (
-        <AdminErrorState message="Couldn't load active members." onRetry={onRetry} />
-      ) : empty ? (
-        <EmptyState title="No activity yet" />
-      ) : (
-        <div style={{ height: 220 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke={t.line} vertical={false} />
-              <XAxis
-                dataKey="date" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
-                tickFormatter={(d: string) => new Date(d).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
-                minTickGap={24}
-              />
-              <YAxis stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false} width={28} allowDecimals={false} />
-              <Tooltip contentStyle={{ background: t.surface, border: `1px solid ${t.line}`, borderRadius: 8, fontSize: 12, boxShadow: t.shadowPop }} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="d1" name="1-day" stroke={t.brand} strokeWidth={2} dot={false} isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-    </section>
-  );
-}
-
-// ─── Alert banner (unchanged copy from prior turn) ────────────────────────────
-
-function AlertBannerRow({
-  triage, pushRed, nonOkChips,
-}: {
-  triage: ReturnType<typeof useTriageCounts>['data'];
-  pushRed: boolean;
-  nonOkChips: number;
-}) {
-  const total = triage?.total ?? 0;
-  const hasTriage = total > 0;
-  if (!hasTriage && !pushRed) return null;
-
-  if (hasTriage) {
-    const rel = triage?.oldestCreatedAt ? relTime(triage.oldestCreatedAt) : 'moments ago';
-    const healthClause = pushRed
-      ? ' - push notifications failing'
-      : nonOkChips > 0
-        ? ` - ${nonOkChips} health alert${nonOkChips === 1 ? '' : 's'}`
-        : '';
-    const message = `${total} waiting - longest ${rel}${healthClause}`;
-    return <BannerLink to={triage!.oldestQueueRoute} tone="warn" message={message} />;
-  }
-  return (
-    <BannerLink
-      to="/admin-v2/health?tab=status"
-      tone="danger"
-      message="Push notifications failing - open push health"
-    />
-  );
-}
-
-function BannerLink({ to, tone, message }: { to: string; tone: 'warn' | 'danger'; message: string }) {
-  const isDanger = tone === 'danger';
-  return (
-    <Link
-      to={to}
-      role="alert"
-      style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 12px',
-        background: isDanger ? t.dangerSoft : t.warnSoft,
-        border: `1px solid ${(isDanger ? t.dangerText : t.warnText)}22`,
-        color: isDanger ? t.dangerText : t.warnText,
-        borderRadius: t.radius.md,
-        fontSize: 13, fontWeight: 600,
-        textDecoration: 'none',
-      }}
-    >
-      <AlertTriangle size={16} />
-      <span style={{ flex: 1 }}>{message}</span>
-      <ChevronRight size={16} />
-    </Link>
-  );
-}
 
 // ─── Clubhouse feed ───────────────────────────────────────────────────────────
 
@@ -668,43 +505,3 @@ function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: stri
   }
 }
 
-// ─── Health chip strip ────────────────────────────────────────────────────────
-
-function HealthChipStrip({
-  egChip, cronChip, echoChip, pushChip, errorsChip,
-}: {
-  egChip: ChipState; cronChip: ChipState; echoChip: ChipState; pushChip: ChipState; errorsChip: ChipState;
-}) {
-  return (
-    <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-      <HealthChip to="/admin-v2/health?tab=status" icon={<RefreshCcw size={14} />} state={egChip} />
-      <HealthChip to="/admin-v2/health?tab=status" icon={<Activity size={14} />} state={cronChip} />
-      <HealthChip to="/admin-v2/health?tab=status" icon={<Cpu size={14} />} state={echoChip} />
-      <HealthChip to="/admin-v2/health?tab=status" icon={<Bell size={14} />} state={pushChip} />
-      <HealthChip to="/admin-v2/health?tab=stability" icon={<ShieldCheck size={14} />} state={errorsChip} />
-    </section>
-  );
-}
-
-function HealthChip({ to, icon, state }: { to: string; icon: React.ReactNode; state: ChipState }) {
-  return (
-    <Link
-      to={to}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: t.radius.lg, boxShadow: t.shadowCard,
-        padding: '10px 12px',
-        textDecoration: 'none', color: t.ink, minWidth: 0,
-      }}
-    >
-      <span aria-hidden style={{ width: 8, height: 8, borderRadius: 999, background: toneColor(state.tone), flexShrink: 0 }} />
-      <span style={{ display: 'inline-flex', color: t.inkMuted }}>{icon}</span>
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.label}</span>
-        <span style={{ fontSize: 11, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.detail}</span>
-      </div>
-      <ChevronRight size={14} color={t.inkFaint} />
-    </Link>
-  );
-}
