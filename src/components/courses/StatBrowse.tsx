@@ -65,6 +65,27 @@ import {
   SLATE_50,
 } from '@/features/courses/_shared/tokens';
 
+/**
+ * Emphasise only the figures inside a sentence: INK 700 with tabular figures
+ * against the surrounding INK_MUTE body. Splits on digit runs so initialisms
+ * like WHS stay in body weight and are not mistaken for a number.
+ */
+const FIGURE_RE = /(\p{Nd}[\p{Nd}.,\u00A0\u202F\u2009]*)/gu;
+const emphasiseFigures = (sentence: string): ReactNode[] =>
+  sentence.split(FIGURE_RE).map((part, i) =>
+    FIGURE_RE.test(part) && /\p{Nd}/u.test(part) ? (
+      <span
+        key={i}
+        style={{ color: INK, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
+      >
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+
+
 interface StatBrowseProps {
   /** Open the course directory sheet — owned by the parent. */
   onOpenDirectory: (country: string | null) => void;
