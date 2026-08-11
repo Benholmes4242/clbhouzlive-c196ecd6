@@ -6,8 +6,11 @@
  * resulting Map down. Do NOT call it inside a post card.
  */
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { feedKeys, viewerId } from '@/lib/queryKeys';
+import { useMergedBatch } from '@/lib/batchQuery';
 
 export interface PostCourseContext {
   course_id: string;
@@ -27,7 +30,13 @@ export type PostCourseContextMap = Map<string, PostCourseContext>;
 
 const EMPTY_MAP: PostCourseContextMap = new Map();
 
-export function usePostCourseContext(courseIds: string[]) {
+/**
+ * @param courseIds the loaded page's course ids (used for the REQUEST, never the key)
+ * @param scope     what this feed IS — 'clubhouse:suggested', `profile:<actor>` …
+ */
+export function usePostCourseContext(courseIds: string[], scope: string) {
+  const { user } = useSupabaseSession();
+  const batch = useMergedBatch<PostCourseContext>();
   // De-duplicate + stabilise the key so scroll/pagination churn does not
   // re-fire the request for ids we already asked about.
   const ids = useMemo(() => {
@@ -37,7 +46,11 @@ export function usePostCourseContext(courseIds: string[]) {
   }, [courseIds]);
 
   const query = useQuery({
-    queryKey: ['post-course-context', ids],
+    // BATCH IDIOM (src/lib/queryKeys.ts). Keyed on scope + viewer + how many
+    // courses are loaded — NEVER on which ones, or every pagination page would
+    // blank every rendered course band for a paint.
+    queryKey: feedKeys.postCourseContext(scope, viewerId(user?.id), ids.length),
+    placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -51,9 +64,11 @@ export function usePostCourseContext(courseIds: string[]) {
       for (const row of (data ?? []) as PostCourseContext[]) {
         map.set(row.course_id, row);
       }
-      return map;
+      return batch.mergeOverPrevious(map);
     },
   });
+
+  batch.commit(query.data);
 
   return query.data ?? EMPTY_MAP;
 }
