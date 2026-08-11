@@ -72,7 +72,7 @@ export const ManageScreen: React.FC<Props> = ({
           ) : null}
         </Panel>
       ) : (
-        <Panel kicker={bodyName} aside="sync on">
+        <Panel kicker={bodyName} aside="synced">
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
             <Dot color={GOOD} />
             <div style={{ fontSize: 15, fontWeight: 700, color: INK }}>
