@@ -56,6 +56,11 @@ interface FeedItem {
   href: string;
   postId?: string;
   courseId?: string;
+  /**
+   * Moderation markers. Hidden and mock rows are MARKED, never filtered:
+   * an admin needs to see that something was hidden.
+   */
+  warnings: string[];
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
@@ -68,18 +73,18 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       .limit(8),
     supabase
       .from('posts')
-      .select('id, content, created_at, user_id')
+      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden')
       .order('created_at', { ascending: false })
       .limit(8),
     supabase
       .from('course_ratings')
-      .select('id, created_at, user_id, course_id, review')
+      .select('id, created_at, user_id, course_id, review, is_mock')
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
 
-  const postRows = (posts.data ?? []) as { id: string; content: string | null; created_at: string; user_id: string }[];
-  const reviewRows = (reviews.data ?? []) as { id: string; created_at: string; user_id: string; course_id: string; review: string | null }[];
+  const postRows = (posts.data ?? []) as { id: string; content: string | null; created_at: string; user_id: string; moderation_hidden: boolean | null; auto_hidden: boolean | null }[];
+  const reviewRows = (reviews.data ?? []) as { id: string; created_at: string; user_id: string; course_id: string; review: string | null; is_mock: boolean | null }[];
   const memberRows = (members.data ?? []) as { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; created_at: string }[];
 
   const profileIds = Array.from(new Set([
@@ -123,6 +128,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       subtitle: null,
       avatarUrl: m.profile_photo_url,
       href: `/admin-v2/users?member=${m.id}`,
+      warnings: [],
     });
   }
   for (const p of postRows) {
@@ -145,6 +151,10 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
       postId: p.id,
+      warnings: [
+        ...(p.auto_hidden ? ['Auto-hidden'] : []),
+        ...(p.moderation_hidden ? ['Hidden'] : []),
+      ],
     });
   }
   for (const r of reviewRows) {
@@ -159,6 +169,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
       courseId: r.course_id,
+      warnings: r.is_mock ? ['Mock'] : [],
     });
   }
 
@@ -297,7 +308,7 @@ function RightNowStrip({
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={intraday} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <LineChart data={intraday} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke={t.line} vertical={false} />
               <XAxis dataKey="hour" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
                 tickFormatter={(h: number) => `${h}h`} />
@@ -413,7 +424,7 @@ function ActiveMembersChart({
       ) : (
         <div style={{ height: 220 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke={t.line} vertical={false} />
               <XAxis
                 dataKey="date" stroke={t.inkFaint} fontSize={10} tickLine={false} axisLine={false}
@@ -585,6 +596,11 @@ function FeedRow({
           </span>
           <span style={{ color: t.inkFaint, fontSize: 11 }}>- {relTime(item.created_at)}</span>
         </div>
+        {item.warnings.length > 0 && (
+          <div style={{ color: t.warnText, fontSize: 11, fontWeight: 700, marginTop: 2 }}>
+            {item.warnings.join(' - ')}
+          </div>
+        )}
         {item.subtitle && (
           <div
             style={{

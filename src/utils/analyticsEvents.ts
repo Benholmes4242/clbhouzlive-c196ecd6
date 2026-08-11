@@ -15,6 +15,7 @@ export const analyticsEvents = {
           ...params,
           session_id: sessionStorage.getItem('session_id') ?? null,
           page: window.location.pathname,
+          build: __BUILD_ID__,
           ua: navigator.userAgent.slice(0, 200),
         },
       });
