@@ -6,7 +6,7 @@ export default function AdminAccessDenied() {
   return (
     <div
       style={{
-        minHeight: '100dvh',
+        minHeight: '100dvh', colorScheme: 'dark',
         background: t.canvas,
         display: 'flex',
         alignItems: 'center',
