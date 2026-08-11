@@ -175,6 +175,12 @@ const ClubhouseContent = () => {
   // Clubhouse feed is now purely social posts + algorithmic suggestions.
   const activeFeed = useSuggestedFeed(user?.id);
 
+  /**
+   * Batch-idiom scope for this surface (src/lib/queryKeys.ts). What the list
+   * IS — one merged suggested feed. The loaded id set is NEVER part of a key.
+   */
+  const FEED_SCOPE = 'clubhouse:suggested';
+
   const posts = activeFeed.posts;
 
   // C1 — batched course data for the whole visible page. ONE rpc call for all
@@ -183,17 +189,17 @@ const ClubhouseContent = () => {
     () => posts.map((p) => resolvePostCourseId(p)).filter((id): id is string => !!id),
     [posts],
   );
-  const courseContextMap = usePostCourseContext(feedCourseIds);
+  const courseContextMap = usePostCourseContext(feedCourseIds, FEED_SCOPE);
 
   // C3 — batched attached-round data. Two queries per page (score-id
   // resolution + round stats/shape); never one per card.
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
-  const postScoreIdMap = usePostScoreIds(feedPostIds);
+  const postScoreIdMap = usePostScoreIds(feedPostIds, FEED_SCOPE);
   const feedScoreIds = useMemo(
     () => Array.from(postScoreIdMap.values()),
     [postScoreIdMap],
   );
-  const postRoundMap = usePostRounds(feedScoreIds);
+  const postRoundMap = usePostRounds(feedScoreIds, FEED_SCOPE);
 
   // Round drill-in from a feed scorecard tap.
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
@@ -204,6 +210,10 @@ const ClubhouseContent = () => {
   // queries have settled — capped, and never for a page whose rounds will
   // never come (both hooks report a disabled query as settled).
   const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
+  // Page-level gate uses `settled` only, so a next-page fetch can never put the
+  // whole feed back into a skeleton mid-scroll. Cards get the finer signal:
+  // a round missing WHILE fetching still shows PostRoundShell.
+  const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundsReady = useRoundChainGate(roundChainSettled, !activeFeed.isLoading && posts.length > 0);
 
   const isLoading = activeFeed.isLoading || (posts.length > 0 && !roundsReady);
@@ -495,7 +505,7 @@ const ClubhouseContent = () => {
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}
               postRoundMap={postRoundMap}
-              postRoundsSettled={roundChainSettled}
+              postRoundsSettled={roundChainSettled && !roundChainFetching}
               onRoundTap={(post, round) =>
                 setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
               }

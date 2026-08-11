@@ -114,17 +114,24 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   // ── Batched enrichment (parity with Clubhouse.tsx) ──
   // ONE course-context call and TWO round calls for the whole visible page.
   // Never per card: the cards read from these maps.
+  /**
+   * Batch-idiom scope (src/lib/queryKeys.ts): whose posts these are and which
+   * filter is on. Never the loaded post ids.
+   */
+  const feedScope = `profile:${actorType}:${actorId}:${activeFilter}`;
+
   const feedCourseIds = useMemo(
     () => filteredPosts.map((p) => resolvePostCourseId(p)).filter((id): id is string => !!id),
     [filteredPosts],
   );
-  const courseContextMap = usePostCourseContext(feedCourseIds);
+  const courseContextMap = usePostCourseContext(feedCourseIds, feedScope);
 
   const feedPostIds = useMemo(() => filteredPosts.map((p) => p.id), [filteredPosts]);
-  const postScoreIdMap = usePostScoreIds(feedPostIds);
+  const postScoreIdMap = usePostScoreIds(feedPostIds, feedScope);
   const feedScoreIds = useMemo(() => Array.from(postScoreIdMap.values()), [postScoreIdMap]);
-  const postRoundMap = usePostRounds(feedScoreIds);
+  const postRoundMap = usePostRounds(feedScoreIds, feedScope);
   const roundChainSettled = postScoreIdMap.settled && postRoundMap.settled;
+  const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundsReady = useRoundChainGate(roundChainSettled, !isLoading && posts.length > 0);
 
   const [roundSheet, setRoundSheet] = useState<{ scoreId: string; userId: string } | null>(null);
@@ -351,7 +358,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           resolveCourseId={resolvePostCourseId}
           postScoreIdMap={postScoreIdMap}
           postRoundMap={postRoundMap}
-          postRoundsSettled={roundChainSettled}
+          postRoundsSettled={roundChainSettled && !roundChainFetching}
           onRoundTap={(post, round) =>
             setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
           }
