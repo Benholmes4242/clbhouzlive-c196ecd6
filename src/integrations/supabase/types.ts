@@ -18252,6 +18252,8 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_admin_ops_health: { Args: { p_days?: number }; Returns: Json }
+      get_admin_retention: { Args: { p_days?: number }; Returns: Json }
       get_admin_role: {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
