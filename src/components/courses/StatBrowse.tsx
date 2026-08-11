@@ -70,14 +70,6 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
-/** One figure treatment for the labelled count column in both dropdowns. */
-const FIGURE_STYLE: React.CSSProperties = {
-  fontSize: 13.5,
-  fontWeight: 700,
-  color: INK,
-  fontVariantNumeric: 'tabular-nums lining',
-};
-
 /**
  * Scanning aid inside the dropdowns only - never in the headline copy.
  * Icons follow the MEANING of each lens: toughest / scoreable are opposites
@@ -443,44 +435,25 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectGroup>
           <SelectLabel
-            className="sticky top-0 z-10 flex w-full items-center justify-between py-2 pl-8 pr-2"
+            className="sticky top-0 z-10 flex w-full items-center py-2 pl-8 pr-2"
             style={{
               borderBottom: `1px solid ${HAIRLINE_INK_8}`,
               backgroundColor: 'hsl(var(--card))',
             }}
           >
             <span style={LABEL}>{t('statBrowse.colArea')}</span>
-            <span style={LABEL}>{t('statBrowse.colCountsCountry')}</span>
           </SelectLabel>
           <SelectItem value="all" className="[&>span:last-child]:w-full">
             <span className="flex w-full items-center gap-2">
               <Globe {...DD_ICON} />
               <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
-              {facets ? (
-                <span className="shrink-0" style={FIGURE_STYLE}>
-                  {formatNumber(facets.played_total)}
-                  <span style={{ color: INK_MUTE, fontWeight: 600 }}>
-                    {'\u00A0/\u00A0'}
-                    {formatNumber(facets.directory_total)}
-                  </span>
-                </span>
-              ) : null}
             </span>
           </SelectItem>
-          {/* Numerator is courses with rounds logged, denominator the whole
-              directory; the sticky header row is what labels the column. */}
           {(facets?.countries ?? []).map((c) => (
             <SelectItem key={c.sub_country} value={c.sub_country} className="[&>span:last-child]:w-full">
               <span className="flex w-full items-center gap-2">
                 <CountryFlag country={c.sub_country} size="sm" />
                 <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
-                <span className="shrink-0" style={FIGURE_STYLE}>
-                  {formatNumber(c.courses)}
-                  <span style={{ color: INK_MUTE, fontWeight: 600 }}>
-                    {'\u00A0/\u00A0'}
-                    {formatNumber(c.directory_total)}
-                  </span>
-                </span>
               </span>
             </SelectItem>
           ))}
@@ -507,34 +480,25 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectGroup>
           <SelectLabel
-            className="sticky top-0 z-10 flex w-full items-center justify-between py-2 pl-8 pr-2"
+            className="sticky top-0 z-10 flex w-full items-center py-2 pl-8 pr-2"
             style={{
               borderBottom: `1px solid ${HAIRLINE_INK_8}`,
               backgroundColor: 'hsl(var(--card))',
             }}
           >
             <span style={LABEL}>{t('statBrowse.colRegion')}</span>
-            <span style={LABEL}>{t('statBrowse.colCountsRegion')}</span>
           </SelectLabel>
           <SelectItem value="all" className="[&>span:last-child]:w-full">
             <span className="flex w-full items-center gap-2">
               <span className="flex-1 min-w-0 truncate">
                 {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
               </span>
-              {countryEntry ? (
-                <span className="shrink-0" style={FIGURE_STYLE}>
-                  {formatNumber(countryEntry.courses)}
-                </span>
-              ) : null}
             </span>
           </SelectItem>
           {regionsForCountry.map((r) => (
             <SelectItem key={r.region} value={r.region} className="[&>span:last-child]:w-full">
               <span className="flex w-full items-center gap-2">
                 <span className="flex-1 min-w-0 truncate">{r.region}</span>
-                <span className="shrink-0" style={FIGURE_STYLE}>
-                  {formatNumber(r.courses)}
-                </span>
               </span>
             </SelectItem>
           ))}
