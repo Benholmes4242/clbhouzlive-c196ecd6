@@ -55,7 +55,7 @@ export default function AdminShell() {
   const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
 
   return (
-    <div style={{ minHeight: '100dvh', background: t.canvas, color: t.ink }}>
+    <div style={{ minHeight: '100dvh', background: t.canvas, color: t.ink, colorScheme: 'dark' }}>
       <AdminDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}

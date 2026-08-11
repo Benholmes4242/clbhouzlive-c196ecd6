@@ -62,7 +62,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
         aria-hidden={!open}
         style={{
           position: 'fixed', inset: 0, zIndex: 90,
-          background: 'rgba(0,0,0,0.45)',
+          background: 'rgba(0,0,0,0.6)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
           transition: 'opacity .22s ease',
