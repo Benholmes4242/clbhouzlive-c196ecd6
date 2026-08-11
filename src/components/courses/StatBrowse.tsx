@@ -173,11 +173,15 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   /* ── URL state: read + validate against the facets ─────────────── */
   /**
    * Lens precedence, highest first:
-   *   1. ?lens= URL param (if a known lens id)
-   *   2. 'rated' — the landing default, never persisted across visits
+   *   1. ?lens= URL param (if a known lens id) — an EXPLICIT choice, never
+   *      reassigned and never disabled, even when it returns no rows.
+   *   2. otherwise 'rated', resolved against the facet counts for the current
+   *      area so a DEFAULTED lens never lands on a dead combination. The
+   *      resolution is never written to the URL: it must keep following the
+   *      data as the member changes area.
    */
   const urlLens = searchParams.get('lens');
-  const lens: StatLens = isStatLens(urlLens) ? urlLens : 'rated';
+  const lensExplicit = isStatLens(urlLens);
 
   const urlCountry = searchParams.get('country');
   const country = useMemo(() => {
@@ -197,6 +201,33 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     if (!facets) return urlRegion;
     return regionsForCountry.some((r) => r.region === urlRegion) ? urlRegion : null;
   }, [country, urlRegion, facets, regionsForCountry]);
+
+  const countryEntry = facets?.countries.find((c) => c.sub_country === country) ?? null;
+  const regionEntry =
+    country && region
+      ? facets?.regions.find((r) => r.sub_country === country && r.region === region) ?? null
+      : null;
+
+  /**
+   * Lens availability for the CURRENT scope: region entry, else country entry,
+   * else the platform-wide counts. Counts come from get_stat_browse_facets —
+   * see the drift-trap note in useStatBrowse.ts. FAILS OPEN: unsettled facets
+   * or a pre-lens_counts cached payload leave every lens selectable.
+   * Derives from country/region only — never from `lens` — so the resolved
+   * default below can read it without a cycle.
+   */
+  const scopeLensCounts: LensCounts | null = region
+    ? regionEntry?.lens_counts ?? null
+    : country
+      ? countryEntry?.lens_counts ?? null
+      : facets?.lens_counts_all ?? null;
+
+  const lens: StatLens = lensExplicit
+    ? urlLens
+    : scopeLensCounts && (scopeLensCounts.rated ?? 0) === 0
+      ? STAT_LENSES.find((l) => (scopeLensCounts[l] ?? 0) > 0) ?? 'rated'
+      : 'rated';
+
 
   const { rows, totalCount, isLoading, isPaging, loadMore } = useStatBrowseList({
     lens,
