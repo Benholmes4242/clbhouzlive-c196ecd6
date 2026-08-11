@@ -21654,6 +21654,10 @@ export type Database = {
       populate_taggable_entities: { Args: never; Returns: undefined }
       populate_tour_ranking_wins: { Args: never; Returns: undefined }
       post_is_round: { Args: { p_post_id: string }; Returns: boolean }
+      post_proof_liked: {
+        Args: { p_actor_ids: string[]; p_post_id: string; p_since: string }
+        Returns: boolean
+      }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
@@ -21739,6 +21743,10 @@ export type Database = {
       }
       record_post_impressions: {
         Args: { p_post_ids: string[] }
+        Returns: undefined
+      }
+      recount_round_post_likes: {
+        Args: { p_score_id: string }
         Returns: undefined
       }
       redeem_whs_invite: {
@@ -22708,6 +22716,15 @@ export type Database = {
           reacted: boolean
           reaction_count: number
         }[]
+      }
+      toggle_post_like: {
+        Args: {
+          p_actor_id?: string
+          p_actor_type?: string
+          p_liked: boolean
+          p_post_id: string
+        }
+        Returns: Json
       }
       toggle_whs_round_reaction: {
         Args: { p_reaction_type?: string; p_score_id: string }
