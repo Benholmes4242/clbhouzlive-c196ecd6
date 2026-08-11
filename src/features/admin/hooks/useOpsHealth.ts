@@ -36,11 +36,24 @@ export interface OpsErrors {
   users_hit_24h: number;
 }
 
+/**
+ * Rounds counted on play_date, NOT created_at: a member connecting a handicap
+ * backfills history, which would spike created_at by dozens on one day.
+ */
+export interface OpsActivity {
+  rounds_in_window: number;
+  rounds_prev_window: number;
+  rounds_members: number;
+  /** 14 points, zeros included. Render every day; do not smooth or drop. */
+  daily: { date: string; n: number }[];
+}
+
 export interface OpsHealth {
   /** Sorted by members DESC then sessions DESC by the RPC. Render as given. */
   clients: OpsClientRow[];
   traffic: OpsTraffic;
   errors: OpsErrors;
+  activity: OpsActivity;
   window_days: number;
   computed_at: string;
 }
