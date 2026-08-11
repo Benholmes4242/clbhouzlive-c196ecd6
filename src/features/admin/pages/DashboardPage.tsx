@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, MessageSquare, UserPlus, Star } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CARD, KICKER, LABEL, FIG, Skeleton } from '../lib/chartPrimitives';
+
 import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
