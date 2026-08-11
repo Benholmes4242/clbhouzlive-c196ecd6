@@ -560,3 +560,37 @@ export function useScoringBreakdownAllCourses(enabled: boolean) {
     },
   });
 }
+
+// ── Most damaging holes, cross-course (WHS connect payoff screen) ────
+export interface NemesisHole {
+  course_id: string;
+  course_name: string | null;
+  course_region: string | null;
+  course_country: string | null;
+  hole_no: number;
+  par: number;
+  times_played: number;
+  my_avg_over: number;
+  field_avg_over: number | null;
+}
+
+/**
+ * get_my_nemesis_holes(p_user_id, p_limit). READ ONLY.
+ * The RPC already enforces its own sample floor (a hole must have been played
+ * at least three times), so the client never filters on times_played.
+ */
+export function useNemesisHoles(userId: string | undefined, limit = 3, enabled = true) {
+  return useQuery<NemesisHole[]>({
+    queryKey: ['whs-nemesis-holes', userId, limit],
+    enabled: enabled && !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)('get_my_nemesis_holes', {
+        p_user_id: userId,
+        p_limit: limit,
+      });
+      if (error) throw error;
+      return (data ?? []) as NemesisHole[];
+    },
+  });
+}
