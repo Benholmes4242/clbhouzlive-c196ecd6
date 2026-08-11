@@ -432,11 +432,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     [t, lens],
   );
 
-  const countryEntry = facets?.countries.find((c) => c.sub_country === country) ?? null;
-  const regionEntry =
-    country && region
-      ? facets?.regions.find((r) => r.sub_country === country && r.region === region) ?? null
-      : null;
+
+
 
   /**
    * Count sentence appended to the lens description: location, figures and a
