@@ -225,27 +225,42 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      <AlertBannerRow
-        triage={triage.data}
-        pushRed={push.data?.status === 'red'}
+      {/* Status first: an admin opens this to find out whether anything is
+          broken, so system state leads and vanity metrics follow. */}
+      <SystemPanel
+        chips={{ eg: egChip, cron: cronChip, echo: echoChip, push: pushChip, errors: errorsChip }}
         nonOkChips={nonOkChips}
+        triage={triage}
+        ops={ops.data}
+        opsLoading={ops.isLoading}
+        eg={eg.data}
       />
 
-      <RightNowStrip
+      <ActivationPanel ops={ops.data} loading={ops.isLoading} />
+
+      <PipelinePanel ops={ops.data} loading={ops.isLoading} />
+
+      <RightNowPanel
         live={live.data?.count ?? null}
-        loading={live.isLoading}
+        liveLoading={live.isLoading}
         intraday={intraday.data ?? []}
         intradayLoading={intraday.isLoading}
+        topUsers={dashboard.glance.data?.topActiveUsers}
+        topUsersLoading={dashboard.glance.isLoading}
       />
 
       <MetricGrid loading={loading} data={m} ops={ops.data} opsLoading={ops.isLoading} />
 
-      <ActiveMembersChart
+      <RetentionPanel data={retention.data} loading={retention.isLoading} />
+
+      <ActiveMembersPanel
         data={actives.data ?? []}
         loading={actives.isLoading}
         isError={actives.isError}
         onRetry={() => actives.refetch()}
       />
+
+      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
 
       <LatestInClubhouse
         items={feed.data ?? []}
@@ -254,16 +269,11 @@ export default function DashboardPage() {
         onRetry={() => feed.refetch()}
       />
 
-      <ClientSplitPanel data={ops.data} loading={ops.isLoading} />
-
-      <HealthChipStrip echoChip={echoChip} pushChip={pushChip} egChip={egChip} cronChip={cronChip} errorsChip={errorsChip} />
-
-      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
-
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
   );
 }
+
 
 
 // ─── Metric grid ──────────────────────────────────────────────────────────────
