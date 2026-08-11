@@ -475,6 +475,36 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
 
+  /**
+   * Area items grouped by macro-region (facets.countries[].country). Groups are
+   * ordered by their largest member's course count DESC, never alphabetically.
+   * Within a group the RPC's own order is preserved. Entries with a missing
+   * country (e.g. a cached payload predating the RPC change) fall into a final
+   * unlabelled group.
+   */
+  const countryGroups = useMemo(() => {
+    type Entry = NonNullable<typeof facets>['countries'][number];
+    const entries: Entry[] = facets?.countries ?? [];
+    const map = new Map<string, Entry[]>();
+    entries.forEach((c) => {
+      const key = c.country || '';
+      const list = map.get(key);
+      if (list) list.push(c);
+      else map.set(key, [c]);
+    });
+    return [...map.entries()]
+      .map(([countryKey, list]) => ({
+        country: countryKey,
+        entries: list,
+        peak: list.reduce((m, e) => Math.max(m, e.courses), 0),
+      }))
+      .sort((a, b) => {
+        if (!a.country) return 1;
+        if (!b.country) return -1;
+        return b.peak - a.peak;
+      });
+  }, [facets]);
+
   const countrySelect = (compact: boolean) => (
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
@@ -492,32 +522,35 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )}
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        <SelectGroup>
-          <SelectLabel
-            className="sticky top-0 z-10 flex w-full items-center py-2 pl-8 pr-2"
-            style={{
-              borderBottom: `1px solid ${HAIRLINE_INK_8}`,
-              backgroundColor: 'hsl(var(--card))',
-            }}
-          >
-            <span style={LABEL}>{t('statBrowse.colArea')}</span>
-          </SelectLabel>
-          <SelectItem value="all" className="[&>span:last-child]:w-full">
-            <span className="flex w-full items-center gap-2">
-              <Globe {...DD_ICON} />
-              <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
-            </span>
-          </SelectItem>
-          {(facets?.countries ?? []).map((c) => (
-            <SelectItem key={c.sub_country} value={c.sub_country} className="[&>span:last-child]:w-full">
-              <span className="flex w-full items-center gap-2">
-                <CountryFlag country={c.sub_country} size="sm" />
-                <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
-              </span>
-            </SelectItem>
-          ))}
-        </SelectGroup>
+        <SelectItem value="all" className="[&>span:last-child]:w-full">
+          <span className="flex w-full items-center gap-2">
+            <Globe {...DD_ICON} />
+            <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
+          </span>
+        </SelectItem>
+        {countryGroups.map((g) => (
+          <SelectGroup key={g.country || '__ungrouped'}>
+            {g.country ? (
+              <SelectLabel className="flex w-full items-center py-2 pl-8 pr-2">
+                <span style={LABEL}>{g.country}</span>
+              </SelectLabel>
+            ) : null}
+            {g.entries.map((c) => (
+              <SelectItem
+                key={c.sub_country}
+                value={c.sub_country}
+                className="[&>span:last-child]:w-full"
+              >
+                <span className="flex w-full items-center gap-2">
+                  <CountryFlag country={c.sub_country} size="sm" />
+                  <span className="flex-1 min-w-0 truncate">{c.sub_country}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        ))}
       </SelectContent>
+
     </Select>
   );
 

@@ -53,7 +53,13 @@ export interface StatBrowseRow {
 }
 
 export interface StatBrowseFacets {
-  countries: Array<{ sub_country: string; courses: number; directory_total: number }>;
+  countries: Array<{
+    /** Macro-region (golf_courses.country). '' when a cached payload predates it. */
+    country: string;
+    sub_country: string;
+    courses: number;
+    directory_total: number;
+  }>;
   regions: Array<{ sub_country: string; region: string; courses: number }>;
   played_total: number;
   directory_total: number;
@@ -96,6 +102,7 @@ export function useStatBrowseFacets() {
       const d = (data ?? {}) as Record<string, unknown>;
       return {
         countries: ((d.countries as StatBrowseFacets['countries']) ?? []).map((c) => ({
+          country: String(c.country ?? ''),
           sub_country: c.sub_country,
           courses: Number(c.courses),
           directory_total: Number(c.directory_total),
