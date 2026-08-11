@@ -475,6 +475,36 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
 
+  /**
+   * Area items grouped by macro-region (facets.countries[].country). Groups are
+   * ordered by their largest member's course count DESC, never alphabetically.
+   * Within a group the RPC's own order is preserved. Entries with a missing
+   * country (e.g. a cached payload predating the RPC change) fall into a final
+   * unlabelled group.
+   */
+  const countryGroups = useMemo(() => {
+    const map = new Map<string, typeof entries>();
+    type Entry = NonNullable<typeof facets>['countries'][number];
+    const entries: Entry[] = facets?.countries ?? [];
+    entries.forEach((c) => {
+      const key = c.country || '';
+      const list = map.get(key);
+      if (list) list.push(c);
+      else map.set(key, [c]);
+    });
+    return [...map.entries()]
+      .map(([countryKey, list]) => ({
+        country: countryKey,
+        entries: list,
+        peak: list.reduce((m, e) => Math.max(m, e.courses), 0),
+      }))
+      .sort((a, b) => {
+        if (!a.country) return 1;
+        if (!b.country) return -1;
+        return b.peak - a.peak;
+      });
+  }, [facets]);
+
   const countrySelect = (compact: boolean) => (
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
