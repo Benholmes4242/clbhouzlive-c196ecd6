@@ -476,14 +476,17 @@ const HandicapPage: React.FC = () => {
   // on every render in the same order (rules of hooks).
   // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
   // passing undefined is safe — it just stays disabled.
-  const { data: ownConnection, isLoading: connLoading, isError: connError, refetch: refetchConn } = useWhsConnection(
+  const { data: ownConnection, isFetched: connFetched, isError: connError, refetch: refetchConn } = useWhsConnection(
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
-  // Connect flow = own view, query settled, no error, no connection. The whole page is
-  // light now (matches Clubhouse/Watch/Tours) — connect flow no longer needs
-  // a special-case background.
-  const isConnectFlow = !isFriendView && !connLoading && !connError && !ownConnection;
+  // Connect flow = own view, query SETTLED, no error, no connection.
+  // Settled means isFetched, NOT !isLoading: a disabled React Query v5 query is
+  // pending with fetchStatus 'idle', so isLoading is false before it has ever
+  // run. This page currently early-returns while the session is loading, so the
+  // old !connLoading read happened to be safe - gating on isFetched removes the
+  // dependency on that early return continuing to exist.
+  const isConnectFlow = !isFriendView && connFetched && !connError && !ownConnection;
 
   // Apply the dark route theming only when NOT in the connect flow.
   // The connect flow uses Direction A (light) and the dark theming would
