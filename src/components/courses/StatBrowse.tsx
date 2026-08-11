@@ -483,9 +483,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
    * unlabelled group.
    */
   const countryGroups = useMemo(() => {
-    const map = new Map<string, typeof entries>();
     type Entry = NonNullable<typeof facets>['countries'][number];
     const entries: Entry[] = facets?.countries ?? [];
+    const map = new Map<string, Entry[]>();
     entries.forEach((c) => {
       const key = c.country || '';
       const list = map.get(key);
