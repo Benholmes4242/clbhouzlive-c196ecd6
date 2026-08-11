@@ -431,6 +431,25 @@ function MetricGrid({ loading, data, ops, opsLoading }: {
 
 // ─── Clubhouse feed ───────────────────────────────────────────────────────────
 
+/**
+ * Local to-par. NOT imported from the member tokens: that module carries
+ * member-surface colours, and pulling it in would couple two palettes.
+ * ROUND FIRST, THEN BRANCH - taking the sign before rounding renders "-0.0"
+ * on a value fractionally under par.
+ */
+function toParParts(gross: number, par: number): { text: string; color: string } {
+  const rounded = Math.round(gross - par);
+  if (rounded === 0) return { text: 'E', color: t.inkMuted };
+  if (rounded < 0) return { text: `\u2212${Math.abs(rounded)}`, color: t.danger };
+  return { text: `+${rounded}`, color: t.ink };
+}
+
+const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
+  member: { text: 'JOINED', color: t.ok },
+  post:   { text: 'POST',   color: t.inkFaint },
+  review: { text: 'REVIEW', color: t.brandText },
+};
+
 function LatestInClubhouse({
   items, loading, isError, onRetry,
 }: {
@@ -441,23 +460,15 @@ function LatestInClubhouse({
   const [openCourse, setOpenCourse] = React.useState<string | null>(null);
 
   return (
-    <section
-      style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, boxShadow: t.shadowCard,
-        padding: 16, display: 'flex', flexDirection: 'column', gap: 12,
-      }}
-    >
-      <div>
-        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
-        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>New members, posts, and reviews</div>
+    <section style={CARD}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+        <span style={KICKER}>Latest in the clubhouse</span>
+        <Link to="/admin-v2/content" style={{ ...LABEL, color: t.inkMuted, textDecoration: 'none' }}>ALL</Link>
       </div>
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ height: 52, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
+          {[0, 1, 2].map(i => <Skeleton key={i} height={52} />)}
         </div>
       ) : isError ? (
         <AdminErrorState message="Couldn't load recent activity." onRetry={onRetry} />
@@ -488,9 +499,7 @@ function FeedRow({
   onOpenPost: (id: string) => void;
   onOpenCourse: (id: string) => void;
 }) {
-  const chip = feedChip(item.kind);
-  // C4-3: post rows -> post insight sheet (upgrades the temporary author-360 routing).
-  // C4-2 (b): review rows -> course insight sheet.
+  // Post rows -> post insight sheet; review rows -> course insight sheet.
   const opensSheet =
     (item.kind === 'post' && !!item.postId) ||
     (item.kind === 'review' && !!item.courseId);
@@ -498,51 +507,70 @@ function FeedRow({
   const rowStyle: React.CSSProperties = {
     display: 'flex', alignItems: 'flex-start', gap: 10,
     padding: '10px 0',
-    borderTop: first ? 'none' : `1px solid ${t.line}`,
+    borderTop: first ? 'none' : `1px solid ${t.hairline}`,
     textDecoration: 'none', color: 'inherit',
     background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
     cursor: 'pointer',
   };
 
+  const kind = KIND_LABEL[item.kind];
+  const round = item.round;
+
   const inner = (
     <>
-      <span
-        aria-hidden
-        style={{
-          width: 28, height: 28, borderRadius: 8,
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: chip.bg, color: chip.fg, flexShrink: 0,
-        }}
-      >
-        {chip.icon}
-      </span>
+      {/* 4.2h The 28px slot is reserved either way so bodies align. */}
       {item.avatarUrl ? (
-        <SquircleAvatar src={item.avatarUrl} alt={item.title} size={28} hairlineRing ringColor={LIGHT_HAIRLINE} />
-      ) : null}
+        <SquircleAvatar src={item.avatarUrl} alt={item.subject} size={28} hairlineRing ringColor={t.line} />
+      ) : (
+        <span
+          aria-hidden
+          style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }}
+        />
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
           <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {item.title}
+            {item.subject}
           </span>
-          <span style={{ color: t.inkFaint, fontSize: 11 }}>- {relTime(item.created_at)}</span>
+          <span style={{ ...LABEL, color: kind.color, flexShrink: 0 }}>{kind.text}</span>
         </div>
-        {item.warnings.length > 0 && (
-          <div style={{ color: t.warnText, fontSize: 11, fontWeight: 700, marginTop: 2 }}>
-            {item.warnings.join(' - ')}
-          </div>
-        )}
-        {item.subtitle && (
+        {item.body && (
           <div
             style={{
               color: t.inkMuted, fontSize: 13, marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}
           >
-            {item.subtitle}
+            {item.body}
+          </div>
+        )}
+        {(item.warnings.length > 0 || item.meta.length > 0 || round) && (
+          <div
+            style={{
+              ...LABEL, ...FIG, marginTop: 3,
+              display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 8,
+            }}
+          >
+            {item.warnings.map(w => (
+              <span key={w} style={{ color: t.warnText, fontWeight: 700 }}>{w}</span>
+            ))}
+            {item.meta.map(mt => <span key={mt}>{mt}</span>)}
+            {round && (() => {
+              const p = toParParts(round.gross, round.par);
+              return (
+                <span style={{ color: t.inkMuted }}>
+                  <span style={{ color: t.ink, fontWeight: 700 }}>{round.gross}</span>{' '}
+                  <span style={{ color: p.color, fontWeight: 700 }}>{p.text}</span>
+                  {round.courseName ? ` - ${round.courseName}` : ''}
+                </span>
+              );
+            })()}
           </div>
         )}
       </div>
-      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 12, flexShrink: 0 }} />
+      {/* 4.2a Right rail: age only. Nothing else may sit in this column. */}
+      <span style={{ ...LABEL, ...FIG, flexShrink: 0, marginTop: 1 }}>{relTime(item.created_at)}</span>
+      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 1, flexShrink: 0 }} />
     </>
   );
 
@@ -554,7 +582,7 @@ function FeedRow({
           if (item.kind === 'post' && item.postId) onOpenPost(item.postId);
           else if (item.kind === 'review' && item.courseId) onOpenCourse(item.courseId);
         }}
-        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.line }}
+        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline }}
       >
         {inner}
       </button>
@@ -568,13 +596,4 @@ function FeedRow({
   );
 }
 
-
-function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
-  switch (kind) {
-    case 'member': return { icon: <UserPlus size={14} />, bg: t.neutralSoft, fg: t.ink };
-    case 'review': return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
-    case 'post':
-    default:       return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };
-  }
-}
 
