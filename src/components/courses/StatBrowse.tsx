@@ -669,14 +669,25 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )}
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        {STAT_LENSES.map((l) => (
-          <SelectItem key={l} value={l}>
-            <span className="flex items-center gap-2">
-              <LensIcon lens={l} />
-              {t(`statBrowse.lens.${l}.label`)}
-            </span>
-          </SelectItem>
-        ))}
+        {/* Fixed order, nothing hidden or reordered: a lens with no qualifying
+            course in this area is disabled with the reason beside it. */}
+        {STAT_LENSES.map((l) => {
+          const reason = lensUnavailableReason(l);
+          return (
+            <SelectItem key={l} value={l} disabled={!!reason}>
+              <span className="flex items-center gap-2 w-full">
+                <LensIcon lens={l} />
+                <span style={{ opacity: reason ? 0.9 : 1 }}>
+                  {t(`statBrowse.lens.${l}.label`)}
+                </span>
+                {reason ? (
+                  <span style={{ ...LABEL, marginLeft: 'auto', paddingLeft: 10 }}>{reason}</span>
+                ) : null}
+              </span>
+            </SelectItem>
+          );
+        })}
+
       </SelectContent>
 
     </Select>
