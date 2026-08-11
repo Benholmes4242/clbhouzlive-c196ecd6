@@ -312,7 +312,7 @@ export function VerificationDetailBody({
             <div style={{
               background: 'rgba(245, 158, 11, 0.10)',
               border: '1px solid rgba(245, 158, 11, 0.35)',
-              color: '#b45309',
+              color: t.warnText,
               padding: '8px 10px',
               borderRadius: 8,
               fontSize: 12,
@@ -395,7 +395,7 @@ export function VerificationDetailBody({
         <Field label="Email verification">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {(row.proofMetadata as any)?.email_verified || row.domainConfirmed ? (
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>Email verified (OTP)</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: t.okText }}>Email verified (OTP)</span>
           ) : (
             <span style={{ fontSize: 12, fontWeight: 600, color: t.inkMuted }}>Email provided (unverified)</span>
           )}

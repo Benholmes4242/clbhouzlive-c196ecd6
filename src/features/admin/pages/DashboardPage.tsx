@@ -661,7 +661,7 @@ function FeedRow({
 
 function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
   switch (kind) {
-    case 'member': return { icon: <UserPlus size={14} />, bg: '#DBEAFE', fg: '#1D4ED8' };
+    case 'member': return { icon: <UserPlus size={14} />, bg: t.neutralSoft, fg: t.ink };
     case 'review': return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
     case 'post':
     default:       return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };

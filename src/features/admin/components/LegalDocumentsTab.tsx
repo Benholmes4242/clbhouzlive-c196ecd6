@@ -180,8 +180,8 @@ export default function LegalDocumentsTab() {
 
 const iconBtnStyle: React.CSSProperties = {
   width: 32, height: 32, borderRadius: 8,
-  border: '1px solid #E2E8F0',
-  background: '#FFFFFF', color: '#0F172A',
+  border: `1px solid ${t.line}`,
+  background: t.surface, color: t.ink,
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
   cursor: 'pointer', flexShrink: 0,
 };
@@ -299,15 +299,15 @@ function DocumentEditor({
           <Field label="Status">
             <label style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '10px 12px', borderRadius: 10, border: '1px solid #E2E8F0',
-              background: '#FFFFFF', cursor: 'pointer',
+              padding: '10px 12px', borderRadius: 10, border: `1px solid ${t.line}`,
+              background: t.surface, cursor: 'pointer',
             }}>
               <input
                 type="checkbox"
                 checked={form.is_published}
                 onChange={(e) => setForm({ ...form, is_published: e.target.checked })}
               />
-              <span style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>
+              <span style={{ fontSize: 13, color: t.ink, fontWeight: 600 }}>
                 {form.is_published ? 'Published (live)' : 'Draft (hidden)'}
               </span>
             </label>
@@ -321,9 +321,9 @@ function DocumentEditor({
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>{label}</label>
+      <label style={{ fontSize: 12, color: t.inkMuted, fontWeight: 600 }}>{label}</label>
       {children}
-      {hint && <div style={{ fontSize: 11, color: '#94A3B8' }}>{hint}</div>}
+      {hint && <div style={{ fontSize: 11, color: t.inkFaint }}>{hint}</div>}
     </div>
   );
 }
@@ -332,20 +332,20 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 12px',
   borderRadius: 10,
-  border: '1px solid #E2E8F0',
-  background: '#FFFFFF',
-  color: '#0F172A',
+  border: `1px solid ${t.line}`,
+  background: t.surface,
+  color: t.ink,
   fontSize: 14,
   outline: 'none',
 };
 
 const btnPrimary: React.CSSProperties = {
   padding: '10px 16px', borderRadius: 10, border: 'none',
-  background: '#0F172A', color: '#FFFFFF', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+  background: t.ink, color: t.canvas, fontSize: 13, fontWeight: 700, cursor: 'pointer',
 };
 
 const btnSecondary: React.CSSProperties = {
   padding: '10px 14px', borderRadius: 10,
-  border: '1px solid #E2E8F0', background: '#FFFFFF', color: '#0F172A',
+  border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
   fontSize: 13, fontWeight: 600, cursor: 'pointer',
 };

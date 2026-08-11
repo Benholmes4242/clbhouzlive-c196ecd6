@@ -26,7 +26,7 @@ export default function DetailDrawer({ open, onClose, title, subtitle, children,
         aria-hidden={!open}
         style={{
           position: 'fixed', inset: 0, zIndex: 150,
-          background: 'rgba(15,23,42,0.45)',
+          background: 'rgba(0,0,0,0.6)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
           transition: 'opacity .22s ease',

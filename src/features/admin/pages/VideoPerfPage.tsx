@@ -529,7 +529,7 @@ function HeadlineCard({
   const chipFg = bad ? t.dangerText : good ? t.okText : t.inkMuted;
   return (
     <div style={{ ...cardStyle, padding: 14, display: 'flex', flexDirection: 'column', gap: 8, minHeight: 96,
-      borderColor: bad ? '#FCA5A5' : t.line }}>
+      borderColor: bad ? t.danger : t.line }}>
       <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.3 }}>{label}</div>
       <div style={{ color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>{loading ? '—' : value}</div>
       {deltaPct != null && (
@@ -560,7 +560,9 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-const LINE_COLORS = ['#0F172A', '#F7931E', '#2563EB', '#16A34A', '#DC2626'];
+// Series colours from tokens. There is no blue token, so the third series
+// takes inkMuted: one hue less than before, but no literal.
+const LINE_COLORS = [t.ink, t.brand, t.inkMuted, t.ok, t.danger];
 function ChartLines({ data, keys, colorOverride }: { data: any[]; keys: string[]; colorOverride?: string[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">

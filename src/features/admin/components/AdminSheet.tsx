@@ -41,7 +41,7 @@ export default function AdminSheet({ open, onClose, title, subtitle, children, f
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 250,
-        background: 'rgba(15,23,42,0.55)',
+        background: 'rgba(0,0,0,0.6)',
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',

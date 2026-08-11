@@ -142,7 +142,7 @@ export default function AppealDetailDrawer({ open, onClose, row }: Props) {
           onClick={() => !busy && setMode(null)}
           style={{
             position: 'fixed', inset: 0, zIndex: 300,
-            background: 'rgba(15,23,42,0.55)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
           }}
         >
@@ -208,7 +208,7 @@ function btnGhost(): React.CSSProperties {
 function btnPrimary(busy = false): React.CSSProperties {
   return {
     padding: '8px 14px', borderRadius: t.radius.md,
-    border: 'none', background: '#F7931E', color: '#0F172A',
+    border: 'none', background: t.brand, color: t.canvas,
     fontSize: 13, fontWeight: 700,
     cursor: busy ? 'not-allowed' : 'pointer',
     opacity: busy ? 0.55 : 1,

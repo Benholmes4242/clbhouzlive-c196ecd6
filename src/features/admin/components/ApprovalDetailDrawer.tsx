@@ -158,7 +158,7 @@ export default function ApprovalDetailDrawer({ open, onClose, row }: Props) {
           onClick={() => !reject.isPending && setRejectOpen(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 300,
-            background: 'rgba(15,23,42,0.55)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
           }}
         >
@@ -220,7 +220,7 @@ function btnGhost(): React.CSSProperties {
 function btnDanger(busy = false): React.CSSProperties {
   return {
     padding: '8px 14px', borderRadius: t.radius.md,
-    border: 'none', background: t.dangerText ?? '#b91c1c', color: '#fff',
+    border: 'none', background: t.dangerText, color: t.canvas,
     fontSize: 13, fontWeight: 700,
     cursor: busy ? 'not-allowed' : 'pointer',
     opacity: busy ? 0.55 : 1,

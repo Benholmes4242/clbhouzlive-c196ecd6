@@ -62,7 +62,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
         aria-hidden={!open}
         style={{
           position: 'fixed', inset: 0, zIndex: 90,
-          background: 'rgba(0,0,0,0.45)',
+          background: 'rgba(0,0,0,0.6)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
           transition: 'opacity .22s ease',
@@ -85,7 +85,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
           <div
             style={{
               width: 34, height: 34, borderRadius: 12,
-              background: 'linear-gradient(135deg,#F7931E,#E8920F)',
+              background: `linear-gradient(135deg,${t.brand},${t.brandText})`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: t.surface,
             }}
