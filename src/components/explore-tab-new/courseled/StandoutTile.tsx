@@ -1,0 +1,281 @@
+import React, { useState } from 'react';
+
+import { CourseImageFallback } from './CourseImageFallback';
+import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
+
+/**
+ * THE STANDOUT TILE — one card, two sections (BRIEF_PERSONAL_BESTS_SECTION §3.3).
+ *
+ * Extracted VERBATIM from AroundTheWorld's tile markup so Standout Rounds and
+ * Personal Bests read as siblings by construction rather than by discipline. No
+ * value was changed in the move: photo scrim, 10px glass figure chip top-left,
+ * plain age label top-right, course name + region over the image, WHO line in
+ * ink (amber when the viewer), quiet detail line beneath.
+ *
+ * The ONE addition Personal Bests needed is `subline` — the server's
+ * reference_line, rendered under the detail in a quieter tone. Standout Rounds
+ * passes nothing for it, so its tiles are byte-identical to before.
+ */
+
+export const TILE_SCRIM =
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
+
+/** A photo at or above this height gets the larger chip and name sizes. */
+export const TALL = 180;
+
+interface Props {
+  courseId: string;
+  courseName: string | null;
+  imageUrl: string | null;
+  region: string | null;
+  /** Photo height in px — a pure function of rank position in both sections. */
+  photo: number;
+  /** Figure chip. Rendered only when `figure` is present. */
+  figure: string | null;
+  unit?: string;
+  /** Relative age, top-right. */
+  whenLabel: string;
+  /** Member name, already resolved ("You" for the viewer). */
+  who: string;
+  isOwn: boolean;
+  /** Quiet line under the name. Empty string renders nothing. */
+  detail?: string;
+  onDetailPress?: () => void;
+  /**
+   * PERSONAL BESTS ONLY: the server's reference_line. Null renders NOTHING —
+   * no dash, no placeholder (§3.5).
+   */
+  subline?: string | null;
+  /** Fixed-width trailing slot on the WHO row (the reaction control). */
+  trailing?: React.ReactNode;
+  /** Anything below the detail line ("+n more here"). */
+  footer?: React.ReactNode;
+  /** New-since ring. */
+  isNew?: boolean;
+  onPress?: () => void;
+}
+
+export function StandoutTile({
+  courseId,
+  courseName,
+  imageUrl,
+  region,
+  photo,
+  figure,
+  unit,
+  whenLabel,
+  who,
+  isOwn,
+  detail = '',
+  onDetailPress,
+  subline = null,
+  trailing,
+  footer,
+  isNew = false,
+  onPress,
+}: Props) {
+  const [pressed, setPressed] = useState(false);
+  const tall = photo >= TALL;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onPress}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      onPointerCancel={() => setPressed(false)}
+      style={{
+        ...CARD_SHELL,
+        ...(isNew ? NEW_CARD_RING : null),
+        padding: 0,
+        textAlign: 'left',
+        fontFamily: SANS,
+        cursor: onPress ? 'pointer' : 'default',
+        opacity: pressed ? 0.72 : 1,
+        transition: 'opacity 120ms ease',
+      }}
+    >
+      <CourseImageFallback
+        courseId={courseId}
+        courseName={courseName}
+        imageUrl={imageUrl}
+        initialsSize={tall ? 26 : 22}
+        style={{ height: photo }}
+      >
+        <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
+
+        {/* FIGURE CHIP — the reason the tile exists: 10px radius on a blurred
+            glass substrate, so the age beside it stops competing. */}
+        {figure && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 4,
+              padding: '5px 10px',
+              borderRadius: 10,
+              background: 'rgba(10,14,10,0.58)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+          >
+            <span
+              style={{
+                ...NUMF,
+                fontSize: 16,
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                color: '#FFFFFF',
+              }}
+            >
+              {figure}
+            </span>
+            {unit && (
+              <span
+                style={{
+                  fontSize: 6.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  lineHeight: 1,
+                  color: 'rgba(255,255,255,0.60)',
+                }}
+              >
+                {unit}
+              </span>
+            )}
+          </span>
+        )}
+
+        {/* AGE — the least important fact on the tile, so not a pill. */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 10,
+            fontSize: 6.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.72)',
+            textShadow: '0 1px 2px rgba(10,14,10,0.55)',
+          }}
+        >
+          {whenLabel}
+        </span>
+
+        <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 800,
+              color: '#fff',
+              letterSpacing: '-0.025em',
+              lineHeight: 1.14,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {courseName}
+          </div>
+          {region && (
+            <div
+              style={{
+                ...LABEL,
+                fontSize: 6.5,
+                color: 'rgba(255,255,255,0.60)',
+                marginTop: 3,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {region}
+            </div>
+          )}
+        </div>
+      </CourseImageFallback>
+
+      {/* TEXT PANEL — no figure here. One figure per tile. */}
+      <div style={{ padding: '11px 13px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 13,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              color: isOwn ? A.AMBER_DEEP : A.INK,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {who || detail}
+          </div>
+          {trailing}
+        </div>
+
+        {!!who && !!detail && (
+          <div
+            role={onDetailPress ? 'button' : undefined}
+            onClick={
+              onDetailPress
+                ? (ev) => {
+                    ev.stopPropagation();
+                    onDetailPress();
+                  }
+                : undefined
+            }
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              lineHeight: 1.32,
+              color: A.MUTE,
+              marginTop: 2,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              cursor: onDetailPress ? 'pointer' : 'inherit',
+            }}
+          >
+            {detail}
+          </div>
+        )}
+
+        {/* THE REFERENCE LINE (§3.5). Quieter than the detail, never a
+            placeholder when absent. */}
+        {subline ? (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: 'rgba(104,112,123,0.78)',
+              marginTop: 3,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {subline}
+          </div>
+        ) : null}
+
+        {footer}
+      </div>
+    </div>
+  );
+}
+
+export default StandoutTile;
