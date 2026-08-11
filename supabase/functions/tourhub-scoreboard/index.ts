@@ -2,6 +2,10 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 import { corsFor } from '../_shared/cors.ts';
+
+// Module scope: helpers below the handler spread this, so it must NOT be
+// handler-scoped. Reassigned per request as the first line of the handler.
+let corsHeaders: Record<string, string> = corsFor(null);
 const ALLOWED_TOURS = new Set(["pga", "lpga", "eur", "champions-tour"]);
 
 function jsonResponse(body: unknown, status = 200, cacheSeconds = 60) {
@@ -33,7 +37,7 @@ function first<T>(arr: T[] | undefined | null): T | null {
 }
 
 serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

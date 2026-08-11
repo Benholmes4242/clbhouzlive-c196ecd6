@@ -20,7 +20,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 import { corsFor } from '../_shared/cors.ts';
-const FUNCTION_VERSION = "2026-07-25-unmatched-queue-v1";
+const FUNCTION_VERSION = "2026-08-11-cors-and-error-queue-v2";
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
 const TIER_1_3_METHODS = new Set([
@@ -294,6 +294,26 @@ Deno.serve(async (req) => {
           whs_course_id: whsCourseId,
           error: msg,
         }));
+        // A course that fails to PROCESS must still reach a human, and must be
+        // distinguishable in the Inbox from one the ladder cleanly gave up on.
+        // "processing_error" is the ladder crashing; the tier_* values are the
+        // ladder finishing without a match.
+        try {
+          if (!(await isAlreadyMapped(supabase, whsCourseId))) {
+            await recordUnmatched(
+              supabase,
+              whsCourseId,
+              "processing_error",
+              null,
+            );
+          }
+        } catch (inner) {
+          console.error(
+            "unmatched_record_after_error_failed",
+            whsCourseId,
+            inner instanceof Error ? inner.message : String(inner),
+          );
+        }
       }
     }
 
@@ -309,13 +329,23 @@ Deno.serve(async (req) => {
     // Suppress unused var warning on projectRef
     void projectRef;
 
+    // A scheduled job that fails silently is worse than one that fails loudly:
+    // when every processed course errored, report a non-2xx.
+    const nonErrorOutcomes = Object.entries(counts)
+      .filter(([k]) => k !== "errored")
+      .reduce((sum, [, v]) => sum + v, 0);
+    const allErrored = counts.errored > 0 && nonErrorOutcomes === 0;
+
     return json({
       processed: candidates.length,
       counts,
       results,
       run_started_at: runStartedAt,
       run_ended_at: runEndedAt,
-    });
+      version: FUNCTION_VERSION,
+      ...(allErrored ? { error: "all_courses_errored" } : {}),
+    }, allErrored ? 500 : 200);
+
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("orchestrator_fatal", msg);

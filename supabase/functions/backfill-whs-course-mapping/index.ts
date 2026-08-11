@@ -2,6 +2,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 import { corsFor } from '../_shared/cors.ts';
+
+// Module scope: helpers below the handler spread this, so it must NOT be
+// handler-scoped. Reassigned per request as the first line of the handler.
+let corsHeaders: Record<string, string> = corsFor(null);
 interface WhsCourse {
   id: string;
   name: string;
@@ -21,8 +25,10 @@ interface GolfCourse {
 
 const GBI = "Britain & Ireland";
 
+const FUNCTION_VERSION = "2026-08-11-cors-module-scope-v1";
+
 Deno.serve(async (req) => {
-  const corsHeaders = corsFor(req.headers.get('Origin'));
+  corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -36,9 +42,14 @@ Deno.serve(async (req) => {
       req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const mode = body.mode ?? "bulk";
 
+    if (mode === "ping") {
+      return json({ ok: true, version: FUNCTION_VERSION });
+    }
+
     if (mode === "single") {
       const id = body.whs_course_id;
       if (!id) return json({ error: "whs_course_id required" }, 400);
+
       const result = await processOne(supabase, id);
       return json(result);
     }
