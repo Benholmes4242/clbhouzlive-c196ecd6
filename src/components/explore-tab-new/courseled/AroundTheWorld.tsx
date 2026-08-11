@@ -22,6 +22,7 @@ import { ShortlistGlassAction } from './ShortlistGlassAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { createMasonryAssignment, placeStable, rememberColumns } from './stableMasonry';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { StandoutTile } from './StandoutTile';
 
 /**
  * Section 2 — AROUND THE WORLD (BRIEF, section 2).
