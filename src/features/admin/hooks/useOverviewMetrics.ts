@@ -7,7 +7,7 @@ function startOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); re
 function daysAgo(n: number) { return new Date(Date.now() - n * DAY); }
 function dayKey(d: Date) { return d.toISOString().slice(0, 10); }
 
-type EventRow = { user_id: string | null; created_at: string };
+type TrendPoint = { date: string; value: number };
 
 // ─── RIGHT NOW: live count (distinct users in last 5 min) ─────────────────────
 // Shared source for the Dashboard Right-Now strip AND the Analytics Live tab.
@@ -135,7 +135,9 @@ async function fetchMetrics(): Promise<MetricsBundle> {
   ]);
 
 
-  const dauDaily = bucketUniquesByDay((eventsRes.data as EventRow[]) ?? [], 14);
+  const activity = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
+  const activityTrend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
+  const dauDaily = activityTrend.map(p => p.value);
   const sessionsDaily = bucketByDay((sessionsRes.data as { created_at: string }[]) ?? [], 14);
   const signupsDaily = bucketByDay((signupsRes.data as { created_at: string }[]) ?? [], 14);
   const postsDaily = bucketByDay((postsRes.data as { created_at: string }[]) ?? [], 14);
