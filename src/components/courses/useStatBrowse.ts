@@ -52,6 +52,9 @@ export interface StatBrowseRow {
   total_count: number;
 }
 
+/** Qualifying-course count per lens for one scope. */
+export type LensCounts = Record<StatLens, number>;
+
 export interface StatBrowseFacets {
   countries: Array<{
     /** Macro-region (golf_courses.country). '' when a cached payload predates it. */
@@ -59,11 +62,20 @@ export interface StatBrowseFacets {
     sub_country: string;
     courses: number;
     directory_total: number;
+    /** null when a cached payload predates lens_counts — treat as all available. */
+    lens_counts: LensCounts | null;
   }>;
-  regions: Array<{ sub_country: string; region: string; courses: number }>;
+  regions: Array<{
+    sub_country: string;
+    region: string;
+    courses: number;
+    lens_counts: LensCounts | null;
+  }>;
   played_total: number;
   directory_total: number;
+  lens_counts_all: LensCounts | null;
 }
+
 
 const num = (v: unknown): number | null =>
   v === null || v === undefined || v === '' ? null : Number(v);
@@ -91,6 +103,26 @@ function normaliseRow(raw: Record<string, unknown>): StatBrowseRow {
   };
 }
 
+/**
+ * DRIFT TRAP — per-lens eligibility now lives in TWO server functions:
+ * as CASE arms inside get_stat_browse_courses (which rows a lens returns) and
+ * as FILTER clauses inside get_stat_browse_facets (the lens_counts consumed
+ * below, which decides whether a lens is offered at all). If one changes
+ * without the other, the dropdown promises rows the list cannot deliver, or
+ * greys out a lens that works. Change them together. Do NOT re-derive
+ * eligibility here to "check" the server — that would make three copies.
+ */
+function normaliseLensCounts(raw: unknown): LensCounts | null {
+  // Absent on payloads cached before lens_counts shipped. Returning null means
+  // "unknown", and every consumer must FAIL OPEN (all lenses available): a
+  // lens shown as empty is recoverable, a working lens greyed out is not.
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const out = {} as LensCounts;
+  for (const l of STAT_LENSES) out[l] = Number(r[l] ?? 0);
+  return out;
+}
+
 /** Facet vocabulary — fetched once per mount, cached for the session. */
 export function useStatBrowseFacets() {
   return useQuery<StatBrowseFacets>({
@@ -101,23 +133,27 @@ export function useStatBrowseFacets() {
       if (error) throw error;
       const d = (data ?? {}) as Record<string, unknown>;
       return {
-        countries: ((d.countries as StatBrowseFacets['countries']) ?? []).map((c) => ({
+        countries: ((d.countries as Record<string, unknown>[]) ?? []).map((c) => ({
           country: String(c.country ?? ''),
-          sub_country: c.sub_country,
+          sub_country: String(c.sub_country),
           courses: Number(c.courses),
           directory_total: Number(c.directory_total),
+          lens_counts: normaliseLensCounts(c.lens_counts),
         })),
-        regions: ((d.regions as StatBrowseFacets['regions']) ?? []).map((r) => ({
-          sub_country: r.sub_country,
-          region: r.region,
+        regions: ((d.regions as Record<string, unknown>[]) ?? []).map((r) => ({
+          sub_country: String(r.sub_country),
+          region: String(r.region),
           courses: Number(r.courses),
+          lens_counts: normaliseLensCounts(r.lens_counts),
         })),
         played_total: Number(d.played_total ?? 0),
         directory_total: Number(d.directory_total ?? 0),
+        lens_counts_all: normaliseLensCounts(d.lens_counts_all),
       };
     },
   });
 }
+
 
 interface UseStatBrowseListArgs {
   lens: StatLens;

@@ -1457,10 +1457,12 @@
       "nothingTitle": "Nothing tracked yet",
       "nothingBody": "No courses match this view yet.",
       "lensTitle": "Nothing here for {{lens}} yet",
-      "lensBody_one": "{{count}} course is tracked in {{country}}, but none has the data this view needs. Try another view.",
-      "lensBody_other": "{{count}} courses are tracked in {{country}}, but none has the data this view needs. Try another view.",
-      "lensBodyAll_one": "{{count}} course is tracked, but none has the data this view needs. Try another view.",
-      "lensBodyAll_other": "{{count}} courses are tracked, but none has the data this view needs. Try another view."
+      "lensBody_one": "{{count}} course is tracked in {{country}}, but it does not have what this view needs.",
+      "lensBody_other": "{{count}} courses are tracked in {{country}}, but none has what this view needs.",
+      "lensBodyAll_one": "{{count}} course is tracked, but it does not have what this view needs.",
+      "lensBodyAll_other": "{{count}} courses are tracked, but none has what this view needs.",
+      "lensSwitch": "See {{country}} in Most played",
+      "lensSwitchAll": "See Most played"
     },
     "directory": {
       "title": "Looking for somewhere else?",
@@ -1477,7 +1479,13 @@
     "countCountry_one": " In {{country}}, {{count}} of {{total}} course tracked via WHS official handicaps.",
     "countCountry_other": " In {{country}}, {{count}} of {{total}} courses tracked via WHS official handicaps.",
     "countRegion_one": " In {{region}}, {{country}}, {{count}} course tracked via WHS official handicaps.",
-    "countRegion_other": " In {{region}}, {{country}}, {{count}} courses tracked via WHS official handicaps."
+    "countRegion_other": " In {{region}}, {{country}}, {{count}} courses tracked via WHS official handicaps.",
+    "lensUnavailable": {
+      "rated": "No ratings yet",
+      "longest": "No tee data",
+      "chase": "All crowns claimed",
+      "nothing": "Nothing tracked"
+    }
   },
   "directorySheet": {
     "placeholder": "Search all courses",

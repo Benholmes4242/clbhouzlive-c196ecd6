@@ -53,6 +53,8 @@ import {
   useStatBrowseList,
   type StatBrowseRow,
   type StatLens,
+  type LensCounts,
+
 } from './useStatBrowse';
 import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import {
@@ -488,6 +490,35 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       : facets?.played_total ?? null;
   const areaHasTracked = facets == null || trackedInArea == null ? null : trackedInArea > 0;
 
+  /**
+   * Lens availability for the CURRENT scope: region entry, else country entry,
+   * else the platform-wide counts. Counts come from get_stat_browse_facets —
+   * see the drift-trap note in useStatBrowse.ts. FAILS OPEN: unsettled facets
+   * or a pre-lens_counts cached payload leave every lens selectable.
+   */
+  const scopeLensCounts: LensCounts | null = region
+    ? regionEntry?.lens_counts ?? null
+    : country
+      ? countryEntry?.lens_counts ?? null
+      : facets?.lens_counts_all ?? null;
+
+  const lensUnavailableReason = useCallback(
+    (l: StatLens): string | null => {
+      // The current selection is never disabled: hiding or greying it would
+      // break the Radix trigger label and silently reassign the member's view.
+      if (l === lens) return null;
+      if (!scopeLensCounts) return null;
+      if ((scopeLensCounts[l] ?? 0) > 0) return null;
+      if (l === 'rated' || l === 'longest' || l === 'chase') {
+        return t(`statBrowse.lensUnavailable.${l}`);
+      }
+      // played/toughest/scoreable cannot be 0 while the area has courses.
+      return t('statBrowse.lensUnavailable.nothing');
+    },
+    [lens, scopeLensCounts, t],
+  );
+
+
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
 
@@ -638,14 +669,25 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         )}
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        {STAT_LENSES.map((l) => (
-          <SelectItem key={l} value={l}>
-            <span className="flex items-center gap-2">
-              <LensIcon lens={l} />
-              {t(`statBrowse.lens.${l}.label`)}
-            </span>
-          </SelectItem>
-        ))}
+        {/* Fixed order, nothing hidden or reordered: a lens with no qualifying
+            course in this area is disabled with the reason beside it. */}
+        {STAT_LENSES.map((l) => {
+          const reason = lensUnavailableReason(l);
+          return (
+            <SelectItem key={l} value={l} disabled={!!reason}>
+              <span className="flex items-center gap-2 w-full">
+                <LensIcon lens={l} />
+                <span style={{ opacity: reason ? 0.9 : 1 }}>
+                  {t(`statBrowse.lens.${l}.label`)}
+                </span>
+                {reason ? (
+                  <span style={{ ...LABEL, marginLeft: 'auto', paddingLeft: 10 }}>{reason}</span>
+                ) : null}
+              </span>
+            </SelectItem>
+          );
+        })}
+
       </SelectContent>
 
     </Select>
@@ -742,7 +784,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
         </div>
-      ) : showEmpty && areaHasTracked === null ? null : showEmpty && areaHasTracked ? (
+      ) : showEmpty && areaHasTracked === null ? null : showEmpty &&
+        areaHasTracked &&
+        lens !== 'played' ? (
+
         /* Case (b): the area HAS tracked courses, none satisfies this lens.
            No Connect CTA — the handicap is what produced the tracked round. */
         <div className="mt-6 text-center">
@@ -771,11 +816,24 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                   formatted: formatNumber(trackedInArea ?? 0),
                 })}
           </p>
+          {/* 'played' has no eligibility filter, so it is guaranteed to have
+              rows whenever the area has tracked courses. */}
+          <button
+            type="button"
+            onClick={() => onLensChange('played')}
+            className="w-full mt-4 h-11 rounded-xl text-[14px] font-bold text-white"
+            style={{ background: INK }}
+          >
+            {country
+              ? t('statBrowse.empty.lensSwitch', { country })
+              : t('statBrowse.empty.lensSwitchAll')}
+          </button>
           {country ? (
+
             <button
               type="button"
               onClick={() => openDirectory(country, 'empty_state')}
-              className="w-full mt-4 h-11 rounded-xl text-[14px] font-semibold"
+              className="w-full mt-2 h-11 rounded-xl text-[14px] font-semibold"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               {t('statBrowse.empty.browse', { country })}
