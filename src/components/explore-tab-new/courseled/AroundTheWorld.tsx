@@ -283,7 +283,10 @@ interface Props {
 
 
 /** Shared with Personal Bests, which must read the same ages. */
-export function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
+export function relativeWhen(
+  iso: string,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days <= 0) return t('discover.when.today', 'Today');
   if (days === 1) return t('discover.when.yesterday', 'Yesterday');
@@ -316,7 +319,6 @@ export function AroundTheWorld({
 }: Props) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [pressed, setPressed] = useState<string | null>(null);
   const opener = useScorecardOpener();
   /**
    * Column memory for the life of this section (§4). A focus refetch may bring
