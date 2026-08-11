@@ -312,7 +312,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
                 height: 56,
                 borderRadius: 16,
                 overflow: 'hidden',
-                border: `2px solid ${W_12}`,
+                border: `0.5px solid ${W_12}`,
               }}
             >
               {avatar}
