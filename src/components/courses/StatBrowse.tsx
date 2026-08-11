@@ -677,6 +677,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         </h2>
         <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
           {description}
+          {countSentence ? emphasiseFigures(countSentence) : null}
+
         </p>
       </div>
 
