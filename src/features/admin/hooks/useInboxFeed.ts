@@ -9,7 +9,7 @@ import { fetchSupportTickets, type SupportTicketRow } from './useSupportTickets'
 import { fetchVerifications, type VerificationRow } from './useVerifications';
 import { fetchCourseRequests, type CourseRequestRow } from './useCourseRequests';
 import { fetchMatchRequests, type MatchRequestRow } from './useMatchRequests';
-import { fetchUnmatchedCourses, type UnmatchedCourseRow } from './useUnmatchedCourses';
+import { fetchUnmatchedCourses, TRIAGE_VISIBLE_STATUSES, type UnmatchedCourseRow } from './useUnmatchedCourses';
 import {
   fetchHolePhotosOpen,
   fetchHolePhotosDone,
@@ -141,8 +141,8 @@ export function useInboxFeed(): InboxFeedResult {
     staleTime: 30_000,
   });
   const unmatchedOpen = useQuery({
-    queryKey: ['admin-v2', 'inbox', 'unmatched-courses-open'],
-    queryFn: () => fetchUnmatchedCourses('open'),
+    queryKey: ['admin-v2', 'inbox', 'unmatched-courses-triage'],
+    queryFn: () => fetchUnmatchedCourses(TRIAGE_VISIBLE_STATUSES),
     enabled: canUsers,
     staleTime: 30_000,
   });
@@ -367,6 +367,7 @@ export function useInboxFeed(): InboxFeedResult {
         ];
         if (row.last_tier_tried) bits.push(`last tier ${row.last_tier_tried}`);
         if (row.echo_suggestion) bits.push(`Echo suggests ${row.echo_suggestion}`);
+        if (row.status === 'needs_catalogue') bits.unshift('needs catalogue entry');
         open.push({
           id: `unmatched-${row.whs_course_id}`,
           type: 'unmatchedCourse',

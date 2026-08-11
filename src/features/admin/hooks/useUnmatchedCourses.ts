@@ -1,7 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UnmatchedCourseStatus = 'open' | 'resolved' | 'ignored';
+/**
+ * Triage decision on a WHS course the ladder couldn't match.
+ * `needs_catalogue` = the club is real but has no golf_courses row yet, so it
+ * cannot be linked. Blocked, not ignored: the rounds are recoverable.
+ * Plain text column, no CHECK constraint - keep every write going through the
+ * helpers below so a typo can't create a silently invisible row.
+ */
+export type UnmatchedCourseStatus = 'open' | 'resolved' | 'ignored' | 'needs_catalogue';
+
+/** Statuses that still belong on an admin screen. */
+export const TRIAGE_VISIBLE_STATUSES: UnmatchedCourseStatus[] = ['open', 'needs_catalogue'];
 
 export interface UnmatchedCourseRow {
   whs_course_id: string;
@@ -22,14 +32,15 @@ const sb: any = supabase;
 // Plain select - no PostgREST embeds (the single FK to whs_courses is not
 // relied on here; the course name is denormalised onto the row).
 export async function fetchUnmatchedCourses(
-  status: UnmatchedCourseStatus = 'open',
+  status: UnmatchedCourseStatus | UnmatchedCourseStatus[] = 'open',
 ): Promise<UnmatchedCourseRow[]> {
+  const statuses = Array.isArray(status) ? status : [status];
   const { data, error } = await sb
     .from('whs_unmatched_courses')
     .select(
       'whs_course_id, whs_course_name, round_count, member_count, last_tier_tried, echo_suggestion, first_seen_at, last_attempt_at, status',
     )
-    .eq('status', status)
+    .in('status', statuses)
     .order('round_count', { ascending: false })
     .order('first_seen_at', { ascending: true })
     .limit(200);
@@ -47,9 +58,11 @@ export async function fetchUnmatchedCourses(
   }));
 }
 
-export function useUnmatchedCourses(status: UnmatchedCourseStatus = 'open') {
+export function useUnmatchedCourses(
+  status: UnmatchedCourseStatus | UnmatchedCourseStatus[] = 'open',
+) {
   return useQuery({
-    queryKey: [...UNMATCHED_COURSES_KEY, status],
+    queryKey: [...UNMATCHED_COURSES_KEY, ...(Array.isArray(status) ? status : [status])],
     queryFn: () => fetchUnmatchedCourses(status),
     staleTime: 30_000,
   });
@@ -88,6 +101,19 @@ export async function linkUnmatchedCourse(
     .from('whs_to_golf_course_map')
     .insert({ whs_course_id: whsCourseId, ...payload });
   if (insertError) throw insertError;
+}
+
+/**
+ * Record the decision "this club is missing from the catalogue". The row stays
+ * visible on both admin screens, chipped as blocked, and drops out of the
+ * Inbox badge - it is waiting on a catalogue addition, not on triage.
+ */
+export async function markUnmatchedNeedsCatalogue(whsCourseId: string): Promise<void> {
+  const { error } = await sb
+    .from('whs_unmatched_courses')
+    .update({ status: 'needs_catalogue' })
+    .eq('whs_course_id', whsCourseId);
+  if (error) throw error;
 }
 
 export async function ignoreUnmatchedCourse(whsCourseId: string): Promise<void> {
