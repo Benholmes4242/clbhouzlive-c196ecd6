@@ -122,41 +122,6 @@ export function useDashboard() {
 
   const [glanceQ, egQ] = results;
 
-  return { postsByHour, topActiveUsers };
-}
-
-async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
-  const { data, error } = await supabase.rpc('get_eg_sync_health' as any);
-  if (error) throw error;
-  return data as EgSyncHealth;
-}
-
-async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
-  const { data, error } = await supabase
-    .from('admin_audit_log')
-    .select('id, action, admin_user_id, target_email, created_at, details')
-    .order('created_at', { ascending: false })
-    .limit(8);
-  if (error) throw error;
-  return (data ?? []).map(e => ({
-    id: e.id, action: e.action, adminUserId: e.admin_user_id,
-    targetEmail: e.target_email, createdAt: e.created_at,
-    details: e.details as Record<string, unknown> | null,
-  }));
-}
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export function useDashboard() {
-  const results = useQueries({
-    queries: [
-      { queryKey: ['admin-v2', 'dashboard', 'glance'], queryFn: fetchTodayGlance,  staleTime: 2*60_000, refetchInterval: 5*60_000 },
-      { queryKey: ['admin-v2', 'dashboard', 'eg'],     queryFn: fetchEgSyncHealth, staleTime: 60_000,  refetchInterval: 120_000 },
-    ],
-  });
-
-  const [kpisQ, queueQ, trendQ, auditQ, glanceQ, egQ] = results;
-
   return {
     glance: { data: glanceQ.data as TodayGlance | undefined, isLoading: glanceQ.isLoading },
     egSyncHealth: {
