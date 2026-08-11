@@ -79,6 +79,14 @@ export function useFriendRoundDetail(
   });
 }
 
+/**
+ * SETTLED IS NOT "NOT LOADING".
+ * This query is disabled until `userId` resolves. In React Query v5 a disabled
+ * query is `isPending` with `fetchStatus: 'idle'`, so `isLoading`
+ * (= isPending && isFetching) is FALSE before it has ever run. Callers that
+ * decide between "connected" and "not connected" MUST use `isFetched` /
+ * `isSuccess` from this hook, never `!isLoading`.
+ */
 export function useWhsConnection(userId: string | undefined) {
   return useQuery({
     queryKey: whsKeys.connection(userId ?? ''),
