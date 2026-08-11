@@ -22,7 +22,10 @@
  * rendering titles, this file is where they land.
  */
 
+import { isBusinessProfilePath } from '@/components/header/globalHeaderRules';
+
 export type ChromeTone = 'light' | 'dark';
+
 
 export type LeftCell =
   | { kind: 'logo' }
@@ -145,23 +148,20 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/i/' },                     spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/rate-course-v2/' },        spec: { chrome: 'none', tone: 'light', bleed: false } },
 
-  // Business profile: /business/:idOrSlug (exactly 3 segments) — ISLAND (H3),
-  // no back button (bottom nav is the way out). Managed sub-pages
-  // (edit/verification/etc.) remain page-owned, non-immersive.
+  // Business profile: /business/:idOrSlug (exactly 3 segments, third segment
+  // not a reserved static route) — ISLAND (H3), no back button (bottom nav is
+  // the way out). Managed sub-pages (edit/verification/etc.) remain
+  // page-owned, non-immersive. The test is the shared predicate so this rule
+  // and the immersive classifier cannot drift.
   {
-    match: {
-      test: (p) => {
-        if (!p.startsWith('/business/')) return false;
-        const segs = p.replace(/\/$/, '').split('/');
-        return segs.length === 3; // profile
-      },
-    },
+    match: { test: isBusinessProfilePath },
     spec: {
       chrome: 'island',
       tone: 'light',
       bleed: true,
     },
   },
+
   // Business social lists (F3): ISLAND, padded. Declared BEFORE the managed-subpage rule.
   { match: { test: (p) => /^\/business\/[^/]+\/(followers|following)$/.test(p) },
     spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/clubhouse' }, tone: 'light', bleed: false, note: 'business social lists (F3)' } },
