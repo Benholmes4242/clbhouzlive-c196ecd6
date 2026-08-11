@@ -142,7 +142,7 @@ export default function AppealDetailDrawer({ open, onClose, row }: Props) {
           onClick={() => !busy && setMode(null)}
           style={{
             position: 'fixed', inset: 0, zIndex: 300,
-            background: 'rgba(15,23,42,0.55)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
           }}
         >
