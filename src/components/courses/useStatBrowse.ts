@@ -52,6 +52,9 @@ export interface StatBrowseRow {
   total_count: number;
 }
 
+/** Qualifying-course count per lens for one scope. */
+export type LensCounts = Record<StatLens, number>;
+
 export interface StatBrowseFacets {
   countries: Array<{
     /** Macro-region (golf_courses.country). '' when a cached payload predates it. */
@@ -59,11 +62,20 @@ export interface StatBrowseFacets {
     sub_country: string;
     courses: number;
     directory_total: number;
+    /** null when a cached payload predates lens_counts — treat as all available. */
+    lens_counts: LensCounts | null;
   }>;
-  regions: Array<{ sub_country: string; region: string; courses: number }>;
+  regions: Array<{
+    sub_country: string;
+    region: string;
+    courses: number;
+    lens_counts: LensCounts | null;
+  }>;
   played_total: number;
   directory_total: number;
+  lens_counts_all: LensCounts | null;
 }
+
 
 const num = (v: unknown): number | null =>
   v === null || v === undefined || v === '' ? null : Number(v);
