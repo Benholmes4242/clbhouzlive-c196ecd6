@@ -183,48 +183,21 @@ export function useOverviewMetrics() {
   });
 }
 
-// ─── ACTIVE MEMBERS: 1d / 7d / 28d rolling over the last 28 days ───────────────
+// ─── ACTIVE MEMBERS: daily actives over the last 28 days ───────────────────────
+// Sourced from get_platform_activity, the same aggregation the Engagement card
+// uses. Rolling 7-day / 28-day unique unions are NOT derivable from a per-day
+// trend, so those lines were removed rather than approximated — see the report.
 
-export interface ActivePoint { date: string; d1: number; d7: number; d28: number }
+export interface ActivePoint { date: string; d1: number }
 
 async function fetchActiveMembers28d(): Promise<ActivePoint[]> {
-  const since = daysAgo(56).toISOString();
-  const { data, error } = await supabase
-    .from('analytics_events')
-    .select('user_id, created_at')
-    .gte('created_at', since)
-    .not('user_id', 'is', null)
-    .limit(50000);
+  const { data, error } = await supabase.rpc('get_platform_activity', { p_days: 28 });
   if (error) throw error;
-
-  const rows = (data as EventRow[]) ?? [];
-  // Group user_ids by day
-  const byDay: Map<string, Set<string>> = new Map();
-  for (const r of rows) {
-    if (!r.user_id) continue;
-    const k = dayKey(new Date(r.created_at));
-    if (!byDay.has(k)) byDay.set(k, new Set());
-    byDay.get(k)!.add(r.user_id);
-  }
-
-  const points: ActivePoint[] = [];
-  for (let i = 27; i >= 0; i--) {
-    const target = daysAgo(i);
-    const targetKey = dayKey(target);
-    const d1 = byDay.get(targetKey)?.size ?? 0;
-    const s7 = new Set<string>();
-    const s28 = new Set<string>();
-    for (let j = 0; j < 28; j++) {
-      const k = dayKey(new Date(target.getTime() - j * DAY));
-      const bucket = byDay.get(k);
-      if (!bucket) continue;
-      if (j < 7) for (const u of bucket) s7.add(u);
-      for (const u of bucket) s28.add(u);
-    }
-    points.push({ date: targetKey, d1, d7: s7.size, d28: s28.size });
-  }
-  return points;
+  const activity = Array.isArray(data) ? data[0] : undefined;
+  const trend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
+  return trend.map(p => ({ date: p.date, d1: p.value }));
 }
+
 
 export function useActiveMembers28d() {
   return useQuery({
