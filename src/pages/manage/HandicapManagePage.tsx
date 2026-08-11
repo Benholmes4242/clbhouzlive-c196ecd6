@@ -19,23 +19,34 @@ import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 
 
 export default function HandicapManagePage() {
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: connection, isLoading: connectionLoading } = useWhsConnection(userId);
+  const { data: connection, isFetched: connectionFetched } = useWhsConnection(userId);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const declineHandicapChip = useDeclineHandicapChip();
 
-  /* Latched at the first resolved render: a page that opened on the connect
+  /* UNRESOLVED IS NOT ABSENT.
+     `useWhsConnection` is disabled until the session resolves `userId`, and a
+     DISABLED React Query v5 query is pending with fetchStatus 'idle' - so its
+     `isLoading` is FALSE before it has ever run. Latching off `!isLoading`
+     therefore recorded "disconnected" on the first render of EVERY mount, for
+     connected members too, and the sticky latch kept the connect flow up for
+     the page's whole lifetime. The latch itself is correct; the signal was not.
+     Settled = session resolved AND the connection query actually fetched. */
+  const settled = !sessionLoading && connectionFetched;
+
+  /* Latched at the first SETTLED render: a page that opened on the connect
      flow keeps it mounted until the flow reports completion. */
   const startedDisconnected = useRef<boolean | null>(null);
   const [flowFinished, setFlowFinished] = useState(false);
-  if (!connectionLoading && startedDisconnected.current === null) {
+  if (settled && startedDisconnected.current === null) {
     startedDisconnected.current = !connection;
   }
+
 
   const invalidateAll = (conn?: WhsConnection | null) => {
     const c = conn ?? connection;
