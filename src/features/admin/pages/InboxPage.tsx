@@ -796,6 +796,17 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
         )}
       </div>
     </AdminSheet>
+    <ConfirmDialog
+      open={confirmIgnore}
+      onClose={() => setConfirmIgnore(false)}
+      onConfirm={() => { setConfirmIgnore(false); void doIgnore(); }}
+      title="Ignore this course?"
+      description={`Ignoring means this WHS course is never linked to a course in the catalogue. ${rounds} played here by ${members} will not appear in any member's course analytics, and will stay hidden until someone links the course. This is not housekeeping - it discards those rounds from every gam surface.`}
+      confirmLabel="Ignore anyway"
+      tone="danger"
+      busy={busy}
+    />
+    </>
   );
 }
 
