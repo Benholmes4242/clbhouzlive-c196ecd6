@@ -46,16 +46,32 @@ function relTime(iso: string): string {
 
 type FeedKind = 'member' | 'post' | 'review';
 
+interface FeedRound {
+  gross: number;
+  par: number;
+  courseName: string | null;
+}
+
 interface FeedItem {
   id: string;
   kind: FeedKind;
   created_at: string;
-  title: string;
-  subtitle: string | null;
+  /** Line 1 subject: member name, post author, or - for reviews - the COURSE. */
+  subject: string;
+  /** Line 2 content: caption, "{author} - {review}", or nothing for a join. */
+  body: string | null;
   avatarUrl: string | null;
   href: string;
   postId?: string;
   courseId?: string;
+  /**
+   * Line 3 metadata. Every entry carries its own noun - never a bare figure.
+   * A zero is only present where the zero is itself a finding (likes,
+   * comments); absent values are omitted rather than rendered as 0.
+   */
+  meta: string[];
+  /** Present only when a post resolves to a processed round. */
+  round?: FeedRound;
   /**
    * Moderation markers. Hidden and mock rows are MARKED, never filtered:
    * an admin needs to see that something was hidden.
@@ -64,6 +80,9 @@ interface FeedItem {
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
+  // 4.1d: 8/8/8 merged and sliced to 8, deliberately. A 4/4/4 split would
+  // spend four slots on reviews in a week with no reviews while live posts
+  // fell off the panel.
   const [members, posts, reviews] = await Promise.all([
     supabase
       .from('user_profiles')
@@ -73,30 +92,52 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       .limit(8),
     supabase
       .from('posts')
-      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden')
+      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden, like_count, comment_count, course_id, whs_score_id, visibility, status')
       .order('created_at', { ascending: false })
       .limit(8),
     supabase
       .from('course_ratings')
-      .select('id, created_at, user_id, course_id, review, is_mock')
+      .select('id, created_at, user_id, course_id, review, is_mock, rating, tee_label, helpful_count')
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
 
-  const postRows = (posts.data ?? []) as { id: string; content: string | null; created_at: string; user_id: string; moderation_hidden: boolean | null; auto_hidden: boolean | null }[];
-  const reviewRows = (reviews.data ?? []) as { id: string; created_at: string; user_id: string; course_id: string; review: string | null; is_mock: boolean | null }[];
+  type PostRow = {
+    id: string; content: string | null; created_at: string; user_id: string;
+    moderation_hidden: boolean | null; auto_hidden: boolean | null;
+    like_count: number | null; comment_count: number | null;
+    course_id: string | null; whs_score_id: string | null;
+    visibility: string | null; status: string | null;
+  };
+  type ReviewRow = {
+    id: string; created_at: string; user_id: string; course_id: string;
+    review: string | null; is_mock: boolean | null; rating: number | null;
+    tee_label: string | null; helpful_count: number | null;
+  };
+  const postRows = (posts.data ?? []) as PostRow[];
+  const reviewRows = (reviews.data ?? []) as ReviewRow[];
   const memberRows = (members.data ?? []) as { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; created_at: string }[];
 
   const profileIds = Array.from(new Set([
     ...postRows.map(r => r.user_id),
     ...reviewRows.map(r => r.user_id),
   ].filter(Boolean)));
-  const courseIds = Array.from(new Set(reviewRows.map(r => r.course_id).filter(Boolean)));
+  // 4.1a ONE course map serves both branches - review course_ids and post
+  // course_ids in the same query.
+  const courseIds = Array.from(new Set([
+    ...reviewRows.map(r => r.course_id),
+    ...postRows.map(r => r.course_id ?? ''),
+  ].filter(Boolean))) as string[];
+  // 4.1c Deliberately narrow: only posts with no caption need a media
+  // fallback subtitle, so media type is NOT reliable metadata here.
   const emptyContentPostIds = postRows
     .filter(p => !((p.content ?? '').trim()))
     .map(p => p.id);
+  const roundScoreIds = Array.from(new Set(
+    postRows.map(p => p.whs_score_id).filter(Boolean),
+  )) as string[];
 
-  const [profRes, courseRes, mediaRes] = await Promise.all([
+  const [profRes, courseRes, mediaRes, roundRes] = await Promise.all([
     profileIds.length
       ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
       : Promise.resolve({ data: [] } as { data: unknown[] }),
@@ -106,6 +147,9 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     emptyContentPostIds.length
       ? supabase.from('post_media').select('post_id, media_type').in('post_id', emptyContentPostIds).limit(50)
       : Promise.resolve({ data: [] } as { data: unknown[] }),
+    roundScoreIds.length
+      ? supabase.from('gam_round_stats').select('whs_score_id, gross_score, course_par, course_name').in('whs_score_id', roundScoreIds)
+      : Promise.resolve({ data: [] } as { data: unknown[] }),
   ]);
   type Prof = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
   const profMap = new Map<string, Prof>(((profRes.data ?? []) as Prof[]).map(p => [p.id, p]));
@@ -114,20 +158,30 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const m of ((mediaRes.data ?? []) as { post_id: string; media_type: string }[])) {
     if (!mediaMap.has(m.post_id)) mediaMap.set(m.post_id, m.media_type);
   }
+  // A missing row means the evaluator has not processed the round yet. The
+  // post then renders as an ordinary post: no partial score, no "pending".
+  const roundMap = new Map<string, FeedRound>();
+  for (const r of ((roundRes.data ?? []) as { whs_score_id: string | null; gross_score: number | null; course_par: number | null; course_name: string | null }[])) {
+    if (!r.whs_score_id) continue;
+    if (r.gross_score == null || r.course_par == null) continue;
+    if (!roundMap.has(r.whs_score_id)) {
+      roundMap.set(r.whs_score_id, { gross: r.gross_score, par: r.course_par, courseName: r.course_name });
+    }
+  }
 
   const displayName = (p: Prof | undefined | null) => p?.display_name ?? p?.username ?? 'A member';
   const items: FeedItem[] = [];
 
   for (const m of memberRows) {
-    const name = m.display_name ?? m.username ?? 'A member';
     items.push({
       id: `member:${m.id}`,
       kind: 'member',
       created_at: m.created_at,
-      title: `New member: ${name}`,
-      subtitle: null,
+      subject: m.display_name ?? m.username ?? 'A member',
+      body: null,
       avatarUrl: m.profile_photo_url,
       href: `/admin-v2/users?member=${m.id}`,
+      meta: [],
       warnings: [],
     });
   }
@@ -135,22 +189,33 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     const prof = profMap.get(p.user_id);
     const name = displayName(prof);
     const content = stripMentionMarkup((p.content ?? '').trim()).trim();
-    let subtitle: string | null = null;
-    if (content) subtitle = content;
+    let body: string | null = null;
+    if (content) body = content;
     else {
       const mt = mediaMap.get(p.id);
-      if (mt === 'video') subtitle = 'Video post';
-      else if (mt === 'image' || mt === 'photo') subtitle = 'Photo post';
+      if (mt === 'video') body = 'Video post';
+      else if (mt === 'image' || mt === 'photo') body = 'Photo post';
     }
+    const likes = p.like_count ?? 0;
+    const comments = p.comment_count ?? 0;
+    const meta: string[] = [
+      `${likes} like${likes === 1 ? '' : 's'}`,
+      `${comments} comment${comments === 1 ? '' : 's'}`,
+    ];
+    const courseName = p.course_id ? courseMap.get(p.course_id)?.name : undefined;
+    if (courseName) meta.push(courseName);
+    if (p.visibility && p.visibility !== 'public') meta.push('Friends only');
     items.push({
       id: `post:${p.id}`,
       kind: 'post',
       created_at: p.created_at,
-      title: `Post from ${name}`,
-      subtitle,
+      subject: name,
+      body,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
       postId: p.id,
+      meta,
+      round: p.whs_score_id ? roundMap.get(p.whs_score_id) : undefined,
       warnings: [
         ...(p.auto_hidden ? ['Auto-hidden'] : []),
         ...(p.moderation_hidden ? ['Hidden'] : []),
@@ -160,15 +225,22 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const r of reviewRows) {
     const course = courseMap.get(r.course_id);
     const prof = profMap.get(r.user_id);
+    const author = displayName(prof);
+    const text = stripMentionMarkup((r.review ?? '').trim()).trim();
+    const meta: string[] = [];
+    if (r.rating != null) meta.push(`${r.rating.toFixed(1)} rated`);
+    if (r.tee_label) meta.push(`${r.tee_label} tees`);
+    if ((r.helpful_count ?? 0) > 0) meta.push(`${r.helpful_count} helpful`);
     items.push({
       id: `review:${r.id}`,
       kind: 'review',
       created_at: r.created_at,
-      title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: stripMentionMarkup((r.review ?? '').trim()).trim() || `by ${displayName(prof)}`,
+      subject: course?.name ?? 'a course',
+      body: text ? `${author} - ${text}` : author,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
       courseId: r.course_id,
+      meta,
       warnings: r.is_mock ? ['Mock'] : [],
     });
   }
@@ -176,6 +248,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   items.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   return items.slice(0, 8);
 }
+
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
