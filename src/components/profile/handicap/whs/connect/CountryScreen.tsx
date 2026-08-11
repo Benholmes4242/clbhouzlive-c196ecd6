@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
 import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL, CAPTION } from './designTokens';
@@ -10,6 +11,7 @@ interface Props {
 
 /** SCREEN 2 - COUNTRY. Federation-neutral: statuses only, no pitch. */
 export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
+  const { t } = useTranslation('handicap');
   const [query, setQuery] = useState('');
 
   const { live, notYet, empty } = useMemo(() => {
@@ -34,7 +36,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
       <FlowHead
         size={27}
         headline="Where do you play?"
-        sub="We read your index from the body that holds it."
+        sub={t('whsConnect.country.sub')}
       />
 
       <div

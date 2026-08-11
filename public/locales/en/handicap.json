@@ -61,7 +61,6 @@
     "sectionNotStarted": "Not started",
     "moreToBeatIt": "{{n}} more to beat it",
     "atYourBest": "At your best",
-
     "settingItNow": "Your best ever, still running",
     "brokenLine": "Best {{n}} {{unit}} \u00b7 broken {{when}}",
     "bestLine": "Best {{n}} {{unit}}",
@@ -132,5 +131,54 @@
     "showAll": "Show all {{count}}",
     "showFewer": "Show fewer",
     "empty": "Nothing sent yet. Invite a friend from the panel behind this sheet and it appears here."
+  },
+  "whsConnect": {
+    "intro": {
+      "headline": "Your game, in numbers you can use.",
+      "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
+      "cta": "Choose your country",
+      "decline": "I don't hold an official handicap"
+    },
+    "rings": {
+      "label": "Which holes cost you",
+      "caption": "Average score over par, by hole type",
+      "par3": "Par 3s",
+      "par4": "Par 4s",
+      "par5": "Par 5s",
+      "holes": "{{n}} holes",
+      "example": "Example profile - {{rounds}} rounds"
+    },
+    "country": {
+      "sub": "We connect to your governing body directly."
+    },
+    "sync": {
+      "kicker": "Connecting",
+      "headline": "Pulling your record.",
+      "sub": "Under a minute for most accounts. It finishes on our servers either way.",
+      "step1": "Reading every round on your record",
+      "step2": "Working out where your shots go",
+      "step3": "Ranking the holes that cost you most",
+      "step4": "Comparing you to the field at each course",
+      "note": "Steps are what the server is doing, in order"
+    },
+    "done": {
+      "kicker": "Connected",
+      "headline": "Your record is all here.",
+      "headlineYears": "{{years}} years of golf, all here.",
+      "headlinePending": "Your rounds are landing.",
+      "sub": "Nothing else to do - your index and your rounds move on their own from here.",
+      "subPending": "Your index is live. The rounds finish arriving on our servers - you can carry on either way.",
+      "indexLabel": "Handicap index",
+      "coursesSince": "{{courses}} courses - since {{year}}",
+      "span": "12 months",
+      "shotsLabel": "Where your shots go",
+      "damagingLabel": "Your most damaging holes",
+      "damagingAside": "By shots lost",
+      "holeNo": "Hole {{n}}",
+      "parCourse": "Par {{par}} - {{course}}",
+      "courseUnknown": "Unmapped course",
+      "floor": "Your scoring breakdown builds as you post rounds.",
+      "cta": "See your full record"
+    }
   }
 }
