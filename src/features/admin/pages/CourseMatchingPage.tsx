@@ -11,6 +11,13 @@ import AdminAccessDenied from '../components/AdminAccessDenied';
 import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
+import {
+  ignoreUnmatchedCourse,
+  markUnmatchedNeedsCatalogue,
+  TRIAGE_VISIBLE_STATUSES,
+  UNMATCHED_COURSES_KEY,
+  type UnmatchedCourseStatus,
+} from '../hooks/useUnmatchedCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
@@ -31,6 +38,11 @@ interface QueueRow {
   matched_at: string | null;
   scored_rounds: number;
   suggested_course_name?: string | null;
+  /** Triage decision from whs_unmatched_courses - null when no row exists. */
+  triage_status: UnmatchedCourseStatus | null;
+  /** Counts off the triage row, used by the ignore consequence copy. */
+  triage_rounds: number | null;
+  triage_members: number | null;
 }
 
 interface CourseHit {
@@ -60,7 +72,26 @@ async function fetchQueue(): Promise<QueueRow[]> {
   const rows = (mapRows ?? []) as any[];
   const whsIds = rows.map((r) => r.whs_course_id);
 
-  // 2) Scored rounds per whs course
+  // 2) Triage decisions. whs_unmatched_courses.status is the single source of
+  // truth for "has a human decided about this course"; the map row is only the
+  // mapping. A course ignored on the Inbox must vanish from here too.
+  const triage = new Map<string, { status: UnmatchedCourseStatus; rounds: number; members: number }>();
+  if (whsIds.length) {
+    const { data: triageRows, error: triageErr } = await supabase
+      .from('whs_unmatched_courses')
+      .select('whs_course_id, status, round_count, member_count')
+      .in('whs_course_id', whsIds);
+    if (triageErr) throw triageErr;
+    (triageRows ?? []).forEach((r: any) => {
+      triage.set(r.whs_course_id, {
+        status: r.status as UnmatchedCourseStatus,
+        rounds: r.round_count ?? 0,
+        members: r.member_count ?? 0,
+      });
+    });
+  }
+
+  // 3) Scored rounds per whs course
   const roundsMap = new Map<string, number>();
   if (whsIds.length) {
     const { data: scoreRows, error: scoreErr } = await supabase
@@ -74,7 +105,7 @@ async function fetchQueue(): Promise<QueueRow[]> {
     });
   }
 
-  // 3) Resolve suggested course names
+  // 4) Resolve suggested course names
   const suggestedIds = Array.from(
     new Set(rows.map((r) => r.echo_suggested_golf_course_id).filter(Boolean)),
   ) as string[];
@@ -88,6 +119,12 @@ async function fetchQueue(): Promise<QueueRow[]> {
   }
 
   return rows
+    // A decision recorded anywhere removes the card everywhere. Courses with
+    // no triage row at all are untriaged and stay.
+    .filter((r) => {
+      const st = triage.get(r.whs_course_id)?.status;
+      return !st || TRIAGE_VISIBLE_STATUSES.includes(st);
+    })
     .map((r) => ({
       whs_course_id: r.whs_course_id,
       whs_name: r.whs_courses?.name ?? '(unknown)',
@@ -101,6 +138,9 @@ async function fetchQueue(): Promise<QueueRow[]> {
       suggested_course_name: r.echo_suggested_golf_course_id
         ? suggestedNames.get(r.echo_suggested_golf_course_id) ?? null
         : null,
+      triage_status: triage.get(r.whs_course_id)?.status ?? null,
+      triage_rounds: triage.get(r.whs_course_id)?.rounds ?? null,
+      triage_members: triage.get(r.whs_course_id)?.members ?? null,
     }))
     .sort((a, b) => b.scored_rounds - a.scored_rounds);
 }
@@ -156,6 +196,9 @@ export default function CourseMatchingPage() {
 
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [active, setActive] = useState<QueueRow | null>(null);
+  const [confirmIgnore, setConfirmIgnore] = useState<QueueRow | null>(null);
+  const [triageBusy, setTriageBusy] = useState(false);
+  const [triageErr, setTriageErr] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = () => qc.invalidateQueries({ queryKey: QUERY_KEY });
@@ -175,6 +218,44 @@ export default function CourseMatchingPage() {
     qc.setQueryData<QueueRow[]>(QUERY_KEY as any, (curr) =>
       (curr ?? []).filter((r) => r.whs_course_id !== whsId),
     );
+  };
+
+  const afterTriage = (whsId: string) => {
+    removeFromQueue(whsId);
+    qc.invalidateQueries({ queryKey: UNMATCHED_COURSES_KEY });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'triage-counts'] });
+  };
+
+  const doIgnore = async (row: QueueRow) => {
+    setTriageBusy(true);
+    setTriageErr(null);
+    try {
+      await ignoreUnmatchedCourse(row.whs_course_id);
+      afterTriage(row.whs_course_id);
+    } catch (e) {
+      setTriageErr(e instanceof Error ? e.message : 'Update failed.');
+    } finally {
+      setTriageBusy(false);
+      setConfirmIgnore(null);
+    }
+  };
+
+  const doNeedsCatalogue = async (row: QueueRow) => {
+    setTriageBusy(true);
+    setTriageErr(null);
+    try {
+      await markUnmatchedNeedsCatalogue(row.whs_course_id);
+      // Stays on the screen, re-chipped as blocked - refetch rather than drop.
+      qc.invalidateQueries({ queryKey: QUERY_KEY });
+      qc.invalidateQueries({ queryKey: UNMATCHED_COURSES_KEY });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'triage-counts'] });
+    } catch (e) {
+      setTriageErr(e instanceof Error ? e.message : 'Update failed.');
+    } finally {
+      setTriageBusy(false);
+    }
   };
 
   if (!caps.viewUsers) return <AdminAccessDenied />;
@@ -215,10 +296,30 @@ export default function CourseMatchingPage() {
               expanded={expanded.has(row.whs_course_id)}
               onToggle={() => toggleExpand(row.whs_course_id)}
               onResolve={() => setActive(row)}
+              onIgnore={() => setConfirmIgnore(row)}
+              onNeedsCatalogue={() => void doNeedsCatalogue(row)}
+              busy={triageBusy}
             />
           ))}
         </div>
       )}
+
+      {triageErr && (
+        <div style={{ padding: '8px 10px', borderRadius: t.radius.md, background: t.dangerSoft, color: t.dangerText, fontSize: 12 }}>
+          {triageErr}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmIgnore !== null}
+        onClose={() => setConfirmIgnore(null)}
+        onConfirm={() => { if (confirmIgnore) void doIgnore(confirmIgnore); }}
+        title="Ignore this course?"
+        description={confirmIgnore ? ignoreConsequence(confirmIgnore) : undefined}
+        confirmLabel="Ignore anyway"
+        tone="danger"
+        busy={triageBusy}
+      />
 
       <ResolveSheet
         row={active}
@@ -234,14 +335,31 @@ export default function CourseMatchingPage() {
 
 /* -------------------- Queue card -------------------- */
 
+/**
+ * Ignore is destructive: it means these rounds never reach any member's course
+ * analytics. Say so, with the counts already on the row.
+ */
+function ignoreConsequence(row: QueueRow): string {
+  const rounds = row.triage_rounds ?? row.scored_rounds;
+  const members = row.triage_members;
+  const roundsTxt = `${rounds} round${rounds === 1 ? '' : 's'}`;
+  const membersTxt = members != null
+    ? ` played by ${members} member${members === 1 ? '' : 's'}`
+    : '';
+  return `Ignoring means this WHS course is never linked to a course in the catalogue. ${roundsTxt}${membersTxt} will not appear in any member's course analytics, and will stay hidden until someone links the course. This is not housekeeping - it discards those rounds from every gam surface.`;
+}
+
 interface CardProps {
   row: QueueRow;
   expanded: boolean;
   onToggle: () => void;
   onResolve: () => void;
+  onIgnore: () => void;
+  onNeedsCatalogue: () => void;
+  busy: boolean;
 }
 
-function QueueCard({ row, expanded, onToggle, onResolve }: CardProps) {
+function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalogue, busy }: CardProps) {
   const segments = useMemo(() => parseReasoning(row.echo_reasoning), [row.echo_reasoning]);
   const conf = row.match_confidence != null ? row.match_confidence.toFixed(2) : '—';
   const agree = row.echo_agreement_count ?? 0;
@@ -273,7 +391,21 @@ function QueueCard({ row, expanded, onToggle, onResolve }: CardProps) {
             {row.scored_rounds} {row.scored_rounds === 1 ? 'round' : 'rounds'}
           </span>
         </div>
-        <StatusPill tone={methodTone(row.match_method)}>{methodLabel(row.match_method)}</StatusPill>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {row.triage_status === 'needs_catalogue' && (
+            <span
+              style={{
+                display: 'inline-flex', alignItems: 'center',
+                padding: '2px 8px', borderRadius: 999,
+                background: t.neutralSoft, color: t.inkMuted,
+                fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
+              }}
+            >
+              Needs catalogue entry
+            </span>
+          )}
+          <StatusPill tone={methodTone(row.match_method)}>{methodLabel(row.match_method)}</StatusPill>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, color: t.inkMuted, fontSize: 12 }}>
@@ -317,7 +449,43 @@ function QueueCard({ row, expanded, onToggle, onResolve }: CardProps) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={onIgnore}
+          disabled={busy}
+          style={{
+            padding: '8px 14px',
+            borderRadius: t.radius.md,
+            border: `1px solid ${t.line}`,
+            background: t.surface,
+            color: t.ink,
+            fontSize: 13, fontWeight: 600,
+            cursor: busy ? 'default' : 'pointer',
+            opacity: busy ? 0.5 : 1,
+          }}
+        >
+          Ignore
+        </button>
+        {row.triage_status !== 'needs_catalogue' && (
+          <button
+            type="button"
+            onClick={onNeedsCatalogue}
+            disabled={busy}
+            style={{
+              padding: '8px 14px',
+              borderRadius: t.radius.md,
+              border: `1px solid ${t.line}`,
+              background: t.surface,
+              color: t.ink,
+              fontSize: 13, fontWeight: 600,
+              cursor: busy ? 'default' : 'pointer',
+              opacity: busy ? 0.5 : 1,
+            }}
+          >
+            Not in the catalogue
+          </button>
+        )}
         <button
           type="button"
           onClick={onResolve}
