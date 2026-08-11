@@ -1455,7 +1455,12 @@
       "connect": "Connect your handicap",
       "browse": "Browse {{country}} in the directory",
       "nothingTitle": "Nothing tracked yet",
-      "nothingBody": "No courses match this view yet."
+      "nothingBody": "No courses match this view yet.",
+      "lensTitle": "Nothing here for {{lens}} yet",
+      "lensBody_one": "{{count}} course is tracked in {{country}}, but none has the data this view needs. Try another view.",
+      "lensBody_other": "{{count}} courses are tracked in {{country}}, but none has the data this view needs. Try another view.",
+      "lensBodyAll_one": "{{count}} course is tracked, but none has the data this view needs. Try another view.",
+      "lensBodyAll_other": "{{count}} courses are tracked, but none has the data this view needs. Try another view."
     },
     "directory": {
       "title": "Looking for somewhere else?",

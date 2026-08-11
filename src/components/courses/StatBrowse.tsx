@@ -431,6 +431,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   );
 
   const countryEntry = facets?.countries.find((c) => c.sub_country === country) ?? null;
+  const regionEntry =
+    country && region
+      ? facets?.regions.find((r) => r.sub_country === country && r.region === region) ?? null
+      : null;
 
   /**
    * Count sentence appended to the lens description: location, figures and a
@@ -442,16 +446,12 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     if (!facets) return null;
     const plural = (n: number) => (n === 1 ? '_one' : '_other');
 
-    if (country && region) {
-      const regionEntry =
-        facets.regions.find((r) => r.sub_country === country && r.region === region) ?? null;
-      if (regionEntry) {
-        return t(`statBrowse.countRegion${plural(regionEntry.courses)}`, {
-          count: formatNumber(regionEntry.courses),
-          region,
-          country,
-        });
-      }
+    if (country && region && regionEntry) {
+      return t(`statBrowse.countRegion${plural(regionEntry.courses)}`, {
+        count: formatNumber(regionEntry.courses),
+        region,
+        country,
+      });
     }
 
     if (country) {
@@ -467,11 +467,27 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       count: formatNumber(facets.played_total),
       total: formatNumber(facets.directory_total),
     });
-  }, [t, facets, country, region, countryEntry]);
+  }, [t, facets, country, region, countryEntry, regionEntry]);
 
   const regionDisabled = !country || regionsForCountry.length <= 1;
   const remaining = Math.max(0, totalCount - rows.length);
   const showEmpty = !isLoading && rows.length === 0;
+
+  /**
+   * Why the list is empty. Derived from the FACET counts, never from the row
+   * list: rows can be empty because the area has nothing tracked (case a) or
+   * because the area has tracked courses and none satisfies the active lens
+   * (case b, e.g. Best rated needs a review). Until facets land the cause is
+   * UNKNOWN and neither empty state may render — an empty state is a claim
+   * about the data.
+   */
+  const trackedInArea = region
+    ? regionEntry?.courses ?? null
+    : country
+      ? countryEntry?.courses ?? null
+      : facets?.played_total ?? null;
+  const areaHasTracked = facets == null || trackedInArea == null ? null : trackedInArea > 0;
+
 
   const countryTriggerLabel = country ?? t('statBrowse.allAreas');
 
@@ -726,8 +742,49 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             />
           ))}
         </div>
+      ) : showEmpty && areaHasTracked === null ? null : showEmpty && areaHasTracked ? (
+        /* Case (b): the area HAS tracked courses, none satisfies this lens.
+           No Connect CTA — the handicap is what produced the tracked round. */
+        <div className="mt-6 text-center">
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: INK }}>
+            {t('statBrowse.empty.lensTitle', { lens: t(`statBrowse.lens.${lens}.label`) })}
+          </h3>
+          <p
+            style={{
+              fontSize: 13,
+              color: INK_MUTE,
+              marginTop: 4,
+              lineHeight: 1.5,
+              maxWidth: 320,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            {country
+              ? t('statBrowse.empty.lensBody', {
+                  count: trackedInArea ?? 0,
+                  formatted: formatNumber(trackedInArea ?? 0),
+                  country,
+                })
+              : t('statBrowse.empty.lensBodyAll', {
+                  count: trackedInArea ?? 0,
+                  formatted: formatNumber(trackedInArea ?? 0),
+                })}
+          </p>
+          {country ? (
+            <button
+              type="button"
+              onClick={() => openDirectory(country, 'empty_state')}
+              className="w-full mt-4 h-11 rounded-xl text-[14px] font-semibold"
+              style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
+            >
+              {t('statBrowse.empty.browse', { country })}
+            </button>
+          ) : null}
+        </div>
       ) : showEmpty ? (
         country ? (
+
           <div
             className="mt-4 p-5"
             style={{
