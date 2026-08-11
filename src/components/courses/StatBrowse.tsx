@@ -28,7 +28,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
 import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
@@ -128,12 +128,20 @@ const LIST_LABEL: Record<string, string> = {
   europe: 'Europe',
 };
 
+/**
+ * SelectTrigger's base carries `[&>span]:line-clamp-1`, which sets
+ * `display:-webkit-box` on our direct child span and kills its `flex` — the
+ * icon then stacks ABOVE the label. Every trigger here re-asserts the row.
+ */
+const TRIGGER_ROW =
+  '[&>span]:!flex [&>span]:items-center [&>span]:gap-2 [&>span]:min-w-0';
+
 const TRIGGER_CLS =
-  'h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none';
+  `h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
 
 /** Condensed sticky bar control. */
 const COMPACT_TRIGGER_CLS =
-  'h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none';
+  `h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
 
 
 /**
@@ -578,14 +586,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{ borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
-        {compact ? (
-          <span className="truncate flex items-center gap-2">
-            <Globe {...DD_ICON} />
-            {countryTriggerLabel}
-          </span>
-        ) : (
-          <SelectValue />
-        )}
+        <span className="flex min-w-0 items-center gap-2">
+          <Globe {...DD_ICON} />
+          <span className="truncate">{countryTriggerLabel}</span>
+        </span>
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectItem value="all" className="[&>span:last-child]:w-full">
@@ -627,13 +631,13 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{ borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
-        {regionDisabled && !compact ? (
-          <span className="truncate">{t('statBrowse.allRegions')}</span>
-        ) : compact ? (
-          <span className="truncate">{region}</span>
-        ) : (
-          <SelectValue />
-        )}
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate">
+            {regionDisabled
+              ? t('statBrowse.allRegions')
+              : region ?? (country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions'))}
+          </span>
+        </span>
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         <SelectGroup>
@@ -678,14 +682,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{ borderColor: HAIRLINE_INK_10, color: INK }}
         aria-label={t('statBrowse.selectLensA11y')}
       >
-        {compact ? (
-          <span className="truncate flex items-center gap-2">
-            <LensIcon lens={lens} />
-            {t(`statBrowse.lens.${lens}.label`)}
-          </span>
-        ) : (
-          <SelectValue />
-        )}
+        <span className="flex min-w-0 items-center gap-2">
+          <LensIcon lens={lens} />
+          <span className="truncate">{t(`statBrowse.lens.${lens}.label`)}</span>
+        </span>
       </SelectTrigger>
       <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
         {/* Fixed order, nothing hidden or reordered: a lens with no qualifying
