@@ -715,7 +715,6 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     }
   };
 
-  return (
   const rounds = `${row.round_count} round${row.round_count === 1 ? '' : 's'}`;
   const members = `${row.member_count} member${row.member_count === 1 ? '' : 's'}`;
 
