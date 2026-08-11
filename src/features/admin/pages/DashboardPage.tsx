@@ -211,6 +211,8 @@ export default function DashboardPage() {
   const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
   const errors = useErrorCount24h();
   const ops = useOpsHealth(7);
+  const retention = useRetention(56);
+
   const errorsChip = useMemo(
     () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
     [errors.data, errors.isLoading, errors.isError],
