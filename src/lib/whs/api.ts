@@ -490,52 +490,11 @@ export async function fetchFriendsActivity(
     bests.map((b) => `${b.friend_connection_id}:${b.best_score_id}`),
   );
 
-  // Reactions over every in-window score row (capped).
-  const allScoreIds = scoreRows.map((s) => s.id).filter((id): id is string => !!id);
+  // Round reactions on the friends rail are retired: the legacy
+  // `whs_round_reactions` store held 0 rows and had no writer. Hearts on
+  // rounds live in `content_reactions` (target_type = 'round'). The rail does
+  // not render a heart, so these fields stay at their neutral defaults.
 
-  let viewerReactedSet = new Set<string>();
-  const reactionCounts: Record<string, number> = {};
-
-  const REACTION_LOOKUP_CAP = 100;
-  const boundedScoreIds = allScoreIds.slice(0, REACTION_LOOKUP_CAP);
-
-  if (boundedScoreIds.length > 0) {
-    try {
-      const userResp = await supabase.auth.getUser();
-      const viewerId = userResp.data.user?.id;
-      if (viewerId) {
-        const { data: vRows, error: vErr } = await supabase
-          .from('whs_round_reactions' as any)
-          .select('score_id')
-          .eq('user_id', viewerId)
-          .in('score_id', boundedScoreIds);
-        if (!vErr) {
-          viewerReactedSet = new Set(((vRows as any[]) ?? []).map((r) => r.score_id as string));
-        } else {
-          console.warn('[whs] viewer reactions lookup failed (non-fatal):', vErr);
-        }
-      }
-    } catch (e) {
-      console.warn('[whs] viewer reactions lookup threw (non-fatal):', e);
-    }
-
-    try {
-      const { data: countRows, error: cErr } = await supabase
-        .from('whs_round_reactions' as any)
-        .select('score_id')
-        .in('score_id', boundedScoreIds);
-      if (!cErr) {
-        for (const row of ((countRows as any[]) ?? [])) {
-          const sid = row.score_id as string;
-          reactionCounts[sid] = (reactionCounts[sid] ?? 0) + 1;
-        }
-      } else {
-        console.warn('[whs] reaction counts lookup failed (non-fatal):', cErr);
-      }
-    } catch (e) {
-      console.warn('[whs] reaction counts lookup threw (non-fatal):', e);
-    }
-  }
 
   const items: WhsFriendActivityWithImage[] = [];
 
