@@ -1,19 +1,41 @@
 // Analytics event tracking utility
 // Rewired to write directly to Supabase analytics_events table
 import { supabase } from '@/integrations/supabase/client';
+import { getSessionId } from './analyticsSession';
+
+/**
+ * Bot traffic is dropped at WRITE time. Read-time filtering means every future
+ * query has to remember to exclude crawlers, and one that forgets reports
+ * crawler volume as member activity.
+ *
+ * Intent must match the read-time filter in get_admin_ops_health: automated,
+ * non-member traffic. Guarded against a missing navigator so it cannot throw.
+ */
+const BOT_UA = /headless|bot|crawler|spider/i;
+function isBot(): boolean {
+  try {
+    const nav = typeof navigator === 'undefined' ? null : navigator;
+    if (!nav) return false;
+    if ((nav as Navigator & { webdriver?: boolean }).webdriver === true) return true;
+    return BOT_UA.test(nav.userAgent || '');
+  } catch {
+    return false;
+  }
+}
 
 type EventParams = Record<string, any>;
 
 export const analyticsEvents = {
   track: async (eventName: string, params?: EventParams) => {
     try {
+      if (isBot()) return;
       const { data: { user } } = await supabase.auth.getUser();
       await supabase.from('analytics_events').insert({
         name: eventName,
         user_id: user?.id ?? null,
         props: {
           ...params,
-          session_id: sessionStorage.getItem('session_id') ?? null,
+          session_id: getSessionId(),
           page: window.location.pathname,
           build: __BUILD_ID__,
           ua: navigator.userAgent.slice(0, 200),
@@ -30,7 +52,7 @@ export const analyticsEvents = {
       analyticsEvents.track('shorts_squircle_avatar_click', {
         creator_id: creatorId,
         position_index: positionIndex,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
@@ -38,7 +60,7 @@ export const analyticsEvents = {
       analyticsEvents.track('shorts_squircle_name_click', {
         username,
         position_index: positionIndex,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
@@ -47,19 +69,19 @@ export const analyticsEvents = {
         creator_id: creatorId,
         is_following: isFollowing,
         position_index: positionIndex,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
     plusClick: () => {
       analyticsEvents.track('shorts_squircle_plus_click', {
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
     empty: () => {
       analyticsEvents.track('shorts_squircle_empty', {
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     }
   },
@@ -70,7 +92,7 @@ export const analyticsEvents = {
       analyticsEvents.track('videos_tab_view', {
         duration,
         topics,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
     
@@ -78,7 +100,7 @@ export const analyticsEvents = {
       analyticsEvents.track('videos_filter_change', {
         duration,
         topics,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     }
   },
@@ -88,7 +110,7 @@ export const analyticsEvents = {
     impression: (count: number) => {
       analyticsEvents.track('lc_strip_impression', {
         count,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
@@ -96,14 +118,14 @@ export const analyticsEvents = {
       analyticsEvents.track('lc_strip_avatar_click', {
         creator_id: id,
         position_index: index,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
     peekOpen: (id: string) => {
       analyticsEvents.track('lc_strip_peek_open', {
         creator_id: id,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
@@ -111,21 +133,21 @@ export const analyticsEvents = {
       analyticsEvents.track('lc_strip_peek_ms', {
         creator_id: id,
         duration_ms: ms,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
     nearbyOpen: (count: number) => {
       analyticsEvents.track('lc_strip_nearby_open', {
         count,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     },
 
     followFromStrip: (id: string) => {
       analyticsEvents.track('lc_strip_follow_from_strip', {
         creator_id: id,
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
+        session_id: getSessionId()
       });
     }
   },

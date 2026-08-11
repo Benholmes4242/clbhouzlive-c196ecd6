@@ -31,6 +31,7 @@ import {
 import { useErrorCount24h } from '../hooks/useStability';
 import { useOpsHealth } from '../hooks/useOpsHealth';
 import { ClientSplitPanel, OpsErrorsPanel } from '../components/OpsPanels';
+import type { OpsHealth } from '../hooks/useOpsHealth';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const num = (n: number) => n.toLocaleString();
@@ -237,7 +238,7 @@ export default function DashboardPage() {
         intradayLoading={intraday.isLoading}
       />
 
-      <MetricGrid loading={loading} data={m} />
+      <MetricGrid loading={loading} data={m} ops={ops.data} opsLoading={ops.isLoading} />
 
       <ActiveMembersChart
         data={actives.data ?? []}
@@ -334,7 +335,13 @@ function RightNowStrip({
 
 // ─── Metric grid ──────────────────────────────────────────────────────────────
 
-function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<typeof useOverviewMetrics>['data'] }) {
+function MetricGrid({ loading, data, ops, opsLoading }: {
+  loading: boolean;
+  data: ReturnType<typeof useOverviewMetrics>['data'];
+  ops?: OpsHealth;
+  opsLoading: boolean;
+}) {
+  const act = ops?.activity;
   return (
     <section
       className="admin-v2-metric-grid"
@@ -362,14 +369,20 @@ function MetricGrid({ loading, data }: { loading: boolean; data: ReturnType<type
         to="/admin-v2/analytics?tab=growth"
         loading={loading}
       />
+      {/*
+        Rounds, not sessions: logging a round is the product's actual action.
+        play_date, never created_at - a handicap connection backfills history.
+        The member count is the reference point: 16 rounds could be one keen
+        golfer or nine.
+      */}
       <MetricCard
-        label="Sessions 7d"
-        value={loading ? null : (data?.sessions.current ?? 0)}
-        delta={loading ? undefined : pctDelta(data?.sessions.current ?? 0, data?.sessions.previous ?? 0)}
-        deltaLabel="vs prev 7d"
-        sparkline={data?.sessions.sparkline}
+        label="Rounds 7d"
+        value={opsLoading ? null : (act?.rounds_in_window ?? 0)}
+        delta={opsLoading ? undefined : pctDelta(act?.rounds_in_window ?? 0, act?.rounds_prev_window ?? 0)}
+        deltaLabel={act ? `by ${act.rounds_members} member${act.rounds_members === 1 ? '' : 's'}` : 'vs prev 7d'}
+        sparkline={act?.daily.map((d) => d.n)}
         to="/admin-v2/analytics?tab=engagement"
-        loading={loading}
+        loading={opsLoading}
       />
       <MetricCard
         label="Posts 7d"
