@@ -9,6 +9,7 @@ import {
   Heart, MessageSquare, UserPlus, Users, Building2, Bell,
   Star, Reply, AtSign, BadgeCheck, XCircle, Trophy, Clock,
   MailQuestion, Ban, Flag, Crown, TrendingUp, Flame, Swords, ShieldAlert, Award,
+  Video,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -84,6 +85,8 @@ export function isGameNotifType(t: string): boolean {
 
 export function resolveKind(row: {
   notif_type: string;
+  /** Present so the unknown fallback can tell "nobody did this" from "someone did". */
+  actor_user_id?: string | null;
   liker_avatar_urls?: unknown;
   target_poster_url?: string | null;
   target_course_image?: string | null;
