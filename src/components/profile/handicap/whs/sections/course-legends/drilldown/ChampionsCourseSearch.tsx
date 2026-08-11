@@ -25,12 +25,16 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
   const [query, setQuery] = useState('');
   const debounced = useDebounce(query, 250);
   const { data: results, isLoading } = useCourseSearch(debounced);
-  const { user } = useSupabaseSession();
-  const { data: connection, isLoading: connLoading } = useWhsConnection(user?.id);
+  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { data: connection, isFetched } = useWhsConnection(user?.id);
 
   const showResults = debounced.trim().length >= 2;
   const filtered = (results ?? []).filter((r) => r.id !== currentCourseId);
-  const showConnectCue = Boolean(user) && !connLoading && !connection;
+  /* UNRESOLVED IS NOT ABSENT: useWhsConnection is disabled until userId exists,
+     and a disabled React Query v5 query is pending with fetchStatus 'idle', so
+     isLoading is FALSE before it has ever run. Gate on settled instead. */
+  const settled = !sessionLoading && isFetched;
+  const showConnectCue = Boolean(user) && settled && !connection;
 
   return (
     <div style={{ padding: '14px 16px 4px' }}>

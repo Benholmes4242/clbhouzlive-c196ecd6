@@ -47,10 +47,14 @@ interface Props {
 export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const { data: connection, isLoading } = useWhsConnection(user?.id);
+  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { data: connection, isFetched } = useWhsConnection(user?.id);
 
-  if (!user || isLoading || connection) return null;
+  /* UNRESOLVED IS NOT ABSENT: useWhsConnection is disabled until userId exists,
+     and a disabled React Query v5 query is pending with fetchStatus 'idle', so
+     isLoading is FALSE before it has ever run. Render nothing until settled. */
+  const settled = !sessionLoading && isFetched;
+  if (!user || !settled || connection) return null;
 
   const { Icon, benefitKey, subKey } = COPY[variant];
   const go = () => navigate('/handicap');
