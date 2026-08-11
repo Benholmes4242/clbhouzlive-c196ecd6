@@ -48,8 +48,40 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: 'p
           .limit(200);
 
         if (likesError) throw likesError;
-        if (!data || data.length === 0) return [] as PostLiker[];
-        likes = data as RawLike[];
+        likes = (data ?? []) as RawLike[];
+
+        // Round-backed posts keep their personal hearts in content_reactions
+        // (canonical). Mirror of public.viewer_liked_post — keep in step.
+        const { data: post } = await supabase
+          .from('posts')
+          .select('whs_score_id')
+          .eq('id', postId!)
+          .maybeSingle();
+
+        if (post?.whs_score_id) {
+          const { data: reactions, error: reactionsError } = await supabase
+            .from('content_reactions')
+            .select('user_id')
+            .eq('target_type', 'round')
+            .eq('target_id', post.whs_score_id)
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+          if (reactionsError) throw reactionsError;
+
+          // Round reactions have no actor columns — always personal.
+          likes = [
+            ...(reactions ?? []).map((r) => ({
+              user_id: r.user_id,
+              actor_type: 'personal' as const,
+              actor_id: r.user_id,
+            })),
+            // Business likes on round posts still live in post_likes.
+            ...likes.filter((l) => (l.actor_type ?? 'personal') === 'business'),
+          ];
+        }
+
+        if (likes.length === 0) return [] as PostLiker[];
       }
 
       // Dedupe by (actor_type, actor_id) when actor info present, otherwise by user_id.
