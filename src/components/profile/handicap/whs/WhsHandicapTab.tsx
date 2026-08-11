@@ -28,23 +28,31 @@ const SkeletonView = () => (
 
 export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null }) => {
   const navigate = useNavigate();
-  const { user: sessionUser } = useSupabaseSession();
-  const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
+  const { user: sessionUser, loading: sessionLoading } = useSupabaseSession();
+  const { data: connection, isFetched, isError, refetch } = useWhsConnection(userId);
   const declineHandicapChip = useDeclineHandicapChip();
 
   /* THE CONNECT FLOW OWNS ITS OWN COMPLETION.
      A connection row appearing is NOT the end of the flow - the member still
      has the connected screen to read and its CTA to tap. So the flow latches
-     at first resolved render: if it started without a connection, it stays
+     at first settled render: if it started without a connection, it stays
      mounted until it calls onConnected (fired from that CTA only). */
   const startedDisconnected = useRef<boolean | null>(null);
   const [flowFinished, setFlowFinished] = useState(false);
 
-  if (isLoading) return <SkeletonView />;
+  /* UNRESOLVED IS NOT ABSENT.
+     `useWhsConnection` is disabled until `userId` exists, and a DISABLED React
+     Query v5 query is pending with fetchStatus 'idle' - so `isLoading` is FALSE
+     before it has ever run. `!isLoading` therefore does NOT mean settled, and
+     latching on it recorded "disconnected" for connected members. */
+  const settled = !sessionLoading && isFetched;
+
+  if (!settled && !isError) return <SkeletonView />;
 
   if (startedDisconnected.current === null && !isError) {
     startedDisconnected.current = !connection;
   }
+
 
 
   // Never fall through to WhsConnectScreen when the query errored — an
