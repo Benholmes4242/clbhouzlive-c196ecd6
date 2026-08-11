@@ -257,11 +257,15 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
     },
   });
 
+  batch.commit(query.data);
+
   // Disabled (no score ids on the page) => settled, so a feed of pure photo
-  // posts is never held back by a query that will never run.
+  // posts is never held back by a query that will never run. A next-page fetch
+  // is settled too — keepPreviousData keeps the rendered rounds valid.
   const settled = ids.length === 0 || !query.isPending;
+  const fetching = query.isFetching;
   return useMemo(
-    () => withSettled(query.data ?? new Map<string, PostRound>(), settled) as PostRoundMapState,
-    [query.data, settled],
+    () => withSettled(query.data ?? new Map<string, PostRound>(), settled, fetching) as PostRoundMapState,
+    [query.data, settled, fetching],
   );
 }
