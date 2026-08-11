@@ -479,6 +479,30 @@ export function AroundTheWorld({
 
   const reactions = useContentReactions(reactionTargets);
 
+  /**
+   * SETTLED means the same thing here as the whole-card hold below: the wire has
+   * resolved AND course meta has landed, so the tiles on screen are final. Only
+   * then is "who is rendered" a fact worth reporting downstream.
+   */
+  const tilesSettled = !isPending && !(courseIds.length > 0 && metaQuery.isPending);
+  const renderedMemberKey = tilesSettled
+    ? slots.list.map((s) => s.top?.userId ?? '-').join('|')
+    : '';
+  useEffect(() => {
+    if (!tilesSettled || !onRenderedMembers) return;
+    const counts = new Map<string, number>();
+    for (const s of slots.list) {
+      const uid = s.top?.userId;
+      if (!uid) continue;
+      counts.set(uid, (counts.get(uid) ?? 0) + 1);
+    }
+    onRenderedMembers(counts);
+    // renderedMemberKey is the stable summary of what is on screen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tilesSettled, renderedMemberKey]);
+
+
+
 
 
   /**
