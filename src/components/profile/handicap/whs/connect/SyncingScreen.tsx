@@ -1,69 +1,96 @@
-import React from 'react';
-import { INK, MUTE, DIM, BORDER, GOOD, LABEL, CAPTION, NUM } from './designTokens';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Check } from 'lucide-react';
+import { INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL } from './designTokens';
 import { FlowBody, FlowHead } from './Primitives';
 
 /**
- * SCREEN 4 - SYNCING. No spinner.
+ * SCREEN 4 - SYNCING. No spinner, NO FIGURE.
  *
  * connect-whs is ONE synchronous call that returns only when the whole import
  * is finished - it streams nothing back, and the connection row (and therefore
  * whs_imported_counts) does not exist until it resolves. So there is NO real
- * rounds-so-far figure to count up here, and a fabricated one on this screen
- * would be the worst possible place for one.
+ * rounds-so-far figure, and a fabricated one on this screen would be the worst
+ * possible place for one. There is therefore no figure slot at all.
  *
- * The figure slot is therefore held with an em dash and labelled honestly. The
- * three steps are a STATEMENT of what the server is doing, in order - no ticks,
- * because we cannot know which one it has reached.
+ * THE STEP TIMER IS COSMETIC. It loops, and the caption says plainly that the
+ * steps are what the server is doing in order - we cannot know which one it has
+ * reached. THE SCREEN ENDS WHEN callConnectWhs RESOLVES, never on the timer.
  */
-const STEPS = ['Signing you in', 'Reading your record', 'Importing rounds'] as const;
+const STEP_MS = 1400;
+const STEP_KEYS = ['step1', 'step2', 'step3', 'step4'] as const;
 
-export const SyncingScreen: React.FC = () => (
-  <FlowBody>
-    <FlowHead
-      kicker="Connecting"
-      kickerColor={GOOD}
-      size={27}
-      headline="Pulling your record."
-      sub="Under a minute for most accounts. It finishes on our servers either way."
-    />
+export const SyncingScreen: React.FC = () => {
+  const { t } = useTranslation('handicap');
+  const [current, setCurrent] = useState(0);
 
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '22px 0 18px' }}>
-      <div
-        style={{
-          fontSize: 46,
-          fontWeight: 800,
-          letterSpacing: '-0.035em',
-          lineHeight: 0.92,
-          color: DIM,
-          ...NUM,
-        }}
-      >
-        {'\u2014'}
+  useEffect(() => {
+    const id = setInterval(() => setCurrent((p) => (p + 1) % STEP_KEYS.length), STEP_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <FlowBody>
+      <FlowHead
+        kicker={t('whsConnect.sync.kicker')}
+        kickerColor={GOOD}
+        size={27}
+        headline={t('whsConnect.sync.headline')}
+        sub={t('whsConnect.sync.sub')}
+      />
+
+      <div style={{ marginTop: 24 }}>
+        {STEP_KEYS.map((key, i) => {
+          const passed = i < current;
+          const isCurrent = i === current;
+          return (
+            <div
+              key={key}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: i === 0 ? '0 0 13px' : '13px 0',
+                borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
+              }}
+            >
+              <span
+                style={{
+                  width: 15,
+                  height: 15,
+                  borderRadius: 999,
+                  flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: passed ? GOOD : 'transparent',
+                  border: passed
+                    ? 'none'
+                    : `1.5px solid ${isCurrent ? GOOD : TRACK}`,
+                  transition: 'background 200ms ease, border-color 200ms ease',
+                }}
+              >
+                {passed ? <Check size={9} strokeWidth={3.2} color="#FFF" /> : null}
+              </span>
+              <span
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: isCurrent ? 700 : 400,
+                  color: passed || isCurrent ? INK : MUTE,
+                }}
+              >
+                {t(`whsConnect.sync.${key}`)}
+              </span>
+            </div>
+          );
+        })}
       </div>
-      <div style={{ ...LABEL, color: MUTE }}>rounds so far</div>
-    </div>
 
-    <div>
-      {STEPS.map((label, i) => (
-        <div
-          key={label}
-          style={{
-            fontSize: 13.5,
-            fontWeight: 700,
-            color: INK,
-            padding: i === 0 ? '0 0 12px' : '12px 0',
-            borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
-          }}
-        >
-          {label}
-        </div>
-      ))}
-    </div>
-
-    <div style={{ ...CAPTION, marginTop: 18, color: DIM, paddingBottom: 24 }}>
-      The count arrives with the import. Long records take a little longer.
-    </div>
-  </FlowBody>
-);
+      <div style={{ ...LABEL, color: DIM, marginTop: 18, paddingBottom: 24 }}>
+        {t('whsConnect.sync.note')}
+      </div>
+    </FlowBody>
+  );
+};
 
 export default SyncingScreen;
