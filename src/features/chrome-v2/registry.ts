@@ -22,7 +22,10 @@
  * rendering titles, this file is where they land.
  */
 
+import { isBusinessProfilePath } from '@/components/header/globalHeaderRules';
+
 export type ChromeTone = 'light' | 'dark';
+
 
 export type LeftCell =
   | { kind: 'logo' }
