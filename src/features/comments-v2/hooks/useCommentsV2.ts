@@ -6,13 +6,14 @@
  * delete_comment_v2 / toggle_comment_like_v2. The client NEVER writes
  * comments_v2, comment_likes_v2, or notifications directly.
  */
-import { useCallback, useMemo } from 'react';
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo, useRef } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 import { patchEngagement } from '@/lib/engagementCache';
+import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 
 export type TargetType = 'post' | 'top_ten' | 'editorial';
 
@@ -75,11 +76,19 @@ export function useCommentsV2({
   const actorId = activeActor?.id ?? user?.id ?? '';
   const blockedIds = useBlockedUserIds(user?.id ?? null);
 
-  const keyRoot = ['comments-v2', targetType, targetId, targetSecondaryId ?? null] as const;
+  /**
+   * Every key on this hook is named through `commentsKeys` (src/lib/queryKeys.ts)
+   * — READS AND WRITES BOTH. The optimistic like below writes the enrichment
+   * cache; when that key was built by hand from `rowIds`, a page landing
+   * between render and tap sent the write to a key nobody was subscribed to and
+   * it failed silently. One builder, both sides.
+   */
+  const scope = commentsScope(targetType, targetId, targetSecondaryId ?? null);
+  const keyRoot = commentsKeys.root(scope);
 
   // Load user's hidden comment IDs so they're filtered from the feed.
   const { data: hiddenIds = new Set<string>() } = useQuery({
-    queryKey: ['comments-v2-hidden', user?.id],
+    queryKey: commentsKeys.hidden(viewerId(user?.id)),
     enabled: !!user?.id && enabled,
     staleTime: 60_000,
     queryFn: async () => {
@@ -99,7 +108,7 @@ export function useCommentsV2({
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery<Page>({
-    queryKey: [...keyRoot, 'pages'],
+    queryKey: commentsKeys.pages(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
     initialPageParam: null as string | null,
@@ -128,7 +137,9 @@ export function useCommentsV2({
   // Fetch all replies for the visible parents in one query.
   const parentIds = useMemo(() => parents.map(p => p.id), [parents]);
   const { data: replies = [] } = useQuery({
-    queryKey: [...keyRoot, 'replies', parentIds],
+    // Batch idiom: how many parents are loaded, never which ones.
+    queryKey: commentsKeys.replies(scope, viewerId(user?.id), parentIds.length),
+    placeholderData: keepPreviousData,
     enabled: enabled && parentIds.length > 0,
     staleTime: 30_000,
     queryFn: async () => {
@@ -145,8 +156,19 @@ export function useCommentsV2({
   const allRows = useMemo(() => [...parents, ...replies], [parents, replies]);
   const rowIds = useMemo(() => allRows.map(r => r.id), [allRows]);
 
+  const enrichmentKey = commentsKeys.enrichment(scope, actorType, actorId, rowIds.length);
+
+  type EnrichmentResult = {
+    profileMap: Map<string, { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null }>;
+    businessMap: Map<string, { id: string; name: string | null; slug: string | null; logo_url: string | null; is_verified: boolean | null }>;
+    likeCounts: Map<string, number>;
+    myLikes: Set<string>;
+  };
+  const previousEnrichmentRef = useRef<EnrichmentResult | undefined>(undefined);
+
   const { data: enrichment } = useQuery({
-    queryKey: [...keyRoot, 'enrichment', rowIds, actorType, actorId],
+    queryKey: enrichmentKey,
+    placeholderData: keepPreviousData,
     enabled: enabled && rowIds.length > 0,
     staleTime: 30_000,
     queryFn: async () => {
@@ -183,9 +205,20 @@ export function useCommentsV2({
       );
       const myLikes = new Set((myLikesRes.data ?? []).map((l) => (l as LikeRow).comment_id));
 
+      // Merge over the previous result (batch idiom): loading page 2 of a
+      // thread must never drop the actors/likes already on screen.
+      const prev = previousEnrichmentRef.current;
+      if (prev) {
+        prev.profileMap.forEach((v, k) => { if (!profileMap.has(k)) profileMap.set(k, v); });
+        prev.businessMap.forEach((v, k) => { if (!businessMap.has(k)) businessMap.set(k, v); });
+        prev.likeCounts.forEach((v, k) => { if (!likeCounts.has(k)) likeCounts.set(k, v); });
+        prev.myLikes.forEach((k) => { if (!rowIds.includes(k)) myLikes.add(k); });
+      }
       return { profileMap, businessMap, likeCounts, myLikes };
     },
   });
+
+  previousEnrichmentRef.current = enrichment ?? previousEnrichmentRef.current;
 
   const shape = useCallback((row: RawCommentRow): CommentV2 => {
     const at = (row.actor_type ?? 'personal') as 'personal' | 'business';
@@ -257,7 +290,7 @@ export function useCommentsV2({
 
   // Header total (top-level count for the current target).
   const { data: totalCount = 0, isLoading: totalCountLoading } = useQuery({
-    queryKey: [...keyRoot, 'count'],
+    queryKey: commentsKeys.count(scope),
     enabled: enabled && !!targetId,
     staleTime: 30_000,
     queryFn: async () => {
@@ -357,7 +390,8 @@ export function useCommentsV2({
       await qc.cancelQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
       // Optimistic like toggle for the row cache — we mutate enrichment directly.
       type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
+      // Same builder as the read above — never rebuilt by hand.
+      qc.setQueryData(enrichmentKey, (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
@@ -378,7 +412,8 @@ export function useCommentsV2({
       const liked = !!res.liked;
       const count = Number(res.count ?? 0);
       type EnrichmentCache = { myLikes: Set<string>; likeCounts: Map<string, number> } & Record<string, unknown>;
-      qc.setQueryData([...keyRoot, 'enrichment', rowIds, actorType, actorId], (old: EnrichmentCache | undefined) => {
+      // Same builder as the read above — never rebuilt by hand.
+      qc.setQueryData(enrichmentKey, (old: EnrichmentCache | undefined) => {
         if (!old) return old;
         const myLikes = new Set<string>(old.myLikes);
         const likeCounts = new Map<string, number>(old.likeCounts);
