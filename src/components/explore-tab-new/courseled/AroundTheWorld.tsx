@@ -269,10 +269,20 @@ interface Props {
   onToggleShortlist?: (courseId: string) => void;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
   lastSeen?: number | null;
+  /**
+   * REPORTS THE MEMBERS THIS SECTION IS ACTUALLY RENDERING, once its tiles have
+   * settled (BRIEF_PERSONAL_BESTS_SECTION §4.2b). Read-only instrumentation:
+   * Personal Bests below needs the count per member to spend its shared budget,
+   * and that fact only exists after the lens filter, the two slot passes and the
+   * course-meta hold have all resolved. Nothing in this section's own logic
+   * consults it.
+   */
+  onRenderedMembers?: (counts: Map<string, number>) => void;
 }
 
 
-function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
+/** Shared with Personal Bests, which must read the same ages. */
+export function relativeWhen(iso: string, t: (k: string, o?: any) => string): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days <= 0) return t('discover.when.today', 'Today');
   if (days === 1) return t('discover.when.yesterday', 'Yesterday');
@@ -301,6 +311,7 @@ export function AroundTheWorld({
   isShortlisted,
   onToggleShortlist,
   lastSeen = null,
+  onRenderedMembers,
 }: Props) {
   const { t } = useTranslation('courses');
   const [sheetOpen, setSheetOpen] = useState(false);
