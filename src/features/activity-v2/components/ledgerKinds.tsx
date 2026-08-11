@@ -394,9 +394,30 @@ export function resolveKind(row: {
       isSystem: true,
     };
   }
-
+  if (t === 'video_ready') {
+    // System-authored outcome for the member (actor_id is NULL server-side),
+    // so amber tile like golfer_verified / rate_course_prompt — not the
+    // neutral Bell, which is reserved for announcements.
+    return {
+      left: 'tile',
+      right: row.target_poster_url || row.target_course_image ? 'thumb' : 'none',
+      tile: { icon: Video, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      isSystem: true,
+    };
+  }
 
   // Unknown: safe fallback ----------------------------------------
+  // With no actor there is nobody to draw, and asking for one renders a
+  // literal '?' via initials(). Degrade to the neutral Bell tile instead so a
+  // future system-authored type is never a question mark.
+  if (!row.actor_user_id) {
+    return {
+      left: 'tile',
+      right: 'none',
+      tile: { icon: Bell, fg: T.INK_60, bg: T.NEUTRAL },
+      isSystem: true,
+    };
+  }
   return { left: 'actor', right: 'none' };
 }
 
