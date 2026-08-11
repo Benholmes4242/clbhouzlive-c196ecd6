@@ -25,6 +25,8 @@ interface GolfCourse {
 
 const GBI = "Britain & Ireland";
 
+const FUNCTION_VERSION = "2026-08-11-cors-module-scope-v1";
+
 Deno.serve(async (req) => {
   corsHeaders = corsFor(req.headers.get('Origin'));
   if (req.method === "OPTIONS") {
@@ -40,9 +42,14 @@ Deno.serve(async (req) => {
       req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const mode = body.mode ?? "bulk";
 
+    if (mode === "ping") {
+      return json({ ok: true, version: FUNCTION_VERSION });
+    }
+
     if (mode === "single") {
       const id = body.whs_course_id;
       if (!id) return json({ error: "whs_course_id required" }, 400);
+
       const result = await processOne(supabase, id);
       return json(result);
     }
