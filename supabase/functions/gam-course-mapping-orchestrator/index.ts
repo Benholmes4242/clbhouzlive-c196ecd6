@@ -427,6 +427,8 @@ async function backfillUnmatched(supabase: any): Promise<number> {
     "whs_to_golf_course_map",
     "whs_course_id, golf_course_id",
   );
+  // A row with a NULL golf_course_id is a RECORD OF FAILURE, not a mapping.
+  // isAlreadyMapped() must apply the same test - see the comment there.
   const mapped = new Set<string>();
   for (const r of mapRows) {
     if (r.golf_course_id) mapped.add(r.whs_course_id as string);
@@ -480,9 +482,11 @@ async function backfillUnmatched(supabase: any): Promise<number> {
   if (error) throw error;
   return payload.length;
 }
-
-
-
+// A whs_to_golf_course_map row with a NULL golf_course_id is a RECORD OF
+// FAILURE (match_method 'no_match_found'), not a mapping. This function and
+// backfillUnmatched() above MUST agree on that: if either treats the mere
+// existence of a row as "mapped", the orchestrator reads back its own failure
+// row and silently suppresses the unmatched-course queue write.
 async function isAlreadyMapped(
   supabase: any,
   whsCourseId: string,
@@ -496,6 +500,7 @@ async function isAlreadyMapped(
     console.error("recheck_error", whsCourseId, error.message);
     return false;
   }
+  // Non-null target required - see comment above.
   return Boolean(data?.golf_course_id);
 }
 
