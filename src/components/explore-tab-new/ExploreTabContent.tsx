@@ -29,6 +29,7 @@ import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
+import { PersonalBests } from './courseled/PersonalBests';
 import { LatestReviews } from './courseled/LatestReviews';
 import { LatestReviewsSheet } from './courseled/LatestReviewsSheet';
 import { useLatestReviews, type LatestReview } from './courseled/hooks/useLatestReviews';
@@ -124,6 +125,17 @@ export default function ExploreTabContent({
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
   const [reviewsSheet, setReviewsSheet] = useState(false);
+
+  /**
+   * THE SHARED MEMBER BUDGET (BRIEF_PERSONAL_BESTS_SECTION §4). Standout Rounds
+   * reports who it is ACTUALLY rendering once its tiles settle; Personal Bests
+   * spends two appearances per member across both sections. `null` means not yet
+   * settled, and the lower section renders nothing until it is.
+   */
+  const [standoutCounts, setStandoutCounts] = useState<Map<string, number> | null>(null);
+  const handleStandoutMembers = useCallback((counts: Map<string, number>) => {
+    setStandoutCounts(counts);
+  }, []);
 
   // LATEST REVIEWS (slot 3): one paginated query, media batched in the same
   // read. No window — "latest" means latest.
@@ -478,6 +490,17 @@ export default function ExploreTabContent({
           onExpand={(revealed) =>
             analyticsEvents.track('discover_courses_expanded', { revealed })
           }
+          onRenderedMembers={handleStandoutMembers}
+        />
+
+        {/* PERSONAL BESTS — the second tier, feats measured against the member's
+            OWN history. Directly below its sibling, and NOT a fifth lens: the
+            lenses filter courses, this changes whose history the bar comes from. */}
+        <PersonalBests
+          userId={userId}
+          standoutCounts={standoutCounts}
+          onCoursePress={(id) => goCourse(id, 'personal_bests')}
+          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
         />
 
 

@@ -187,3 +187,20 @@ export const top100Keys = {
   enrichment: (scope: string, viewer: ViewerId, loadedCount: number) =>
     batchKey('top100-enrichment', scope, viewer, loadedCount),
 } as const;
+
+/* ─────────────────────────────── Discover ─────────────────────────────── */
+
+export const discoverKeys = {
+  /**
+   * Personal Bests (BRIEF_PERSONAL_BESTS_SECTION §5.1). Viewer-scoped: the RPC
+   * is SECURITY INVOKER and resolves the viewer's friends server-side, so two
+   * members get different answers from identical parameters. Three scalars, no
+   * array-derived material.
+   */
+  personalBests: (
+    viewer: ViewerId,
+    days: number,
+    limit: number,
+    perMember: number,
+  ) => ['discover', 'personal-bests', viewer, days, limit, perMember] as const,
+} as const;

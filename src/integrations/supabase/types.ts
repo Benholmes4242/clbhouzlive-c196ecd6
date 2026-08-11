@@ -19716,6 +19716,26 @@ export type Database = {
           total_rounds: number
         }[]
       }
+      get_personal_bests: {
+        Args: { p_days?: number; p_limit?: number; p_per_member?: number }
+        Returns: {
+          course_id: string
+          course_name: string
+          display_name: string
+          feat_kind: string
+          figure: string
+          figure_unit: string
+          headline: string
+          is_self: boolean
+          play_date: string
+          profile_photo_url: string
+          rarity: number
+          reference_line: string
+          region: string
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_pickem_leaderboard: {
         Args: { p_user_id?: string }
         Returns: {
