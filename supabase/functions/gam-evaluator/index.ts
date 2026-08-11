@@ -1613,6 +1613,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
           courseName = course?.name?.trim() || null;
         } catch { /* non-fatal */ }
 
+        // NOTE: the DB trigger gam_legend_pulse_emit (on gam_course_legends
+        // INSERT) already enqueued this exact legend_lost row a few lines up,
+        // with the SAME deduplication_key. So this upsert always no-ops and
+        // returns zero rows, which means writeActivityRow() never runs here —
+        // the Activity mirror for legend_lost lives in that trigger. Keep the
+        // two copies identical; do not "fix" the missing ledger row here.
         await enqueueNotification(prevTopUser, "legend_lost", {
           course_id: courseId,
           category: cfg.category,
