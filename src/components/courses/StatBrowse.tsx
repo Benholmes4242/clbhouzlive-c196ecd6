@@ -490,17 +490,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       : facets?.played_total ?? null;
   const areaHasTracked = facets == null || trackedInArea == null ? null : trackedInArea > 0;
 
-  /**
-   * Lens availability for the CURRENT scope: region entry, else country entry,
-   * else the platform-wide counts. Counts come from get_stat_browse_facets —
-   * see the drift-trap note in useStatBrowse.ts. FAILS OPEN: unsettled facets
-   * or a pre-lens_counts cached payload leave every lens selectable.
-   */
-  const scopeLensCounts: LensCounts | null = region
-    ? regionEntry?.lens_counts ?? null
-    : country
-      ? countryEntry?.lens_counts ?? null
-      : facets?.lens_counts_all ?? null;
+
+
 
   const lensUnavailableReason = useCallback(
     (l: StatLens): string | null => {
