@@ -10,6 +10,11 @@
  * session alive exactly as a user action should.
  *
  * Every reader must come through getSessionId(). No copies of the timeout.
+ *
+ * KNOWN AND ACCEPTED: the id now survives logout, so on a shared device a
+ * second member's first 30 minutes carry the previous session id. user_id is
+ * on every row, so nothing is misattributed to the wrong person - only the
+ * session boundary is wrong. Deliberately NOT cleared on logout.
  */
 import { safeLocalStorage } from './safeLocalStorage';
 
