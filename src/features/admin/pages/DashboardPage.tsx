@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, MessageSquare, UserPlus, Star } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CARD, KICKER, LABEL, FIG, Skeleton } from '../lib/chartPrimitives';
+
 import { adminTheme as t } from '../theme';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
@@ -46,16 +48,32 @@ function relTime(iso: string): string {
 
 type FeedKind = 'member' | 'post' | 'review';
 
+interface FeedRound {
+  gross: number;
+  par: number;
+  courseName: string | null;
+}
+
 interface FeedItem {
   id: string;
   kind: FeedKind;
   created_at: string;
-  title: string;
-  subtitle: string | null;
+  /** Line 1 subject: member name, post author, or - for reviews - the COURSE. */
+  subject: string;
+  /** Line 2 content: caption, "{author} - {review}", or nothing for a join. */
+  body: string | null;
   avatarUrl: string | null;
   href: string;
   postId?: string;
   courseId?: string;
+  /**
+   * Line 3 metadata. Every entry carries its own noun - never a bare figure.
+   * A zero is only present where the zero is itself a finding (likes,
+   * comments); absent values are omitted rather than rendered as 0.
+   */
+  meta: string[];
+  /** Present only when a post resolves to a processed round. */
+  round?: FeedRound;
   /**
    * Moderation markers. Hidden and mock rows are MARKED, never filtered:
    * an admin needs to see that something was hidden.
@@ -64,6 +82,9 @@ interface FeedItem {
 }
 
 async function fetchClubhouseFeed(): Promise<FeedItem[]> {
+  // 4.1d: 8/8/8 merged and sliced to 8, deliberately. A 4/4/4 split would
+  // spend four slots on reviews in a week with no reviews while live posts
+  // fell off the panel.
   const [members, posts, reviews] = await Promise.all([
     supabase
       .from('user_profiles')
@@ -73,30 +94,52 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       .limit(8),
     supabase
       .from('posts')
-      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden')
+      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden, like_count, comment_count, course_id, whs_score_id, visibility, status')
       .order('created_at', { ascending: false })
       .limit(8),
     supabase
       .from('course_ratings')
-      .select('id, created_at, user_id, course_id, review, is_mock')
+      .select('id, created_at, user_id, course_id, review, is_mock, rating, tee_label, helpful_count')
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
 
-  const postRows = (posts.data ?? []) as { id: string; content: string | null; created_at: string; user_id: string; moderation_hidden: boolean | null; auto_hidden: boolean | null }[];
-  const reviewRows = (reviews.data ?? []) as { id: string; created_at: string; user_id: string; course_id: string; review: string | null; is_mock: boolean | null }[];
+  type PostRow = {
+    id: string; content: string | null; created_at: string; user_id: string;
+    moderation_hidden: boolean | null; auto_hidden: boolean | null;
+    like_count: number | null; comment_count: number | null;
+    course_id: string | null; whs_score_id: string | null;
+    visibility: string | null; status: string | null;
+  };
+  type ReviewRow = {
+    id: string; created_at: string; user_id: string; course_id: string;
+    review: string | null; is_mock: boolean | null; rating: number | null;
+    tee_label: string | null; helpful_count: number | null;
+  };
+  const postRows = (posts.data ?? []) as PostRow[];
+  const reviewRows = (reviews.data ?? []) as ReviewRow[];
   const memberRows = (members.data ?? []) as { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; created_at: string }[];
 
   const profileIds = Array.from(new Set([
     ...postRows.map(r => r.user_id),
     ...reviewRows.map(r => r.user_id),
   ].filter(Boolean)));
-  const courseIds = Array.from(new Set(reviewRows.map(r => r.course_id).filter(Boolean)));
+  // 4.1a ONE course map serves both branches - review course_ids and post
+  // course_ids in the same query.
+  const courseIds = Array.from(new Set([
+    ...reviewRows.map(r => r.course_id),
+    ...postRows.map(r => r.course_id ?? ''),
+  ].filter(Boolean))) as string[];
+  // 4.1c Deliberately narrow: only posts with no caption need a media
+  // fallback subtitle, so media type is NOT reliable metadata here.
   const emptyContentPostIds = postRows
     .filter(p => !((p.content ?? '').trim()))
     .map(p => p.id);
+  const roundScoreIds = Array.from(new Set(
+    postRows.map(p => p.whs_score_id).filter(Boolean),
+  )) as string[];
 
-  const [profRes, courseRes, mediaRes] = await Promise.all([
+  const [profRes, courseRes, mediaRes, roundRes] = await Promise.all([
     profileIds.length
       ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
       : Promise.resolve({ data: [] } as { data: unknown[] }),
@@ -106,6 +149,9 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     emptyContentPostIds.length
       ? supabase.from('post_media').select('post_id, media_type').in('post_id', emptyContentPostIds).limit(50)
       : Promise.resolve({ data: [] } as { data: unknown[] }),
+    roundScoreIds.length
+      ? supabase.from('gam_round_stats').select('whs_score_id, gross_score, course_par, course_name').in('whs_score_id', roundScoreIds)
+      : Promise.resolve({ data: [] } as { data: unknown[] }),
   ]);
   type Prof = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
   const profMap = new Map<string, Prof>(((profRes.data ?? []) as Prof[]).map(p => [p.id, p]));
@@ -114,20 +160,30 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const m of ((mediaRes.data ?? []) as { post_id: string; media_type: string }[])) {
     if (!mediaMap.has(m.post_id)) mediaMap.set(m.post_id, m.media_type);
   }
+  // A missing row means the evaluator has not processed the round yet. The
+  // post then renders as an ordinary post: no partial score, no "pending".
+  const roundMap = new Map<string, FeedRound>();
+  for (const r of ((roundRes.data ?? []) as { whs_score_id: string | null; gross_score: number | null; course_par: number | null; course_name: string | null }[])) {
+    if (!r.whs_score_id) continue;
+    if (r.gross_score == null || r.course_par == null) continue;
+    if (!roundMap.has(r.whs_score_id)) {
+      roundMap.set(r.whs_score_id, { gross: r.gross_score, par: r.course_par, courseName: r.course_name });
+    }
+  }
 
   const displayName = (p: Prof | undefined | null) => p?.display_name ?? p?.username ?? 'A member';
   const items: FeedItem[] = [];
 
   for (const m of memberRows) {
-    const name = m.display_name ?? m.username ?? 'A member';
     items.push({
       id: `member:${m.id}`,
       kind: 'member',
       created_at: m.created_at,
-      title: `New member: ${name}`,
-      subtitle: null,
+      subject: m.display_name ?? m.username ?? 'A member',
+      body: null,
       avatarUrl: m.profile_photo_url,
       href: `/admin-v2/users?member=${m.id}`,
+      meta: [],
       warnings: [],
     });
   }
@@ -135,22 +191,37 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
     const prof = profMap.get(p.user_id);
     const name = displayName(prof);
     const content = stripMentionMarkup((p.content ?? '').trim()).trim();
-    let subtitle: string | null = null;
-    if (content) subtitle = content;
+    let body: string | null = null;
+    if (content) body = content;
     else {
       const mt = mediaMap.get(p.id);
-      if (mt === 'video') subtitle = 'Video post';
-      else if (mt === 'image' || mt === 'photo') subtitle = 'Photo post';
+      if (mt === 'video') body = 'Video post';
+      else if (mt === 'image' || mt === 'photo') body = 'Photo post';
     }
+    const likes = p.like_count ?? 0;
+    const comments = p.comment_count ?? 0;
+    const meta: string[] = [
+      `${likes} like${likes === 1 ? '' : 's'}`,
+      `${comments} comment${comments === 1 ? '' : 's'}`,
+    ];
+    const courseName = p.course_id ? courseMap.get(p.course_id)?.name : undefined;
+    if (courseName) meta.push(courseName);
+    // post_visibility is ('anyone' | 'followers' | 'private') - 'anyone' IS
+    // public. 'private' is named as itself rather than mislabelled "friends".
+    if (p.visibility === 'followers') meta.push('Friends only');
+    else if (p.visibility === 'private') meta.push('Private');
+
     items.push({
       id: `post:${p.id}`,
       kind: 'post',
       created_at: p.created_at,
-      title: `Post from ${name}`,
-      subtitle,
+      subject: name,
+      body,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
       postId: p.id,
+      meta,
+      round: p.whs_score_id ? roundMap.get(p.whs_score_id) : undefined,
       warnings: [
         ...(p.auto_hidden ? ['Auto-hidden'] : []),
         ...(p.moderation_hidden ? ['Hidden'] : []),
@@ -160,15 +231,22 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   for (const r of reviewRows) {
     const course = courseMap.get(r.course_id);
     const prof = profMap.get(r.user_id);
+    const author = displayName(prof);
+    const text = stripMentionMarkup((r.review ?? '').trim()).trim();
+    const meta: string[] = [];
+    if (r.rating != null) meta.push(`${r.rating.toFixed(1)} rated`);
+    if (r.tee_label) meta.push(`${r.tee_label} tees`);
+    if ((r.helpful_count ?? 0) > 0) meta.push(`${r.helpful_count} helpful`);
     items.push({
       id: `review:${r.id}`,
       kind: 'review',
       created_at: r.created_at,
-      title: `Review: ${course?.name ?? 'a course'}`,
-      subtitle: stripMentionMarkup((r.review ?? '').trim()).trim() || `by ${displayName(prof)}`,
+      subject: course?.name ?? 'a course',
+      body: text ? `${author} - ${text}` : author,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
       courseId: r.course_id,
+      meta,
       warnings: r.is_mock ? ['Mock'] : [],
     });
   }
@@ -176,6 +254,7 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
   items.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   return items.slice(0, 8);
 }
+
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -358,6 +437,25 @@ function MetricGrid({ loading, data, ops, opsLoading }: {
 
 // ─── Clubhouse feed ───────────────────────────────────────────────────────────
 
+/**
+ * Local to-par. NOT imported from the member tokens: that module carries
+ * member-surface colours, and pulling it in would couple two palettes.
+ * ROUND FIRST, THEN BRANCH - taking the sign before rounding renders "-0.0"
+ * on a value fractionally under par.
+ */
+function toParParts(gross: number, par: number): { text: string; color: string } {
+  const rounded = Math.round(gross - par);
+  if (rounded === 0) return { text: 'E', color: t.inkMuted };
+  if (rounded < 0) return { text: `\u2212${Math.abs(rounded)}`, color: t.danger };
+  return { text: `+${rounded}`, color: t.ink };
+}
+
+const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
+  member: { text: 'JOINED', color: t.ok },
+  post:   { text: 'POST',   color: t.inkFaint },
+  review: { text: 'REVIEW', color: t.brandText },
+};
+
 function LatestInClubhouse({
   items, loading, isError, onRetry,
 }: {
@@ -368,23 +466,15 @@ function LatestInClubhouse({
   const [openCourse, setOpenCourse] = React.useState<string | null>(null);
 
   return (
-    <section
-      style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, boxShadow: t.shadowCard,
-        padding: 16, display: 'flex', flexDirection: 'column', gap: 12,
-      }}
-    >
-      <div>
-        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Latest in the clubhouse</div>
-        <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>New members, posts, and reviews</div>
+    <section style={CARD}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+        <span style={KICKER}>Latest in the clubhouse</span>
+        <Link to="/admin-v2/content" style={{ ...LABEL, color: t.inkMuted, textDecoration: 'none' }}>ALL</Link>
       </div>
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{ height: 52, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
+          {[0, 1, 2].map(i => <Skeleton key={i} height={52} />)}
         </div>
       ) : isError ? (
         <AdminErrorState message="Couldn't load recent activity." onRetry={onRetry} />
@@ -415,9 +505,7 @@ function FeedRow({
   onOpenPost: (id: string) => void;
   onOpenCourse: (id: string) => void;
 }) {
-  const chip = feedChip(item.kind);
-  // C4-3: post rows -> post insight sheet (upgrades the temporary author-360 routing).
-  // C4-2 (b): review rows -> course insight sheet.
+  // Post rows -> post insight sheet; review rows -> course insight sheet.
   const opensSheet =
     (item.kind === 'post' && !!item.postId) ||
     (item.kind === 'review' && !!item.courseId);
@@ -425,51 +513,70 @@ function FeedRow({
   const rowStyle: React.CSSProperties = {
     display: 'flex', alignItems: 'flex-start', gap: 10,
     padding: '10px 0',
-    borderTop: first ? 'none' : `1px solid ${t.line}`,
+    borderTop: first ? 'none' : `1px solid ${t.hairline}`,
     textDecoration: 'none', color: 'inherit',
     background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
     cursor: 'pointer',
   };
 
+  const kind = KIND_LABEL[item.kind];
+  const round = item.round;
+
   const inner = (
     <>
-      <span
-        aria-hidden
-        style={{
-          width: 28, height: 28, borderRadius: 8,
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          background: chip.bg, color: chip.fg, flexShrink: 0,
-        }}
-      >
-        {chip.icon}
-      </span>
+      {/* 4.2h The 28px slot is reserved either way so bodies align. */}
       {item.avatarUrl ? (
-        <SquircleAvatar src={item.avatarUrl} alt={item.title} size={28} hairlineRing ringColor={LIGHT_HAIRLINE} />
-      ) : null}
+        <SquircleAvatar src={item.avatarUrl} alt={item.subject} size={28} hairlineRing ringColor={t.line} />
+      ) : (
+        <span
+          aria-hidden
+          style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }}
+        />
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
           <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {item.title}
+            {item.subject}
           </span>
-          <span style={{ color: t.inkFaint, fontSize: 11 }}>- {relTime(item.created_at)}</span>
+          <span style={{ ...LABEL, color: kind.color, flexShrink: 0 }}>{kind.text}</span>
         </div>
-        {item.warnings.length > 0 && (
-          <div style={{ color: t.warnText, fontSize: 11, fontWeight: 700, marginTop: 2 }}>
-            {item.warnings.join(' - ')}
-          </div>
-        )}
-        {item.subtitle && (
+        {item.body && (
           <div
             style={{
               color: t.inkMuted, fontSize: 13, marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}
           >
-            {item.subtitle}
+            {item.body}
+          </div>
+        )}
+        {(item.warnings.length > 0 || item.meta.length > 0 || round) && (
+          <div
+            style={{
+              ...LABEL, ...FIG, marginTop: 3,
+              display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 8,
+            }}
+          >
+            {item.warnings.map(w => (
+              <span key={w} style={{ color: t.warnText, fontWeight: 700 }}>{w}</span>
+            ))}
+            {item.meta.map(mt => <span key={mt}>{mt}</span>)}
+            {round && (() => {
+              const p = toParParts(round.gross, round.par);
+              return (
+                <span style={{ color: t.inkMuted }}>
+                  <span style={{ color: t.ink, fontWeight: 700 }}>{round.gross}</span>{' '}
+                  <span style={{ color: p.color, fontWeight: 700 }}>{p.text}</span>
+                  {round.courseName ? ` - ${round.courseName}` : ''}
+                </span>
+              );
+            })()}
           </div>
         )}
       </div>
-      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 12, flexShrink: 0 }} />
+      {/* 4.2a Right rail: age only. Nothing else may sit in this column. */}
+      <span style={{ ...LABEL, ...FIG, flexShrink: 0, marginTop: 1 }}>{relTime(item.created_at)}</span>
+      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 1, flexShrink: 0 }} />
     </>
   );
 
@@ -481,7 +588,7 @@ function FeedRow({
           if (item.kind === 'post' && item.postId) onOpenPost(item.postId);
           else if (item.kind === 'review' && item.courseId) onOpenCourse(item.courseId);
         }}
-        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.line }}
+        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline }}
       >
         {inner}
       </button>
@@ -495,13 +602,4 @@ function FeedRow({
   );
 }
 
-
-function feedChip(kind: FeedKind): { icon: React.ReactNode; bg: string; fg: string } {
-  switch (kind) {
-    case 'member': return { icon: <UserPlus size={14} />, bg: t.neutralSoft, fg: t.ink };
-    case 'review': return { icon: <Star size={14} />, bg: t.brandSoft, fg: t.brandText };
-    case 'post':
-    default:       return { icon: <MessageSquare size={14} />, bg: t.canvas, fg: t.ink };
-  }
-}
 
