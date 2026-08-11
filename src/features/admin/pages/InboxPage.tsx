@@ -18,6 +18,7 @@ import SupportTicketDrawer from '../components/SupportTicketDrawer';
 import ApprovalDetailDrawer from '../components/ApprovalDetailDrawer';
 import AdminSheet from '../components/AdminSheet';
 import HolePhotoReviewSheet from '../components/HolePhotoReviewSheet';
+import ConfirmDialog from '../components/ConfirmDialog';
 import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import { usePanelRole } from '@/hooks/usePanelRole';
