@@ -1452,6 +1452,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_tag_visibility_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       business_team_members: {
@@ -3566,6 +3573,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_mood_blurbs_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
         ]
       }
@@ -7924,6 +7938,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_courses_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       post_dismissals: {
@@ -7952,6 +7973,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_dismissals_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
         ]
       }
@@ -8129,6 +8157,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_impressions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       post_likes: {
@@ -8163,6 +8198,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
         ]
       }
@@ -8275,6 +8317,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
             foreignKeyName: "post_media_source_review_media_id_fkey"
             columns: ["source_review_media_id"]
             isOneToOne: false
@@ -8325,6 +8374,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       post_shares: {
@@ -8354,6 +8410,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_shares_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       post_views: {
@@ -8382,6 +8445,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_views_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
         ]
       }
@@ -11560,6 +11630,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "stream_assets_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       support_messages: {
@@ -12542,6 +12619,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tournament_result_meta_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
             foreignKeyName: "tournament_result_meta_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: true
@@ -12867,6 +12951,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_content_preferences_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
         ]
       }
@@ -14130,6 +14221,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_profiles_featured_post_id_fkey"
+            columns: ["featured_post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
             foreignKeyName: "user_profiles_home_club_business_id_fkey"
             columns: ["home_club_business_id"]
             isOneToOne: false
@@ -14142,6 +14240,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_last_seen_post_id_fkey"
+            columns: ["last_seen_post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
           },
           {
             foreignKeyName: "user_profiles_primary_club_id_fkey"
@@ -15138,6 +15243,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "video_progress_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
         ]
       }
       web_vitals: {
@@ -15905,45 +16017,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "whs_invite_status"
             referencedColumns: ["redeemer_connection_id"]
-          },
-        ]
-      }
-      whs_round_reactions: {
-        Row: {
-          created_at: string
-          id: string
-          reaction_type: string
-          score_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          reaction_type?: string
-          score_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          reaction_type?: string
-          score_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "whs_round_reactions_score_id_fkey"
-            columns: ["score_id"]
-            isOneToOne: false
-            referencedRelation: "whs_friend_course_bests"
-            referencedColumns: ["best_score_id"]
-          },
-          {
-            foreignKeyName: "whs_round_reactions_score_id_fkey"
-            columns: ["score_id"]
-            isOneToOne: false
-            referencedRelation: "whs_scores"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -16941,6 +17014,61 @@ export type Database = {
             columns: ["primary_club_id"]
             isOneToOne: false
             referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_post_like_count_drift: {
+        Row: {
+          business_post_like_count: number | null
+          content_reaction_count: number | null
+          expected_like_count: number | null
+          post_id: string | null
+          stored_like_count: number | null
+          user_id: string | null
+          whs_score_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_user_profile_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "posts_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: false
+            referencedRelation: "whs_scores"
             referencedColumns: ["id"]
           },
         ]
@@ -22725,13 +22853,6 @@ export type Database = {
           p_post_id: string
         }
         Returns: Json
-      }
-      toggle_whs_round_reaction: {
-        Args: { p_reaction_type?: string; p_score_id: string }
-        Returns: {
-          reacted: boolean
-          total: number
-        }[]
       }
       tournament_scoring_totals:
         | {
