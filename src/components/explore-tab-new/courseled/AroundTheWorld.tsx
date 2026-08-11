@@ -868,226 +868,55 @@ export function AroundTheWorld({
                   {col.map((tt) => {
                     const { g, m } = tt;
                     return (
-                      <div
+                      <StandoutTile
                         key={tt.slotKey}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => onCoursePress(g.courseId)}
-                        onPointerDown={() => setPressed(tt.slotKey)}
-
-                        onPointerUp={() => setPressed(null)}
-                        onPointerLeave={() => setPressed(null)}
-                        onPointerCancel={() => setPressed(null)}
-                        style={{
-                          ...CARD_SHELL,
-                          ...(isNewSince(g.at, lastSeen) ? NEW_CARD_RING : null),
-                          padding: 0,
-                          textAlign: 'left',
-                          fontFamily: SANS,
-                          cursor: 'pointer',
-                          opacity: pressed === tt.slotKey ? 0.72 : 1,
-                          transition: 'opacity 120ms ease',
-                        }}
-                      >
-                        <CourseImageFallback
-                          courseId={g.courseId}
-                          courseName={m?.name ?? g.courseName}
-                          imageUrl={m?.imageUrl ?? g.courseImage}
-                          initialsSize={tt.tall ? 26 : 22}
-                          style={{ height: tt.photo }}
-                        >
-                          <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
-
-                          {/* FIGURE CHIP — the reason the tile exists. It stays
-                              a chip (BRIEF_STANDOUT_ROUNDS §3): 10px radius on
-                              a blurred glass substrate rather than a filled
-                              tier pill, so the age beside it can stop
-                              competing. */}
-                          {tt.figure && (
-                            <span
-                              style={{
-                                position: 'absolute',
-                                top: 8,
-                                left: 8,
-                                display: 'inline-flex',
-                                alignItems: 'baseline',
-                                gap: 4,
-                                padding: '5px 10px',
-                                borderRadius: 10,
-                                background: 'rgba(10,14,10,0.58)',
-                                backdropFilter: 'blur(8px)',
-                                WebkitBackdropFilter: 'blur(8px)',
-                              }}
-                            >
-                              <span
-                                style={{
-                                  ...NUMF,
-                                  fontSize: 16,
-                                  letterSpacing: '-0.02em',
-                                  lineHeight: 1,
-                                  color: '#FFFFFF',
-                                }}
-                              >
-                                {tt.figure}
-                              </span>
-                              {tt.unit && (
-                                <span
-                                  style={{
-                                    fontSize: 6.5,
-                                    fontWeight: 800,
-                                    letterSpacing: '0.14em',
-                                    textTransform: 'uppercase',
-                                    lineHeight: 1,
-                                    color: 'rgba(255,255,255,0.60)',
-                                  }}
-                                >
-                                  {tt.unit}
-                                </span>
-                              )}
-                            </span>
-                          )}
-
-                          {/* AGE — the least important fact on the tile, so it
-                              is NOT a pill: plain label on the scrim, carried
-                              by a 1px text shadow. */}
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: 8,
-                              right: 10,
-                              fontSize: 6.5,
-                              fontWeight: 800,
-                              letterSpacing: '0.14em',
-                              textTransform: 'uppercase',
-                              color: 'rgba(255,255,255,0.72)',
-                              textShadow: '0 1px 2px rgba(10,14,10,0.55)',
-                            }}
-                          >
-                            {relativeWhen(g.at, t)}
-                          </span>
-
-
-                          <div
-                            style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}
-                          >
-                            <div
-                              style={{
-                                fontSize: 14,
-                                fontWeight: 800,
-                                color: '#fff',
-                                letterSpacing: '-0.025em',
-                                lineHeight: 1.14,
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                              }}
-                            >
-                              {m?.name ?? g.courseName ?? t('discover.unknownCourse', 'Course')}
-                            </div>
-                            {m?.region && (
-                              <div
-                                style={{
-                                  ...LABEL,
-                                  fontSize: 6.5,
-                                  color: 'rgba(255,255,255,0.60)',
-                                  marginTop: 3,
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                {m.region}
-                              </div>
-                            )}
-                          </div>
-                        </CourseImageFallback>
-
-                        {/* TEXT PANEL — no figure here. One figure per tile. */}
-                        <div style={{ padding: '11px 13px 12px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <div
-                              style={{
-                                flex: 1,
-                                minWidth: 0,
-                                fontSize: 13,
-                                fontWeight: 800,
-                                letterSpacing: '-0.01em',
-                                color: tt.isOwn ? A.AMBER_DEEP : A.INK,
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                            >
-                              {tt.who
-                                ? tt.isOwn
-                                  ? t('discover.wire.you', 'You')
-                                  : tt.who
-                                : tt.detail}
-                            </div>
-                            {/* FIXED-WIDTH TRAILING SLOT — rendered whether or
-                                not a control appears, so names never go ragged
-                                between a tile with a reaction and one without. */}
-                            <ReactionSlot>
-                              {tt.reactTo
-                                ? (() => {
-                                    const st = reactions.stateFor(
-                                      tt.reactTo.type,
-                                      tt.reactTo.id,
-                                    );
-                                    return (
-                                      <ReactionAction
-                                        hidden={!reactions.viewerId || reactions.unavailable}
-                                        readOnly={tt.isOwn}
-                                        count={st.count}
-                                        reacted={st.mine}
-                                        onToggle={() =>
-                                          reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
-                                        }
-                                        label={
-                                          tt.reactTo.type === 'round'
-                                            ? t('discover.reactions.action', 'Like this round')
-                                            : t(
-                                                'discover.reactions.actionReview',
-                                                'Like this review',
-                                              )
-                                        }
-                                      />
-                                    );
-                                  })()
-                                : null}
-                            </ReactionSlot>
-                          </div>
-
-                          {tt.who && tt.detailShown && (
-                            <div
-                              role={tt.onPress ? 'button' : undefined}
-                              onClick={
-                                tt.onPress
-                                  ? (ev) => {
-                                      ev.stopPropagation();
-                                      tt.onPress?.();
-                                    }
-                                  : undefined
-                              }
-                              style={{
-                                fontSize: 12,
-                                fontWeight: 600,
-                                lineHeight: 1.32,
-                                color: A.MUTE,
-                                marginTop: 2,
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                                cursor: tt.onPress ? 'pointer' : 'inherit',
-                              }}
-                            >
-                              {tt.detail}
-                            </div>
-                          )}
-
-                          {tt.more > 0 && (
+                        courseId={g.courseId}
+                        courseName={m?.name ?? g.courseName ?? t('discover.unknownCourse', 'Course')}
+                        imageUrl={m?.imageUrl ?? g.courseImage}
+                        region={m?.region ?? null}
+                        photo={tt.photo}
+                        figure={tt.figure}
+                        unit={tt.unit}
+                        whenLabel={relativeWhen(g.at, t)}
+                        who={tt.who}
+                        isOwn={tt.isOwn}
+                        /* ONE FACT, ONCE: where the chip carries the whole fact the
+                           line is omitted — unless there is no name, in which case
+                           the wording IS the title. */
+                        detail={tt.detailShown ? tt.detail : tt.who ? '' : tt.detail}
+                        onDetailPress={tt.onPress}
+                        isNew={isNewSince(g.at, lastSeen)}
+                        onPress={() => onCoursePress(g.courseId)}
+                        trailing={
+                          /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a
+                             control appears, so names never go ragged between a tile
+                             with a reaction and one without. */
+                          <ReactionSlot>
+                            {tt.reactTo
+                              ? (() => {
+                                  const st = reactions.stateFor(tt.reactTo.type, tt.reactTo.id);
+                                  return (
+                                    <ReactionAction
+                                      hidden={!reactions.viewerId || reactions.unavailable}
+                                      readOnly={tt.isOwn}
+                                      count={st.count}
+                                      reacted={st.mine}
+                                      onToggle={() =>
+                                        reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
+                                      }
+                                      label={
+                                        tt.reactTo.type === 'round'
+                                          ? t('discover.reactions.action', 'Like this round')
+                                          : t('discover.reactions.actionReview', 'Like this review')
+                                      }
+                                    />
+                                  );
+                                })()
+                              : null}
+                          </ReactionSlot>
+                        }
+                        footer={
+                          tt.more > 0 ? (
                             <div
                               style={{
                                 fontSize: 6.5,
@@ -1103,9 +932,9 @@ export function AroundTheWorld({
                                 count: tt.more,
                               })}
                             </div>
-                          )}
-                        </div>
-                      </div>
+                          ) : null
+                        }
+                      />
                     );
                   })}
                 </div>
