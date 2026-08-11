@@ -22861,6 +22861,10 @@ export type Database = {
         Args: { p_code: string; p_verification_id: string }
         Returns: Json
       }
+      viewer_liked_post: {
+        Args: { p_actor_type?: string; p_post_id: string; p_viewer: string }
+        Returns: boolean
+      }
       viewer_shares_host_club: {
         Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
