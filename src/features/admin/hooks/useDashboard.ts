@@ -88,8 +88,6 @@ function calcDelta(current: number, previous: number): number {
 
 async function fetchKpis(): Promise<DashboardKpis> {
   const now          = new Date();
-  const oneDayAgo    = new Date(now.getTime() - 24  * 3600_000);
-  const twoDaysAgo   = new Date(now.getTime() - 48  * 3600_000);
   const fourteenAgo  = new Date(now.getTime() - 14  * 24 * 3600_000);
   const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
   const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
