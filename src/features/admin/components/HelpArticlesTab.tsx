@@ -201,12 +201,11 @@ export default function HelpArticlesTab() {
 
 const iconBtnStyle: React.CSSProperties = {
   width: 32, height: 32, borderRadius: 8,
-  border: `1px solid ${adminTheme_line()}`,
+  border: `1px solid ${t.line}`,
   background: t.surface, color: t.ink,
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
   cursor: 'pointer', flexShrink: 0,
 };
-function adminTheme_line() { return t.line; }
 
 /* --------------------------- Editor sheet --------------------------- */
 

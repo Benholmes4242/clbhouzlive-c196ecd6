@@ -36,13 +36,6 @@ export interface TodayGlance {
   topActiveUsers: TopActiveUser[];
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toDateKey(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-}
-
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
 async function fetchTodayGlance(): Promise<TodayGlance> {
@@ -96,6 +89,10 @@ async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
   return data as EgSyncHealth;
 }
 
+/**
+ * Retained but UNREFERENCED: it answers "what did I do", not "how is the
+ * platform", so it is no longer part of useDashboard's return.
+ */
 async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
   const { data, error } = await supabase
     .from('admin_audit_log')
