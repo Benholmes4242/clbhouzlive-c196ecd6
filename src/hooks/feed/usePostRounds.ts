@@ -21,8 +21,11 @@
  * renders as it did before C3.
  */
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { feedKeys, viewerId } from '@/lib/queryKeys';
+import { useMergedBatch } from '@/lib/batchQuery';
 
 /** One hole of the round shape, ordered by hole_no. */
 export interface PostRoundHole {
@@ -68,11 +71,15 @@ export type PostScoreIdMap = Map<string, string>;
  * query counts as SETTLED: a page with no posts, or no post carrying a score
  * id, is READY, not perpetually loading.
  */
-export type PostRoundMapState = PostRoundMap & { readonly settled: boolean };
-export type PostScoreIdMapState = PostScoreIdMap & { readonly settled: boolean };
+export type PostRoundMapState = PostRoundMap & { readonly settled: boolean; readonly fetching: boolean };
+export type PostScoreIdMapState = PostScoreIdMap & { readonly settled: boolean; readonly fetching: boolean };
 
-function withSettled<M extends Map<string, unknown>>(map: M, settled: boolean): M & { settled: boolean } {
-  return Object.assign(new Map(map) as M, { settled });
+function withSettled<M extends Map<string, unknown>>(
+  map: M,
+  settled: boolean,
+  fetching: boolean,
+): M & { settled: boolean; fetching: boolean } {
+  return Object.assign(new Map(map) as M, { settled, fetching });
 }
 
 function stableIds(ids: (string | null | undefined)[]): string[] {
@@ -102,11 +109,16 @@ function completeShape(
 }
 
 /** Batched post_id -> whs_score_id for one feed page. */
-export function usePostScoreIds(postIds: string[]): PostScoreIdMapState {
+export function usePostScoreIds(postIds: string[], scope: string): PostScoreIdMapState {
   const ids = useMemo(() => stableIds(postIds), [postIds]);
+  const { user } = useSupabaseSession();
+  const batch = useMergedBatch<string>();
 
   const query = useQuery({
-    queryKey: ['post-score-ids', ids],
+    // BATCH IDIOM (src/lib/queryKeys.ts): scope + viewer + loaded count. The id
+    // set drives the REQUEST, never the key.
+    queryKey: feedKeys.postScoreIds(scope, viewerId(user?.id), ids.length),
+    placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -121,24 +133,35 @@ export function usePostScoreIds(postIds: string[]): PostScoreIdMapState {
       for (const row of (data ?? []) as { id: string; whs_score_id: string | null }[]) {
         if (row.whs_score_id) map.set(row.id, row.whs_score_id);
       }
-      return map;
+      return batch.mergeOverPrevious(map);
     },
   });
 
+  batch.commit(query.data);
+
   // Disabled (no post ids) => settled. Error => settled (isPending is false).
+  // A NEXT-PAGE fetch is also settled: keepPreviousData means the map on screen
+  // is still valid, so the page-level gate must not re-close mid-scroll.
+  // `fetching` is the finer signal cards use for their own waiting state.
   const settled = ids.length === 0 || !query.isPending;
+  const fetching = query.isFetching;
   return useMemo(
-    () => withSettled(query.data ?? new Map<string, string>(), settled) as PostScoreIdMapState,
-    [query.data, settled],
+    () => withSettled(query.data ?? new Map<string, string>(), settled, fetching) as PostScoreIdMapState,
+    [query.data, settled, fetching],
   );
 }
 
 /** Batched round stats + hole shape for one feed page. */
-export function usePostRounds(scoreIds: string[]): PostRoundMapState {
+export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapState {
   const ids = useMemo(() => stableIds(scoreIds), [scoreIds]);
+  const { user } = useSupabaseSession();
+  const batch = useMergedBatch<PostRound>();
 
   const query = useQuery({
-    queryKey: ['post-rounds', ids],
+    // BATCH IDIOM (src/lib/queryKeys.ts). Viewer-scoped: RLS decides which
+    // rounds resolve, so the answer differs per identity.
+    queryKey: feedKeys.postRounds(scope, viewerId(user?.id), ids.length),
+    placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
