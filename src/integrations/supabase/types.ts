@@ -21653,7 +21653,7 @@ export type Database = {
         | { Args: { use_typmod?: boolean }; Returns: string }
       populate_taggable_entities: { Args: never; Returns: undefined }
       populate_tour_ranking_wins: { Args: never; Returns: undefined }
-      post_likes_skip_round_posts: { Args: never; Returns: boolean }
+      post_is_round: { Args: { p_post_id: string }; Returns: boolean }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
