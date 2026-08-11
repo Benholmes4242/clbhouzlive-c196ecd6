@@ -402,14 +402,50 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     [lens, t],
   );
 
-  const description = useMemo(() => {
-    const base = t(`statBrowse.lens.${lens}.description`);
-    if (region && country) return base + t('statBrowse.inRegion', { region, country });
-    if (country) return base + t('statBrowse.inCountry', { country });
-    return base;
-  }, [t, lens, country, region]);
+  const description = useMemo(
+    () => t(`statBrowse.lens.${lens}.description`),
+    [t, lens],
+  );
 
   const countryEntry = facets?.countries.find((c) => c.sub_country === country) ?? null;
+
+  /**
+   * Count sentence appended to the lens description: location, figures and a
+   * single provenance phrase. Renders nothing until facets have landed — an
+   * unresolved figure is not an absent figure, so no partial or zero counts.
+   * A region that facets cannot resolve falls back to the country sentence.
+   */
+  const countSentence = useMemo(() => {
+    if (!facets) return null;
+    const plural = (n: number) => (n === 1 ? '_one' : '_other');
+
+    if (country && region) {
+      const regionEntry =
+        facets.regions.find((r) => r.sub_country === country && r.region === region) ?? null;
+      if (regionEntry) {
+        return t(`statBrowse.countRegion${plural(regionEntry.courses)}`, {
+          count: formatNumber(regionEntry.courses),
+          region,
+          country,
+        });
+      }
+    }
+
+    if (country) {
+      if (!countryEntry) return null;
+      return t(`statBrowse.countCountry${plural(countryEntry.courses)}`, {
+        count: formatNumber(countryEntry.courses),
+        total: formatNumber(countryEntry.directory_total),
+        country,
+      });
+    }
+
+    return t(`statBrowse.countAll${plural(facets.played_total)}`, {
+      count: formatNumber(facets.played_total),
+      total: formatNumber(facets.directory_total),
+    });
+  }, [t, facets, country, region, countryEntry]);
+
   const regionDisabled = !country || regionsForCountry.length <= 1;
   const remaining = Math.max(0, totalCount - rows.length);
   const showEmpty = !isLoading && rows.length === 0;
