@@ -208,7 +208,7 @@ function btnGhost(): React.CSSProperties {
 function btnPrimary(busy = false): React.CSSProperties {
   return {
     padding: '8px 14px', borderRadius: t.radius.md,
-    border: 'none', background: '#F7931E', color: '#0F172A',
+    border: 'none', background: t.brand, color: t.canvas,
     fontSize: 13, fontWeight: 700,
     cursor: busy ? 'not-allowed' : 'pointer',
     opacity: busy ? 0.55 : 1,

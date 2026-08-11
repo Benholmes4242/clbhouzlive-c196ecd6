@@ -55,15 +55,15 @@ const TYPE_LABEL: Record<InboxType, string> = {
 };
 
 const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: string }> = {
-  report:        { icon: <ShieldAlert size={16} />, bg: '#FEE2E2', fg: '#B91C1C' },
-  appeal:        { icon: <Gavel size={16} />,       bg: '#EDE9FE', fg: '#6D28D9' },
-  support:       { icon: <LifeBuoy size={16} />,    bg: '#E0F2FE', fg: '#0369A1' },
-  verification:  { icon: <BadgeCheck size={16} />,  bg: '#FEF3C7', fg: '#B45309' },
-  approval:      { icon: <ShieldCheck size={16} />, bg: '#DCFCE7', fg: '#15803D' },
-  match:         { icon: <Link2 size={16} />,       bg: '#F1F5F9', fg: '#0F172A' },
-  courseRequest: { icon: <Map size={16} />,         bg: '#F1F5F9', fg: '#0F172A' },
-  unmatchedCourse: { icon: <Unlink size={16} />,   bg: '#FEF3C7', fg: '#B45309' },
-  holePhoto:     { icon: <Camera size={16} />,      bg: '#E0F2FE', fg: '#0369A1' },
+  report:        { icon: <ShieldAlert size={16} />, bg: t.dangerSoft, fg: t.dangerText },
+  appeal:        { icon: <Gavel size={16} />,       bg: t.neutralSoft, fg: t.ink },
+  support:       { icon: <LifeBuoy size={16} />,    bg: t.neutralSoft, fg: t.inkMuted },
+  verification:  { icon: <BadgeCheck size={16} />,  bg: t.warnSoft, fg: t.warnText },
+  approval:      { icon: <ShieldCheck size={16} />, bg: t.okSoft, fg: t.okText },
+  match:         { icon: <Link2 size={16} />,       bg: t.neutralSoft, fg: t.ink },
+  courseRequest: { icon: <Map size={16} />,         bg: t.neutralSoft, fg: t.ink },
+  unmatchedCourse: { icon: <Unlink size={16} />,   bg: t.warnSoft, fg: t.warnText },
+  holePhoto:     { icon: <Camera size={16} />,      bg: t.neutralSoft, fg: t.inkMuted },
 };
 
 function relTime(iso: string): string {
@@ -874,7 +874,7 @@ function btnGhost(): React.CSSProperties {
 function btnPrimary(busy = false): React.CSSProperties {
   return {
     padding: '8px 14px', borderRadius: t.radius.md,
-    border: 'none', background: t.brand, color: '#fff',
+    border: 'none', background: t.brand, color: t.canvas,
     fontSize: 13, fontWeight: 700,
     cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.55 : 1,
   };

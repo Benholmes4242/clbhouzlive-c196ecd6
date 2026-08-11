@@ -642,7 +642,7 @@ function CourseDetail({
               style={{
                 position: 'absolute', right: 8, bottom: 8,
                 padding: '6px 10px', borderRadius: t.radius.sm,
-                background: 'rgba(15,23,42,.7)', color: '#fff', fontSize: 12, fontWeight: 600,
+                background: 'rgba(0,0,0,.7)', color: t.ink, fontSize: 12, fontWeight: 600,
                 border: 'none', cursor: 'pointer',
                 display: 'inline-flex', alignItems: 'center', gap: 6,
               }}
@@ -985,7 +985,7 @@ function AddCourseSheet({ open, onClose, onCreated, uploadPhoto, onOpenExisting 
               style={{
                 position: 'absolute', right: 8, bottom: 8,
                 padding: '6px 10px', borderRadius: t.radius.sm,
-                background: 'rgba(15,23,42,.7)', color: '#fff', fontSize: 12, fontWeight: 600,
+                background: 'rgba(0,0,0,.7)', color: t.ink, fontSize: 12, fontWeight: 600,
                 border: 'none', cursor: busy ? 'not-allowed' : 'pointer',
                 display: 'inline-flex', alignItems: 'center', gap: 6,
               }}

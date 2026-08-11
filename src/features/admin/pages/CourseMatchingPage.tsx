@@ -495,7 +495,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
             borderRadius: t.radius.md,
             border: 'none',
             background: t.brand,
-            color: '#fff',
+            color: t.canvas,
             fontSize: 13, fontWeight: 700,
             cursor: 'pointer',
           }}
@@ -693,7 +693,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
                 borderRadius: t.radius.md,
                 border: 'none',
                 background: t.brand,
-                color: '#fff',
+                color: t.canvas,
                 fontSize: 13, fontWeight: 700,
                 cursor: chosen && !busy ? 'pointer' : 'default',
                 opacity: chosen && !busy ? 1 : 0.5,

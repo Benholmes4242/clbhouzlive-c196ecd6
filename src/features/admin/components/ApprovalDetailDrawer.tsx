@@ -220,7 +220,7 @@ function btnGhost(): React.CSSProperties {
 function btnDanger(busy = false): React.CSSProperties {
   return {
     padding: '8px 14px', borderRadius: t.radius.md,
-    border: 'none', background: t.dangerText ?? '#b91c1c', color: '#fff',
+    border: 'none', background: t.dangerText, color: t.canvas,
     fontSize: 13, fontWeight: 700,
     cursor: busy ? 'not-allowed' : 'pointer',
     opacity: busy ? 0.55 : 1,

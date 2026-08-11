@@ -592,7 +592,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
         height: 26,
         borderRadius: 999,
         border: 'none',
-        background: checked ? '#0F172A' : t.line,
+        background: checked ? t.ink : t.line,
         position: 'relative',
         cursor: 'pointer',
         padding: 0,
@@ -607,7 +607,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
           width: 20,
           height: 20,
           borderRadius: '50%',
-          background: '#fff',
+          background: t.surface,
           boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
           transition: 'left .15s',
         }}
