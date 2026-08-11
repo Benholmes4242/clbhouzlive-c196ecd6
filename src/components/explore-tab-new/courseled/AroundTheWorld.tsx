@@ -285,7 +285,8 @@ interface Props {
 /** Shared with Personal Bests, which must read the same ages. */
 export function relativeWhen(
   iso: string,
-  t: (k: string, o?: string | Record<string, unknown>) => string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t: (k: string, o?: any) => string,
 ): string {
   const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
   if (days <= 0) return t('discover.when.today', 'Today');
