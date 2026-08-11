@@ -56,18 +56,37 @@ export function isLightImmersiveRoute(pathname: string): boolean {
 
 
 /**
+ * Static segments that follow /business/ but are NOT a business identifier.
+ * They look like a profile path by shape (3 segments) but are standard shell
+ * pages, so they must be excluded by name.
+ */
+export const BUSINESS_RESERVED_SEGMENTS = new Set([
+  'create',
+  'success',
+  'intro',
+  'invite',
+]);
+
+/**
  * Business PROFILE only is immersive (hero bleed). All other /business/*
  * routes (create wizard, managed subpages, invite pages, follower lists)
  * are standard shell pages whose headers must sit below the notch.
  *
- * Segment logic mirrors the chrome-v2 registry profile rule so the two
- * systems can never disagree: `/business/:idOrSlug` is exactly 3 segments
- * after stripping a trailing slash.
+ * A profile path is exactly 3 segments after stripping a trailing slash AND
+ * its third segment is not one of BUSINESS_RESERVED_SEGMENTS. Shape alone is
+ * not enough: '/business/create' is also 3 segments.
+ *
+ * This is the single definition. The chrome-v2 registry profile rule calls
+ * this function rather than re-deriving the test, so the two systems cannot
+ * disagree — and cannot be made to disagree by reordering the registry.
  */
-function isBusinessProfilePath(pathname: string): boolean {
+export function isBusinessProfilePath(pathname: string): boolean {
   if (!pathname.startsWith('/business/')) return false;
-  return pathname.replace(/\/$/, '').split('/').length === 3;
+  const segs = pathname.replace(/\/$/, '').split('/');
+  if (segs.length !== 3) return false;
+  return !BUSINESS_RESERVED_SEGMENTS.has(segs[2].toLowerCase());
 }
+
 
 export function isImmersiveRoute(pathname: string): boolean {
   // The review composer is a plain light page, not a hero page — it must
