@@ -53,6 +53,8 @@ import {
   useStatBrowseList,
   type StatBrowseRow,
   type StatLens,
+  type LensCounts,
+
 } from './useStatBrowse';
 import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import {
