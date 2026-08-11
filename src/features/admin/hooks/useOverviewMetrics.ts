@@ -201,8 +201,13 @@ export function useActiveMembers28d() {
   });
 }
 
-// Delta helper
-export function pctDelta(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
+// Delta helper.
+// Returns null when there is no comparable previous period: a previous of 0
+// has no percentage change, and returning 100 made "from nothing" and a
+// genuine doubling indistinguishable. Callers render "New" for null.
+export function pctDelta(current: number, previous: number): number | null {
+  if (previous === 0) return null;
+  // Round FIRST so callers branch on the rendered value, never on a raw
+  // fraction that would print "-0.0%".
   return Math.round(((current - previous) / previous) * 100 * 10) / 10;
 }
