@@ -77,8 +77,11 @@ export function pointsTone(first: number, last: number): ChartTone {
 export const LABEL_STYLE = {
   fontFamily: CHART_FONT,
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
+  /* Axis and footer figures live in this role. Tabular so an axis label does
+     not shift width as the data changes. */
+  fontVariantNumeric: 'tabular-nums lining' as const,
   color: CHART.DIM,
 };

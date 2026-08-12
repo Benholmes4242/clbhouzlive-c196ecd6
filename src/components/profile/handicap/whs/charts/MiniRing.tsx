@@ -79,7 +79,7 @@ export const MiniRing: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 17,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: CHART.INK,
             fontVariantNumeric: 'tabular-nums lining-nums',

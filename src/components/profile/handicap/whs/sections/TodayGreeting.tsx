@@ -232,7 +232,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
                 <span
                   style={{
                     color: 'var(--hcp-t-100)',
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}
                 >
                   {Math.round(weather.tempNow)}°
@@ -246,7 +246,7 @@ const TodayGreeting: React.FC<Props> = ({ connectionId, userId }) => {
                     <span
                       style={{
                         color: 'var(--hcp-t-100)',
-                        fontVariantNumeric: 'tabular-nums',
+                        fontVariantNumeric: 'tabular-nums lining',
                       }}
                     >
                       {Math.round(weather.tempMax)}°

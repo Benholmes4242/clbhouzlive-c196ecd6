@@ -33,7 +33,7 @@ export const ThirdsChart: React.FC<Props> = ({ thirds, height = 88, digits = 1 }
           <div
             style={{
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               color: i === worst ? CHART.UP : CHART.INK,
               fontVariantNumeric: 'tabular-nums lining-nums',

@@ -60,7 +60,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
           fontSize: 22,
           fontWeight: 700,
           color,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           letterSpacing: '-0.01em',
           lineHeight: 1,
         }}
@@ -152,7 +152,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 color: 'var(--hcp-t-100)',
                 lineHeight: 0.9,
                 letterSpacing: '-0.03em',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {handicap != null
@@ -186,7 +186,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 justifyContent: 'flex-end',
                 marginBottom: 6,
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: 'var(--hcp-t-40)',

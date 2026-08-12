@@ -63,7 +63,7 @@ export const Figure: React.FC<{
     <div
       style={{
         fontSize: size,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.02em',
         lineHeight: 1,
         color: INK,
@@ -345,7 +345,7 @@ export const FlowHead: React.FC<{
       style={{
         margin: 0,
         fontSize: size,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.035em',
         lineHeight: 1.08,
         color: INK,
