@@ -6,12 +6,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
   UserPlus, MoreVertical, Search, ShieldAlert, MapPin, Radio, BadgeCheck,
-  ChevronRight, AtSign,
+  AtSign,
 } from 'lucide-react';
+import { LABEL } from '@/lib/tokens/type';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
+import { formatDurationShort } from '../lib/chartPrimitives';
 import SectionTabs from '../components/SectionTabs';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
@@ -30,10 +32,88 @@ import MemberActivityCard from '../components/MemberActivityCard';
 
 type TabId = 'members' | 'team' | 'invites';
 
+/** Still used by the WHS sync line, Team grants and Invites copy. */
 function relTime(iso: string | null | undefined): string {
   if (!iso) return '-';
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); }
   catch { return '-'; }
+}
+
+const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
+const FIG_T = { fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' } as const;
+
+/**
+ * The roster's one age format. Absolute and tabular: "now" / "44m" / "31h" /
+ * "32d". Shares formatDurationShort with the Dashboard and the Inbox; only the
+ * sub-2-minute band differs (that formatter emits seconds, which read as noise
+ * on a roster).
+ */
+function ageShort(iso: string | null | undefined): string {
+  if (!iso) return '-';
+  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (!Number.isFinite(secs)) return '-';
+  if (secs < 120) return 'now';
+  return formatDurationShort(Math.max(0, secs));
+}
+
+function ageTone(iso: string | null | undefined): string {
+  if (!iso) return t.inkFaint;
+  const h = (Date.now() - new Date(iso).getTime()) / 3_600_000;
+  if (h < 24) return t.ok;
+  if (h < 24 * 14) return t.inkMuted;
+  return t.inkFaint;
+}
+
+/** 'user' is the default role and distinguishes nothing; suppress it by name. */
+const DEFAULT_ROLES = new Set(['user']);
+function badgeRole(role: string | null): string | null {
+  if (!role) return null;
+  return DEFAULT_ROLES.has(role) ? null : role;
+}
+
+/** Top-level view switch. Not a filter — active state is ink, like every other
+ * active control in the console. SectionTabs stays untouched for its other
+ * four consumers. */
+function TopTabs({ tabs, activeId, onChange }: {
+  tabs: Array<{ id: TabId; label: string; count?: number }>;
+  activeId: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 8, padding: '4px 2px', flexWrap: 'wrap' }}>
+      {tabs.map(tab => {
+        const active = tab.id === activeId;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onChange(tab.id)}
+            style={{
+              padding: '8px 14px', borderRadius: 999,
+              border: `1px solid ${active ? t.ink : t.line}`,
+              background: active ? t.ink : t.surface,
+              color: active ? t.canvas : t.inkMuted,
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {tab.label}
+            {typeof tab.count === 'number' && (
+              <span style={{
+                ...FIG_T, background: active ? t.canvas : t.line,
+                color: active ? t.ink : t.inkMuted,
+                fontSize: 11, padding: '0 6px', borderRadius: 999,
+                minWidth: 18, textAlign: 'center',
+              }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 /**
@@ -83,7 +163,7 @@ export default function UsersPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
-      <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
+      <TopTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
       {effectiveTab === 'members' && <MembersTab />}
       {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
       {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
@@ -164,8 +244,9 @@ function MembersTab() {
     setDrawerUserId(null);
   };
 
-  const chips: { id: UserFilterStatus; label: string; count?: number }[] = [
-    { id: 'all',           label: 'All',            count: counts.all },
+  // Cohort board. No 'all' tile: the roster defaults to all members and a tile
+  // deselects on a second tap. 'all' stays a valid ?filter= value.
+  const cohorts: { id: Exclude<UserFilterStatus, 'all'>; label: string; count: number }[] = [
     { id: 'new_this_week', label: 'New this week',  count: counts.new_this_week },
     { id: 'active_24h',    label: 'Active 24h',     count: counts.active_24h },
     { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
@@ -174,6 +255,7 @@ function MembersTab() {
     { id: 'verified',      label: 'Verified',       count: counts.verified },
     { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
+  const activeCohortLabel = cohorts.find(c => c.id === filter)?.label ?? 'All members';
 
   const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
 
@@ -195,11 +277,19 @@ function MembersTab() {
         />
       </div>
 
-      <SectionTabs
-        tabs={chips.map(f => ({ id: f.id, label: f.label, count: f.count }))}
-        activeId={filter}
-        onChange={(id) => updateFilterUrl(id as UserFilterStatus)}
-      />
+      {/* Cohort board — two columns; labels are too long for three at 390px */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+        {cohorts.map(c => (
+          <CohortTile
+            key={c.id}
+            label={c.label}
+            count={c.count}
+            share={allCount > 0 ? c.count / allCount : 0}
+            active={filter === c.id}
+            onClick={() => updateFilterUrl(filter === c.id ? 'all' : c.id)}
+          />
+        ))}
+      </div>
 
       {/* Roster list card with caption */}
       <div style={{
@@ -208,10 +298,14 @@ function MembersTab() {
       }}>
         <div style={{
           padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
-          fontSize: 10, fontWeight: 700, color: t.inkFaint,
-          textTransform: 'uppercase', letterSpacing: 0.6,
+          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
         }}>
-          Most recently active
+          <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {activeCohortLabel}
+          </span>
+          <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
+            Index · last seen
+          </span>
         </div>
         {isLoading ? (
           <SkeletonCards />
@@ -261,10 +355,59 @@ function MembersTab() {
   );
 }
 
+/* ─────────────────────── Cohort tile ─────────────────────── */
+
+/**
+ * Proportion bar = the cohort's share of allCount (never of the filtered set or
+ * of the page). The bar states the proportion and the figure states the count;
+ * a percentage would be a third statement of the same fact.
+ */
+function CohortTile({ label, count, share, active, onClick }: {
+  label: string; count: number; share: number; active: boolean; onClick: () => void;
+}) {
+  const empty = count === 0;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      style={{
+        display: 'flex', flexDirection: 'column', gap: 8,
+        padding: '8px 10px 10px',
+        borderRadius: t.radius.lg,
+        background: active ? t.neutralSoft : t.surface,
+        border: `1px solid ${active ? t.line : t.hairline}`,
+        cursor: 'pointer', textAlign: 'left',
+        opacity: empty ? 0.55 : 1,
+        minWidth: 0,
+      }}
+    >
+      <span aria-hidden style={{ height: 2.5, borderRadius: 2, width: '100%', background: t.line, overflow: 'hidden' }}>
+        <span style={{
+          display: 'block', height: '100%', borderRadius: 2,
+          width: `${Math.min(100, Math.max(0, share * 100))}%`,
+          background: t.brand,
+        }} />
+      </span>
+      <span style={{
+        ...LABEL_T, color: t.inkMuted,
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
+      }}>
+        {label}
+      </span>
+      <span style={{ ...FIG_T, fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink }}>
+        {count}
+      </span>
+    </button>
+  );
+}
+
 /* ─────────────────────── Roster row ─────────────────────── */
 
 function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () => void; divider: boolean }) {
   const isNew = Date.now() - new Date(user.created_at).getTime() < 7 * 86400_000;
+  const role = badgeRole(user.role);
+  const hcp = user.handicap_index;
   return (
     <button
       onClick={onOpen}
@@ -287,34 +430,44 @@ function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () =
           }}>
             {user.display_name ?? user.username ?? '-'}
           </span>
-          {user.is_suspended && <StatusPill tone="danger">Suspended</StatusPill>}
-          {isNew && <StatusPill tone="brand">New</StatusPill>}
-          {user.role && <StatusPill tone="warn">{user.role}</StatusPill>}
+          {user.is_suspended && (
+            <span style={{ ...LABEL_T, color: t.danger, flexShrink: 0 }}>Suspended</span>
+          )}
+          {isNew && !user.is_suspended && (
+            <span style={{ ...LABEL_T, color: t.ok, flexShrink: 0 }}>New</span>
+          )}
+          {role && (
+            <span style={{ ...LABEL_T, color: t.brandText, flexShrink: 0 }}>{role}</span>
+          )}
         </div>
         <div style={{
           color: t.inkMuted, fontSize: 12, marginTop: 2,
-          display: 'flex', alignItems: 'center', gap: 6,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          display: 'flex', alignItems: 'center', gap: 5,
+          overflow: 'hidden', whiteSpace: 'nowrap',
         }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.username ? `@${user.username}` : ''}
           </span>
           {user.home_club && (
             <>
-              <span>|</span>
-              <MapPin size={11} style={{ flexShrink: 0 }} />
+              {user.username && <span style={{ flexShrink: 0 }}>·</span>}
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.home_club}</span>
             </>
           )}
         </div>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-        <span style={{
-          fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums',
-        }}>
-          {relTime(user.last_seen_at)}
+      <div style={{
+        flexShrink: 0, minWidth: 52, textAlign: 'right',
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2,
+      }}>
+        {hcp === null || hcp === undefined ? (
+          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.inkFaint }}>—</span>
+        ) : (
+          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.ink }}>{hcp.toFixed(1)}</span>
+        )}
+        <span style={{ ...LABEL_T, ...FIG_T, color: ageTone(user.last_seen_at) }}>
+          {ageShort(user.last_seen_at)}
         </span>
-        <ChevronRight size={14} color={t.inkFaint} />
       </div>
     </button>
   );
