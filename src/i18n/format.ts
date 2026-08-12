@@ -588,8 +588,8 @@ export function formatOrdinal(n: number): string {
 
 /**
  * "X ago"-style relative time. Buckets and copy match the deleted
- * `src/lib/gam/visuals.ts` helper (and, when `yesterday` is off, the
- * `src/components/championship/FriendsActivityFeed.tsx` inline formatter).
+ * `src/lib/gam/visuals.ts` helper (and, when `yesterday` is off, the inline
+ * formatter from the deleted championship friends-activity feed).
  *
  * en output:
  *   < 60s          → "just now"
