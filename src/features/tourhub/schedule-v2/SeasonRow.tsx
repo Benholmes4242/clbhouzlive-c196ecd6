@@ -18,7 +18,6 @@ import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
-import { FIGS } from '@/lib/tokens/type';
   AMBER,
   FONT,
   GOLD,
