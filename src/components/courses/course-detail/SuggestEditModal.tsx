@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,7 +89,7 @@ const SuggestEditModal: React.FC<SuggestEditModalProps> = ({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('courseDetail.suggestEdit.title')}</DialogTitle>
+          <DialogTitle style={TITLE}>{t('courseDetail.suggestEdit.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 mt-3">
           {edits.map((field, i) => (
