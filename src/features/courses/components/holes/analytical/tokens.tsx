@@ -10,7 +10,19 @@
  *   - colour means exactly three things: over par, under par, you
  *   - signed values round FIRST, then branch, so -0.04 never renders "-0.0"
  *   - absent values render nothing (no placeholder dashes)
+ *
+ * LEGACY SCALE (BRIEF_LEGACY_TOKENS_WEIGHT_REPOINT). The roles here - NUM,
+ * LABEL, TITLE, KICKER, CAPTION - are the ANALYTICAL scale. They are NOT the
+ * canonical app scale: src/lib/tokens/type.ts is canonical for new work.
+ * The names collide but the roles differ, deliberately, in SIZE:
+ *   legacy TITLE  13  = a PANEL heading   / canonical TITLE 17 = a SHEET title
+ *   legacy LABEL   9 / 0.13em             / canonical LABEL  8 / 0.16em
+ *   legacy KICKER 10 / 0.16em             / canonical KICKER 9 / 0.19em
+ * Do NOT repoint these at the canonical module: that would resize every panel
+ * heading across 114 importers. Weights are now 700 app-wide; nothing here
+ * renders at 800.
  */
+
 import React from 'react';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -66,13 +78,13 @@ export const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lin
 export const NUM: React.CSSProperties = {
   fontFamily: SANS,
   letterSpacing: '-0.02em',
-  fontWeight: 800,
+  fontWeight: 700,
   ...FIGS,
 };
 
 export const LABEL: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: A.DIM,
@@ -99,7 +111,7 @@ export const Hairline: React.FC<{ style?: React.CSSProperties }> = ({ style }) =
   <div style={{ height: 1, background: A.HAIRLINE, ...style }} />
 );
 
-export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: A.INK };
+export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 700, color: A.INK };
 
 export interface ToParParts { text: string; tone: string }
 
@@ -124,7 +136,7 @@ export function toParParts(v: number | null | undefined, digits = 1): ToParParts
 
 export const Panel: React.FC<{
   kicker?: string;
-  /** Panel-level heading (13/800 INK). Used where a panel titles itself. */
+  /** Panel-level heading (13/700 INK). Used where a panel titles itself. */
   title?: string;
   aside?: string;
   footer?: string;
@@ -182,7 +194,7 @@ export const Panel: React.FC<{
             }}
           >
             <span style={{ ...LABEL, color: A.INK }}>{action.label}</span>
-            <span style={{ fontSize: 11, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+            <span style={{ fontSize: 11, color: A.INK, fontWeight: 700 }} aria-hidden="true">
               {'\u203A'}
             </span>
           </button>
@@ -224,7 +236,7 @@ export const Panel: React.FC<{
         }}
       >
         <span style={{ ...LABEL, color: A.INK }}>{footer}</span>
-        <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+        <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
           {'\u203A'}
         </span>
       </button>
@@ -328,7 +340,7 @@ export const Action: React.FC<{
     }}
   >
     <span style={{ ...LABEL, color: tone }}>{label}</span>
-    <span style={{ fontSize: 12, color: tone, fontWeight: 800 }} aria-hidden="true">
+    <span style={{ fontSize: 12, color: tone, fontWeight: 700 }} aria-hidden="true">
       {'\u203A'}
     </span>
   </button>
@@ -383,7 +395,7 @@ export const EmptyState: React.FC<{
       <div
         style={biz
           ? BIZ_TITLE
-          : { fontSize: 16, fontWeight: 800, color: A.INK, lineHeight: 1.25 }}
+          : { fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}
       >
         {title}
       </div>
@@ -407,7 +419,7 @@ export const EmptyState: React.FC<{
             borderRadius: 999,
             padding: biz ? '13px 24px' : '12px 22px',
             fontSize: biz ? 14.5 : 13.5,
-            fontWeight: biz ? 700 : 800,
+            fontWeight: 700,
             letterSpacing: biz ? '-0.01em' : undefined,
             fontFamily: SANS,
             cursor: 'pointer',
