@@ -11,6 +11,15 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { setLastCloseSnapshot } from '@/perf/positionContinuity';
 
+/**
+ * The fullscreen viewer paints media and nothing else. A post with an empty or
+ * absent `mediaItems` renders a black slide under live chrome, which reads as
+ * broken. This is the ONLY exclusion condition — never post type, notability
+ * or the presence of an attached round.
+ */
+const hasMedia = (p: FeedPost | undefined | null): boolean =>
+  !!p && Array.isArray(p.mediaItems) && p.mediaItems.length > 0;
+
 
 
 export interface OpenOrigin {
