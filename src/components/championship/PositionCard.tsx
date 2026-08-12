@@ -67,7 +67,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       <div className="flex items-center justify-between mb-6">
         {/* Rank */}
         <div className="text-center">
-          <div className="text-4xl font-black tracking-tight">
+          <div className="text-4xl font-bold tracking-tight">
             {getOrdinalSuffix(rank)}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -77,14 +77,14 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
         {/* Courses */}
         <div className="text-center">
-          <div className="text-4xl font-black tracking-tight">{courses}</div>
+          <div className="text-4xl font-bold tracking-tight">{courses}</div>
           <div className="text-xs text-muted-foreground mt-1">courses</div>
         </div>
 
         {/* Streak */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-1">
-            <span className="text-4xl font-black tracking-tight">{streak}</span>
+            <span className="text-4xl font-bold tracking-tight">{streak}</span>
             {streak > 0 && (
               <Flame 
                 className={cn(

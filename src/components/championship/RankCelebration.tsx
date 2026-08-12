@@ -56,7 +56,7 @@ export const RankCelebration: React.FC<RankCelebrationProps> = ({
         <p className="text-lg text-muted-foreground">
           +{positions} position{positions > 1 ? 's' : ''}
         </p>
-        <p className="text-3xl font-black text-primary mt-2">
+        <p className="text-3xl font-bold text-primary mt-2">
           Now #{currentRank}
         </p>
       </div>

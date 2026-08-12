@@ -61,15 +61,15 @@ export const PerformanceStrip: React.FC<PerformanceStripProps> = ({
       {/* Stats Row - subtle pills on page background */}
       <div className="grid grid-cols-3 gap-3">
         <div className="text-center py-4 bg-muted/20 rounded-xl">
-          <div className="text-3xl font-black">{rankText}</div>
+          <div className="text-3xl font-bold">{rankText}</div>
           <div className="text-xs text-muted-foreground mt-1">in division</div>
         </div>
         <div className="text-center py-4 bg-muted/20 rounded-xl">
-          <div className="text-3xl font-black">{coursesCount}</div>
+          <div className="text-3xl font-bold">{coursesCount}</div>
           <div className="text-xs text-muted-foreground mt-1">courses</div>
         </div>
         <div className="text-center py-4 bg-muted/20 rounded-xl">
-          <div className="text-3xl font-black flex items-center justify-center gap-1">
+          <div className="text-3xl font-bold flex items-center justify-center gap-1">
             {streakDays}
             {streakDays > 0 && (
               <Flame className={cn(

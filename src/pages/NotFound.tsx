@@ -15,7 +15,7 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-6" style={{ background: '#F8FAFC' }}>
       <div className="text-center">
-        <h1 className="text-5xl font-black mb-3" style={{ color: '#0F172A', letterSpacing: '-0.02em' }}>404</h1>
+        <h1 className="text-5xl font-bold mb-3" style={{ color: '#0F172A', letterSpacing: '-0.02em' }}>404</h1>
         <p className="text-base mb-6" style={{ color: '#64748B' }}>This page doesn't exist.</p>
         <button
           onClick={() => navigate('/clubhouse')}

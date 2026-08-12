@@ -24,7 +24,7 @@ export const VALUE_TYPE: React.CSSProperties = {
 
 export const LABEL_TYPE: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
 };

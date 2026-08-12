@@ -132,7 +132,7 @@ export const PodiumVisual: React.FC<PodiumVisualProps> = ({
         >
           <div className="w-full h-full flex items-end justify-center pb-2">
             <span className={cn(
-              "text-2xl font-black opacity-20",
+              "text-2xl font-bold opacity-20",
               position === 1 && "text-amber-600",
               position === 2 && "text-slate-500",
               position === 3 && "text-orange-500",
