@@ -33,6 +33,7 @@ import {
 } from '@/hooks/courses/useDirectoryRecentRatings';
 
 import { openRequestCourseSheet } from './requestCourseSheetStore';
+import { FIGS, TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;

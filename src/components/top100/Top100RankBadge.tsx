@@ -1,6 +1,7 @@
 import React from 'react';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
+import { FIGS } from '@/lib/tokens/type';
 
 export interface Top100RankBadgeProps {
   listSlug: 'global' | 'gb-i' | 'usa' | 'europe';

@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { shortenCourseName, type Verdict } from './verdict';
+import { FIGS } from '@/lib/tokens/type';
 
 const GREEN_BG = '#EDF7F0';
 const GREEN_INK = '#0C7B40';

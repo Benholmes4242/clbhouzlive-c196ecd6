@@ -9,6 +9,7 @@ import { useCourseSearch, getSuggestions } from '@/hooks/useCourseSearch';
 import { getFlagCode } from '@/utils/countryFlags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { FIGS, TITLE } from '@/lib/tokens/type';
 
 interface Course {
   id: string;

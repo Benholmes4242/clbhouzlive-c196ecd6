@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { expectedRating } from '@/components/top100/verdict';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { TITLE } from '@/lib/tokens/type';
 import {
   AMBER,
   HAIRLINE_INK_8,

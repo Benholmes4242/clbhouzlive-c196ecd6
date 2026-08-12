@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AMBER, HAIRLINE_INK_8, INK, INK_MUTE, INK_TINT_04, SURFACE } from '@/features/courses/_shared/tokens';
 import type { Top100Mover } from '@/hooks/top100/useTop100Movers';
+import { FIGS } from '@/lib/tokens/type';
 
 /** Numerals stay in the Geist stack: monospace faces slash their zeros. */
 const MONO = 'inherit';

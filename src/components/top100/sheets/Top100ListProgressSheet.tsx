@@ -18,6 +18,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
+import { TITLE } from '@/lib/tokens/type';
 import {
   AMBER,
   HAIRLINE_INK_8,
