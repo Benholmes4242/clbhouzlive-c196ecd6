@@ -4,6 +4,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
+import { KICKER } from '@/lib/tokens/type';
 
 // Only the trigger chevron is theme-dependent; the sheet is always light.
 const PALETTE = {
