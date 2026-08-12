@@ -153,11 +153,8 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
         <div
           id="courseled-moments-title"
           style={{
-            fontSize: 20,
-            fontWeight: 800,
+            ...TITLE_METRICS,
             color: A.INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.momentsOfTheMonth', 'Moments of the month')}
@@ -187,7 +184,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
                 <div
                   style={{
                     fontSize: 13,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: A.INK,
                     letterSpacing: '-0.01em',
                     minWidth: 0,
@@ -204,7 +201,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
                   style={{
                     ...KICKER,
                     fontSize: 8.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.14em',
                     color: A.DIM,
                     fontVariantNumeric: 'tabular-nums lining',

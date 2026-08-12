@@ -51,11 +51,8 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
         <div
           id="courseled-mostplayed-title"
           style={{
-            fontSize: 19,
-            fontWeight: 800,
+            ...TITLE_METRICS,
             color: A.INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.mostPlayed', 'Most played this week')}

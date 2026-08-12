@@ -65,11 +65,8 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
         <div
           id="friends-rounds-title"
           style={{
-            fontSize: 20,
-            fontWeight: 700,
+            ...TITLE_METRICS,
             color: INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.friendsRounds.title', "Friends' latest rounds")}

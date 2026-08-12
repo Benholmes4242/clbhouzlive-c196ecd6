@@ -113,7 +113,7 @@ function Pill({
         whiteSpace: 'nowrap',
         fontFamily: SANS,
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.09em',
         textTransform: 'uppercase',
         cursor: onClick ? 'pointer' : 'default',
@@ -153,7 +153,7 @@ function TextAction({
         color,
         fontFamily: SANS,
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.09em',
         textTransform: 'uppercase',
         cursor: 'pointer',
@@ -263,7 +263,7 @@ function GolferRow({
         <div
           style={{
             fontSize: 14,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.015em',
             lineHeight: 1.25,
             color: A.INK,
@@ -500,10 +500,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
           id="find-golfers-title"
           style={{
             margin: '5px 0 0',
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.1,
+            ...TITLE_METRICS,
             color: A.INK,
           }}
         >
@@ -575,7 +572,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
             <div
               style={{
                 fontSize: 15.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: A.INK,
                 overflowWrap: 'anywhere',
@@ -609,7 +606,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
                 color: A.INK,
                 fontFamily: SANS,
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',
               }}
@@ -682,7 +679,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
             color: A.PANEL,
             fontFamily: SANS,
             fontSize: 13,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.01em',
           }}
         >
