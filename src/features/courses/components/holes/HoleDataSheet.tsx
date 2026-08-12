@@ -17,6 +17,7 @@ import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
 import {
+import { TITLE } from '@/lib/tokens/type';
   A, Panel, Hairline, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
 } from './analytical/tokens';
 
@@ -205,12 +206,9 @@ export const HoleDataSheet: React.FC<Props> = ({
         {section !== 'shape' && (
           <h2
             style={{
+              ...TITLE,
               margin: 0,
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '-0.01em',
               color: INK,
-              lineHeight: 1.15,
             }}
           >
             {t('courses:holes.clubGuide.title')}

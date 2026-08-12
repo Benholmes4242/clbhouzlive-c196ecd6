@@ -22,7 +22,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
-import { FIGS } from '@/lib/tokens/type';
+import { FIGS, TITLE } from '@/lib/tokens/type';
 
 const THIN_ROUNDS = 10;
 
@@ -169,9 +169,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
           <div style={kickerStyle}>{t('feed.courseSheet.kicker')}</div>
           <h2
             style={{
-              fontSize: 21,
-              fontWeight: 700,
-              letterSpacing: '-0.025em',
+              ...TITLE,
               color: T100,
               marginTop: 6,
             }}
