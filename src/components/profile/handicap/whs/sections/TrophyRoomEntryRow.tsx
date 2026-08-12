@@ -41,7 +41,7 @@ const THEME = {
 
 const LABEL = {
   fontSize: 10,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
 };
@@ -143,7 +143,7 @@ export const TrophyRoomEntryRow: React.FC<Props> = ({
           <span
             style={{
               fontSize: 18,
-              fontWeight: 800,
+              fontWeight: 700,
               color: t_.ink,
               letterSpacing: '-0.02em',
               fontVariantNumeric: 'tabular-nums',

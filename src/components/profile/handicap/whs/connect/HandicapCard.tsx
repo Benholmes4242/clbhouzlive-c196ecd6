@@ -47,7 +47,7 @@ const Counter: React.FC<{ label: string; value: number | null; pending?: boolean
         display: 'flex',
         alignItems: 'center',
         fontSize: 17,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.02em',
         color: INK,
         ...NUM,
@@ -109,7 +109,7 @@ export const HandicapCard: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'center',
               fontSize: 46,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.035em',
               lineHeight: 0.92,
               color: INK,
@@ -126,7 +126,7 @@ export const HandicapCard: React.FC<Props> = ({
           <div style={{ minWidth: 58 }}>
             {deltaText ? (
               <>
-                <div style={{ fontSize: 15, fontWeight: 800, color: deltaColor, ...NUM }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: deltaColor, ...NUM }}>
                   {deltaText}
                 </div>
                 <div style={{ ...LABEL, marginTop: 4 }}>12 months</div>

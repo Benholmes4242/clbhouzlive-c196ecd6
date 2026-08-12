@@ -43,7 +43,7 @@ export const KICKER: React.CSSProperties = {
 
 export const LABEL: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: DIM,
@@ -51,7 +51,7 @@ export const LABEL: React.CSSProperties = {
 
 export const H1: React.CSSProperties = {
   fontSize: 23,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.02em',
   lineHeight: 1.13,
   color: INK,

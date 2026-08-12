@@ -123,7 +123,7 @@ const DistributionChart: React.FC<{
           gap: 4,
           padding: '2px 6px',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           color: '#34D399',
           letterSpacing: '0.14em',
           background: 'var(--hcp-bg-1)',
@@ -183,7 +183,7 @@ const DistributionChart: React.FC<{
                   <div
                     style={{
                       fontSize: 10,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: isUser ? AMBER : INK_55,
                       marginBottom: 4,
                       fontVariantNumeric: 'tabular-nums',
@@ -272,7 +272,7 @@ const AvailableCard: React.FC<{
             fontFamily: FONT_SF,
             margin: 0,
             fontSize: 44,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'var(--hcp-t-100)',
             letterSpacing: '-0.04em',
             lineHeight: 1,
@@ -297,7 +297,7 @@ const AvailableCard: React.FC<{
               : copy.pillTone === 'neutral' ? '#854F0B'
               : INK_70,
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase' as const,
             fontFamily: FONT_SF,
@@ -372,7 +372,7 @@ const AvailableCard: React.FC<{
             <span
               style={{
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: INK_55,
@@ -383,7 +383,7 @@ const AvailableCard: React.FC<{
             <span
               style={{
                 fontSize: 18,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: AMBER,
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,

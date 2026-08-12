@@ -140,7 +140,7 @@ const EyebrowRow: React.FC<{
         textTransform: 'uppercase',
         fontSize: 10,
         letterSpacing: '0.18em',
-        fontWeight: 800,
+        fontWeight: 700,
         color: color ?? T.textMid,
       }}
     >
@@ -273,7 +273,7 @@ const CounterStrip: React.FC<{
                   left: '50%',
                   transform: 'translateX(-50%)',
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: cell.isExpiring ? T.bad : T.good,
                   lineHeight: 1,
                 }}
@@ -444,7 +444,7 @@ const ActionFooter: React.FC<{
         background: pillBg,
         border: `1px solid ${pillBorder}`,
         fontSize: 12.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: pillColor,
         fontVariantNumeric: 'tabular-nums',
         letterSpacing: '0.01em',
@@ -651,7 +651,7 @@ const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
           prose={
             <>
               Shoot{' '}
-              <strong style={{ color: T.goodSoft, fontWeight: 800 }}>{cutTarget.toFixed(1)} or better</strong>{' '}
+              <strong style={{ color: T.goodSoft, fontWeight: 700 }}>{cutTarget.toFixed(1)} or better</strong>{' '}
               next round to break the slide.
             </>
           }
@@ -675,7 +675,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
             textTransform: 'uppercase',
             fontSize: 10,
             letterSpacing: '0.18em',
-            fontWeight: 800,
+            fontWeight: 700,
             color: T.textMid,
             marginBottom: 8,
           }}
@@ -722,7 +722,7 @@ const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
           textTransform: 'uppercase',
           fontSize: 10,
           letterSpacing: '0.18em',
-          fontWeight: 800,
+          fontWeight: 700,
           color: T.textMid,
           marginBottom: 8,
         }}

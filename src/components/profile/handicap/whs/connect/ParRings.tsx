@@ -59,7 +59,7 @@ const Ring: React.FC<{
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: size >= 84 ? 17 : 16,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: INK,
             ...NUM,

@@ -230,7 +230,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
                 <Pin size={13} color="var(--hcp-amber)" strokeWidth={2.4} />
               </div>
             </div>
-            <div style={{ fontSize: 19, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               Every handicap is a rivalry waiting to happen
             </div>
             <div style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', marginTop: 12, lineHeight: 1.5, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>

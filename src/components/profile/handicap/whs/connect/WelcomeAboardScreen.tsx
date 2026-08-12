@@ -152,7 +152,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               <div
                 style={{
                   fontSize: 40,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.04em',
                   lineHeight: 1,
                   color: INK,
@@ -166,7 +166,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                   <div
                     style={{
                       fontSize: 15,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: deltaColor,
                       display: 'flex',
                       alignItems: 'center',
@@ -234,7 +234,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: INK, ...NUM }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: INK, ...NUM }}>
                           {t('whsConnect.done.holeNo', { n: h.hole_no })}
                         </div>
                         <div style={{ ...LABEL, color: DIM, marginTop: 4, whiteSpace: 'normal' }}>
@@ -244,7 +244,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                           })}
                         </div>
                       </div>
-                      <div style={{ fontSize: 13.5, fontWeight: 800, color: BAD, flexShrink: 0, ...NUM }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: BAD, flexShrink: 0, ...NUM }}>
                         {`+${Math.abs(h.my_avg_over).toFixed(2)}`}
                       </div>
                     </div>

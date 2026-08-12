@@ -186,7 +186,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 justifyContent: 'flex-end',
                 marginBottom: 6,
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: 'var(--hcp-t-40)',

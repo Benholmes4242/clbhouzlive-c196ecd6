@@ -99,7 +99,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
           <div
             style={{
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'var(--hcp-t-60)',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
@@ -153,7 +153,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: 'var(--hcp-t-60)',
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
@@ -165,7 +165,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
               <div
                 style={{
                   fontSize: 26,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
@@ -187,7 +187,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 background: hcpBg,
                 color: hcpColor,
                 fontSize: 11,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.04em',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -216,7 +216,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
             <span
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: 'var(--hcp-t-60)',
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
@@ -236,7 +236,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                   background: 'var(--hcp-bg-3)',
                   border: '1px solid var(--hcp-line-2)',
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',

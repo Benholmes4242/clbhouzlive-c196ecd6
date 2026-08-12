@@ -94,7 +94,7 @@ export const DistributionRing: React.FC<Props> = ({
         <span
           style={{
             fontSize: 34,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             lineHeight: 1,
             color: CHART.INK,

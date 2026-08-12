@@ -148,7 +148,7 @@ const HoleCell: React.FC<{
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: 11,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: numeralColor,
                 lineHeight: 1,
               }}
@@ -203,7 +203,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         style={{
           width: 24,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           color: 'var(--hcp-t-60)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
@@ -235,7 +235,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--hcp-t-100)' }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>
           {anyPlayed ? total : '\u2014'}
         </span>
         {anyPlayed && (

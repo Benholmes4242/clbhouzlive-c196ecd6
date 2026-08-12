@@ -55,7 +55,7 @@ export const CompareOwnerCTA: React.FC<Props> = ({
             style={{
               marginTop: 4,
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               color: CHART.INK,
               letterSpacing: '-0.005em',
               lineHeight: 1.25,
