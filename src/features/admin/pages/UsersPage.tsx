@@ -355,10 +355,59 @@ function MembersTab() {
   );
 }
 
+/* ─────────────────────── Cohort tile ─────────────────────── */
+
+/**
+ * Proportion bar = the cohort's share of allCount (never of the filtered set or
+ * of the page). The bar states the proportion and the figure states the count;
+ * a percentage would be a third statement of the same fact.
+ */
+function CohortTile({ label, count, share, active, onClick }: {
+  label: string; count: number; share: number; active: boolean; onClick: () => void;
+}) {
+  const empty = count === 0;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      style={{
+        display: 'flex', flexDirection: 'column', gap: 8,
+        padding: '8px 10px 10px',
+        borderRadius: t.radius.lg,
+        background: active ? t.neutralSoft : t.surface,
+        border: `1px solid ${active ? t.line : t.hairline}`,
+        cursor: 'pointer', textAlign: 'left',
+        opacity: empty ? 0.55 : 1,
+        minWidth: 0,
+      }}
+    >
+      <span aria-hidden style={{ height: 2.5, borderRadius: 2, width: '100%', background: t.line, overflow: 'hidden' }}>
+        <span style={{
+          display: 'block', height: '100%', borderRadius: 2,
+          width: `${Math.min(100, Math.max(0, share * 100))}%`,
+          background: t.brand,
+        }} />
+      </span>
+      <span style={{
+        ...LABEL_T, color: t.inkMuted,
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
+      }}>
+        {label}
+      </span>
+      <span style={{ ...FIG_T, fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink }}>
+        {count}
+      </span>
+    </button>
+  );
+}
+
 /* ─────────────────────── Roster row ─────────────────────── */
 
 function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () => void; divider: boolean }) {
   const isNew = Date.now() - new Date(user.created_at).getTime() < 7 * 86400_000;
+  const role = badgeRole(user.role);
+  const hcp = user.handicap_index;
   return (
     <button
       onClick={onOpen}
@@ -381,34 +430,44 @@ function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () =
           }}>
             {user.display_name ?? user.username ?? '-'}
           </span>
-          {user.is_suspended && <StatusPill tone="danger">Suspended</StatusPill>}
-          {isNew && <StatusPill tone="brand">New</StatusPill>}
-          {user.role && <StatusPill tone="warn">{user.role}</StatusPill>}
+          {user.is_suspended && (
+            <span style={{ ...LABEL_T, color: t.danger, flexShrink: 0 }}>Suspended</span>
+          )}
+          {isNew && !user.is_suspended && (
+            <span style={{ ...LABEL_T, color: t.ok, flexShrink: 0 }}>New</span>
+          )}
+          {role && (
+            <span style={{ ...LABEL_T, color: t.brandText, flexShrink: 0 }}>{role}</span>
+          )}
         </div>
         <div style={{
           color: t.inkMuted, fontSize: 12, marginTop: 2,
-          display: 'flex', alignItems: 'center', gap: 6,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          display: 'flex', alignItems: 'center', gap: 5,
+          overflow: 'hidden', whiteSpace: 'nowrap',
         }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.username ? `@${user.username}` : ''}
           </span>
           {user.home_club && (
             <>
-              <span>|</span>
-              <MapPin size={11} style={{ flexShrink: 0 }} />
+              {user.username && <span style={{ flexShrink: 0 }}>·</span>}
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.home_club}</span>
             </>
           )}
         </div>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-        <span style={{
-          fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums',
-        }}>
-          {relTime(user.last_seen_at)}
+      <div style={{
+        flexShrink: 0, minWidth: 52, textAlign: 'right',
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2,
+      }}>
+        {hcp === null || hcp === undefined ? (
+          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.inkFaint }}>—</span>
+        ) : (
+          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.ink }}>{hcp.toFixed(1)}</span>
+        )}
+        <span style={{ ...LABEL_T, ...FIG_T, color: ageTone(user.last_seen_at) }}>
+          {ageShort(user.last_seen_at)}
         </span>
-        <ChevronRight size={14} color={t.inkFaint} />
       </div>
     </button>
   );
