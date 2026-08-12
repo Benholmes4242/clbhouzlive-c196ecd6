@@ -672,7 +672,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
               >
                 <span style={{
                   fontSize: 14,
-                  fontWeight: isActive ? 800 : 600,
+                  fontWeight: isActive ? 700 : 600,
                   color: isActive ? INK : INK_SUBTLE,
                   letterSpacing: '-0.01em',
                   display: 'inline-block',

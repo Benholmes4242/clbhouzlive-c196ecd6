@@ -29,7 +29,7 @@ export function SegmentedTabs({ options, value, onChange, className = '' }: Segm
             style={{
               background: 'transparent',
               border: 'none',
-              fontWeight: isActive ? 800 : 500,
+              fontWeight: isActive ? 700 : 500,
               color: isActive ? '#0F172A' : '#94A3B8',
               letterSpacing: isActive ? '-0.01em' : 0,
             }}

@@ -237,7 +237,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                     color: isActive ? '#FFFFFF' : A.INK,
                     fontFamily: 'inherit',
                     fontSize: 16,
-                    fontWeight: isActive ? 800 : 600,
+                    fontWeight: isActive ? 700 : 600,
                     letterSpacing: '-0.01em',
                     cursor: 'pointer',
                     textAlign: 'left',

@@ -376,7 +376,7 @@ export function LeaderboardBand({
             textAlign: 'center',
             color: INK_ALPHA_45,
             fontSize: firstYearEvent ? 11 : 13,
-            fontWeight: firstYearEvent ? 800 : 600,
+            fontWeight: firstYearEvent ? 700 : 600,
             letterSpacing: firstYearEvent ? '0.16em' : 'normal',
             textTransform: firstYearEvent ? 'uppercase' : 'none',
             borderTop: `0.5px solid ${INK_15}`,

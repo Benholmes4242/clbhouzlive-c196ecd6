@@ -75,7 +75,7 @@ const ActionButton: React.FC<FooterAction> = ({
         background: isPrimary ? T100 : BG_2,
         color: isPrimary ? BG_0 : T100,
         fontSize: 15,
-        fontWeight: isPrimary ? 800 : 700,
+        fontWeight: isPrimary ? 700 : 700,
         cursor: 'pointer',
         fontFamily: FONT,
         display: 'inline-flex',

@@ -451,7 +451,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           <div
             style={{
               fontSize: demotedRow ? 9 : 13,
-              fontWeight: demotedRow ? 800 : isLeader ? 800 : 700,
+              fontWeight: demotedRow ? 700 : isLeader ? 800 : 700,
               color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
               fontVariantNumeric: 'tabular-nums lining-nums',
               letterSpacing: demotedRow ? '0.06em' : undefined,
@@ -545,7 +545,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                     style={{
                       fontSize: 12.5,
                       // History is settled; the live round is what is happening.
-                      fontWeight: settled ? 600 : 800,
+                      fontWeight: settled ? 600 : 700,
                       opacity: settled ? 0.55 : 1,
                       color: houseColor(val),
                     }}
@@ -563,7 +563,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                 style={{
                   fontSize: 12.5,
                   // Still out there = a number, stated. Settled = a quiet 'F'.
-                  fontWeight: thruDisplay === 'F' ? 600 : 800,
+                  fontWeight: thruDisplay === 'F' ? 600 : 700,
                   color: thruDisplay === 'F' ? A.DIM : A.BODY,
                 }}
               >

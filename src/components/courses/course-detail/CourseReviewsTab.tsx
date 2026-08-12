@@ -666,7 +666,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       aria-label={t('review.filterA11y', { label, count })}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%' }}
                     >
-                      <span style={{ fontSize: 10.5, fontWeight: selected ? 800 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 92, textAlign: 'left', flexShrink: 0 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: selected ? 700 : 600, color: selected ? INK : INK_MUTE, letterSpacing: '0.02em', textTransform: 'uppercase', width: 92, textAlign: 'left', flexShrink: 0 }}>
                         {label}
 
                       </span>

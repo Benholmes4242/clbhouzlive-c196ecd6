@@ -72,7 +72,7 @@ export function LastYearRow({
           <span
             style={{
               fontSize: isWinner ? 16 : 14,
-              fontWeight: isWinner ? 800 : 700,
+              fontWeight: isWinner ? 700 : 700,
               color: INK,
               letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',

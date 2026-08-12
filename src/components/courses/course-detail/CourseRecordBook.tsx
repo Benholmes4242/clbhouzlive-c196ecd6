@@ -184,7 +184,7 @@ export const CourseRecordBook: React.FC<Props> = ({
                   <div
                     style={{
                       fontSize: 13,
-                      fontWeight: isYou ? 800 : 700,
+                      fontWeight: isYou ? 700 : 700,
                       color: tone,
                       marginTop: 2,
                       overflow: 'hidden',

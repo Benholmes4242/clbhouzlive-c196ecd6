@@ -43,7 +43,7 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
               border: 'none',
               cursor: 'pointer',
               fontSize: 13,
-              fontWeight: isActive ? 800 : 500,
+              fontWeight: isActive ? 700 : 500,
               color: isActive ? '#0F172A' : '#94A3B8',
               letterSpacing: isActive ? '-0.01em' : 0,
               transition: 'color 0.15s ease',
