@@ -73,7 +73,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
       <div
         style={{
           fontSize: 10.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: '#94A3B8',
@@ -113,7 +113,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           <div
             style={{
               fontSize: 10.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.72)',

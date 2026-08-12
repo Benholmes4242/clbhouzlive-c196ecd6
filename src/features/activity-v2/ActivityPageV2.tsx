@@ -19,6 +19,7 @@ import {
 } from './hooks/useActivityFeedV2';
 import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMomentCard';
 import { FriendRequestsRail } from './components/FriendRequestsRail';
+import { FIGURE } from '@/lib/tokens/type';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
@@ -80,10 +81,9 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
     {label}
     {typeof count === 'number' && count > 0 && (
       <span
-        className="tabular-nums"
         style={{
+          ...FIGURE,
           fontSize: 10.5,
-          fontWeight: 800,
           padding: '2px 7px',
           borderRadius: 20,
           background: active ? 'rgba(255,255,255,0.18)' : AMBER_SOFT,

@@ -139,7 +139,7 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
           <span
             style={{
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               color: '#64748B',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
