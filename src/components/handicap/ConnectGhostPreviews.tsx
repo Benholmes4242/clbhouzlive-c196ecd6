@@ -34,7 +34,7 @@ const Ring: React.FC<{ pct: number; color: string; label: string }> = ({ pct, co
             transform="rotate(-90 42 42)"
           />
         </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 18, fontWeight: 700, color: INK }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 18, fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: INK }}>
           {pct}%
         </div>
       </div>
@@ -51,7 +51,7 @@ export const HolesGhost: React.FC = () => (
     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
       Your scoring breakdown
     </div>
-    <div style={{ marginTop: 6, fontSize: 22, fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>
+    <div style={{ marginTop: 6, fontSize: 22, fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>
       +8.5 shots over par in an average round
     </div>
     <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -65,7 +65,7 @@ export const HolesGhost: React.FC = () => (
           <div style={{ flex: 1, height: 8, background: 'rgba(15,23,42,0.06)', borderRadius: 4, overflow: 'hidden' }}>
             <div style={{ width: `${60 + r.hole % 20}%`, height: '100%', background: RED, borderRadius: 4 }} />
           </div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: RED, minWidth: 32, textAlign: 'right' }}>{r.over}</div>
+          <div style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: RED, minWidth: 32, textAlign: 'right' }}>{r.over}</div>
         </div>
       ))}
     </div>
@@ -116,7 +116,7 @@ export const ProfileGhost: React.FC = () => (
           width: 66, height: 66, borderRadius: 22,
           background: `linear-gradient(135deg, ${AMBER} 0%, #E07F0E 100%)`,
           color: '#FFF', display: 'grid', placeItems: 'center',
-          fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+          fontSize: 22, fontVariantNumeric: 'tabular-nums', fontWeight: 700, letterSpacing: '-0.02em',
         }}
       >
         12.4
@@ -125,7 +125,7 @@ export const ProfileGhost: React.FC = () => (
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_60 }}>
           Handicap Index
         </div>
-        <div style={{ fontSize: 44, fontWeight: 300, color: INK, letterSpacing: '-0.03em', lineHeight: 1 }}>
+        <div style={{ fontSize: 44, fontVariantNumeric: 'tabular-nums', fontWeight: 300, color: INK, letterSpacing: '-0.03em', lineHeight: 1 }}>
           12.4
         </div>
       </div>
@@ -143,7 +143,7 @@ export const ProfileGhost: React.FC = () => (
         { k: 'Best', v: '76' },
       ].map((t) => (
         <div key={t.k} style={{ border: `1px solid ${HAIRLINE}`, borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: INK }}>{t.v}</div>
+          <div style={{ fontSize: 18, fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: INK }}>{t.v}</div>
           <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: INK_60, marginTop: 2 }}>
             {t.k}
           </div>
