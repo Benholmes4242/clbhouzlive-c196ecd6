@@ -1,14 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { adminTheme as t } from '../theme';
 import { CARD, KICKER, LABEL, FIG, Skeleton, num, formatDurationShort } from '../lib/chartPrimitives';
 import { toneColor, type ChipState, type ChipTone } from '../lib/healthChips';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import type { OpsHealth } from '../hooks/useOpsHealth';
 import type { EgSyncHealth } from '../hooks/useDashboard';
 import type { useTriageCounts } from '../hooks/useTriageCounts';
 
 const HAIRLINE = `1px solid ${t.hairline}`;
+
+/** Column widths for the client split, shared by the header row and the rows. */
+const SESSIONS_COL = 62;
+const MEMBERS_COL = 38;
+
+const CLIENTS_REGION_ID = 'admin-system-clients';
+const CLIENTS_OPEN_KEY = 'admin-v2:system:clients-open';
+
+
 
 // ─── 1 SYSTEM ─────────────────────────────────────────────────────────────────
 
@@ -72,7 +82,10 @@ export function SystemPanel({
   const caps: { state: ChipState; to: string }[] = [
     { state: { ...chips.eg, detail: egDetail(chips.eg, eg) }, to: '/admin-v2/health?tab=status' },
     { state: chips.cron, to: '/admin-v2/health?tab=status' },
-    { state: chips.echo, to: '/admin-v2/health?tab=status' },
+    // "Echo engines" cannot fit five columns at 390px. The detail line already
+    // says "engines"; shortened here only, so other surfaces keep the long label.
+    { state: { ...chips.echo, label: 'Echo' }, to: '/admin-v2/health?tab=status' },
+
     { state: chips.push, to: '/admin-v2/health?tab=status' },
     { state: chips.errors, to: '/admin-v2/health?tab=stability' },
   ];
@@ -90,6 +103,15 @@ export function SystemPanel({
   const buckets = (triage.data?.byQueue ?? []).filter(b => b.count > 0);
   const clients = ops?.clients ?? [];
   const traffic = ops?.traffic;
+
+  // Reference material, not a daily check: collapsed until an admin opens it.
+  const [clientsOpen, setClientsOpen] = React.useState<boolean>(
+    () => safeLocalStorage.get(CLIENTS_OPEN_KEY) === '1',
+  );
+  React.useEffect(() => {
+    safeLocalStorage.set(CLIENTS_OPEN_KEY, clientsOpen ? '1' : '0');
+  }, [clientsOpen]);
+
 
   return (
     <section style={CARD}>
@@ -146,36 +168,76 @@ export function SystemPanel({
       {/* 1e CLIENT SPLIT - rows, never a stacked bar: a member on two clients
           appears twice, so the counts do not sum to a whole. */}
       <div style={{ borderTop: HAIRLINE, paddingTop: 4 }}>
-        <div style={{ ...LABEL, paddingTop: 6 }}>Members by client, last {ops?.window_days ?? 7}d</div>
-        {opsLoading ? (
-          <div style={{ paddingTop: 8 }}><Skeleton height={132} /></div>
-        ) : clients.length === 0 ? (
-          <div style={{ color: t.inkFaint, fontSize: 12, paddingTop: 8 }}>No member sessions in the window.</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {clients.map((c, i) => (
-              <div
-                key={c.client}
-                style={{
-                  display: 'flex', alignItems: 'baseline', gap: 10, padding: '10px 0',
-                  borderTop: i === 0 ? 'none' : HAIRLINE,
-                }}
-              >
-                <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0 }}>{c.client}</span>
-                <span style={{ ...LABEL, ...FIG }}>{num(c.sessions)} sessions</span>
-                <span style={{ ...FIG, color: t.ink, fontSize: 17, fontWeight: 800, minWidth: 34, textAlign: 'right' }}>
-                  {num(c.members)}
-                </span>
+        <button
+          type="button"
+          onClick={() => setClientsOpen(v => !v)}
+          aria-expanded={clientsOpen}
+          aria-controls={CLIENTS_REGION_ID}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+            background: 'transparent', border: 'none', padding: '6px 0 0',
+            cursor: 'pointer', textAlign: 'left', color: 'inherit',
+          }}
+        >
+          <span style={{ ...LABEL, flex: 1, minWidth: 0 }}>
+            Members by client, last {ops?.window_days ?? 7}d
+          </span>
+          <ChevronDown
+            size={14}
+            color={t.inkFaint}
+            aria-hidden
+            style={{
+              flexShrink: 0,
+              transform: clientsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 160ms ease',
+            }}
+          />
+        </button>
+
+        <div id={CLIENTS_REGION_ID} hidden={!clientsOpen}>
+          {opsLoading ? (
+            <div style={{ paddingTop: 8 }}><Skeleton height={132} /></div>
+          ) : clients.length === 0 ? (
+            <div style={{ color: t.inkFaint, fontSize: 12, paddingTop: 8 }}>No member sessions in the window.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Column headers only - NEVER a total, a percentage, a
+                  percentage-of-total or a bar here: a member who uses two
+                  clients is counted in both rows, so these figures do not sum
+                  to the member count and any total would assert a partition
+                  that does not exist. */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, paddingTop: 8 }}>
+                <span style={{ flex: 1, minWidth: 0 }} />
+                <span style={{ ...LABEL, color: t.inkFaint, width: SESSIONS_COL, textAlign: 'right' }}>Sessions</span>
+                <span style={{ ...LABEL, color: t.inkFaint, width: MEMBERS_COL, textAlign: 'right' }}>Members</span>
               </div>
-            ))}
-          </div>
-        )}
+              {clients.map((c, i) => (
+                <div
+                  key={c.client}
+                  style={{
+                    display: 'flex', alignItems: 'baseline', gap: 10, padding: '10px 0',
+                    borderTop: i === 0 ? 'none' : HAIRLINE,
+                  }}
+                >
+                  <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0 }}>{c.client}</span>
+                  <span style={{ ...LABEL, ...FIG, width: SESSIONS_COL, textAlign: 'right' }}>{num(c.sessions)}</span>
+                  <span style={{ ...FIG, color: t.ink, fontSize: 17, fontWeight: 700, width: MEMBERS_COL, textAlign: 'right' }}>
+                    {num(c.members)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* The summary of the section: visible collapsed AND expanded. */}
         {traffic && !opsLoading ? (
-          <div style={{ ...LABEL, ...FIG, borderTop: HAIRLINE, paddingTop: 10, marginTop: 2 }}>
+          <div style={{ ...LABEL, ...FIG, borderTop: HAIRLINE, paddingTop: 10, marginTop: 8 }}>
             {num(traffic.member_sessions)} member sessions, {num(traffic.bot_sessions)} bot
           </div>
         ) : null}
       </div>
+
     </section>
   );
 }
