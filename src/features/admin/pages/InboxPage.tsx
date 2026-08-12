@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  ShieldAlert, Gavel, LifeBuoy, BadgeCheck, ShieldCheck, Link2, Map, ChevronRight,
-  CheckCircle2, AlertTriangle, Unlink, Camera,
-} from 'lucide-react';
+import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { LABEL } from '@/lib/tokens/type';
 import { courseMatchLabel } from '../lib/geography';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-import { useInboxOpsStats, formatDurationShort } from '../hooks/useInboxOpsStats';
+import { useInboxOpsStats, formatDurationShort as formatDurationMs } from '../hooks/useInboxOpsStats';
+// Seconds in. The Dashboard's System panel uses this exact formatter, so an age
+// reads identically on both surfaces.
+import { formatDurationShort } from '../lib/chartPrimitives';
 import EmptyState from '../components/EmptyState';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
