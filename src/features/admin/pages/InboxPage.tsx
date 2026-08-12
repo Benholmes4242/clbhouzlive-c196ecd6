@@ -347,19 +347,26 @@ function InboxListPage() {
           </div>
         )}
 
-        {/* Workbench pinned row */}
-        {canUsers && workbenchCount > 0 && (typeFilter === 'all' || typeFilter === 'match') && view === 'open' && (
+      </section>
+
+      {/* TOOLS */}
+      {canUsers && workbenchCount > 0 && view === 'open' && (
+        <section
+          style={{
+            background: t.surface, border: `1px solid ${t.line}`,
+            borderRadius: 18, boxShadow: t.shadowCard,
+            padding: 12, display: 'flex', flexDirection: 'column',
+          }}
+        >
+          <div style={{ ...LABEL_T, color: t.inkFaint, padding: '2px 4px 8px' }}>Tools</div>
           <Link
             to="/admin-v2/inbox/matching"
             style={{
-              marginTop: 8,
               display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 4px',
-              borderTop: `1px solid ${t.line}`,
+              padding: '4px 4px',
               textDecoration: 'none', color: t.ink,
             }}
           >
-            <TypeChip type="match" />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: t.ink }}>Course matching workbench</div>
               <div style={{ fontSize: 11.5, color: t.inkMuted }}>
@@ -368,8 +375,8 @@ function InboxListPage() {
             </div>
             <ChevronRight size={16} color={t.inkFaint} />
           </Link>
-        )}
-      </section>
+        </section>
+      )}
 
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }`}</style>
 
