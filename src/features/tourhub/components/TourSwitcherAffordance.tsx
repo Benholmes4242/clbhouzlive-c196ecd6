@@ -68,7 +68,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
           )}
           <span
             style={{
-              fontFamily: '',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontVariantNumeric: 'tabular-nums',
               fontSize: 13,
               fontWeight: 800,
