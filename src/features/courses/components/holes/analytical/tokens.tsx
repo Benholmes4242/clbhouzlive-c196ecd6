@@ -10,7 +10,19 @@
  *   - colour means exactly three things: over par, under par, you
  *   - signed values round FIRST, then branch, so -0.04 never renders "-0.0"
  *   - absent values render nothing (no placeholder dashes)
+ *
+ * LEGACY SCALE (BRIEF_LEGACY_TOKENS_WEIGHT_REPOINT). The roles here - NUM,
+ * LABEL, TITLE, KICKER, CAPTION - are the ANALYTICAL scale. They are NOT the
+ * canonical app scale: src/lib/tokens/type.ts is canonical for new work.
+ * The names collide but the roles differ, deliberately, in SIZE:
+ *   legacy TITLE  13  = a PANEL heading   / canonical TITLE 17 = a SHEET title
+ *   legacy LABEL   9 / 0.13em             / canonical LABEL  8 / 0.16em
+ *   legacy KICKER 10 / 0.16em             / canonical KICKER 9 / 0.19em
+ * Do NOT repoint these at the canonical module: that would resize every panel
+ * heading across 114 importers. Weights are now 700 app-wide; nothing here
+ * renders at 800.
  */
+
 import React from 'react';
 import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
