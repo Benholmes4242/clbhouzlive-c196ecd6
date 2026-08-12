@@ -422,7 +422,7 @@ function ChampionRowDark({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 19, fontWeight: 900, letterSpacing: '-0.02em',
+          fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em',
           color: scoreColor(score), flexShrink: 0,
         }}
       >
@@ -891,7 +891,7 @@ export function CinematicFrame({
                 borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
               }}>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1033,7 +1033,7 @@ export function CinematicFrame({
                 >
                   {entryName(winner)}
                 </div>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 30, fontWeight: 900, color: scoreColor(winner.score), marginTop: 8, letterSpacing: '-0.02em' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 30, fontWeight: 700, color: scoreColor(winner.score), marginTop: 8, letterSpacing: '-0.02em' }}>
                   {fmtScore(winner.score)}
                 </div>
               </div>
