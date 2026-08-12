@@ -65,10 +65,10 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                   resting slides get a small numeral chip. */}
               {active ? (
                 <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '40%', background: 'linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0))', display: 'flex', alignItems: 'flex-end', padding: 7 }}>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
                 </span>
               ) : (
-                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.35)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.35)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(i); }}

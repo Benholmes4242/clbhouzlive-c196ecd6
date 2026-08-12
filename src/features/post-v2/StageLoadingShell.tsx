@@ -88,7 +88,7 @@ export const StageLoadingShell: React.FC<{
           <div
             style={{
               fontSize: 14.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: CT_DARK.ink,
               letterSpacing: '-0.015em',
               whiteSpace: 'nowrap',

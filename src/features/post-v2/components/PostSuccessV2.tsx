@@ -258,7 +258,7 @@ function Kicker({ color, children }: { color?: string; children: React.ReactNode
     <div
       style={{
         fontSize: 8.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: color ?? 'rgba(255,255,255,0.38)',
@@ -274,7 +274,7 @@ function Headline({ children }: { children: React.ReactNode }) {
     <div
       style={{
         fontSize: 26,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.02em',
         lineHeight: 1.15,
         color: 'rgba(255,255,255,0.96)',
@@ -316,7 +316,7 @@ function Strip({ cells }: { cells: StripCell[] }) {
           <div
             style={{
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               color: c.color ?? 'rgba(255,255,255,0.96)',
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -327,7 +327,7 @@ function Strip({ cells }: { cells: StripCell[] }) {
             style={{
               marginTop: 4,
               fontSize: 7.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.38)',
@@ -357,7 +357,7 @@ function Column({ children }: { children: React.ReactNode }) {
 function Label({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      fontSize: 21, fontWeight: 800, letterSpacing: '-0.01em',
+      fontSize: 21, fontWeight: 700, letterSpacing: '-0.01em',
       color: 'rgba(255,255,255,0.96)', lineHeight: 1.15,
     }}>{children}</div>
   );
