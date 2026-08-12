@@ -6,12 +6,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
   UserPlus, MoreVertical, Search, ShieldAlert, MapPin, Radio, BadgeCheck,
-  ChevronRight, AtSign,
+  AtSign,
 } from 'lucide-react';
+import { LABEL } from '@/lib/tokens/type';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
+import { formatDurationShort } from '../lib/chartPrimitives';
 import SectionTabs from '../components/SectionTabs';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
