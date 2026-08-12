@@ -309,11 +309,16 @@ function InboxListPage() {
       >
         <div
           style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
-            color: t.inkFaint, padding: '4px 4px 8px',
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+            gap: 10, padding: '4px 4px 8px',
           }}
         >
-          {view === 'done' ? 'Recently closed' : 'Oldest wait first'}
+          <span style={{ ...LABEL_T, color: t.inkMuted }}>
+            {typeFilter === 'all' ? 'All queues' : TYPE_LABEL[typeFilter as InboxType]}
+          </span>
+          <span style={{ ...LABEL_T, color: t.inkFaint }}>
+            {view === 'done' ? 'Recently closed' : 'Longest wait first'}
+          </span>
         </div>
 
         {feed.isLoading && filtered.length === 0 ? (
