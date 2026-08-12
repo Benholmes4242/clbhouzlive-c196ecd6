@@ -209,7 +209,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           {total === 0 ? t('invites.headlineNone') : t('invites.headlineSent', { count: total })}
         </h2>
         {total > 0 && (
-          <div style={{ ...LABEL, fontFamily: REC.FONT, marginTop: 8 }}>
+          <div style={{ ...LABEL, fontFamily: REC.FONT, marginTop: 8, ...REC.TABULAR }}>
             {t('invites.split', {
               pending: groups.pending.length,
               joined: groups.joined.length,
