@@ -81,6 +81,7 @@ export default function MetricCard({
           display: 'inline-flex', alignItems: 'center', gap: 2,
           color: state === 'up' ? t.okText : state === 'down' ? t.dangerText : t.inkMuted,
           fontSize: 11, fontWeight: 600,
+          fontVariantNumeric: 'tabular-nums',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {state === 'up' && <ArrowUpRight size={11} />}

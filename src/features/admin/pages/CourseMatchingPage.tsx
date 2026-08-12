@@ -385,7 +385,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
               display: 'inline-flex', alignItems: 'center',
               padding: '2px 8px', borderRadius: 999,
               background: t.neutralSoft, color: t.inkMuted,
-              fontSize: 11, fontWeight: 600,
+              fontSize: 11, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
             }}
           >
             {row.scored_rounds} {row.scored_rounds === 1 ? 'round' : 'rounds'}
@@ -411,7 +411,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, color: t.inkMuted, fontSize: 12 }}>
         <span>conf <span style={{ color: t.ink, fontWeight: 600, fontFeatureSettings: '"tnum" 1' }}>{conf}</span></span>
         <span>·</span>
-        <span>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
         <span>·</span>
         <span>{relTime(row.matched_at)}</span>
         {row.suggested_course_name && (
