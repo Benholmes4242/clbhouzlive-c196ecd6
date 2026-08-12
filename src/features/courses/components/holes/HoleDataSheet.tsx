@@ -605,7 +605,7 @@ const SkylineCard: React.FC<{
                 y={H - 4}
                 textAnchor="middle"
                 fontSize={9}
-                fontWeight={isHardest ? 800 : 600}
+                fontWeight={isHardest ? 700 : 600}
                 fill={isHardest ? INK : INK_55}
                 style={{ fontFamily: FONT }}
               >

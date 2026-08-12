@@ -272,7 +272,7 @@ const ShapeChart: React.FC<{
                 left: `${(cx(i) / W) * 100}%`,
                 transform: 'translateX(-50%)',
                 fontSize: 8.5,
-                fontWeight: end ? 800 : 600,
+                fontWeight: end ? 700 : 600,
                 color: end ? A.BODY : A.DIM,
               }}
             >

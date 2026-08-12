@@ -57,7 +57,7 @@ function fmtRating(n: number | null | undefined): string {
   return n != null && Number.isFinite(n) && n > 0 ? n.toFixed(1) : DASH;
 }
 
-/** Counter cell: figure 23/800 INK over a 7.5/800/0.14em DIM label. */
+/** Counter cell: figure 23/700 INK over a 7.5/700/0.14em DIM label. */
 const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div style={{ textAlign: 'center', minWidth: 0 }}>
     <div
