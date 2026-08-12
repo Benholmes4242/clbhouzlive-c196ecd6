@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageSquare, Star, X, Edit3, Trash2, MapPin, Sparkles } from 'lucide-react';

@@ -321,7 +321,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       <AlertDialog open={!!confirmApprove} onOpenChange={(open) => !open && setConfirmApprove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve request?</AlertDialogTitle>
+            <AlertDialogTitle style={TITLE}>Approve request?</AlertDialogTitle>
             <AlertDialogDescription>
               Add {confirmApprove?.requester.display_name || confirmApprove?.requester.username || 'this user'} to {businessName} as {getRoleLabel(confirmApprove?.requested_role || '')}.
             </AlertDialogDescription>
@@ -343,7 +343,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       <AlertDialog open={!!confirmDecline} onOpenChange={(open) => !open && setConfirmDecline(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Decline request?</AlertDialogTitle>
+            <AlertDialogTitle style={TITLE}>Decline request?</AlertDialogTitle>
             <AlertDialogDescription>
               Decline {confirmDecline?.requester.display_name || confirmDecline?.requester.username || 'this user'}'s request to join {businessName}.
             </AlertDialogDescription>
