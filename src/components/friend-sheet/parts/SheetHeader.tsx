@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { BG_2, T60, T100, GREEN, LINE_2, FONT } from './_shared/tokens';
 import { formatFriendName } from './_shared/formatName';
+import { TITLE } from '@/lib/tokens/type';
 
 export interface SheetHeaderProps {
   avatarUrl: string | null;
@@ -84,10 +85,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <h2
             style={{
               margin: 0,
-              fontSize: 21,
-              fontWeight: 700,
+              ...TITLE,
               color: T100,
-              letterSpacing: '-0.03em',
               lineHeight: 1.05,
               fontFamily: FONT,
             }}
@@ -192,7 +191,7 @@ const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
         background: palette.bg,
         color: palette.color,
         fontSize: 10,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.06em',
         textTransform: 'uppercase',
         lineHeight: 1.4,
