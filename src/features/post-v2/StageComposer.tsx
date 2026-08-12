@@ -49,6 +49,8 @@ import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 import { CT_DARK } from '@/features/_shared/composerTokens';
+import { LABEL, DISPLAY_TRACKING } from '@/lib/tokens/type';
+import { SURFACE } from '@/lib/tokens/surface';
 import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
@@ -731,14 +733,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               <button
                 onClick={saveAsDraft}
                 disabled={savingDraft}
-                style={{ height: 48, background: LIGHT.ink, color: '#FFFFFF', border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 800, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
+                style={{ height: 48, background: LIGHT.ink, color: '#FFFFFF', border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 700, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
               >
                 {savingDraft ? 'Saving' : 'Save draft'}
               </button>
             )}
             <button
               onClick={() => { setSheet(null); reset(); onClose(); }}
-              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 14, fontWeight: 800, cursor: 'pointer', color: '#C0392B' }}
+              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 14, fontWeight: 700, cursor: 'pointer', color: '#C0392B' }}
             >
               Discard
             </button>
@@ -769,7 +771,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                 photograph is the context and the title is not rendered.
                 The bar keeps its height either way. */}
             {emptyStage && (
-              <div style={{ fontSize: 16, fontWeight: 800, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: CT_DARK.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {isEditMode ? 'Edit post' : 'New post'}
               </div>
             )}
@@ -793,10 +795,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               background: CT_DARK.bg, overflowY: 'auto',
             }}
           >
-            <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: CT_DARK.dim }}>
+            <div style={{ ...LABEL, color: CT_DARK.dim }}>
               {t('emptyState.limitKicker', { count: MAX_MEDIA })}
             </div>
-            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, color: CT_DARK.ink }}>
+            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 700, letterSpacing: DISPLAY_TRACKING, lineHeight: 1.15, color: CT_DARK.ink }}>
               {isEditMode ? t('emptyState.promptEdit') : t('emptyState.prompt')}
             </div>
             <div
@@ -863,7 +865,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
               {/* Slide counter — glass chip, top-right */}
               {state.media.length > 1 && (
-                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: 'rgba(11,15,20,0.62)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', fontSize: 11, fontWeight: 800, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: 'rgba(11,15,20,0.62)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', fontSize: 11, fontWeight: 700, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
                   {state.activeIndex + 1}/{state.media.length}
                 </div>
               )}
@@ -872,7 +874,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               {active && !active.existingId && (
                 <button
                   onClick={() => setSheet(active.type === 'video' ? 'cover' : 'adjust')}
-                  style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 800, gap: 6 }}
+                  style={{ ...floatingChipStyle, top: 'auto', right: 'auto', bottom: 12, left: 12, padding: '9px 13px', fontWeight: 700, gap: 6 }}
                 >
                   <Pencil size={13} />
                   Edit
@@ -895,7 +897,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                       borderRadius: 999,
                       padding: '8px 13px',
                       fontSize: 10.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       cursor: 'pointer',
                       flex: 'none',
                     }}
@@ -933,7 +935,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               borderRadius: 999,
               border: 'none',
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               background: emptyStage ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
               color: emptyStage ? CT_DARK.dim : '#11131A',
@@ -1012,10 +1014,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 14.5, fontWeight: 800, color: LIGHT.ink }}>Tag a course</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Tag a course</span>
               <button
                 onClick={() => { openDetail('course'); setSheet('course'); }}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Search
                 <ChevronRight size={12} strokeWidth={2.5} />
@@ -1031,7 +1033,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                     key={`tagged-${c.id}`}
                     onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
                     aria-label={`Untag ${c.name}`}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${LIGHT.ink}`, background: LIGHT.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: '#FFFFFF' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${LIGHT.ink}`, background: LIGHT.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}
                   >
                     {c.name}
                     <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
@@ -1043,7 +1045,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                     onClick={() => { openDetail('course'); setCourses([...state.courses, { id: c.id, name: c.name, country: c.country }]); }}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
                   >
-                    <span style={{ fontWeight: 800, color: LIGHT.mute }}>+</span>
+                    <span style={{ fontWeight: 700, color: LIGHT.mute }}>+</span>
                     {c.name}
                     <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
                   </button>
@@ -1121,7 +1123,7 @@ const emptyButtonBase: React.CSSProperties = {
   height: 44,
   borderRadius: 999,
   fontSize: 14,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.01em',
   cursor: 'pointer',
 };
@@ -1212,13 +1214,15 @@ const moreRowStyle: React.CSSProperties = {
 };
 
 // Page 2 (words) light tokens — the canvas is the app's editorial light surface.
+// Page 2 ink comes from SURFACE.light (identical values, previously restated
+// here). canvas / panel / line have no ramp equivalent and stay local.
 const LIGHT = {
   canvas: '#F8FAFC',
   panel: '#FFFFFF',
   line: '#E9EDF2',
-  ink: '#0E1216',
-  mute: '#68707B',
-  dim: '#A2A9B2',
+  ink: SURFACE.light.ink,
+  mute: SURFACE.light.mute,
+  dim: SURFACE.light.dim,
 } as const;
 
 const lightIconButtonStyle: React.CSSProperties = {

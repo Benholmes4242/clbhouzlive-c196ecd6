@@ -101,7 +101,7 @@ export function ImmersiveSuccessShell({
             bottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
             textAlign: 'center',
             fontSize: 10.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'rgba(255,255,255,0.4)',
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
