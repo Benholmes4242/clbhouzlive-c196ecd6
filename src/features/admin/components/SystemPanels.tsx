@@ -82,7 +82,10 @@ export function SystemPanel({
   const caps: { state: ChipState; to: string }[] = [
     { state: { ...chips.eg, detail: egDetail(chips.eg, eg) }, to: '/admin-v2/health?tab=status' },
     { state: chips.cron, to: '/admin-v2/health?tab=status' },
-    { state: chips.echo, to: '/admin-v2/health?tab=status' },
+    // "Echo engines" cannot fit five columns at 390px. The detail line already
+    // says "engines"; shortened here only, so other surfaces keep the long label.
+    { state: { ...chips.echo, label: 'Echo' }, to: '/admin-v2/health?tab=status' },
+
     { state: chips.push, to: '/admin-v2/health?tab=status' },
     { state: chips.errors, to: '/admin-v2/health?tab=stability' },
   ];
