@@ -115,7 +115,7 @@ export function MostPlayedLeaderboard({
                     WebkitBoxOrient: 'vertical',
                     WebkitLineClamp: 2,
                     fontSize: 13.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: A.INK,
                     letterSpacing: '-0.015em',
                     lineHeight: 1.2,

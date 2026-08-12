@@ -116,7 +116,7 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  *
  * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4):
  *
- *   padding 11 + 12 = 23, WHO line 18 (13/800, one line)
+ *   padding 11 + 12 = 23, WHO line 18 (13/700, one line)
  *   DETAIL 2 marginTop + 16 a line (12/600 at lineHeight 1.32), max two
  *   MORE line 15 (6.5 label + 6 marginTop)
  *
@@ -924,7 +924,7 @@ export function AroundTheWorld({
                             <div
                               style={{
                                 fontSize: 6.5,
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 letterSpacing: '0.14em',
                                 textTransform: 'uppercase',
                                 color: A.MUTE,

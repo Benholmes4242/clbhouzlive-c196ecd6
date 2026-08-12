@@ -121,7 +121,7 @@ export function CourseImageFallback({
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: initialsSize,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.04em',
               color: 'rgba(255,255,255,0.85)',
             }}

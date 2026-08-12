@@ -118,7 +118,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
           <div
             style={{
               fontSize: NAME_SIZE,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.2,
@@ -222,7 +222,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
                 className="tabular-nums"
                 style={{
                   fontSize: 13,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: '-0.02em',
                   color: toPar.tone,
@@ -236,7 +236,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight }: Props)
             style={{
               marginTop: 4,
               fontSize: STAT_LABEL_SIZE,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
               color: SLATE_400,

@@ -277,7 +277,7 @@ export function ReviewTile({
           <span
             style={{
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               color: reviewLabelColor(r.rating, 'dark'),
               letterSpacing: '-0.02em',
               lineHeight: 1,
@@ -310,7 +310,7 @@ export function ReviewTile({
           <div
             style={{
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               color: '#FFFFFF',
               letterSpacing: '-0.025em',
               lineHeight: 1.12,

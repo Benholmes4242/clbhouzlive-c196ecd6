@@ -117,7 +117,7 @@ export function HonoursRow({
           style={{
             display: 'block',
             fontSize: 13.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: A.INK,
             letterSpacing: '-0.015em',
             overflow: 'hidden',
@@ -146,7 +146,7 @@ export function HonoursRow({
           style={{
             display: 'block',
             fontSize: 11.5,
-            fontWeight: e.isOwn ? 800 : 600,
+            fontWeight: e.isOwn ? 700 : 600,
             lineHeight: 1.32,
             color: e.isOwn ? A.AMBER_DEEP : A.BODY,
             marginTop: 1,
@@ -221,7 +221,7 @@ export function HonoursBoard({
               <div
                 style={{
                   fontSize: 9.5,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   color: GOLD_INK,
