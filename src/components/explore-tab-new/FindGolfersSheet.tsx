@@ -30,8 +30,8 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { A, FIGS, KICKER, LABEL, SANS } from './courseled/tokens';
-import {
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import {
   useFindGolfers,
   type FindGolferRow,
 } from './courseled/hooks/useFindGolfers';
