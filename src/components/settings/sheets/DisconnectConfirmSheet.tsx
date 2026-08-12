@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { TITLE } from '@/lib/tokens/type';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const INK = '#0F172A';
@@ -40,7 +41,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
             <div style={{ marginBottom: 6 }}>
               <SectionHeader tier="standard" kicker="Disconnect" tone="danger" />
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
+            <h2 style={{ ...TITLE, margin: 0, lineHeight: 1.2 }}>
               Disconnect England Golf?
             </h2>
           </div>

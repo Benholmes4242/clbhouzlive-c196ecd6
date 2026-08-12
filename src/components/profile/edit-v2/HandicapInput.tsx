@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/manage/ui';
+import { FIGURE } from '@/lib/tokens/type';
 import { SegToggle } from './SegToggle';
 
 interface Props {
@@ -69,6 +70,7 @@ export function HandicapInput({ value, onChange }: Props) {
         <input
           type="text"
           inputMode="decimal"
+          style={{ fontVariantNumeric: FIGURE.fontVariantNumeric }}
           value={inputValue}
           onChange={handleChange}
           placeholder={isPlusHandicap ? '1.2' : 'e.g. 8.4'}
