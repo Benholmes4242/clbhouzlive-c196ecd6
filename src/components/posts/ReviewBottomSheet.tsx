@@ -46,6 +46,7 @@ import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { ReviewGhostNumeral, ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { TITLE } from '@/lib/tokens/type';
 
 /* Light-mode surface tokens (Dispatch canvas set). */
 const CANVAS = '#F8FAFC';
@@ -455,10 +456,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <h1
                     id="review-sheet-title"
                     style={{
+                      ...TITLE,
                       margin: '6px 0 0',
-                      fontSize: 22,
-                      fontWeight: 800,
-                      lineHeight: 1.15,
                       color: INK,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',

@@ -5,6 +5,7 @@ import { Skeleton, EmptyStub, RetryStub } from '@/components/profile/handicap/ga
 import SectionHeader from '@/components/ui/SectionHeader';
 import { usePlayerSearch, type PlayerSearchResult } from '@/hooks/gam/usePlayerSearch';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
+import { TITLE } from '@/lib/tokens/type';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -230,7 +231,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
                 <Pin size={13} color="var(--hcp-amber)" strokeWidth={2.4} />
               </div>
             </div>
-            <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            <div style={{ ...TITLE, color: 'var(--hcp-t-100)' }}>
               Every handicap is a rivalry waiting to happen
             </div>
             <div style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', marginTop: 12, lineHeight: 1.5, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>

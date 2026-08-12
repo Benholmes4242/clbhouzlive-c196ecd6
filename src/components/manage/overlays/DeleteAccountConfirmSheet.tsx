@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { TITLE } from '@/lib/tokens/type';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -57,7 +58,7 @@ export default function DeleteAccountConfirmSheet({
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: RED }}>
               Permanent
             </span>
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: '6px 0 0', lineHeight: 1.2 }}>
+            <h2 style={{ ...TITLE, margin: '6px 0 0' }}>
               Delete account?
             </h2>
           </div>
