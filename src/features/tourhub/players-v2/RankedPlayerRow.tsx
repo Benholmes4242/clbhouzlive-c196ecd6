@@ -81,7 +81,7 @@ function RankedPlayerRowInner({
           fontSize: 15,
           fontWeight: 200,
           color: INK,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           textAlign: 'right',
         }}
       >
@@ -161,7 +161,7 @@ function RankedPlayerRowInner({
           fontSize: 14,
           fontWeight: 200,
           color: INK,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           lineHeight: 1,
         }}
       >

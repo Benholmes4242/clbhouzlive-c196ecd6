@@ -248,7 +248,7 @@ function StatBoardRowsInner({
               fontSize: 12,
               fontWeight: 500,
               color: INK_MUTE,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               textAlign: 'right',
             }}
           >
@@ -273,7 +273,7 @@ function StatBoardRowsInner({
                 fontSize: 14,
                 fontWeight: 700,
                 color: INK,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
                 lineHeight: 1,
               }}
             >
@@ -287,7 +287,7 @@ function StatBoardRowsInner({
                   marginTop: 3,
                   color: INK_FAINT,
                   whiteSpace: 'nowrap',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                 }}
               >
                 {t('leaders.behind', { gap: r.behindFormatted })}
@@ -380,7 +380,7 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                   color: isLeader ? '#FFFFFF' : INK,
                   fontSize: 11,
                   fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',

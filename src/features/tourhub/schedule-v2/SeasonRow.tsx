@@ -103,7 +103,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               // surface, so the app-wide "amber means you" rule does not apply here.
               // This is the only amber figure on the schedule. Do not extend it.
               color: isAnchor ? AMBER : INK,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               letterSpacing: '-0.01em',
             }}
           >
@@ -342,7 +342,7 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
           fontSize: 16,
           fontWeight: 200,
           color: highlight ? GOLD : INK_MUTE,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           lineHeight: 1,
           letterSpacing: '-0.02em',
         }}
@@ -409,7 +409,7 @@ const ChampionStrip: React.FC<{
             fontSize: 11.5,
             fontWeight: 700,
             color: getScoreColor(score, 'light'),
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             lineHeight: 1.2,
           }}
         >
@@ -462,7 +462,7 @@ const LeaderStrip: React.FC<{
             fontSize: 11.5,
             fontWeight: 700,
             color: getScoreColor(score, 'light'),
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             lineHeight: 1.2,
           }}
         >
