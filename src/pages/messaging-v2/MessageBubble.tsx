@@ -8,6 +8,7 @@ import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
+import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 
 const INK = '#1F2428';
@@ -318,7 +319,7 @@ export const MessageBubble: React.FC<Props> = ({
               }}
             >
               <span>{r.emoji}</span>
-              {r.count > 1 ? <span style={{ position: "relative",  color: SUB }}>{r.count}</span> : null}
+              {r.count > 1 ? <span style={{ position: "relative",  ...FIGS, color: SUB }}>{r.count}</span> : null}
             </span>
           ))}
         </div>
@@ -357,7 +358,7 @@ export const MessageBubble: React.FC<Props> = ({
           ) : isSending ? (
             <Clock size={11} style={{ position: "relative",  color: HINT }} />
           ) : null}
-          <span style={{ position: "relative",  color: HINT, fontSize: 10.5, lineHeight: 1 }}>
+          <span style={{ position: "relative",  ...FIGS, color: HINT, fontSize: 10.5, lineHeight: 1 }}>
             {formatTime(message.created_at)}
           </span>
           {showTicks && !isFailed && !isSending ? (
