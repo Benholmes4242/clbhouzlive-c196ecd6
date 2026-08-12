@@ -172,7 +172,7 @@ export function AllTeeTimesSheet({
           {tournamentName && (
             <h2
               id="tournament-tee-times-sheet-title"
-              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
             >
               {tournamentName}
             </h2>

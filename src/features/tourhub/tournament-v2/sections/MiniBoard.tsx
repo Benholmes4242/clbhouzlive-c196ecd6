@@ -71,7 +71,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
             borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.10em',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.10em',
             color: INK_FAINT, textTransform: 'uppercase',
           }}
         >
@@ -115,7 +115,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
               }}
               className="active:bg-black/[0.03] transition-colors"
             >
-              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
                 {posText}
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
@@ -131,10 +131,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 800, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums' }}>
                 {today == null ? BLANK : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 800, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>

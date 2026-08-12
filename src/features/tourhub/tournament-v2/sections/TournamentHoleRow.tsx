@@ -157,7 +157,7 @@ export const TournamentHoleRow: React.FC<{
           ...FIGS,
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK }}>
+        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>
           {row.hole_no}
         </span>
         <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, textAlign: 'center' }}>
@@ -212,7 +212,7 @@ export const TournamentHoleRow: React.FC<{
                 <span style={{ ...LABEL, fontSize: 7.5 }}>
                   {t('courses:courseDetail.plays.legendField')}
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: A.INK }}>{field.text}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: A.INK }}>{field.text}</span>
               </span>
             )}
           </span>
@@ -235,7 +235,7 @@ export const TournamentHoleRow: React.FC<{
                     }}
                   >
                     <span style={{ ...LABEL, fontSize: 8 }}>{s.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: A.INK, ...FIGS }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>
                       {Math.round(share)}%
                     </span>
                   </div>
@@ -276,7 +276,7 @@ export const TournamentHoleRow: React.FC<{
 const DetailFigure: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
     <span style={{ ...LABEL, fontSize: 8 }}>{label}</span>
-    <span style={{ fontSize: 12.5, fontWeight: 800, color: A.INK }}>{value}</span>
+    <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>{value}</span>
   </span>
 );
 

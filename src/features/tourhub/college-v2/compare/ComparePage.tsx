@@ -449,7 +449,7 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
       <div
         style={{
           fontSize: 8.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: INK_FAINT,

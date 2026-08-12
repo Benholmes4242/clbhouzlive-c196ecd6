@@ -68,7 +68,7 @@ export function EventInfoSection({ meta, broadcast }: Props) {
             <div
               style={{
                 width: 104, flexShrink: 0,
-                fontSize: 9, fontWeight: 800, color: INK_FAINT,
+                fontSize: 9, fontWeight: 700, color: INK_FAINT,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}
             >

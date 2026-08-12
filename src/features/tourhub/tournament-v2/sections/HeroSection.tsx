@@ -71,7 +71,7 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
       <div
         style={{
           fontSize: 19,
-          fontWeight: 800,
+          fontWeight: 700,
           lineHeight: 1,
           color: tone ?? '#fff',
           fontVariantNumeric: 'tabular-nums lining',
@@ -85,7 +85,7 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
         style={{
           marginTop: 5,
           fontSize: 8.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
@@ -146,7 +146,7 @@ function PersonLockup({
             alignItems: 'center',
             gap: 5,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.12em',
             color: labelTone ?? 'rgba(255,255,255,0.62)',
             textTransform: 'uppercase',
@@ -159,7 +159,7 @@ function PersonLockup({
         <div
           style={{
             fontSize: 15.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: '#fff',
             marginTop: 3,
             overflow: 'hidden',
@@ -404,7 +404,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             background: chip.bg,
             border: `1px solid ${chip.border}`,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: chip.color,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
@@ -418,7 +418,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         <h1
           style={{
             fontSize: 21,
-            fontWeight: 800,
+            fontWeight: 700,
             color: '#fff',
             lineHeight: 1.04,
             letterSpacing: '-0.02em',

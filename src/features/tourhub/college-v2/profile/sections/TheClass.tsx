@@ -49,7 +49,7 @@ const KICKER_STYLE: React.CSSProperties = {
 
 const LABEL_STYLE: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: INK_FAINT,
@@ -277,7 +277,7 @@ export function TheClass({ slug, collegeName }: Props) {
                   <span
                     style={{
                       fontSize: 14,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: INK,
                       fontVariantNumeric: 'tabular-nums',
                       letterSpacing: '-0.005em',

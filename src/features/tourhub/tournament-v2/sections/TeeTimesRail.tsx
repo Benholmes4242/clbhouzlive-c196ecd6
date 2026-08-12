@@ -134,7 +134,7 @@ export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
                 <div
                   style={{
                     fontSize: 9.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: INK_FAINT,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
@@ -208,7 +208,7 @@ export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
             className="active:opacity-80 transition-opacity"
           >
             <ChevronRight size={20} strokeWidth={2} aria-hidden />
-            <span style={{ fontSize: 11.5, fontWeight: 800, color: INK_MUTE, textAlign: 'center' }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: INK_MUTE, textAlign: 'center' }}>
               {actionLabel}
             </span>
           </button>

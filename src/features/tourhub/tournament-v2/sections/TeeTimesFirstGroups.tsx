@@ -60,7 +60,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
             <div
               style={{
                 fontSize: 15,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums',
@@ -72,7 +72,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
               style={{
                 marginTop: 5,
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',
                 color: INK_FAINT,

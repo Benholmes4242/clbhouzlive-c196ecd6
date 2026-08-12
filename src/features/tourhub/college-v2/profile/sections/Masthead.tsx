@@ -66,7 +66,7 @@ export function Masthead({
             padding: '0 16px',
             borderRadius: 999,
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
             border: '0.75px solid rgba(255,255,255,0.28)',

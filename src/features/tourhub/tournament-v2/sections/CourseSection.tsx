@@ -224,7 +224,7 @@ function HolesSheet({
           <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
           <h2
             id="tournament-holes-sheet-title"
-            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
           >
             {t('tournament.course.sheetTitle', { ns: 'tourhub', defaultValue: 'How the field scores' })}
           </h2>

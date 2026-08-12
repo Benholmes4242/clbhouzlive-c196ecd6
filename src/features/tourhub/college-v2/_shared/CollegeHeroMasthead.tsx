@@ -28,7 +28,7 @@ import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
    token does not read on this dark gradient. */
 const LABEL_STYLE: CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: WHITE_ALPHA_55,
@@ -36,7 +36,7 @@ const LABEL_STYLE: CSSProperties = {
 
 const FIGURE_STYLE: CSSProperties = {
   fontSize: 19,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.02em',
   color: '#FFFFFF',
   marginTop: 4,
@@ -203,7 +203,7 @@ export function CollegeHeroMasthead({
           style={{
             margin: 0,
             fontSize: 20,
-            fontWeight: 800,
+            fontWeight: 700,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
