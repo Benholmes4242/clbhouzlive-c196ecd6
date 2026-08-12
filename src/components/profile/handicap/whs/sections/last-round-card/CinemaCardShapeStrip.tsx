@@ -48,6 +48,7 @@ export const CinemaCardShapeStrip: React.FC<Props> = ({ holes }) => {
     color: 'rgba(255,255,255,0.55)',
     letterSpacing: '0.16em',
     textTransform: 'uppercase',
+    fontVariantNumeric: 'tabular-nums lining',
     fontFamily: FONT_SF,
   };
 
