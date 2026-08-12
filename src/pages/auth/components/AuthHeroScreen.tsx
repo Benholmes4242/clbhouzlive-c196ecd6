@@ -7,6 +7,7 @@ import { toast } from '@/lib/toast';
 import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isMedianApp } from '@/utils/median/isMedianApp';
+import { BODY, DISPLAY_TRACKING } from '@/lib/tokens/type';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
@@ -150,7 +151,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div className="flex flex-col items-center text-center" style={{ marginTop: 18 }}>
           <h1
             className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
-            style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
+            style={{ letterSpacing: DISPLAY_TRACKING, color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
             {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'baseline', marginLeft: 2 }} />
           </h1>
@@ -225,7 +226,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
                 <div className="flex items-center gap-3" aria-hidden="true">
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
                 </div>
 
@@ -258,13 +259,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </div>
 
             {emailError && (
-              <p className="text-[13px] text-center" style={{ color: '#F87171' }}>{emailError}</p>
+              <p className="text-center" style={{ ...BODY, color: '#F87171' }}>{emailError}</p>
             )}
 
             {errorMessage && !hasEditedSinceError && (
               <p
                 key={errorNonce}
-                className="text-[13px] text-center auth-error-fade"
+                className="text-center auth-error-fade"
                 style={{ color: '#F87171' }}
               >
                 {errorMessage}
@@ -296,7 +297,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
             <p
               className="text-center"
-              style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}
+              style={{ ...BODY, color: 'rgba(255,255,255,0.55)' }}
             >
               {t('auth:hero.codeHint')}
             </p>
@@ -304,8 +305,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <p
               style={{
                 margin: '14px 4px 0',
-                fontSize: 11.5,
-                lineHeight: 1.55,
+                ...BODY,
                 color: 'rgba(255,255,255,0.45)',
                 textAlign: 'center',
               }}

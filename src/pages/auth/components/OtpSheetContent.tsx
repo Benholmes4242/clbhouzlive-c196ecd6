@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { LABEL, BODY, FIGURE } from '@/lib/tokens/type';
 
 interface OtpSheetContentProps {
   email: string;
@@ -160,16 +161,15 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
     <div className="space-y-4">
       {/* Sent-to */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.60)', margin: 0 }}>
+        <p style={{ ...LABEL, color: 'rgba(255,255,255,0.60)', margin: 0 }}>
           {t('otp.sentTo')}
         </p>
-        <p className="text-[14px]" style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 650 }}>{email}</span>
+        <p style={{ ...BODY, margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{email}</span>
           <button
             type="button"
             onClick={onUseDifferentEmail}
-            className="text-[13px]"
-            style={{ color: '#F7931E', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            style={{ ...BODY, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             {t('otp.changeEmail')}
           </button>
@@ -201,8 +201,9 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               border: `1px solid ${d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)'}`,
               transition: 'border-color 150ms ease',
               color: 'rgba(255,255,255,0.96)',
+              ...FIGURE,
               fontSize: 21,
-              fontWeight: 650,
+              fontWeight: 600,
               caretColor: '#F7931E',
             }}
             onFocus={(e) => {
@@ -217,12 +218,12 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
       {/* Error / Info */}
       {errorMessage && (
-        <p className="text-[13px] text-center" style={{ color: '#F87171' }}>
+        <p className="text-center" style={{ ...BODY, color: '#F87171' }}>
           {errorMessage}
         </p>
       )}
       {infoMessage && !errorMessage && (
-        <p className="text-[13px] text-center" style={{ color: 'rgba(255,255,255,0.96)' }}>
+        <p className="text-center" style={{ ...BODY, color: 'rgba(255,255,255,0.96)' }}>
           {infoMessage}
         </p>
       )}
@@ -251,8 +252,8 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           type="button"
           onClick={onResend}
           disabled={resendCooldown > 0 || submitting}
-          className="text-[13px]"
           style={{
+            ...BODY,
             color: resendCooldown > 0 ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
             cursor: resendCooldown > 0 ? 'default' : 'pointer',
           }}
