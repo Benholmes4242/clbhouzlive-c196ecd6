@@ -32,7 +32,7 @@ function TickerEntry({ row }: { row: TickerRow }) {
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, marginRight: 14 }}>
       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', fontWeight: 600 }}>{row.rank}</span>
       <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.95)' }}>{row.shortName}</span>
-      <span style={{ fontSize: 12, fontWeight: 800, color: entryScoreColour(row.score) }}>
+      <span style={{ fontSize: 12, fontWeight: 700, color: entryScoreColour(row.score) }}>
         {fmtScore(row.score)}
       </span>
       <span style={{ color: 'rgba(255,255,255,0.20)', marginLeft: 6 }}>·</span>
@@ -66,7 +66,7 @@ export function Ticker({ rows }: TickerProps) {
         style={{
           padding: '0 12px',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           color: 'rgba(255,255,255,0.50)',
           flexShrink: 0,

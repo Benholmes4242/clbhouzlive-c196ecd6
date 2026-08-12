@@ -73,7 +73,7 @@ export function SoloLeaderRow({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16,
-          fontWeight: 800,
+          fontWeight: 700,
           color: GOLD_DARK,
           letterSpacing: '-0.02em',
         }}
@@ -92,7 +92,7 @@ export function SoloLeaderRow({
           <span
             style={{
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
@@ -333,7 +333,7 @@ export function TiedLeadersRow({ count, score, today, players, isLast = false }:
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16,
-          fontWeight: 800,
+          fontWeight: 700,
           color: GOLD_DARK,
           letterSpacing: '-0.02em',
         }}
@@ -347,7 +347,7 @@ export function TiedLeadersRow({ count, score, today, players, isLast = false }:
         <div
           style={{
             fontSize: 16,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK,
             letterSpacing: '-0.01em',
             whiteSpace: 'nowrap',
@@ -455,7 +455,7 @@ export function ChampionRow({
           <span
             style={{
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',

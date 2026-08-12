@@ -211,7 +211,7 @@ function SoloRowDark({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em',
           color: scoreColor(score), flexShrink: 0,
         }}
       >
@@ -278,7 +278,7 @@ function TiedLeadersRowDark({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em',
           color: scoreColor(scoreStringToNumber(score)), flexShrink: 0,
         }}
       >
@@ -348,7 +348,7 @@ function TiedChasersRowDark({
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
+          fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em',
           color: scoreColor(score), flexShrink: 0,
         }}
       >
@@ -401,7 +401,7 @@ function ChampionRowDark({
           style={{
             ...NUMERIC_STYLE,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: GOLD,
             textTransform: 'uppercase',
@@ -411,7 +411,7 @@ function ChampionRowDark({
         </span>
         <span
           style={{
-            fontSize: 17, fontWeight: 800, color: 'white',
+            fontSize: 17, fontWeight: 700, color: 'white',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             letterSpacing: '-0.01em',
           }}
@@ -465,7 +465,7 @@ function DefendingChampionRowDark({
           style={{
             ...NUMERIC_STYLE,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: GOLD,
             textTransform: 'uppercase',
@@ -475,7 +475,7 @@ function DefendingChampionRowDark({
         </span>
         <span
           style={{
-            fontSize: 18, fontWeight: 800, color: 'white',
+            fontSize: 18, fontWeight: 700, color: 'white',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             letterSpacing: '-0.01em',
           }}
@@ -517,7 +517,7 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
           style={{
             ...NUMERIC_STYLE,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: DARK_EYEBROW,
             textTransform: 'uppercase',
@@ -800,8 +800,8 @@ export function CinematicFrame({
             border: '0.5px solid rgba(255,255,255,0.18)',
             borderRadius: 8, padding: '5px 9px',
           }}>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
-            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{p.value}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
+            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>{p.value}</span>
           </div>
         ))}
       </div>
@@ -890,7 +890,7 @@ export function CinematicFrame({
                 border: '0.5px solid rgba(255,255,255,0.18)',
                 borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
               }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
               </div>
             ) : (
@@ -962,7 +962,7 @@ export function CinematicFrame({
               color: 'white',
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontSize: isResults ? 28 : 'clamp(28px, 8vw, 34px)',
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               lineHeight: 1.02,
               textShadow: 'none',
@@ -1014,13 +1014,13 @@ export function CinematicFrame({
                     ringColor={GOLD}
                   />
                 </span>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 800, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
                   {t('overview.cinematic.championLabel')}
                 </div>
                 <div
                   style={{
                     fontSize: 26,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#fff',
                     marginTop: 6,
                     lineHeight: 1.1,
@@ -1074,20 +1074,20 @@ export function CinematicFrame({
                 );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
                   {defendingChamp.year
                     ? t('overview.cinematic.defendingChampionYearLabel', { year: defendingChamp.year })
                     : t('overview.cinematic.defendingChampionLabel')}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1, minWidth: 0 }}>
-                  <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
+                  <span style={{ fontSize: 17, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
                   {defendingChamp.score
-                    ? <span style={{ ...NUMERIC_STYLE, fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{defendingChamp.score}</span>
+                    ? <span style={{ ...NUMERIC_STYLE, fontSize: 14, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{defendingChamp.score}</span>
                     : null}
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)', color: '#fff', fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)', color: '#fff', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               {viewTournamentLabel}
               <ChevronRight size={14} strokeWidth={2.5} />
             </div>
@@ -1142,7 +1142,7 @@ export function CinematicFrame({
                   {fieldStrength?.totalPlayers != null ? t('overview.cinematic.inTheField', { count: fieldStrength.totalPlayers }) : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
                   <ChevronRight size={13} strokeWidth={2.5} color={DARK_EYEBROW} style={{ flexShrink: 0 }} />
                 </span>
               </div>
@@ -1230,9 +1230,9 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colToday')}</span>}
-              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colTotal')}</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colThru')}</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colToday')}</span>}
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colTotal')}</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colThru')}</span>
             </div>
 
             {/* Score rows */}
@@ -1266,7 +1266,7 @@ export function CinematicFrame({
                         {today == null ? '—' : fmtScore(today)}
                       </span>
                     )}
-                    <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
                       {fmtScore(entry?.score)}
                     </span>
                     <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
@@ -1285,7 +1285,7 @@ export function CinematicFrame({
                   <StackedAvatarsDark items={row.items} size={26} />
                   <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
                   {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
-                  <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
+                  <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
                     {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
                   </span>
                   <span style={{ width: COL_THRU, flexShrink: 0 }} />
@@ -1305,7 +1305,7 @@ export function CinematicFrame({
                 {t('overview.cinematic.inTheField', { count: fieldSize })}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: DARK_EYEBROW }}>{t('overview.cinematic.ctaTournament')}</span>
                 <ChevronRight size={13} strokeWidth={2.5} color={DARK_EYEBROW} style={{ flexShrink: 0 }} />
               </span>
             </div>
@@ -1329,7 +1329,7 @@ export function CinematicFrame({
             width: '100%',
           }}
         >
-          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
+          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', color: GOLD }}>
             {t('overview.cinematic.finalLeaderboardCount', { count: safe.length })}
           </span>
           <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />

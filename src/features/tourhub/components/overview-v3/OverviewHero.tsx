@@ -237,7 +237,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
               style={{
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 fontSize: 9.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.08em',
                 color: '#fff',
                 background: 'rgba(10,14,20,0.55)',

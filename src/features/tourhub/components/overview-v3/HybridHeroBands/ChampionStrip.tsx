@@ -93,7 +93,7 @@ export function ChampionStrip({
             <span
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.18em',
                 color: GOLD,
                 textTransform: 'uppercase',
@@ -121,7 +121,7 @@ export function ChampionStrip({
           <div
             style={{
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'white',
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
@@ -198,7 +198,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
         <div
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.18em',
             color: STATUS_NEGATIVE,
             textTransform: 'uppercase',
@@ -273,7 +273,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <div style={{
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.18em',
           color: GOLD,
           marginBottom: 2,
@@ -284,7 +284,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           <Trophy size={10} color={GOLD} strokeWidth={2.5} />
           {t('overview.playoff.eyebrow')}
         </div>
-        <div style={{ fontSize: 17, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
           {t('overview.playoff.tiedAtTop', { count })}
         </div>
       </div>

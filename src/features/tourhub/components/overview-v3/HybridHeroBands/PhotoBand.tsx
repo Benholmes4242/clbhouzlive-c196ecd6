@@ -185,7 +185,7 @@ export function PhotoBand({
             color: 'white',
             fontFamily: FONT,
             fontSize: 34,
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 0.96,
             letterSpacing: '-0.025em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
@@ -251,7 +251,7 @@ export function PhotoBand({
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.14em',
                       color: 'rgba(255,255,255,0.65)',
                       textTransform: 'uppercase',
@@ -278,7 +278,7 @@ export function PhotoBand({
                     style={{
                       ...NUMERIC_STYLE,
                       fontSize: 13,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: momentScoreColour(momentScore),
                     }}
                   >
@@ -305,7 +305,7 @@ export function PhotoBand({
                   cursor: 'pointer',
                   fontFamily: FONT,
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                   // Quiet action on a dark hero band: white-62, never amber
                   // (ACTION INK FLIP). Amber here stays only on the figure above.

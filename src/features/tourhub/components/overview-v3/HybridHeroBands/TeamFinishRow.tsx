@@ -77,7 +77,7 @@ function TeamCrestTile({
         justifyContent: 'center',
         color: 'white',
         ...NUMERIC_STYLE,
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: Math.round(size * 0.5),
         letterSpacing: '-0.02em',
         flexShrink: 0,

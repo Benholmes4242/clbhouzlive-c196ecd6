@@ -146,7 +146,7 @@ function StackedAvatars({
             background: 'rgba(255,255,255,0.16)',
             color: 'rgba(255,255,255,0.92)',
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.01em',
             display: 'inline-flex',
             alignItems: 'center',
@@ -184,7 +184,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
       <span
         style={{
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.12em',
           color: GOLD,
           textTransform: 'uppercase',
@@ -233,7 +233,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
             style={{
               ...NUMERIC_STYLE,
               fontSize: 24,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               color: 'white',
               lineHeight: 1,
@@ -244,7 +244,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           <span
             style={{
               fontSize: 8.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.55)',
             }}
@@ -504,7 +504,7 @@ export function CinematicHeroFullBleed({
             border: `0.5px solid ${GOLD_RING}`,
             color: GOLD,
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             lineHeight: 1,
@@ -565,7 +565,7 @@ export function CinematicHeroFullBleed({
             margin: 0,
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 'clamp(22px, 7.2vw, 28px)',
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 0.98,
             letterSpacing: '-0.01em',
             color: 'white',
@@ -625,7 +625,7 @@ export function CinematicHeroFullBleed({
             <span
               style={{
                 fontSize: 9.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 color: GOLD,
                 textTransform: 'uppercase',
@@ -636,7 +636,7 @@ export function CinematicHeroFullBleed({
             <span
               style={{
                 fontSize: 19,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: 'white',
                 lineHeight: 1.05,
                 letterSpacing: '-0.01em',
@@ -652,7 +652,7 @@ export function CinematicHeroFullBleed({
                 style={{
                   ...NUMERIC_STYLE,
                   fontSize: 15,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.02em',
                   color: LEADER_RED,
                 }}
@@ -663,7 +663,7 @@ export function CinematicHeroFullBleed({
                 <span
                   style={{
                     fontSize: 8.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.08em',
                     color: GOLD,
                     background: GOLD_TINT,
@@ -762,7 +762,7 @@ export function CinematicHeroFullBleed({
                       width: COL_TOTAL,
                       textAlign: 'center',
                       fontSize: 17,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '-0.02em',
                       color: scoreColour(row.entry?.score),
                     }}
@@ -810,7 +810,7 @@ export function CinematicHeroFullBleed({
                     width: COL_TOTAL,
                     textAlign: 'center',
                     fontSize: 17,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '-0.02em',
                     color: scoreColour(tieScoreNum),
                   }}
@@ -865,7 +865,7 @@ export function CinematicHeroFullBleed({
                     width: COL_THRU,
                     textAlign: 'center',
                     fontSize: 8,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.12em',
                     color: 'rgba(255,255,255,0.45)',
                   }}
@@ -880,7 +880,7 @@ export function CinematicHeroFullBleed({
                     width: COL_TODAY,
                     textAlign: 'center',
                     fontSize: 8,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.12em',
                     color: 'rgba(255,255,255,0.45)',
                   }}
@@ -894,7 +894,7 @@ export function CinematicHeroFullBleed({
                   width: COL_TOTAL,
                   textAlign: 'center',
                   fontSize: 8,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                   color: 'rgba(255,255,255,0.45)',
                 }}
@@ -993,7 +993,7 @@ export function CinematicHeroFullBleed({
                       width: COL_TOTAL,
                       textAlign: 'center',
                       fontSize: 17,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '-0.02em',
                       color: row.isLeader ? LEADER_RED : scoreColour(row.entry?.score),
                     }}
@@ -1052,7 +1052,7 @@ export function CinematicHeroFullBleed({
                     width: COL_TOTAL,
                     textAlign: 'center',
                     fontSize: 17,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '-0.02em',
                     color: row.isLeader ? (awaitingPlayoff ? GOLD : LEADER_RED) : scoreColour(tieScoreNum),
                   }}
@@ -1110,7 +1110,7 @@ export function CinematicHeroFullBleed({
                 <span
                   style={{
                     fontSize: 9.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.14em',
                     color: GOLD,
                     textTransform: 'uppercase',
@@ -1201,7 +1201,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
           style={{
             ...NUMERIC_STYLE,
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.06em',
             // Quiet action on a dark band: white-62, never amber (ACTION INK FLIP).
             color: DARK_ACTION,
@@ -1223,7 +1223,7 @@ function CourseStat({ label, value }: { label: string; value: string }) {
       <span
         style={{
           fontSize: 8.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.5)',
         }}
@@ -1234,7 +1234,7 @@ function CourseStat({ label, value }: { label: string; value: string }) {
         style={{
           ...NUMERIC_STYLE,
           fontSize: 18,
-          fontWeight: 800,
+          fontWeight: 700,
           color: 'white',
           letterSpacing: '-0.02em',
         }}
