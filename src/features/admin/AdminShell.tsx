@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation, useSearchParams } from 'react-rou
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, RefreshCw } from 'lucide-react';
 import { usePanelRole } from '@/hooks/usePanelRole';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { panelCan } from '@/lib/panelCan';
 import { adminTheme as t } from './theme';
 import AdminDrawer from './AdminDrawer';
@@ -41,6 +42,18 @@ export default function AdminShell() {
   const { role, loading } = usePanelRole();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
+
+  // Admin owns the notch: dark bar (#0A0D12) with LIGHT content (white glyphs).
+  // Route-scoped so keep-alive member pages can't repaint it on resume.
+  useMedianStatusBar(
+    'light',
+    t.canvas,
+    false,
+    false,
+    true,
+    location.pathname,
+    (p) => p.startsWith('/admin-v2'),
+  );
 
   if (loading) return <AdminLoading />;
   if (role === 'none' || role === 'unknown') return <AdminAccessDenied />;
