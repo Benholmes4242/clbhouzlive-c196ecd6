@@ -1,6 +1,6 @@
 /**
  * useHandicapTrend12mo — 12-month handicap delta for the profile hero
- * scorecard (HeroHandicapCardDark / ProfileHandicapCard).
+ * scorecard (HeroHandicapCardDark).
  *
  * Returns:
  *   - delta: number | null   — current − ~365-day-ago index, rounded to 1dp.
