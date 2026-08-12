@@ -34,7 +34,7 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
     <div
       style={{
         fontSize: 20,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.025em',
         color: tone,
         marginTop: 3,
@@ -231,7 +231,7 @@ const ShapeChart: React.FC<{
               top: Math.max(0, hardestTopY - 15),
               transform: 'translateX(-50%)',
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               color: A.INK,
               whiteSpace: 'nowrap',
@@ -460,7 +460,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
                   <div
                     style={{
                       fontSize: 20,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '-0.025em',
                       color: A.INK,
                       marginTop: 3,
@@ -473,7 +473,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
                   <div
                     style={{
                       fontSize: 20,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '-0.025em',
                       color: c.tone,
                       marginTop: 4,
@@ -546,7 +546,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
           <h2
             id="course-holes-sheet-title"
-            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 800, color: A.INK }}
+            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 700, color: A.INK }}
           >
             {t('courses:courseDetail.holes.sheetTitle')}
           </h2>

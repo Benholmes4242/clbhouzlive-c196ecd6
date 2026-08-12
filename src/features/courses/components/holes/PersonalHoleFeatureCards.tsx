@@ -43,7 +43,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
       <div
         style={{
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: AMBER,

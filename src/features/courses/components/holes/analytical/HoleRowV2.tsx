@@ -213,7 +213,7 @@ export const HoleRowV2: React.FC<{
             style={{
               display: 'block',
               fontSize: 18,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.03em',
               color: A.INK,
               lineHeight: 1.1,
@@ -277,7 +277,7 @@ export const HoleRowV2: React.FC<{
               style={{
                 display: 'block',
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: field ? field.tone : A.DIM,
                 lineHeight: 1.1,
@@ -295,7 +295,7 @@ export const HoleRowV2: React.FC<{
               style={{
                 display: 'block',
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: A.AMBER_DEEP,
                 lineHeight: 1.1,
@@ -341,7 +341,7 @@ export const HoleRowV2: React.FC<{
                   <span
                     style={{
                       fontSize: 13,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: A.INK,
                       lineHeight: 1,
                       fontVariantNumeric: 'tabular-nums',

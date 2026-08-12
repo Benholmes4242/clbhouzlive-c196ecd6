@@ -306,7 +306,7 @@ export const HoleDataSheet: React.FC<Props> = ({
                 <div
                   style={{
                     fontSize: 11,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: GOLD_INK,
@@ -318,7 +318,7 @@ export const HoleDataSheet: React.FC<Props> = ({
                   style={{
                     margin: '4px 0 0',
                     fontSize: 17,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: INK,
                     letterSpacing: '-0.01em',
                     lineHeight: 1.2,
@@ -371,7 +371,7 @@ export const HoleDataSheet: React.FC<Props> = ({
                   background: sort === v ? INK : 'transparent',
                   color: sort === v ? '#FFFFFF' : INK_55,
                   fontSize: 11,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.04em',
                   padding: '6px 12px',
                   borderRadius: 999,
@@ -454,7 +454,7 @@ export const HoleDataSheet: React.FC<Props> = ({
               background: collapsed ? INK : '#F8FAFC',
               color: collapsed ? '#FFFFFF' : INK,
               fontSize: 13.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.005em',
               cursor: 'pointer',
               marginTop: 4,
@@ -540,7 +540,7 @@ const SkylineCard: React.FC<{
     <section style={embedded ? { scrollMarginTop: STICKY_SAFE } : { ...CARD, padding: 16, scrollMarginTop: STICKY_SAFE }}>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 800, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: INK }}>{t('courses:holes.shapeOfCourse')}</div>
         <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center' }}>
           <LegendSwatch
             swatch={<span style={{ display: 'inline-block', width: 10, height: 6, background: INK_20, borderRadius: 2 }} />}
@@ -644,7 +644,7 @@ const LegendSwatch: React.FC<{ swatch: React.ReactNode; label: string }> = ({ sw
       alignItems: 'center',
       gap: 5,
       fontSize: 9,
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: '0.10em',
       color: INK_55,
       textTransform: 'uppercase',
@@ -781,7 +781,7 @@ const StoryTiles: React.FC<{
                 <div
                   style={{
                     fontSize: 8,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: A.DIM,
@@ -895,7 +895,7 @@ const StoryTile: React.FC<{
     <div
       style={{
         fontSize: 10,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.12em',
         color: INK_55,
         textTransform: 'uppercase',
@@ -906,7 +906,7 @@ const StoryTile: React.FC<{
     <div
       style={{
         fontSize: 16.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: personal ? GOLD_INK : INK,
         letterSpacing: '-0.005em',
         lineHeight: 1.15,
@@ -997,7 +997,7 @@ const HoleCard: React.FC<{
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               ...NUM,
             }}
           >
@@ -1049,7 +1049,7 @@ const HoleCard: React.FC<{
           <div
             style={{
               fontSize: 14.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               ...NUM,
               lineHeight: 1,
@@ -1144,7 +1144,7 @@ const ExpandedCard: React.FC<{
               <div
                 style={{
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: b.gold ? GOLD_INK : INK,
                   ...NUM,
                   lineHeight: 1,
@@ -1189,7 +1189,7 @@ const ExpandedCard: React.FC<{
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.10em',
                   color: INK_55,
                   marginTop: 3,

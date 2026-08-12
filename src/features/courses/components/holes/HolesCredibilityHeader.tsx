@@ -37,7 +37,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
       >
         <ShieldCheck size={13} strokeWidth={2.2} />
         <span>
-          <span style={{ fontWeight: 800 }}>
+          <span style={{ fontWeight: 700 }}>
             {t('courses:holes.rounds', { count: totalRounds, formattedCount: formatNumber(totalRounds) })}
           </span>
           {t('courses:holes.credibilitySuffix')}
