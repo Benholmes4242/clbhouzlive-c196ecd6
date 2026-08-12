@@ -4,9 +4,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from '@/lib/toast';
 import {
-  MapPin, Plus, Search, RefreshCw, Image as ImageIcon,
+  Plus, Search, RefreshCw, Image as ImageIcon,
   Trash2, Upload, Loader2, Zap,
-  Trophy, Compass, CheckCircle2, ChevronRight,
+  CheckCircle2, ChevronRight,
 } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
