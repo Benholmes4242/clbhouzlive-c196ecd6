@@ -115,7 +115,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
           style={{
             margin: '6px 0 0',
             fontFamily: FONT,
-            fontSize: 20,
+            fontSize: 17,
             fontWeight: 700,
             letterSpacing: '-0.01em',
             color: CHART.INK,
