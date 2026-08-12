@@ -77,7 +77,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       <div
         style={{
           fontSize: 64,
-          fontWeight: 800,
+          fontWeight: 700,
           lineHeight: 1,
           letterSpacing: '-0.035em',
           color,
@@ -166,7 +166,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           display: 'flex',
           marginTop: 9,
           fontSize: 9.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
         }}

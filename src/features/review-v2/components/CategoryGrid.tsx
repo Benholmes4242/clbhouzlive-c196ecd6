@@ -95,7 +95,7 @@ function CategoryRow({
         <span
           style={{
             fontSize: 18,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.03em',
             color: value == null ? RV2.muted : color,
           }}

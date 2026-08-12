@@ -661,7 +661,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             <div
               style={{
                 fontSize: 14.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.015em',
                 color: RV2.ink,
                 whiteSpace: 'nowrap',
@@ -716,7 +716,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             <div
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 color: i <= step ? RV2.ink : RV2.muted,
@@ -748,7 +748,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <h1
             style={{
               fontSize: 20,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               marginBottom: 16,
               color: RV2.ink,
@@ -798,7 +798,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <h1
             style={{
               fontSize: 20,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               marginBottom: 4,
               color: RV2.ink,
