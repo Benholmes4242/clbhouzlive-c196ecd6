@@ -16,6 +16,7 @@ import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolv
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
+import { KICKER, LABEL } from '@/lib/tokens/type';
 import { adminTheme as t } from '../theme';
 import SectionTabs from '../components/SectionTabs';
 import StatTile from '../components/StatTile';
@@ -90,12 +91,24 @@ export default function ContentPage() {
 
 /* ───────────────────────── Courses tab ───────────────────────── */
 
-const FILTER_LABEL: Record<CourseFilter, string> = {
-  all: 'A TO Z',
-  top100: 'A TO Z',
-  missing_coords: 'NO COORDS',
-  missing_photo: 'NO PHOTO',
+const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
+const FIG_T = { fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' } as const;
+
+/** The active view's name. Names a view, never a sort order. */
+const VIEW_LABEL: Record<CourseFilter, string> = {
+  all: 'A to Z',
+  top100: 'Ranked courses',
+  missing_coords: 'Missing coordinates',
+  missing_photo: 'Missing photo',
 };
+
+/**
+ * Tone an issue by RARITY. An issue affecting most of the directory is a fact
+ * about the directory, not an exception, so it drops to faint ink. The tone
+ * follows the data: a directory at 20% missing gets its amber back.
+ */
+const issueTone = (affected: number, total: number) =>
+  total > 0 && affected / total > 0.5 ? t.inkFaint : t.warnText;
 
 function isCourseFilter(v: string | null): v is CourseFilter {
   return v === 'all' || v === 'top100' || v === 'missing_coords' || v === 'missing_photo';
@@ -157,20 +170,22 @@ function CoursesTab() {
 
   const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
 
-  const totalLabel = c.stats.total > 0 ? c.stats.total.toLocaleString() : '';
-  const placeholder = totalLabel ? `Search ${totalLabel} courses` : 'Search courses';
+  const total = c.stats.total;
+  const withCoords = c.stats.geocoded;
+  const withPhoto = Math.max(0, total - c.stats.missingPhoto);
 
-  const chips: { id: CourseFilter; label: string; count: number | null; issue: boolean }[] = [
-    { id: 'all',            label: 'All',       count: c.stats.total,         issue: false },
-    { id: 'top100',         label: 'Top 100',   count: c.stats.top100,        issue: false },
-    { id: 'missing_coords', label: 'No coords', count: c.stats.missingCoords, issue: true  },
-    { id: 'missing_photo',  label: 'No photo',  count: c.stats.missingPhoto,  issue: true  },
+  /**
+   * Each tile states what the directory HAS and filters to the INVERSE - the
+   * work is the gap, not the coverage. The list heading names the filtered
+   * view, which is what makes the inversion legible.
+   */
+  const coverage: { id: CourseFilter; label: string; value: number }[] = [
+    { id: 'missing_coords', label: 'With coords', value: withCoords },
+    { id: 'missing_photo',  label: 'With photo',  value: withPhoto },
+    { id: 'top100',         label: 'Ranked',      value: c.stats.top100 },
   ];
 
   const activeIssueChip = c.filter === 'missing_coords' || c.filter === 'missing_photo';
-  const caption = activeIssueChip
-    ? (c.filter === 'missing_coords' ? 'NO COORDS' : 'NO PHOTO')
-    : 'A TO Z';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -181,7 +196,7 @@ function CoursesTab() {
           <input
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder={placeholder}
+            placeholder="Search courses"
             style={{
               width: '100%', padding: '10px 12px 10px 36px',
               borderRadius: t.radius.md, border: `1px solid ${t.line}`,
@@ -202,47 +217,33 @@ function CoursesTab() {
         </button>
       </div>
 
-      {/* Filter chips */}
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', padding: '2px' }}>
-        {chips.map(chip => {
-          const active = c.filter === chip.id;
-          const hasCount = typeof chip.count === 'number';
-          const countText = hasCount ? chip.count!.toLocaleString() : '';
-          const inactiveIssueColor = chip.issue && !active ? t.warnText : t.inkMuted;
-          const label = chip.id === 'all' && hasCount ? `All ${countText}` : chip.label;
-          return (
-            <button
-              key={chip.id}
-              onClick={() => c.setFilter(chip.id)}
-              style={{
-                flexShrink: 0, padding: '8px 14px', borderRadius: 999,
-                border: `1px solid ${active ? 'transparent' : t.line}`,
-                background: active ? t.brandSoft : t.surface,
-                color: active ? t.brandText : inactiveIssueColor,
-                fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              <span>{label}</span>
-              {chip.id !== 'all' && hasCount && (
-                <span style={{
-                  background: active ? t.brand : t.neutralSoft,
-                  color: active ? t.surface : (chip.issue ? t.warnText : t.inkMuted),
-                  fontSize: 11, padding: '0 6px', borderRadius: 999,
-                  minWidth: 18, textAlign: 'center', fontVariantNumeric: 'tabular-nums',
-                }}>{countText}</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Caption */}
+      {/* Coverage board — states what the directory HAS; tiles filter the gap. */}
       <div style={{
-        fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
-        color: t.inkFaint, textTransform: 'uppercase',
-      }}>{caption}</div>
+        background: t.surface, border: `1px solid ${t.line}`,
+        borderRadius: 18, padding: '10px 12px 12px',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+          gap: 10, marginBottom: 10,
+        }}>
+          <span style={{ ...KICKER, color: t.inkMuted }}>Directory</span>
+          <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint }}>
+            {total.toLocaleString()} courses
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+          {coverage.map(tile => (
+            <CoverageTile
+              key={tile.id}
+              label={tile.label}
+              value={tile.value}
+              total={total}
+              active={c.filter === tile.id}
+              onClick={() => c.setFilter(c.filter === tile.id ? 'all' : tile.id)}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* List */}
       {c.isLoading ? (
@@ -256,9 +257,32 @@ function CoursesTab() {
           ? <EmptyState icon={<CheckCircle2 size={22} color={t.ok} />} title="Nothing to fix here." />
           : <EmptyState title="No courses" subtitle={searchInput ? `for "${searchInput}"` : undefined} />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {c.courses.map(course => (
-            <CourseCard key={course.id} course={course} onOpen={() => openCourse(course.id)} />
+        <div style={{
+          background: t.surface, border: `1px solid ${t.line}`,
+          borderRadius: 18, overflow: 'hidden',
+        }}>
+          <div style={{
+            padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
+          }}>
+            <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {VIEW_LABEL[c.filter]}
+            </span>
+            <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint, flexShrink: 0 }}>
+              {c.total.toLocaleString()}
+            </span>
+          </div>
+          {c.courses.map((course, i) => (
+            <CourseRow
+              key={course.id}
+              course={course}
+              first={i === 0}
+              activeFilter={c.filter}
+              missingCoords={c.stats.missingCoords}
+              missingPhoto={c.stats.missingPhoto}
+              total={total}
+              onOpen={() => openCourse(course.id)}
+            />
           ))}
         </div>
       )}
