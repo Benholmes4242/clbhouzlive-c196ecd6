@@ -56,7 +56,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 700,
           color: played ? '#FBBC2E' : 'rgba(255,255,255,0.55)',
           ...GAM.TABULAR,
         }}
@@ -156,7 +156,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           style={{
             flexShrink: 0,
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 700,
             color: GAM.AMBER,
             padding: '4px 9px',
             borderRadius: 999,
@@ -178,7 +178,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           style={{
             flexShrink: 0,
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'rgba(255,255,255,0.55)',
             letterSpacing: '0.10em',
             textTransform: 'uppercase',

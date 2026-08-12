@@ -33,7 +33,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
           <div
             style={{
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.12em',
               color: 'var(--hcp-t-60)',
               textTransform: 'uppercase',
@@ -44,7 +44,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
           <div
             style={{
               fontSize: 14.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'var(--hcp-t-100)',
               marginTop: 3,
               letterSpacing: '-0.01em',

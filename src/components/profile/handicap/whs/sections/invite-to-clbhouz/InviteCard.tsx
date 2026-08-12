@@ -84,7 +84,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
               width: 42, height: 42, borderRadius: 12,
               background: getAvatarFallbackColor(friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 15, fontWeight: 800,
+              color: '#fff', fontSize: 15, fontWeight: 700,
             }}
           >
             {getInitialsFromName(friend.friend_name) || '?'}
@@ -109,7 +109,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
       })()}
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {displayName(friend.friend_name)}{' '}
           <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
             {fmtHcp(hcp)}
@@ -136,7 +136,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           cursor: 'pointer',
           fontFamily: FONT_SF,
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.62)',
