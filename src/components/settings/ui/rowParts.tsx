@@ -1,4 +1,5 @@
 import React from 'react';
+import { FIGURE } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
@@ -89,10 +90,9 @@ export function SettingsFigure({ children }: { children: React.ReactNode }) {
   return (
     <span
       style={{
+        ...FIGURE,
         fontSize: 14,
-        fontWeight: 700,
         letterSpacing: '-0.02em',
-        fontVariantNumeric: 'tabular-nums',
         color: A.INK,
       }}
     >
