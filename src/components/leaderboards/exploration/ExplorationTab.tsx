@@ -480,7 +480,7 @@ export function ExplorationTab() {
       style={{
         background: BG,
         minHeight: '100%',
-        fontFamily: '"Geist", system-ui, -apple-system, sans-serif',
+        fontFamily: '"SF Pro", system-ui, -apple-system, sans-serif',
         color: INK,
       }}
     >

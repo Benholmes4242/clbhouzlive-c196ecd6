@@ -161,7 +161,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       ) : (
         <div
           style={{
-            fontFamily: GAM.FONT_GEIST,
+            fontFamily: GAM.FONT_SF,
             fontSize: compact ? 13 : 15,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums lining',
@@ -214,7 +214,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span
           style={{
-            fontFamily: GAM.FONT_GEIST,
+            fontFamily: GAM.FONT_SF,
             fontSize: valueSize,
             fontWeight: 700,
             color: valueColor,

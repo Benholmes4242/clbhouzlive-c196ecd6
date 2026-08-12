@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
-const FONT = "'Geist', -apple-system, sans-serif";
+const FONT = "'SF Pro', -apple-system, sans-serif";
 const AMBER = '#F7931E';
 
 interface Props {

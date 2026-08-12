@@ -5,7 +5,7 @@ import { buildForecast, type Forecast, type CounterCell } from '@/lib/whs/foreca
 import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // ── Tokens ──────────────────────────────────────────────────────────
 const T = {

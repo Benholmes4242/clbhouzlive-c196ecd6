@@ -14,7 +14,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { HubRpcRow } from '../utils/toFeedPost';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 function Tile({
   row,

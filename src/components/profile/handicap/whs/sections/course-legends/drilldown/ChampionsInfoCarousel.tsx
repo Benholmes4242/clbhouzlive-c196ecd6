@@ -7,7 +7,7 @@ import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { ChampionsGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const FONT = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
 const KEY_PROVENANCE = 'champions_provenance_dismissed_v1';
 const KEY_INFO_V2 = 'champions_info_dismissed_v2';

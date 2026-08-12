@@ -48,7 +48,7 @@ import type { NavigateOptions, To } from 'react-router-dom';
 
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = INK_TOKEN;
 const INK_55 = INK_45_TOKEN;
 const SLATE_BG = PAGE_BG;
@@ -319,7 +319,7 @@ export default function ManageProfile() {
               )}
               <h1
                 style={{
-                  fontFamily: GEIST, fontSize: 18, fontWeight: 600, color: INK,
+                  fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, color: INK,
                   letterSpacing: '-0.01em', margin: 0,
                 }}
               >
@@ -331,7 +331,7 @@ export default function ManageProfile() {
                 onClick={skipOnboarding}
                 disabled={isSkipping}
                 style={{
-                  fontFamily: GEIST, fontSize: 13, fontWeight: 700, color: INK_55,
+                  fontFamily: SF_STACK, fontSize: 13, fontWeight: 700, color: INK_55,
                   background: 'transparent', border: 'none',
                   cursor: isSkipping ? 'default' : 'pointer',
                   padding: '8px 4px', opacity: isSkipping ? 0.5 : 1,
@@ -358,7 +358,7 @@ export default function ManageProfile() {
                         position: 'relative',
                         padding: '12px 2px 12px',
                         background: 'none', border: 'none', cursor: 'pointer',
-                        fontFamily: GEIST,
+                        fontFamily: SF_STACK,
                         fontSize: 15,
                         fontWeight: active ? 600 : 500,
                         color: active ? INK : INK_55,
@@ -720,7 +720,7 @@ function ProfileTabBody({
         <button
           onClick={() => setShowSocial((v: boolean) => !v)}
           className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-semibold bg-transparent border-0 cursor-pointer"
-          style={{ color: INK_55, fontFamily: GEIST }}
+          style={{ color: INK_55, fontFamily: SF_STACK }}
         >
           {showSocial ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           {showSocial ? 'Hide social links' : 'Add social links'}
@@ -760,7 +760,7 @@ function ProfileTabBody({
               fontWeight: 700,
               background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
               color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
             }}
           >
             {isSaving ? (
@@ -817,7 +817,7 @@ function HandicapRow({
 }: HandicapRowProps) {
   if (state === 'whs') {
     return (
-      <div style={{ fontFamily: GEIST }}>
+      <div style={{ fontFamily: SF_STACK }}>
         <FieldLabel>Official handicap</FieldLabel>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
           <span style={bizFigure(34, INK)}>
@@ -840,7 +840,7 @@ function HandicapRow({
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
               background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)',
-              fontSize: 14, fontWeight: 600, color: INK, fontFamily: GEIST, cursor: 'pointer',
+              fontSize: 14, fontWeight: 600, color: INK, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
             View full stats
@@ -852,7 +852,7 @@ function HandicapRow({
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
               background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
-              fontSize: 13, fontWeight: 500, color: INK_55, fontFamily: GEIST, cursor: 'pointer',
+              fontSize: 13, fontWeight: 500, color: INK_55, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
             Manage connection
@@ -865,7 +865,7 @@ function HandicapRow({
 
   if (state === 'manual') {
     return (
-      <div style={{ fontFamily: GEIST }}>
+      <div style={{ fontFamily: SF_STACK }}>
         <HandicapInput value={form.handicapIndex} onChange={onChange} />
         <p style={{ fontSize: 12, color: INK_55, margin: '12px 4px 10px', lineHeight: 1.5 }}>
           {HELPER_COPY}
@@ -876,7 +876,7 @@ function HandicapRow({
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
             minHeight: 46, padding: '12px 16px', borderRadius: 999,
             background: INK, color: '#fff', border: 'none',
-            fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
+            fontSize: 14, fontWeight: 700, fontFamily: SF_STACK, cursor: 'pointer',
           }}
         >
           Connect official handicap
@@ -886,7 +886,7 @@ function HandicapRow({
   }
 
   return (
-    <div style={{ fontFamily: GEIST }}>
+    <div style={{ fontFamily: SF_STACK }}>
       <FieldLabel>Handicap</FieldLabel>
       {/* The helper reads BEFORE the button - it explains why you would tap it. */}
       <p style={{ fontSize: 12, color: INK_55, margin: '0 4px 12px', lineHeight: 1.5 }}>
@@ -898,7 +898,7 @@ function HandicapRow({
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           minHeight: 46, padding: '12px 16px', borderRadius: 999,
           background: INK, color: '#fff', border: 'none',
-          fontSize: 14, fontWeight: 700, fontFamily: GEIST, cursor: 'pointer',
+          fontSize: 14, fontWeight: 700, fontFamily: SF_STACK, cursor: 'pointer',
         }}
       >
         Connect official handicap

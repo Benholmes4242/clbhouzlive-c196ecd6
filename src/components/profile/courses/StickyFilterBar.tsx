@@ -59,7 +59,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
           display: 'flex',
           gap: 8,
           justifyContent: 'center',
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         {TABS.map(({ key, label, count }) => {

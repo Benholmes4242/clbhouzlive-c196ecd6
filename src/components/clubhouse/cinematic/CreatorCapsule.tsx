@@ -416,7 +416,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           overflow: 'hidden',
           padding: '16px 16px 14px',
           color: FROST.ink,
-          fontFamily: 'Geist, system-ui, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           cursor: 'pointer',
         }}
       >

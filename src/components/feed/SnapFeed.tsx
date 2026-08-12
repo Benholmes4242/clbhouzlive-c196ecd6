@@ -870,7 +870,7 @@ export function SnapFeed({
               flexDirection: 'column',
               alignItems: 'center',
               textAlign: 'center',
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             }}
           >
             <img

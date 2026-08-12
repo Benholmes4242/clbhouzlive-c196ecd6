@@ -23,7 +23,7 @@ type CueVariant =
   | 'tour-venue'
   | 'tour-holes';
 
-const FONT = 'Geist, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // Variant catalogue. Copy is keyed and resolved via t() at the render site so
 // the strings live in JSON (see courses.json > courseDetail.handicapCue.variants).

@@ -30,7 +30,7 @@ export const DrilldownHeader: React.FC<Props> = ({
     className="relative overflow-hidden"
     style={{
       height: '306px',
-      fontFamily: GAM.FONT_GEIST,
+      fontFamily: GAM.FONT_SF,
     }}
   >
     {/* Gradient fallback behind image — matches GolfClubView */}

@@ -51,7 +51,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                 fontSize: 11,
                 fontWeight: 700,
                 color: 'var(--hcp-t-100)',
-                fontFamily: GAM.FONT_GEIST,
+                fontFamily: GAM.FONT_SF,
                 letterSpacing: '0.01em',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -75,7 +75,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                   color: held ? 'var(--hcp-bg-1)' : 'var(--hcp-t-60)',
                   fontSize: 11,
                   fontWeight: 700,
-                  fontFamily: GAM.FONT_GEIST,
+                  fontFamily: GAM.FONT_SF,
                   fontVariantNumeric: 'tabular-nums lining',
                   letterSpacing: '-0.02em',
                 }}

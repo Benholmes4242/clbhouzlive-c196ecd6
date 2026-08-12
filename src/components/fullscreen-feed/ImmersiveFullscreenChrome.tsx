@@ -354,7 +354,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: 12,
-          fontFamily: 'Geist, system-ui, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         {/* LEFT — back chevron */}
@@ -487,7 +487,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           right: 64, // reserve space for right rail
           zIndex: Z.echo,
           pointerEvents: 'none',
-          fontFamily: 'Geist, system-ui, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           display: 'flex',
           alignItems: 'flex-start',
           gap: 10,
@@ -598,7 +598,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           zIndex: Z.echo,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           gap: 20, pointerEvents: 'none',
-          fontFamily: 'Geist, system-ui, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         {activeMediaIsVideo && (
@@ -667,7 +667,7 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
       background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
       pointerEvents: 'auto', filter: ICON_SHADOW,
-      fontFamily: 'Geist, system-ui, sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     }}
   >
     <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -50,7 +50,7 @@ export const WindowToggle: React.FC<Props> = ({
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontSize: 9,
               fontWeight: active ? 800 : 700,
               letterSpacing: '0.13em',

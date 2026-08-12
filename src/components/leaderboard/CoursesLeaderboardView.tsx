@@ -400,7 +400,7 @@ export function CoursesLeaderboardView() {
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#F8FAFC', fontFamily: 'Geist, system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#F8FAFC', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
 
       {/* ── MASTHEAD ─────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 14px', borderBottom: '3px double #0F172A', textAlign: 'center', background: '#F8FAFC' }}>

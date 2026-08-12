@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { openGamAchievements } from '../gam/events';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const THEME = {
   dark: {

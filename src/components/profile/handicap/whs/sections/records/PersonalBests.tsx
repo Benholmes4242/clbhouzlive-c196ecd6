@@ -15,7 +15,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const D_BG = 'var(--hcp-bg-1)';
 const D_LINE = 'var(--hcp-line)';
 const D_T100 = 'var(--hcp-t-100)';

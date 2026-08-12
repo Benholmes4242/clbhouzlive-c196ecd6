@@ -5,7 +5,7 @@ import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
 import { Sparkline, indexTone, toneColor } from '../../charts';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   friend: PulseFriend;

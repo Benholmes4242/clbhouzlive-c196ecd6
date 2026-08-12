@@ -19,7 +19,7 @@ const INK_55    = 'var(--hcp-t-60)';
 const INK_40    = 'var(--hcp-t-40)';
 const INK_10    = 'var(--hcp-line-2)';
 const INK_06    = 'var(--hcp-bg-3)';
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const BUCKET_ORDER: HandicapBucket[] = [
   'sub_zero', '0_4', '5_9', '10_14', '15_19', '20_24', 'over_25',
@@ -188,7 +188,7 @@ const DistributionChart: React.FC<{
                       marginBottom: 4,
                       fontVariantNumeric: 'tabular-nums',
                       letterSpacing: '-0.01em',
-                      fontFamily: FONT_GEIST,
+                      fontFamily: FONT_SF,
                     }}
                   >
                     {b.pct}%
@@ -232,7 +232,7 @@ const DistributionChart: React.FC<{
             style={{
               flex: 1,
               textAlign: 'center',
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
               fontSize: 10.5,
               fontWeight: b.is_user_bucket ? 700 : 500,
               color: b.is_user_bucket ? INK : INK_55,
@@ -269,7 +269,7 @@ const AvailableCard: React.FC<{
             shrinking it would flatten the surface. See alignment sweep notes. */}
         <h3
           style={{
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
             margin: 0,
             fontSize: 44,
             fontWeight: 800,
@@ -300,7 +300,7 @@ const AvailableCard: React.FC<{
             fontWeight: 800,
             letterSpacing: '0.14em',
             textTransform: 'uppercase' as const,
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
           }}
         >
           {copy.pillLabel}
@@ -309,7 +309,7 @@ const AvailableCard: React.FC<{
 
       <p
         style={{
-          fontFamily: FONT_GEIST,
+          fontFamily: FONT_SF,
           fontSize: 13,
           color: 'var(--hcp-t-60)',
           padding: '6px 16px 0',
@@ -354,7 +354,7 @@ const AvailableCard: React.FC<{
             marginTop: 12,
             paddingTop: 12,
             borderTop: `0.5px solid ${INK_06}`,
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
           }}
         >
           {/* You callout (left) */}
@@ -442,7 +442,7 @@ const UnavailableCard: React.FC<{ reason: 'cohort_unavailable' }> = () => (
       borderRadius: 14,
       background: 'var(--hcp-bg-2)',
       border: '1px solid var(--hcp-line-2)',
-      fontFamily: FONT_GEIST,
+      fontFamily: FONT_SF,
       textAlign: 'center',
     }}
   >
@@ -541,7 +541,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
           {showFallback && (
             <p
               style={{
-                fontFamily: FONT_GEIST,
+                fontFamily: FONT_SF,
                 fontSize: 12,
                 color: INK_55,
                 padding: '4px 16px 0',

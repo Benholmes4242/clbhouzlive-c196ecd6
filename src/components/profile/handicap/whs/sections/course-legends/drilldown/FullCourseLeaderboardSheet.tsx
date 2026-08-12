@@ -236,7 +236,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           flex: 1,
           minHeight: 0,
           position: 'relative',
-          fontFamily: GAM.FONT_GEIST,
+          fontFamily: GAM.FONT_SF,
           color: INK,
           background: SURFACE,
         }}
@@ -344,7 +344,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   color: isActive ? SURFACE : INK,
                   fontSize: 11,
                   fontWeight: isActive ? 800 : 700,
-                  fontFamily: GAM.FONT_GEIST,
+                  fontFamily: GAM.FONT_SF,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.01em',
@@ -459,7 +459,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               background: SURFACE,
               borderBottom: `0.5px solid ${HAIRLINE}`,
               flexShrink: 0,
-              fontFamily: GAM.FONT_GEIST,
+              fontFamily: GAM.FONT_SF,
             }}
           >
             <span />
@@ -603,7 +603,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               background: '#0F172A',
               color: '#FFFFFF',
               border: 'none',
-              fontFamily: GAM.FONT_GEIST,
+              fontFamily: GAM.FONT_SF,
               fontSize: 11.5,
               fontWeight: 700,
               letterSpacing: '0.06em',

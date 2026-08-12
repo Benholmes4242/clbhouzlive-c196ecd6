@@ -1,7 +1,7 @@
 import { FilterChips } from '@/components/ui/FilterChips';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 const CHIPS = [
   { id: 'all', label: 'All' },

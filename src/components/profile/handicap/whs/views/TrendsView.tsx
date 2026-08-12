@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  * and RoundsArchiveSheet carries the list at 75dvh.
  */
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   connectionId: string;

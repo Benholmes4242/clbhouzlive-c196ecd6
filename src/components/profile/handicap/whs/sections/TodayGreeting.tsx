@@ -15,7 +15,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { formatWeekdayDayMonthShortGB } from '@/i18n/format';
 import { useTodayWeather } from '@/lib/whs/useTodayWeather';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   connectionId: string;

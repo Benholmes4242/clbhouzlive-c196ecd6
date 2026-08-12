@@ -31,7 +31,7 @@ interface HookCell {
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_06 = 'rgba(15,23,42,0.06)';
 const INK_20 = 'rgba(15,23,42,0.20)';

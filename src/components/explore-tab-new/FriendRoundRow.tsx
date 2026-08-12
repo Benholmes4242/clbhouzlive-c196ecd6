@@ -22,7 +22,7 @@ import {
  */
 
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const SLATE_400 = '#94A3B8';
 const SLATE_500 = '#64748B';

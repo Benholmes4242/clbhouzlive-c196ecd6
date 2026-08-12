@@ -27,7 +27,7 @@ import {
   INK_TINT_04,
 } from '@/features/courses/_shared/tokens';
 
-/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+/** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
 type Segment = 'all' | 'played' | 'not_played' | 'rated';

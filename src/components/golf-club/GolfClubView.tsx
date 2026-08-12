@@ -399,7 +399,7 @@ interface CourseTitleOverlayProps {
   onOpenStats: () => void;
 }
 
-// Geist tabular numerals, NOT a monospace face: Menlo / SF Mono / Consolas draw
+// SF Pro tabular numerals, NOT a monospace face: Menlo / SF Mono / Consolas draw
 // a slashed zero that `font-feature-settings: "zero" 0` cannot switch off.
 const MONO_FIGURE: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining',

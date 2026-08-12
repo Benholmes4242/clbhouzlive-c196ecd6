@@ -166,7 +166,7 @@ export function ChampionStrip({
             fontStyle: 'italic',
             lineHeight: 1.4,
             letterSpacing: '-0.005em',
-            fontFamily: "'Geist', sans-serif",
+            fontFamily: "'SF Pro', sans-serif",
           }}
         >
           {narrative}

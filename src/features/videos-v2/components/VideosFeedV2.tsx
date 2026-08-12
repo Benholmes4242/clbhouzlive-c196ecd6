@@ -26,7 +26,7 @@ import { VideoFeedCard } from './VideoFeedCard';
 import { ClipsInterruptShelf } from './ClipsInterruptShelf';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface Props {
   sort: VideosSortId;

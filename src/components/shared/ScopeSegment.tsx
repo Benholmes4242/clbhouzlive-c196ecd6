@@ -12,7 +12,7 @@ import React from 'react';
  * Labels stay caller-owned so i18n and casing decisions live with each site.
  */
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export interface ScopeSegmentOption<T extends string> {
   value: T;

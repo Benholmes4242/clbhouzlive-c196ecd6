@@ -1,7 +1,7 @@
 import React from 'react';
 
 const COUNTER_GREEN = '#059669';
-const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+const FONT_MONO = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface GlassGrossRingProps {
   value: number | string;
@@ -12,7 +12,7 @@ interface GlassGrossRingProps {
 
 /**
  * Counter ring for ON-PHOTO glass tiles (Cinema cards, sheet hero, Friends Yesterday hero).
- * Pill-shaped ring around a white Geist Mono numeral, sized for the glass triad.
+ * Pill-shaped ring around a white SF Pro numeral, sized for the glass triad.
  * When isCounter is false, renders plain numeral with no ring (no padding, no glow).
  */
 export const GlassGrossRing: React.FC<GlassGrossRingProps> = ({
@@ -72,7 +72,7 @@ interface MiniGrossRingProps {
 
 /**
  * Counter ring for Friends-tab 124px mini-glass tiles. Circular ring around
- * a white Geist Mono numeral, sized tighter than the large/medium variants.
+ * a white SF Pro numeral, sized tighter than the large/medium variants.
  */
 export const MiniGrossRing: React.FC<MiniGrossRingProps> = ({ value, isCounter }) => {
   const isDash = value === '\u2014';

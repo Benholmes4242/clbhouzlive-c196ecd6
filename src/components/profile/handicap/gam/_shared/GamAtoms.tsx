@@ -3,7 +3,7 @@ import type { BadgeRarity } from '@/lib/gam/types';
 import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
 import { Skeleton as BaseSkeleton } from '@/components/ui/skeleton';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /**
  * RarityPill — small uppercase tag for badge rarity, friend Compare indicators,

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFriendRequestsV2, type FriendRequestRowV2 } from '../hooks/useFriendRequestsV2';
 
-const GEIST =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK =
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_60 = '#475569';
 const AMBER_DEEP = '#C97A10';
@@ -105,7 +105,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             border: 'none',
             cursor: pending ? 'default' : 'pointer',
             opacity: pending ? 0.6 : 1,
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
           }}
         >
           {pending ? '…' : 'Accept'}
@@ -124,7 +124,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             border: `1px solid ${HAIR}`,
             cursor: pending ? 'default' : 'pointer',
             opacity: pending ? 0.6 : 1,
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
           }}
         >
           Decline
@@ -156,7 +156,7 @@ export const FriendRequestsRail: React.FC = () => {
           transition={{ duration: 0.22, ease: 'easeOut' }}
           style={{ overflow: 'hidden' }}
         >
-          <section style={{ padding: '18px 0 6px', fontFamily: GEIST }}>
+          <section style={{ padding: '18px 0 6px', fontFamily: SF_STACK }}>
             <div
               style={{
                 padding: '0 16px 10px',

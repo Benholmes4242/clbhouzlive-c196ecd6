@@ -10,7 +10,7 @@ import React from 'react';
  */
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 export interface FilterChipsOption<T extends string> {
   id: T;

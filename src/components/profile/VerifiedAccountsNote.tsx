@@ -18,7 +18,7 @@ const INK = '#0F172A';
 const INK_60 = '#64748B';
 const HAIRLINE = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const FONT = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 const DISMISS_KEY = 'verified_accounts_note_dismissed_v1';
 const CONTACT_HREF =

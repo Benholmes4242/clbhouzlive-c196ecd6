@@ -6,7 +6,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const RED = '#DC2626';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   open: boolean;

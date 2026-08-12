@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 const AMBER = '#F7931E';
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
-const FONT = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT = '"SF Pro", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FALLBACK_URL = 'https://clbhouz.co.uk';
 
 async function fetchDownloadUrl(): Promise<string> {

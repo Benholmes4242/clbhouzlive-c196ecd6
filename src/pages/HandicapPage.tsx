@@ -57,7 +57,7 @@ const AMBER_INK = '#C97211';
 const AMBER_SOFT = 'rgba(247,147,30,0.06)';
 const AMBER_BORDER = 'rgba(247,147,30,0.28)';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 function getGreeting(now: Date = new Date()): string {
   const hour = now.getHours();
@@ -140,7 +140,7 @@ const FriendTitleRow: React.FC<{
             background: `linear-gradient(135deg, ${AMBER}, ${AMBER_INK})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: 16,
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
             flexShrink: 0,
           }}
         >
@@ -152,7 +152,7 @@ const FriendTitleRow: React.FC<{
           style={{
             fontSize: 10.5, fontWeight: 700, color: AMBER,
             letterSpacing: '0.14em', marginBottom: 2,
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
             textTransform: 'uppercase',
           }}
         >
@@ -168,7 +168,7 @@ const FriendTitleRow: React.FC<{
         >
           <span
             style={{
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
               fontSize: 22,
               fontWeight: 700,
               color: 'var(--hcp-t-100)',
@@ -247,7 +247,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
       {(readOnly || hasConnection) && (
         <div
           style={{
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
             background: 'var(--hcp-bg-0)',
           }}
         >
@@ -320,13 +320,13 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
   if (isError) {
     return (
       <div className="px-6 py-16 text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST, margin: 0 }}>
+        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_SF, margin: 0 }}>
           Couldn't load this player's handicap.
         </p>
         <button
           type="button"
           onClick={() => refetch()}
-          style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+          style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_SF }}
         >
           Retry
         </button>
@@ -337,7 +337,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
   if (!connection) {
     return (
       <div className="px-6 py-16 text-center">
-        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_GEIST }}>
+        <p style={{ fontSize: 14, color: INK_55, fontFamily: FONT_SF }}>
           This player hasn't connected their handicap yet.
         </p>
       </div>
@@ -538,7 +538,7 @@ const HandicapPage: React.FC = () => {
   if (!isFriendView && connError) {
     return (
       <PageRoot dark={true}>
-        <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center', fontFamily: FONT_GEIST }}>
+        <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center', fontFamily: FONT_SF }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>
             Couldn't load your handicap
           </div>
@@ -548,7 +548,7 @@ const HandicapPage: React.FC = () => {
           <button
             type="button"
             onClick={() => refetchConn()}
-            style={{ background: AMBER, color: '#0F172A', border: 'none', borderRadius: 999, padding: '10px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_GEIST }}
+            style={{ background: AMBER, color: '#0F172A', border: 'none', borderRadius: 999, padding: '10px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT_SF }}
           >
             Retry
           </button>

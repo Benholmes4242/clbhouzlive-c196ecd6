@@ -32,7 +32,7 @@ import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFe
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface CourseMediaCanonGridProps {
   posts: FeedPost[];

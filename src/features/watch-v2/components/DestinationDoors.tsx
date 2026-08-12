@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface DoorProps {
   title: string;

@@ -23,8 +23,8 @@ interface Props {
 }
 
 // ── Tokens ────────────────────────────────────────────────────────────────
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT_GEIST, fontVariantNumeric: 'tabular-nums' };
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const NUM: React.CSSProperties = { fontFamily: FONT_SF, fontVariantNumeric: 'tabular-nums' };
 
 const GOOD = '#55BD8B';
 const AMBER = '#F7931E';
@@ -151,7 +151,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               flexDirection: 'column',
               alignItems: 'center',
               gap: 12,
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
             }}
           >
             <div style={{ fontSize: 12, color: DIM }}>
@@ -168,7 +168,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 color: INK,
                 fontSize: 12,
                 fontWeight: 700,
-                fontFamily: FONT_GEIST,
+                fontFamily: FONT_SF,
                 cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
               }}
@@ -199,7 +199,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               padding: '20px 14px',
               textAlign: 'center',
               color: DIM,
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
               fontSize: 12,
             }}
           >
@@ -309,7 +309,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               border: `1px solid ${LINE}`,
               borderRadius: 18,
               padding: '16px 14px 12px',
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
             }}
           >
             {/* 1. Header row */}
@@ -374,7 +374,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 WebkitTapHighlightColor: 'transparent',
                 minHeight: 40,
                 cursor: 'pointer',
-                fontFamily: FONT_GEIST,
+                fontFamily: FONT_SF,
               }}
             >
               <span

@@ -6,7 +6,7 @@ import { buildInsightMap } from './friendRoundParts';
 import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const SLATE_50 = '#F8FAFC';
 const INK = '#0F172A';
 const EYEBROW_INK = '#0E1216';

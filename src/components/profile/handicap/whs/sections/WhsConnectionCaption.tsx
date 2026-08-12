@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const SEASON_GREEN = '#006747';
 
@@ -17,7 +17,7 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

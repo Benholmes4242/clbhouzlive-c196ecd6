@@ -17,7 +17,7 @@ interface BreakdownsPickerSheetProps {
   mode?: 'breakdowns' | 'review';
 }
 
-const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const FONT_SERIF = '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '';

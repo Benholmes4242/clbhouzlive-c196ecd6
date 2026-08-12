@@ -31,7 +31,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
 
-const F = 'Geist, system-ui, sans-serif';
+const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const SECONDARY = '#4B5563';
 const MUTED = '#94A3B8';

@@ -15,7 +15,7 @@ export const CoverGuidance: React.FC = () => {
         flex: 1,
         minWidth: 0,
         paddingBottom: 2,
-        fontFamily: 'Geist, -apple-system, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         fontSize: 11.5,
         fontWeight: 500,
         lineHeight: 1.35,

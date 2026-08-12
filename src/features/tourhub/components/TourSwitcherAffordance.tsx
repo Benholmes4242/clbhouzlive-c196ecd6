@@ -68,7 +68,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
           )}
           <span
             style={{
-              fontFamily: 'Geist',
+              fontFamily: 'SF Pro',
               fontVariantNumeric: 'tabular-nums',
               fontSize: 13,
               fontWeight: 800,

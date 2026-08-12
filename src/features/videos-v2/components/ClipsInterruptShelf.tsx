@@ -20,7 +20,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { InterruptClipRow } from '../hooks/useInterruptClips';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface Props {
   clips: InterruptClipRow[];

@@ -44,7 +44,7 @@ const T = {
   gold: '#FBBC2E',
   amberInk: '#854F0B',
 };
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const INITIAL_COUNT = 30;
 const LOAD_MORE_COUNT = 15;

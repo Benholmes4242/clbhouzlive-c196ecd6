@@ -12,7 +12,7 @@ import { toast } from '@/lib/toast';
 
 // Daylight tokens - kept in-file so this component never depends on a
 // section-scoped stylesheet.
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const INK_10 = 'rgba(15,23,42,0.08)';
@@ -152,7 +152,7 @@ export const GenderPromptSheet: React.FC = () => {
         style={{
           background: '#FFFFFF',
           color: INK,
-          fontFamily: GEIST,
+          fontFamily: SF_STACK,
           paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
         }}
       >
@@ -215,7 +215,7 @@ export const GenderPromptSheet: React.FC = () => {
               borderRadius: 12,
               border: 'none',
               cursor: canSave ? 'pointer' : 'default',
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
               fontSize: 15,
               fontWeight: 700,
               color: '#FFFFFF',
@@ -235,7 +235,7 @@ export const GenderPromptSheet: React.FC = () => {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
               fontSize: 14,
               fontWeight: 600,
               color: INK_55,

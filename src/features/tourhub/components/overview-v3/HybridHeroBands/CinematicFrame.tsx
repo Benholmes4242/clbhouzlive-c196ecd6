@@ -960,7 +960,7 @@ export function CinematicFrame({
             style={{
               margin: 0,
               color: 'white',
-              fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+              fontFamily: "'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif",
               fontSize: isResults ? 28 : 'clamp(28px, 8vw, 34px)',
               fontWeight: 800,
               letterSpacing: '-0.025em',

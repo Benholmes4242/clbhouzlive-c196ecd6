@@ -97,9 +97,9 @@
   /* ========================================
      TOUR HUB TYPOGRAPHY SCALE
      ======================================== */
-  --th-font-display: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --th-font-text: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --th-font-mono: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --th-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --th-font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --th-font-mono: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* ============================================================================

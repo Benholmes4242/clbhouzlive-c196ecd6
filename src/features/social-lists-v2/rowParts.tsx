@@ -14,7 +14,7 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 
 /* ── tokens (shared with SocialListPage) ────────────────────────────── */
 export const ROW_FONT =
-  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 export const ROW_INK = '#0F172A';
 export const ROW_INK_MUTE = '#64748B';
 export const ROW_SURFACE = '#FFFFFF';

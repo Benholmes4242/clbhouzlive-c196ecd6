@@ -17,7 +17,7 @@ interface FullLeaderboardSheetProps {
   ownerFirstName?: string | null;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 // Hardcoded dark tokens — BottomSheet portals outside .hcp-dark scope.
 const DIM = 'rgba(242,244,247,0.55)';
 const LABEL_STYLE: React.CSSProperties = {

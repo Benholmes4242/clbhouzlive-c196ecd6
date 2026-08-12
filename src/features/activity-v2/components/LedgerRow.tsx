@@ -22,8 +22,8 @@ import { getActivityLink } from '../utils/activityLinks';
 import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds';
 
 
-const GEIST =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK =
+  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   row: ActivityFeedRowV2;
@@ -171,7 +171,7 @@ const FollowBackPill: React.FC<{ targetUserId: string; name: string }> = ({
         fontWeight: 700,
         border: 'none',
         cursor: 'pointer',
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         opacity: toggle.isPending ? 0.6 : 1,
       }}
       aria-label={`Follow back ${name}`}
@@ -193,7 +193,7 @@ const ResolvePill: React.FC = () => (
       display: 'inline-flex',
       alignItems: 'center',
       gap: 3,
-      fontFamily: GEIST,
+      fontFamily: SF_STACK,
     }}
   >
     Resolve <ChevronRight size={12} strokeWidth={2.5} />
@@ -252,7 +252,7 @@ const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ cand
         color: T.AMBER_DEEP,
         fontSize: 11.5,
         fontWeight: 700,
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         cursor: 'pointer',
       }}
     >
@@ -345,7 +345,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
           fontSize: 15,
           fontWeight: 800,
           color: reviewLabelColor(row.target_review_rating, 'light'),
-          fontFamily: GEIST,
+          fontFamily: SF_STACK,
         }}
       >
         {row.target_review_rating.toFixed(1)}
@@ -395,7 +395,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         background: isUnread ? 'rgba(247,147,30,0.045)' : 'transparent',
         opacity: 1,
         cursor: 'pointer',
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         borderBottom: `0.5px solid ${T.HAIR}`,
         userSelect: 'none',
       }}

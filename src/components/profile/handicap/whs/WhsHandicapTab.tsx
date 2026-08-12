@@ -70,7 +70,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
           gap: 14,
           padding: 24,
           textAlign: 'center',
-          fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         <div style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC' }}>

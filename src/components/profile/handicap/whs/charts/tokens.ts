@@ -29,7 +29,7 @@ export const CHART = {
 } as const;
 
 export const CHART_FONT =
-  'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export type ChartTone = 'up' | 'down' | 'amber' | 'neutral';
 

@@ -7,7 +7,7 @@ import {
   SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   holes: WhsScoreHole[];
@@ -48,7 +48,7 @@ export const CinemaCardShapeStrip: React.FC<Props> = ({ holes }) => {
     color: 'rgba(255,255,255,0.55)',
     letterSpacing: '0.16em',
     textTransform: 'uppercase',
-    fontFamily: FONT_GEIST,
+    fontFamily: FONT_SF,
   };
 
   return (

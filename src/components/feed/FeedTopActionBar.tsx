@@ -66,7 +66,7 @@ const chipBase: React.CSSProperties = {
   color: '#fff',
   cursor: 'pointer',
   pointerEvents: 'auto',
-  fontFamily: 'Geist, system-ui, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   fontSize: 14,
   fontWeight: 700,
   lineHeight: 1,

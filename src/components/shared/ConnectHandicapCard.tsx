@@ -6,7 +6,7 @@ const AMBER_DEEP = '#E07F0E';
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const FONT = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface ConnectHandicapCardProps {
   headline: string;

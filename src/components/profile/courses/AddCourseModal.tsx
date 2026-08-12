@@ -6,7 +6,7 @@
  *  - Add Course: search played courses, add rated, prompt to rate unrated
  *
  * Current sheet language: 75dvh canvas sheet, no amber anywhere, CAPS eyebrows,
- * Geist throughout, tabular-num scores, band-coloured ratings, uniform dim ranks.
+ * SF Pro throughout, tabular-num scores, band-coloured ratings, uniform dim ranks.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';

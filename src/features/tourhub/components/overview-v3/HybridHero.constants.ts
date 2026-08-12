@@ -98,15 +98,15 @@ export const CINEMATIC_FRAME_HEIGHT_UPCOMING = 480;
 export const MARQUEE_DURATION_SECONDS = 40;
 
 // Type fonts
-export const FONT_SANS = "'Geist', -apple-system, BlinkMacSystemFont, sans-serif";
+export const FONT_SANS = "'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif";
 
 /**
- * Numeric column styling — Geist with tabular-nums for column alignment.
+ * Numeric column styling — SF Pro with tabular-nums for column alignment.
  * Use `...NUMERIC_STYLE` for any numeric span (scores, par, pos, etc.).
  * `"zero" 0` explicitly disables the slashed-zero glyph (Ben prefers unslashed).
  */
 export const NUMERIC_STYLE = {
-  fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+  fontFamily: "'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif",
   fontVariantNumeric: 'tabular-nums lining-nums' as const,
   fontFeatureSettings: '"zero" 0',
 };

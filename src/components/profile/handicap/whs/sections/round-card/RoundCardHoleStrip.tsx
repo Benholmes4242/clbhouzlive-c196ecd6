@@ -17,7 +17,7 @@ const INK_55 = 'var(--hcp-t-60)';
 const INK_85 = 'rgba(15,23,42,0.85)';
 const AMBER_INK = '#C97211';
 const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const STRIP_STROKE = 1.4;
 
 export interface HoleRow {
@@ -133,7 +133,7 @@ const HoleCell: React.FC<{
                 color: numeralColor,
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
-                fontFamily: FONT_GEIST,
+                fontFamily: FONT_SF,
               }}
             >
               {score}
@@ -196,7 +196,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         display: 'flex',
         alignItems: 'center',
         gap: 8,
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
       }}
     >
       <div

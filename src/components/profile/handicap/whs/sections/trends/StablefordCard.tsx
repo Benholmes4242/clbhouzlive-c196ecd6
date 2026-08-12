@@ -41,7 +41,7 @@ const T = {
   redSoft: 'rgba(159,29,29,0.12)',
   ringTrack: 'var(--hcp-bg-3)',
 };
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const HOLE_C = {
   birdie: SC_BIRDIE,

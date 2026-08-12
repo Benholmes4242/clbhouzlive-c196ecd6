@@ -178,7 +178,7 @@ const LeftCapsule: React.FC<{
         {title != null && (
           <span
             style={{
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontWeight: 700,
               fontSize: 14,
               color: inkFor(tone),
@@ -247,7 +247,7 @@ const LeftCapsule: React.FC<{
 // ---------------------------------------------------------------------------
 const HCP_RESERVE_LABEL = 'Connect HCP';
 const HCP_LABEL_TYPE: React.CSSProperties = {
-  fontFamily: 'Geist, system-ui, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   fontSize: 11.5,
   fontWeight: 700,
   letterSpacing: '0.01em',
@@ -325,7 +325,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
           display: 'inline-flex',
           alignItems: 'center',
           gap: 4,
-          fontFamily: 'Geist, system-ui, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
         <span
@@ -427,7 +427,7 @@ const AvatarCell: React.FC<{
             borderRadius: 999,
             background: '#F7931E',
             color: '#FFFFFF',
-            fontFamily: 'Geist, system-ui, sans-serif',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontWeight: 700,
             fontSize: 8,
             lineHeight: '12px',

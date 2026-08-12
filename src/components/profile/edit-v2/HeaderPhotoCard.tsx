@@ -132,7 +132,7 @@ return (
             gap: 6,
             background: 'rgba(0,0,0,0.45)',
             color: '#fff',
-            fontFamily: 'Geist, -apple-system, sans-serif',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 12.5,
             fontWeight: 500,
             padding: '7px 11px',

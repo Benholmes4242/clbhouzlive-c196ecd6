@@ -90,7 +90,7 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 5,
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             }}
             className="active:scale-[0.96]"
           >

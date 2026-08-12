@@ -8,7 +8,7 @@ import {
   COURSE_SCRIMS,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
-const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /** Dark LABEL: 7.5/700/0.16em at T40. */
 const LABEL_STYLE: React.CSSProperties = {
