@@ -30,6 +30,7 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
+import { TITLE, FIGURE, FIGS } from '@/lib/tokens/type';
 
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
 import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';
@@ -150,11 +151,8 @@ export function FullListSheet({
           <div
             id="tour-leaders-full-sheet-title"
             style={{
-              fontSize: 18,
-              fontWeight: 700,
+              ...TITLE,
               color: INK,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.1,
             }}
           >
             {t(category.labelKey)}

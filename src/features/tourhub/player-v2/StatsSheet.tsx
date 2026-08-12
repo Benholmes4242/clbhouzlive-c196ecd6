@@ -26,6 +26,7 @@ import {
   useLeaderCategories,
 } from '../leaders-v2/data/useLeaderCategories';
 import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
+import { TITLE, FIGURE } from '@/lib/tokens/type';
 
 interface StatsSheetProps {
   open: boolean;
@@ -325,10 +326,8 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             id="stats-sheet-title"
             style={{
               margin: '0 0 3px',
-              fontSize: 19,
-              fontWeight: 700,
+              ...TITLE,
               color: INK,
-              letterSpacing: '-0.01em',
             }}
           >
             {playerName}
