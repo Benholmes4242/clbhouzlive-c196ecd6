@@ -177,6 +177,17 @@ function InboxListPage() {
   const openCount = openItems.length;
   const oldest = feed.oldestCreatedAt;
 
+  // Oldest OPEN item per queue. The feed sorts high-priority to the top, so the
+  // first row of a type is not necessarily its oldest - take the minimum.
+  const oldestByType = useMemo(() => {
+    const out: Partial<Record<InboxType, string>> = {};
+    for (const item of openItems) {
+      const held = out[item.type];
+      if (!held || new Date(item.createdAt) < new Date(held)) out[item.type] = item.createdAt;
+    }
+    return out;
+  }, [openItems]);
+
   const openRow = (item: InboxItem) => {
     switch (item.type) {
       case 'report': setModRow(item.payload as ModerationQueueRow); break;
