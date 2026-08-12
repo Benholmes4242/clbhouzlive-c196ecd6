@@ -192,7 +192,7 @@ const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
         background: palette.bg,
         color: palette.color,
         fontSize: 10,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.06em',
         textTransform: 'uppercase',
         lineHeight: 1.4,
