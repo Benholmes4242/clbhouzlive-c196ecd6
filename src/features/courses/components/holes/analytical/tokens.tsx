@@ -124,7 +124,7 @@ export function toParParts(v: number | null | undefined, digits = 1): ToParParts
 
 export const Panel: React.FC<{
   kicker?: string;
-  /** Panel-level heading (13/800 INK). Used where a panel titles itself. */
+  /** Panel-level heading (13/700 INK). Used where a panel titles itself. */
   title?: string;
   aside?: string;
   footer?: string;
