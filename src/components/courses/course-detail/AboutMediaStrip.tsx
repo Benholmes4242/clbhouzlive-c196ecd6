@@ -1,5 +1,5 @@
-import React
-import { FIGS, FIGURE } from '@/lib/tokens/type';, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
+import { FIGS, FIGURE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Play, Plus } from 'lucide-react';
