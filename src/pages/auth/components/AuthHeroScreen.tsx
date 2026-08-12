@@ -7,6 +7,7 @@ import { toast } from '@/lib/toast';
 import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isMedianApp } from '@/utils/median/isMedianApp';
+import { BODY, DISPLAY_TRACKING } from '@/lib/tokens/type';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
@@ -225,7 +226,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
                 <div className="flex items-center gap-3" aria-hidden="true">
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
-                  <span style={{ ...LABEL, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
                 </div>
 
