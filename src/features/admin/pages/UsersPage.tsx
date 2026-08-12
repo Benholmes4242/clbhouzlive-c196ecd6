@@ -32,10 +32,88 @@ import MemberActivityCard from '../components/MemberActivityCard';
 
 type TabId = 'members' | 'team' | 'invites';
 
+/** Still used by the WHS sync line, Team grants and Invites copy. */
 function relTime(iso: string | null | undefined): string {
   if (!iso) return '-';
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); }
   catch { return '-'; }
+}
+
+const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
+const FIG_T = { fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' } as const;
+
+/**
+ * The roster's one age format. Absolute and tabular: "now" / "44m" / "31h" /
+ * "32d". Shares formatDurationShort with the Dashboard and the Inbox; only the
+ * sub-2-minute band differs (that formatter emits seconds, which read as noise
+ * on a roster).
+ */
+function ageShort(iso: string | null | undefined): string {
+  if (!iso) return '-';
+  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (!Number.isFinite(secs)) return '-';
+  if (secs < 120) return 'now';
+  return formatDurationShort(Math.max(0, secs));
+}
+
+function ageTone(iso: string | null | undefined): string {
+  if (!iso) return t.inkFaint;
+  const h = (Date.now() - new Date(iso).getTime()) / 3_600_000;
+  if (h < 24) return t.ok;
+  if (h < 24 * 14) return t.inkMuted;
+  return t.inkFaint;
+}
+
+/** 'user' is the default role and distinguishes nothing; suppress it by name. */
+const DEFAULT_ROLES = new Set(['user']);
+function badgeRole(role: string | null): string | null {
+  if (!role) return null;
+  return DEFAULT_ROLES.has(role) ? null : role;
+}
+
+/** Top-level view switch. Not a filter — active state is ink, like every other
+ * active control in the console. SectionTabs stays untouched for its other
+ * four consumers. */
+function TopTabs({ tabs, activeId, onChange }: {
+  tabs: Array<{ id: TabId; label: string; count?: number }>;
+  activeId: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 8, padding: '4px 2px', flexWrap: 'wrap' }}>
+      {tabs.map(tab => {
+        const active = tab.id === activeId;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onChange(tab.id)}
+            style={{
+              padding: '8px 14px', borderRadius: 999,
+              border: `1px solid ${active ? t.ink : t.line}`,
+              background: active ? t.ink : t.surface,
+              color: active ? t.canvas : t.inkMuted,
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {tab.label}
+            {typeof tab.count === 'number' && (
+              <span style={{
+                ...FIG_T, background: active ? t.canvas : t.line,
+                color: active ? t.ink : t.inkMuted,
+                fontSize: 11, padding: '0 6px', borderRadius: 999,
+                minWidth: 18, textAlign: 'center',
+              }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 /**
