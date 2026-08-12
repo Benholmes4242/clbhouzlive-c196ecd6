@@ -98,7 +98,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
               <p
                 style={{
                   fontSize: 13.5,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: A.INK,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -113,7 +113,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
             </div>
             <span
               aria-hidden="true"
-              style={{ fontSize: 15, fontWeight: 800, color: A.DIM, flexShrink: 0 }}
+              style={{ fontSize: 15, fontWeight: 700, color: A.DIM, flexShrink: 0 }}
             >
               {'\u203A'}
             </span>

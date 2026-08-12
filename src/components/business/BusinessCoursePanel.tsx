@@ -139,7 +139,7 @@ export const BusinessCoursePanel: React.FC<BusinessCoursePanelProps> = ({
       aside={rounds > 0 ? t('business.course.fromRounds', { count: rounds }) : undefined}
       style={{ marginTop: 12 }}
     >
-      <p style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em', margin: 0 }}>
+      <p style={{ fontSize: 15, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em', margin: 0 }}>
         {course.name}
       </p>
       {meta && <p style={{ ...CAPTION, marginTop: 4 }}>{meta}</p>}
