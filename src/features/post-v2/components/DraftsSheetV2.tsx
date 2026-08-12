@@ -50,7 +50,7 @@ export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDele
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 13,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     flex: '0 0 auto',
                   }}
                 >

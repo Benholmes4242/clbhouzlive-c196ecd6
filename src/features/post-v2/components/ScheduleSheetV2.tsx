@@ -129,7 +129,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
                   position: 'relative',
                 }}
               >
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 0.6, color: isToday ? CT.amber : (selected ? CT.amber : CT.secondary) }}>{isToday ? 'TODAY' : DAY_LABELS[d.getDay()]}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.6, color: isToday ? CT.amber : (selected ? CT.amber : CT.secondary) }}>{isToday ? 'TODAY' : DAY_LABELS[d.getDay()]}</span>
                 <span style={{ fontSize: 17, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{d.getDate()}</span>
                 <span style={{ fontSize: 10, color: selected ? 'rgba(248,250,252,0.7)' : CT.secondary }}>{MONTH_LABELS[d.getMonth()]}</span>
               </button>
@@ -211,7 +211,7 @@ function Preset({ children, onClick }: { children: React.ReactNode; onClick: () 
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: CT.secondary }}>{children}</div>
+    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>{children}</div>
   );
 }
 
