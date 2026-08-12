@@ -79,7 +79,7 @@ export function EventInfoSection({ meta, broadcast }: Props) {
                 flex: 1, minWidth: 0,
                 fontSize: 13, fontWeight: 700, color: INK,
                 lineHeight: 1.4,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {value}

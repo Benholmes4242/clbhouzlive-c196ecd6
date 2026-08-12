@@ -54,7 +54,7 @@ const LABEL_STYLE: React.CSSProperties = {
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: INK_FAINT,
-  fontVariantNumeric: 'tabular-nums',
+  fontVariantNumeric: 'tabular-nums lining',
 };
 
 function formatPos(row: WeekAlumnusRow): string | null {
@@ -187,7 +187,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
                           fontSize: 12,
                           fontWeight: 600,
                           color: INK_MUTE,
-                          fontVariantNumeric: 'tabular-nums',
+                          fontVariantNumeric: 'tabular-nums lining',
                           letterSpacing: '0.01em',
                         }}
                       >
@@ -208,7 +208,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
                         fontSize: 17,
                         fontWeight: 700,
                         color: getScoreColor(scoreVal, 'light'),
-                        fontVariantNumeric: 'tabular-nums',
+                        fontVariantNumeric: 'tabular-nums lining',
                         letterSpacing: '-0.01em',
                       }}
                     >
@@ -220,7 +220,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
                         fontSize: 13,
                         fontWeight: 700,
                         color: INK,
-                        fontVariantNumeric: 'tabular-nums',
+                        fontVariantNumeric: 'tabular-nums lining',
                         letterSpacing: '-0.005em',
                       }}
                     >

@@ -440,7 +440,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               fontWeight: 500,
               color: 'rgba(255,255,255,0.65)',
               marginTop: 4,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               textShadow: TEXT_SHADOW,
             }}
           >

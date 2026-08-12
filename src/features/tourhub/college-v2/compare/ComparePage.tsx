@@ -561,7 +561,7 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     textAlign: alignRight ? 'right' : 'left',
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}
                 >
                   {subline}

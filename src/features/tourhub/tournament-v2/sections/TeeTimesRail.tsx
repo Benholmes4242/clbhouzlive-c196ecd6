@@ -139,7 +139,7 @@ export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
                     marginBottom: 8,
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}
                 >
                   {meta}

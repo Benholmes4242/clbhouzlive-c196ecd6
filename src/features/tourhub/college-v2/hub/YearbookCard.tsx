@@ -86,7 +86,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
           fontSize: 15,
           fontWeight: 500,
           color: INK,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           textAlign: 'right',
           letterSpacing: '-0.02em',
         }}
@@ -165,7 +165,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
             color: INK_MUTE,
             marginTop: 2,
             letterSpacing: '0.02em',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -200,7 +200,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
             fontSize: 15,
             fontWeight: 700,
             color: INK,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             letterSpacing: '-0.02em',
             lineHeight: 1,
           }}
@@ -232,7 +232,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
               color: STATUS_LIVE,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
             }}
           >
             <span

@@ -115,7 +115,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
               }}
               className="active:bg-black/[0.03] transition-colors"
             >
-              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums lining' }}>
                 {posText}
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
@@ -128,13 +128,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
                   {r.player?.full_name ?? BLANK}
                 </span>
               </div>
-              <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums lining' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums lining' }}>
                 {today == null ? BLANK : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums lining' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>

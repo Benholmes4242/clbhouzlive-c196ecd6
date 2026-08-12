@@ -213,7 +213,7 @@ export function CollegeHubPage() {
                 color: '#FFFFFF',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {year}
@@ -505,7 +505,7 @@ export function CollegeHubPage() {
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             color: INK_FAINT,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {t('college.hub.footer', { year })}
