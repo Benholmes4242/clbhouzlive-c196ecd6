@@ -278,25 +278,24 @@ function InboxListPage() {
         })}
       </div>
 
-      {/* Filter chips */}
+      {/* Queue board */}
       <div
         style={{
-          display: 'flex', gap: 8, overflowX: 'auto',
-          scrollbarWidth: 'none', padding: '2px 0',
+          display: 'grid',
+          gridTemplateColumns: `repeat(${visibleTypes.length <= 4 ? 2 : 3}, minmax(0, 1fr))`,
+          gap: 8,
         }}
-        className="admin-inbox-chips"
       >
-        <Chip label="All" active={typeFilter === 'all'} onClick={() => setType('all')} />
         {visibleTypes.map(tp => (
-          <Chip
+          <QueueTile
             key={tp}
             label={TYPE_LABEL[tp]}
-            count={view === 'open' ? feed.counts[tp] : undefined}
+            count={feed.counts[tp] ?? 0}
+            oldestIso={oldestByType[tp] ?? null}
             active={typeFilter === tp}
-            onClick={() => setType(tp)}
+            onClick={() => setType(typeFilter === tp ? 'all' : tp)}
           />
         ))}
-        <style>{`.admin-inbox-chips::-webkit-scrollbar{display:none}`}</style>
       </div>
 
       {/* Stream card */}
