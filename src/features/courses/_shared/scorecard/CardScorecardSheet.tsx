@@ -708,7 +708,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <div
               style={{
                 ...TITLE, marginTop: 3, lineHeight: 1.22,
-                letterSpacing: '-0.01em',
                 display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
               }}
