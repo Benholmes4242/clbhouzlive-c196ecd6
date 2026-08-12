@@ -972,7 +972,7 @@ function InboxOpsStrip({ doneItems }: { doneItems: InboxItem[] }) {
       {medianMs != null && (
         <Chip
           label="Median time to resolve"
-          value={formatDurationShort(medianMs)}
+          value={formatDurationMs(medianMs)}
           note={`n=${sampleSize}`}
         />
       )}
