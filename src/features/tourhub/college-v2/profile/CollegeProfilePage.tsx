@@ -155,7 +155,7 @@ export function CollegeProfilePage() {
             >
               <AlertCircle size={20} color="#DC2626" />
             </div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: INK, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 4 }}>
               Couldn't load school data
             </div>
             <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginBottom: 12 }}>

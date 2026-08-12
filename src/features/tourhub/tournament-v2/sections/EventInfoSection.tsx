@@ -68,7 +68,7 @@ export function EventInfoSection({ meta, broadcast }: Props) {
             <div
               style={{
                 width: 104, flexShrink: 0,
-                fontSize: 9, fontWeight: 800, color: INK_FAINT,
+                fontSize: 9, fontWeight: 700, color: INK_FAINT,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}
             >
@@ -79,7 +79,7 @@ export function EventInfoSection({ meta, broadcast }: Props) {
                 flex: 1, minWidth: 0,
                 fontSize: 13, fontWeight: 700, color: INK,
                 lineHeight: 1.4,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {value}

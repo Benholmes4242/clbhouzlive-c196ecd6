@@ -110,7 +110,7 @@ function Column({
       <div
         style={{
           fontSize: 18,
-          fontWeight: 800,
+          fontWeight: 700,
           color: '#FFFFFF',
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
@@ -131,7 +131,7 @@ function Column({
           fontWeight: 700,
           color: WHITE_ALPHA_65,
           letterSpacing: '0.02em',
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           textAlign: 'center',
         }}
       >
@@ -158,7 +158,7 @@ function Column({
           border: '0.75px solid rgba(255,255,255,0.28)',
           color: '#FFFFFF',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
           cursor: 'pointer',
@@ -190,7 +190,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
       <div
         style={{
           fontSize: 9.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: AMBER,

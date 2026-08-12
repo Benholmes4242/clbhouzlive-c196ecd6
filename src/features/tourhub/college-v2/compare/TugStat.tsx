@@ -68,17 +68,17 @@ function stripSign(s: string): string {
 function valueStyle(color: string, align: 'left' | 'right') {
   return {
     fontSize: 16,
-    fontWeight: 800,
+    fontWeight: 700,
     color,
     letterSpacing: '-0.02em',
-    fontVariantNumeric: 'tabular-nums' as const,
+    fontVariantNumeric: 'tabular-nums lining' as const,
     textAlign: align,
   };
 }
 
 const LABEL_STYLE = {
   fontSize: 10,
-  fontWeight: 800,
+  fontWeight: 700,
   color: INK_FAINT,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
@@ -235,11 +235,11 @@ function Coverage({
       style={{
         marginTop: 3,
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         color: INK_FAINT,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining',
         textAlign: align,
       }}
     >

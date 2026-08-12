@@ -196,7 +196,7 @@ export function CollegeHubPage() {
             <div
               style={{
                 fontSize: 9.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
                 color: AMBER,
@@ -209,11 +209,11 @@ export function CollegeHubPage() {
               style={{
                 margin: 0,
                 fontSize: 32,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: '#FFFFFF',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {year}
@@ -318,7 +318,7 @@ export function CollegeHubPage() {
               <div
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   color: INK_FAINT,
@@ -370,7 +370,7 @@ export function CollegeHubPage() {
                 border: 'none',
                 color: INK_MUTE,
                 fontSize: 11,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
@@ -416,7 +416,7 @@ export function CollegeHubPage() {
                 padding: 0,
                 color: INK,
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
@@ -505,7 +505,7 @@ export function CollegeHubPage() {
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             color: INK_FAINT,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {t('college.hub.footer', { year })}

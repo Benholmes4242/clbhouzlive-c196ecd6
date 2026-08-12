@@ -12,6 +12,7 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { TITLE } from '@/lib/tokens/type';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
@@ -89,7 +90,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
         <div
           style={{
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: INK_FAINT,
@@ -100,11 +101,8 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
         </div>
         <div
           style={{
-            fontSize: 18,
-            fontWeight: 800,
+            ...TITLE,
             color: INK,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.1,
             marginBottom: 12,
           }}
         >
@@ -191,7 +189,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                     {s.logoUrl ? (
                       <img src={s.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     ) : (
-                      <span style={{ fontSize: 10, fontWeight: 800, color: isTop ? GOLD_DEEP : INK }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: isTop ? GOLD_DEEP : INK }}>
                         {(s.shortName ?? s.collegeName).slice(0, 3).toUpperCase()}
                       </span>
                     )}
@@ -226,10 +224,10 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                   style={{
                     flexShrink: 0,
                     fontSize: 10,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.04em',
                     color: isTop ? GOLD : INK_MUTE,
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}
                 >
                   No.{s.rank}

@@ -49,11 +49,11 @@ const KICKER_STYLE: React.CSSProperties = {
 
 const LABEL_STYLE: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: INK_FAINT,
-  fontVariantNumeric: 'tabular-nums',
+  fontVariantNumeric: 'tabular-nums lining',
 };
 
 const DOT = ' \u00B7 ';
@@ -190,7 +190,7 @@ export function TheClass({ slug, collegeName }: Props) {
                   fontSize: 13,
                   fontWeight: 500,
                   color: INK_MUTE,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                   letterSpacing: '-0.01em',
                 }}
               >
@@ -263,7 +263,7 @@ export function TheClass({ slug, collegeName }: Props) {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
+                      fontVariantNumeric: 'tabular-nums lining',
                     }}
                   >
                     {subline}
@@ -277,9 +277,9 @@ export function TheClass({ slug, collegeName }: Props) {
                   <span
                     style={{
                       fontSize: 14,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: INK,
-                      fontVariantNumeric: 'tabular-nums',
+                      fontVariantNumeric: 'tabular-nums lining',
                       letterSpacing: '-0.005em',
                     }}
                   >

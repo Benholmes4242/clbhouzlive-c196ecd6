@@ -334,9 +334,9 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           <span
             style={{
               fontSize: 12.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: houseColor(cl),
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               flexShrink: 0,
             }}
           >
@@ -371,7 +371,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
       <div
         style={{
           fontSize: 7,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.09em',
           textTransform: 'uppercase',
           color: labelColor ?? A.DIM,
@@ -386,7 +386,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
         }}
       >
         {children}
@@ -453,7 +453,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
               fontSize: demotedRow ? 9 : 13,
               fontWeight: demotedRow ? 800 : isLeader ? 800 : 700,
               color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               letterSpacing: demotedRow ? '0.06em' : undefined,
               whiteSpace: 'nowrap',
             }}
@@ -506,10 +506,10 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             style={{
               textAlign: 'right',
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               color: totColor,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               whiteSpace: 'nowrap',
             }}
           >
@@ -596,9 +596,9 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                     alignItems: 'center',
                     gap: 2,
                     fontSize: 11,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: climbed ? TREND_UP : TREND_DOWN,
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}
                 >
                   <span aria-hidden style={{ fontSize: 8 }}>

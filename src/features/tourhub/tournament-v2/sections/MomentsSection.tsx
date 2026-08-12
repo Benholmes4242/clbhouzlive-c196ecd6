@@ -69,7 +69,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               onClick={() => navigate('/post-v2')}
               style={{
                 background: INK, color: '#FFFFFF',
-                fontSize: 12, fontWeight: 800, fontFamily: FONT,
+                fontSize: 12, fontWeight: 700, fontFamily: FONT,
                 border: 'none', borderRadius: 14,
                 padding: '10px 16px', cursor: 'pointer',
               }}
@@ -114,7 +114,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
             <div style={KICKER}>{t('tournament.moments.eyebrow')}</div>
             <h2
               id="tournament-moments-sheet-title"
-              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em' }}
+              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
             >
               {t('tournament.moments.sheetTitle')}
             </h2>
@@ -187,7 +187,7 @@ function MomentCard({ moment, tourCode }: { moment: ReturnType<typeof useEventMo
           ringColor={LIGHT_HAIRLINE}
         />
       )}
-      <div style={{ fontSize: 10.5, fontWeight: 800, color: INK, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, color: INK, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
         {moment!.headline}
       </div>
       {player && (
