@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { BG_2, T60, T100, GREEN, LINE_2, FONT } from './_shared/tokens';
 import { formatFriendName } from './_shared/formatName';
+import { TITLE } from '@/lib/tokens/type';
 
 export interface SheetHeaderProps {
   avatarUrl: string | null;
