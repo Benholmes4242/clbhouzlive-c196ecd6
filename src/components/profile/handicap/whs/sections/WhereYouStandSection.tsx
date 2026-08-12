@@ -186,7 +186,7 @@ const DistributionChart: React.FC<{
                       fontWeight: 700,
                       color: isUser ? AMBER : INK_55,
                       marginBottom: 4,
-                      fontVariantNumeric: 'tabular-nums lining',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
                       letterSpacing: '-0.01em',
                       fontFamily: FONT_SF,
                     }}
@@ -236,7 +236,7 @@ const DistributionChart: React.FC<{
               fontSize: 10.5,
               fontWeight: b.is_user_bucket ? 700 : 500,
               color: b.is_user_bucket ? INK : INK_55,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {BUCKET_LABEL[b.bucket]}
@@ -276,7 +276,7 @@ const AvailableCard: React.FC<{
             color: 'var(--hcp-t-100)',
             letterSpacing: '-0.04em',
             lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {copy.headline}
@@ -322,7 +322,7 @@ const AvailableCard: React.FC<{
           style={{
             color: 'var(--hcp-t-100)',
             fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {formatNumber(data.cohort_size)}
@@ -385,7 +385,7 @@ const AvailableCard: React.FC<{
                 fontSize: 18,
                 fontWeight: 700,
                 color: AMBER,
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
               }}

@@ -58,7 +58,7 @@ const FIGURE: React.CSSProperties = {
   letterSpacing: '-0.02em',
   color: INK,
   lineHeight: 1,
-  fontVariantNumeric: 'tabular-nums lining',
+  fontVariantNumeric: 'tabular-nums lining-nums',
 };
 
 export function ScheduleTab() {
@@ -324,7 +324,7 @@ export function ScheduleTab() {
           }}
         >
           <span style={KICKER}>{t('schedule.eyebrow.season')}</span>
-          <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>
+          <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums' }}>
             {tourLens
               ? `${yearLabel} · ${TOUR_CONFIG[tourLens]?.name ?? tourLens}`
               : `${yearLabel}`}

@@ -4,7 +4,7 @@
  *
  * Rules encoded here:
  *   - no internal divider lines; separation is a panel edge or whitespace
- *   - figures use the app sans stack with tabular-nums lining (NOT a
+ *   - figures use the app sans stack with tabular-nums lining-nums (NOT a
  *     monospace face - Menlo / SF Mono / Consolas slash the zero by default
  *     and `font-feature-settings: "zero" 0` cannot switch that off)
  *   - colour means exactly three things: over par, under par, you
@@ -73,7 +73,7 @@ export const RAMP = {
 export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /** Tabular figures WITHOUT a monospace face - this is what removes the slash. */
-export const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining' };
+export const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
 
 export const NUM: React.CSSProperties = {
   fontFamily: SANS,

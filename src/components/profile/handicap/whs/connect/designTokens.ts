@@ -30,7 +30,7 @@ export const WASH =
 
 /** Every figure on this surface. */
 export const NUM: React.CSSProperties = {
-  fontVariantNumeric: 'tabular-nums lining',
+  fontVariantNumeric: 'tabular-nums lining-nums',
 };
 
 export const KICKER: React.CSSProperties = {

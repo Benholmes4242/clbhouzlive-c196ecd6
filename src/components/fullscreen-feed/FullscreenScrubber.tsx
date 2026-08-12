@@ -321,7 +321,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontSize: 11,
               fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               padding: '3px 7px',
               borderRadius: 6,
               pointerEvents: 'none',

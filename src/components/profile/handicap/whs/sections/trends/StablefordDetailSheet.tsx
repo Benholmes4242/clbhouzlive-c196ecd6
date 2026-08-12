@@ -169,7 +169,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
                 style={{
                   ...LABEL,
                   color: toneColor(deltaTone),
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {`${delta > 0 ? '+' : '\u2212'}${Math.abs(delta).toFixed(1)} ${t('stableford.deltaSuffix')}`}
@@ -206,7 +206,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
                     fontSize: 16,
                     fontWeight: 700,
                     color: CHART.INK,
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                     lineHeight: 1,
                   }}
                 >

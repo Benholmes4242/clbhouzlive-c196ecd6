@@ -93,7 +93,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
                 color: 'rgba(255,255,255,0.85)',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
               {dateLabel}

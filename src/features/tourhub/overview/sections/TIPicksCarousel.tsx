@@ -588,7 +588,7 @@ function CaseSheet({
               marginTop: i === 0 ? 0 : 16,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 700, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {String(i + 1).padStart(2, '0')}
             </div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>

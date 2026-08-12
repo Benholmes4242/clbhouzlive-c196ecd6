@@ -71,7 +71,7 @@ function valueStyle(color: string, align: 'left' | 'right') {
     fontWeight: 700,
     color,
     letterSpacing: '-0.02em',
-    fontVariantNumeric: 'tabular-nums lining' as const,
+    fontVariantNumeric: 'tabular-nums lining-nums' as const,
     textAlign: align,
   };
 }
@@ -239,7 +239,7 @@ function Coverage({
         color: INK_FAINT,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums lining',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         textAlign: align,
       }}
     >

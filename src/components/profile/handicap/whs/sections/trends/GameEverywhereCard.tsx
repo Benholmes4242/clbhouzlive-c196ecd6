@@ -79,7 +79,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
             letterSpacing: '-0.022em',
             lineHeight: 1,
             color: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           +{(d.avg_over_par ?? 0).toFixed(1)}

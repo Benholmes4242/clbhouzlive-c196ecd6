@@ -74,7 +74,7 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
           fontWeight: 700,
           lineHeight: 1,
           color: tone ?? '#fff',
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           letterSpacing: '-0.02em',
           textShadow: TEXT_SHADOW,
         }}
@@ -177,7 +177,7 @@ function PersonLockup({
               fontWeight: 600,
               color: WHITE_ALPHA_65,
               marginTop: 2,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               textShadow: TEXT_SHADOW,
             }}
           >
@@ -440,7 +440,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               fontWeight: 500,
               color: 'rgba(255,255,255,0.65)',
               marginTop: 4,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               textShadow: TEXT_SHADOW,
             }}
           >

@@ -6,7 +6,7 @@ import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums lining' };
+const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums lining-nums' };
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const GOOD = '#34D399';

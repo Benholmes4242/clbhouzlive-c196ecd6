@@ -682,7 +682,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                           }}
                         />
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums lining', width: 22, textAlign: 'right', flexShrink: 0 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums lining-nums', width: 22, textAlign: 'right', flexShrink: 0 }}>
                         {count}
                       </span>
                     </button>

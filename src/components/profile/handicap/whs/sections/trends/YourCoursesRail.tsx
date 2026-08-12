@@ -109,7 +109,7 @@ export const YourCoursesRail: React.FC<Props> = ({ readOnly = false }) => {
                   fontWeight: 700,
                   letterSpacing: '-0.04em',
                   color: 'var(--hcp-t-100)',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >

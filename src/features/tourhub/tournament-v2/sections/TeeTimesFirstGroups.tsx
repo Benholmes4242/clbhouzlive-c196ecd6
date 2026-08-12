@@ -63,7 +63,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
                 fontWeight: 700,
                 color: INK,
                 letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
               {formatTimeHm(new Date(g.teeTime))}
@@ -143,7 +143,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
                           fontSize: 11,
                           fontWeight: 600,
                           color: INK_MUTE,
-                          fontVariantNumeric: 'tabular-nums lining',
+                          fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >
                         {posText}
@@ -155,7 +155,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
                           fontSize: 12,
                           fontWeight: 700,
                           color: getScoreColor(score, 'light'),
-                          fontVariantNumeric: 'tabular-nums lining',
+                          fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >
                         {fmtScore(score)}

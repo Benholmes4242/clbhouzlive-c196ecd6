@@ -93,7 +93,7 @@ export function MostPlayedLeaderboard({
                   color: A.DIM,
                   width: 13,
                   flexShrink: 0,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {formatNumber(i + 1)}
@@ -148,7 +148,7 @@ export function MostPlayedLeaderboard({
                       fontSize: 9,
                       color: A.DIM,
                       marginTop: 2,
-                      fontVariantNumeric: 'tabular-nums lining',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
                     {t('discover.mostPlayedDelta', '+{{count}} on last week', {

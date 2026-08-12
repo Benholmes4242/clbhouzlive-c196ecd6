@@ -60,11 +60,11 @@ export const BODY: CSSProperties = {
 export const FIGURE: CSSProperties = {
   fontWeight: 700,
   letterSpacing: '-0.04em',
-  fontVariantNumeric: 'tabular-nums lining',
+  fontVariantNumeric: 'tabular-nums lining-nums',
 };
 
 /** Tabular figures on their own, for text that is mostly prose but holds digits. */
-export const FIGS: CSSProperties = { fontVariantNumeric: 'tabular-nums lining' };
+export const FIGS: CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
 
 /**
  * Headline sizes for hero type. Tracking follows TITLE (tighter as size grows);

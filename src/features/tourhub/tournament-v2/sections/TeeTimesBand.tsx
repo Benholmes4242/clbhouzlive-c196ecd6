@@ -78,7 +78,7 @@ export function TeeTimesBand({ round, groupCount, onTap }: Props) {
               fontWeight: 500,
               color: INK_MUTE,
               lineHeight: 1.35,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {subline}

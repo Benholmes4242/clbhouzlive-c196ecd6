@@ -205,7 +205,7 @@ export function MomentsSheet({ open, onClose, moments, onTilePress }: Props) {
                     fontWeight: 700,
                     letterSpacing: '0.14em',
                     color: A.DIM,
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                     flexShrink: 0,
                   }}
                 >

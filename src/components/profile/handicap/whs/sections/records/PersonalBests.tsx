@@ -282,7 +282,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                         fontWeight: 700,
                         letterSpacing: '-0.04em',
                         color: D_T100,
-                        fontVariantNumeric: 'tabular-nums lining',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
                         lineHeight: 1,
                       }}
                     >

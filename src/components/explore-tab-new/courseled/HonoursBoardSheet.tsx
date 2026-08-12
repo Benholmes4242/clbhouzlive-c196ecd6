@@ -50,7 +50,7 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
             ...LABEL,
             color: GOLD_INK,
             marginBottom: 5,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {t('discover.honoursOnTheBoard', '{{count}} on the board', {

@@ -24,7 +24,7 @@ interface Props {
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT_SF, fontVariantNumeric: 'tabular-nums lining' };
+const NUM: React.CSSProperties = { fontFamily: FONT_SF, fontVariantNumeric: 'tabular-nums lining-nums' };
 
 const GOOD = '#55BD8B';
 const AMBER = '#F7931E';

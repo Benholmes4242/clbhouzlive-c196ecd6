@@ -177,7 +177,7 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
               letterSpacing: '0.12em',
               color: T.ink40,
               fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {metaCount}
@@ -394,7 +394,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
             letterSpacing: '0.14em',
             color: T.ink40,
             fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {dist.total} ROUNDS
@@ -459,7 +459,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
                   fontSize: 16,
                   fontWeight: 700,
                   color: isZero ? T.inkMute : c.color,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >
@@ -483,7 +483,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
                   marginTop: 3,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {c.range}
@@ -537,7 +537,7 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
         fontSize: 10.5,
         color: T.inkMute,
         fontWeight: 600,
-        fontVariantNumeric: 'tabular-nums lining',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         whiteSpace: 'nowrap',
       }}
     >
@@ -587,7 +587,7 @@ const ScoringRangeBlock: React.FC<{
             fontSize: 9.5,
             fontWeight: 700,
             color: T.ink40,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             letterSpacing: '0.10em',
           }}
         >
@@ -631,7 +631,7 @@ const ScoringRangeBlock: React.FC<{
           fontWeight: 700,
           letterSpacing: '0.10em',
           color: T.ink40,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         <span>
@@ -795,7 +795,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
             letterSpacing: '0.14em',
             color: T.ink40,
             fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {totalHoles} HOLES · {roundsWithHoles} ROUNDS
@@ -864,7 +864,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   fontSize: 15,
                   fontWeight: 700,
                   color: countColor,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >
@@ -888,7 +888,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
                   marginTop: 3,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {pct}%
@@ -1022,7 +1022,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
             fontWeight: 700,
             letterSpacing: '0.10em',
             color: T.ink40,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           <span
@@ -1072,7 +1072,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                   justifyContent: 'center',
                   fontSize: 12,
                   fontWeight: 700,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   flexShrink: 0,
                   background: unlocked ? row.color : 'transparent',
                   color: unlocked ? BADGE_INK : T.ink40,
@@ -1123,7 +1123,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                   fontSize: 17,
                   fontWeight: 700,
                   color: unlocked ? row.color : 'rgba(242,244,247,0.22)',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   letterSpacing: '-0.01em',
                 }}
               >
