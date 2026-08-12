@@ -635,7 +635,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   >
                     {communityScore.toFixed(1)}
                   </span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
                 </div>
                 <div
                   style={{ fontSize: 11, ...TIER_LABEL_STYLE, color: bandColor(communityScore), textAlign: 'center' }}
@@ -682,7 +682,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                           }}
                         />
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums', width: 22, textAlign: 'right', flexShrink: 0 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: selected ? INK : INK_MUTE, fontVariantNumeric: 'tabular-nums lining', width: 22, textAlign: 'right', flexShrink: 0 }}>
                         {count}
                       </span>
                     </button>
@@ -773,7 +773,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   <button
                     type="button"
                     onClick={handleRateClick}
-                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: '#0F172A', color: '#FFFFFF', fontSize: 12, fontWeight: 800, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: '#0F172A', color: '#FFFFFF', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}
                   >
                     <Pencil className="w-3.5 h-3.5" /> {t('review.editYours')}
                   </button>

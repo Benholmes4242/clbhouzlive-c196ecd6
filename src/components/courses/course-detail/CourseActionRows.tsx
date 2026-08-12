@@ -72,7 +72,7 @@ const Row: React.FC<{ label: string; meta?: string; onClick: () => void; last?: 
   >
     <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK }}>{label}</span>
     {meta && <span style={{ fontSize: 11.5, color: A.MUTE }}>{meta}</span>}
-    <span style={{ fontSize: 13, color: A.DIM, fontWeight: 800 }} aria-hidden="true">
+    <span style={{ fontSize: 13, color: A.DIM, fontWeight: 700 }} aria-hidden="true">
       {'\u203A'}
     </span>
   </button>

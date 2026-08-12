@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses, type BusinessMembership } from '@/hooks/useMyBusinesses';
 import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 import { AppLog } from '@/lib/logger';
+import { KICKER, TITLE } from '@/lib/tokens/type';
 
 interface ClaimCourseSheetProps {
   open: boolean;
@@ -139,10 +140,10 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   // --- Render ---
   const renderHeader = () => (
     <div style={{ padding: '4px 0 12px' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
+      <div style={{ ...KICKER, color: '#0E1216' }}>
         {t('courseDetail.claim.sheet.kicker')}
       </div>
-      <h2 style={{ fontSize: 18, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1.25 }}>
+      <h2 style={{ ...TITLE, color: INK, marginTop: 4 }}>
         {t('courseDetail.claim.sheet.title', { clubName })}
       </h2>
     </div>
@@ -347,7 +348,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         <div
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
             color: '#A2A9B2',

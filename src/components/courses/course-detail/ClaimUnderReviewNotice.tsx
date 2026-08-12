@@ -6,7 +6,7 @@ const ClaimUnderReviewNotice: React.FC = () => {
   const { t } = useTranslation('courses');
   return (
     <div style={{ padding: '8px 16px', textAlign: 'center' }}>
-      <div style={{ fontSize: 13, fontWeight: 800, color: INK, marginBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>
         {t('courseDetail.claim.underReview.title')}
       </div>
       <p style={{ fontSize: 12, color: INK_FAINT, margin: '0 auto', maxWidth: 280, lineHeight: 1.5 }}>

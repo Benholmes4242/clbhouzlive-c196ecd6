@@ -97,7 +97,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         <span
           style={{
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             color: AMBER,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
@@ -145,7 +145,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
             border: 'none',
             borderRadius: 12,
             fontSize: 12.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.02em',
             cursor: 'pointer',
             fontFamily: FONT,

@@ -321,7 +321,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
               fontFamily: 'Geist, system-ui, sans-serif',
               fontSize: 11,
               fontWeight: 600,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               padding: '3px 7px',
               borderRadius: 6,
               pointerEvents: 'none',

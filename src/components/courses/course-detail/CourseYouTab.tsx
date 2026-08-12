@@ -78,7 +78,7 @@ const UnlockList: React.FC<{ unclaimedCount: number }> = ({ unclaimedCount }) =>
     <div style={{ padding: '0 16px' }}>
       <Panel>
         <div style={{ ...LABEL, marginBottom: 12 }}>What you'd unlock</div>
-        <div style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.01em', marginBottom: 14 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em', marginBottom: 14 }}>
           Your side of this course
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -107,7 +107,7 @@ const UpForGrabs: React.FC<{
       <div style={{ ...LABEL, marginBottom: 10 }}>Up for grabs</div>
       {recordLabel ? (
         <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: A.INK }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>
             {`Course record: ${recordLabel}${holderName ? ` by ${holderName}` : ''}`}
           </div>
           {unclaimedCount > 0 && (

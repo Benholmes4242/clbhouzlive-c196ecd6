@@ -448,7 +448,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   aria-hidden="true"
                   style={{ width: 20, height: 20, flexShrink: 0, objectFit: 'contain' }}
                 />
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums lining', lineHeight: 1 }}>
                   {formatRatingValue(courseRating!)}
                 </span>
               </button>
@@ -677,7 +677,7 @@ const RailButton: React.FC<RailButtonProps> = ({ onClick, ariaLabel, count, acce
       <span
         style={{
           fontSize: 13, fontWeight: 700, color: accent ? AMBER : '#fff',
-          lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: TEXT_SHADOW,
+          lineHeight: 1, fontVariantNumeric: 'tabular-nums lining', textShadow: TEXT_SHADOW,
         }}
       >
         {count}

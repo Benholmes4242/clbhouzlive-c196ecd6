@@ -239,7 +239,7 @@ export const YouAtThisClubStrip: React.FC<Props> = ({ userId, courseId, theme = 
             className="tabular-nums"
             style={{
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1,

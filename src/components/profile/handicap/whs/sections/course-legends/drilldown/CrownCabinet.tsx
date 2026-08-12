@@ -108,7 +108,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
             <span
               style={{
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 color: held ? HELD_LABEL : 'var(--hcp-t-40)',
@@ -230,7 +230,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
               <span
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   color: held ? HELD_LABEL : 'var(--hcp-t-40)',
