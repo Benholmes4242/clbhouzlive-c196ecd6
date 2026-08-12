@@ -42,7 +42,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   const labelStyle: React.CSSProperties = isSearchScale
     ? {
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: isDark ? 'rgba(255,255,255,0.7)' : '#64748B',
@@ -83,7 +83,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
             onClick={onViewAll}
             style={{
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.005em',
               background: 'none',

@@ -207,7 +207,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               <span
                 style={{
                   fontSize: 24,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.4px',
                   lineHeight: 1,
                   flexShrink: 0,
@@ -339,7 +339,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               <span
                 style={{
                   fontSize: 44,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-2.2px',
                   lineHeight: 0.85,
                   ...FROST_SCORE_GRADIENT,

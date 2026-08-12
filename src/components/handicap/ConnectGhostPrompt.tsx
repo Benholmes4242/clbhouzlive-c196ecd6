@@ -100,7 +100,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
           <span style={{ fontSize: 13, fontWeight: 700, color: AMBER_TEXT_DEEP, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {slimBenefit}
           </span>
-          <span style={{ fontSize: 13, fontWeight: 800, color: AMBER, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: AMBER, whiteSpace: 'nowrap' }}>
             {t('connectGhost.slimCta')}
           </span>
         </button>
@@ -169,10 +169,10 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             background: '#FFFFFF',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: AMBER, marginBottom: 6 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: AMBER, marginBottom: 6 }}>
             {eyebrow}
           </div>
-          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: INK, lineHeight: 1.2 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: INK, lineHeight: 1.2 }}>
             {headline}
           </div>
           <div style={{ marginTop: 6, fontSize: 13.5, fontWeight: 500, color: INK_60, lineHeight: 1.5 }}>
@@ -190,7 +190,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
               border: 'none',
               borderRadius: 13,
               fontSize: 14,
-              fontWeight: 800,
+              fontWeight: 700,
               cursor: 'pointer',
               fontFamily: FONT,
             }}

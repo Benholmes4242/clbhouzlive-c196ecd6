@@ -11,7 +11,7 @@
  * Pick the theme that matches the surface, never the other pair's value.
  */
 export const INDEX_DELTA = {
-  /** White / #F8FAFC analytical surfaces: HcpStrip, ProfileHandicapCard, Discover friends. */
+  /** White / #F8FAFC analytical surfaces: HcpStrip, HeroHandicapCardDark, Discover friends. */
   light: {
     improved: '#0F8F4A',
     drifted: '#C8372B',
