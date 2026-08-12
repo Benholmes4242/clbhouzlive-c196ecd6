@@ -111,7 +111,7 @@ export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
         top,
         transform: 'translateY(-50%)',
         fontSize,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.05em',
         lineHeight: 1,
         pointerEvents: 'none',
@@ -156,7 +156,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
     <span
       style={{
         fontSize,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',

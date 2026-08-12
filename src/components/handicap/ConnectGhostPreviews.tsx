@@ -34,7 +34,7 @@ const Ring: React.FC<{ pct: number; color: string; label: string }> = ({ pct, co
             transform="rotate(-90 42 42)"
           />
         </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 18, fontWeight: 800, color: INK }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 18, fontWeight: 700, color: INK }}>
           {pct}%
         </div>
       </div>
@@ -48,10 +48,10 @@ const Ring: React.FC<{ pct: number; color: string; label: string }> = ({ pct, co
 /** Holes: scoring breakdown - "+8.5 over par" + 3 leak rows + 3 rings. */
 export const HolesGhost: React.FC = () => (
   <div style={{ fontFamily: FONT }}>
-    <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
+    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
       Your scoring breakdown
     </div>
-    <div style={{ marginTop: 6, fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.02em' }}>
+    <div style={{ marginTop: 6, fontSize: 22, fontWeight: 700, color: INK, letterSpacing: '-0.02em' }}>
       +8.5 shots over par in an average round
     </div>
     <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -65,7 +65,7 @@ export const HolesGhost: React.FC = () => (
           <div style={{ flex: 1, height: 8, background: 'rgba(15,23,42,0.06)', borderRadius: 4, overflow: 'hidden' }}>
             <div style={{ width: `${60 + r.hole % 20}%`, height: '100%', background: RED, borderRadius: 4 }} />
           </div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: RED, minWidth: 32, textAlign: 'right' }}>{r.over}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: RED, minWidth: 32, textAlign: 'right' }}>{r.over}</div>
         </div>
       ))}
     </div>
@@ -87,7 +87,7 @@ export const AboutGhost: React.FC = () => {
   ];
   return (
     <div style={{ fontFamily: FONT }}>
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
         How you compare here
       </div>
       <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -95,7 +95,7 @@ export const AboutGhost: React.FC = () => {
           <div key={r.label}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: r.ink }}>{r.label}</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: r.ink, fontVariantNumeric: 'tabular-nums' }}>{r.value}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: r.ink, fontVariantNumeric: 'tabular-nums' }}>{r.value}</span>
             </div>
             <div style={{ height: 6, background: 'rgba(15,23,42,0.06)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ width: `${r.pct}%`, height: '100%', background: r.color, borderRadius: 3 }} />
@@ -116,13 +116,13 @@ export const ProfileGhost: React.FC = () => (
           width: 66, height: 66, borderRadius: 22,
           background: `linear-gradient(135deg, ${AMBER} 0%, #E07F0E 100%)`,
           color: '#FFF', display: 'grid', placeItems: 'center',
-          fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em',
+          fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
         }}
       >
         12.4
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_60 }}>
+        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_60 }}>
           Handicap Index
         </div>
         <div style={{ fontSize: 44, fontWeight: 300, color: INK, letterSpacing: '-0.03em', lineHeight: 1 }}>
@@ -143,7 +143,7 @@ export const ProfileGhost: React.FC = () => (
         { k: 'Best', v: '76' },
       ].map((t) => (
         <div key={t.k} style={{ border: `1px solid ${HAIRLINE}`, borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: INK }}>{t.v}</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: INK }}>{t.v}</div>
           <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: INK_60, marginTop: 2 }}>
             {t.k}
           </div>
@@ -159,10 +159,10 @@ export const ChampionsGhost: React.FC = () => {
   return (
     <div style={{ fontFamily: FONT }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: INK_60 }}>
           Crown cabinet
         </div>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 999, background: 'rgba(15,23,42,0.06)', color: INK_60 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 999, background: 'rgba(15,23,42,0.06)', color: INK_60 }}>
           0 / 7
         </div>
       </div>
