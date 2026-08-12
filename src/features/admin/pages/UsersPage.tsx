@@ -163,7 +163,7 @@ export default function UsersPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
-      <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
+      <TopTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
       {effectiveTab === 'members' && <MembersTab />}
       {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
       {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
