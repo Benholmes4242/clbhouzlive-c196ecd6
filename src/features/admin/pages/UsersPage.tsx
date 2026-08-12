@@ -277,11 +277,19 @@ function MembersTab() {
         />
       </div>
 
-      <SectionTabs
-        tabs={chips.map(f => ({ id: f.id, label: f.label, count: f.count }))}
-        activeId={filter}
-        onChange={(id) => updateFilterUrl(id as UserFilterStatus)}
-      />
+      {/* Cohort board — two columns; labels are too long for three at 390px */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+        {cohorts.map(c => (
+          <CohortTile
+            key={c.id}
+            label={c.label}
+            count={c.count}
+            share={allCount > 0 ? c.count / allCount : 0}
+            active={filter === c.id}
+            onClick={() => updateFilterUrl(filter === c.id ? 'all' : c.id)}
+          />
+        ))}
+      </div>
 
       {/* Roster list card with caption */}
       <div style={{
@@ -290,10 +298,14 @@ function MembersTab() {
       }}>
         <div style={{
           padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
-          fontSize: 10, fontWeight: 700, color: t.inkFaint,
-          textTransform: 'uppercase', letterSpacing: 0.6,
+          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
         }}>
-          Most recently active
+          <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {activeCohortLabel}
+          </span>
+          <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
+            Index · last seen
+          </span>
         </div>
         {isLoading ? (
           <SkeletonCards />
