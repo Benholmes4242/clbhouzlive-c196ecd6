@@ -1,14 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { adminTheme as t } from '../theme';
 import { CARD, KICKER, LABEL, FIG, Skeleton, num, formatDurationShort } from '../lib/chartPrimitives';
 import { toneColor, type ChipState, type ChipTone } from '../lib/healthChips';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import type { OpsHealth } from '../hooks/useOpsHealth';
 import type { EgSyncHealth } from '../hooks/useDashboard';
 import type { useTriageCounts } from '../hooks/useTriageCounts';
 
 const HAIRLINE = `1px solid ${t.hairline}`;
+
+/** Column widths for the client split, shared by the header row and the rows. */
+const SESSIONS_COL = 62;
+const MEMBERS_COL = 38;
+
+const CLIENTS_REGION_ID = 'admin-system-clients';
+const CLIENTS_OPEN_KEY = 'admin-v2:system:clients-open';
+
+
 
 // ─── 1 SYSTEM ─────────────────────────────────────────────────────────────────
 
