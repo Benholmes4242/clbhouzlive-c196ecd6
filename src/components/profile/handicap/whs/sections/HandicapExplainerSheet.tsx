@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
+import { FIGS } from '@/lib/tokens/type';
 
 /**
  * Educational copy note: "your" in this sheet refers to the reader
@@ -135,7 +136,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
             body={
               <>
                 Your handicap index is the average of those 8 lowest differentials. Right now that's{' '}
-                <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>
+                <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700, ...FIGS }}>
                   {currentHandicap.toFixed(1)}
                 </strong>.
               </>
@@ -151,10 +152,10 @@ const HandicapExplainerSheet: React.FC<Props> = ({
                 isAtRisk ? (
                   <>
                     One of your good counters is rolling out next round. That means even an average score would push your handicap up to{' '}
-                    <strong style={{ color: RED, fontWeight: 700 }}>
+                    <strong style={{ color: RED, fontWeight: 700, ...FIGS }}>
                       {fmtDiff(settleAt, { plus: true })}
                     </strong>. To prevent that, beat a differential of{' '}
-                    <strong style={{ color: GREEN, fontWeight: 700 }}>
+                    <strong style={{ color: GREEN, fontWeight: 700, ...FIGS }}>
                       {fmtDiff(cutTarget, { plus: true })}
                     </strong>{' '}
                     — that score replaces your current worst counter and pulls the average back down.
@@ -162,11 +163,11 @@ const HandicapExplainerSheet: React.FC<Props> = ({
                 ) : (
                   <>
                     Beat a differential of{' '}
-                    <strong style={{ color: GREEN, fontWeight: 700 }}>
+                    <strong style={{ color: GREEN, fontWeight: 700, ...FIGS }}>
                       {fmtDiff(cutTarget, { plus: true })}
                     </strong>{' '}
                     and your handicap drops. If you don't, it settles at{' '}
-                    <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>
+                    <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700, ...FIGS }}>
                       {fmtDiff(settleAt, { plus: true })}
                     </strong>{' '}
                     — close to where it is now. No risk of going up this round.
