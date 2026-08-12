@@ -288,7 +288,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                   <span
                     style={{
                       fontSize: 8.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.10em',
                       textTransform: 'uppercase',
                       color: viewerStatus === 'rated' ? '#F7931E' : 'rgba(255,255,255,0.82)',
@@ -318,7 +318,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
           >
             <div
               style={{
-                fontSize: 17, fontWeight: 800, color: '#fff',
+                fontSize: 17, fontWeight: 700, color: '#fff',
                 fontVariantNumeric: 'tabular-nums lining',
                 letterSpacing: '-0.015em',
               }}
@@ -445,7 +445,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               />
               <span
                 style={{
-                  fontSize: 15, fontWeight: 800, color: '#fff',
+                  fontSize: 15, fontWeight: 700, color: '#fff',
                   lineHeight: 1, letterSpacing: '-0.015em',
                 }}
               >

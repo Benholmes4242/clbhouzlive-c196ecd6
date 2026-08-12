@@ -782,7 +782,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         >
           {t('statBrowse.eyebrow')}
         </div>
-        <h2 style={{ fontSize: 20, fontWeight: 800, color: INK, marginTop: 4 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: INK, marginTop: 4 }}>
           {t(`statBrowse.lens.${lens}.title`)}
         </h2>
         <p style={{ fontSize: 12.5, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
@@ -873,7 +873,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <div style={{ fontSize: 28, lineHeight: 1 }}>
               <CountryFlag country={country} size="lg" />
             </div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: INK, marginTop: 10 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: INK, marginTop: 10 }}>
               {t('statBrowse.empty.title', { country })}
             </h3>
             <p style={{ fontSize: 13.5, color: INK_MUTE, marginTop: 6, lineHeight: 1.5 }}>

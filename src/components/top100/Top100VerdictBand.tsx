@@ -168,7 +168,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
           alignItems: 'center',
           gap: 7,
           fontSize: 11.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.005em',
           lineHeight: 1.3,
         }}

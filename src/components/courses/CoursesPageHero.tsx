@@ -236,7 +236,7 @@ function CoursesPageHeroInner() {
               <div
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   color: 'rgba(255,255,255,0.62)',
@@ -253,7 +253,7 @@ function CoursesPageHeroInner() {
                 <span
                   style={{
                     fontSize: 39,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#fff',
                     lineHeight: 1,
                     letterSpacing: '-0.03em',
@@ -267,7 +267,7 @@ function CoursesPageHeroInner() {
                 <div
                   style={{
                     fontSize: 18.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#fff',
                     lineHeight: 1.15,
                     letterSpacing: '-0.01em',
@@ -362,7 +362,7 @@ function CoursesPageHeroInner() {
                   background: '#fff',
                   color: '#15171F',
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.005em',
                   padding: '9px 15px',
                   borderRadius: 999,

@@ -94,7 +94,7 @@ export const MoverRow: React.FC<{
           fontVariantNumeric: 'tabular-nums',
           fontFeatureSettings: '"zero" 0, "tnum" 1',
           fontSize: 13,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.02em',
           color: up ? GREEN : RED,
           flexShrink: 0,
@@ -140,7 +140,7 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
           <div
             style={{
               fontSize: 8.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: AMBER,
@@ -151,7 +151,7 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
           <div
             style={{
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.02em',
               marginTop: 3,

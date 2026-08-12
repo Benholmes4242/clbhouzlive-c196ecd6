@@ -158,7 +158,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       <div className="px-4 pb-2" style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
         <h2
           id="course-directory-title"
-          style={{ fontSize: 16, fontWeight: 800, color: INK, marginBottom: 10 }}
+          style={{ fontSize: 16, fontWeight: 700, color: INK, marginBottom: 10 }}
         >
           {t('statBrowse.directory.title')}
         </h2>
@@ -222,7 +222,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                   <span
                     style={{
                       fontSize: 10.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: INK_MUTE,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
@@ -233,7 +233,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                   <button
                     type="button"
                     onClick={clearRecents}
-                    style={{ fontSize: 11, fontWeight: 800, color: INK }}
+                    style={{ fontSize: 11, fontWeight: 700, color: INK }}
                   >
                     {t('directorySheet.recentClear')}
                   </button>
@@ -266,7 +266,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                   className="block"
                   style={{
                     fontSize: 10.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: INK_MUTE,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
@@ -341,7 +341,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
               style={{
                 marginTop: 12,
                 fontSize: 13.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK,
                 textDecoration: 'underline',
                 textUnderlineOffset: 3,
