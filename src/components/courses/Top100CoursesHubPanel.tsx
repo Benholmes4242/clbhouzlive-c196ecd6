@@ -375,7 +375,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             <h2
               style={{
                 margin: 0,
-                fontFamily: "'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 fontSize: 20,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
@@ -396,7 +396,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               maxWidth: 330,
               marginTop: 6,
               marginBottom: 12,
-              fontFamily: "'SF Pro', sans-serif",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               letterSpacing: '-0.005em',
             }}
           >

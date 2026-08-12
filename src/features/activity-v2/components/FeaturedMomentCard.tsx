@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
 const SF_STACK =
-  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;

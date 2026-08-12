@@ -48,7 +48,7 @@ import type { NavigateOptions, To } from 'react-router-dom';
 
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
-const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = INK_TOKEN;
 const INK_55 = INK_45_TOKEN;
 const SLATE_BG = PAGE_BG;

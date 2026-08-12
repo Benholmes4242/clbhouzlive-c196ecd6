@@ -204,7 +204,7 @@ export const CHARCOAL = '#15171F';                           // canonical charco
 // TYPOGRAPHY
 // ============================================================================
 export const FONT =
-  '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // ============================================================================
 // BAR (proportional tug/track fills on light surfaces)

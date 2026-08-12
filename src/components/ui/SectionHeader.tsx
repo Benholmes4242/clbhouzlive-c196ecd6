@@ -8,7 +8,7 @@ import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
 
 
-const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 const AMBER_AA = '#0E1216'; // eyebrow ink (flipped from amber — EYEBROW INK FLIP)
 const INK = '#0F172A';

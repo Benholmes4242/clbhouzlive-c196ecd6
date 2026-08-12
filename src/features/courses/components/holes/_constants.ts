@@ -4,7 +4,7 @@ export const INK = '#0F172A';
 export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // Mono numeral stack - analyst-grade tabular alignment on the Holes tab (data-page exception).
-export const MONO = "'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+export const MONO = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // -----------------------------------------------------------------------------
 // "World Feed" scoring palette.

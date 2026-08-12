@@ -23,7 +23,7 @@ import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds
 
 
 const SF_STACK =
-  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   row: ActivityFeedRowV2;

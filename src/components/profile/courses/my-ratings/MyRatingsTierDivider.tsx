@@ -11,7 +11,7 @@ import type { RatingTier } from '@/lib/ratingTier';
  */
 
 const FONT_SANS =
-  '"SF Pro", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const INK_TERTIARY = '#94A3B8';
 const HAIRLINE = '#E2E8F0';

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useFriendRequestsV2, type FriendRequestRowV2 } from '../hooks/useFriendRequestsV2';
 
 const SF_STACK =
-  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_60 = '#475569';
 const AMBER_DEEP = '#C97A10';

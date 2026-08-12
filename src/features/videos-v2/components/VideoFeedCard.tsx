@@ -20,7 +20,7 @@ import type { VideosFeedV2Row } from '../hooks/useVideosFeedV2';
 import { VideoCardMoreButton } from '@/features/watch-v2/components/VideoCardMoreButton';
 
 const FONT_FAMILY =
-  'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   row: VideosFeedV2Row;

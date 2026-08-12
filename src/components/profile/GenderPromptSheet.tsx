@@ -12,7 +12,7 @@ import { toast } from '@/lib/toast';
 
 // Daylight tokens - kept in-file so this component never depends on a
 // section-scoped stylesheet.
-const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const INK_10 = 'rgba(15,23,42,0.08)';

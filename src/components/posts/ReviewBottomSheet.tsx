@@ -56,7 +56,7 @@ const BODY = '#3A424C';
 const MUTE = '#68707B';
 const GRABBER = '#D6DBE1';
 const FONT_SF =
-  "'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 
 export interface ReviewBottomSheetProps {

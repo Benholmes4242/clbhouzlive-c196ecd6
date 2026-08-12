@@ -13,7 +13,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 const FONTS = {
-  sf: "'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  sf: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
 };
 
 export interface InlineReviewCardProps {

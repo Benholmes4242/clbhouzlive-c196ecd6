@@ -5,7 +5,7 @@
  */
 import React from 'react';
 
-export const SF_STACK = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+export const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 export const INK = '#0F172A';
 export const INK_60 = '#475569';
 export const INK_45 = '#64748B';

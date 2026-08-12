@@ -15,7 +15,7 @@ import { levelForMedals } from '@/components/profile/handicap/whs/gam/trophy-roo
 import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
-const FONT = "'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const GOLD = '#FBBC2E';
 
 interface Props {

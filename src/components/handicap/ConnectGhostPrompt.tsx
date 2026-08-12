@@ -24,7 +24,7 @@ const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER_TINT_BG = 'rgba(247,147,30,0.10)';
 const AMBER_TINT_BORDER = 'rgba(247,147,30,0.20)';
 const AMBER_TEXT_DEEP = '#9A5B08';
-const FONT = 'SF Pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export type ConnectGhostSurface = 'holes' | 'about' | 'profile' | 'champions';
 

@@ -480,7 +480,7 @@ export function ExplorationTab() {
       style={{
         background: BG,
         minHeight: '100%',
-        fontFamily: '"SF Pro", system-ui, -apple-system, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         color: INK,
       }}
     >

@@ -70,7 +70,7 @@ export interface ScoreMarkProps {
   surface?: 'light' | 'dark';
 }
 
-const FONT_SF = "'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const ScoreMark: React.FC<ScoreMarkProps> = ({
   strokes,

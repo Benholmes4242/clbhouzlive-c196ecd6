@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const SF_STACK = "'SF Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const CANVAS = '#F8FAFC';
 const INK = '#0F172A';
 const CHARCOAL = '#15171F';
