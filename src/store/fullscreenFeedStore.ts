@@ -219,9 +219,20 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   },
 
 
-  open: (posts, startIndex = 0, options) => {
+  open: (rawPosts, startIndex = 0, options) => {
+    // ── Media-less posts must never reach the viewer: they have nothing to
+    // paint, so the slide renders black under a full chrome/action rail.
+    // Filter on media presence ONLY (never post type) — a round post with
+    // composer-attached photos HAS media and stays swipeable.
+    // Resolve the tapped post by identity BEFORE filtering, then remap.
+    const intended: FeedPost | undefined = rawPosts[startIndex];
+    if (!hasMedia(intended)) return; // never fall back to index 0
+    const posts = rawPosts.filter(hasMedia);
+    startIndex = Math.max(0, posts.findIndex((p) => p.id === intended!.id));
+
     const openingPost: any = posts[startIndex];
     const slidePostId: string | null = openingPost?.id ?? null;
+
     const openT = traceLookup({ postId: slidePostId });
     trace('store.open', {
       openId: openT?.openId,
@@ -463,11 +474,13 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));
-      const additions = newPosts.filter((p) => !existing.has(p.id));
+      // Same media filter as open(): page two must not introduce blank slides.
+      const additions = newPosts.filter((p) => !existing.has(p.id) && hasMedia(p));
       if (additions.length === 0) return s;
       return { posts: [...s.posts, ...additions] };
     });
   },
+
 
   setActiveIndex: (idx) => {
     const prev = get().activeIndex;
