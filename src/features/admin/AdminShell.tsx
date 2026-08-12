@@ -62,7 +62,14 @@ export default function AdminShell() {
   const segment = location.pathname.split('/')[2] ?? 'dashboard';
   const title = SECTION_TITLES[segment] ?? 'Admin';
 
-  const headerHeight = 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))';
+  // The admin mounts inside .app-shell, which already pays padding-top: var(--sat)
+  // (index.css:772 — /admin-v2 is deliberately NOT an immersive route, so that
+  // padding stays). The header is position: fixed against the VIEWPORT (verified:
+  // no transform/filter/contain/will-change anywhere in the ancestor chain), so it
+  // pays the inset itself. main therefore pads by 52px ONLY — the header's visual
+  // height minus the inset .app-shell has already moved main's top edge down by.
+  // Padding main by headerHeight would bill the notch twice.
+  const headerHeight = 'calc(52px + env(safe-area-inset-top, 0px))';
 
   const defaultRoute = role === 'moderator' ? 'inbox?type=report' : 'dashboard';
   const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
@@ -80,7 +87,7 @@ export default function AdminShell() {
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
           height: headerHeight,
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: t.surface,
           borderBottom: `1px solid ${t.line}`,
           display: 'flex', alignItems: 'center',
@@ -111,7 +118,8 @@ export default function AdminShell() {
       </header>
 
       <main style={{
-        paddingTop: headerHeight,
+        // 52px, NOT headerHeight: see the comment on headerHeight above.
+        paddingTop: '52px',
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         minHeight: '100dvh',
       }}>
