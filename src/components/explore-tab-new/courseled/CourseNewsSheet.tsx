@@ -8,6 +8,7 @@ import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * COURSE NEWS SHEET — the complete list of live courses behind Around the
@@ -114,11 +115,8 @@ export function CourseNewsSheet({
         <div
           id="courseled-news-title"
           style={{
-            fontSize: 20,
-            fontWeight: 800,
+            ...TITLE_METRICS,
             color: A.INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.aroundTheWorld', 'Standout rounds')}
@@ -205,7 +203,7 @@ export function CourseNewsSheet({
                         <span
                           style={{
                             fontSize: 7.5,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             letterSpacing: '0.1em',
                             textTransform: 'uppercase',
                             color: 'rgba(255,255,255,0.72)',
@@ -227,7 +225,7 @@ export function CourseNewsSheet({
                       top: 6,
                       right: 6,
                       fontSize: 7.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                       color: '#FFFFFF',
@@ -263,7 +261,7 @@ export function CourseNewsSheet({
                       right: onToggleShortlist && canShortlist?.(e.courseId) ? 36 : 8,
                       bottom: 6,
                       fontSize: 11,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: '#fff',
                       letterSpacing: '-0.01em',
                       overflow: 'hidden',

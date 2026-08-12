@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { HonoursBoard, GOLD_INK, HONOURS_WASH } from './HonoursBoard';
 import { A, LABEL, SANS } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * THE HONOURS BOARD, ALL TIME — the complete legendary set in the same row
@@ -59,11 +60,8 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
         <div
           id="courseled-honours-title"
           style={{
-            fontSize: 19,
-            fontWeight: 800,
+            ...TITLE_METRICS,
             color: A.INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.honoursTitleSentence', 'The honours board')}

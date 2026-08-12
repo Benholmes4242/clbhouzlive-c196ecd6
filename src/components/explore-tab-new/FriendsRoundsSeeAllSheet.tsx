@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap } from './friendRoundParts';
 import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const SLATE_50 = '#F8FAFC';
@@ -65,11 +66,8 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
         <div
           id="friends-rounds-title"
           style={{
-            fontSize: 20,
-            fontWeight: 700,
+            ...TITLE_METRICS,
             color: INK,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.friendsRounds.title', "Friends' latest rounds")}

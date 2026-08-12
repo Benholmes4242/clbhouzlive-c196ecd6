@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { MostPlayedLeaderboard } from './MostPlayedLeaderboard';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, LABEL, SANS } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * MOST PLAYED SHEET — the full frequency table (BRIEF, section 5 "See all").
@@ -51,11 +52,8 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
         <div
           id="courseled-mostplayed-title"
           style={{
-            fontSize: 19,
-            fontWeight: 800,
+            ...TITLE_METRICS,
             color: A.INK,
-            letterSpacing: '-0.025em',
-            lineHeight: 1.1,
           }}
         >
           {t('discover.mostPlayed', 'Most played this week')}

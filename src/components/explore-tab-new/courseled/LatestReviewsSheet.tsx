@@ -7,6 +7,7 @@ import { useContentReactions, type ReactionTarget } from './hooks/useContentReac
 
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * LATEST REVIEWS SHEET (BRIEF_LATEST_REVIEWS, section 5).
@@ -167,11 +168,8 @@ export function LatestReviewsSheet({
           <div
             id="courseled-reviews-title"
             style={{
-              fontSize: 20,
-              fontWeight: 800,
+              ...TITLE_METRICS,
               color: A.INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
             }}
           >
             {t('discover.latestReviews', 'Latest reviews')}
@@ -226,7 +224,7 @@ export function LatestReviewsSheet({
       <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
         {visible.length === 0 && complete ? (
           <div style={{ padding: '28px 8px', textAlign: 'center' }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: A.INK, letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: A.INK, letterSpacing: '-0.02em' }}>
               {t('discover.reviews.region.emptyTitle', {
                 defaultValue: 'No reviews from {{region}} yet',
                 region: activeLabel,

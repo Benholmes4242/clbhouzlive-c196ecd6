@@ -1,5 +1,6 @@
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 interface RegionSheetProps {
   open: boolean;
@@ -47,10 +48,8 @@ export default function RegionSheet({
         <div
           id="explore-region-sheet-title"
           style={{
-            fontSize: 20,
-            fontWeight: 700,
+            ...TITLE_METRICS,
             color: '#0F172A',
-            letterSpacing: '-0.02em',
           }}
         >
           Browse by region
