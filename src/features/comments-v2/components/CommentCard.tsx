@@ -13,6 +13,7 @@ import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { getActorRouteByType } from '@/types/actor';
 import { CommentImageV2 } from './CommentImageV2';
 import { ReplyRow } from './ReplyRow';
+import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
 

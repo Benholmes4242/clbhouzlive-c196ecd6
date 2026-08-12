@@ -101,10 +101,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
             style={{
               padding: '12px 12px 8px',
               fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
+              ...KICKER,
               color: '#0F172A',
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}
