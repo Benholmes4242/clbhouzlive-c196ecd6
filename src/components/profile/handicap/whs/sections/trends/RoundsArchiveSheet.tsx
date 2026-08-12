@@ -89,7 +89,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
               fontWeight: 700,
               color: CHART.INK,
               letterSpacing: '-0.01em',
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
             }}
           >
             {total != null

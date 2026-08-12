@@ -75,11 +75,11 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
         <span
           style={{
             fontSize: 48,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.022em',
             lineHeight: 1,
             color: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           +{(d.avg_over_par ?? 0).toFixed(1)}
@@ -117,7 +117,7 @@ const GameEverywhereBody: React.FC<{ d: ScoringBreakdownAllCourses }> = ({ d }) 
           <div
             style={{
               fontSize: 14,
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'var(--hcp-t-100)',
               letterSpacing: '-0.01em',
             }}
