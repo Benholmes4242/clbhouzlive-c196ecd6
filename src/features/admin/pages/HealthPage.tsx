@@ -196,7 +196,7 @@ function SystemCard({
             background: tint.bg, color: tint.fg,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>{icon}</span>
-          <div style={{ flex: 1, minWidth: 0, color: t.ink, fontSize: 14.5, fontWeight: 800 }}>{title}</div>
+          <div style={{ flex: 1, minWidth: 0, color: t.ink, fontSize: 14.5, fontWeight: 700 }}>{title}</div>
           <StatusPill chip={chip} />
         </div>
         {children}
@@ -220,7 +220,7 @@ function StatGrid({ stats }: { stats: Array<{ label: string; value: React.ReactN
           </div>
           <div style={{
             color: s.bad ? t.dangerText : t.ink,
-            fontSize: 17, fontWeight: 800, lineHeight: 1.1,
+            fontSize: 17, fontWeight: 700, lineHeight: 1.1,
             fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
           }}>{s.value}</div>
         </div>
@@ -528,14 +528,14 @@ function WatchdogRow({
       <div style={{ color: t.ink, fontSize: 13, fontWeight: 600, lineHeight: 1.35 }}>
         Queued{' '}
         <span style={{
-          color: countColor, fontWeight: 800,
+          color: countColor, fontWeight: 700,
           fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
         }}>
           {wd.queue_rows_60m}
         </span>
         {' of '}
         <span style={{
-          color: t.ink, fontWeight: 800,
+          color: t.ink, fontWeight: 700,
           fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
         }}>
           {wd.notifications_60m_push_eligible}

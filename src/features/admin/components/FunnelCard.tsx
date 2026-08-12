@@ -39,7 +39,7 @@ export default function FunnelCard({ view, loading }: Props) {
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: 1,
                     }}>{s.label}</div>
                     <div style={{
-                      color: t.ink, fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                      color: t.ink, fontSize: 15, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
                       flexShrink: 0,
                     }}>{s.count.toLocaleString()}</div>
                   </div>

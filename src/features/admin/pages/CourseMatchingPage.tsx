@@ -385,7 +385,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
               display: 'inline-flex', alignItems: 'center',
               padding: '2px 8px', borderRadius: 999,
               background: t.neutralSoft, color: t.inkMuted,
-              fontSize: 11, fontWeight: 600,
+              fontSize: 11, fontWeight: 600, fontVariantNumeric: 'tabular-nums',
             }}
           >
             {row.scored_rounds} {row.scored_rounds === 1 ? 'round' : 'rounds'}
@@ -398,7 +398,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
                 display: 'inline-flex', alignItems: 'center',
                 padding: '2px 8px', borderRadius: 999,
                 background: t.neutralSoft, color: t.inkMuted,
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
               }}
             >
               Needs catalogue entry
@@ -411,7 +411,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, color: t.inkMuted, fontSize: 12 }}>
         <span>conf <span style={{ color: t.ink, fontWeight: 600, fontFeatureSettings: '"tnum" 1' }}>{conf}</span></span>
         <span>·</span>
-        <span>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
         <span>·</span>
         <span>{relTime(row.matched_at)}</span>
         {row.suggested_course_name && (
@@ -720,7 +720,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Search golf_courses
             </label>
             <input
@@ -742,7 +742,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
 
           {suggestion && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                 Model suggestion
               </div>
               <CourseRow hit={suggestion} label="Model suggestion" />
@@ -750,7 +750,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Results
             </div>
             {searchErr ? (
@@ -769,7 +769,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Notes (optional)
             </label>
             <textarea

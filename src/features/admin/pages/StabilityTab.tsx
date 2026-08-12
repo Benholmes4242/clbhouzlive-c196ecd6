@@ -88,7 +88,7 @@ function Headline({ loading, data }: { loading: boolean; data: ReturnType<typeof
           Crash-free sessions · 7d
         </div>
         <div style={{
-          color: t.ink, fontSize: 24, fontWeight: 800, lineHeight: 1.1,
+          color: t.ink, fontSize: 24, fontWeight: 700, lineHeight: 1.1,
           fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
         }}>
           {primary}
@@ -144,7 +144,7 @@ function TopErrorsCard({ loading, topErrors }: { loading: boolean; topErrors: To
     }}>
       <div style={{
         padding: '12px 16px',
-        color: t.ink, fontSize: 14.5, fontWeight: 800,
+        color: t.ink, fontSize: 14.5, fontWeight: 700,
         borderBottom: `1px solid ${t.line}`,
       }}>
         Top errors

@@ -263,7 +263,7 @@ function Headline({
       }}>{eyebrow}</div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
         <div style={{
-          color: t.ink, fontSize: 38, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+          color: t.ink, fontSize: 38, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
         }}>
           {loading ? '-' : value}
         </div>
@@ -962,7 +962,7 @@ function LiveCountCard({ live, loading }: { live: number | null; loading: boolea
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
         <div style={{
-          color: t.ink, fontSize: 42, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+          color: t.ink, fontSize: 42, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
         }}>
           {loading || live === null ? '-' : fmtInt(live)}
         </div>
@@ -1228,7 +1228,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
         }}>Events in period</div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
           <div style={{
-            color: t.ink, fontSize: 38, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+            color: t.ink, fontSize: 38, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
           }}>
             {isLoading ? '-' : fmtInt(totals.count)}
           </div>
@@ -1450,7 +1450,7 @@ function StatBox({ label, value }: { label: string; value: string }) {
         color: t.inkFaint, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase',
       }}>{label}</div>
       <div style={{
-        color: t.ink, fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+        color: t.ink, fontSize: 18, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
       }}>{value}</div>
     </div>
   );

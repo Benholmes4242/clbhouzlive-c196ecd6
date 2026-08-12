@@ -68,7 +68,7 @@ export default function MetricCard({
         {label}
       </div>
       <div style={{
-        color: t.ink, fontSize: 24, fontWeight: 800, lineHeight: 1.05,
+        color: t.ink, fontSize: 24, fontWeight: 700, lineHeight: 1.05,
         letterSpacing: '-0.03em',
         fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1',
         fontVariantNumeric: 'tabular-nums',
@@ -81,6 +81,7 @@ export default function MetricCard({
           display: 'inline-flex', alignItems: 'center', gap: 2,
           color: state === 'up' ? t.okText : state === 'down' ? t.dangerText : t.inkMuted,
           fontSize: 11, fontWeight: 600,
+          fontVariantNumeric: 'tabular-nums',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {state === 'up' && <ArrowUpRight size={11} />}

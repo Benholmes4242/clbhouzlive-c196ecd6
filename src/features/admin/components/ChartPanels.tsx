@@ -84,7 +84,7 @@ export function RightNowPanel({
         <Skeleton height={32} />
       ) : (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ ...FIG, color: t.ink, fontSize: 32, fontWeight: 800, lineHeight: 1 }}>
+          <span style={{ ...FIG, color: t.ink, fontSize: 32, fontWeight: 700, lineHeight: 1 }}>
             {num(live ?? 0)}
           </span>
           <span style={{ color: t.inkMuted, fontSize: 13, fontWeight: 500 }}>
@@ -191,7 +191,7 @@ export function RetentionPanel({ data, loading }: { data?: Retention; loading: b
                 {/* eligible 0 renders nothing: no 0%, no dash, no n/a. */}
                 {col.eligible > 0 ? (
                   <>
-                    <div style={{ ...FIG, color: t.ink, fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', marginTop: 2 }}>
+                    <div style={{ ...FIG, color: t.ink, fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', marginTop: 2 }}>
                       {Math.round((col.returned / col.eligible) * 100)}%
                     </div>
                     <div style={{ ...LABEL, ...FIG, marginTop: 1 }}>
@@ -299,7 +299,7 @@ export function ActiveMembersPanel({
             ] as const).map(([label, value]) => (
               <div key={label}>
                 <div style={LABEL}>{label}</div>
-                <div style={{ ...FIG, color: t.ink, fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', marginTop: 2 }}>
+                <div style={{ ...FIG, color: t.ink, fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', marginTop: 2 }}>
                   {value}
                 </div>
               </div>

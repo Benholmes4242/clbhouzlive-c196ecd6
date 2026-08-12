@@ -267,7 +267,7 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1 }}>
+            <span style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 }}>
               {num(a.connected)}
             </span>
             <span style={{ color: t.inkMuted, fontSize: 12 }}>of {num(a.members_total)} members</span>
@@ -287,7 +287,7 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
             ] as const).map(([label, value, color]) => (
               <div key={label}>
                 <div style={LABEL}>{label}</div>
-                <div style={{ ...FIG, color, fontSize: 17, fontWeight: 800, marginTop: 2 }}>{num(value)}</div>
+                <div style={{ ...FIG, color, fontSize: 17, fontWeight: 700, marginTop: 2 }}>{num(value)}</div>
               </div>
             ))}
           </div>
@@ -329,7 +329,7 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
           <div style={{ display: 'flex', gap: 24 }}>
             <div>
               <div style={LABEL}>Waiting</div>
-              <div style={{ ...FIG, color: tone === 'ok' ? t.ink : toneColor(tone), fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+              <div style={{ ...FIG, color: tone === 'ok' ? t.ink : toneColor(tone), fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                 {num(p.unprocessed)}
               </div>
             </div>
@@ -337,14 +337,14 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
             {p.unprocessed > 0 ? (
               <div>
                 <div style={LABEL}>Oldest</div>
-                <div style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+                <div style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                   {formatDurationShort(p.oldest_wait_sec)}
                 </div>
               </div>
             ) : null}
             <div>
               <div style={LABEL}>Median</div>
-              <div style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+              <div style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                 {formatDurationShort(p.median_process_sec)}
               </div>
             </div>
