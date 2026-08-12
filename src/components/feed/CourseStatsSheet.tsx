@@ -22,6 +22,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { FIGS } from '@/lib/tokens/type';
 
 const THIN_ROUNDS = 10;
 
@@ -35,12 +36,9 @@ const LINE = 'rgba(255,255,255,0.10)';
 // App charcoal surface (same value the dark handicap hero uses via --hcp-bg-0).
 const CHARCOAL = '#15171F';
 
-const MONO =
-  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace';
-
 const kickerStyle: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   color: AMBER,
@@ -48,7 +46,7 @@ const kickerStyle: React.CSSProperties = {
 
 const sectionLabel: React.CSSProperties = {
   fontSize: 8.5,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
   color: T40,
@@ -69,10 +67,9 @@ const Section: React.FC<{
     {figure ? (
       <div
         style={{
-          fontFamily: MONO,
-          fontVariantNumeric: 'tabular-nums',
+          ...FIGS,
           fontSize: figureSize,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.035em',
           lineHeight: 1,
           color: figureColor ?? T100,
@@ -173,7 +170,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
           <h2
             style={{
               fontSize: 21,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               color: T100,
               marginTop: 6,
@@ -204,8 +201,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 12.5,
-                    fontFamily: MONO,
-                    fontVariantNumeric: 'tabular-nums',
+                    ...FIGS,
                     color: T70,
                   }}
                 >
@@ -231,7 +227,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
               }}
             >
               <Star size={11} color={AMBER} fill={AMBER} />
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: AMBER }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: AMBER }}>
                 {`#${data.top100_rank}${data.top100_list ? ` \u00b7 ${data.top100_list}` : ''}`}
               </span>
             </div>
@@ -298,10 +294,9 @@ export const CourseStatsSheet: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
               <span
                 style={{
-                  fontFamily: MONO,
-                  fontVariantNumeric: 'tabular-nums',
+                  ...FIGS,
                   fontSize: 26,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.035em',
                   color: T100,
                 }}
@@ -310,7 +305,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
               </span>
               <span style={{ fontSize: 13, color: T70 }}>
                 {t('feed.courseSheet.hardestHoleMeta', { par: data.hardest_hole_par ?? 0 })}{' '}
-                <span style={{ color: RED, fontFamily: MONO, fontWeight: 800 }}>
+                <span style={{ color: RED, ...FIGS, fontWeight: 700 }}>
                   {data.hardest_hole_plays != null ? data.hardest_hole_plays.toFixed(2) : ''}
                 </span>
               </span>
@@ -332,7 +327,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
               background: AMBER,
               color: '#0F172A',
               fontSize: 14.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               cursor: 'pointer',
             }}

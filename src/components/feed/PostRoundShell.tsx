@@ -32,7 +32,7 @@ const Line: React.FC<{ size: number; width: number | string; tone?: string }> = 
   width,
   tone,
 }) => (
-  <span style={{ fontSize: size, fontWeight: 800, lineHeight: size === 34 ? 1 : undefined }}>
+  <span style={{ fontSize: size, fontWeight: 700, lineHeight: size === 34 ? 1 : undefined }}>
     <span style={bar(width, tone)}>&nbsp;</span>
   </span>
 );
