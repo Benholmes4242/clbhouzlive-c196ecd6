@@ -103,7 +103,7 @@ export const HoleRow: React.FC<{
         <span
           style={{
             fontFamily: SANS,
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             fontSize: 12,
             fontWeight: 600,
             color: A.MUTE,
@@ -116,7 +116,7 @@ export const HoleRow: React.FC<{
           <span
             style={{
               fontFamily: SANS,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               fontSize: 12,
               fontWeight: 600,
               color: A.MUTE,

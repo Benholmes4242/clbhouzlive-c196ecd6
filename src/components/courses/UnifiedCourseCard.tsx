@@ -319,7 +319,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <div
               style={{
                 fontSize: 17, fontWeight: 700, color: '#fff',
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
                 letterSpacing: '-0.015em',
               }}
             >
@@ -447,7 +447,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 style={{
                   fontSize: 15, fontWeight: 700, color: '#fff',
                   lineHeight: 1, letterSpacing: '-0.015em',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {course.communityRating.toFixed(1)}

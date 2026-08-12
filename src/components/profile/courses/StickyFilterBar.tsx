@@ -95,7 +95,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                     fontSize: 11.5,
                     fontWeight: 600,
                     color: isActive ? 'rgba(255,255,255,0.65)' : '#94A3B8',
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
                   {count}

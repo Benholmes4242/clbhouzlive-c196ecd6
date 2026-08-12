@@ -242,7 +242,7 @@ function CoursesPageHeroInner() {
                   color: 'rgba(255,255,255,0.62)',
                   marginBottom: 8,
                   fontFeatureSettings: '"tnum" 1',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {eyebrowParts.join(' · ')}
@@ -259,7 +259,7 @@ function CoursesPageHeroInner() {
                     lineHeight: 1,
                     letterSpacing: '-0.03em',
                     fontFeatureSettings: '"tnum" 1',
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
                   #{hero.list_rank}

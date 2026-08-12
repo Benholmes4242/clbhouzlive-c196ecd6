@@ -342,7 +342,7 @@ function UpcomingAct({
               {firstTee && (
                 <>
                   <span style={{ color: INK_MUTE }}>{t('tournament.shell.field.firstTeeSep')}</span>
-                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums lining' }}>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {`${formatWeekdayShort(new Date(firstTee))} ${formatTimeHm(new Date(firstTee))}`}
                   </span>
                 </>

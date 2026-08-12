@@ -31,7 +31,7 @@ const VALUE_STYLE = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
-  fontVariantNumeric: 'tabular-nums lining' as const,
+  fontVariantNumeric: 'tabular-nums lining-nums' as const,
 };
 
 export const Last5AgainstTarget: React.FC<Props> = ({

@@ -6,7 +6,7 @@ import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
+const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums lining-nums' };
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const GOOD = '#34D399';
@@ -184,11 +184,11 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             alignItems: 'baseline', padding: '0 4px',
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: DIM,
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: DIM,
             }}>
               {periodLabel}
             </span>
-            <span style={{ fontSize: 12, fontWeight: 800, color: chipColor, ...NUM }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: chipColor, ...NUM }}>
               {arrow ? `${arrow} ` : ''}{Math.abs(netDelta).toFixed(1)}
             </span>
           </div>
@@ -200,7 +200,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
           }}>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{
-                fontSize: 20, fontWeight: 800, color: INK, lineHeight: 1,
+                fontSize: 20, fontWeight: 700, color: INK, lineHeight: 1,
                 letterSpacing: '-0.01em', ...NUM,
               }}>
                 {selected.handicap_index.toFixed(1)}
@@ -214,7 +214,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             </span>
             {isSelectedMin && (
               <span style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: GOOD,
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: GOOD,
               }}>
                 LOWEST OF THE PERIOD
               </span>
@@ -296,13 +296,13 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             {/* h. Extent labels */}
             <text
               x={PADX} y={H - 6} fill={FAINT}
-              style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em' }}
+              style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em' }}
             >
               {fmtDateShort(first.observed_at)}
             </text>
             <text
               x={W - PADR} y={H - 6} textAnchor="end" fill={FAINT}
-              style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em' }}
+              style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em' }}
             >
               {fmtDateShort(last.observed_at)}
             </text>
@@ -321,7 +321,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
                 boxSizing: 'border-box',
               }} />
               <span style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: FAINT,
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: FAINT,
               }}>
                 LOWEST{' '}
                 <span style={{ color: GOOD, ...NUM }}>{dataMin.toFixed(1)}</span>
@@ -330,7 +330,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
               </span>
             </span>
             <span style={{
-              fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: FAINT, ...NUM,
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: FAINT, ...NUM,
             }}>
               {n} SNAPSHOTS
             </span>
@@ -363,7 +363,7 @@ const RangePills: React.FC<{
               color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
               fontFamily: FONT,
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.06em',
               borderRadius: 999,
               border: 'none',

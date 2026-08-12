@@ -432,7 +432,7 @@ const FilterChip: React.FC<{
       style={{
         fontSize: 11,
         fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         opacity: active ? 0.7 : 0.5,
       }}
     >
@@ -466,7 +466,7 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: T.inkFaded,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
       }}
     >
       {count} {count === 1 ? 'round' : 'rounds'}
@@ -536,7 +536,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
             letterSpacing: '-0.045em',
             color: T.ink,
             lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             minHeight: 21,
           }}
         >
@@ -600,7 +600,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
             letterSpacing: '-0.03em',
             color: T.ink,
             lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             minHeight: 15,
           }}
         >

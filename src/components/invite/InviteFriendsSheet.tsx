@@ -306,7 +306,7 @@ function FriendGroup({
         }}
       >
         <span style={KICKER}>{label}</span>
-        <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining' }}>{rows.length}</span>
+        <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums' }}>{rows.length}</span>
       </div>
       {/* BRIEF_INVITE_SHEET_SURFACE: no fill here. The rows sit on the sheet's
           own canvas; the hairline above separates them from the header, and
@@ -664,7 +664,7 @@ function UnconnectedState({ source }: { source: string }) {
             <div
               style={{
                 fontFamily: SANS,
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
                 fontSize: 12.5,
                 color: A.MUTE,
                 whiteSpace: 'nowrap',

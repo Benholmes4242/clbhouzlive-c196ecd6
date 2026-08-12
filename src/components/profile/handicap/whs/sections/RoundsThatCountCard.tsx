@@ -24,7 +24,7 @@ interface Props {
 
 // ── Tokens ────────────────────────────────────────────────────────────────
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT_SF, fontVariantNumeric: 'tabular-nums' };
+const NUM: React.CSSProperties = { fontFamily: FONT_SF, fontVariantNumeric: 'tabular-nums lining-nums' };
 
 const GOOD = '#55BD8B';
 const AMBER = '#F7931E';
@@ -324,7 +324,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               <span
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.14em',
                   color: DIM,
                 }}
@@ -335,7 +335,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 12,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: GOOD,
                     ...NUM,
                   }}
@@ -387,7 +387,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 13,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: INK,
                     ...NUM,
                   }}
@@ -397,7 +397,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 13,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: diffColor,
                     ...NUM,
                   }}
@@ -415,7 +415,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 9,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.1em',
                     color: statusColor,
                   }}
@@ -554,7 +554,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 fill={FAINT}
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                 }}
               >
@@ -567,7 +567,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 fill={FAINT}
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                 }}
               >
@@ -599,7 +599,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 <span
                   style={{
                     fontSize: 9,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.1em',
                     color: FAINT,
                   }}
@@ -622,7 +622,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.1em',
                       color: FAINT,
                     }}
@@ -649,7 +649,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               <span
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.12em',
                   color: DIM,
                 }}
@@ -667,7 +667,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   <span
                     style={{
                       fontSize: 9,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.1em',
                       color: FAINT,
                     }}
@@ -687,7 +687,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         <span
                           style={{
                             fontSize: 12,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             color: GOOD,
                             ...NUM,
                           }}
@@ -697,7 +697,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         <span
                           style={{
                             fontSize: 9,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             letterSpacing: '0.1em',
                             color: GOOD,
                           }}
@@ -717,7 +717,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         <span
                           style={{
                             fontSize: 12,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             color: WARN,
                             ...NUM,
                           }}
@@ -727,7 +727,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         <span
                           style={{
                             fontSize: 9,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             letterSpacing: '0.1em',
                             color: WARN,
                           }}
@@ -739,7 +739,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                       <span
                         style={{
                           fontSize: 9,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           letterSpacing: '0.1em',
                           color: FAINT,
                         }}

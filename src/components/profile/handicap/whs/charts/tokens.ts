@@ -82,6 +82,6 @@ export const LABEL_STYLE = {
   textTransform: 'uppercase' as const,
   /* Axis and footer figures live in this role. Tabular so an axis label does
      not shift width as the data changes. */
-  fontVariantNumeric: 'tabular-nums lining' as const,
+  fontVariantNumeric: 'tabular-nums lining-nums' as const,
   color: CHART.DIM,
 };

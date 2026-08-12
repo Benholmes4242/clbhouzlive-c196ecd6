@@ -146,7 +146,7 @@ export const TrophyRoomEntryRow: React.FC<Props> = ({
               fontWeight: 700,
               color: t_.ink,
               letterSpacing: '-0.02em',
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {earned}

@@ -148,7 +148,7 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
               marginTop: 4,
               ...LABEL_STYLE,
               color: 'rgba(255,255,255,0.82)',
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {meta}
@@ -219,7 +219,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             fontSize: 13,
             fontWeight: 600,
             color: 'var(--hcp-t-60)',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {indexBefore.toFixed(1)}
@@ -232,7 +232,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             fontSize: 15,
             fontWeight: 700,
             color: rose ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {indexAfter.toFixed(1)}
@@ -246,7 +246,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
             fontSize: 15,
             fontWeight: 700,
             color: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {indexAfter.toFixed(1)}
@@ -340,7 +340,7 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
                     fontWeight: 700,
                     color,
                     letterSpacing: '-0.04em',
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                     lineHeight: 1,
                   }}
                 >

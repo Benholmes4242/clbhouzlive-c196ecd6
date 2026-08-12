@@ -227,7 +227,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                     fontWeight: 700,
                     letterSpacing: '0.04em',
                     color: isTop ? GOLD : INK_MUTE,
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
                   No.{s.rank}

@@ -202,7 +202,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
 
         {standsAlone && <p style={CAPTION}>{t('champions.standsAlone')}</p>}
-        {!standsAlone && chaseCta && <p style={{ ...CAPTION, fontVariantNumeric: 'tabular-nums lining' }}>{chaseCta}</p>}
+        {!standsAlone && chaseCta && <p style={{ ...CAPTION, fontVariantNumeric: 'tabular-nums lining-nums' }}>{chaseCta}</p>}
 
         <Action
           label={
@@ -211,7 +211,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               : t('champions.fullLeaderboard')
           }
           onClick={onFullLeaderboardTap}
-          style={{ width: '100%', fontVariantNumeric: 'tabular-nums lining', marginTop: 6 }}
+          style={{ width: '100%', fontVariantNumeric: 'tabular-nums lining-nums', marginTop: 6 }}
         />
 
         {proBenchmark && (

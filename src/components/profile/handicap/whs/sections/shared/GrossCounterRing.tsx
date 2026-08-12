@@ -31,7 +31,7 @@ export const GlassGrossRing: React.FC<GlassGrossRingProps> = ({
           color: '#FFFFFF',
           letterSpacing: '-0.03em',
           lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           display: 'inline-block',
         }}
       >
@@ -57,7 +57,7 @@ export const GlassGrossRing: React.FC<GlassGrossRingProps> = ({
         color: '#FFFFFF',
         letterSpacing: '-0.03em',
         lineHeight: 1,
-        fontVariantNumeric: 'tabular-nums lining',
+        fontVariantNumeric: 'tabular-nums lining-nums',
       }}
     >
       {value}
@@ -86,7 +86,7 @@ export const MiniGrossRing: React.FC<MiniGrossRingProps> = ({ value, isCounter }
           color: '#FFFFFF',
           letterSpacing: '-0.03em',
           lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         {value}
@@ -110,7 +110,7 @@ export const MiniGrossRing: React.FC<MiniGrossRingProps> = ({ value, isCounter }
         color: '#FFFFFF',
         letterSpacing: '-0.03em',
         lineHeight: 1,
-        fontVariantNumeric: 'tabular-nums lining',
+        fontVariantNumeric: 'tabular-nums lining-nums',
       }}
     >
       {value}

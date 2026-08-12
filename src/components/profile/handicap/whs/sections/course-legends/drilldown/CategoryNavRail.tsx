@@ -76,7 +76,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
                   fontSize: 11,
                   fontWeight: 700,
                   fontFamily: GAM.FONT_SF,
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   letterSpacing: '-0.02em',
                 }}
               >

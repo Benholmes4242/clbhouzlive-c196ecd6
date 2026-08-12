@@ -25,7 +25,7 @@ const inputStyle = (invalid: boolean): React.CSSProperties => ({
   fontFamily: FONT,
   outline: 'none',
   background: '#FFF',
-  fontVariantNumeric: 'tabular-nums lining',
+  fontVariantNumeric: 'tabular-nums lining-nums',
 });
 
 /** SCREEN 3 - SIGN IN, and its rejected-credential state. */

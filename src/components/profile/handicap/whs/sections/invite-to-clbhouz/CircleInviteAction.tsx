@@ -98,7 +98,7 @@ export const CircleInviteAction: React.FC<Props> = ({ ownerUserId }) => {
               fontWeight: 700,
               letterSpacing: '-0.035em',
               color: 'var(--hcp-t-100)',
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {connected
@@ -106,7 +106,7 @@ export const CircleInviteAction: React.FC<Props> = ({ ownerUserId }) => {
               : t('handicap.circle.invite.headingUnconnected')}
           </h3>
           {connected && (
-            <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining', flexShrink: 0 }}>
+            <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums', flexShrink: 0 }}>
               {t('handicap.circle.invite.invitedCount', { count: invitedTotal })}
             </span>
           )}

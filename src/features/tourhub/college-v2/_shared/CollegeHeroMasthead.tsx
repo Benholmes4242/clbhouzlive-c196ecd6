@@ -224,7 +224,7 @@ export function CollegeHeroMasthead({
               alignItems: 'flex-start',
               justifyContent: 'center',
               gap: 28,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {showEarnings && (

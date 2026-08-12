@@ -143,7 +143,7 @@ export function FullListSheet({
               textTransform: 'uppercase',
               color: INK,
               marginBottom: 5,
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {eyebrow}
@@ -250,7 +250,7 @@ export function FullListSheet({
                       textAlign: 'right',
                       fontSize: 12,
                       fontWeight: 500,
-                      fontVariantNumeric: 'tabular-nums lining',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
                       color: INK_MUTE,
                       lineHeight: 1,
                     }}
@@ -315,7 +315,7 @@ export function FullListSheet({
                         fontWeight: 700,
                         color: INK,
                         lineHeight: 1,
-                        fontVariantNumeric: 'tabular-nums lining',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
                       }}
                     >
                       {r.valueFormatted}
@@ -332,7 +332,7 @@ export function FullListSheet({
                           color: INK_FAINT,
                           whiteSpace: 'nowrap',
                           lineHeight: 1,
-                          fontVariantNumeric: 'tabular-nums lining',
+                          fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >
                         {t('leaders.behind', { gap: r.behindFormatted })}

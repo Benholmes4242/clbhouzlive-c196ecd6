@@ -67,7 +67,7 @@ function RankedPlayerRowInner({
     border: 'none',
     textAlign: 'left',
     fontFamily: 'inherit',
-    fontVariantNumeric: 'tabular-nums lining',
+    fontVariantNumeric: 'tabular-nums lining-nums',
   };
 
   const body = (
@@ -81,7 +81,7 @@ function RankedPlayerRowInner({
           fontSize: 15,
           fontWeight: 200,
           color: INK,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           textAlign: 'right',
         }}
       >
@@ -161,7 +161,7 @@ function RankedPlayerRowInner({
           fontSize: 14,
           fontWeight: 200,
           color: INK,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           lineHeight: 1,
         }}
       >

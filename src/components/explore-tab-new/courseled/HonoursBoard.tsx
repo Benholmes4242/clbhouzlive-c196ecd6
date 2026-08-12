@@ -166,7 +166,7 @@ export function HonoursRow({
           fontSize: 9,
           color: GOLD_INK,
           flexShrink: 0,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         {formatYearNumeric(e.at)}
@@ -235,7 +235,7 @@ export function HonoursBoard({
                   fontSize: 9,
                   color: A.DIM,
                   marginLeft: 'auto',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {t('discover.honoursOnTheBoard', '{{count}} on the board', {

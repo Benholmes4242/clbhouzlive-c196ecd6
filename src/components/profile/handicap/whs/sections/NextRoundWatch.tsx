@@ -201,7 +201,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                     fontSize: 14.5,
                     fontWeight: 600,
                     color: CHART.INK,
-                    fontVariantNumeric: 'tabular-nums lining',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
                   {r.shoot.toFixed(1)}
@@ -220,7 +220,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
                       fontSize: 14.5,
                       fontWeight: 700,
                       color: moves ? CHART.DOWN : CHART.MUTE,
-                      fontVariantNumeric: 'tabular-nums lining',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
                     {r.becomes.toFixed(1)}

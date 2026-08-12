@@ -171,7 +171,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
             fontWeight: 700,
             letterSpacing: '-0.045em',
             color: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             fontFeatureSettings: '"kern" 1, "liga" 1',
             lineHeight: 1,
           }}
@@ -190,7 +190,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
                 fontSize: 11,
                 fontWeight: 700,
                 color: deltaColor,
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,

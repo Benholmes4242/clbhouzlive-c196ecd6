@@ -436,7 +436,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   fontWeight: 700,
                   color: INK,
                   letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums lining',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >
@@ -607,7 +607,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               fontSize: 11.5,
               fontWeight: 700,
               letterSpacing: '0.06em',
-              fontVariantNumeric: 'tabular-nums lining',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               textTransform: 'uppercase',
               cursor: 'pointer',
               boxShadow: '0 4px 16px rgba(15,23,42,0.28)',

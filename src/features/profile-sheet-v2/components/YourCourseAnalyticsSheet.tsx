@@ -615,7 +615,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           flexDirection: 'column',
           flex: 1,
           minHeight: 0,
-          // Figures inherit tabular-nums lining from here down, so the bucket
+          // Figures inherit tabular-nums lining-nums from here down, so the bucket
           // percentage column stacks its decimals and % signs.
           ...FIGS,
         }}

@@ -131,7 +131,7 @@ function Column({
           fontWeight: 700,
           color: WHITE_ALPHA_65,
           letterSpacing: '0.02em',
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           textAlign: 'center',
         }}
       >

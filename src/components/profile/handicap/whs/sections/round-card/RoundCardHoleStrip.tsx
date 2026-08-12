@@ -131,7 +131,7 @@ const HoleCell: React.FC<{
                 fontSize: 10,
                 fontWeight: 700,
                 color: numeralColor,
-                fontVariantNumeric: 'tabular-nums lining',
+                fontVariantNumeric: 'tabular-nums lining-nums',
                 lineHeight: 1,
                 fontFamily: FONT_SF,
               }}
@@ -232,7 +232,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
           alignItems: 'baseline',
           justifyContent: 'flex-end',
           gap: 4,
-          fontVariantNumeric: 'tabular-nums lining',
+          fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>

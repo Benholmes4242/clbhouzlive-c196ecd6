@@ -173,11 +173,11 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
           <span
             style={{
               fontSize: 9.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.12em',
               color: T.ink40,
               fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
             {metaCount}
@@ -270,7 +270,7 @@ const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode
             cursor: 'pointer',
             fontFamily: FONT,
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.08em',
             transition: 'background 160ms ease, color 160ms ease',
           }}
@@ -310,7 +310,7 @@ const ScopeToggle: React.FC<{
           cursor: 'pointer',
           fontFamily: FONT,
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.06em',
           transition: 'background 160ms ease, color 160ms ease',
         }}
@@ -379,7 +379,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
         <span
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
             fontFamily: FONT,
@@ -390,11 +390,11 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
         <span
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.ink40,
             fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {dist.total} ROUNDS
@@ -409,7 +409,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
             <span
               style={{
                 fontSize: 30,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: CHART.INK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -457,9 +457,9 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               <div
                 style={{
                   fontSize: 16,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: isZero ? T.inkMute : c.color,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >
@@ -468,7 +468,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: T.ink40,
                   letterSpacing: '0.12em',
                   marginTop: 6,
@@ -479,11 +479,11 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
                   marginTop: 3,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {c.range}
@@ -514,7 +514,7 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
     <div
       style={{
         fontSize: 10,
-        fontWeight: 800,
+        fontWeight: 700,
         color: T.ink,
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
@@ -537,7 +537,7 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
         fontSize: 10.5,
         color: T.inkMute,
         fontWeight: 600,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         whiteSpace: 'nowrap',
       }}
     >
@@ -575,7 +575,7 @@ const ScoringRangeBlock: React.FC<{
         <span
           style={{
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: T.inkMute,
             letterSpacing: '0.14em',
           }}
@@ -585,9 +585,9 @@ const ScoringRangeBlock: React.FC<{
         <span
           style={{
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: T.ink40,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
             letterSpacing: '0.10em',
           }}
         >
@@ -628,10 +628,10 @@ const ScoringRangeBlock: React.FC<{
           justifyContent: 'space-between',
           marginTop: 8,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.10em',
           color: T.ink40,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         <span>
@@ -780,7 +780,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         <span
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
             fontFamily: FONT,
@@ -791,11 +791,11 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         <span
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.ink40,
             fontFamily: FONT,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {totalHoles} HOLES · {roundsWithHoles} ROUNDS
@@ -810,7 +810,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
             <span
               style={{
                 fontSize: 30,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: SC_BIRDIE_DARK,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums lining-nums',
@@ -862,9 +862,9 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               <div
                 style={{
                   fontSize: 15,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: countColor,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   lineHeight: 1,
                 }}
               >
@@ -873,7 +873,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: labelColor,
                   letterSpacing: '0.12em',
                   marginTop: 6,
@@ -884,11 +884,11 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               <div
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
                   marginTop: 3,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {pct}%
@@ -1007,7 +1007,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         <span
           style={{
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
             fontFamily: FONT,
@@ -1019,10 +1019,10 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
           style={{
             fontFamily: FONT,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.10em',
             color: T.ink40,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           <span
@@ -1071,8 +1071,8 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 12,
-                  fontWeight: 800,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   flexShrink: 0,
                   background: unlocked ? row.color : 'transparent',
                   color: unlocked ? BADGE_INK : T.ink40,
@@ -1087,7 +1087,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                 <div
                   style={{
                     fontSize: 14,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: unlocked ? T.ink : T.inkMute,
                     lineHeight: 1.15,
                   }}
@@ -1098,7 +1098,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                   style={{
                     marginTop: 3,
                     fontSize: 9.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.10em',
                   }}
                 >
@@ -1121,9 +1121,9 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
               <div
                 style={{
                   fontSize: 17,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: unlocked ? row.color : 'rgba(242,244,247,0.22)',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                   letterSpacing: '-0.01em',
                 }}
               >

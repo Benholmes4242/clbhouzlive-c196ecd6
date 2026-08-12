@@ -182,7 +182,7 @@ export function OneThingRow({ userId, onFindGolfers }: Props) {
             color: A.DIM,
             marginTop: 4,
             whiteSpace: 'nowrap',
-            fontVariantNumeric: 'tabular-nums lining',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {status}

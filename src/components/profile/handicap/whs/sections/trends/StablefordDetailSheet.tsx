@@ -26,7 +26,7 @@ const LABEL: React.CSSProperties = {
   margin: 0,
   fontFamily: FONT,
   fontSize: 9.5,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: CHART.DIM,
@@ -115,15 +115,15 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
           style={{
             margin: '6px 0 0',
             fontFamily: FONT,
-            fontSize: 20,
-            fontWeight: 800,
+            fontSize: 17,
+            fontWeight: 700,
             letterSpacing: '-0.01em',
             color: CHART.INK,
           }}
         >
           {t('stableford.title')}
         </h2>
-        <p style={{ ...LABEL, marginTop: 6 }}>
+        <p style={{ ...LABEL, marginTop: 6, fontVariantNumeric: 'tabular-nums lining-nums' }}>
           {t('stableford.sample', { count: dist.total, scope: scopeLabel })}
         </p>
 
@@ -153,7 +153,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
                 style={{
                   fontFamily: FONT,
                   fontSize: 34,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: CHART.INK,
                   lineHeight: 1,
                   letterSpacing: '-0.02em',
@@ -169,7 +169,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
                 style={{
                   ...LABEL,
                   color: toneColor(deltaTone),
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
                 }}
               >
                 {`${delta > 0 ? '+' : '\u2212'}${Math.abs(delta).toFixed(1)} ${t('stableford.deltaSuffix')}`}
@@ -204,9 +204,9 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
                   style={{
                     fontFamily: FONT,
                     fontSize: 16,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: CHART.INK,
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                     lineHeight: 1,
                   }}
                 >

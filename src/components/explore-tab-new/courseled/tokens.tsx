@@ -29,7 +29,7 @@ export { A, SANS, FIGS };
 export const NUMF: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '-0.02em',
-  fontVariantNumeric: 'tabular-nums lining',
+  fontVariantNumeric: 'tabular-nums lining-nums',
 };
 
 export const SCRIM_STRONG =
