@@ -10,7 +10,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { A, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { LABEL as LABEL_METRICS } from '@/lib/tokens/type';
+
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
 
 interface Props {
   onNavigate: (route: string) => void;

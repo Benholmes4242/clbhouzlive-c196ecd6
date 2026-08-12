@@ -154,7 +154,7 @@ export default function ActorCards({
                         overflow: 'hidden',
                         background: p.type === 'business' ? A.INK : A.TRACK,
                         color: p.type === 'business' ? A.AMBER : A.MUTE,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         fontSize: 16,
                         display: 'flex',
                         alignItems: 'center',
@@ -257,7 +257,7 @@ export default function ActorCards({
               padding: '13px 8px',
             }}
           >
-            <div style={{ fontWeight: 800, fontSize: 16, color: A.AMBER_DEEP, lineHeight: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 16, color: A.AMBER_DEEP, lineHeight: 1 }}>
               +
             </div>
             <div style={{ fontWeight: 600, fontSize: 10, color: A.MUTE, marginTop: 4 }}>
