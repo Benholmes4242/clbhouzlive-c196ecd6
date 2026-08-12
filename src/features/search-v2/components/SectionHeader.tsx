@@ -1,6 +1,10 @@
 import type React from 'react';
 import { ChevronRight } from 'lucide-react';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { KICKER as KICKER_METRICS, LABEL as LABEL_METRICS } from '@/lib/tokens/type';
+
+/** Canonical metrics; the surface supplies the ink. */
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
 
 interface Props {
   label: string;
@@ -33,10 +37,7 @@ export function SectionHeader({ label, onSeeAll, right }: Props) {
 }
 
 export const ACTION: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 800,
-  letterSpacing: '0.13em',
-  textTransform: 'uppercase',
+  ...LABEL_METRICS,
   color: A.INK,
   background: 'none',
   border: 'none',

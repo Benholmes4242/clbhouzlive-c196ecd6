@@ -611,14 +611,14 @@ function CommitResults({
             background: '#0F172A',
             color: '#F8FAFC',
             fontSize: 14,
-            fontWeight: 800,
+            fontWeight: 700,
           }}
           aria-hidden="true"
         >
           <Search size={15} strokeWidth={2.5} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-extrabold truncate" style={{ color: '#0F172A' }}>
+          <div className="text-[14px] font-bold truncate" style={{ color: '#0F172A' }}>
             Search “{query}”
           </div>
           <div className="text-[11.5px]" style={{ color: '#64748B' }}>
@@ -631,7 +631,7 @@ function CommitResults({
         <>
           <div style={{ padding: '16px 16px 12px' }}>
             <span
-              className="text-[11px] font-extrabold tracking-[0.08em] uppercase"
+              className="text-[11px] font-bold tracking-[0.08em] uppercase"
               style={{ color: '#64748B' }}
             >
               Previews

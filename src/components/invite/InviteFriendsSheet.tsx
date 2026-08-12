@@ -34,11 +34,19 @@ import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import {
   A,
   CAPTION,
-  KICKER,
-  LABEL,
   SANS,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
+import {
+  LABEL as LABEL_METRICS,
+  KICKER as KICKER_METRICS,
+  TITLE as TITLE_METRICS,
+} from '@/lib/tokens/type';
+
+/** Canonical metrics; the sheet keeps its own ink. */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
+const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const DOT = '\u00B7';
 
@@ -124,10 +132,7 @@ function InviteHeader({ sub }: { sub?: string | null }) {
         id="invite-friends-title"
         style={{
           margin: '4px 0 0',
-          fontSize: 17,
-          fontWeight: 800,
-          color: A.INK,
-          letterSpacing: '-0.01em',
+          ...TITLE,
         }}
       >
         {t('invite.title')}
@@ -357,7 +362,7 @@ function ShareLinkButton({ source }: { source: string }) {
         border: 'none',
         borderRadius: 12,
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 700,
         fontFamily: SANS,
         cursor: busy ? 'default' : 'pointer',
       }}
@@ -480,7 +485,7 @@ function EGFriendRow({
             ),
             color: '#fff',
             fontSize: 12,
-            fontWeight: 800,
+            fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -545,7 +550,7 @@ function EGFriendRow({
           <span style={{ ...LABEL, color: A.INK }}>
             {already ? t('invite.reshare') : t('invite.invite')}
           </span>
-          <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+          <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
             {'\u203A'}
           </span>
         </button>
@@ -631,10 +636,7 @@ function UnconnectedState({ source }: { source: string }) {
           id="invite-friends-title"
           style={{
             margin: '4px 0 0',
-            fontSize: 15,
-            fontWeight: 800,
-            color: A.INK,
-            letterSpacing: '-0.01em',
+            ...TITLE,
           }}
         >
           {t('invite.unconnected.title')}
@@ -693,7 +695,7 @@ function UnconnectedState({ source }: { source: string }) {
             border: 'none',
             borderRadius: 12,
             fontSize: 13.5,
-            fontWeight: 800,
+            fontWeight: 700,
             fontFamily: SANS,
             cursor: loading ? 'default' : 'pointer',
             opacity: loading || !link ? 0.5 : 1,

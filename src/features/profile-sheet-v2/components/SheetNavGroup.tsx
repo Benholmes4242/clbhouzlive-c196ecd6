@@ -13,7 +13,11 @@
 
 import React from 'react';
 
-import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { LABEL as LABEL_METRICS } from '@/lib/tokens/type';
+
+/** Canonical metrics; this surface keeps its own ink (set per call site). */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
 
 const CHEVRON = '\u203A';
 
@@ -68,7 +72,7 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
       </div>
       {/* A tag OR a chevron — never both. */}
       {trailing ?? (
-        <span style={{ color: A.INK, fontSize: 16, fontWeight: 800 }}>{CHEVRON}</span>
+        <span style={{ color: A.INK, fontSize: 16, fontWeight: 700 }}>{CHEVRON}</span>
       )}
     </button>
   );

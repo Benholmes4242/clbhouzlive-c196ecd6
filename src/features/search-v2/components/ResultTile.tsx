@@ -32,6 +32,6 @@ export function ResultTile({
 
 export const TILE_INITIALS: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 800,
+  fontWeight: 700,
   color: A.MUTE,
 };

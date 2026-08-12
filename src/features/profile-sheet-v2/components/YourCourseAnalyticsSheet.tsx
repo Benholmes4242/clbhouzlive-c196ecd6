@@ -17,19 +17,23 @@ import { Search } from 'lucide-react';
 import {
   A,
   CAPTION,
-  KICKER,
-  LABEL,
   NUM,
   RAMP,
   SANS,
   StatRow,
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
+import { LABEL as LABEL_METRICS, KICKER as KICKER_METRICS, TITLE as TITLE_METRICS, FIGS } from '@/lib/tokens/type';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
+
+/** Canonical metrics from the shared module; this sheet keeps its palette. */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
+const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
@@ -120,7 +124,7 @@ function Row({
       <div style={{ minWidth: 0, flex: 1, paddingRight: 12 }}>
         <div
           style={{
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: 13.5,
             color: A.INK,
             overflow: 'hidden',
@@ -271,7 +275,7 @@ function AnalyticsCourseRow({
       <div style={{ minWidth: 0 }}>
         <div
           style={{
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: 13.5,
             color: A.INK,
             overflow: 'hidden',
@@ -315,7 +319,7 @@ function AnalyticsCourseRow({
 
       {avgVal != null && (
         <div style={{ width: 52, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
-          <div style={{ fontWeight: 800, fontSize: 13.5, color: A.INK }}>
+          <div style={{ fontWeight: 700, fontSize: 13.5, color: A.INK }}>
             {fmtSigned(avgVal, 1)}
           </div>
           <div
@@ -611,6 +615,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           flexDirection: 'column',
           flex: 1,
           minHeight: 0,
+          // Figures inherit tabular-nums lining from here down, so the bucket
+          // percentage column stacks its decimals and % signs.
+          ...FIGS,
         }}
       >
         {/* Fixed header (does NOT scroll) */}
@@ -620,10 +627,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             id="your-course-analytics-title"
             style={{
               margin: '4px 0 0',
-              fontSize: 17,
-              fontWeight: 800,
-              color: A.INK,
-              letterSpacing: '-0.01em',
+              ...TITLE,
             }}
           >
             {t('yourCourses.sheetTitle')}
@@ -691,7 +695,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: 15, fontWeight: 800, color: A.INK }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: A.INK }}>
                   {t('yourCourses.buildingTitle')}
                 </div>
                 <div style={{ ...CAPTION, marginTop: 6 }}>{t('yourCourses.buildingBody')}</div>
