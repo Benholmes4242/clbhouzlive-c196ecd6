@@ -66,13 +66,13 @@ export const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lin
 export const NUM: React.CSSProperties = {
   fontFamily: SANS,
   letterSpacing: '-0.02em',
-  fontWeight: 800,
+  fontWeight: 700,
   ...FIGS,
 };
 
 export const LABEL: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: A.DIM,
@@ -99,7 +99,7 @@ export const Hairline: React.FC<{ style?: React.CSSProperties }> = ({ style }) =
   <div style={{ height: 1, background: A.HAIRLINE, ...style }} />
 );
 
-export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: A.INK };
+export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 700, color: A.INK };
 
 export interface ToParParts { text: string; tone: string }
 
@@ -182,7 +182,7 @@ export const Panel: React.FC<{
             }}
           >
             <span style={{ ...LABEL, color: A.INK }}>{action.label}</span>
-            <span style={{ fontSize: 11, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+            <span style={{ fontSize: 11, color: A.INK, fontWeight: 700 }} aria-hidden="true">
               {'\u203A'}
             </span>
           </button>
@@ -224,7 +224,7 @@ export const Panel: React.FC<{
         }}
       >
         <span style={{ ...LABEL, color: A.INK }}>{footer}</span>
-        <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+        <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
           {'\u203A'}
         </span>
       </button>
@@ -328,7 +328,7 @@ export const Action: React.FC<{
     }}
   >
     <span style={{ ...LABEL, color: tone }}>{label}</span>
-    <span style={{ fontSize: 12, color: tone, fontWeight: 800 }} aria-hidden="true">
+    <span style={{ fontSize: 12, color: tone, fontWeight: 700 }} aria-hidden="true">
       {'\u203A'}
     </span>
   </button>
@@ -383,7 +383,7 @@ export const EmptyState: React.FC<{
       <div
         style={biz
           ? BIZ_TITLE
-          : { fontSize: 16, fontWeight: 800, color: A.INK, lineHeight: 1.25 }}
+          : { fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}
       >
         {title}
       </div>
@@ -407,7 +407,7 @@ export const EmptyState: React.FC<{
             borderRadius: 999,
             padding: biz ? '13px 24px' : '12px 22px',
             fontSize: biz ? 14.5 : 13.5,
-            fontWeight: biz ? 700 : 800,
+            fontWeight: 700,
             letterSpacing: biz ? '-0.01em' : undefined,
             fontFamily: SANS,
             cursor: 'pointer',
