@@ -162,7 +162,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
           <div
             style={{
               color: A.INK,
-              fontWeight: 800,
+              fontWeight: 700,
               fontSize: 14.5,
               lineHeight: 1.15,
               letterSpacing: '-0.01em',

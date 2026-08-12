@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import {
   Dialog,
   DialogContent,
@@ -163,7 +164,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <DialogTitle>Add Courses to Your List</DialogTitle>
+            <DialogTitle style={TITLE}>Add Courses to Your List</DialogTitle>
             <Button
               variant="ghost"
               size="sm"

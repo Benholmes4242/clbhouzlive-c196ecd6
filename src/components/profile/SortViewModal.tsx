@@ -1,4 +1,5 @@
 import React from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import {
   Dialog,
   DialogPortal,
@@ -57,7 +58,7 @@ const SortViewModal: React.FC<SortViewModalProps> = ({
             
             <div className="relative">
               <DialogHeader className="mb-6">
-                <DialogTitle className="text-white text-lg font-semibold">Sort & View Options</DialogTitle>
+                <DialogTitle className="text-white" style={TITLE}>Sort &amp; View Options</DialogTitle>
               </DialogHeader>
               
               <div className="space-y-6">

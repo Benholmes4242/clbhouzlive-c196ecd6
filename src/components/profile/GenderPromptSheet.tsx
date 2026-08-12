@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -164,7 +165,7 @@ export const GenderPromptSheet: React.FC = () => {
           <div
             style={{
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: AMBER,
@@ -175,11 +176,8 @@ export const GenderPromptSheet: React.FC = () => {
           <h2
             style={{
               margin: '8px 0 0',
-              fontSize: 22,
-              fontWeight: 700,
-              lineHeight: 1.2,
+              ...TITLE,
               color: INK,
-              letterSpacing: '-0.01em',
             }}
           >
             See the right comparisons for you

@@ -47,7 +47,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         <Panel kicker={kicker}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', fontFamily: SANS }}>
             <MapPin size={20} color={A.DIM} strokeWidth={2} />
-            <div style={{ marginTop: 10, fontSize: 14.5, fontWeight: 800, color: A.INK }}>
+            <div style={{ marginTop: 10, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
               {isOwnProfile
                 ? t('legacy.emptyTitleOwn', { defaultValue: 'No courses logged yet' })
                 : t('legacy.emptyTitleOther', { defaultValue: 'No courses played yet' })}

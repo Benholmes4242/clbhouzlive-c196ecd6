@@ -228,7 +228,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
             <span className="text-xs font-semibold text-muted-foreground text-center leading-tight max-w-[100px]">
               {getGhostBadgeName(nudge)}
             </span>
-            <p className="text-[11px] text-muted-foreground/70 tabular-nums mt-0.5">
+            <p className="text-[11px] text-muted-foreground/70 tabular-nums lining-nums mt-0.5">
               {nudge.type === 'global' ? nudge.totalPlayed : nudge.playedOnList}/{nudge.nextThreshold} played
             </p>
           </button>

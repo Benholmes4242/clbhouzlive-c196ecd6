@@ -152,7 +152,7 @@ export const HeroCell: React.FC<{
       <div
         style={{
           fontSize: 17,
-          fontWeight: 800,
+          fontWeight: 700,
           color: '#FFFFFF',
           lineHeight: 1.1,
           letterSpacing: '-0.01em',
@@ -165,7 +165,7 @@ export const HeroCell: React.FC<{
         style={{
           marginTop: 4,
           fontSize: 7.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: W_45,
@@ -324,7 +324,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
               style={{
                 margin: 0,
                 fontSize: 20,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.03em',
                 color: '#FFFFFF',
                 overflow: 'hidden',
@@ -383,7 +383,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
             <div
               style={{
                 fontSize: 8.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: W_45,
@@ -395,7 +395,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
               <span
                 style={{
                   fontSize: 40,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
                   color: headline.color ?? '#FFFFFF',
@@ -447,7 +447,7 @@ export const HeroPill: React.FC<{
       color: '#FFFFFF',
       fontFamily: SANS,
       fontSize: 8,
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
       padding: '9px 14px',

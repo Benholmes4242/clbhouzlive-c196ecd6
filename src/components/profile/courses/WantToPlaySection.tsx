@@ -124,11 +124,11 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 {isTop100 && (
                   <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 7px', borderRadius: 999, background: 'rgba(247,147,30,0.92)' }}>
                     <Trophy size={9} strokeWidth={2.6} color="#fff" />
-                    <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: '#fff' }}>TOP 100</span>
+                    <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.1em', color: '#fff' }}>TOP 100</span>
                   </div>
                 )}
                 <div style={{ position: 'absolute', left: 12, right: 12, bottom: 10 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.1, letterSpacing: '-0.02em', color: '#fff', textShadow: '0 1px 6px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, lineHeight: 1.1, letterSpacing: '-0.02em', color: '#fff', textShadow: '0 1px 6px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {course.course_name}
                   </div>
                   {loc && (
@@ -151,7 +151,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleReview(course); }}
-                    style={{ flexShrink: 0, padding: '6px 13px', borderRadius: 999, border: '1px solid rgba(247,147,30,0.30)', background: 'rgba(247,147,30,0.10)', color: '#C97211', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                    style={{ flexShrink: 0, padding: '6px 13px', borderRadius: 999, border: '1px solid rgba(247,147,30,0.30)', background: 'rgba(247,147,30,0.10)', color: '#C97211', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
                   >
                     Review
                   </button>

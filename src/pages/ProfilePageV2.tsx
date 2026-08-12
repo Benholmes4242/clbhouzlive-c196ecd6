@@ -931,7 +931,7 @@ const ProfilePageV2Content: React.FC = () => {
                     border: `1px solid ${A.BORDER}`,
                     fontFamily: SANS,
                     fontSize: 11,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
                     color: A.INK,
@@ -966,7 +966,7 @@ const ProfilePageV2Content: React.FC = () => {
                     style={{
                       fontFamily: SANS,
                       fontSize: 8.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                       color: A.INK,
@@ -990,7 +990,7 @@ const ProfilePageV2Content: React.FC = () => {
                   style={{
                     fontFamily: SANS,
                     fontSize: 8.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: A.INK,

@@ -8,6 +8,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { RatedCourseData } from './my-ratings/myRatingsTiers';
+import { TITLE } from '@/lib/tokens/type';
 
 interface BreakdownsPickerSheetProps {
   isOpen: boolean;
@@ -79,11 +80,8 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
               <SheetTitle
                 style={{
                   fontFamily: FONT_SANS,
-                  fontWeight: 700,
-                  fontSize: 22,
+                  ...TITLE,
                   color: '#0F172A',
-                  letterSpacing: '-0.015em',
-                  lineHeight: 1.1,
                   textAlign: 'left',
                 }}
               >
@@ -240,7 +238,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                       <span
                         style={{
                           color: '#0F172A',
-                          fontVariantNumeric: 'tabular-nums',
+                          fontVariantNumeric: 'tabular-nums lining',
                         }}
                       >
                         {int}.{dec}

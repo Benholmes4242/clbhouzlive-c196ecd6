@@ -93,7 +93,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
         <div
           style={{
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: A.INK,
@@ -128,7 +128,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             flexShrink: 0,
             fontFamily: SANS,
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: A.INK,
@@ -222,7 +222,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                     borderRadius: 999,
                     padding: '3px 8px',
                     fontSize: 11,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#FFFFFF',
                     ...FIGS,
                   }}
@@ -246,7 +246,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                     <span
                       style={{
                         fontSize: 12,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: '#FFFFFF',
                         ...FIGS,
                       }}
@@ -256,7 +256,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                     <span
                       style={{
                         fontSize: 7,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.08em',
                         textTransform: 'uppercase',
                         color: 'rgba(255,255,255,0.7)',
@@ -276,7 +276,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 <div
                   style={{
                     fontSize: 12,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: A.INK,
                     lineHeight: 1.25,
                     display: '-webkit-box',
