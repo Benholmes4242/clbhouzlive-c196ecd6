@@ -31,6 +31,7 @@ import {
   useSocialListCounts,
   type SocialListRow,
 } from './hooks/useSocialListV2';
+import { FIGURE } from '@/lib/tokens/type';
 import { RowAvatar, RowSubline, FollowButton } from './rowParts';
 
 /* ── design tokens (Circle) ─────────────────────────────────────────── */
@@ -162,7 +163,7 @@ export default function SocialListPage({
         <div
           style={{
             fontSize: 21,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1.15,
@@ -217,6 +218,7 @@ export default function SocialListPage({
                 {typeof c === 'number' && (
                   <span
                     style={{
+                      ...FIGURE,
                       fontSize: 11.5,
                       fontWeight: 600,
                       opacity: 0.6,
@@ -602,13 +604,12 @@ function RichRow({
           {!isBusiness && showHcp && (
             <span
               style={{
+                ...FIGURE,
                 fontSize: 10.5,
-                fontWeight: 800,
                 color: INK,
                 background: 'rgba(0,0,0,0.05)',
                 padding: '2px 6px',
                 borderRadius: 6,
-                fontVariantNumeric: 'tabular-nums',
               }}
             >
               {formatHcp(row.handicap_index!)}
