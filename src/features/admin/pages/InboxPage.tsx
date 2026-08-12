@@ -54,18 +54,13 @@ const TYPE_LABEL: Record<InboxType, string> = {
   holePhoto: 'Hole photos',
 };
 
-const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: string }> = {
-  report:        { icon: <ShieldAlert size={16} />, bg: t.dangerSoft, fg: t.dangerText },
-  appeal:        { icon: <Gavel size={16} />,       bg: t.neutralSoft, fg: t.ink },
-  support:       { icon: <LifeBuoy size={16} />,    bg: t.neutralSoft, fg: t.inkMuted },
-  verification:  { icon: <BadgeCheck size={16} />,  bg: t.warnSoft, fg: t.warnText },
-  approval:      { icon: <ShieldCheck size={16} />, bg: t.okSoft, fg: t.okText },
-  match:         { icon: <Link2 size={16} />,       bg: t.neutralSoft, fg: t.ink },
-  courseRequest: { icon: <Map size={16} />,         bg: t.neutralSoft, fg: t.ink },
-  unmatchedCourse: { icon: <Unlink size={16} />,   bg: t.warnSoft, fg: t.warnText },
-  holePhoto:     { icon: <Camera size={16} />,      bg: t.neutralSoft, fg: t.inkMuted },
-};
+/** The page's one age format. Absolute, tabular-safe: "44m" / "31h" / "32d". */
+function ageShort(iso: string): string {
+  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
+  return Number.isFinite(secs) ? formatDurationShort(Math.max(0, secs)) : '-';
+}
 
+/** Kept for the Done view only: "closed 2 days ago" beats an absolute age. */
 function relTime(iso: string): string {
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
 }
@@ -76,6 +71,8 @@ function ageColour(iso: string): string {
   if (diffH >= 8) return t.warnText;
   return t.inkFaint;
 }
+
+const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 
 // ---------- redirects helper ----------
 
