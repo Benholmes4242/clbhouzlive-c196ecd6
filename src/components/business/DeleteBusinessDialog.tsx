@@ -1,4 +1,5 @@
 import {
+import { TITLE } from '@/lib/tokens/type';
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -48,7 +49,7 @@ export function DeleteBusinessDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="rounded-sq-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete business profile?</AlertDialogTitle>
+          <AlertDialogTitle style={TITLE}>Delete business profile?</AlertDialogTitle>
           <AlertDialogDescription>
             This will permanently remove {businessName} from Clbhouz. This action can{"'"}t be undone.
           </AlertDialogDescription>

@@ -3,6 +3,7 @@
  * Uses react-easy-crop for intuitive crop/zoom experience
  */
 import { useState, useCallback } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import Cropper, { Area } from 'react-easy-crop';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -153,7 +154,7 @@ export function ImageCropModal({
         aria-describedby={undefined}
       >
         <VisuallyHidden>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle style={TITLE}>{title}</DialogTitle>
         </VisuallyHidden>
         
         {/* Crop area */}
