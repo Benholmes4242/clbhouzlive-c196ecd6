@@ -23,7 +23,7 @@ import React from 'react';
  * override of the light atoms.
  */
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /**
  * DARK_ROW_TITLE — the identity line of a dark row or card.

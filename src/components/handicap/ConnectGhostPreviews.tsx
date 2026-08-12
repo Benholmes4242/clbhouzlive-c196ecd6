@@ -16,7 +16,7 @@ const RED = '#DC2626';
 const GREEN = '#16A34A';
 const WARN = '#F59E0B';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const FONT = 'Geist, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const Ring: React.FC<{ pct: number; color: string; label: string }> = ({ pct, color, label }) => {
   const r = 34;

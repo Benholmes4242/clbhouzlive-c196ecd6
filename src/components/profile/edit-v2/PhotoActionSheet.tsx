@@ -1,7 +1,7 @@
 import React from 'react';
 import { ImageIcon, Camera, Trash2 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { GEIST, INK, INK_45, FIELD_FILL, DANGER, HAIR } from '@/components/manage/ui';
+import { SF_STACK, INK, INK_45, FIELD_FILL, DANGER, HAIR } from '@/components/manage/ui';
 
 interface PhotoActionSheetProps {
   open: boolean;
@@ -30,7 +30,7 @@ function RowBtn({
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         fontSize: 15,
         fontWeight: 500,
         color: danger ? DANGER : INK,
@@ -55,7 +55,7 @@ export function PhotoActionSheet({
         <div
           style={{
             textAlign: 'center',
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
             fontSize: 12,
             fontWeight: 600,
             color: INK_45,
@@ -89,7 +89,7 @@ export function PhotoActionSheet({
             background: FIELD_FILL,
             border: `1px solid ${HAIR}`,
             borderRadius: 12,
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
             fontSize: 15,
             fontWeight: 600,
             color: INK,

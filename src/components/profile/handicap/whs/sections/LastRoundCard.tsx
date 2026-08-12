@@ -13,7 +13,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /**
  * Convert an ISO date to a relative time-ago string.
@@ -61,7 +61,7 @@ export const LastRoundCard: React.FC<Props> = ({
       <section style={{ marginTop: 32 }}>
         <DarkSectionHeader eyebrow="Last Round" />
         <div style={{ padding: '0 16px' }}>
-          <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_GEIST }}>
+          <p style={{ fontSize: 14, color: 'var(--hcp-t-60)', fontFamily: FONT_SF }}>
             {emptyCopy}
           </p>
         </div>
@@ -77,7 +77,7 @@ export const LastRoundCard: React.FC<Props> = ({
 
   return (
     <>
-      <section style={{ marginTop: 32, fontFamily: FONT_GEIST }}>
+      <section style={{ marginTop: 32, fontFamily: FONT_SF }}>
         <DarkSectionHeader eyebrow="Last Round" right={formattedDate} />
         <LastRoundHeroCard
           round={lastRound}

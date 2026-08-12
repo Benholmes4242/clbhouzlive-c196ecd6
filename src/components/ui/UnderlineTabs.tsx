@@ -9,7 +9,7 @@ import React from 'react';
  */
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const DEFAULT_UNDERLINE = '#15171F';
 

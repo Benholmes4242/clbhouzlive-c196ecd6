@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const MUTE = 'var(--hcp-t-60)';
 const HAIRLINE = 'var(--hcp-line)';

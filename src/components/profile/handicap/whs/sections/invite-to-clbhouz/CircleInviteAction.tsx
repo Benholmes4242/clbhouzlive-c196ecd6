@@ -36,7 +36,7 @@ import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 import { DARK_ROW_TITLE } from '../_shared/darkAtoms';
 
-const FONT = '"Geist", system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const DOT = '\u00B7';
 const SOURCE = 'handicap_circle';
 

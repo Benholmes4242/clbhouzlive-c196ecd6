@@ -12,7 +12,7 @@ interface Props {
   connection: WhsConnection;
 }
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 function formatDelta(v: number | null | undefined): string {
   if (v === null || v === undefined) return '—';

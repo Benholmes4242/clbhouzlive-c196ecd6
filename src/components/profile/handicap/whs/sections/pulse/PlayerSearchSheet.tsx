@@ -6,7 +6,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import { usePlayerSearch, type PlayerSearchResult } from '@/hooks/gam/usePlayerSearch';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   open: boolean;

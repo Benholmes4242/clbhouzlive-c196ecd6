@@ -12,7 +12,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRelativeAgo } from '@/i18n/format';
 const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 
 interface Props {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const CANVAS = '#F8FAFC';
 const INK = '#0F172A';
 const CHARCOAL = '#15171F';
@@ -32,7 +32,7 @@ const AppDownloadGate: React.FC = () => {
   <div
     style={{
       position: 'fixed', inset: 0, zIndex: 2147483000,
-      background: CANVAS, fontFamily: GEIST,
+      background: CANVAS, fontFamily: SF_STACK,
       display: 'flex', flexDirection: 'column', overflowY: 'auto',
       WebkitFontSmoothing: 'antialiased',
     }}

@@ -83,7 +83,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           fontFamily: isDark
-            ? 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+            ? '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
             : undefined,
         }}
       >

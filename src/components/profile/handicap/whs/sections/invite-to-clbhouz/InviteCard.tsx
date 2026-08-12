@@ -23,7 +23,7 @@ const HAIRLINE = 'rgba(255,255,255,0.08)';
 const CARD_BG = '#1B1E27';
 const CELL_BG = '#20242E';
 
-const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 
 export const InviteCard: React.FC<Props> = ({ friend }) => {
@@ -64,7 +64,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 14,
         padding: '10px 12px',
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
       }}
     >
       {(() => {
@@ -134,7 +134,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          fontFamily: FONT_GEIST,
+          fontFamily: FONT_SF,
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: '0.13em',

@@ -19,7 +19,7 @@ const GREEN_DEEP = '#15803D';
 const GREEN_SOFT = 'rgba(52,211,153,0.12)';
 const RED_INK = '#EF4444';
 const RED_SOFT = 'rgba(239,68,68,0.10)';
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {
   if (n == null) return '—';
@@ -82,7 +82,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
         background: 'var(--hcp-bg-1)',
       }}
     >
@@ -277,7 +277,7 @@ export const RoundCardShell: React.FC<RoundCardShellProps> = ({
         cursor: 'pointer',
         background: 'var(--hcp-bg-1)',
         textAlign: 'left',
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
       }}
     >
       {/* Banner */}

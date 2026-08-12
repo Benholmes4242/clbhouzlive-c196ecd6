@@ -1,7 +1,7 @@
 import React from 'react';
 import { buildEyebrow } from './eyebrowLabel';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 
 export const CourseEyebrow: React.FC<{

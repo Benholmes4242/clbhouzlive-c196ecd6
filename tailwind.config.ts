@@ -29,13 +29,13 @@ export default {
 		},
 		extend: {
 	fontFamily: {
-		// Geist — Single variable font for all typography
-		'sans': ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-		'display': ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-		// Legacy class names → all resolve to Geist
-		'league-spartan': ['"Geist"', 'sans-serif'],
-		'dm-sans': ['"Geist"', 'sans-serif'],
-		'playfair': ['"Geist"', 'sans-serif'],
+		// SF Pro / system stack — no webfont request
+		'sans': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		'display': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		// Legacy class names → all resolve to the canonical system stack
+		'league-spartan': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		'dm-sans': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		'playfair': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
 	},
 			fontSize: {
 				// CLBHOUZ SEMANTIC TYPE SCALE - 8 Roles

@@ -235,7 +235,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
           {showCounter ? (
             <div
               style={{
-                fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 fontSize: 9.5,
                 fontWeight: 800,
                 letterSpacing: '0.08em',

@@ -55,8 +55,8 @@ const INK = '#0E1216';
 const BODY = '#3A424C';
 const MUTE = '#68707B';
 const GRABBER = '#D6DBE1';
-const FONT_GEIST =
-  "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+const FONT_SF =
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 
 export interface ReviewBottomSheetProps {
@@ -390,7 +390,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               borderTop: `1px solid ${BORDER}`,
               color: INK,
 
-              fontFamily: FONT_GEIST,
+              fontFamily: FONT_SF,
               transform: 'translateZ(0)',
             }}
           >

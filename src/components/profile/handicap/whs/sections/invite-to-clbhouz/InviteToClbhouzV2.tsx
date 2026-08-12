@@ -21,7 +21,7 @@ const T = {
   amber: '#F7931E',
   cardBg: 'var(--hcp-bg-1)',
 };
-const FONT = '"Geist", system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);

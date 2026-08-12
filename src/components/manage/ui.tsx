@@ -5,7 +5,7 @@
  */
 import React from 'react';
 
-export const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+export const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 export const INK = '#0F172A';
 export const INK_60 = '#475569';
 export const INK_45 = '#64748B';
@@ -36,7 +36,7 @@ export function Label({
     >
       <span
         style={{
-          fontFamily: GEIST,
+          fontFamily: SF_STACK,
           fontSize: 13,
           fontWeight: 600,
           color: INK_60,
@@ -94,7 +94,7 @@ export function GroupLabel({
         marginTop: 4,
         marginBottom: 8,
         padding: '0 4px',
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.14em',
@@ -117,7 +117,7 @@ export const FIELD_STYLE: React.CSSProperties = {
   padding: '11px 13px',
   fontSize: 15,
   color: INK,
-  fontFamily: GEIST,
+  fontFamily: SF_STACK,
   outline: 'none',
 };
 
@@ -137,7 +137,7 @@ export function Nudge({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         fontSize: 12,
         color: INK_45,
       }}

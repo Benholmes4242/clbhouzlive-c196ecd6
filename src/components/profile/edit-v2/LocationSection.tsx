@@ -3,7 +3,7 @@ import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
 import { Label } from '@/components/manage/ui';
 
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // ─── Country list ─────────────────────────────────────────────────────────────
 // Golf-primary markets first, then alphabetical.
@@ -117,7 +117,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   style={{
                     background: c === value ? 'rgba(15,23,42,0.06)' : 'transparent',
                     color: '#0F172A',
-                    fontFamily: GEIST,
+                    fontFamily: SF_STACK,
                     fontWeight: c === value ? 600 : 400,
                   }}
                   onMouseEnter={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}

@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export interface SegOption {
   value: string;
@@ -37,7 +37,7 @@ export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
               padding: '9px 14px',
               borderRadius: 11,
               cursor: 'pointer',
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
               fontSize: 14,
               fontWeight: active ? 700 : 500,
               color: active ? '#FFFFFF' : '#64748B',
@@ -50,7 +50,7 @@ export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
             {active && <Check size={13} strokeWidth={3} />}
             <span>{o.label}</span>
             {o.hint && (
-              <span style={{ fontFamily: GEIST, fontWeight: 500, color: active ? 'rgba(255,255,255,0.65)' : '#94A3B8', fontSize: 12 }}>
+              <span style={{ fontFamily: SF_STACK, fontWeight: 500, color: active ? 'rgba(255,255,255,0.65)' : '#94A3B8', fontSize: 12 }}>
                 {o.hint}
               </span>
             )}

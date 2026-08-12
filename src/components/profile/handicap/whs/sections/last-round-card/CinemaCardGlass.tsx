@@ -4,8 +4,8 @@ import { splitCourseName } from './splitCourseName';
 
 import { GlassGrossRing } from '../shared/GrossCounterRing';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const FONT_MONO = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 const MINUS = '\u2212';
 const EM_DASH = '\u2014';
@@ -32,7 +32,7 @@ const labelStyle: React.CSSProperties = {
   color: 'rgba(255,255,255,0.55)',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  fontFamily: FONT_GEIST,
+  fontFamily: FONT_SF,
 };
 
 const valueStyle = (color: string): React.CSSProperties => ({
@@ -89,7 +89,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
         border: '0.5px solid rgba(255,255,255,0.18)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        fontFamily: FONT_GEIST,
+        fontFamily: FONT_SF,
       }}
     >
       {/* Header */}
@@ -100,7 +100,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
           color: '#FFFFFF',
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
-          fontFamily: FONT_GEIST,
+          fontFamily: FONT_SF,
         }}
       >
         {title}
@@ -114,7 +114,7 @@ export const CinemaCardGlass: React.FC<Props> = ({
             color: 'rgba(255,255,255,0.60)',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            fontFamily: FONT_GEIST,
+            fontFamily: FONT_SF,
           }}
         >
           {meta}

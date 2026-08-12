@@ -318,7 +318,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
               bottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)',
               background: 'rgba(0,0,0,0.66)',
               color: '#fff',
-              fontFamily: 'Geist, system-ui, sans-serif',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontSize: 11,
               fontWeight: 600,
               fontVariantNumeric: 'tabular-nums lining',

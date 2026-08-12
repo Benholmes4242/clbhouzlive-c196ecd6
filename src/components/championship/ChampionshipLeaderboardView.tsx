@@ -345,7 +345,7 @@ interface ChampionshipLeaderboardViewProps {
 /**
  * ChampionshipLeaderboardView — Front Page edition.
  * Editorial newspaper layout with masthead, lede, box score, prize/sponsor card,
- * schedule strip, and full standings. All "serif moments" use Geist 900.
+ * schedule strip, and full standings. All "serif moments" use SF Pro 900.
  */
 interface ChaseStatement {
   priority: number;

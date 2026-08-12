@@ -16,7 +16,7 @@ import { toParText } from './hooks/useRegionFeats';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const GOLD = '#FBBC2E';
 const UNDER_PAR = '#FF4D57';
 

@@ -22,7 +22,7 @@ export function bandColor(score: number | null | undefined): string {
 
 const LABEL_INK = 'rgba(15,23,42,0.42)';
 const TRACK = 'rgba(15,23,42,0.08)';
-/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+/** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
 const NUMERALS: React.CSSProperties = {

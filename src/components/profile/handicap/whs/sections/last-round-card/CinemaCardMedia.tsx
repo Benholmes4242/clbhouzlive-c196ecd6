@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { formatWeekdayLongDayMonthLongGB } from '@/i18n/format';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
-const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 
 interface Props {
@@ -81,7 +81,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           gap: 12,
-          fontFamily: FONT_GEIST,
+          fontFamily: FONT_SF,
         }}
       >
         <div>

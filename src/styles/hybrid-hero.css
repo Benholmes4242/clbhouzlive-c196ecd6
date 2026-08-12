@@ -18,7 +18,7 @@
 
 .hybrid-hero-title {
   margin: 0;
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 800;
   letter-spacing: -0.035em;
   font-size: clamp(24px, 8.5vw, 42px);

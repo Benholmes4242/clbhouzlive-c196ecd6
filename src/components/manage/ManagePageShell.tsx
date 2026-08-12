@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { PAGE_BG } from '@/components/manage/ui';
 
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const SLATE_BG = PAGE_BG;
 
@@ -66,7 +66,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, fi
               </button>
               <h1
                 style={{
-                  fontFamily: GEIST, fontSize: 18, fontWeight: 600, color: INK,
+                  fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, color: INK,
                   letterSpacing: '-0.01em', margin: 0,
                 }}
               >

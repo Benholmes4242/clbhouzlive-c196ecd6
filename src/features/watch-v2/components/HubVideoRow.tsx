@@ -19,7 +19,7 @@ import { VideoCardMoreButton } from './VideoCardMoreButton';
 import type { HubRpcRow } from '../utils/toFeedPost';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 function Card({
   row,

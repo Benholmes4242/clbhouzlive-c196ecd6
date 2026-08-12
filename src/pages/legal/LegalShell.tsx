@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const GEIST = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const LegalShell: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0E14', fontFamily: GEIST }}>
+    <div style={{ minHeight: '100vh', background: '#0A0E14', fontFamily: SF_STACK }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 24 }}>
         <Link
           to="/"

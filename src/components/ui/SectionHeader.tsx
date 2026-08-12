@@ -8,7 +8,7 @@ import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
 
 
-const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 const AMBER_AA = '#0E1216'; // eyebrow ink (flipped from amber — EYEBROW INK FLIP)
 const INK = '#0F172A';
@@ -95,7 +95,7 @@ function ActionAffordance({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 2,
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         fontSize: 13,
         fontWeight: 700,
         color,
@@ -116,7 +116,7 @@ function MetaSlot({ children }: { children: ReactNode }) {
   return (
     <span
       style={{
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.12em',
@@ -180,7 +180,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         <h3
           style={{
             margin: 0,
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
             fontSize: 19,
             fontWeight: 800,
             letterSpacing: '-0.01em',
@@ -227,7 +227,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
               fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.14em',
@@ -249,7 +249,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
               <span
                 style={{
                   marginLeft: 8,
-                  fontFamily: GEIST,
+                  fontFamily: SF_STACK,
                   fontSize: 11,
                   fontWeight: 800,
                   color: '#94A3B8',
@@ -277,7 +277,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           <h2
             style={{
               margin: 0,
-              fontFamily: GEIST,
+              fontFamily: SF_STACK,
               fontSize: titleSize,
               fontWeight: 800,
               letterSpacing: titleTracking,
@@ -308,7 +308,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         <p
           style={{
             margin: '8px 0 0 0',
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
             fontSize: 13,
             fontWeight: 500,
             color: subColor,

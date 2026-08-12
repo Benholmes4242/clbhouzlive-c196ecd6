@@ -1,10 +1,10 @@
 export const AMBER = '#F7931E';
 export const DEEP_AMBER = '#B26818';                  // darker amber - empty-state pill borders (mirrors GAM.DEEP_AMBER from WHS Legends)
 export const INK = '#0F172A';
-export const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // Mono numeral stack - analyst-grade tabular alignment on the Holes tab (data-page exception).
-export const MONO = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+export const MONO = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // -----------------------------------------------------------------------------
 // "World Feed" scoring palette.

@@ -35,7 +35,7 @@ import { RowAvatar, RowSubline, FollowButton } from './rowParts';
 
 /* ── design tokens (Circle) ─────────────────────────────────────────── */
 const FONT =
-  '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
 const INK_FAINT = '#94A3B8';

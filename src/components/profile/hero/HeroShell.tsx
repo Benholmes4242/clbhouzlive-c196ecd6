@@ -45,7 +45,7 @@ export const HERO_CONTENT_INSET =
  *
  * Every figure below is the literal the component itself renders, so
  * this stays honest if the type scale moves. Text line boxes are
- * fontSize x LINE (Geist resolves `line-height: normal` to 1.5) except
+ * fontSize x LINE (SF Pro resolves `line-height: normal` to 1.5) except
  * where a lineHeight is stated inline.
  * ------------------------------------------------------------------ */
 const LINE = 1.5;

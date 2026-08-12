@@ -27,7 +27,7 @@ const AMBER_RGBA_WEAK = 'rgba(247,147,30,0.04)';
 const AMBER_BORDER = 'rgba(247,147,30,0.3)';
 const INK = '#0F172A';
 const INK_SECONDARY = '#64748B';
-const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export function ConnectHandicapTile() {
   const navigate = useNavigate();

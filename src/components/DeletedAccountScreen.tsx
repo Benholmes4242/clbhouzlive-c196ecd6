@@ -2,7 +2,7 @@ import React from 'react';
 
 const INK = '#0F172A';
 const MUTE = '#64748B';
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const SUPPORT_EMAIL = 'support@clbhouz.com';
 
 /**

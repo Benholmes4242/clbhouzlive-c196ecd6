@@ -25,7 +25,7 @@ import {
   INK_MUTE,
 } from '@/features/courses/_shared/tokens';
 
-/** Numerals stay in the Geist stack: monospace faces slash their zeros. */
+/** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
 /** 1st / 2nd / 3rd / 4th ... */

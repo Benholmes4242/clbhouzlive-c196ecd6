@@ -13,7 +13,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 const FONTS = {
-  geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  sf: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
 };
 
 export interface InlineReviewCardProps {
@@ -106,7 +106,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         color: '#fff',
         cursor: 'pointer',
         pointerEvents: isVisible ? 'auto' : 'none',
-        fontFamily: FONTS.geist,
+        fontFamily: FONTS.sf,
         WebkitTapHighlightColor: 'transparent',
         paddingRight: 70,
         textShadow: '0 1px 8px rgba(0,0,0,0.5)',
@@ -125,7 +125,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           WebkitBackdropFilter: 'blur(14px) saturate(150%)',
           border: '1px solid rgba(255,255,255,0.16)',
           marginBottom: 11,
-          fontFamily: FONTS.geist,
+          fontFamily: FONTS.sf,
         }}
       >
         <img

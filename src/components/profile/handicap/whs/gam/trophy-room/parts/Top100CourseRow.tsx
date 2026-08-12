@@ -35,7 +35,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
         width: '100%',
         textAlign: 'left',
         cursor: 'pointer',
-        fontFamily: GAM.FONT_GEIST,
+        fontFamily: GAM.FONT_SF,
         color: 'rgba(255,255,255,0.96)',
         opacity: played ? 1 : 0.65,
       }}
@@ -162,7 +162,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             borderRadius: 999,
             border: `1px solid ${GAM.AMBER}66`,
             background: 'transparent',
-            fontFamily: GAM.FONT_GEIST,
+            fontFamily: GAM.FONT_SF,
             letterSpacing: '0.02em',
             cursor: 'pointer',
             marginLeft: 4,

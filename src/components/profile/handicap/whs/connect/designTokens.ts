@@ -16,7 +16,7 @@ export const BAD = '#C8372B';
 export const TRACK = 'rgba(14,18,22,0.08)';
 
 export const FONT =
-  'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /**
  * Connect-surface base. #F8FAFC matches the host page (ManagePageShell) and the

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_55 = 'rgba(15,23,42,0.55)';
 const HAIRLINE = 'rgba(15,23,42,0.08)';

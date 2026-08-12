@@ -23,8 +23,8 @@ import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 
-const GEIST =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK =
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
 const INK_60 = '#475569';
 const AMBER = '#F7931E';
@@ -72,7 +72,7 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
       color: active ? '#FFFFFF' : INK_60,
       border: active ? '1px solid transparent' : `1px solid ${HAIR2}`,
       gap: 6,
-      fontFamily: GEIST,
+      fontFamily: SF_STACK,
       fontSize: 13,
       fontWeight: 600,
     }}
@@ -107,7 +107,7 @@ const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ lab
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
       color: '#94A3B8',
-      fontFamily: GEIST,
+      fontFamily: SF_STACK,
     }}
   >
     {label}
@@ -341,7 +341,7 @@ export const ActivityPageV2: React.FC = () => {
         fontSize: 12.5,
         fontWeight: 700,
         cursor: 'pointer',
-        fontFamily: GEIST,
+        fontFamily: SF_STACK,
       }}
     >
       <CheckCheck size={14} strokeWidth={2.5} />
@@ -377,7 +377,7 @@ export const ActivityPageV2: React.FC = () => {
       right={markAllRead}
       belowTitle={chips}
     >
-      <div style={{ background: PAGE, fontFamily: GEIST, minHeight: '100%' }}>
+      <div style={{ background: PAGE, fontFamily: SF_STACK, minHeight: '100%' }}>
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
 
@@ -410,7 +410,7 @@ export const ActivityPageV2: React.FC = () => {
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: 'pointer',
-                fontFamily: GEIST,
+                fontFamily: SF_STACK,
               }}
             >
               Retry

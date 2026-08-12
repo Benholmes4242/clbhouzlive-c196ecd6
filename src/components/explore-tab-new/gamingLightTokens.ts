@@ -13,7 +13,7 @@ export const HAIRLINE_DARK = '1px solid rgba(255,255,255,0.12)';
 export const CARD_BORDER = '1px solid rgba(15,23,42,0.07)';
 
 export const FONT =
-  'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // Value/label typography DNA (from FeatCard / CircleActivityStrip).
 export const VALUE_TYPE: React.CSSProperties = {

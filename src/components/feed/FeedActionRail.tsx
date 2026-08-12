@@ -110,7 +110,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         transform: pressed ? 'scale(0.92)' : 'scale(1)',
         transition: 'transform 0.12s',
         filter: FLOAT_SHADOW,
-        fontFamily: 'Geist, system-ui, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         pointerEvents: 'auto',
         touchAction: 'pan-y',
       }}
@@ -218,7 +218,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         alignItems: 'center',
         gap: 18,
         pointerEvents: 'none',
-        fontFamily: 'Geist, system-ui, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       {/* Playback: mute toggle — video posts only, top of rail */}

@@ -35,7 +35,7 @@ const T = {
   good: '#34D399',                    // GOOD-BRIGHT (movement glyph)
 };
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
 
 const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (

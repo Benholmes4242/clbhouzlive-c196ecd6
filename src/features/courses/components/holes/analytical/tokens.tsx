@@ -58,7 +58,7 @@ export const RAMP = {
   double: 'rgba(14,18,22,0.70)',
 } as const;
 
-export const SANS = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /** Tabular figures WITHOUT a monospace face - this is what removes the slash. */
 export const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining' };

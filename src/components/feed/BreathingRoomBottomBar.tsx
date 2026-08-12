@@ -125,7 +125,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           : undefined,
         zIndex: Z.echo,
         pointerEvents: 'none',
-        fontFamily: 'Geist, system-ui, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
       <div style={isFullscreen ? { maxWidth: 640, margin: '0 auto' } : undefined}>

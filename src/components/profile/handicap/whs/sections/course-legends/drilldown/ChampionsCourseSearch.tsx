@@ -8,7 +8,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseEyebrow } from '../_shared/CourseEyebrow';
 import { GAM } from '../../../gam/tokens';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   /** Optional id to exclude from results (the current course). */

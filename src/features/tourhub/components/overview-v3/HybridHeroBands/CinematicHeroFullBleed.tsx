@@ -563,7 +563,7 @@ export function CinematicHeroFullBleed({
         <h1
           style={{
             margin: 0,
-            fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 'clamp(22px, 7.2vw, 28px)',
             fontWeight: 800,
             lineHeight: 0.98,

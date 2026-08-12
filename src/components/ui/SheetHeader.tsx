@@ -2,7 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const FONT_SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface SheetHeaderProps {
   /** Caps eyebrow above the title. Optional — omit for sheets with no eyebrow context. */
@@ -61,7 +61,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <div style={{ marginBottom: 6 }}>
             <span
               style={{
-                fontFamily: FONT_SERIF,
+                fontFamily: FONT_SANS,
                 fontSize: 9,
                 fontWeight: 800,
                 color: eyebrowColor,
@@ -75,7 +75,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         )}
         <h2
           style={{
-            fontFamily: FONT_SERIF,
+            fontFamily: FONT_SANS,
             fontSize: 24,
             fontWeight: 800,
             color: titleColor,
@@ -89,7 +89,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         {sub && (
           <p
             style={{
-              fontFamily: FONT_SERIF,
+              fontFamily: FONT_SANS,
               fontSize: 13,
               fontWeight: 500,
               color: subColor,

@@ -13,7 +13,7 @@ import { ClipsWall } from './components/ClipsWall';
 
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const DEFAULT_MOOD: ClipsV2Mood = 'for_you';
 

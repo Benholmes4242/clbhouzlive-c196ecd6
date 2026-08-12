@@ -3,8 +3,8 @@ import { Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
-const GEIST =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SF_STACK =
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -69,7 +69,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
   };
 
   return (
-    <div style={{ padding: '18px 16px 4px', fontFamily: GEIST }}>
+    <div style={{ padding: '18px 16px 4px', fontFamily: SF_STACK }}>
       <div
         style={{
           fontSize: 10.5,
@@ -196,7 +196,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
             fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
-            fontFamily: GEIST,
+            fontFamily: SF_STACK,
           }}
         >
           {ctaLabel} ›

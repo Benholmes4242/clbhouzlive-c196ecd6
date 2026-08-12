@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DarkSectionHeader, DARK_ROW_TITLE } from '../_shared/darkAtoms';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const MAX_ITEMS = 6;
 
 interface Props {

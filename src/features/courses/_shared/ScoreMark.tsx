@@ -70,7 +70,7 @@ export interface ScoreMarkProps {
   surface?: 'light' | 'dark';
 }
 
-const FONT_GEIST = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const ScoreMark: React.FC<ScoreMarkProps> = ({
   strokes,
@@ -78,7 +78,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   size = 38,
   showStroke = true,
   colourOverride,
-  fontFamily = FONT_GEIST,
+  fontFamily = FONT_SF,
   surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);

@@ -135,7 +135,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
         position: 'fixed', inset: 0, background: '#0F172A', color: '#F8FAFC',
         zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center',
         padding: 'max(env(safe-area-inset-top, 0px), 32px) 24px max(env(safe-area-inset-bottom, 0px), 32px)',
-        fontFamily: 'Geist, system-ui, -apple-system, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         overflowY: 'auto',
       }}
     >

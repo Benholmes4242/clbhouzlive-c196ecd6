@@ -5,7 +5,7 @@ import { DarkSectionHeader } from './_shared/darkAtoms';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
 
 // ── Tokens ────────────────────────────────────────────────────────────────

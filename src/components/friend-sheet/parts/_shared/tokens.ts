@@ -23,7 +23,7 @@ export const GREEN = '#34D399';
 export const RED = '#EF4444';
 
 export const FONT =
-  'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const TAB: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',

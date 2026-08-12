@@ -11,7 +11,7 @@ import { VideosFeedV2 } from './components/VideosFeedV2';
 import { VIDEOS_V2_CATEGORY_IDS, type VideosV2CategoryId } from './categories';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const VALID_SORTS: readonly VideosSortId[] = ['latest', 'popular', 'following'];
 const DEFAULT_SORT: VideosSortId = 'latest';

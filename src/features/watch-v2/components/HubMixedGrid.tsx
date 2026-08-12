@@ -8,7 +8,7 @@ import { FeedCard } from '@/components/feed-cards/FeedCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const FONT_FAMILY =
-  'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 function SkeletonTile({ aspect }: { aspect: string }) {
   return (
