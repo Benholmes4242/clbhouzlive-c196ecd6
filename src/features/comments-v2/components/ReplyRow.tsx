@@ -72,7 +72,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
           </span>
           {comment.actor_type === 'business' && (
             <span style={{
-              padding: '1px 5px', borderRadius: 3, fontSize: 8.5, fontWeight: 800,
+              padding: '1px 5px', borderRadius: 3, fontSize: 8.5, fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.14em',
               background: 'rgba(247,147,30,0.10)', color: AMBER,
             }}>{t('comments.business')}</span>
