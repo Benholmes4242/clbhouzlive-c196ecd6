@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
+import { FIGURE } from '@/lib/tokens/type';
 import { bandColor } from '../bandColor';
 import { useReviewReceipt } from '../hooks/useReviewReceipt';
 import type { CategoryKey, ReviewV2Course } from '../types';
@@ -122,7 +123,7 @@ export function ReviewReceipt({
     borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${RV2.hairline}`,
   });
 
-  const figure = (color: string): React.CSSProperties => ({ fontWeight: 700, color });
+  const figure = (color: string): React.CSSProperties => ({ ...FIGURE, color });
 
   return (
     <div
@@ -152,7 +153,7 @@ export function ReviewReceipt({
           <div
             style={{
               fontSize: 68,
-              fontWeight: 700,
+              ...FIGURE,
               lineHeight: 1,
               letterSpacing: '-0.035em',
               color: heroColor,
@@ -211,7 +212,7 @@ export function ReviewReceipt({
                   <span
                     style={{
                       fontSize: 12.5,
-                      fontWeight: 700,
+                      ...FIGURE,
                       letterSpacing: '-0.03em',
                       color: c,
                       width: 26,

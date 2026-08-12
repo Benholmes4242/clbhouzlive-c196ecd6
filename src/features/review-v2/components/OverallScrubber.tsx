@@ -4,6 +4,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
+import { FIGURE } from '@/lib/tokens/type';
 import { bandColor } from '../bandColor';
 
 interface Props {
@@ -77,7 +78,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       <div
         style={{
           fontSize: 64,
-          fontWeight: 700,
+          ...FIGURE,
           lineHeight: 1,
           letterSpacing: '-0.035em',
           color,
@@ -166,7 +167,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           display: 'flex',
           marginTop: 9,
           fontSize: 9.5,
-          fontWeight: 700,
+          ...FIGURE,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
         }}
