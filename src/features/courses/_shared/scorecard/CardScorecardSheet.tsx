@@ -16,9 +16,19 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
-  A, SANS, FIGS, NUM, LABEL, KICKER, TITLE, Panel, StatRow, Action, Hairline,
+  A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
   toParParts, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
+import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+
+/**
+ * Canonical scale (src/lib/tokens/type.ts) is colourless by design; this sheet
+ * keeps its own palette, so ink is re-attached here and nowhere else.
+ */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
+/** Panel headings sit below the sheet title: same role, 13px as before. */
+const SECTION_TITLE: React.CSSProperties = { ...TITLE, fontSize: 13 };
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
 /**
@@ -145,7 +155,7 @@ const CardRow: React.FC<{
     {cells.map((c, i) => (
       <span key={i} style={{ textAlign: 'center', minWidth: 0 }}>
         {typeof c === 'object' ? c : (
-          <span style={{ ...NUM, fontSize: 12, fontWeight: muted ? 600 : 800, color: tone ?? (muted ? A.MUTE : A.INK) }}>
+          <span style={{ ...NUM, fontSize: 12, fontWeight: muted ? 500 : 700, color: tone ?? (muted ? A.MUTE : A.INK) }}>
             {c}
           </span>
         )}
@@ -697,8 +707,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             )}
             <div
               style={{
-                fontSize: 17, fontWeight: 800, color: A.INK, marginTop: 3, lineHeight: 1.22,
-                letterSpacing: '-0.01em',
+                ...TITLE, marginTop: 3, lineHeight: 1.22,
                 display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
               }}
@@ -764,7 +773,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <Hairline style={{ margin: '18px 0 14px' }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
-                  <span style={{ ...TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ ...SECTION_TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t('courses:scorecard.howItUnfolded')}
                   </span>
                   {/*
@@ -928,7 +937,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   {/* row 1 */}
                   <div
                     style={{
-                      fontSize: 13.5, fontWeight: 800, color: A.INK,
+                      fontSize: 13.5, fontWeight: 700, color: A.INK,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       alignSelf: 'end',
                     }}
