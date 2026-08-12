@@ -4,6 +4,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
+import { KICKER } from '@/lib/tokens/type';
 
 // Only the trigger chevron is theme-dependent; the sheet is always light.
 const PALETTE = {
@@ -101,10 +102,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
             style={{
               padding: '12px 12px 8px',
               fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
+              ...KICKER,
               color: '#0F172A',
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}

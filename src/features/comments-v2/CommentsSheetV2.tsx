@@ -25,6 +25,8 @@ import { CommentCard } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
+import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
 import {
   AlertDialog,
@@ -244,14 +246,14 @@ function CommentsSheetV2Inner({
                   style={{ width: 96, height: 21, background: 'rgba(14,18,22,0.06)' }}
                 />
               ) : (
-                <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em', lineHeight: '21px' }}>
+                <div style={{ ...TITLE_SCALE, ...FIGS, color: INK }}>
                   {totalCount === 0
                     ? t('comments.countNone')
                     : t('comments.count', { count: totalCount })}
                 </div>
               )}
               {!totalCountLoading && totalCount === 0 && (
-                <div style={{ fontSize: 13, color: MUTE, marginTop: 4 }}>
+                <div style={{ ...BODY, color: MUTE, marginTop: 4 }}>
                   {t('comments.emptyLine')}
                 </div>
               )}

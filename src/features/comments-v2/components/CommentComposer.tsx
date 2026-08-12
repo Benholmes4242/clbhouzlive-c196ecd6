@@ -187,7 +187,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
                 />
                 <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{a.name}</span>
                 {a.type === 'business' && (
-                  <span style={{ fontSize: 9, fontWeight: 800, color: AMBER, letterSpacing: '0.14em' }}>BUSINESS</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: AMBER, letterSpacing: '0.14em' }}>BUSINESS</span>
                 )}
               </button>
             ))}

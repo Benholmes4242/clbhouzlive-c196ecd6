@@ -3,6 +3,7 @@
  * calls back onSubmit(reason, details) which the parent forwards to
  * useCommentsV2.reportComment (writes hidden_comments + reports).
  */
+import { TITLE as TITLE_SCALE } from '@/lib/tokens/type';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -74,7 +75,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
 
             <div className="flex items-center justify-between px-5 pb-2">
               <span style={{
-                fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
+                fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em',
                 textTransform: 'uppercase', color: AMBER,
               }}>REPORT COMMENT</span>
               <button type="button" onClick={close} className="bg-transparent border-0 p-1 cursor-pointer" aria-label="Close">
@@ -84,7 +85,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
 
             {step === 'reason' && (
               <div className="px-5 pb-4">
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: INK, marginBottom: 12 }}>
+                <h3 style={{ ...TITLE_SCALE, color: INK, marginBottom: 12 }}>
                   Why are you reporting this?
                 </h3>
                 <div className="space-y-2">
@@ -134,7 +135,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
 
             {step === 'details' && (
               <div className="px-5 pb-4">
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: INK, marginBottom: 12 }}>
+                <h3 style={{ ...TITLE_SCALE, color: INK, marginBottom: 12 }}>
                   Add details (optional)
                 </h3>
                 <textarea
@@ -187,7 +188,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                 >
                   <Check size={22} color={AMBER} />
                 </div>
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: INK }}>Thanks for letting us know</h3>
+                <h3 style={{ ...TITLE_SCALE, color: INK }}>Thanks for letting us know</h3>
                 <p style={{ fontSize: 13, color: SECONDARY, marginTop: 6 }}>
                   We'll review this comment and take action if needed.
                 </p>
