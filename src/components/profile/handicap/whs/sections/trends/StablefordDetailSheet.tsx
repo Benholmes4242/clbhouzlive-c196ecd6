@@ -123,7 +123,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
         >
           {t('stableford.title')}
         </h2>
-        <p style={{ ...LABEL, marginTop: 6 }}>
+        <p style={{ ...LABEL, marginTop: 6, fontVariantNumeric: 'tabular-nums lining-nums' }}>
           {t('stableford.sample', { count: dist.total, scope: scopeLabel })}
         </p>
 
