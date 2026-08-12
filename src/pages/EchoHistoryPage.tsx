@@ -11,6 +11,7 @@ import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave
 import { formatRelativeRounded } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { TITLE } from '@/lib/tokens/type';
 
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
@@ -247,7 +248,7 @@ const EchoHistoryPage: React.FC = () => {
           >
             <ChevronLeft size={24} />
           </button>
-          <span style={{ fontSize: 15, fontWeight: 600, color: INK, flex: 1 }}>
+          <span style={{ ...TITLE, color: INK, flex: 1 }}>
             History
           </span>
           <div style={{ width: 40, height: 40, flexShrink: 0 }} />
@@ -452,7 +453,7 @@ const EchoHistoryPage: React.FC = () => {
                     justifyContent: 'space-between',
                   }}
                 >
-                  <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
+                  <span style={{ ...TITLE, color: INK }}>
                     Rename chat
                   </span>
                   <button
@@ -506,7 +507,7 @@ const EchoHistoryPage: React.FC = () => {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
+                <span style={{ ...TITLE, color: INK }}>
                   {deleteCount > 1
                     ? t('history.delete.group.title', {
                         count: deleteCount,
