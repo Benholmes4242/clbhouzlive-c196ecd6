@@ -48,6 +48,7 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
               color: 'var(--hcp-t-100)',
               marginTop: 3,
               letterSpacing: '-0.01em',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
