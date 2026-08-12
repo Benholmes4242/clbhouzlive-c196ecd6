@@ -283,7 +283,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Type scale mirrors CoursesPageHero: 10/800 eyebrow, 18.5 title. */}
+          {/* Type scale mirrors CoursesPageHero: 10/700 eyebrow, 18.5 title. */}
           <div
             style={{
               fontSize: 10,

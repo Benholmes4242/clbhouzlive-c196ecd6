@@ -140,7 +140,7 @@ export function ReactionAction({
  * renders nothing but still occupies its width, so the figure axis is identical
  * on every row.
  *
- * WIDTH: 42px — the 15px glyph + 4px gap + a three-digit count at 11.5px/800
+ * WIDTH: 42px — the 15px glyph + 4px gap + a three-digit count at 11.5px/700
  * tabular (~22px), which is the widest realistic count on these surfaces.
  */
 export const REACTION_SLOT_W = 42;

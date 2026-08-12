@@ -146,7 +146,7 @@ export function HonoursRow({
           style={{
             display: 'block',
             fontSize: 11.5,
-            fontWeight: e.isOwn ? 800 : 600,
+            fontWeight: e.isOwn ? 700 : 600,
             lineHeight: 1.32,
             color: e.isOwn ? A.AMBER_DEEP : A.BODY,
             marginTop: 1,
