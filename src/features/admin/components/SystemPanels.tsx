@@ -104,6 +104,15 @@ export function SystemPanel({
   const clients = ops?.clients ?? [];
   const traffic = ops?.traffic;
 
+  // Reference material, not a daily check: collapsed until an admin opens it.
+  const [clientsOpen, setClientsOpen] = React.useState<boolean>(
+    () => safeLocalStorage.get(CLIENTS_OPEN_KEY) === '1',
+  );
+  React.useEffect(() => {
+    safeLocalStorage.set(CLIENTS_OPEN_KEY, clientsOpen ? '1' : '0');
+  }, [clientsOpen]);
+
+
   return (
     <section style={CARD}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
