@@ -13,6 +13,7 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { FIGURE } from '@/lib/tokens/type';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
@@ -340,10 +341,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
   } else if (spec.right === 'rating' && row.target_review_rating != null) {
     rightEl = (
       <span
-        className="tabular-nums"
         style={{
+          ...FIGURE,
           fontSize: 15,
-          fontWeight: 800,
           color: reviewLabelColor(row.target_review_rating, 'light'),
           fontFamily: SF_STACK,
         }}

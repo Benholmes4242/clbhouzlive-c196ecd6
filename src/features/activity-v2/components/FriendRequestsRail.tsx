@@ -161,7 +161,7 @@ export const FriendRequestsRail: React.FC = () => {
               style={{
                 padding: '0 16px 10px',
                 fontSize: 10.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: '#94A3B8',
