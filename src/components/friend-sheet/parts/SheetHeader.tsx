@@ -84,10 +84,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <h2
             style={{
               margin: 0,
-              fontSize: 21,
-              fontWeight: 700,
+              ...TITLE,
               color: T100,
-              letterSpacing: '-0.03em',
               lineHeight: 1.05,
               fontFamily: FONT,
             }}
