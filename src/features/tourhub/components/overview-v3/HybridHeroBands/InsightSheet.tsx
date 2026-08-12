@@ -20,6 +20,7 @@ import { formatNumber } from '@/i18n/format';
 import { formatPurse } from '../../../_shared/formatPurse';
 import { useVenueCourseDna } from '../../../hooks/useVenueCourseDna';
 import { AMBER } from '../HybridHero.constants';
+import { TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;
@@ -164,7 +165,7 @@ export function InsightSheet({
             {courseTitle && (
               <div
                 id="insight-sheet-title"
-                style={{ fontSize: 20, fontWeight: 700, color: INK, lineHeight: 1.2 }}
+                style={{ ...TITLE, color: INK }}
               >
                 {courseTitle}
               </div>
