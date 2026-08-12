@@ -139,7 +139,7 @@ export function StandoutTile({
               <span
                 style={{
                   fontSize: 6.5,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   lineHeight: 1,
@@ -159,7 +159,7 @@ export function StandoutTile({
             top: 8,
             right: 10,
             fontSize: 6.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: 'rgba(255,255,255,0.72)',
@@ -173,7 +173,7 @@ export function StandoutTile({
           <div
             style={{
               fontSize: 14,
-              fontWeight: 800,
+              fontWeight: 700,
               color: '#fff',
               letterSpacing: '-0.025em',
               lineHeight: 1.14,
@@ -211,7 +211,7 @@ export function StandoutTile({
               flex: 1,
               minWidth: 0,
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               color: isOwn ? A.AMBER_DEEP : A.INK,
               whiteSpace: 'nowrap',

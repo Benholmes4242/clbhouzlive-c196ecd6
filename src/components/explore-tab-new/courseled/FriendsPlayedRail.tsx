@@ -178,7 +178,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     style={{
                       display: 'block',
                       fontSize: 12.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: '#fff',
                       letterSpacing: '-0.015em',
                       overflow: 'hidden',
@@ -212,7 +212,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           style={{
                             fontSize: 6.5,
 
-                            fontWeight: 800,
+                            fontWeight: 700,
                             letterSpacing: '0.13em',
                             textTransform: 'uppercase',
                             color: A.DIM,

@@ -64,7 +64,7 @@ export function ReactionAction({
         style={{
           ...FIGS,
           fontSize: 11.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: countColor,
           lineHeight: 1,
         }}

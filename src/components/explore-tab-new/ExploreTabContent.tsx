@@ -421,7 +421,7 @@ export default function ExploreTabContent({
           style={{
             margin: '4px 0 0',
             fontSize: 26,
-            fontWeight: 800,
+            fontWeight: 700,
             color: A.INK,
             letterSpacing: '-0.02em',
           }}

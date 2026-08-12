@@ -124,7 +124,7 @@ function ThreeUp({ cells }: { cells: Array<[string, string, string]> }) {
             style={{
               ...NUMF,
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               color: tone,
               whiteSpace: 'nowrap',
@@ -303,7 +303,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                     <div
                       style={{
                         fontSize: 14.5,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: '#fff',
                         letterSpacing: '-0.02em',
                       }}
@@ -380,7 +380,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             style={{
                               ...NUMF,
                               fontSize: 25,
-                              fontWeight: 800,
+                              fontWeight: 700,
                               lineHeight: 0.92,
                               letterSpacing: '-0.035em',
                               color: scoreColor(peek.leaderScore),
@@ -412,7 +412,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                               style={{
                                 ...LABEL,
                                 fontSize: 6.5,
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 letterSpacing: '0.13em',
                                 color: A.DIM,
                                 marginLeft: 'auto',
@@ -460,7 +460,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                             style={{
                               ...LABEL,
                               fontSize: 6.5,
-                              fontWeight: 800,
+                              fontWeight: 700,
                               letterSpacing: '0.13em',
                               color: A.DIM,
                             }}
@@ -472,7 +472,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                               ...NUMF,
                               marginLeft: 'auto',
                               fontSize: 15,
-                              fontWeight: 800,
+                              fontWeight: 700,
                               letterSpacing: '-0.025em',
                               color: A.INK,
                             }}
@@ -519,7 +519,7 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                       alignItems: 'center',
                       gap: 4,
                       fontSize: 9.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
                       color: A.INK,

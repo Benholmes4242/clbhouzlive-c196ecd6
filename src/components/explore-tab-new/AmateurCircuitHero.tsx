@@ -287,7 +287,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             style={{
               fontSize: 10,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: GOLD,
@@ -300,7 +300,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             style={{
               fontSize: 18.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               lineHeight: 1.15,
               color: '#FFFFFF',
@@ -325,7 +325,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                     padding: '3px 6px',
                     borderRadius: 4,
                     fontSize: 10,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.07em',
                     lineHeight: 1,
                     whiteSpace: 'nowrap',
@@ -413,7 +413,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                   background: '#FFFFFF',
                   color: '#15171F',
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.005em',
                   padding: '9px 15px',
                   borderRadius: 999,
@@ -443,7 +443,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             style={{
               // 39 is the Courses hero rank figure.
               fontSize: 39,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.03em',
               lineHeight: 1,
               color: bigColor,

@@ -12,7 +12,7 @@ export const GOLD = '#D8A93C';
 export { A, SANS, KICKER, LABEL, FIGS };
 
 export const NUMF: React.CSSProperties = {
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.02em',
   fontVariantNumeric: 'tabular-nums lining',
 };
@@ -161,7 +161,7 @@ export function ImageChip({
         top: 8,
         [side]: 8,
         fontSize: 8,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
         color: '#FFFFFF',

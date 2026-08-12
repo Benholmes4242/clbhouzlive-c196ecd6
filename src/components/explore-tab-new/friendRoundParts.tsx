@@ -93,13 +93,13 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...FIGS, fontSize: 12.5, fontWeight: 800, color: mv.tone }}>
+      <span style={{ ...FIGS, fontSize: 12.5, fontWeight: 700, color: mv.tone }}>
         {mv.arrow}{mv.figure}
       </span>
       <span
         style={{
           fontSize: 6.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
           color: A.DIM,
