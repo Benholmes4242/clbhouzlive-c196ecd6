@@ -44,7 +44,7 @@ const SHEET_EYEBROW: React.CSSProperties = {
   ...KICKER,
   fontSize: 9.5,
   letterSpacing: '0.15em',
-  fontWeight: 800,
+  fontWeight: 700,
 };
 
 
@@ -57,13 +57,13 @@ function fmtRating(n: number | null | undefined): string {
   return n != null && Number.isFinite(n) && n > 0 ? n.toFixed(1) : DASH;
 }
 
-/** Counter cell: figure 23/800 INK over a 7.5/800/0.14em DIM label. */
+/** Counter cell: figure 23/700 INK over a 7.5/700/0.14em DIM label. */
 const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div style={{ textAlign: 'center', minWidth: 0 }}>
     <div
       style={{
         fontSize: 7.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         color: A.DIM,
@@ -74,7 +74,7 @@ const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, v
     <div
       style={{
         fontSize: 23,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.025em',
         color: A.INK,
         marginTop: 8,
@@ -254,7 +254,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
         <span
           style={{
             fontSize: 8.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: A.INK,
@@ -265,7 +265,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
         <span
           style={{
             fontSize: figSize,
-            fontWeight: 800,
+            fontWeight: 700,
             color: A.INK,
             textAlign: 'right',
             ...FIGS,
@@ -276,7 +276,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
         <span
           style={{
             fontSize: figSize,
-            fontWeight: 800,
+            fontWeight: 700,
             color: A.INK,
             textAlign: 'right',
             ...FIGS,
@@ -300,7 +300,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
         padding: '8.5px 0',
       }}
     >
-      <span style={{ fontSize: 13.5, fontWeight: 800, color: A.INK, ...FIGS }}>{h.hole_no}</span>
+      <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, ...FIGS }}>{h.hole_no}</span>
       <span
         style={{ fontSize: 13, fontWeight: 600, color: A.BODY, textAlign: 'right', ...FIGS }}
       >
@@ -363,7 +363,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
                 transition: 'background-color 160ms ease, border-color 160ms ease',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 800, color: on ? A.PANEL : A.INK }}>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: on ? A.PANEL : A.INK }}>
                 {tee.tee_label}
               </span>
               <span
@@ -400,7 +400,7 @@ const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string
                 <div
                   style={{
                     fontSize: 24,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '-0.02em',
                     color: A.INK,
                     marginTop: 7,
@@ -573,7 +573,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
             <span
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: A.INK,
@@ -581,7 +581,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
             >
               {t('courses:courseDetail.card.fullCard')}
             </span>
-            <span style={{ fontSize: 12, color: A.INK, fontWeight: 800 }} aria-hidden="true">
+            <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
               {'\u203A'}
             </span>
           </button>
@@ -592,7 +592,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         <div
           style={{
             fontSize: 8.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: A.DIM,
@@ -608,7 +608,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
           <span
             style={{
               fontSize: 46,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.035em',
               color: A.INK,
               lineHeight: 0.92,
@@ -619,7 +619,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
           {slope != null ? (
             <>
               {/* Difficulty is neither a score nor the viewing member - no colour. */}
-              <span style={{ fontSize: 16, fontWeight: 800, color: A.INK }}>{deltaText}</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: A.INK }}>{deltaText}</span>
               <span style={{ fontSize: 13, fontWeight: 600, color: A.MUTE }}>
                 {t('courses:courseDetail.card.vsStandard', { standard: STANDARD_SLOPE })}
               </span>
@@ -695,7 +695,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
             style={{
               margin: '3px 0 0',
               fontSize: 22,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.025em',
               lineHeight: 1.1,
               color: A.INK,

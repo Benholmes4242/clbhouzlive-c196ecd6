@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FONT, INK, MONO } from './_constants';
+import { FONT, INK, SANS } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 const AMBER = '#F7931E';
@@ -43,7 +43,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
       <div
         style={{
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: AMBER,
@@ -60,7 +60,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1,
-            fontFamily: MONO,
+            fontFamily: SANS,
             fontVariantNumeric: 'tabular-nums',
             flexShrink: 0,
           }}
@@ -72,7 +72,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
             fontSize: 11.5,
             fontWeight: 600,
             color: INK_MUTE,
-            fontFamily: MONO,
+            fontFamily: SANS,
             fontVariantNumeric: 'tabular-nums',
             whiteSpace: 'nowrap',
           }}
@@ -87,7 +87,7 @@ const Card: React.FC<{ eyebrow: string; hole: PairHole }> = ({ eyebrow, hole }) 
           color: INK_MUTE,
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
-          fontFamily: MONO,
+          fontFamily: SANS,
           fontVariantNumeric: 'tabular-nums',
           whiteSpace: 'nowrap',
           marginTop: 'auto',

@@ -39,7 +39,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
             alignItems: 'center',
             gap: 6,
             fontSize: 12,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK,
             letterSpacing: '-0.005em',
           }}
@@ -60,7 +60,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
         <span
           style={{
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: INK_MUTE,
             textTransform: 'uppercase',

@@ -3,8 +3,8 @@ export const DEEP_AMBER = '#B26818';                  // darker amber - empty-st
 export const INK = '#0F172A';
 export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-// Mono numeral stack - analyst-grade tabular alignment on the Holes tab (data-page exception).
-export const MONO = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+// SF Pro sans stack (same value as FONT). Kept as a named export for the Holes tab figure cells.
+export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // -----------------------------------------------------------------------------
 // "World Feed" scoring palette.

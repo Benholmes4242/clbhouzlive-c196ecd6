@@ -213,7 +213,7 @@ export const HoleRowV2: React.FC<{
             style={{
               display: 'block',
               fontSize: 18,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.03em',
               color: A.INK,
               lineHeight: 1.1,
@@ -277,7 +277,7 @@ export const HoleRowV2: React.FC<{
               style={{
                 display: 'block',
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: field ? field.tone : A.DIM,
                 lineHeight: 1.1,
@@ -295,7 +295,7 @@ export const HoleRowV2: React.FC<{
               style={{
                 display: 'block',
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: A.AMBER_DEEP,
                 lineHeight: 1.1,
@@ -341,7 +341,7 @@ export const HoleRowV2: React.FC<{
                   <span
                     style={{
                       fontSize: 13,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: A.INK,
                       lineHeight: 1,
                       fontVariantNumeric: 'tabular-nums',
@@ -469,7 +469,7 @@ export const HoleRowV2: React.FC<{
 /**
  * A footnote figure: label BEFORE the value, on one baseline, 12.5/700. The
  * collapsed row's figures are the opposite shape - value above a micro label,
- * 14/800 - so the amber YOU average and the red YOUR GAP cannot read as one
+ * 14/700 - so the amber YOU average and the red YOUR GAP cannot read as one
  * number changing colour.
  */
 const DetailFigure: React.FC<{ label: string; value: string; tone?: string }> = ({

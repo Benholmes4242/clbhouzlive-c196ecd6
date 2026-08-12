@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
-import { FONT, INK, MONO, SC_BIRDIE, SC_DOUBLE } from './_constants';
+import { FONT, INK, SANS, SC_BIRDIE, SC_DOUBLE } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface Props {
@@ -96,7 +96,7 @@ const Card: React.FC<{
       <div
         style={{
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: eyebrow,
@@ -112,7 +112,7 @@ const Card: React.FC<{
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1,
-            fontFamily: MONO,
+            fontFamily: SANS,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -123,7 +123,7 @@ const Card: React.FC<{
             fontSize: 11.5,
             fontWeight: 600,
             color: INK_MUTE,
-            fontFamily: MONO,
+            fontFamily: SANS,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -138,7 +138,7 @@ const Card: React.FC<{
           letterSpacing: '0.04em',
           textTransform: 'uppercase',
           marginTop: -2,
-          fontFamily: MONO,
+          fontFamily: SANS,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
