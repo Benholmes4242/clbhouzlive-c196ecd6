@@ -372,73 +372,110 @@ function DraftRestoredBar({ visible, onDiscard }: { visible: boolean; onDiscard:
 
 
 
-function CourseCard({ course, onOpen }: { course: AdminCourseRow; onOpen: () => void }) {
-  const top100 = isTop100(course);
+/**
+ * One coverage tile. The bar is SHAPE, the figure is MAGNITUDE and the
+ * percentage is PROPORTION - three views of one number, and no fourth.
+ * The bar is never rescaled and has no minimum width: a nearly empty bar is
+ * the true picture and the reason the panel exists.
+ */
+function CoverageTile({ label, value, total, active, onClick }: {
+  label: string; value: number; total: number; active: boolean; onClick: () => void;
+}) {
+  const share = total > 0 ? value / total : 0;
+  const pct = share >= 0.995 ? 100 : share > 0 && share < 0.01 ? Math.round(share * 1000) / 10 : Math.round(share * 100);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      style={{
+        display: 'flex', flexDirection: 'column', gap: 8,
+        padding: '8px 10px 10px',
+        borderRadius: t.radius.lg,
+        background: active ? t.neutralSoft : t.surface,
+        border: `1px solid ${active ? t.line : t.hairline}`,
+        cursor: 'pointer', textAlign: 'left', minWidth: 0,
+      }}
+    >
+      <span aria-hidden style={{ height: 2.5, borderRadius: 2, width: '100%', background: t.line, overflow: 'hidden' }}>
+        <span style={{
+          display: 'block', height: '100%', borderRadius: 2,
+          width: `${share * 100}%`, background: t.brand,
+        }} />
+      </span>
+      <span style={{
+        ...LABEL_T, color: t.inkMuted,
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>{label}</span>
+      <span style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
+        <span style={{ ...FIG_T, fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink }}>
+          {value.toLocaleString()}
+        </span>
+        <span style={{ ...FIG_T, fontSize: 10.5, fontWeight: 700, color: t.inkFaint }}>{pct}%</span>
+      </span>
+    </button>
+  );
+}
+
+/**
+ * One roster row. No border (the panel owns the edge), no icon tile (an
+ * ornamental glyph distinguishes nothing across 23,291 rows). The rank in the
+ * right rail says Top 100 better than a tinted capsule did.
+ */
+function CourseRow({ course, first, activeFilter, missingCoords, missingPhoto, total, onOpen }: {
+  course: AdminCourseRow;
+  first: boolean;
+  activeFilter: CourseFilter;
+  missingCoords: number;
+  missingPhoto: number;
+  total: number;
+  onOpen: () => void;
+}) {
   const rank = firstRank(course);
-  const noCoords = course.latitude == null || course.longitude == null;
-  const noPhoto = !course.thumbnail_image;
-  const region = [course.sub_country, course.country].filter(Boolean).join(', ') || course.country || '';
+  // Suppress a marker that merely repeats the active filter.
+  const noCoords = (course.latitude == null || course.longitude == null) && activeFilter !== 'missing_coords';
+  const noPhoto = !course.thumbnail_image && activeFilter !== 'missing_photo';
+  // `country` is a MACRO-REGION ("Britain & Ireland", "USA"), not a country.
+  const region = [course.sub_country, course.country].filter(Boolean).join(' · ') || course.country || '';
 
   return (
     <button
       onClick={onOpen}
       style={{
-        width: '100%', textAlign: 'left',
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, padding: 12,
-        display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+        width: '100%', textAlign: 'left', background: 'transparent',
+        border: 'none', borderTop: first ? 'none' : `1px solid ${t.hairline}`,
+        padding: '10px 14px',
+        display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
       }}
     >
-      <div style={{
-        width: 38, height: 38, borderRadius: 12,
-        background: top100 ? t.brandSoft : t.neutralSoft,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}>
-        {top100
-          ? <Trophy size={18} color={t.brandText} />
-          : <Compass size={18} color={t.inkMuted} />
-        }
-      </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          <span style={{
-            fontSize: 13.5, fontWeight: 700, color: t.ink,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            minWidth: 0, flex: '0 1 auto',
-          }}>{course.name}</span>
-          {top100 && (
-            <span style={{
-              flexShrink: 0,
-              background: t.brandSoft, color: t.brandText,
-              fontSize: 10, fontWeight: 700, letterSpacing: 0.3,
-              padding: '2px 6px', borderRadius: 999,
-              fontVariantNumeric: 'tabular-nums',
-            }}>
-              {rank != null ? `T100 #${rank}` : 'T100'}
-            </span>
-          )}
-        </div>
         <div style={{
-          fontSize: 12, color: t.inkMuted, marginTop: 2,
-          display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center',
+          fontSize: 13.5, fontWeight: 700, color: t.ink,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>{course.name}</div>
+        <div style={{
+          marginTop: 2, fontSize: 11.5, color: t.inkFaint,
+          display: 'flex', gap: 8, alignItems: 'baseline', minWidth: 0,
         }}>
-          <span style={{
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            maxWidth: '100%',
-          }}>{region || '-'}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {region || '—'}
+          </span>
           {noCoords && (
-            <span style={{ color: t.warnText, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-              <MapPin size={11} /> No coords
-            </span>
+            <span style={{ ...LABEL_T, color: issueTone(missingCoords, total), flexShrink: 0 }}>No coords</span>
           )}
           {noPhoto && (
-            <span style={{ color: t.warnText, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-              <ImageIcon size={11} /> No photo
-            </span>
+            <span style={{ ...LABEL_T, color: issueTone(missingPhoto, total), flexShrink: 0 }}>No photo</span>
           )}
         </div>
       </div>
-      <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
+      {rank != null ? (
+        <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 46 }}>
+          <div style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.brandText }}>#{rank}</div>
+          <div style={{ ...LABEL_T, color: t.inkFaint, marginTop: 1 }}>Top 100</div>
+        </div>
+      ) : (
+        <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
+      )}
     </button>
   );
 }
