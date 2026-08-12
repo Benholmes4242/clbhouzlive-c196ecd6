@@ -15,7 +15,7 @@ export const GAM = {
   BRONZE: '#A16207',
   GREY: '#94A3B8',
   FONT_SF: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  TABULAR: { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' },
+  TABULAR: { fontVariantNumeric: 'tabular-nums lining-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' },
 } as const;
 
 

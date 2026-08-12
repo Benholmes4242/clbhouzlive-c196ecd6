@@ -72,7 +72,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
               padding: '16px 16px 12px',
               fontFamily: FONT,
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: 'var(--hcp-t-60)',

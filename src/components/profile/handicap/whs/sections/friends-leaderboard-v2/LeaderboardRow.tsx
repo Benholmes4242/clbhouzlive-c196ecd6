@@ -36,7 +36,7 @@ const T = {
 };
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
+const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums lining-nums' };
 
 const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="#F7931E" aria-hidden style={{ flexShrink: 0 }}>

@@ -37,7 +37,7 @@ export const MilestoneDetail: React.FC<Props> = ({ data, item, onBack }) => {
         style={{
           margin: '8px 0 0',
           fontSize: 22,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.02em',
           color: REC.INK,
         }}

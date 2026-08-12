@@ -31,7 +31,7 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
             fontSize: 11,
             fontWeight: 700,
             color: 'var(--hcp-t-60)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           Member {membershipNumber}

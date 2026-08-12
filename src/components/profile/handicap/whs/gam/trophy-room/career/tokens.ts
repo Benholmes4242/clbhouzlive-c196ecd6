@@ -46,7 +46,7 @@ export const KICKER = {
 
 export const LABEL = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
   color: REC.DIM,
@@ -59,7 +59,7 @@ export const CAPTION = {
 };
 
 export const FIGURE = {
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.02em',
   color: REC.INK,
   ...REC.TABULAR,

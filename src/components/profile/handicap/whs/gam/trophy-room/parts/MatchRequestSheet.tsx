@@ -123,7 +123,7 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
         <div
           style={{
             fontSize: 17,
-            fontWeight: 800,
+            fontWeight: 700,
             fontFamily: FONT,
             color: '#fff',
             letterSpacing: '-0.01em',
@@ -181,7 +181,7 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
                 background: AMBER,
                 color: '#101418',
                 fontSize: 13.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 fontFamily: FONT,
                 cursor: 'pointer',
               }}
@@ -201,7 +201,7 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
               <div
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.18em',
                   color: 'rgba(255,255,255,0.45)',
                   fontFamily: FONT,
@@ -215,7 +215,7 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
             <div
               style={{
                 fontSize: 11,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.55)',

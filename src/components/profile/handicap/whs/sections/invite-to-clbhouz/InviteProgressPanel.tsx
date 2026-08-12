@@ -76,7 +76,7 @@ export const InviteProgressPanel: React.FC<Props> = ({ sentCount, onClick }) => 
         <div
           style={{
             fontSize: 28,
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1,
             letterSpacing: '-0.02em',
             color: CHART.INK,
