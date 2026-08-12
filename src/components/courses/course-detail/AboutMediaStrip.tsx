@@ -1,4 +1,5 @@
-import React, { useMemo, useRef } from 'react';
+import React
+import { FIGS, FIGURE } from '@/lib/tokens/type';, { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Play, Plus } from 'lucide-react';
@@ -382,7 +383,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                    <span style={{ color: '#fff', fontSize: 19, fontWeight: 700 }}>+{overflowCount}</span>
+                    <span style={{ ...FIGURE, color: '#fff', fontSize: 19 }}>+{overflowCount}</span>
                     <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>{t('courseDetail.mediaStrip.seeAll')}</span>
                   </div>
                 </div>
