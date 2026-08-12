@@ -39,7 +39,7 @@ const Header: React.FC<{ photoCount: number; videoCount: number }> = ({
     }}
   >
     <span style={KICKER}>MEDIA</span>
-    <span style={LABEL}>
+    <span style={{ ...LABEL, ...FIGS }}>
       {`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} \u00B7 ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
     </span>
   </div>
