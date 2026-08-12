@@ -287,7 +287,7 @@ export const ProfileHero: React.FC<Props> = ({
                             alignItems: 'baseline',
                             gap: 5,
                             fontSize: 12,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             ...FIGS,
                           }}
                         >
@@ -302,7 +302,7 @@ export const ProfileHero: React.FC<Props> = ({
                             style={{
                               color: W_40,
                               fontSize: 7.5,
-                              fontWeight: 800,
+                              fontWeight: 700,
                               letterSpacing: '0.16em',
                               textTransform: 'uppercase',
                             }}

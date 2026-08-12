@@ -72,7 +72,7 @@ const PlainScore: React.FC<{ value: number; size?: number; color?: string }> = (
   return (
     <span style={{
       fontSize: size,
-      fontWeight: 800,
+      fontWeight: 700,
       color,
       letterSpacing: '-0.01em',
       fontVariantNumeric: 'tabular-nums',
@@ -207,7 +207,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               flex: 1,
               minWidth: 0,
               fontSize: 13.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.3,
@@ -785,7 +785,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         <div style={{ width: 3, height: 9, background: INK }} />
                         <span style={{
                           fontSize: 10,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           letterSpacing: '0.14em',
                           color: INK_SUBTLE,
                           textTransform: 'uppercase',
@@ -861,7 +861,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           cursor: 'pointer',
                           color: INK,
                           fontSize: 10,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           letterSpacing: '0.14em',
                           textTransform: 'uppercase',
                         }}

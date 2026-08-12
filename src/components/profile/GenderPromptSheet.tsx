@@ -164,7 +164,7 @@ export const GenderPromptSheet: React.FC = () => {
           <div
             style={{
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: AMBER,
