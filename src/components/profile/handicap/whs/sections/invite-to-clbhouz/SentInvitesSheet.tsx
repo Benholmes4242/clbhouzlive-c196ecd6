@@ -199,7 +199,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           style={{
             margin: '6px 0 0',
             fontFamily: REC.FONT,
-            fontSize: 21,
+            fontSize: 17,
             fontWeight: 700,
             letterSpacing: '-0.02em',
             color: REC.INK,
