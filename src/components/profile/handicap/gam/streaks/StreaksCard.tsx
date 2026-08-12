@@ -273,7 +273,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
               color: tokens.figureColor,
               lineHeight: 1,
               letterSpacing: '-0.045em',
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining-nums',
               fontFeatureSettings: '"kern" 1, "liga" 1',
             }}
           >
@@ -312,7 +312,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: 'var(--hcp-t-60)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           <span>{progressLeft}</span>

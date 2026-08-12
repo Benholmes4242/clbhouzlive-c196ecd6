@@ -288,7 +288,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                     fontWeight: 700,
                     letterSpacing: '-0.03em',
                     color: 'var(--hcp-t-100)',
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
                   {cohorts.totalInactive}

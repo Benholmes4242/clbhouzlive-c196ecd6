@@ -228,7 +228,7 @@ export const KPICell: React.FC<KPICellProps> = ({
           fontWeight: 700,
           letterSpacing: '-0.025em',
           lineHeight: 1,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining-nums',
           color: valueColor,
         }}
       >
@@ -239,7 +239,7 @@ export const KPICell: React.FC<KPICellProps> = ({
           style={{
             fontSize: 10.5,
             color: 'var(--hcp-t-40)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {meta}
@@ -337,7 +337,7 @@ export const VerdictNumber: React.FC<VerdictNumberProps> = ({
         color,
         fontWeight: 700,
         letterSpacing: '-0.02em',
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         fontSize,
         ...style,
       }}
@@ -379,7 +379,7 @@ export const VerdictPill: React.FC<VerdictPillProps> = ({ children, verdict = 'n
         fontSize: 9.5,
         letterSpacing: '0.14em',
         fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
       }}
     >
       {children}

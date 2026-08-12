@@ -111,7 +111,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {displayName(friend.friend_name)}{' '}
-          <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, fontVariantNumeric: 'tabular-nums lining-nums' }}>
             {fmtHcp(hcp)}
           </span>
         </div>

@@ -162,7 +162,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
                 fontWeight: 700,
                 letterSpacing: '-0.03em',
                 color: 'rgba(242,244,247,0.96)',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
               {cohorts.totalInactive}

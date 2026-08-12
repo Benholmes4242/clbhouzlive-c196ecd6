@@ -27,7 +27,7 @@ const StatLine: React.FC<StatLineProps> = ({ count, singular, plural }) => (
         color: 'rgba(255,255,255,0.72)',
       }}
     >
-      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{count}</span>{' '}
+      <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums' }}>{count}</span>{' '}
       {count === 1 ? singular : plural}
     </span>
   </div>
