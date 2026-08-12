@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -190,7 +191,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-4 py-3 border-b flex-shrink-0">
-          <DialogTitle className="text-lg">Drop a pin on the map</DialogTitle>
+          <DialogTitle style={TITLE}>Drop a pin on the map</DialogTitle>
         </DialogHeader>
 
         {/* Search bar */}
