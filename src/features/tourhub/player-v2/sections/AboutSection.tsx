@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import type { TourPlayer } from '../../hooks/useTourHubData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK, INK_FAINT, SURFACE } from '../../_shared/tokens';
+import { FIGS } from '@/lib/tokens/type';
 
 interface AboutSectionProps {
   player: TourPlayer;
@@ -101,7 +102,7 @@ export function AboutSection({ player }: AboutSectionProps) {
             >
               {f.label}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em', ...FIGS }}>
               {f.value}
             </div>
           </div>

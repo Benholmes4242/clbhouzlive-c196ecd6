@@ -18,6 +18,7 @@ import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
+import { FIGS } from '@/lib/tokens/type';
   AMBER,
   FONT,
   GOLD,
@@ -181,6 +182,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                 color: INK_MUTE,
                 letterSpacing: '0.01em',
                 lineHeight: 1.3,
+                ...FIGS,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',

@@ -27,6 +27,7 @@ import {
 } from '../leaders-v2/data/useLeaderCategories';
 import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
+import { FIGS } from '@/lib/tokens/type';
 
 interface StatsSheetProps {
   open: boolean;
@@ -375,6 +376,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
                 lineHeight: 1.5,
                 color: INK_MUTE,
                 textAlign: 'center',
+                ...FIGS,
               }}
             >
               {t('player.stats.rankFootnote', { count: poolSize })}

@@ -35,6 +35,7 @@ import {
   type Anatomy,
 } from './boards/AlmanacBoards';
 import { FullListSheet } from './FullListSheet';
+import { FIGS } from '@/lib/tokens/type';
 
 // Compact tour-eyebrow chip labels resolved via i18n. Keys are the stable
 // TourId enum; the values live under leaders.tourChip.<tour>.
@@ -256,6 +257,7 @@ export function LeadersTab() {
               color: INK_MUTE,
               letterSpacing: '0.04em',
               textAlign: 'center',
+              ...FIGS,
             }}
           >
             {t('leaders.footer')}

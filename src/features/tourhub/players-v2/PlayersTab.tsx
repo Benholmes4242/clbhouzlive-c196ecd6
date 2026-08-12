@@ -36,6 +36,7 @@ import { usePlayersRanking, type RankedRow, type PlayersTourId } from './data/us
 import { useLivePlayerIds } from './data/useLivePlayerIds';
 import { useWorldRankLookup } from './data/useWorldRankLookup';
 import { RankedPlayerRow, RankedPlayerHeader } from './RankedPlayerRow';
+import { FIGS } from '@/lib/tokens/type';
 
 
 type SortKey = 'ranking' | 'live';
@@ -402,6 +403,7 @@ export function PlayersTab() {
             fontWeight: 500,
             color: INK_MUTE,
             letterSpacing: '0.01em',
+            ...FIGS,
           }}
         >
           {t('players.search.noneInField', { count: loadedCount })}
@@ -508,6 +510,7 @@ export function PlayersTab() {
           color: INK_MUTE,
           letterSpacing: '0.04em',
           textAlign: 'center',
+          ...FIGS,
         }}
       >
         {t('players.footer.sample', { count: loadedCount })}
