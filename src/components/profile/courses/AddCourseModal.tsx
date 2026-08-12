@@ -75,7 +75,7 @@ const PlainScore: React.FC<{ value: number; size?: number; color?: string }> = (
       fontWeight: 700,
       color,
       letterSpacing: '-0.01em',
-      fontVariantNumeric: 'tabular-nums',
+      fontVariantNumeric: 'tabular-nums lining',
       fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
     }}>
       {safe.toFixed(1)}
@@ -158,7 +158,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           fontWeight: 700,
           color: INK_SUBTLE,
           letterSpacing: '-0.03em',
-          fontVariantNumeric: 'tabular-nums lining-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
           lineHeight: 1.3,
           flexShrink: 0,
@@ -687,7 +687,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     fontSize: 11,
                     fontWeight: 700,
                     color: isActive ? INK_SOFT : INK_SUBTLE,
-                    fontVariantNumeric: 'tabular-nums',
+                    fontVariantNumeric: 'tabular-nums lining',
                   }}>
                     {count}
                   </span>

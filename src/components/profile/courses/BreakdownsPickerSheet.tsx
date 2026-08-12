@@ -240,7 +240,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                       <span
                         style={{
                           color: '#0F172A',
-                          fontVariantNumeric: 'tabular-nums',
+                          fontVariantNumeric: 'tabular-nums lining',
                         }}
                       >
                         {int}.{dec}

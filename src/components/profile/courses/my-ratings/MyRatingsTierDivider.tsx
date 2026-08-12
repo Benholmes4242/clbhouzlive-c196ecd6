@@ -73,7 +73,7 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
               fontWeight: 600,
               color: INK_TERTIARY,
               letterSpacing: '0.12em',
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
             }}
           >
             {count}
