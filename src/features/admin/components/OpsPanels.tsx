@@ -81,7 +81,7 @@ export function ClientSplitPanel({ data, loading }: { data?: OpsHealth; loading:
                 {c.client}
               </span>
               <span style={{ ...LABEL, ...FIG }}>{num(c.sessions)} sessions</span>
-              <span style={{ ...FIG, color: t.ink, fontSize: 17, fontWeight: 800, minWidth: 34, textAlign: 'right' }}>
+              <span style={{ ...FIG, color: t.ink, fontSize: 17, fontWeight: 700, minWidth: 34, textAlign: 'right' }}>
                 {num(c.members)}
               </span>
             </div>
@@ -127,7 +127,7 @@ export function OpsErrorsPanel({ data, loading }: { data?: OpsHealth; loading: b
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ ...FIG, color: tone, fontSize: 28, fontWeight: 800, lineHeight: 1 }}>
+            <span style={{ ...FIG, color: tone, fontSize: 28, fontWeight: 700, lineHeight: 1 }}>
               {rate === null ? '-' : `${(Math.round(rate * 10) / 10).toFixed(1)}%`}
             </span>
             <span style={{ color: t.inkMuted, fontSize: 12 }}>error rate, last 24h</span>

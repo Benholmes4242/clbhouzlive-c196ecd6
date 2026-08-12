@@ -68,7 +68,7 @@ export default function MetricCard({
         {label}
       </div>
       <div style={{
-        color: t.ink, fontSize: 24, fontWeight: 800, lineHeight: 1.05,
+        color: t.ink, fontSize: 24, fontWeight: 700, lineHeight: 1.05,
         letterSpacing: '-0.03em',
         fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1',
         fontVariantNumeric: 'tabular-nums',

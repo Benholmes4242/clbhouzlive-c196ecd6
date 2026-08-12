@@ -77,7 +77,7 @@ function CardBody({ name, size, definition, clickable, loading }: {
         {clickable && <ChevronRight size={14} color={t.inkFaint} />}
       </div>
       <div style={{
-        color: t.ink, fontSize: 22, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+        color: t.ink, fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
         lineHeight: 1,
       }}>
         {loading || size === null ? '-' : size.toLocaleString()}

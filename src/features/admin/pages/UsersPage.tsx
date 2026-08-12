@@ -700,7 +700,7 @@ function Member360Sheet({
             />
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 17, fontWeight: 800, color: t.ink }}>
+                <span style={{ fontSize: 17, fontWeight: 700, color: t.ink }}>
                   {detail.display_name ?? '-'}
                 </span>
                 {detail.is_verified && <CheckCircle2 size={14} color={t.ok} />}
@@ -1164,7 +1164,7 @@ function Stat({ label, value, divider }: { label: string; value: number; divider
       borderLeft: divider ? `1px solid ${t.line}` : 'none',
     }}>
       <div style={{
-        fontSize: 18, fontWeight: 800, color: t.ink,
+        fontSize: 18, fontWeight: 700, color: t.ink,
         fontVariantNumeric: 'tabular-nums',
       }}>
         {value.toLocaleString()}

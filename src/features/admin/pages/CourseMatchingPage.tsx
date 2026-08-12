@@ -398,7 +398,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
                 display: 'inline-flex', alignItems: 'center',
                 padding: '2px 8px', borderRadius: 999,
                 background: t.neutralSoft, color: t.inkMuted,
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
               }}
             >
               Needs catalogue entry
@@ -720,7 +720,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Search golf_courses
             </label>
             <input
@@ -742,7 +742,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
 
           {suggestion && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                 Model suggestion
               </div>
               <CourseRow hit={suggestion} label="Model suggestion" />
@@ -750,7 +750,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <div style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Results
             </div>
             {searchErr ? (
@@ -769,7 +769,7 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <label style={{ color: t.inkFaint, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Notes (optional)
             </label>
             <textarea

@@ -67,7 +67,7 @@ function StatCard({
       }}>{eyebrow}</div>
       <div style={{
         color: tone === 'warn' ? t.warnText : t.ink,
-        fontSize: 24, fontWeight: 800, lineHeight: 1, ...NUM,
+        fontSize: 24, fontWeight: 700, lineHeight: 1, ...NUM,
       }}>{value}</div>
     </div>
   );
