@@ -79,7 +79,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
               <SheetTitle
                 style={{
                   fontFamily: FONT_SANS,
-                  fontWeight: 900,
+                  fontWeight: 700,
                   fontSize: 22,
                   color: '#0F172A',
                   letterSpacing: '-0.015em',
@@ -210,7 +210,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   <div
                     style={{
                       fontFamily: FONT_SANS,
-                      fontWeight: 900,
+                      fontWeight: 700,
                       fontSize: 15,
                       color: '#0F172A',
                       lineHeight: 1.15,

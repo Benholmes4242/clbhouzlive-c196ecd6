@@ -82,7 +82,7 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
             <p
               style={{
                 fontSize: 'clamp(16px,4vw,20px)',
-                fontWeight: 900,
+                fontWeight: 700,
                 color: '#0C0C0E',
                 fontFamily: 'DM Sans,system-ui,sans-serif',
                 marginTop: 2,

@@ -76,7 +76,7 @@
    ============================================ */
 .hero-tournament-name {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.3px;
   color: #FFFFFF;
   line-height: 1.2;
@@ -512,7 +512,7 @@
 
 .leader-row-highlight .leaderboard-score {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 @keyframes crownPulse {

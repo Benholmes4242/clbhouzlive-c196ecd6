@@ -70,7 +70,7 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="text-2xl text-foreground mb-2" style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>
+          <h1 className="text-2xl text-foreground mb-2" style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
             Your business profile is live 🎉
           </h1>
           <p className="text-muted-foreground">
@@ -113,7 +113,7 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.4 }}
           className="w-full max-w-sm mb-10"
         >
-          <h2 className="text-sm text-foreground mb-4" style={{ fontWeight: 900 }}>What you can do next</h2>
+          <h2 className="text-sm text-foreground mb-4" style={{ fontWeight: 700 }}>What you can do next</h2>
           <div className="space-y-3">
             <button
               onClick={() => navigate('/create-post', { state: { businessId, asBusinessId: businessId } })}

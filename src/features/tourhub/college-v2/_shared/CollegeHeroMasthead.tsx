@@ -172,7 +172,7 @@ export function CollegeHeroMasthead({
           <span
             style={{
               fontSize: 22,
-              fontWeight: 900,
+              fontWeight: 700,
               color: GOLD,
               letterSpacing: '0.04em',
               filter: isRankOne
