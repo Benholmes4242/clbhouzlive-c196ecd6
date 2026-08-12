@@ -134,8 +134,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           style={{ width: 14, height: 14, objectFit: 'contain' }}
           aria-hidden="true"
         />
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
           {formattedRating}
           <span style={{ fontSize: 10, opacity: 0.6 }}>/10</span>
         </span>
