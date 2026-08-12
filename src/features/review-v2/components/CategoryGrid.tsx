@@ -5,6 +5,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
+import { FIGURE } from '@/lib/tokens/type';
 import { bandColor } from '../bandColor';
 import type { CategoryKey } from '../types';
 
@@ -95,7 +96,7 @@ function CategoryRow({
         <span
           style={{
             fontSize: 18,
-            fontWeight: 800,
+            ...FIGURE,
             letterSpacing: '-0.03em',
             color: value == null ? RV2.muted : color,
           }}

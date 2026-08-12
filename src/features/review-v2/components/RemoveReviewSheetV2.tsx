@@ -6,6 +6,7 @@
 import React, { useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import { RV2 } from '../tokens';
+import { TITLE } from '@/lib/tokens/type';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 interface Props {
@@ -71,7 +72,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
             <Trash2 size={18} color="#EF4444" />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: RV2.ink }}>Remove review?</div>
+            <div style={{ ...TITLE, color: RV2.ink }}>Remove review?</div>
             <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 2 }}>
               Your score, verdict, and any media go with it.
             </div>

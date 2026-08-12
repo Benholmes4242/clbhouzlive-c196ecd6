@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
+import { FIGURE } from '@/lib/tokens/type';
 import { bandColor } from '../bandColor';
 import { useReviewReceipt } from '../hooks/useReviewReceipt';
 import type { CategoryKey, ReviewV2Course } from '../types';
@@ -122,7 +123,7 @@ export function ReviewReceipt({
     borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${RV2.hairline}`,
   });
 
-  const figure = (color: string): React.CSSProperties => ({ fontWeight: 800, color });
+  const figure = (color: string): React.CSSProperties => ({ ...FIGURE, color });
 
   return (
     <div
@@ -140,7 +141,7 @@ export function ReviewReceipt({
           <div
             style={{
               fontSize: 10,
-              fontWeight: 800,
+              fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.14em',
               color: RV2.eyebrow,
@@ -152,7 +153,7 @@ export function ReviewReceipt({
           <div
             style={{
               fontSize: 68,
-              fontWeight: 800,
+              ...FIGURE,
               lineHeight: 1,
               letterSpacing: '-0.035em',
               color: heroColor,
@@ -160,7 +161,7 @@ export function ReviewReceipt({
           >
             {overall == null ? '--' : overall.toFixed(1)}
           </div>
-          <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.015em', marginTop: 12 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.015em', marginTop: 12 }}>
             {course.name}
           </div>
           <div style={{ fontSize: 11.5, color: RV2.secondary, marginTop: 2 }}>
@@ -211,7 +212,7 @@ export function ReviewReceipt({
                   <span
                     style={{
                       fontSize: 12.5,
-                      fontWeight: 800,
+                      ...FIGURE,
                       letterSpacing: '-0.03em',
                       color: c,
                       width: 26,
@@ -242,7 +243,7 @@ export function ReviewReceipt({
                   avg: (
                     <span
                       style={{
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: bandColor(catAvg),
                         fontVariantNumeric: 'tabular-nums',
                       }}
@@ -263,7 +264,7 @@ export function ReviewReceipt({
               <div
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
                   color: 'rgba(15,23,42,0.42)',
@@ -335,7 +336,7 @@ export function ReviewReceipt({
                               rank: receipt.top100_rank ?? 0,
                               list: receipt.top100_list ?? '',
                             }}
-                            components={{ b: <span style={{ fontWeight: 800 }} /> }}
+                            components={{ b: <span style={{ fontWeight: 700 }} /> }}
                           />
                         </div>
                         <div
@@ -363,7 +364,7 @@ export function ReviewReceipt({
                           i18nKey="review.wizard.receipt.rowD"
                           ns="courses"
                           values={{ ordinal: ordinal(receipt.your_rank_of_rated ?? 1) }}
-                          components={{ b: <span style={{ fontWeight: 800 }} /> }}
+                          components={{ b: <span style={{ fontWeight: 700 }} /> }}
                         />
                       </div>
                       <div
@@ -390,7 +391,7 @@ export function ReviewReceipt({
                 <div
                   style={{
                     fontSize: 10,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.14em',
                     color: 'rgba(15,23,42,0.42)',
@@ -452,7 +453,7 @@ export function ReviewReceipt({
                       background: RV2.amberSoft,
                       color: '#C2620A',
                       fontSize: 12,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       flexShrink: 0,
                     }}
                   >
