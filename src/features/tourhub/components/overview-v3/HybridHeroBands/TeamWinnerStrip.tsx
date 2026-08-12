@@ -72,7 +72,7 @@ function TeamCrestTile({
         justifyContent: 'center',
         color: 'white',
         ...NUMERIC_STYLE,
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 18,
         letterSpacing: '-0.02em',
         flexShrink: 0,
@@ -135,14 +135,14 @@ export function TeamWinnerStrip({
       />
       <TeamCrestTile teamName={teamName} teamColor={teamColor} teamCrestUrl={teamCrestUrl} />
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-        <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.18em', color: GOLD, marginBottom: 2, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: GOLD, marginBottom: 2, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
           <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
           {eyebrowText}
         </div>
         <div
           style={{
             fontSize: 17,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'white',
             letterSpacing: '-0.01em',
             whiteSpace: 'nowrap',

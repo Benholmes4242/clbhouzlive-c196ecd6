@@ -21,7 +21,7 @@ export function CancelledPanel({ reason }: { reason?: string }) {
       <div
         style={{
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.18em',
           color: SLATE_500,
           textTransform: 'uppercase',

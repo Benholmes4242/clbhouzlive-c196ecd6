@@ -79,7 +79,7 @@ function factNode(fact: TickerFact, key: string): ReactNode {
         className={fact.pulseLabel ? 'hero-wire-fact-pulse' : undefined}
         style={{
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.08em',
           color: fact.labelGold ? GOLD : 'rgba(255,255,255,0.45)',
         }}
@@ -135,7 +135,7 @@ function EmptyStateBar({
       style={{
         padding: '0 12px',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: AMBER,
         background: 'rgba(247,147,30,0.16)',
@@ -237,7 +237,7 @@ export function HeroWireTicker({ rows, emptyStateFacts }: HeroWireTickerProps) {
       >
         {r.shortName}
       </span>
-      <span style={{ fontWeight: 800, color: scoreColor(r.score) }}>{fmtScore(r.score)}</span>
+      <span style={{ fontWeight: 700, color: scoreColor(r.score) }}>{fmtScore(r.score)}</span>
     </span>
   ));
 
@@ -247,7 +247,7 @@ export function HeroWireTicker({ rows, emptyStateFacts }: HeroWireTickerProps) {
       style={{
         padding: '0 12px',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: 'rgba(255,255,255,0.55)',
         background: BG,

@@ -409,7 +409,7 @@ export function LeaderboardBand({
           }}
         >
           <div style={{ flex: 1, padding: '6px 20px', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: INK_ALPHA_45, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', color: INK_ALPHA_45, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
               {new Date().getFullYear() - 1}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -419,7 +419,7 @@ export function LeaderboardBand({
           </div>
           <div style={{ width: '0.5px', background: INK_15, alignSelf: 'stretch' }} />
           <div style={{ padding: '6px 20px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: INK_ALPHA_45, textTransform: 'uppercase' }}>
               {t('overview.leaderboardBand.fieldEyebrow')}
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>
@@ -440,7 +440,7 @@ export function LeaderboardBand({
           borderTop: `0.5px solid ${INK_15}`,
           color: AMBER,
           fontSize: 11.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           display: 'flex',

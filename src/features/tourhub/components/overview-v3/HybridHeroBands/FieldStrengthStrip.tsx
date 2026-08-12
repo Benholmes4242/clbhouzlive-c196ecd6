@@ -93,7 +93,7 @@ export function FieldStrengthStrip({
         <div
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.18em',
             color: GOLD,
             textTransform: 'uppercase',
@@ -109,7 +109,7 @@ export function FieldStrengthStrip({
         <div
           style={{
             fontSize: 15,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'white',
             letterSpacing: '-0.01em',
             lineHeight: 1.15,

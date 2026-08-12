@@ -20,6 +20,7 @@ import { formatNumber } from '@/i18n/format';
 import { formatPurse } from '../../../_shared/formatPurse';
 import { useVenueCourseDna } from '../../../hooks/useVenueCourseDna';
 import { AMBER } from '../HybridHero.constants';
+import { TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;
@@ -80,7 +81,7 @@ function StatTile({ value, label }: { value: React.ReactNode; label: string }) {
       <div
         style={{
           fontSize: 19,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK,
           lineHeight: 1.1,
           fontVariantNumeric: 'tabular-nums',
@@ -91,7 +92,7 @@ function StatTile({ value, label }: { value: React.ReactNode; label: string }) {
       <div
         style={{
           fontSize: 10.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: DIM,
@@ -164,7 +165,7 @@ export function InsightSheet({
             {courseTitle && (
               <div
                 id="insight-sheet-title"
-                style={{ fontSize: 20, fontWeight: 800, color: INK, lineHeight: 1.2 }}
+                style={{ ...TITLE, color: INK }}
               >
                 {courseTitle}
               </div>
@@ -189,7 +190,7 @@ export function InsightSheet({
         <div
           style={{
             fontSize: 10.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: DIM,
@@ -218,7 +219,7 @@ export function InsightSheet({
               <div
                 style={{
                   fontSize: 10.5,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   color: DIM,
@@ -237,7 +238,7 @@ export function InsightSheet({
                       background: 'rgba(247,147,30,0.12)',
                       color: '#A15E00',
                       fontSize: 12,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.02em',
                     }}
                   >
@@ -262,7 +263,7 @@ export function InsightSheet({
                       <span style={{ fontWeight: 700 }}>{label}</span>
                       <span
                         style={{
-                          fontWeight: 800,
+                          fontWeight: 700,
                           color: DIM,
                           fontVariantNumeric: 'tabular-nums',
                         }}
@@ -314,7 +315,7 @@ export function InsightSheet({
             background: INK,
             color: '#fff',
             fontSize: 15.5,
-            fontWeight: 800,
+            fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
             marginTop: 4,
