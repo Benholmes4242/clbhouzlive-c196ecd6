@@ -244,8 +244,9 @@ function MembersTab() {
     setDrawerUserId(null);
   };
 
-  const chips: { id: UserFilterStatus; label: string; count?: number }[] = [
-    { id: 'all',           label: 'All',            count: counts.all },
+  // Cohort board. No 'all' tile: the roster defaults to all members and a tile
+  // deselects on a second tap. 'all' stays a valid ?filter= value.
+  const cohorts: { id: Exclude<UserFilterStatus, 'all'>; label: string; count: number }[] = [
     { id: 'new_this_week', label: 'New this week',  count: counts.new_this_week },
     { id: 'active_24h',    label: 'Active 24h',     count: counts.active_24h },
     { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
@@ -254,6 +255,7 @@ function MembersTab() {
     { id: 'verified',      label: 'Verified',       count: counts.verified },
     { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
+  const activeCohortLabel = cohorts.find(c => c.id === filter)?.label ?? 'All members';
 
   const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
 
