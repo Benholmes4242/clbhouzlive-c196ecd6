@@ -209,20 +209,22 @@ function InboxListPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      {/* Header */}
+      {/* Header — the shell already renders ADMIN / Inbox; only the summary lives here. */}
       <header style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-          Admin
-        </div>
-        <div style={{ color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>Inbox</div>
         {openCount > 0 && (
           <div
             style={{
-              color: t.inkMuted, fontSize: 13, marginTop: 4,
+              color: t.inkMuted, fontSize: 13,
               fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {openCount} open{oldest ? ` - longest ${relTime(oldest)}` : ''}
+            <span style={{ color: t.ink, fontWeight: 700 }}>{openCount}</span> open
+            {oldest && (
+              <>
+                {' - longest '}
+                <span style={{ color: ageColour(oldest), fontWeight: 700 }}>{ageShort(oldest)}</span>
+              </>
+            )}
           </div>
         )}
         {view === 'open' && <InboxOpsStrip doneItems={feed.doneItems} />}
