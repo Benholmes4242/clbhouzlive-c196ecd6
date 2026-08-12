@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 /**
  * Design tokens for the Frost Panel visual system.
  * Used across review post surfaces (InlineReviewCard, ReviewBottomSheet,
- * ReviewOverlayCore, CreatorCapsule review mode).
+ * ReviewOverlayCore, and review-mode overlays).
  *
  * Vision Pro / iOS 17+ glass morphism language with amber accents.
  */
