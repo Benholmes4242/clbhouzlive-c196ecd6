@@ -56,7 +56,7 @@ function Door({ title, suffix, onClick, tone }: DoorProps) {
           background: circleBg,
         }}
       />
-      <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
+      <div style={{ fontWeight: 700, fontSize: 17, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
         {title}
       </div>
       <div
@@ -75,7 +75,7 @@ function Door({ title, suffix, onClick, tone }: DoorProps) {
           position: 'absolute',
           right: 10,
           bottom: 8,
-          fontWeight: 800,
+          fontWeight: 700,
           fontSize: 18,
           lineHeight: 1,
           opacity: chevronOpacity,

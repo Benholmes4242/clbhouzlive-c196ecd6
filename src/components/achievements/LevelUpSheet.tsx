@@ -85,7 +85,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
       <div
         style={{
           fontSize: 12,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.55)',
@@ -129,7 +129,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           background: GOLD,
           color: '#0F172A',
           fontSize: 15,
-          fontWeight: 800,
+          fontWeight: 700,
           border: 'none',
           cursor: 'pointer',
         }}

@@ -80,7 +80,7 @@ export function MaintenanceWall({ message }: Props) {
           style={{
             margin: '8px 0 0',
             fontSize: 22,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: INK,
           }}
@@ -113,7 +113,7 @@ export function MaintenanceWall({ message }: Props) {
             alignItems: 'center',
             gap: 6,
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: '#0E1216',

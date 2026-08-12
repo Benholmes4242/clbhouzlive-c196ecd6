@@ -42,7 +42,7 @@ const DeletedAccountScreen: React.FC<{ onSignInDifferent?: () => void }> = ({
       >
         Account closed
       </span>
-      <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.025em', margin: '10px 0 0', lineHeight: 1.15 }}>
+      <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', margin: '10px 0 0', lineHeight: 1.15 }}>
         This account has been deleted
       </h1>
       <p style={{ fontSize: 15, lineHeight: 1.55, color: MUTE, margin: '14px 0 0' }}>

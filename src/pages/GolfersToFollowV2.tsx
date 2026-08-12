@@ -153,7 +153,7 @@ export default function GolfersToFollowV2() {
               fontSize: 26,
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
-              fontWeight: 800,
+              fontWeight: 700,
               color: ROW_INK,
             }}
           >

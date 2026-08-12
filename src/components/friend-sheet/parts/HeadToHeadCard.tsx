@@ -105,7 +105,7 @@ const BigDuelsNumber: React.FC<{ count: number }> = ({ count }) => (
     <span
       style={{
         fontSize: 11,
-        fontWeight: 800,
+        fontWeight: 700,
         color: T60,
         letterSpacing: '0.10em',
         textTransform: 'uppercase',
@@ -195,7 +195,7 @@ const FullCard: React.FC<{
               <span
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: T60,
                   letterSpacing: '0.10em',
                   marginLeft: 4,

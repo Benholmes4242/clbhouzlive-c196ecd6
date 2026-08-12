@@ -267,7 +267,7 @@ function StatCell({ label, value, tone = 'ink' }: { label: string; value: string
         style={{
           color: tone === 'amber' ? AMBER : INK,
           fontSize: 18,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.01em',
         }}
       >
@@ -450,7 +450,7 @@ export default function BusinessReviewsPage() {
           >
             <Star size={24} strokeWidth={2} style={{ color: AMBER }} />
           </div>
-          <h2 style={{ color: INK, fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em' }}>
+          <h2 style={{ color: INK, fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em' }}>
             Reviews are for golf course profiles
           </h2>
           <p className="mt-2" style={{ color: INK_45, fontSize: 14, lineHeight: 1.45 }}>
@@ -483,7 +483,7 @@ export default function BusinessReviewsPage() {
                   <div>
                     <div
                       className="tabular-nums"
-                      style={{ color: INK, fontSize: 40, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}
+                      style={{ color: INK, fontSize: 40, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}
                     >
                       {fmtRating(summary?.avg ?? null)}
                     </div>

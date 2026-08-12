@@ -330,7 +330,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
       >
         <span
           style={{
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: 12.5,
             color: inkFor(tone),
             fontVariantNumeric: 'tabular-nums',

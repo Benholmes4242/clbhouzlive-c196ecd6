@@ -44,7 +44,7 @@ const barFigureStyle: React.CSSProperties = {
   ...NUMERALS,
   fontFamily: MONO,
   fontSize: 11,
-  fontWeight: 800,
+  fontWeight: 700,
   lineHeight: 1,
   letterSpacing: '-0.02em',
 };
