@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import { CT } from '@/features/_shared/composerTokens';
+import { TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;
@@ -56,7 +57,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         </div>
         {title && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px 12px' }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: CT.ink, letterSpacing: -0.2 }}>{title}</div>
+            <div style={{ ...TITLE, color: CT.ink }}>{title}</div>
             <button
               onClick={onClose}
               aria-label={t('action.close')}
