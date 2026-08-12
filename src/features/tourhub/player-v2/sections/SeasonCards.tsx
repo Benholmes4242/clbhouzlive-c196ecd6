@@ -121,7 +121,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
               alignItems: 'center',
               gap: 4,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
               color: INK,
@@ -154,7 +154,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
             <div
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK_FAINT,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',
@@ -166,7 +166,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
               style={{
                 marginTop: 6,
                 fontSize: 21,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: INK,
                 lineHeight: 1,

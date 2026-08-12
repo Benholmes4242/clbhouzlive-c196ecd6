@@ -18,6 +18,7 @@ import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
+import { FIGS } from '@/lib/tokens/type';
   AMBER,
   FONT,
   GOLD,
@@ -102,7 +103,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               // surface, so the app-wide "amber means you" rule does not apply here.
               // This is the only amber figure on the schedule. Do not extend it.
               color: isAnchor ? AMBER : INK,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               letterSpacing: '-0.01em',
             }}
           >
@@ -112,7 +113,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             style={{
               marginTop: 4,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               color: INK_MUTE,
               textTransform: 'uppercase',
@@ -139,7 +140,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                 style={{
                   flex: 'none',
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.16em',
                   color: INK_MUTE,
                   padding: '2px 6px',
@@ -181,6 +182,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                 color: INK_MUTE,
                 letterSpacing: '0.01em',
                 lineHeight: 1.3,
+                ...FIGS,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -259,7 +261,7 @@ const MajorChip: React.FC = () => {
       style={{
         flex: 'none',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: GOLD_DEEP,
         padding: '2px 6px',
@@ -282,7 +284,7 @@ const PlayoffChip: React.FC = () => {
       style={{
         flex: 'none',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: VIOLET,
         padding: '2px 6px',
@@ -315,7 +317,7 @@ const LiveMark: React.FC = () => {
         style={{
           marginTop: 4,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: LIVE_DOT,
           textTransform: 'uppercase',
@@ -340,7 +342,7 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
           fontSize: 16,
           fontWeight: 200,
           color: highlight ? GOLD : INK_MUTE,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           lineHeight: 1,
           letterSpacing: '-0.02em',
         }}
@@ -351,7 +353,7 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
         style={{
           marginTop: 3,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',
@@ -405,9 +407,9 @@ const ChampionStrip: React.FC<{
         <span
           style={{
             fontSize: 11.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: getScoreColor(score, 'light'),
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             lineHeight: 1.2,
           }}
         >
@@ -418,7 +420,7 @@ const ChampionStrip: React.FC<{
         style={{
           marginLeft: 'auto',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: GOLD_DEEP,
           textTransform: 'uppercase',
@@ -458,9 +460,9 @@ const LeaderStrip: React.FC<{
         <span
           style={{
             fontSize: 11.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: getScoreColor(score, 'light'),
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             lineHeight: 1.2,
           }}
         >
@@ -500,7 +502,7 @@ const DefendsStrip: React.FC<{ name: string; photoCandidates: string[] }> = ({
         style={{
           marginLeft: 'auto',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',

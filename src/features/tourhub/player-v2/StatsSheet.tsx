@@ -26,6 +26,7 @@ import {
   useLeaderCategories,
 } from '../leaders-v2/data/useLeaderCategories';
 import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
+import { TITLE, FIGS } from '@/lib/tokens/type';
 
 interface StatsSheetProps {
   open: boolean;
@@ -83,7 +84,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
       <div
         style={{
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK_FAINT,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
@@ -95,7 +96,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
         style={{
           marginTop: 4,
           fontSize: 19,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK,
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
@@ -109,7 +110,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
           style={{
             marginTop: 3,
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK_FAINT,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
@@ -325,10 +326,8 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             id="stats-sheet-title"
             style={{
               margin: '0 0 3px',
-              fontSize: 19,
-              fontWeight: 800,
+              ...TITLE,
               color: INK,
-              letterSpacing: '-0.01em',
             }}
           >
             {playerName}
@@ -337,7 +336,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             style={{
               margin: 0,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK_FAINT,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
@@ -376,6 +375,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
                 lineHeight: 1.5,
                 color: INK_MUTE,
                 textAlign: 'center',
+                ...FIGS,
               }}
             >
               {t('player.stats.rankFootnote', { count: poolSize })}

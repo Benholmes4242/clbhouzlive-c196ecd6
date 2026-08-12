@@ -85,7 +85,7 @@ export function FormSection({ results }: FormSectionProps) {
               <div
                 style={{
                   fontSize: 14,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: isWin ? AMBER_DEEP : isMissed ? INK_FAINT : INK,
                   fontVariantNumeric: 'tabular-nums lining-nums',
                   letterSpacing: '-0.02em',

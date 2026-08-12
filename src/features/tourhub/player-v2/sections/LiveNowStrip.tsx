@@ -27,7 +27,7 @@ interface LiveNowStripProps {
 
 const LABEL_ON_DARK = {
   fontSize: 9,
-  fontWeight: 800 as const,
+  fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
 };
@@ -93,7 +93,7 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           <div
             style={{
               fontSize: 11.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: '#FFFFFF',
               letterSpacing: '-0.005em',
               whiteSpace: 'nowrap',
@@ -127,7 +127,7 @@ export function LiveNowStrip({ liveData, playerName }: LiveNowStripProps) {
           <div
             style={{
               fontSize: 20,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               color: scoreColor,
               fontVariantNumeric: 'tabular-nums lining-nums',

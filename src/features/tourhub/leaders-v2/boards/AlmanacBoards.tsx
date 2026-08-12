@@ -248,14 +248,14 @@ function StatBoardRowsInner({
               fontSize: 12,
               fontWeight: 500,
               color: INK_MUTE,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               textAlign: 'right',
             }}
           >
             {r.rankLabel}
           </div>
           {showMovement && (
-            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, lineHeight: 1 }}>
+            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, lineHeight: 1 }}>
               <MovementFigure movement={r.movement} nullPlaceholder="none" variant="inline" />
             </div>
           )}
@@ -271,9 +271,9 @@ function StatBoardRowsInner({
             <div
               style={{
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
                 lineHeight: 1,
               }}
             >
@@ -287,7 +287,7 @@ function StatBoardRowsInner({
                   marginTop: 3,
                   color: INK_FAINT,
                   whiteSpace: 'nowrap',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                 }}
               >
                 {t('leaders.behind', { gap: r.behindFormatted })}
@@ -379,8 +379,8 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                   background: isLeader ? INK : 'rgba(15,23,42,0.06)',
                   color: isLeader ? '#FFFFFF' : INK,
                   fontSize: 11,
-                  fontWeight: 800,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums lining',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',

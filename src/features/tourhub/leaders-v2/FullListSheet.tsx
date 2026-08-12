@@ -30,6 +30,7 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
+import { TITLE } from '@/lib/tokens/type';
 
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
 import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';
@@ -142,7 +143,7 @@ export function FullListSheet({
               textTransform: 'uppercase',
               color: INK,
               marginBottom: 5,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
             }}
           >
             {eyebrow}
@@ -150,11 +151,8 @@ export function FullListSheet({
           <div
             id="tour-leaders-full-sheet-title"
             style={{
-              fontSize: 18,
-              fontWeight: 800,
+              ...TITLE,
               color: INK,
-              letterSpacing: '-0.01em',
-              lineHeight: 1.1,
             }}
           >
             {t(category.labelKey)}
@@ -252,7 +250,7 @@ export function FullListSheet({
                       textAlign: 'right',
                       fontSize: 12,
                       fontWeight: 500,
-                      fontVariantNumeric: 'tabular-nums',
+                      fontVariantNumeric: 'tabular-nums lining',
                       color: INK_MUTE,
                       lineHeight: 1,
                     }}
@@ -314,10 +312,10 @@ export function FullListSheet({
                     <div
                       style={{
                         fontSize: 14,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: INK,
                         lineHeight: 1,
-                        fontVariantNumeric: 'tabular-nums',
+                        fontVariantNumeric: 'tabular-nums lining',
                       }}
                     >
                       {r.valueFormatted}
@@ -334,7 +332,7 @@ export function FullListSheet({
                           color: INK_FAINT,
                           whiteSpace: 'nowrap',
                           lineHeight: 1,
-                          fontVariantNumeric: 'tabular-nums',
+                          fontVariantNumeric: 'tabular-nums lining',
                         }}
                       >
                         {t('leaders.behind', { gap: r.behindFormatted })}

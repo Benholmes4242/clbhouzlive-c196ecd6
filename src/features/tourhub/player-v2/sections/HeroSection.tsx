@@ -29,7 +29,7 @@ interface HeroSectionProps {
 // LABEL token on dark: 9 / 800 / 0.13em / uppercase.
 const LABEL_ON_DARK = {
   fontSize: 9,
-  fontWeight: 800 as const,
+  fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
 };
@@ -49,7 +49,7 @@ function RankFigure({ label, value }: { label: string; value: number }) {
         style={{
           marginTop: 4,
           fontSize: 22,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.02em',
           lineHeight: 1,
           color: '#FFFFFF',
@@ -136,7 +136,7 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
             style={{
               margin: 0,
               fontSize: 26,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               lineHeight: 1.1,
               color: '#FFFFFF',
