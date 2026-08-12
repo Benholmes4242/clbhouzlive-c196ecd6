@@ -24,16 +24,16 @@ import {
   Action,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, KICKER as KICKER_METRICS, TITLE as TITLE_METRICS, FIGS } from '@/lib/tokens/type';
-
-/** Canonical metrics from the shared module; this sheet keeps its palette. */
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
-const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
+
+/** Canonical metrics from the shared module; this sheet keeps its palette. */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
+const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
@@ -615,6 +615,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
           flexDirection: 'column',
           flex: 1,
           minHeight: 0,
+          // Figures inherit tabular-nums lining from here down, so the bucket
+          // percentage column stacks its decimals and % signs.
+          ...FIGS,
         }}
       >
         {/* Fixed header (does NOT scroll) */}
