@@ -30,7 +30,7 @@ import {
   INK_MUTE,
   SLATE_50,
 } from '../_shared/tokens';
-import { TITLE, FIGURE, FIGS } from '@/lib/tokens/type';
+import { TITLE } from '@/lib/tokens/type';
 
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
 import type { LivePlayerMap } from '../players-v2/data/useLivePlayerIds';

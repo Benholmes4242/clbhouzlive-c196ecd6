@@ -26,8 +26,7 @@ import {
   useLeaderCategories,
 } from '../leaders-v2/data/useLeaderCategories';
 import { INK, INK_FAINT, INK_MUTE, SURFACE } from '../_shared/tokens';
-import { TITLE, FIGURE } from '@/lib/tokens/type';
-import { FIGS } from '@/lib/tokens/type';
+import { TITLE, FIGS } from '@/lib/tokens/type';
 
 interface StatsSheetProps {
   open: boolean;
