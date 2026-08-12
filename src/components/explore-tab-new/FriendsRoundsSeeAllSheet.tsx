@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap } from './friendRoundParts';
 import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const SLATE_50 = '#F8FAFC';

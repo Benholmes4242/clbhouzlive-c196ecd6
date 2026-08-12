@@ -5,6 +5,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { MomentTile } from './MomentTile';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 import { A, KICKER, SANS } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * MOMENTS SHEET — the full month of member media, GROUPED BY COURSE

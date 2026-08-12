@@ -7,6 +7,7 @@ import { useContentReactions, type ReactionTarget } from './hooks/useContentReac
 
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * LATEST REVIEWS SHEET (BRIEF_LATEST_REVIEWS, section 5).

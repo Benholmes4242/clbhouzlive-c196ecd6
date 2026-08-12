@@ -31,6 +31,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { A, FIGS, KICKER, LABEL, SANS } from './courseled/tokens';
 import {
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
   useFindGolfers,
   type FindGolferRow,
 } from './courseled/hooks/useFindGolfers';
@@ -174,7 +175,7 @@ function Fig({ label, value, bold }: { label: string; value: string; bold?: bool
       <span
         style={{
           fontSize: 12.5,
-          fontWeight: bold ? 800 : 700,
+          fontWeight: bold ? 700 : 600,
           color: bold ? A.INK : A.BODY,
           letterSpacing: '-0.01em',
           marginLeft: 4,

@@ -1,5 +1,6 @@
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 interface RegionSheetProps {
   open: boolean;

@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { MostPlayedLeaderboard } from './MostPlayedLeaderboard';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, LABEL, SANS } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * MOST PLAYED SHEET — the full frequency table (BRIEF, section 5 "See all").

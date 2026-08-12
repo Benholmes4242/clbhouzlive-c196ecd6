@@ -8,6 +8,7 @@ import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * COURSE NEWS SHEET — the complete list of live courses behind Around the
