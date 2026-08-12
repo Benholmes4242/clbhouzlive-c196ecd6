@@ -43,7 +43,7 @@ const valueStyle = (color: string): React.CSSProperties => ({
   letterSpacing: '-0.03em',
   lineHeight: 1,
   marginTop: 4,
-  fontVariantNumeric: 'tabular-nums',
+  fontVariantNumeric: 'tabular-nums lining',
 });
 
 function fmtDiff(d: number | null): string {
