@@ -78,7 +78,7 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
         padding: big ? '5px 12px' : '3px 9px',
         borderRadius: 999,
         fontSize: big ? 13 : 11,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: 0.4,
         fontVariantNumeric: 'tabular-nums',
         ...chipColors(v.kind),
@@ -229,7 +229,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         <div
                           style={{
                             fontSize: 15.5,
-                            fontWeight: 800,
+                            fontWeight: 700,
                             letterSpacing: '-0.02em',
                             color: INK,
                             whiteSpace: 'nowrap',
@@ -266,7 +266,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       style={{
                         marginTop: 12,
                         fontSize: 9,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: AMBER_DEEP,
                         letterSpacing: '0.09em',
                         textTransform: 'uppercase',
@@ -316,7 +316,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 /** 7.5/800 uppercase tabular — the pick index and the status share one voice. */
 const PICK_META: React.CSSProperties = {
   fontSize: 7.5,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
   fontVariantNumeric: 'tabular-nums',
@@ -505,7 +505,7 @@ function CaseSheet({
           <span
             style={{
               fontSize: 10,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
@@ -516,7 +516,7 @@ function CaseSheet({
           <span
             style={{
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK_45,
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -527,7 +527,7 @@ function CaseSheet({
         <h2
           style={{
             fontSize: 26,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK,
             margin: '2px 0 0',
             letterSpacing: '-0.024em',
@@ -560,7 +560,7 @@ function CaseSheet({
             >
               {t('overview.tiPicks.case.courseFit')}
             </span>
-            <span style={{ fontSize: 12, fontWeight: 800, color: AMBER, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: AMBER, fontVariantNumeric: 'tabular-nums' }}>
               {Math.round(pick.courseFitScore)}
             </span>
           </div>
@@ -588,7 +588,7 @@ function CaseSheet({
               marginTop: i === 0 ? 0 : 16,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 800, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining' }}>
               {String(i + 1).padStart(2, '0')}
             </div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
@@ -605,7 +605,7 @@ function CaseSheet({
             }}
           >
 
-            <div style={{ fontSize: 15, fontWeight: 800, color: RED_TX, minWidth: 22, lineHeight: 1.2 }}>!</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: RED_TX, minWidth: 22, lineHeight: 1.2 }}>!</div>
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
               {pick.concern}
             </div>
@@ -668,7 +668,7 @@ function CaseSheet({
           background: INK,
           color: '#FFFFFF',
           fontSize: 13.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: 0.3,
           border: 'none',
           cursor: 'pointer',
@@ -712,7 +712,7 @@ function VerdictBanner({
         <span
           style={{
             fontSize: 7.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: A.DIM,
@@ -796,7 +796,7 @@ function BannerRow({
       <span
         style={{
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 700,
           color: leftColor,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
@@ -807,7 +807,7 @@ function BannerRow({
       <span
         style={{
           fontSize: 17,
-          fontWeight: 800,
+          fontWeight: 700,
           color: rightColor,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.01em',
@@ -832,7 +832,7 @@ function StatTile({ label, value, accent }: { label: string; value: string; acce
       <div
         style={{
           fontSize: 18,
-          fontWeight: 800,
+          fontWeight: 700,
           color: accent ? AMBER : INK,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.015em',
@@ -897,7 +897,7 @@ function Last5Block({
                 padding: '7px 0',
                 borderRadius: 10,
                 fontSize: 11.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: 0.3,
                 ...(v.kind === 'none'
@@ -955,7 +955,7 @@ function AllPicksSheet({
       <div
         style={{
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
@@ -966,7 +966,7 @@ function AllPicksSheet({
         {t('overview.tiPicks.board.eyebrow', { n: total })}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ fontSize: 24, fontWeight: 800, color: INK, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
           {t('overview.tiPicks.board.title')}
         </div>
         {showRecord ? (
@@ -975,7 +975,7 @@ function AllPicksSheet({
               padding: '4px 10px',
               borderRadius: 999,
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: 0.3,
               background: recordGood ? GREEN_BG : RED_BG,
               color: recordGood ? GREEN_TX : RED_TX,
@@ -1048,7 +1048,7 @@ function AllPicksSheet({
                   <div
                     style={{
                       fontSize: 14,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: INK,
                       letterSpacing: '-0.02em',
                       whiteSpace: 'nowrap',

@@ -89,7 +89,7 @@ function SchoolSquircle({ size, logo, name }: { size: number; logo: string | nul
           display: logo ? 'none' : 'flex',
           position: 'absolute',
           fontSize: Math.round(size * 0.34),
-          fontWeight: 800,
+          fontWeight: 700,
           color: V4.inkSoft,
           letterSpacing: '-0.02em',
         }}
@@ -146,7 +146,7 @@ export function CollegeFranchise() {
             <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
             <Skeleton className="h-3.5 w-20 rounded" />
           </div>
-          <span style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
             <Skeleton className="h-3.5 w-20 rounded" />
@@ -252,7 +252,7 @@ export function CollegeFranchise() {
           onClick={() => goCollege(leader.normalized_name)}
           onCaptainClick={leaderCap ? () => navigate(`/tourhub/player/${leaderCap.playerId}`) : undefined}
         />
-        <div style={{ fontSize: 10, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
+        <div style={{ fontSize: 10, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
         <DuelSide
           name={chaserShort}
           logo={chaserLogo}
@@ -280,13 +280,13 @@ export function CollegeFranchise() {
           <div style={{ width: `${chaserPct}%`, background: chaserColor, opacity: 0.85 }} />
         </div>
         <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'baseline' }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrencyUsdCompact(leader.earnings_total)}
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
             {t('overview.collegeFranchise.tugLabel')}
           </span>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
             {formatCurrencyUsdCompact(chaser.earnings_total)}
           </span>
         </div>
@@ -383,7 +383,7 @@ function DuelSide({
           <div
             style={{
               fontSize: 14,
-              fontWeight: 800,
+              fontWeight: 700,
               color: V4.ink,
               letterSpacing: '-0.01em',
               textAlign: 'center',
@@ -423,7 +423,7 @@ function DuelSide({
           <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {captain.name}
           </span>
-          <span style={{ fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 7.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
             {t('overview.collegeFranchise.captainSuffix')}
           </span>
         </button>

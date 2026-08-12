@@ -60,7 +60,7 @@ export function ConnectHandicapTile() {
           <div
             style={{
               fontSize: 13.5,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.2,
@@ -88,7 +88,7 @@ export function ConnectHandicapTile() {
             color: '#FFFFFF',
             fontFamily: FONT,
             fontSize: 12.5,
-            fontWeight: 800,
+            fontWeight: 700,
             border: 'none',
             borderRadius: 14,
             padding: '9px 16px',

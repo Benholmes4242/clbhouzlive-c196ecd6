@@ -132,7 +132,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                     >
                       <div style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
                         <div style={{ fontSize: 21, color: r.isMajor ? V4.amberDeep : V4.ink, lineHeight: 1, ...NUMERAL_THIN }}>{day}</div>
-                        <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.12em' }}>{mon}</div>
+                        <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.12em' }}>{mon}</div>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
@@ -151,7 +151,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                       </div>
                       <div style={{ width: 44, textAlign: 'right', flexShrink: 0 }}>
                         <div style={{ fontSize: 16, color: r.isMajor && soon ? V4.amberDeep : r.isMajor ? V4.ink : V4.inkMute, lineHeight: 1, ...NUMERAL_THIN }}>{r.days_away}</div>
-                        <div style={{ marginTop: 4, fontSize: 7.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.12em' }}>{t('overview.comingUp.daysLabel')}</div>
+                        <div style={{ marginTop: 4, fontSize: 7.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.12em' }}>{t('overview.comingUp.daysLabel')}</div>
                       </div>
                     </button>
                   );
@@ -192,7 +192,7 @@ function Chip({ label, fg, gradient }: { label: string; fg: string; gradient: st
         background: gradient,
         color: fg,
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
       }}

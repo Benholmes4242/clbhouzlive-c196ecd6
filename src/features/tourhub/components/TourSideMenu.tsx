@@ -430,7 +430,7 @@ function LiveRow({
             style={{
               display: 'block',
               fontSize: 15,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.02em',
               color: getScoreColor(leaderToPar, 'light'),
               ...FIGS,

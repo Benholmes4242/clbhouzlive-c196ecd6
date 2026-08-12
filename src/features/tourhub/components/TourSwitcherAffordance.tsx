@@ -71,7 +71,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               fontVariantNumeric: 'tabular-nums',
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.02em',
               color: isMajorActive ? GOLD : '#FFFFFF',
             }}
@@ -105,7 +105,7 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
           <span
             style={{
               fontSize: 8,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               color: isMajorActive ? GOLD_DEEP : AMBER,
               textTransform: 'uppercase',

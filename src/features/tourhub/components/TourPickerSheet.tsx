@@ -198,7 +198,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               <div
                 style={{
                   fontSize: 13,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: GOLD_DEEP,
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
@@ -226,10 +226,10 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             {activeMajor.status === 'live' ? (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
               </span>
             ) : (
-              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>
+              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: GOLD_DEEP }}>
                 {t('status.upcoming')}
               </span>
             )}
@@ -271,7 +271,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {t('picker.noEventsThisWeek')}
                   </div>
                 </div>
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
                   {t('status.noEvent')}
                 </span>
               </button>
@@ -324,15 +324,15 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                 {slide.type === 'live' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
                   </span>
                 ) : slide.type === 'completed' ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <Trophy size={12} strokeWidth={2.5} style={{ color: GOLD_DEEP }} aria-hidden />
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD_DEEP }}>{t('status.results')}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: GOLD_DEEP }}>{t('status.results')}</span>
                   </span>
                 ) : (
-                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
+                  <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     {t('status.upcoming')}
                   </span>
                 )}

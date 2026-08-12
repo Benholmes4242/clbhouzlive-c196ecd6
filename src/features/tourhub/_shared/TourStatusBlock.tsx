@@ -79,7 +79,7 @@ export function TourStatusBlock({
           <span
             style={{
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '-0.01em',
               color: demoted ? A.BODY : tourScoreColor(score),
               ...FIGS,
@@ -89,14 +89,14 @@ export function TourStatusBlock({
           </span>
         )}
         {posText && (
-          <span style={{ fontSize: 12, fontWeight: 800, color: A.INK, ...FIGS }}>{posText}</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>{posText}</span>
         )}
       </div>
       {label && (
         <span
           style={{
             fontSize: 7,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: A.DIM,

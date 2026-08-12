@@ -85,7 +85,7 @@ function Cell({
       <div
         style={{
           fontSize: 25,
-          fontWeight: 800,
+          fontWeight: 700,
           lineHeight: 1,
           color: color ?? A.INK,
           letterSpacing: '-0.03em',
@@ -101,7 +101,7 @@ function Cell({
         style={{
           marginTop: 3,
           fontSize: 7,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: A.DIM,
@@ -152,7 +152,7 @@ function HoleNumeral({ hole, par }: { hole: number; par: number }) {
         style={{
           width: COL_HOLE,
           fontSize: 15,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.03em',
           color: A.INK,
           ...FIGS,
@@ -164,7 +164,7 @@ function HoleNumeral({ hole, par }: { hole: number; par: number }) {
         style={{
           width: COL_PAR,
           fontSize: 6.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: A.DIM,
@@ -184,7 +184,7 @@ function Figure({ v }: { v: number }) {
         width: COL_FIG,
         textAlign: 'right',
         fontSize: 14,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '-0.02em',
         color: A.INK,
         ...FIGS,
@@ -281,7 +281,7 @@ function AxisMarkers() {
   const { t } = useTranslation('tourhub');
   const label = {
     fontSize: 7,
-    fontWeight: 800,
+    fontWeight: 700,
     letterSpacing: '0.14em',
     textTransform: 'uppercase' as const,
     color: A.DIM,
@@ -343,7 +343,7 @@ function HoleLadder({ rows }: { rows: HoleAverageRow[] }) {
           <div
             style={{
               fontSize: 7.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: A.MUTE,
@@ -451,7 +451,7 @@ export function LiveFieldPanel({
             <div
               style={{
                 fontSize: 7.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: A.DIM,
@@ -463,7 +463,7 @@ export function LiveFieldPanel({
               <span
                 style={{
                   fontSize: 44,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.04em',
                   lineHeight: 0.9,
                   color: tourFigColor(field.avg),
