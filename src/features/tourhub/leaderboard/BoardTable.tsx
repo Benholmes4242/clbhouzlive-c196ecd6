@@ -451,7 +451,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
           <div
             style={{
               fontSize: demotedRow ? 9 : 13,
-              fontWeight: demotedRow ? 700 : isLeader ? 800 : 700,
+              fontWeight: demotedRow ? 700 : isLeader ? 700 : 700,
               color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
               fontVariantNumeric: 'tabular-nums lining-nums',
               letterSpacing: demotedRow ? '0.06em' : undefined,
