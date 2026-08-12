@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageSquare, Star, X, Edit3, Trash2, MapPin, Sparkles } from 'lucide-react';
@@ -450,7 +451,7 @@ export default function BusinessReviewsPage() {
           >
             <Star size={24} strokeWidth={2} style={{ color: AMBER }} />
           </div>
-          <h2 style={{ color: INK, fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em' }}>
+          <h2 style={{ ...TITLE, color: INK }}>
             Reviews are for golf course profiles
           </h2>
           <p className="mt-2" style={{ color: INK_45, fontSize: 14, lineHeight: 1.45 }}>
@@ -482,8 +483,7 @@ export default function BusinessReviewsPage() {
                 <div className="flex items-start gap-4">
                   <div>
                     <div
-                      className="tabular-nums"
-                      style={{ color: INK, fontSize: 40, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}
+                      style={{ ...FIGURE, color: INK, fontSize: 40, letterSpacing: '-0.02em', lineHeight: 1 }}
                     >
                       {fmtRating(summary?.avg ?? null)}
                     </div>
