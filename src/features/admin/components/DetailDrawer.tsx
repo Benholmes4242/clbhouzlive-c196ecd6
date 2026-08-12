@@ -54,7 +54,7 @@ export default function DetailDrawer({ open, onClose, title, subtitle, children,
         }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             {title && (
-              <div style={{ fontSize: 15, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: t.ink, lineHeight: 1.2 }}>
                 {title}
               </div>
             )}

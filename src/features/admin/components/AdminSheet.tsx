@@ -71,7 +71,7 @@ export default function AdminSheet({ open, onClose, title, subtitle, children, f
           padding: '14px 16px',
         }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{title}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: t.ink, lineHeight: 1.2 }}>{title}</div>
             {subtitle && <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 2 }}>{subtitle}</div>}
           </div>
           <button
