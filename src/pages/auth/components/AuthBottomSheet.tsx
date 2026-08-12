@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { TITLE, BODY } from '@/lib/tokens/type';
 
 interface AuthBottomSheetProps {
   isOpen: boolean;
@@ -87,10 +88,8 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
               <div>
                 <h2
                   style={{
-                    fontSize: 20,
-                    fontWeight: 800,
+                    ...TITLE,
                     color: 'rgba(255,255,255,0.96)',
-                    letterSpacing: '-0.03em',
                   }}
                 >
                   {title}
@@ -99,9 +98,8 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             )}
             {subtitle && (
               <p 
-                className="text-[14px]"
                 style={{ 
-                  lineHeight: '1.45',
+                  ...BODY,
                   color: 'rgba(255,255,255,0.72)',
                 }}
               >
