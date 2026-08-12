@@ -121,7 +121,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
             fontSize: 19,
             fontWeight: 700,
             color: 'var(--hcp-tour-text)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             letterSpacing: '-0.02em',
             whiteSpace: 'nowrap',
           }}

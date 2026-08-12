@@ -164,7 +164,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontFamily: GAM.FONT_GEIST,
             fontSize: compact ? 13 : 15,
             fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             color: rankColor,
             lineHeight: 1,
             textAlign: 'right',
@@ -198,7 +198,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             color: subColor,
             fontWeight: 500,
             letterSpacing: '-0.003em',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
           }}
         >
           {subText}
@@ -219,7 +219,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontWeight: 700,
             color: valueColor,
             letterSpacing: '-0.02em',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             lineHeight: 1,
           }}
         >

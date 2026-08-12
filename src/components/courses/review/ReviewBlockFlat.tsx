@@ -200,7 +200,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               fontWeight: 900,
               letterSpacing: '-0.03em',
               lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
               color: bandColor(score),
             }}
           >
@@ -249,7 +249,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               <span style={{ fontSize: 9, fontWeight: 700, color: '#F7931E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {s.label}
               </span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums lining' }}>
                 {formatRatingValue(Number(s.value))}
               </span>
             </div>

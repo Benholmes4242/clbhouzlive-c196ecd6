@@ -73,7 +73,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           fontSize: 11,
           fontWeight: 700,
           color: '#FFFFFF',
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           letterSpacing: '-0.01em',
         }}
       >
@@ -104,7 +104,7 @@ export const DrilldownHeader: React.FC<Props> = ({
             fontWeight: 700,
             letterSpacing: '0.08em',
             color: 'rgba(255,255,255,0.65)',
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: 'tabular-nums lining',
             margin: 0,
           }}
         >
