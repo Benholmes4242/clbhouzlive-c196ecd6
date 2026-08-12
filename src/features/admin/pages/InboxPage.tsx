@@ -389,55 +389,79 @@ function InboxListPage() {
 
 // ---------- pieces ----------
 
-function Chip({
-  label, count, active, onClick,
-}: { label: string; count?: number; active: boolean; onClick: () => void }) {
+function QueueTile({
+  label, count, oldestIso, active, onClick,
+}: {
+  label: string;
+  count: number;
+  oldestIso: string | null;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const empty = count === 0;
+  const tone = oldestIso ? ageColour(oldestIso) : t.line;
+  const capOpacity = !oldestIso ? 1 : tone === t.inkFaint ? 0.5 : 1;
   return (
     <button
+      type="button"
       onClick={onClick}
+      aria-pressed={active}
       style={{
-        flexShrink: 0,
-        padding: '8px 14px', borderRadius: 999,
-        border: `1px solid ${active ? 'transparent' : t.line}`,
-        background: active ? t.ink : t.surface,
-        color: active ? t.surface : t.inkMuted,
-        fontSize: 13, fontWeight: 600, cursor: 'pointer',
-        display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+        display: 'flex', flexDirection: 'column', gap: 8,
+        padding: '8px 10px 10px',
+        borderRadius: t.radius.lg,
+        background: active ? t.neutralSoft : t.surface,
+        border: `1px solid ${active ? t.line : t.hairline}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+        opacity: empty ? 0.55 : 1,
+        minWidth: 0,
       }}
     >
-      {label}
-      {typeof count === 'number' && count > 0 && (
-        <span style={{
-          background: active ? t.brand : t.line,
-          color: active ? t.surface : t.inkMuted,
-          fontSize: 11, padding: '0 6px', borderRadius: 999, minWidth: 18, textAlign: 'center',
-          fontFeatureSettings: '"tnum" 1',
-        }}>{count}</span>
-      )}
+      <span
+        aria-hidden
+        style={{
+          height: 2.5, borderRadius: 2, width: '100%',
+          background: tone, opacity: capOpacity,
+        }}
+      />
+      <span
+        style={{
+          ...LABEL_T, color: t.inkMuted,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          maxWidth: '100%',
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+        <span
+          style={{
+            fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink,
+            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {count}
+        </span>
+        {!empty && oldestIso && (
+          <span
+            style={{
+              fontSize: 11, fontWeight: 700, color: tone,
+              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {ageShort(oldestIso)}
+          </span>
+        )}
+      </span>
     </button>
   );
 }
 
-function TypeChip({ type }: { type: InboxType }) {
-  const meta = TYPE_META[type];
-  return (
-    <span
-      aria-hidden
-      style={{
-        width: 34, height: 34, borderRadius: 12,
-        background: meta.bg, color: meta.fg,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}
-    >
-      {meta.icon}
-    </span>
-  );
-}
-
-function StreamRow({ item, first, done, onClick }: {
-  item: InboxItem; first: boolean; done: boolean; onClick: () => void;
+function StreamRow({ item, first, done, showQueue, onClick }: {
+  item: InboxItem; first: boolean; done: boolean; showQueue: boolean; onClick: () => void;
 }) {
-  const meta = `${TYPE_LABEL[item.type]} - ${item.meta.replace(/^[^-]+-\s*/, '')}`;
+  const meta = item.meta.replace(/^[^-]+-\s*/, '');
   return (
     <button
       type="button"
@@ -451,7 +475,6 @@ function StreamRow({ item, first, done, onClick }: {
         opacity: done ? 0.72 : 1,
       }}
     >
-      <TypeChip type={item.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           {item.isHighPriority && (
@@ -474,6 +497,11 @@ function StreamRow({ item, first, done, onClick }: {
           >
             {item.title}
           </span>
+          {showQueue && (
+            <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
+              {TYPE_LABEL[item.type]}
+            </span>
+          )}
         </div>
         <div
           style={{
@@ -481,18 +509,22 @@ function StreamRow({ item, first, done, onClick }: {
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
         >
-          {done && item.closedOutcome ? `${TYPE_LABEL[item.type]} - ${item.closedOutcome}` : meta}
+          {done && item.closedOutcome ? item.closedOutcome : meta}
         </div>
       </div>
-      <span
-        style={{
-          fontSize: 11, fontWeight: 600,
-          color: done ? t.inkFaint : ageColour(item.createdAt),
-          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-          flexShrink: 0,
-        }}
-      >
-        {relTime(item.createdAt)}
+      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+        <span
+          style={{
+            fontSize: 11, fontWeight: 700,
+            color: done ? t.inkFaint : ageColour(item.createdAt),
+            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {done ? relTime(item.createdAt) : ageShort(item.createdAt)}
+        </span>
+        {!done && (
+          <span style={{ ...LABEL_T, color: t.inkFaint, marginTop: 1 }}>Waiting</span>
+        )}
       </span>
       <ChevronRight size={14} color={t.inkFaint} />
     </button>
