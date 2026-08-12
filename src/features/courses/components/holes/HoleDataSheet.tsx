@@ -16,8 +16,8 @@ import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
 import { HolePhotoGallery } from './HolePhotoGallery';
-import {
 import { TITLE } from '@/lib/tokens/type';
+import {
   A, Panel, Hairline, toParParts, LABEL as LABEL_A, NUM as NUM_A, KICKER as KICKER_A,
 } from './analytical/tokens';
 
