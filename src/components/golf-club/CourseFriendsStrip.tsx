@@ -84,6 +84,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
               fontSize: 12.5,
               color: A.INK,
               fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums lining',
               marginTop: 3,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
