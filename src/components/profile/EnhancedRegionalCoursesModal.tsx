@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -464,7 +465,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               {/* Header with title and close button */}
               <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-none">
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4">
-                  <h2 className="text-xl sm:text-2xl font-bold">
+                  <h2 style={TITLE}>
                     {regionName}
                   </h2>
                   <button

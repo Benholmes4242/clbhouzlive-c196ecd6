@@ -1,4 +1,5 @@
 import React from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { Building2, Search, Shield, BarChart3 } from 'lucide-react';
 import {
   Dialog,
@@ -53,7 +54,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           </div>
 
           {/* Title */}
-          <h2 className="text-[20px] font-bold text-foreground">
+          <h2 className="text-foreground" style={TITLE}>
             Create your business presence
           </h2>
 
