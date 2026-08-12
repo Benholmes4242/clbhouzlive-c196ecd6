@@ -12,6 +12,7 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { TITLE } from '@/lib/tokens/type';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   AMBER,
@@ -100,11 +101,8 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
         </div>
         <div
           style={{
-            fontSize: 18,
-            fontWeight: 700,
+            ...TITLE,
             color: INK,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.1,
             marginBottom: 12,
           }}
         >

@@ -670,6 +670,7 @@ export function LeaderboardTab() {
           fontSize: 8.5,
           color: MUTED,
           textAlign: 'center',
+          ...FIGS,
         }}
       >
         {footnote}

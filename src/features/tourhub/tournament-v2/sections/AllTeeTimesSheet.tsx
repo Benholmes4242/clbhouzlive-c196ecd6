@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -172,7 +173,7 @@ export function AllTeeTimesSheet({
           {tournamentName && (
             <h2
               id="tournament-tee-times-sheet-title"
-              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
+              style={{ margin: '3px 0 0', ...TITLE, color: A.INK }}
             >
               {tournamentName}
             </h2>
@@ -231,7 +232,7 @@ export function AllTeeTimesSheet({
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           {!isDrawn ? (
             <div style={{ padding: '24px 16px' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: INK_MUTE, lineHeight: 1.5, ...TFIGS }}>
                 {t('tournament.allTeeTimes.roundEmpty', {
                   prev: roundNum - 1,
                   defaultValue: `Draw released after Round ${roundNum - 1}`,

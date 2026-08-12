@@ -12,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
 import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
@@ -90,12 +91,12 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           {meta?.name && (
             <h2
               id="tournament-full-board-sheet-title"
-              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
+              style={{ margin: '3px 0 0', ...TITLE, color: A.INK }}
             >
               {meta.name}
             </h2>
           )}
-          <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: INK_MUTE, marginTop: 2, ...TFIGS }}>
             {t('overview.fieldStrength.playersCount', { count: entries.length })}
 
           </div>
