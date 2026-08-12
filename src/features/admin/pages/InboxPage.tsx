@@ -341,6 +341,7 @@ function InboxListPage() {
                 item={item}
                 first={idx === 0}
                 done={view === 'done'}
+                showQueue={typeFilter === 'all'}
                 onClick={() => openRow(item)}
               />
             ))}
