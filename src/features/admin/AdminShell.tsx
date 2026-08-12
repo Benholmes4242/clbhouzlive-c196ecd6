@@ -87,7 +87,7 @@ export default function AdminShell() {
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
           height: headerHeight,
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: t.surface,
           borderBottom: `1px solid ${t.line}`,
           display: 'flex', alignItems: 'center',
@@ -118,7 +118,8 @@ export default function AdminShell() {
       </header>
 
       <main style={{
-        paddingTop: headerHeight,
+        // 52px, NOT headerHeight: see the comment on headerHeight above.
+        paddingTop: '52px',
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         minHeight: '100dvh',
       }}>
