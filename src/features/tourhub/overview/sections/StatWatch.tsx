@@ -118,7 +118,7 @@ function StatCard({
         flexDirection: 'column',
       }}
     >
-      <div style={{ fontSize: 9, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
         {category.label}
       </div>
 

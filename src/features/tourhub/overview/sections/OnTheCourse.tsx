@@ -351,7 +351,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     <span
                       style={{
                         fontSize: 8,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.14em',
                         textTransform: 'uppercase',
                         color: stillOut ? A.INK : A.MUTE,
@@ -373,7 +373,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     <span
                       style={{
                         fontSize: 7,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.14em',
                         textTransform: 'uppercase',
                         color: A.DIM,
@@ -436,7 +436,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                           width: 22,
                           flexShrink: 0,
                           fontSize: 7.5,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           color: A.DIM,
                           letterSpacing: '0.02em',
                           ...FIGS,
@@ -460,13 +460,13 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                         {name}
                       </span>
                       {isCut ? (
-                        <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
                       ) : (
                         <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
                           <span
                             style={{
                               fontSize: 15,
-                              fontWeight: 800,
+                              fontWeight: 700,
                               letterSpacing: '-0.02em',
                               color: total ? scoreColor(total) : V4.inkFaint,
                               ...FIGS,
@@ -525,7 +525,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
               }}
             >
               <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>›</span>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.allGroups')}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.allGroups')}</span>
               <span style={{ fontSize: 10, fontWeight: 600, color: '#94A3B8' }}>
                 {moreCount != null ? t('overview.onTheCourse.moreCount', { count: moreCount }) : t('overview.onTheCourse.fullField')}
               </span>
@@ -557,7 +557,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                     writingMode: 'vertical-rl',
                     transform: 'rotate(180deg)',
                     fontSize: 7.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: '#94A3B8',
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
@@ -620,7 +620,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       containIntrinsicSize: `${CARD_MIN_W}px ${CARD_H_EST}px`,
                     } as React.CSSProperties}
                   >
-                    <div style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                    <div style={{ fontSize: 9.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
                       {time ? t('overview.onTheCourse.teeTimeLabel', { time }) : ''}
                       {g.startingHole ? t('overview.onTheCourse.holeLabelSep', { hole: g.startingHole }) : ''}
                     </div>
@@ -664,9 +664,9 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                             {p.name}
                           </div>
                           {isCut ? (
-                            <span style={{ fontSize: 9.5, fontWeight: 800, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
+                            <span style={{ fontSize: 9.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
                           ) : (
-                            <span style={{ fontSize: 12.5, fontWeight: 800, color: display === '—' ? V4.inkFaint : scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                            <span style={{ fontSize: 12.5, fontWeight: 700, color: display === '—' ? V4.inkFaint : scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
                           )}
                         </button>
                       );
@@ -699,8 +699,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 }}
               >
                 <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>‹</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine1')}</span>
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: V4.ink }}>{t('overview.onTheCourse.backToLine2')}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.backToLine1')}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.backToLine2')}</span>
               </button>
             </>
           )}

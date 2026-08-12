@@ -51,7 +51,7 @@ export function EditorialEmpty({
       <div
         style={{
           fontSize: 10.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: tint === 'slate' ? INK_SOFT : DEEP_AMBER,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
@@ -64,7 +64,7 @@ export function EditorialEmpty({
       <h3
         style={{
           fontSize: 20,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK,
           letterSpacing: '-0.02em',
           lineHeight: 1.2,

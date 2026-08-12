@@ -177,7 +177,7 @@ export function CourseOfTheWeekSection() {
                     border: '1px solid rgba(255,255,255,0.15)',
                     color: '#FFFFFF',
                     fontSize: 10,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     fontVariantNumeric: 'tabular-nums',
@@ -204,7 +204,7 @@ export function CourseOfTheWeekSection() {
                       background: 'rgba(247,147,30,0.92)',
                       color: '#FFFFFF',
                       fontSize: 10,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       fontVariantNumeric: 'tabular-nums',
@@ -219,7 +219,7 @@ export function CourseOfTheWeekSection() {
                   <div
                     style={{
                       fontSize: 22,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: '#FFFFFF',
                       letterSpacing: '-0.02em',
                       lineHeight: 1.1,

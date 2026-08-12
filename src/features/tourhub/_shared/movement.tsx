@@ -43,7 +43,7 @@ export function MovementFigure({
         minWidth: 34,
         textAlign: 'right',
         fontSize: 11,
-        fontWeight: 800,
+        fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
       };
 
