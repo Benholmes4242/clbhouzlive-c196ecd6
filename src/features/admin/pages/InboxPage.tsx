@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  ShieldAlert, Gavel, LifeBuoy, BadgeCheck, ShieldCheck, Link2, Map, ChevronRight,
-  CheckCircle2, AlertTriangle, Unlink, Camera,
-} from 'lucide-react';
+import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { LABEL } from '@/lib/tokens/type';
 import { courseMatchLabel } from '../lib/geography';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-import { useInboxOpsStats, formatDurationShort } from '../hooks/useInboxOpsStats';
+import { useInboxOpsStats, formatDurationShort as formatDurationMs } from '../hooks/useInboxOpsStats';
+// Seconds in. The Dashboard's System panel uses this exact formatter, so an age
+// reads identically on both surfaces.
+import { formatDurationShort } from '../lib/chartPrimitives';
 import EmptyState from '../components/EmptyState';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
@@ -54,18 +55,13 @@ const TYPE_LABEL: Record<InboxType, string> = {
   holePhoto: 'Hole photos',
 };
 
-const TYPE_META: Record<InboxType, { icon: React.ReactNode; bg: string; fg: string }> = {
-  report:        { icon: <ShieldAlert size={16} />, bg: t.dangerSoft, fg: t.dangerText },
-  appeal:        { icon: <Gavel size={16} />,       bg: t.neutralSoft, fg: t.ink },
-  support:       { icon: <LifeBuoy size={16} />,    bg: t.neutralSoft, fg: t.inkMuted },
-  verification:  { icon: <BadgeCheck size={16} />,  bg: t.warnSoft, fg: t.warnText },
-  approval:      { icon: <ShieldCheck size={16} />, bg: t.okSoft, fg: t.okText },
-  match:         { icon: <Link2 size={16} />,       bg: t.neutralSoft, fg: t.ink },
-  courseRequest: { icon: <Map size={16} />,         bg: t.neutralSoft, fg: t.ink },
-  unmatchedCourse: { icon: <Unlink size={16} />,   bg: t.warnSoft, fg: t.warnText },
-  holePhoto:     { icon: <Camera size={16} />,      bg: t.neutralSoft, fg: t.inkMuted },
-};
+/** The page's one age format. Absolute, tabular-safe: "44m" / "31h" / "32d". */
+function ageShort(iso: string): string {
+  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
+  return Number.isFinite(secs) ? formatDurationShort(Math.max(0, secs)) : '-';
+}
 
+/** Kept for the Done view only: "closed 2 days ago" beats an absolute age. */
 function relTime(iso: string): string {
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
 }
@@ -76,6 +72,8 @@ function ageColour(iso: string): string {
   if (diffH >= 8) return t.warnText;
   return t.inkFaint;
 }
+
+const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 
 // ---------- redirects helper ----------
 
@@ -177,6 +175,17 @@ function InboxListPage() {
   const openCount = openItems.length;
   const oldest = feed.oldestCreatedAt;
 
+  // Oldest OPEN item per queue. The feed sorts high-priority to the top, so the
+  // first row of a type is not necessarily its oldest - take the minimum.
+  const oldestByType = useMemo(() => {
+    const out: Partial<Record<InboxType, string>> = {};
+    for (const item of openItems) {
+      const held = out[item.type];
+      if (!held || new Date(item.createdAt) < new Date(held)) out[item.type] = item.createdAt;
+    }
+    return out;
+  }, [openItems]);
+
   const openRow = (item: InboxItem) => {
     switch (item.type) {
       case 'report': setModRow(item.payload as ModerationQueueRow); break;
@@ -209,20 +218,22 @@ function InboxListPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      {/* Header */}
+      {/* Header — the shell already renders ADMIN / Inbox; only the summary lives here. */}
       <header style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-          Admin
-        </div>
-        <div style={{ color: t.ink, fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>Inbox</div>
         {openCount > 0 && (
           <div
             style={{
-              color: t.inkMuted, fontSize: 13, marginTop: 4,
+              color: t.inkMuted, fontSize: 13,
               fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {openCount} open{oldest ? ` - longest ${relTime(oldest)}` : ''}
+            <span style={{ color: t.ink, fontWeight: 700 }}>{openCount}</span> open
+            {oldest && (
+              <>
+                {' - longest '}
+                <span style={{ color: ageColour(oldest), fontWeight: 700 }}>{ageShort(oldest)}</span>
+              </>
+            )}
           </div>
         )}
         {view === 'open' && <InboxOpsStrip doneItems={feed.doneItems} />}
@@ -278,25 +289,24 @@ function InboxListPage() {
         })}
       </div>
 
-      {/* Filter chips */}
+      {/* Queue board */}
       <div
         style={{
-          display: 'flex', gap: 8, overflowX: 'auto',
-          scrollbarWidth: 'none', padding: '2px 0',
+          display: 'grid',
+          gridTemplateColumns: `repeat(${visibleTypes.length <= 4 ? 2 : 3}, minmax(0, 1fr))`,
+          gap: 8,
         }}
-        className="admin-inbox-chips"
       >
-        <Chip label="All" active={typeFilter === 'all'} onClick={() => setType('all')} />
         {visibleTypes.map(tp => (
-          <Chip
+          <QueueTile
             key={tp}
             label={TYPE_LABEL[tp]}
-            count={view === 'open' ? feed.counts[tp] : undefined}
+            count={feed.counts[tp] ?? 0}
+            oldestIso={oldestByType[tp] ?? null}
             active={typeFilter === tp}
-            onClick={() => setType(tp)}
+            onClick={() => setType(typeFilter === tp ? 'all' : tp)}
           />
         ))}
-        <style>{`.admin-inbox-chips::-webkit-scrollbar{display:none}`}</style>
       </div>
 
       {/* Stream card */}
@@ -309,11 +319,16 @@ function InboxListPage() {
       >
         <div
           style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
-            color: t.inkFaint, padding: '4px 4px 8px',
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+            gap: 10, padding: '4px 4px 8px',
           }}
         >
-          {view === 'done' ? 'Recently closed' : 'Oldest wait first'}
+          <span style={{ ...LABEL_T, color: t.inkMuted }}>
+            {typeFilter === 'all' ? 'All queues' : TYPE_LABEL[typeFilter as InboxType]}
+          </span>
+          <span style={{ ...LABEL_T, color: t.inkFaint }}>
+            {view === 'done' ? 'Recently closed' : 'Longest wait first'}
+          </span>
         </div>
 
         {feed.isLoading && filtered.length === 0 ? (
@@ -341,25 +356,33 @@ function InboxListPage() {
                 item={item}
                 first={idx === 0}
                 done={view === 'done'}
+                showQueue={typeFilter === 'all'}
                 onClick={() => openRow(item)}
               />
             ))}
           </div>
         )}
 
-        {/* Workbench pinned row */}
-        {canUsers && workbenchCount > 0 && (typeFilter === 'all' || typeFilter === 'match') && view === 'open' && (
+      </section>
+
+      {/* TOOLS */}
+      {canUsers && workbenchCount > 0 && view === 'open' && (
+        <section
+          style={{
+            background: t.surface, border: `1px solid ${t.line}`,
+            borderRadius: 18, boxShadow: t.shadowCard,
+            padding: 12, display: 'flex', flexDirection: 'column',
+          }}
+        >
+          <div style={{ ...LABEL_T, color: t.inkFaint, padding: '2px 4px 8px' }}>Tools</div>
           <Link
             to="/admin-v2/inbox/matching"
             style={{
-              marginTop: 8,
               display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 4px',
-              borderTop: `1px solid ${t.line}`,
+              padding: '4px 4px',
               textDecoration: 'none', color: t.ink,
             }}
           >
-            <TypeChip type="match" />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: t.ink }}>Course matching workbench</div>
               <div style={{ fontSize: 11.5, color: t.inkMuted }}>
@@ -368,8 +391,8 @@ function InboxListPage() {
             </div>
             <ChevronRight size={16} color={t.inkFaint} />
           </Link>
-        )}
-      </section>
+        </section>
+      )}
 
       <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }`}</style>
 
@@ -389,55 +412,79 @@ function InboxListPage() {
 
 // ---------- pieces ----------
 
-function Chip({
-  label, count, active, onClick,
-}: { label: string; count?: number; active: boolean; onClick: () => void }) {
+function QueueTile({
+  label, count, oldestIso, active, onClick,
+}: {
+  label: string;
+  count: number;
+  oldestIso: string | null;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const empty = count === 0;
+  const tone = oldestIso ? ageColour(oldestIso) : t.line;
+  const capOpacity = !oldestIso ? 1 : tone === t.inkFaint ? 0.5 : 1;
   return (
     <button
+      type="button"
       onClick={onClick}
+      aria-pressed={active}
       style={{
-        flexShrink: 0,
-        padding: '8px 14px', borderRadius: 999,
-        border: `1px solid ${active ? 'transparent' : t.line}`,
-        background: active ? t.ink : t.surface,
-        color: active ? t.surface : t.inkMuted,
-        fontSize: 13, fontWeight: 600, cursor: 'pointer',
-        display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+        display: 'flex', flexDirection: 'column', gap: 8,
+        padding: '8px 10px 10px',
+        borderRadius: t.radius.lg,
+        background: active ? t.neutralSoft : t.surface,
+        border: `1px solid ${active ? t.line : t.hairline}`,
+        cursor: 'pointer',
+        textAlign: 'left',
+        opacity: empty ? 0.55 : 1,
+        minWidth: 0,
       }}
     >
-      {label}
-      {typeof count === 'number' && count > 0 && (
-        <span style={{
-          background: active ? t.brand : t.line,
-          color: active ? t.surface : t.inkMuted,
-          fontSize: 11, padding: '0 6px', borderRadius: 999, minWidth: 18, textAlign: 'center',
-          fontFeatureSettings: '"tnum" 1',
-        }}>{count}</span>
-      )}
+      <span
+        aria-hidden
+        style={{
+          height: 2.5, borderRadius: 2, width: '100%',
+          background: tone, opacity: capOpacity,
+        }}
+      />
+      <span
+        style={{
+          ...LABEL_T, color: t.inkMuted,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          maxWidth: '100%',
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+        <span
+          style={{
+            fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink,
+            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {count}
+        </span>
+        {!empty && oldestIso && (
+          <span
+            style={{
+              fontSize: 11, fontWeight: 700, color: tone,
+              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {ageShort(oldestIso)}
+          </span>
+        )}
+      </span>
     </button>
   );
 }
 
-function TypeChip({ type }: { type: InboxType }) {
-  const meta = TYPE_META[type];
-  return (
-    <span
-      aria-hidden
-      style={{
-        width: 34, height: 34, borderRadius: 12,
-        background: meta.bg, color: meta.fg,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}
-    >
-      {meta.icon}
-    </span>
-  );
-}
-
-function StreamRow({ item, first, done, onClick }: {
-  item: InboxItem; first: boolean; done: boolean; onClick: () => void;
+function StreamRow({ item, first, done, showQueue, onClick }: {
+  item: InboxItem; first: boolean; done: boolean; showQueue: boolean; onClick: () => void;
 }) {
-  const meta = `${TYPE_LABEL[item.type]} - ${item.meta.replace(/^[^-]+-\s*/, '')}`;
+  const meta = item.meta.replace(/^[^-]+-\s*/, '');
   return (
     <button
       type="button"
@@ -451,7 +498,6 @@ function StreamRow({ item, first, done, onClick }: {
         opacity: done ? 0.72 : 1,
       }}
     >
-      <TypeChip type={item.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           {item.isHighPriority && (
@@ -474,6 +520,11 @@ function StreamRow({ item, first, done, onClick }: {
           >
             {item.title}
           </span>
+          {showQueue && (
+            <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
+              {TYPE_LABEL[item.type]}
+            </span>
+          )}
         </div>
         <div
           style={{
@@ -481,18 +532,22 @@ function StreamRow({ item, first, done, onClick }: {
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
         >
-          {done && item.closedOutcome ? `${TYPE_LABEL[item.type]} - ${item.closedOutcome}` : meta}
+          {done && item.closedOutcome ? item.closedOutcome : meta}
         </div>
       </div>
-      <span
-        style={{
-          fontSize: 11, fontWeight: 600,
-          color: done ? t.inkFaint : ageColour(item.createdAt),
-          fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-          flexShrink: 0,
-        }}
-      >
-        {relTime(item.createdAt)}
+      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+        <span
+          style={{
+            fontSize: 11, fontWeight: 700,
+            color: done ? t.inkFaint : ageColour(item.createdAt),
+            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {done ? relTime(item.createdAt) : ageShort(item.createdAt)}
+        </span>
+        {!done && (
+          <span style={{ ...LABEL_T, color: t.inkFaint, marginTop: 1 }}>Waiting</span>
+        )}
       </span>
       <ChevronRight size={14} color={t.inkFaint} />
     </button>
@@ -917,7 +972,7 @@ function InboxOpsStrip({ doneItems }: { doneItems: InboxItem[] }) {
       {medianMs != null && (
         <Chip
           label="Median time to resolve"
-          value={formatDurationShort(medianMs)}
+          value={formatDurationMs(medianMs)}
           note={`n=${sampleSize}`}
         />
       )}
