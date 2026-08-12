@@ -49,6 +49,8 @@ import AdjustSheet from './components/AdjustSheet';
 import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 import { CT_DARK } from '@/features/_shared/composerTokens';
+import { LABEL, DISPLAY_TRACKING } from '@/lib/tokens/type';
+import { SURFACE } from '@/lib/tokens/surface';
 import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
@@ -793,10 +795,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               background: CT_DARK.bg, overflowY: 'auto',
             }}
           >
-            <div style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: CT_DARK.dim }}>
+            <div style={{ ...LABEL, color: CT_DARK.dim }}>
               {t('emptyState.limitKicker', { count: MAX_MEDIA })}
             </div>
-            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: CT_DARK.ink }}>
+            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 700, letterSpacing: DISPLAY_TRACKING, lineHeight: 1.15, color: CT_DARK.ink }}>
               {isEditMode ? t('emptyState.promptEdit') : t('emptyState.prompt')}
             </div>
             <div
@@ -1212,13 +1214,15 @@ const moreRowStyle: React.CSSProperties = {
 };
 
 // Page 2 (words) light tokens — the canvas is the app's editorial light surface.
+// Page 2 ink comes from SURFACE.light (identical values, previously restated
+// here). canvas / panel / line have no ramp equivalent and stay local.
 const LIGHT = {
   canvas: '#F8FAFC',
   panel: '#FFFFFF',
   line: '#E9EDF2',
-  ink: '#0E1216',
-  mute: '#68707B',
-  dim: '#A2A9B2',
+  ink: SURFACE.light.ink,
+  mute: SURFACE.light.mute,
+  dim: SURFACE.light.dim,
 } as const;
 
 const lightIconButtonStyle: React.CSSProperties = {
