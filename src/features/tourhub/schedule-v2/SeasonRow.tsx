@@ -18,7 +18,6 @@ import { formatPurse } from '../_shared/formatPurse';
 import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
-import { FIGS } from '@/lib/tokens/type';
   AMBER,
   FONT,
   GOLD,
@@ -28,6 +27,7 @@ import { FIGS } from '@/lib/tokens/type';
   INK_MUTE,
   LIVE_DOT,
 } from '../_shared/tokens';
+import { FIGS } from '@/lib/tokens/type';
 
 const VIOLET = '#7C3AED';
 const VIOLET_TINT = 'rgba(124,58,237,0.10)';
