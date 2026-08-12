@@ -77,7 +77,7 @@ const figureValueStyle: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
   fontFeatureSettings: '"zero" 0',
   fontSize: 16,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.03em',
   lineHeight: 1,
 };
@@ -239,7 +239,7 @@ export const PostCourseBand: React.FC<Props> = ({
           flex: 1,
           minWidth: 0,
           fontSize: 14.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.015em',
           lineHeight: 1.05,
           color: C.ink,
@@ -271,7 +271,7 @@ export const PostCourseBand: React.FC<Props> = ({
               fontSize: 11.5,
               fontFamily: MONO,
               fontVariantNumeric: 'tabular-nums',
-              fontWeight: 800,
+              fontWeight: 700,
               color: C.mute,
               lineHeight: 1,
             }}

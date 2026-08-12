@@ -85,7 +85,7 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     <span
       style={{
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
         color: DIM,
@@ -94,8 +94,8 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
       {label}
     </span>
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={{ ...NUM, fontSize: 13.5, fontWeight: 800, color: INK }}>{total ?? '—'}</span>
-      <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: toParColor(toPar) }}>
+      <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total ?? '—'}</span>
+      <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
         {fmtToPar(toPar)}
       </span>
     </span>
@@ -180,7 +180,7 @@ const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
         <span
           style={{
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             color: DIM,
@@ -188,7 +188,7 @@ const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
         >
           Trajectory
         </span>
-        <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: toParColor(final) }}>
+        <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(final) }}>
           {fmtToPar(final)}
         </span>
       </div>
@@ -321,7 +321,7 @@ export const PostRoundCard: React.FC<Props> = ({
               border: `1px solid ${HAIRLINE}`,
               color: AMBER,
               fontSize: 9.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
             }}
@@ -338,7 +338,7 @@ export const PostRoundCard: React.FC<Props> = ({
             <div
               style={{
                 fontSize: 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: AMBER,
@@ -361,7 +361,7 @@ export const PostRoundCard: React.FC<Props> = ({
               <div
                 style={{
                   fontSize: 16,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.02em',
                   color: '#FFFFFF',
                   whiteSpace: 'nowrap',
@@ -380,7 +380,7 @@ export const PostRoundCard: React.FC<Props> = ({
                 style={{
                   ...NUM,
                   fontSize: 34,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.03em',
                   color: '#FFFFFF',
                   lineHeight: 1,
@@ -388,7 +388,7 @@ export const PostRoundCard: React.FC<Props> = ({
               >
                 {gross ?? '—'}
               </span>
-              <span style={{ ...NUM, fontSize: 15, fontWeight: 800, color: toParColor(toPar) }}>
+              <span style={{ ...NUM, fontSize: 15, fontWeight: 700, color: toParColor(toPar) }}>
                 {fmtToPar(toPar)}
               </span>
             </div>
@@ -466,7 +466,7 @@ export const PostRoundCard: React.FC<Props> = ({
             </span>
           </span>
           {crown.margin && (
-            <span style={{ ...NUM, fontSize: 12, fontWeight: 800, color: AMBER, flexShrink: 0 }}>
+            <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: AMBER, flexShrink: 0 }}>
               {crown.margin}
             </span>
           )}
