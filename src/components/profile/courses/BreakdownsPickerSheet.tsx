@@ -17,7 +17,7 @@ interface BreakdownsPickerSheetProps {
   mode?: 'breakdowns' | 'review';
 }
 
-const FONT_SERIF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const FONT_SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '';
@@ -78,7 +78,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
             <div className="flex-1 min-w-0">
               <SheetTitle
                 style={{
-                  fontFamily: FONT_SERIF,
+                  fontFamily: FONT_SANS,
                   fontWeight: 900,
                   fontSize: 22,
                   color: '#0F172A',
@@ -91,7 +91,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
               </SheetTitle>
               <p
                 style={{
-                  fontFamily: FONT_SERIF,
+                  fontFamily: FONT_SANS,
                   fontSize: 12,
                   color: '#64748B',
                   marginTop: 6,
@@ -209,7 +209,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontFamily: FONT_SERIF,
+                      fontFamily: FONT_SANS,
                       fontWeight: 900,
                       fontSize: 15,
                       color: '#0F172A',
@@ -224,7 +224,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   </div>
                   <div
                     style={{
-                      fontFamily: FONT_SERIF,
+                      fontFamily: FONT_SANS,
                       marginTop: 4,
                       fontSize: 10,
                       fontWeight: 700,
