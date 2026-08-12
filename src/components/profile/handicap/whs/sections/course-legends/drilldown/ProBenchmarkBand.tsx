@@ -71,7 +71,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
             <span
               style={{
                 fontSize: 12.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: 'var(--hcp-t-100)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -119,7 +119,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
         <span
           style={{
             fontSize: 19,
-            fontWeight: 800,
+            fontWeight: 700,
             color: 'var(--hcp-tour-text)',
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',

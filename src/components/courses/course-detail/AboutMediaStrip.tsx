@@ -382,7 +382,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                    <span style={{ color: '#fff', fontSize: 19, fontWeight: 800 }}>+{overflowCount}</span>
+                    <span style={{ color: '#fff', fontSize: 19, fontWeight: 700 }}>+{overflowCount}</span>
                     <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>{t('courseDetail.mediaStrip.seeAll')}</span>
                   </div>
                 </div>

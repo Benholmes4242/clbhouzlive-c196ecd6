@@ -278,7 +278,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               <span
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
                   padding: '3px 8px',
@@ -293,7 +293,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               <span
                 style={{
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
                   padding: '3px 8px',
@@ -394,7 +394,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               <div
                 style={{
                   fontSize: 16,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: INK,
                   letterSpacing: '-0.015em',
                   lineHeight: 1.15,
@@ -433,7 +433,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               <div
                 style={{
                   fontSize: 22,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: INK,
                   letterSpacing: '-0.02em',
                   fontVariantNumeric: 'tabular-nums',
@@ -469,7 +469,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               style={{
                 textAlign: 'center',
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: INK_55,
@@ -481,7 +481,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               style={{
                 textAlign: 'center',
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: INK_55,
@@ -605,7 +605,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               border: 'none',
               fontFamily: GAM.FONT_GEIST,
               fontSize: 11.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.06em',
               fontVariantNumeric: 'tabular-nums',
               textTransform: 'uppercase',

@@ -84,7 +84,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
             id="rating-filter-title"
             style={{
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 700,
               color: '#0F172A',
               textAlign: 'left',
               margin: 0,

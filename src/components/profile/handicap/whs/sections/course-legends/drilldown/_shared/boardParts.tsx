@@ -60,7 +60,7 @@ export const BoardAvatar: React.FC<{ photoUrl: string | null; name: string; size
           color: '#FFFFFF',
           fontFamily: SANS,
           fontSize: size <= 26 ? 9.5 : 11,
-          fontWeight: 800,
+          fontWeight: 700,
         }}
       >
         {!photoUrl && initials}
@@ -113,7 +113,7 @@ export const BoardRow: React.FC<{
       <span
         style={{
           fontSize: 13,
-          fontWeight: 800,
+          fontWeight: 700,
           color: tone,
           letterSpacing: '-0.01em',
           minWidth: 0,

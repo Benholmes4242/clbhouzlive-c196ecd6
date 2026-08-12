@@ -71,7 +71,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           fontSize: 11,
-          fontWeight: 800,
+          fontWeight: 700,
           color: '#FFFFFF',
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.01em',
@@ -91,7 +91,7 @@ export const DrilldownHeader: React.FC<Props> = ({
         onPhoto
       />
       <h1
-        className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl"
+        className="text-[22px] md:text-[28px] font-bold tracking-[-0.3px] text-white drop-shadow-2xl"
         style={{ lineHeight: 1.15, marginBottom: 6 }}
       >
         {state.courseName}

@@ -54,7 +54,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}>
         <span
           style={{
-            fontSize: 9, fontWeight: 800, letterSpacing: '0.13em',
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.13em',
             textTransform: 'uppercase', color: A.DIM,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -110,7 +110,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             {t(i18nKey)}
             {(
               <span style={{
-                fontSize: 11, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
                 color: isActive ? 'rgba(255,255,255,0.6)' : A.DIM,
               }}>
                 {count}

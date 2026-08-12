@@ -405,7 +405,7 @@ const MONO_FIGURE: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
   fontFeatureSettings: '"zero" 0, "tnum" 1',
   letterSpacing: '-0.03em',
-  fontWeight: 800,
+  fontWeight: 700,
   fontSize: 13,
   color: 'rgba(255,255,255,0.95)',
 };
@@ -493,7 +493,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
       <h1
-        className="text-[23px] md:text-[26px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
+        className="text-[23px] md:text-[26px] font-bold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
         style={{ lineHeight: 1.15 }}
       >
         {course.name}

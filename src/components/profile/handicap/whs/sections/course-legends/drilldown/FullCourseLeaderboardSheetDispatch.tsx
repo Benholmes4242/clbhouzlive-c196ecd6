@@ -146,7 +146,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
             id="course-legends-full-sheet-title"
             style={{
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               color: A.INK,
               letterSpacing: '-0.01em',
               marginTop: 3,

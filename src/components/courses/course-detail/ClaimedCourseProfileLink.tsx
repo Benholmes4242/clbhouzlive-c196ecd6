@@ -37,7 +37,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span style={{ fontSize: 14, fontWeight: 800, color: INK_FAINT }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: INK_FAINT }}>
             {business.name.slice(0, 1)}
           </span>
         )}
@@ -47,7 +47,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
           <span
             style={{
               fontSize: 13,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',

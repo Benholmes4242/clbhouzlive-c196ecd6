@@ -109,7 +109,7 @@ export const CourseRivalryLine: React.FC<Props> = ({ userId, courseId, bare = fa
         <span
           style={{
             fontSize: 13,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK,
             letterSpacing: '-0.01em',
             whiteSpace: 'nowrap',

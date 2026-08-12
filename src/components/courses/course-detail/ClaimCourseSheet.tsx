@@ -142,7 +142,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
       <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
         {t('courseDetail.claim.sheet.kicker')}
       </div>
-      <h2 style={{ fontSize: 18, fontWeight: 800, color: INK, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1.25 }}>
+      <h2 style={{ fontSize: 18, fontWeight: 700, color: INK, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1.25 }}>
         {t('courseDetail.claim.sheet.title', { clubName })}
       </h2>
     </div>
@@ -347,7 +347,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         <div
           style={{
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
             color: '#A2A9B2',

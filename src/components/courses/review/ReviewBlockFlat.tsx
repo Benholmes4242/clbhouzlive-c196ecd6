@@ -135,7 +135,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                   justifyContent: 'center',
                   color: '#fff',
                   fontSize: 13,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.02em',
                 }}
               >
@@ -158,7 +158,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 justifyContent: 'center',
                 color: '#fff',
                 fontSize: 13,
-                fontWeight: 800,
+                fontWeight: 700,
                 flexShrink: 0,
               }}
             >
@@ -168,7 +168,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#0F172A', lineHeight: 1.3 }}>{user.name}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>{user.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 1, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 11, color: '#94A3B8' }}>{formatDate(createdAt)}</span>
             {review.teeLabel && (
@@ -249,7 +249,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               <span style={{ fontSize: 9, fontWeight: 700, color: '#F7931E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {s.label}
               </span>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                 {formatRatingValue(Number(s.value))}
               </span>
             </div>
