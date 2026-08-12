@@ -94,7 +94,7 @@ export function ratingTextColor(rating: number | null | undefined): string {
  * Size stays per-surface. Notably: NO `tabular-nums` — it cramps the decimal.
  */
 export const HERO_NUMBER_STYLE = {
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.01em',
   fontVariantNumeric: 'normal',
   fontFamily: 'inherit',
@@ -105,7 +105,7 @@ export const HERO_NUMBER_STYLE = {
  * for colour. Uppercase rendering is the caller's responsibility.
  */
 export const TIER_LABEL_STYLE = {
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
   fontFamily: 'inherit',

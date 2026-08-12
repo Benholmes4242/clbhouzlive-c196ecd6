@@ -180,7 +180,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <div
           style={{
             fontSize: nameSize,
-            fontWeight: isChampion ? 800 : 600,
+            fontWeight: isChampion ? 700 : 600,
             color: nameColor,
             letterSpacing: '-0.014em',
             lineHeight: 1.25,

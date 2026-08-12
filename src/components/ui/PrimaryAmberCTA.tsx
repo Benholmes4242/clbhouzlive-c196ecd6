@@ -45,8 +45,8 @@ export const PrimaryAmberCTA: React.FC<PrimaryAmberCTAProps> = ({
 }) => {
   const sizeStyles: Record<NonNullable<PrimaryAmberCTAProps['size']>, React.CSSProperties> = {
     sm: { padding: '11px 16px', fontSize: 12, fontWeight: 700 },
-    md: { padding: '13px 20px', fontSize: 14, fontWeight: 800 },
-    lg: { padding: '16px 24px', fontSize: 15, fontWeight: 800 },
+    md: { padding: '13px 20px', fontSize: 14, fontWeight: 700 },
+    lg: { padding: '16px 24px', fontSize: 15, fontWeight: 700 },
   };
 
   const spinnerSize = size === 'sm' ? 14 : size === 'lg' ? 18 : 16;

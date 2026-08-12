@@ -380,7 +380,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                                 background: '#F7931E',
                                 color: '#15171F',
                                 fontSize: 8,
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 lineHeight: '14px',
                                 textAlign: 'center',
                                 boxShadow: theme === 'dark' ? '0 0 0 1.5px rgba(27,30,39,0.9)' : '0 0 0 1.5px rgba(250,251,253,0.9)',

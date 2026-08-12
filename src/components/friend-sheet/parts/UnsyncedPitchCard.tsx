@@ -58,7 +58,7 @@ export const UnsyncedPitchCard: React.FC<Props> = ({
           style={{
             textAlign: 'center',
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
             color: AMBER,
@@ -137,7 +137,7 @@ const PerkTile: React.FC<Perk> = ({ icon, title, sub }) => (
     <div
       style={{
         fontSize: 12,
-        fontWeight: 800,
+        fontWeight: 700,
         color: T100,
         letterSpacing: '-0.005em',
         lineHeight: 1.25,

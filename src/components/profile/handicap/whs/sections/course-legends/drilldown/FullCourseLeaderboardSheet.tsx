@@ -343,7 +343,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE}`,
                   color: isActive ? SURFACE : INK,
                   fontSize: 11,
-                  fontWeight: isActive ? 800 : 700,
+                  fontWeight: isActive ? 700 : 700,
                   fontFamily: GAM.FONT_SF,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',

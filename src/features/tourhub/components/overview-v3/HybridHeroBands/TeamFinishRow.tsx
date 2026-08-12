@@ -165,7 +165,7 @@ export function TeamFinishRow({
           <div
             style={{
               fontSize: isChampion ? 15 : 14,
-              fontWeight: isChampion ? 800 : 700,
+              fontWeight: isChampion ? 700 : 700,
               color: INK,
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',

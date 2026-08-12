@@ -73,7 +73,7 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
             alignItems: 'center',
             gap: 3,
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             padding: '3px 8px',
             borderRadius: 999,
             background: chipBg,

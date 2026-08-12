@@ -25,7 +25,7 @@ function KickerInner({ children, color = 'slate' }: KickerProps) {
     <div
       style={{
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: COLOR_MAP[color],

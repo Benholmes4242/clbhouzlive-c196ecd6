@@ -34,7 +34,7 @@ export const MovementCell: React.FC<Props> = ({
   const fontSize = size === 'chip' ? 10 : size === 'figure' ? 11.5 : 11;
   const base: React.CSSProperties = {
     fontSize,
-    fontWeight: size === 'figure' ? 700 : 800,
+    fontWeight: size === 'figure' ? 700 : 700,
     fontVariantNumeric: 'tabular-nums lining-nums',
     letterSpacing: size === 'figure' ? '0' : '0.01em',
     lineHeight: 1,

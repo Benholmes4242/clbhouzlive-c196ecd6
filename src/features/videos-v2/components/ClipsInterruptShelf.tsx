@@ -227,7 +227,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
             fontFamily: FONT_FAMILY,
           }}
         >
-          <div style={{ fontWeight: 800, fontSize: 16, color: '#94A3B8', lineHeight: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 16, color: '#94A3B8', lineHeight: 1 }}>
             {'\u203A'}
           </div>
           <div style={{ marginTop: 4, fontWeight: 600, fontSize: 11, color: '#64748B' }}>

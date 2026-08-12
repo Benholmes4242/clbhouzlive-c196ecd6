@@ -277,7 +277,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                     color: active ? '#FFFFFF' : 'rgba(255,255,255,0.40)',
                     fontFamily: 'inherit',
                     fontSize: 17,
-                    fontWeight: active ? 800 : 600,
+                    fontWeight: active ? 700 : 600,
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',

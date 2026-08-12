@@ -328,7 +328,7 @@ export function HubVideoRow() {
                 fontFamily: FONT_FAMILY,
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#c97a10' }}>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#c97a10' }}>
                 {'\u203A'}
               </div>
               <div style={{ fontWeight: 600, fontSize: 11, color: '#64748B' }}>

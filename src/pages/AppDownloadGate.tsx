@@ -58,7 +58,7 @@ const AppDownloadGate: React.FC = () => {
 
         {contextLabel ? (
           <>
-            <h1 style={{ margin: '10px 0 0', fontSize: 26, lineHeight: 1.2, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+            <h1 style={{ margin: '10px 0 0', fontSize: 26, lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
               You've been invited to view {contextLabel} on Clbhouz.
             </h1>
             <p style={{ margin: '13px auto 0', fontSize: 15.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.66)', maxWidth: 320 }}>
@@ -67,7 +67,7 @@ const AppDownloadGate: React.FC = () => {
           </>
         ) : (
           <>
-            <h1 style={{ margin: '10px 0 0', fontSize: 30, lineHeight: 1.15, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+            <h1 style={{ margin: '10px 0 0', fontSize: 30, lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
               The home of golf courses.
             </h1>
             <p style={{ margin: '13px auto 0', fontSize: 15.5, lineHeight: 1.55, color: 'rgba(255,255,255,0.66)', maxWidth: 320 }}>
