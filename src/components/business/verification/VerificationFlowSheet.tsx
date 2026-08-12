@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { TITLE } from '@/lib/tokens/type';
 /**
  * VerificationFlowSheet — single-page "Get verified" flow.
  *
@@ -552,8 +553,7 @@ export default function VerificationFlowSheet({
               <ChevronLeft size={18} strokeWidth={2.5} style={{ color: '#0F172A' }} />
             </button>
             <h2
-              className="text-[18px] leading-none"
-              style={{ color: '#0F172A', fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}
+              style={{ ...TITLE, color: '#0F172A', lineHeight: 1, margin: 0 }}
             >
               {showDomainMode ? 'Verify domain' : 'Submit for review'}
             </h2>
@@ -1276,7 +1276,7 @@ function ConfirmationView({
       >
         <CheckCircle2 className="h-8 w-8" style={{ color: '#059669' }} />
       </div>
-      <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>
+      <h2 className="mb-2" style={{ ...TITLE, color: BIZ.ink }}>
         Request submitted
       </h2>
       <p className="text-[14px] max-w-xs mx-auto" style={{ color: BIZ.inkMute }}>

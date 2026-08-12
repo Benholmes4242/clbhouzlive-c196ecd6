@@ -168,7 +168,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
                   >
                     <MiniFlag iso={c.code} />
                     <span className="flex-1 truncate text-[14px]">{c.name}</span>
-                    <span className="text-[12px] text-muted-foreground tabular-nums">{c.dialCode}</span>
+                    <span className="text-[12px] text-muted-foreground tabular-nums lining-nums">{c.dialCode}</span>
                   </button>
                 ))
               ) : (

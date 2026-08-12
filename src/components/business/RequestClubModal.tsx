@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import {
   Dialog,
   DialogContent,
@@ -67,7 +68,7 @@ export function RequestClubModal({ open, onOpenChange, initialName = '' }: Reque
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Request a course</DialogTitle>
+          <DialogTitle style={TITLE}>Request a course</DialogTitle>
           <DialogDescription>
             Can't find your course? Send us the name and we'll add it to clbhouz.
           </DialogDescription>

@@ -153,7 +153,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
                   style={{
                     paddingBottom: 3,
                     fontSize: 11.5,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: W_55,
                     fontFamily: SANS,
                     ...FIGS,

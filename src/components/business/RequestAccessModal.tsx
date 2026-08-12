@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { TITLE } from '@/lib/tokens/type';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -148,7 +149,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2" style={TITLE}>
             <Building2 className="w-5 h-5 text-muted-foreground" />
             Request access
           </DialogTitle>

@@ -529,7 +529,7 @@ function MetricCell({
         {label}
       </span>
       <span
-        className="tabular-nums flex items-center"
+        className="tabular-nums lining-nums flex items-center"
         style={{
           height: 26,
           color: BIZ.ink,
@@ -587,7 +587,7 @@ function ActionRow({
         {label}
       </span>
       {hint && (
-        <span className="text-[11.5px] font-semibold tabular-nums" style={{ color: BIZ.inkMute }}>
+        <span className="text-[11.5px] font-semibold tabular-nums lining-nums" style={{ color: BIZ.inkMute }}>
           {hint}
         </span>
       )}

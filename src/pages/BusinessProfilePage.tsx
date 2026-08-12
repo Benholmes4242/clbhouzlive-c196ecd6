@@ -500,7 +500,7 @@ const BusinessProfilePage: React.FC = () => {
               style={{
                 marginTop: 6, background: 'transparent', border: 'none', padding: 0,
                 minHeight: 36, display: 'flex', alignItems: 'center',
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.13em',
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.13em',
                 textTransform: 'uppercase', color: A.INK,
               }}
             >
