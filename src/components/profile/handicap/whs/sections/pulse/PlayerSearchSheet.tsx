@@ -88,7 +88,7 @@ const PlayerRow: React.FC<{ p: PlayerSearchResult; onTap: () => void }> = ({ p, 
         >
           {p.display_name}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 2, fontVariantNumeric: 'tabular-nums lining' }}>
           {hcpLabel}
         </div>
       </div>

@@ -116,7 +116,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.05em',
                 lineHeight: 0.85,
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {gross ?? '\u2014'}
@@ -129,7 +129,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                   color: AMBER_INK,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                   paddingBottom: 6,
                 }}
               >
@@ -169,7 +169,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontVariantNumeric: 'tabular-nums lining',
                 }}
               >
                 {stableford}
@@ -189,7 +189,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.04em',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums lining',
               }}
             >
               {hcpIsCut

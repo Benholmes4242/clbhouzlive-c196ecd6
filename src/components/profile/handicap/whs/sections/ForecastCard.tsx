@@ -185,7 +185,7 @@ const Headline: React.FC<{
         letterSpacing: '-0.045em',
         lineHeight: 0.95,
         color: numberColor,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining',
         flexShrink: 0,
       }}
     >
@@ -323,7 +323,7 @@ const CounterDetailPanel: React.FC<{ cell: CounterCell }> = ({ cell }) => {
           fontSize: 12.5,
           fontWeight: 700,
           color: color ?? T.textHi,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -446,7 +446,7 @@ const ActionFooter: React.FC<{
         fontSize: 12.5,
         fontWeight: 700,
         color: pillColor,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining',
         letterSpacing: '0.01em',
         flexShrink: 0,
       }}

@@ -86,7 +86,7 @@ const figureStyle: React.CSSProperties = {
   lineHeight: 1,
   letterSpacing: '-0.04em',
   color: CHART.INK,
-  fontVariantNumeric: 'tabular-nums',
+  fontVariantNumeric: 'tabular-nums lining',
 };
 
 /**
