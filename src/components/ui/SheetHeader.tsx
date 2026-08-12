@@ -62,11 +62,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
             <span
               style={{
                 fontFamily: FONT_SANS,
-                fontSize: 9,
-                fontWeight: 800,
+                ...KICKER,
                 color: eyebrowColor,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
               }}
             >
               {eyebrow}
@@ -76,10 +73,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
         <h2
           style={{
             fontFamily: FONT_SANS,
-            fontSize: 24,
-            fontWeight: 800,
+            ...TITLE,
             color: titleColor,
-            letterSpacing: '-0.02em',
             lineHeight: 1.15,
             margin: 0,
           }}
@@ -90,13 +85,13 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           <p
             style={{
               fontFamily: FONT_SANS,
-              fontSize: 13,
-              fontWeight: 500,
+              ...BODY,
               color: subColor,
               lineHeight: 1.4,
               margin: '6px 0 0',
             }}
           >
+
             {sub}
           </p>
         )}
