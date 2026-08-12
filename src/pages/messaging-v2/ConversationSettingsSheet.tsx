@@ -18,6 +18,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { FIGS } from '@/lib/tokens/type';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -394,7 +395,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                 </div>
               )}
               {isGroup ? (
-                <span style={{ color: SUB, fontSize: 13 }}>
+                <span style={{ ...FIGS, color: SUB, fontSize: 13 }}>
                   {members.length} {members.length === 1 ? 'member' : 'members'}
                 </span>
               ) : null}
