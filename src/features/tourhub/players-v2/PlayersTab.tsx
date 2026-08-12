@@ -355,7 +355,7 @@ export function PlayersTab() {
                   color: active ? '#FFFFFF' : INK_MUTE,
                   fontFamily: 'inherit',
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
                   cursor: 'pointer',

@@ -255,7 +255,7 @@ function StatBoardRowsInner({
             {r.rankLabel}
           </div>
           {showMovement && (
-            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, lineHeight: 1 }}>
+            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, lineHeight: 1 }}>
               <MovementFigure movement={r.movement} nullPlaceholder="none" variant="inline" />
             </div>
           )}
@@ -271,7 +271,7 @@ function StatBoardRowsInner({
             <div
               style={{
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK,
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
@@ -379,7 +379,7 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                   background: isLeader ? INK : 'rgba(15,23,42,0.06)',
                   color: isLeader ? '#FFFFFF' : INK,
                   fontSize: 11,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
                   display: 'inline-flex',
                   alignItems: 'center',

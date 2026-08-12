@@ -46,7 +46,7 @@ const KICKER: React.CSSProperties = {
 
 const LABEL: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: INK_FAINT,
@@ -54,7 +54,7 @@ const LABEL: React.CSSProperties = {
 
 const FIGURE: React.CSSProperties = {
   fontSize: 21,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '-0.02em',
   color: INK,
   lineHeight: 1,
@@ -439,7 +439,7 @@ export function ScheduleTab() {
                       WebkitBackdropFilter: 'blur(14px)',
                       padding: '14px 16px 6px',
                       fontSize: 10.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.14em',
                       color: INK_MUTE,
                       textTransform: 'uppercase',
@@ -497,7 +497,7 @@ export function ScheduleTab() {
             border: 'none',
             fontFamily: FONT,
             fontSize: 11,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
@@ -542,7 +542,7 @@ const StatCell: React.FC<{ label: string; value: string; suffix?: string }> = ({
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
       <span style={FIGURE}>{value}</span>
       {suffix && (
-        <span style={{ fontSize: 11, fontWeight: 800, color: INK_MUTE }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: INK_MUTE }}>
           {suffix}
         </span>
       )}

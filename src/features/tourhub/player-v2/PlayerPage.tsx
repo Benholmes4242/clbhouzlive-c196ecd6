@@ -106,7 +106,7 @@ export function PlayerPage() {
                 if (statsError) refetchStats();
                 if (resultsError) refetchResults();
               }}
-              style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12.5, fontWeight: 800, color: '#B91C1C', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12.5, fontWeight: 700, color: '#B91C1C', cursor: 'pointer', textDecoration: 'underline' }}
             >
               {t('player.error.retry')}
             </button>

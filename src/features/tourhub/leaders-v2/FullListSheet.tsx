@@ -151,7 +151,7 @@ export function FullListSheet({
             id="tour-leaders-full-sheet-title"
             style={{
               fontSize: 18,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
               lineHeight: 1.1,
@@ -314,7 +314,7 @@ export function FullListSheet({
                     <div
                       style={{
                         fontSize: 14,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: INK,
                         lineHeight: 1,
                         fontVariantNumeric: 'tabular-nums',

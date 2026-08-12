@@ -92,7 +92,7 @@ export function AboutSection({ player }: AboutSectionProps) {
             <div
               style={{
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 color: INK_FAINT,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',

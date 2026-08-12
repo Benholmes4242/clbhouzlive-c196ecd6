@@ -83,7 +83,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
       <div
         style={{
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK_FAINT,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',
@@ -95,7 +95,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
         style={{
           marginTop: 4,
           fontSize: 19,
-          fontWeight: 800,
+          fontWeight: 700,
           color: INK,
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
@@ -109,7 +109,7 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
           style={{
             marginTop: 3,
             fontSize: 9,
-            fontWeight: 800,
+            fontWeight: 700,
             color: INK_FAINT,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
@@ -326,7 +326,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             style={{
               margin: '0 0 3px',
               fontSize: 19,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
             }}
@@ -337,7 +337,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
             style={{
               margin: 0,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK_FAINT,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',

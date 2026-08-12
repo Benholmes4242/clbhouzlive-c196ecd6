@@ -138,7 +138,7 @@ function RankedPlayerRowInner({
               display: 'flex',
               alignItems: 'center',
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
               marginTop: 2,
@@ -197,7 +197,7 @@ export function RankedPlayerHeader({
 }) {
   const cell: React.CSSProperties = {
     fontSize: 9,
-    fontWeight: 800,
+    fontWeight: 700,
     letterSpacing: '0.13em',
     textTransform: 'uppercase',
     color: 'rgba(15,23,42,0.45)',

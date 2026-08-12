@@ -55,7 +55,7 @@ const KICKER = {
 
 const LABEL = {
   fontSize: 9,
-  fontWeight: 800 as const,
+  fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
 };
@@ -126,7 +126,7 @@ export function PlayerResultRow({
         <div
           style={{
             fontSize: 18,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: INK,
             fontVariantNumeric: 'tabular-nums lining-nums',
@@ -196,7 +196,7 @@ export function PlayerResultRow({
         <div
           style={{
             fontSize: 12.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: isWin ? AMBER_DEEP : isMissed ? INK_FAINT : INK,
             fontVariantNumeric: 'tabular-nums lining-nums',
             lineHeight: 1,
@@ -269,7 +269,7 @@ function SeasonResultsSheet({
             style={{
               margin: '0 0 4px',
               fontSize: 17,
-              fontWeight: 800,
+              fontWeight: 700,
               color: INK,
               letterSpacing: '-0.01em',
             }}

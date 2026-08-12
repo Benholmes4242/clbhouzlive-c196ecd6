@@ -112,7 +112,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
             style={{
               marginTop: 4,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               color: INK_MUTE,
               textTransform: 'uppercase',
@@ -139,7 +139,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                 style={{
                   flex: 'none',
                   fontSize: 9,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.16em',
                   color: INK_MUTE,
                   padding: '2px 6px',
@@ -259,7 +259,7 @@ const MajorChip: React.FC = () => {
       style={{
         flex: 'none',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: GOLD_DEEP,
         padding: '2px 6px',
@@ -282,7 +282,7 @@ const PlayoffChip: React.FC = () => {
       style={{
         flex: 'none',
         fontSize: 9,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.16em',
         color: VIOLET,
         padding: '2px 6px',
@@ -315,7 +315,7 @@ const LiveMark: React.FC = () => {
         style={{
           marginTop: 4,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: LIVE_DOT,
           textTransform: 'uppercase',
@@ -351,7 +351,7 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
         style={{
           marginTop: 3,
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',
@@ -405,7 +405,7 @@ const ChampionStrip: React.FC<{
         <span
           style={{
             fontSize: 11.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: getScoreColor(score, 'light'),
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1.2,
@@ -418,7 +418,7 @@ const ChampionStrip: React.FC<{
         style={{
           marginLeft: 'auto',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: GOLD_DEEP,
           textTransform: 'uppercase',
@@ -458,7 +458,7 @@ const LeaderStrip: React.FC<{
         <span
           style={{
             fontSize: 11.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: getScoreColor(score, 'light'),
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1.2,
@@ -500,7 +500,7 @@ const DefendsStrip: React.FC<{ name: string; photoCandidates: string[] }> = ({
         style={{
           marginLeft: 'auto',
           fontSize: 9,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
           textTransform: 'uppercase',
