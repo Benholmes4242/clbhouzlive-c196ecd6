@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      _feed_v3_backup: {
+        Row: {
+          def: string | null
+          saved_at: string | null
+        }
+        Insert: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Update: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           category: string
