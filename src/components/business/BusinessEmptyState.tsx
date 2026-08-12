@@ -107,7 +107,7 @@ const ReachCell = ({
           fontWeight: 700,
           letterSpacing: '-0.04em',
           color: A.INK,
-          fontVariantNumeric: 'tabular-nums',
+          fontVariantNumeric: 'tabular-nums lining',
           // The query is a claim about the platform: while it is in flight the
           // cell renders NOTHING, never a zero. The box holds its height.
           minHeight: 28,
@@ -126,7 +126,7 @@ const ReachCell = ({
               fontSize: 10.5,
               fontWeight: 700,
               color: A.GREEN,
-              fontVariantNumeric: 'tabular-nums',
+              fontVariantNumeric: 'tabular-nums lining',
             }}
           >
             <span aria-hidden style={{ fontSize: 7.5 }}>

@@ -148,7 +148,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                 >
                   <MiniFlag iso={c.code} />
                   <span className="flex-1 truncate text-[14px]">{c.name}</span>
-                  <span className="text-[12px] text-muted-foreground tabular-nums">{c.dialCode}</span>
+                  <span className="text-[12px] text-muted-foreground tabular-nums lining-nums">{c.dialCode}</span>
                   {value === c.name && <Check className="h-4 w-4 text-[#F7931E]" />}
                 </button>
               ))
