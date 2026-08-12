@@ -230,7 +230,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
               <span
                 style={{
                   fontSize: 84,
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: 'rgba(255,255,255,0.16)',
                   letterSpacing: '-0.04em',
                   filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.45)) drop-shadow(0 1px 3px rgba(0,0,0,0.30))',

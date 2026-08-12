@@ -155,7 +155,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         {/* Rank numeral — uniform dim tabular figures at every position */}
         <div style={{
           fontSize: 16,
-          fontWeight: 900,
+          fontWeight: 700,
           color: INK_SUBTLE,
           letterSpacing: '-0.03em',
           fontVariantNumeric: 'tabular-nums lining-nums',

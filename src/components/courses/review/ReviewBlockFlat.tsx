@@ -197,7 +197,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           <span
             style={{
               fontSize: 22,
-              fontWeight: 900,
+              fontWeight: 700,
               letterSpacing: '-0.03em',
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums lining',

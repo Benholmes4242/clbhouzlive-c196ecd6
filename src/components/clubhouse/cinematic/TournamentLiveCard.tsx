@@ -269,7 +269,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 </div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <div style={{ fontSize: 38, fontWeight: 900, color: AMBER, lineHeight: 1 }}>
+                <div style={{ fontSize: 38, fontWeight: 700, color: AMBER, lineHeight: 1 }}>
                   {leader.scoreDisplay}
                 </div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>

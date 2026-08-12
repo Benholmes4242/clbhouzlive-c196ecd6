@@ -93,7 +93,7 @@ const BigDuelsNumber: React.FC<{ count: number }> = ({ count }) => (
     <span
       style={{
         fontSize: 38,
-        fontWeight: 900,
+        fontWeight: 700,
         color: AMBER,
         letterSpacing: '-0.04em',
         lineHeight: 1,
@@ -174,7 +174,7 @@ const FullCard: React.FC<{
               <span
                 style={{
                   fontSize: 22,
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: rec.wins > rec.losses ? AMBER : T100,
                   letterSpacing: '-0.02em',
                 }}
@@ -185,7 +185,7 @@ const FullCard: React.FC<{
               <span
                 style={{
                   fontSize: 22,
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: rec.losses > rec.wins ? AMBER : T100,
                   letterSpacing: '-0.02em',
                 }}

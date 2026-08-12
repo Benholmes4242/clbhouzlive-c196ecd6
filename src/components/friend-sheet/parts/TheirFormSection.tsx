@@ -58,7 +58,7 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
         <span
           style={{
             fontSize: 36,
-            fontWeight: 900,
+            fontWeight: 700,
             color: T100,
             letterSpacing: '-0.04em',
             lineHeight: 1,

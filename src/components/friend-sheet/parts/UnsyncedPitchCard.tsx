@@ -72,7 +72,7 @@ export const UnsyncedPitchCard: React.FC<Props> = ({
             margin: '0 0 8px',
             textAlign: 'center',
             fontSize: 22,
-            fontWeight: 900,
+            fontWeight: 700,
             color: T100,
             letterSpacing: '-0.02em',
             lineHeight: 1.18,

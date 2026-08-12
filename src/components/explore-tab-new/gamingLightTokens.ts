@@ -17,14 +17,14 @@ export const FONT =
 
 // Value/label typography DNA (from FeatCard / CircleActivityStrip).
 export const VALUE_TYPE: React.CSSProperties = {
-  fontWeight: 900,
+  fontWeight: 700,
   fontVariantNumeric: 'tabular-nums',
   letterSpacing: '-0.02em',
 };
 
 export const LABEL_TYPE: React.CSSProperties = {
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
 };

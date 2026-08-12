@@ -93,7 +93,7 @@ function Column({
           <span
             style={{
               fontSize: 24,
-              fontWeight: 900,
+              fontWeight: 700,
               color: isTop ? GOLD : '#FFFFFF',
               letterSpacing: '0.04em',
               filter: isTop
