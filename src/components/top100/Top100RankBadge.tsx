@@ -1,6 +1,7 @@
 import React from 'react';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
+import { FIGS } from '@/lib/tokens/type';
 
 export interface Top100RankBadgeProps {
   listSlug: 'global' | 'gb-i' | 'usa' | 'europe';
@@ -41,7 +42,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       }}
     >
       {renderIcon()}
-      <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
+      <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1, ...FIGS }}>
         #{rank}
       </span>
     </div>

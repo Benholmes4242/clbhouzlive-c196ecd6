@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
 
 interface RequestCourseSheetProps {
@@ -81,7 +82,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
             >
               <Check size={28} color="#F7931E" strokeWidth={2.5} />
             </div>
-            <h2 id="request-course-title" className="text-[18px] font-semibold text-slate-900 mb-1.5">
+            <h2 id="request-course-title" className="text-slate-900 mb-1.5" style={TITLE}>
               {t('request.sheet.successTitle')}
             </h2>
             <p className="text-[14px] text-slate-500 mb-6 max-w-[280px]">{successMessage}</p>
@@ -97,7 +98,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
         ) : (
           <>
             <div className="pt-1 pb-4">
-              <h2 id="request-course-title" className="text-[18px] font-semibold text-slate-900">
+              <h2 id="request-course-title" className="text-slate-900" style={TITLE}>
                 {t('request.sheet.title')}
               </h2>
               <p className="text-[13px] text-slate-500 mt-1 leading-snug">

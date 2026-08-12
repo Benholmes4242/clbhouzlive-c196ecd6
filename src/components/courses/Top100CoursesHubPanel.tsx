@@ -377,7 +377,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 margin: 0,
                 fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
                 fontSize: 20,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 color: '#0F172A',
                 lineHeight: 1.2,

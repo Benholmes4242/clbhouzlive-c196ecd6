@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { shortenCourseName, type Verdict } from './verdict';
+import { FIGS } from '@/lib/tokens/type';
 
 const GREEN_BG = '#EDF7F0';
 const GREEN_INK = '#0C7B40';
@@ -168,7 +169,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
           alignItems: 'center',
           gap: 7,
           fontSize: 11.5,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '-0.005em',
           lineHeight: 1.3,
         }}
@@ -182,6 +183,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
       {ratingRank && (
         <span
           style={{
+            ...FIGS,
             fontSize: 10.5,
             fontWeight: 600,
             lineHeight: 1.3,

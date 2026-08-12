@@ -22,6 +22,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
+import { FIGS } from '@/lib/tokens/type';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -169,7 +170,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
                   <p style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))', margin: 0 }}>
                     {course.name}
                   </p>
-                  <p style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))', margin: 0 }}>
+                  <p style={{ ...FIGS, fontSize: 11, color: 'hsl(var(--muted-foreground))', margin: 0 }}>
                     {[course.sub_country, course.country].filter(Boolean).join(', ')}
                     {course.global_rank ? ` · #${course.global_rank} World` : ''}
                   </p>

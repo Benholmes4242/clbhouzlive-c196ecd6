@@ -15,6 +15,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { MoverRow } from '../Top100MoversSection';
 import type { MoverRange, Top100Mover } from '@/hooks/top100/useTop100Movers';
 import { HAIRLINE_INK_8, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
+import { TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;
@@ -45,7 +46,7 @@ export const Top100MoversSheet: React.FC<Props> = ({
     <BottomSheet open={open} onClose={onClose} maxHeight="90dvh">
       <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(90dvh - 30px)' }}>
         <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em' }}>
+          <div style={{ ...TITLE, color: INK }}>
             {t('top100.movers.title')}
           </div>
           <div style={{ fontSize: 12, fontWeight: 500, color: INK_MUTE, marginTop: 3 }}>

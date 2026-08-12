@@ -70,14 +70,14 @@ export const YourStatsChip: React.FC<Props> = ({ count, tone, onClick, ariaLabel
   const style = tone === 'dark' ? darkStyle : lightStyle;
   const labelStyle: React.CSSProperties = {
     fontSize: 9,
-    fontWeight: 800,
+    fontWeight: 700,
     letterSpacing: '0.10em',
     textTransform: 'uppercase',
   };
   const figureStyle: React.CSSProperties = {
     ...FIGS,
     fontSize: 12,
-    fontWeight: 800,
+    fontWeight: 700,
     letterSpacing: '-0.02em',
   };
   const content = (

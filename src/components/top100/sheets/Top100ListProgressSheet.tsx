@@ -18,6 +18,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ScopeSegment } from '@/components/shared/ScopeSegment';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
+import { TITLE } from '@/lib/tokens/type';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -100,7 +101,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
     <BottomSheet open={open} onClose={onClose} maxHeight="90dvh">
       <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(90dvh - 30px)' }}>
         <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.02em' }}>
+          <div style={{ ...TITLE, color: INK }}>
             {listName}
           </div>
           <div
@@ -189,7 +190,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
                       fontVariantNumeric: 'tabular-nums',
                       fontFeatureSettings: '"zero" 0, "tnum" 1',
                       fontSize: 12,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: 'rgba(15,23,42,0.35)',
                       width: 26,
                       flexShrink: 0,
@@ -239,7 +240,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
                       style={{
                         flexShrink: 0,
                         fontSize: 8.5,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
                         color: AMBER,
