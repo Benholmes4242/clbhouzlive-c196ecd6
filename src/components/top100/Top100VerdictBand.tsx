@@ -182,6 +182,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
       {ratingRank && (
         <span
           style={{
+            ...FIGS,
             fontSize: 10.5,
             fontWeight: 600,
             lineHeight: 1.3,

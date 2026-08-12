@@ -206,7 +206,7 @@ export function CourseSearchSheet({
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A1A' }}>
+                <h3 style={{ ...TITLE, color: '#1A1A1A' }}>
                   {t('searchSheet.title')}
                 </h3>
                 <button
@@ -433,7 +433,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             {course.rating != null && (
               <span>
                 {t('searchSheet.ratingBullet', { defaultValue: '• ' })}
-                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600 }}>{course.rating.toFixed(1)}</span>
+                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600, ...FIGS }}>{course.rating.toFixed(1)}</span>
                 <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
               </span>
             )}

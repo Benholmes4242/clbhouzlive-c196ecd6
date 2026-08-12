@@ -41,7 +41,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       }}
     >
       {renderIcon()}
-      <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1 }}>
+      <span className="text-[14px] font-bold text-white" style={{ lineHeight: 1, ...FIGS }}>
         #{rank}
       </span>
     </div>

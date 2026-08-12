@@ -447,6 +447,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 style={{
                   fontSize: 15, fontWeight: 700, color: '#fff',
                   lineHeight: 1, letterSpacing: '-0.015em',
+                  fontVariantNumeric: 'tabular-nums lining',
                 }}
               >
                 {course.communityRating.toFixed(1)}

@@ -158,7 +158,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       <div className="px-4 pb-2" style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
         <h2
           id="course-directory-title"
-          style={{ fontSize: 16, fontWeight: 700, color: INK, marginBottom: 10 }}
+          style={{ ...TITLE, color: INK, marginBottom: 10 }}
         >
           {t('statBrowse.directory.title')}
         </h2>
@@ -210,7 +210,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
         {!enabled ? (
           <div>
             {recents.length === 0 && ratedRows.length === 0 && (
-              <p style={{ fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
+              <p style={{ ...FIGS, fontSize: 13, color: INK_MUTE, marginTop: 20, lineHeight: 1.5 }}>
                 {t('directorySheet.prompt', { count: DIRECTORY_MIN_QUERY })}
               </p>
             )}

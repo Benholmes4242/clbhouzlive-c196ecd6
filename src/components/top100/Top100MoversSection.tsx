@@ -78,7 +78,7 @@ export const MoverRow: React.FC<{
         >
           {mover.course_name}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+        <div style={{ ...FIGS, fontSize: 11, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
           {mover.avg_rating != null
             ? t('top100.movers.now', { rating: mover.avg_rating.toFixed(1) })
             : mover.country}
