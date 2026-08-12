@@ -13,6 +13,7 @@ import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FIGS } from '@/lib/tokens/type';
 import { ContourField } from '@/components/shared/ContourField';
 import type {
   ConversationDetail,
@@ -363,7 +364,7 @@ const ThreadV2Page: React.FC = () => {
               ) : null}
             </div>
             {header.secondary ? (
-              <span style={{ color: SUB, fontSize: 12, lineHeight: '14px' }}>
+              <span style={{ ...FIGS, color: SUB, fontSize: 12, lineHeight: '14px' }}>
                 {header.secondary}
               </span>
             ) : null}

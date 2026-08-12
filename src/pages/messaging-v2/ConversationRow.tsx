@@ -20,6 +20,7 @@ import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { supabase } from '@/integrations/supabase/client';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
 import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
+import { FIGURE, FIGS } from '@/lib/tokens/type';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
@@ -273,6 +274,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
           >
             <span
               style={{
+                ...FIGS,
                 color: timeColor,
                 fontSize: 12,
                 lineHeight: '16px',
@@ -285,10 +287,10 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
               <span
                 className="inline-flex items-center justify-center rounded-full"
                 style={{
+                  ...FIGURE,
                   background: AMBER,
                   color: '#FFFFFF',
                   fontSize: 12,
-                  fontWeight: 600,
                   minWidth: 20,
                   height: 20,
                   padding: '0 6px',

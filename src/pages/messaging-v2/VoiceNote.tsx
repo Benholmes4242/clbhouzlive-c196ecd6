@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Play, Pause, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import type { MessageAttachment } from '@/types/messaging';
+import { FIGURE } from '@/lib/tokens/type';
 
 interface Props {
   attachment: MessageAttachment;
@@ -151,9 +152,9 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
         </div>
         <div
           style={{
+            ...FIGURE,
             fontSize: 10,
             color: timeColor,
-            fontVariantNumeric: 'tabular-nums',
           }}
         >
           {formatTime(playing || current > 0 ? current : duration)}
