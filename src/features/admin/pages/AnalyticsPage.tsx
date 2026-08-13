@@ -667,21 +667,475 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
   );
 }
 
-// ─── Retention ────────────────────────────────────────────────────────────────
+// ─── Overview ─────────────────────────────────────────────────────────────────
+//
+// Six panels answering four questions IN ORDER: do they activate, do they come
+// back, are we growing, what do they do. The order is the argument.
 
-
-
-function heatBg(value: number | null): string {
-  if (value === null || value === 0) return t.canvas;
-  // 0.08 base + value-proportional up to ~0.6
-  const alpha = 0.08 + Math.min(0.52, (value / 100) * 0.52);
-  // adminTheme.brand is a hex, convert to rgba
+/** Brand at an alpha. brand is a hex in both themes. */
+function brandAlpha(alpha: number): string {
   const hex = t.brand.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16);
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+const OV_KICKER: React.CSSProperties = {
+  color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+};
+const OV_LABEL: React.CSSProperties = {
+  color: t.inkFaint, fontSize: 11, fontWeight: 600, letterSpacing: 0.3,
+};
+const OV_FIG: React.CSSProperties = {
+  fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1',
+};
+
+/**
+ * S6 SKELETON RULE. While a query is in flight the panel renders this - never a
+ * zero, never an empty state. An empty state is a claim about the data.
+ */
+function OvSkeleton({ height }: { height: number }) {
+  return (
+    <div style={{
+      height, background: t.canvas, borderRadius: t.radius.md,
+      animation: 'admin-pulse 1.4s ease-in-out infinite',
+    }} />
+  );
+}
+
+function OvPanel({
+  title, subtitle, right, children,
+}: {
+  title: string; subtitle?: string; right?: React.ReactNode; children: React.ReactNode;
+}) {
+  return (
+    <Card style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={OV_KICKER}>{title}</div>
+          {subtitle && <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4 }}>{subtitle}</div>}
+        </div>
+        {right}
+      </div>
+      {children}
+    </Card>
+  );
+}
+
+export function OverviewTab() {
+  const fc      = useFunnelCohorts(8);
+  const windows = useActiveWindows(28);
+  const metrics = useOverviewMetrics();
+  const ops     = useOpsHealth(7);
+  const screens = useScreenAnalytics(30);
+  const actions = useMemberActions(7);
+
+  return (
+    <>
+      <ActivationPanel data={fc.data ?? null} loading={fc.isLoading} />
+      <ReturnPanel
+        windows={windows.data ?? null}
+        loading={windows.isLoading || fc.isLoading}
+        totalMembers={fc.data?.funnel?.[0]?.n ?? null}
+      />
+      <CohortGrid data={fc.data ?? null} loading={fc.isLoading} />
+      <LastSevenDays
+        metrics={metrics.data ?? null}
+        ops={ops.data ?? null}
+        loading={metrics.isLoading || ops.isLoading}
+      />
+      <WhereMembersGo rows={screens.data ?? null} loading={screens.isLoading} />
+      <WhatMembersDid data={actions.data ?? null} loading={actions.isLoading} />
+    </>
+  );
+}
+
+// ─── 2a Activation ────────────────────────────────────────────────────────────
+
+function convTone(pct: number): string {
+  if (pct < 30) return t.danger;
+  if (pct < 70) return t.warn;
+  return t.ok;
+}
+
+function ActivationPanel({ data, loading }: { data: FunnelCohorts | null; loading: boolean }) {
+  const funnel = data?.funnel ?? [];
+  const faults = useMemo(() => nestingFaults(funnel), [funnel]);
+  const base = funnel[0]?.n ?? 0;
+
+  const signedUp = funnel.find(s => s.key === 'signed_up')?.n ?? base;
+  const connected = funnel.find(s => s.key === 'connected')?.n ?? null;
+  const unconnected = connected === null ? null : Math.max(0, signedUp - connected);
+
+  return (
+    <OvPanel title="Activation" subtitle="Every member, and how far they get">
+      {loading || !data ? (
+        <OvSkeleton height={220} />
+      ) : funnel.length === 0 ? (
+        <EmptyState title="No funnel data" />
+      ) : (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {funnel.map((s, i) => {
+              // Width is a share of STEP 1, so the shape is the funnel. Never
+              // clamped against the parent: a bar wider than its parent is a
+              // data fault and must be visible, not laundered.
+              const width = base > 0 ? (s.n / base) * 100 : 0;
+              const prev = i > 0 ? funnel[i - 1].n : null;
+              const conv = prev && prev > 0 ? Math.round((s.n / prev) * 100) : null;
+              const isGate = s.key === 'connected';
+              return (
+                <div key={s.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{
+                      color: isGate ? t.ink : t.inkMuted,
+                      fontSize: 13, fontWeight: isGate ? 700 : 600,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>{s.label}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10, flexShrink: 0 }}>
+                      <span style={{ color: t.ink, fontSize: 15, fontWeight: 700, ...OV_FIG }}>{fmtInt(s.n)}</span>
+                      {conv !== null && (
+                        <span style={{ color: convTone(conv), fontSize: 12, fontWeight: 700, ...OV_FIG }}>
+                          {conv}%
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div style={{ height: 10, background: t.canvas, borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${width}%`, height: '100%', borderRadius: 999,
+                      background: isGate ? t.brand : brandAlpha(0.45),
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ height: 1, background: t.hairline, margin: '2px 0' }} />
+
+          {unconnected !== null && (
+            <div style={{ color: t.inkMuted, fontSize: 12.5, lineHeight: 1.5, ...OV_FIG }}>
+              {fmtInt(unconnected)} members have never connected a handicap. For them the product has
+              no rounds, no scorecards and no entry to the stat browse.
+            </div>
+          )}
+
+          {faults.length > 0 && (
+            <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600, lineHeight: 1.5 }}>
+              Data fault: {faults.map(f => `${f.key} (${f.n}) exceeds ${f.parentKey} (${f.parentN})`).join('; ')}.
+              A funnel step cannot be wider than the one above it - the bars are drawn as returned, not clamped.
+            </div>
+          )}
+        </>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2b Return ────────────────────────────────────────────────────────────────
+
+function ReturnPanel({
+  windows, loading, totalMembers,
+}: { windows: ActiveWindows | null; loading: boolean; totalMembers: number | null }) {
+  const daily = windows?.daily ?? [];
+  const { ref, width } = useElementWidth<HTMLDivElement>();
+  const H = 120;
+
+  const geom = useMemo(() => {
+    if (daily.length < 2) return null;
+    const vals = daily.map(d => d.wau);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const span = max - min || 1;
+    const pts = vals.map((v, i) => ({
+      x: (i / (vals.length - 1)) * 100,
+      y: 6 + (1 - (v - min) / span) * (H - 12),
+    }));
+    return { d: monotonePath(pts), last: pts[pts.length - 1] };
+  }, [daily]);
+
+  const share = (totalMembers && windows) ? Math.round((windows.mau.current / totalMembers) * 100) : null;
+
+  const ticks = useMemo(() => {
+    if (daily.length === 0) return [];
+    return fourTickIndices(daily.length).map(i => {
+      const d = new Date(daily[i].date);
+      return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'short' })}`;
+    });
+  }, [daily]);
+
+  return (
+    <OvPanel
+      title="Return"
+      subtitle="Members coming back, not just arriving"
+      right={!loading && windows?.stickiness !== null && windows?.stickiness !== undefined ? (
+        <span style={{ ...OV_LABEL, color: t.inkMuted, ...OV_FIG, whiteSpace: 'nowrap' }}>
+          {windows.stickiness}% weekly of monthly
+        </span>
+      ) : undefined}
+    >
+      {loading || !windows ? (
+        <OvSkeleton height={200} />
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
+            <FigureBlock label="This week" value={fmtInt(windows.wau.current)} />
+            <FigureBlock label="This month" value={fmtInt(windows.mau.current)} />
+            <FigureBlock label="Of all members" value={share === null ? null : `${share}%`} />
+          </div>
+          <div ref={ref} style={{ position: 'relative' }}>
+            {geom ? (
+              <>
+                <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+                  <path
+                    d={geom.d}
+                    fill="none"
+                    stroke={t.brand}
+                    strokeWidth={1.75}
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                {width > 0 && <EndDot left={(geom.last.x / 100) * width} top={geom.last.y} color={t.brand} />}
+              </>
+            ) : (
+              <div style={{ ...OV_LABEL, color: t.inkFaint }}>Not enough days for a line yet</div>
+            )}
+            {ticks.length > 0 && <AxisTicks labels={ticks} />}
+          </div>
+        </>
+      )}
+    </OvPanel>
+  );
+}
+
+function FigureBlock({ label, value }: { label: string; value: string | null }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <span style={OV_LABEL}>{label}</span>
+      <span style={{ color: t.ink, fontSize: 26, fontWeight: 700, lineHeight: 1, ...OV_FIG }}>
+        {value ?? '—'}
+      </span>
+    </div>
+  );
+}
+
+// ─── 2c Weekly cohorts ────────────────────────────────────────────────────────
+
+/** 0.08 → 0.58 brand ramp. Never called with null: a null cell is an outline. */
+function cohortFill(pct: number): string {
+  return brandAlpha(0.08 + Math.min(0.5, (pct / 100) * 0.5));
+}
+
+function weekLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'short' })}`;
+}
+
+function CohortGrid({ data, loading }: { data: FunnelCohorts | null; loading: boolean }) {
+  const cohorts = data?.cohorts ?? [];
+  return (
+    <OvPanel title="Weekly cohorts" subtitle="Share of each signup week active in the weeks after. No W0: it is 100% by definition.">
+      {loading || !data ? (
+        <OvSkeleton height={220} />
+      ) : cohorts.length === 0 ? (
+        <EmptyState title="No cohorts yet" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '108px repeat(4, minmax(0, 1fr))', gap: 4 }}>
+            <span />
+            {[1, 2, 3, 4].map(w => (
+              <span key={w} style={{ ...OV_LABEL, textAlign: 'center' }}>W{w}</span>
+            ))}
+          </div>
+          {cohorts.map(c => (
+            <div key={c.week} style={{ display: 'grid', gridTemplateColumns: '108px repeat(4, minmax(0, 1fr))', gap: 4, alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                <span style={{ color: t.ink, fontSize: 12.5, fontWeight: 700, ...OV_FIG }}>{weekLabel(c.week)}</span>
+                {/* A percentage over a six-member cohort is a lie of omission. */}
+                <span style={{ ...OV_LABEL, ...OV_FIG }}>{fmtInt(c.size)} members</span>
+              </div>
+              {[0, 1, 2, 3].map(i => {
+                const v = i < c.weeks.length ? c.weeks[i] : null;
+                if (v === null) {
+                  // The week has NOT ELAPSED. Not 0%, not a dash, not a fill:
+                  // "we do not know yet" is a different claim to "nobody came back".
+                  return (
+                    <div key={i} style={{
+                      minHeight: 36, borderRadius: 8,
+                      border: `1px dashed ${t.line}`, background: 'transparent',
+                    }} />
+                  );
+                }
+                return (
+                  <div key={i} style={{
+                    minHeight: 36, borderRadius: 8, background: cohortFill(v),
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: v > 55 ? t.canvas : t.ink,
+                    fontSize: 12.5, fontWeight: 700, ...OV_FIG,
+                  }}>{v}%</div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2d Last 7 days ───────────────────────────────────────────────────────────
+
+function LastSevenDays({
+  metrics, ops, loading,
+}: { metrics: MetricsBundle | null; ops: OpsHealth | null; loading: boolean }) {
+  const rows = useMemo(() => {
+    if (!metrics || !ops) return [];
+    return [
+      {
+        key: 'rounds',
+        label: 'Rounds',
+        current: ops.activity.rounds_in_window,
+        prior: ops.activity.rounds_prev_window,
+        note: `by ${fmtInt(ops.activity.rounds_members)} members`,
+      },
+      { key: 'posts',   label: 'Posts',   current: metrics.posts.current,   prior: metrics.posts.previous },
+      { key: 'reviews', label: 'Reviews', current: metrics.reviews.current, prior: metrics.reviews.previous },
+      { key: 'signups', label: 'Signups', current: metrics.signups.current, prior: metrics.signups.previous },
+    ];
+  }, [metrics, ops]);
+
+  return (
+    <OvPanel title="Last 7 days" subtitle="Against the 7 days before">
+      {loading || rows.length === 0 ? (
+        <OvSkeleton height={180} />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {rows.map((r, i) => (
+            <div key={r.key} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              padding: '11px 0',
+              borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${t.hairline}`,
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 600 }}>{r.label}</div>
+                {r.note && <div style={{ ...OV_LABEL, ...OV_FIG }}>{r.note}</div>}
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ color: t.ink, fontSize: 17, fontWeight: 700, ...OV_FIG }}>{fmtInt(r.current)}</span>
+                <DeltaChip delta={pctDelta(r.current, r.prior)} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2e Where members go ──────────────────────────────────────────────────────
+
+function WhereMembersGo({ rows, loading }: { rows: ScreenRow[] | null; loading: boolean }) {
+  const top = useMemo(() => {
+    if (!rows) return [];
+    // area === 'Admin' is the manifest's own classification of /admin,
+    // /admin/*, /admin-v2/*, /admin-setup and /error-logs.
+    return rows
+      .filter(r => r.area !== 'Admin' && r.views > 0)
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 7);
+  }, [rows]);
+  const max = top[0]?.views ?? 0;
+
+  return (
+    <OvPanel title="Where members go" subtitle="Top 7 screens by views, last 30 days. The console itself is excluded.">
+      {loading || !rows ? (
+        <OvSkeleton height={220} />
+      ) : top.length === 0 ? (
+        <EmptyState title="No screen views recorded" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {top.map(r => (
+            <div key={r.route_pattern} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                <span style={{
+                  color: t.ink, fontSize: 13, fontWeight: 600, minWidth: 0,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>{r.label}</span>
+                <span style={{ color: t.ink, fontSize: 14, fontWeight: 700, flexShrink: 0, ...OV_FIG }}>
+                  {fmtInt(r.views)}
+                </span>
+              </div>
+              <div style={{ height: 8, background: t.canvas, borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{
+                  width: `${max > 0 ? (r.views / max) * 100 : 0}%`, height: '100%',
+                  background: brandAlpha(0.55), borderRadius: 999,
+                }} />
+              </div>
+              <div style={{ ...OV_LABEL, ...OV_FIG }}>
+                {fmtInt(r.unique_users)} members
+                {/* Nullable by design: no dwell samples renders NOTHING, not "0s". */}
+                {r.median_dwell_sec !== null && ` · ${Math.round(r.median_dwell_sec)}s median`}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2f What members did ──────────────────────────────────────────────────────
+
+function WhatMembersDid({ data, loading }: { data: MemberActions | null; loading: boolean }) {
+  const actions = (data?.actions ?? []).slice(0, 10);
+  return (
+    <OvPanel
+      title="What members did"
+      subtitle="Deliberate actions in the last 7 days. Times and members are separate: one enthusiast is not adoption."
+    >
+      {loading || !data ? (
+        <OvSkeleton height={240} />
+      ) : actions.length === 0 ? (
+        <div style={{ color: t.inkMuted, fontSize: 13 }}>No actions recorded</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 72px 72px', gap: 8,
+            paddingBottom: 8, borderBottom: `1px solid ${t.line}`,
+          }}>
+            <span style={OV_LABEL}>Action</span>
+            <span style={{ ...OV_LABEL, textAlign: 'right' }}>Times</span>
+            <span style={{ ...OV_LABEL, textAlign: 'right' }}>Members</span>
+          </div>
+          {actions.map((a, i) => (
+            <div key={a.name} style={{
+              display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 72px 72px', gap: 8,
+              alignItems: 'center', padding: '10px 0',
+              borderBottom: i === actions.length - 1 ? 'none' : `1px solid ${t.hairline}`,
+            }}>
+              <span style={{
+                color: t.ink, fontSize: 13.5, fontWeight: 600, minWidth: 0,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>{humaniseActionName(a.name)}</span>
+              <span style={{ color: t.ink, fontSize: 14, fontWeight: 700, textAlign: 'right', ...OV_FIG }}>
+                {fmtInt(a.times)}
+              </span>
+              <span style={{ color: t.inkMuted, fontSize: 14, fontWeight: 700, textAlign: 'right', ...OV_FIG }}>
+                {fmtInt(a.members)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
