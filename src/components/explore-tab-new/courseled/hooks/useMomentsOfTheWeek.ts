@@ -8,7 +8,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 /**
  * useMomentsOfTheWeek — the most recent course-tagged member media, one per
  * course (BRIEF, section 4). Same joins the course Media tab reads (posts ->
- * post_media, tagged_course_ids), scoped to 14 days with a small limit.
+ * post_media, tagged_course_ids), scoped to 30 days (WINDOW_DAYS) with a candidate ceiling.
  *
  * Returns FeedPost objects so a tile can hand the read-only fullscreen viewer
  * exactly what it hands from any other media surface.
