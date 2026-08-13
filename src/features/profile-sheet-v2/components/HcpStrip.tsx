@@ -74,6 +74,50 @@ function formatDelta(v: number): string {
   return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
 }
 
+/** Smooth polyline through points using cubic Bezier splines.
+ *  Replaces sharp changes of direction with rounded corners while keeping the
+ *  curve passing through every supplied point. */
+function smoothPath(points: readonly (readonly [number, number])[]): string {
+  if (points.length === 0) return '';
+  if (points.length === 1) {
+    return `M${points[0][0].toFixed(1)},${points[0][1].toFixed(1)}`;
+  }
+
+  const tangents: [number, number][] = points.map((p, i) => {
+    if (i === 0) {
+      const next = points[1];
+      return [next[0] - p[0], next[1] - p[1]];
+    }
+    if (i === points.length - 1) {
+      const prev = points[i - 1];
+      return [p[0] - prev[0], p[1] - prev[1]];
+    }
+    const prev = points[i - 1];
+    const next = points[i + 1];
+    return [(next[0] - prev[0]) / 2, (next[1] - prev[1]) / 2];
+  });
+
+  const tension = 0.25; // 0 = straight lines, higher = rounder
+
+  let d = `M${points[0][0].toFixed(1)},${points[0][1].toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i += 1) {
+    const [x0, y0] = points[i];
+    const [x1, y1] = points[i + 1];
+    const [tx0, ty0] = tangents[i];
+    const [tx1, ty1] = tangents[i + 1];
+
+    const c1x = x0 + tx0 * tension;
+    const c1y = y0 + ty0 * tension;
+    const c2x = x1 - tx1 * tension;
+    const c2y = y1 - ty1 * tension;
+
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}`;
+  }
+
+  return d;
+}
+
+
 // ---------------------------------------------------------------------------
 // Shell — owns the border, the radius and the band heights. The plot is handed
 // the full inner width so it can run EDGE TO EDGE to the card's own border.
@@ -185,14 +229,14 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
       // (amber), and ends near best (green). It previews the real colour
       // system without pretending to be the member's own data.
       const ys = [0.78, 0.68, 0.72, 0.52, 0.46, 0.38, 0.28, 0.18];
-      const d = ys
-        .map((r, i) => {
-          const x = (i / (ys.length - 1)) * w;
-          const y = pad + r * (h - pad * 2);
-          return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-        })
-        .join(' ');
+      const ghostPoints = ys.map((r, i) => {
+        const x = (i / (ys.length - 1)) * w;
+        const y = pad + r * (h - pad * 2);
+        return [x, y] as const;
+      });
+      const d = smoothPath(ghostPoints);
       const area = `${d} L${w},${h} L0,${h} Z`;
+
       return (
         <>
           <svg width={w} height={h} style={{ display: 'block' }} aria-hidden>
@@ -410,8 +454,9 @@ const TrendCard: React.FC<{
           const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2 - 10);
           return [x, y] as const;
         });
-        const line = xy.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+        const line = smoothPath(xy);
         const area = `${line} L${w - padX},${h} L${padX},${h} Z`;
+
         const mx = xy[active][0];
         const my = xy[active][1];
         const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
