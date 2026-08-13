@@ -370,6 +370,10 @@ const CardFeedSkeleton: React.FC<{
   variant?: SkeletonCardVariant;
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio }) => {
+  const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
+  return (
+    <>
+
 
       {/* Chrome island skeleton — mirrors ChromeIsland: two dark glass capsules
           at sat+10, inset 12px, 44h, radius 999. Keep the SkeletonBlock contents
