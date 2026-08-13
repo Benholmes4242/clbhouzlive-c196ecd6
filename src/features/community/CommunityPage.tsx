@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
@@ -13,42 +13,42 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { CommunityCourseIndex } from './CommunityCourseIndex';
 import { CommunityEverythingGrid } from './CommunityEverythingGrid';
-import { CommunityRail, clampAspect } from './CommunityRail';
+import { CommunityRail, clampAspect, HEADING_STYLE, SCROLLER_GUTTER } from './CommunityRail';
 import { CommunitySkeleton } from './CommunitySkeleton';
 import { featuredMoment, useCommunityRails } from './useCommunityRails';
 
 /**
- * COMMUNITY PAGE (BRIEF_COMMUNITY_PAGE_V2) — the destination that replaced the
- * moments see-all sheet.
- *
- * WHY A PAGE, NOT A SHEET. The sheet promised "the complete month" and delivered
- * a scrolling wall inside a 95dvh box with no address, no back stack and no way
- * to link to it. A month of member media across 57 clubs is a section of the
- * product, so it gets a route.
+ * COMMUNITY PAGE — the destination that replaced the moments see-all sheet.
  *
  * SHAPE, top to bottom:
- *   1  FEATURED LEAD    one recent moment, TRUE ASPECT, full width
- *   2  RAILS            relevance-ordered, ALL-TIME pool (useCommunityRails)
- *   3  COURSE INDEX     every club with media, grouped by region — text rows
- *   4  EVERYTHING       square 3-up incremental grid, the complete index
+ *   1  HEADER          title on the island's row + a filter chip row
+ *   2  FEATURED LEAD   one RECENT moment (30d), TRUE ASPECT, full width
+ *   3  RAILS           relevance-ordered, one tile per course
+ *   4  BROWSE BY CLUB  twelve clubs, horizontal — a suggestion, not an index
+ *   5  EVERYTHING      square 3-up incremental grid, the complete index
  *
- * ONE QUERY drives all four. The rails, the index and the grid are readings of
- * the same array, so they cannot disagree about what exists.
+ * ONE QUERY drives all of it, and ONE FILTER narrows all of it. A chip that
+ * narrowed only the grid would leave the rails above it describing a pool the
+ * member is no longer looking at.
  *
- * HEADER: the chrome-v2 registry gives this route the island BACK capsule, so
- * the page's own sticky masthead carries the TITLE ONLY — a second back arrow
- * would be two ways to do one thing.
+ * CHIP STATE IS COMPONENT STATE, never the URL: a filtered view is not a place
+ * a member should be able to land on cold.
  */
 
-/** Height of the featured lead. Its WIDTH is the column; aspect drives nothing
- *  but the crop, so a landscape lead is short and a portrait lead is tall. */
 const LEAD_MAX_H = 420;
 const LEAD_MIN_H = 240;
 
 const INK = '#0E1216';
-const DIM = '#A2A9B2';
+const MUTE = '#A2A9B2';
+const PANEL = '#EDF0F3';
+const BORDER = '#E2E7EC';
 const CANVAS = '#F8FAFC';
 const HAIR = '#EDF0F3';
+
+/** At most four region chips — past that the row is a directory again. */
+const MAX_REGION_CHIPS = 4;
+
+type ChipId = 'all' | 'video' | 'played' | `region:${string}`;
 
 export default function CommunityPage() {
   const { t } = useTranslation('courses');
@@ -59,11 +59,12 @@ export default function CommunityPage() {
   const moments = useMemo(() => data ?? [], [data]);
 
   const playedMap = useUserStatsCourseMap();
+  const [chip, setChip] = useState<ChipId>('all');
 
   /**
    * MEMBER REGION, derived rather than fetched: the region the member has played
-   * in most, inside this very pool. A profile field would be a second source of
-   * truth for the same question and could point at a region with no media.
+   * in most, inside this very pool. Computed on the UNFILTERED pool so a chip
+   * cannot move the member's home region.
    */
   const memberRegion = useMemo(() => {
     if (playedMap.size === 0) return null;
@@ -83,22 +84,44 @@ export default function CommunityPage() {
     return best;
   }, [moments, playedMap]);
 
-  const rails = useCommunityRails({ moments, memberRegion });
-  const lead = useMemo(() => featuredMoment(moments), [moments]);
+  /** Regions present in the pool, biggest first, capped. Labels are DATA. */
+  const regions = useMemo(() => {
+    const tally = new Map<string, number>();
+    for (const m of moments) {
+      if (!m.region) continue;
+      tally.set(m.region, (tally.get(m.region) ?? 0) + 1);
+    }
+    return [...tally.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, MAX_REGION_CHIPS)
+      .map(([region]) => region);
+  }, [moments]);
 
-  // READ-ONLY viewer, exactly as Discover opens moments: this page reports, it
-  // is not a second engagement surface. One deduped post list serves every
-  // surface on the page so the viewer can page through the whole community.
+  const pool = useMemo(() => {
+    if (chip === 'all') return moments;
+    if (chip === 'video') return moments.filter((m) => m.mediaType === 'video');
+    if (chip === 'played') return moments.filter((m) => playedMap.has(m.courseId));
+    const region = chip.slice('region:'.length);
+    return moments.filter((m) => m.region === region);
+  }, [moments, chip, playedMap]);
+
+  const rails = useCommunityRails({ moments: pool, memberRegion });
+  // ABSENT rather than stale: no fallback to an older moment or to the
+  // unfiltered pool when the filtered pool has nothing inside 30 days.
+  const lead = useMemo(() => featuredMoment(pool), [pool]);
+
+  // READ-ONLY viewer, exactly as Discover opens moments. The QUEUE IS WHAT THE
+  // MEMBER CAN SEE: under a filter it carries only filtered moments.
   const posts = useMemo(() => {
     const seen = new Set<string>();
     const out = [] as Moment['post'][];
-    for (const m of moments) {
+    for (const m of pool) {
       if (seen.has(m.post.id)) continue;
       seen.add(m.post.id);
       out.push(m.post);
     }
     return out;
-  }, [moments]);
+  }, [pool]);
 
   const handleTile = useCallback(
     (m: Moment) => {
@@ -128,9 +151,17 @@ export default function CommunityPage() {
       )
     : LEAD_MIN_H;
 
+  const chips: { id: ChipId; label: string }[] = [
+    { id: 'all', label: t('community.filter.all', 'All') },
+    { id: 'video', label: t('community.filter.video', 'Video') },
+    { id: 'played', label: t('community.filter.played', 'Played') },
+    ...regions.map((r) => ({ id: `region:${r}` as ChipId, label: r })),
+  ];
+
   return (
     <PageRoot style={{ background: CANVAS, minHeight: '100dvh' }}>
-      {/* MASTHEAD — sticky, sits BELOW the floating island (44 + 10 gap + notch). */}
+      {/* MASTHEAD — sticky. The title sits on the island back arrow's row,
+          vertically centred, inset past the capsule. */}
       <div
         style={{
           position: 'sticky',
@@ -138,38 +169,58 @@ export default function CommunityPage() {
           zIndex: 2,
           background: CANVAS,
           borderBottom: `0.5px solid ${HAIR}`,
-          padding: '0 16px 10px',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+          padding: '0 0 8px',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
         }}
       >
         <div
           style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: DIM,
-            marginBottom: 4,
+            minHeight: 44,
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 16px 0 60px',
           }}
         >
-          {isPending
-            ? '\u00A0'
-            : t('community.count', {
-                defaultValue: '{{count}} moments',
-                count: moments.length,
-              })}
+          <h1
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: INK,
+              margin: 0,
+            }}
+          >
+            {t('discover.momentsFromCommunity', 'From the community')}
+          </h1>
         </div>
-        <h1
-          style={{
-            fontSize: 17,
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            color: INK,
-            margin: 0,
-          }}
-        >
-          {t('discover.momentsFromCommunity', 'From the community')}
-        </h1>
+
+        <div style={{ display: 'flex', gap: 6, ...SCROLLER_GUTTER }}>
+          {chips.map((c) => {
+            const on = c.id === chip;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setChip(c.id)}
+                style={{
+                  flex: 'none',
+                  padding: '6px 12px',
+                  borderRadius: 999,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '-0.01em',
+                  background: on ? INK : PANEL,
+                  color: on ? '#FFFFFF' : MUTE,
+                  border: on ? '1px solid transparent' : `1px solid ${BORDER}`,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Nav-visible page: flat 88 bottom per spacing canon. */}
@@ -177,7 +228,7 @@ export default function CommunityPage() {
         {isPending ? (
           <CommunitySkeleton />
         ) : moments.length === 0 ? (
-          <div style={{ padding: '40px 16px', fontSize: 13, color: DIM }}>
+          <div style={{ padding: '40px 16px', fontSize: 13, color: MUTE }}>
             {t('community.empty', 'No member media yet.')}
           </div>
         ) : (
@@ -208,48 +259,20 @@ export default function CommunityPage() {
               />
             ))}
 
-            <SectionRule label={t('community.courseIndex', 'Every course')} />
             <CommunityCourseIndex
-              moments={moments}
-              elsewhereLabel={t('community.elsewhere', 'Elsewhere')}
+              moments={pool}
+              title={t('community.browseByClub', 'Browse by club')}
               countLabel={(n) =>
                 t('community.count', { defaultValue: '{{count}} moments', count: n })
               }
             />
 
-            <SectionRule label={t('community.everything', 'Everything')} />
-            <CommunityEverythingGrid moments={moments} onTilePress={handleTile} />
+            <h2 style={HEADING_STYLE}>{t('community.everything', 'Everything')}</h2>
+            <CommunityEverythingGrid moments={pool} onTilePress={handleTile} />
           </>
         )}
       </main>
     </PageRoot>
-  );
-}
-
-/** 3px rule marker + label — the Dispatch section seam. */
-function SectionRule({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '18px 16px 10px',
-      }}
-    >
-      <span aria-hidden style={{ width: 3, height: 12, background: INK }} />
-      <h2
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '-0.01em',
-          color: INK,
-          margin: 0,
-        }}
-      >
-        {label}
-      </h2>
-    </div>
   );
 }
 
