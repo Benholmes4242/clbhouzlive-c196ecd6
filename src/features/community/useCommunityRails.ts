@@ -16,8 +16,12 @@ import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
  * rail declares a WEIGHT; rails sort by weight descending and empties are
  * dropped before ordering, so position is earned by having something to say.
  *
- * Rails are DISJOINT from nothing — the same moment may appear in a rail and in
- * the grid below. The grid is the complete index; rails are readings of it.
+ * ONE TILE PER COURSE ON CROSS-COURSE RAILS (REFINE §2). Every rail here is
+ * about a SET OF PLACES, so three tiles of the same club is three quarters of a
+ * rail spent on one subject. V2 §4.2b specified ordering "by moment rank within
+ * a course", which is exactly what produced that; it was wrong. Some rails now
+ * fall under MIN_RAIL_TILES and disappear — correct, since a rail that only had
+ * three tiles because one club supplied all three never had three subjects.
  */
 
 /** A rail needs enough tiles to read as a row rather than a stray tile. */
@@ -53,7 +57,7 @@ interface Args {
 
 /**
  * Counts moments per course over the whole pool. Used by the busiest rail and
- * by the course index, so both agree on what "busiest" means.
+ * by the club rail, so both agree on what "busiest" means.
  */
 export function countByCourse(moments: Moment[]): Map<string, number> {
   const m = new Map<string, number>();
@@ -61,8 +65,23 @@ export function countByCourse(moments: Moment[]): Map<string, number> {
   return m;
 }
 
+/**
+ * ONE TILE PER COURSE, keeping the incoming order. The pool arrives
+ * rank-ordered, so the first moment seen for a course is its highest-ranked.
+ */
+export function oneTilePerCourse(moments: Moment[]): Moment[] {
+  const seen = new Set<string>();
+  const out: Moment[] = [];
+  for (const m of moments) {
+    if (seen.has(m.courseId)) continue;
+    seen.add(m.courseId);
+    out.push(m);
+  }
+  return out;
+}
+
 function cap(list: Moment[]): Moment[] {
-  return list.slice(0, MAX_RAIL_TILES);
+  return oneTilePerCourse(list).slice(0, MAX_RAIL_TILES);
 }
 
 export function useCommunityRails({
@@ -96,13 +115,7 @@ export function useCommunityRails({
       .slice(0, MAX_RAIL_TILES)
       .map(([id]) => id);
     const busiestSet = new Set(busiestCourses);
-    const busiest: Moment[] = [];
-    const takenCourse = new Set<string>();
-    for (const m of moments) {
-      if (!busiestSet.has(m.courseId) || takenCourse.has(m.courseId)) continue;
-      takenCourse.add(m.courseId);
-      busiest.push(m);
-    }
+    const busiest = cap(moments.filter((m) => busiestSet.has(m.courseId)));
 
     const recentCount = (list: Moment[]) => {
       const since = Date.now() - FEATURED_WINDOW_DAYS * DAY;
@@ -131,19 +144,16 @@ export function useCommunityRails({
 }
 
 /**
- * FEATURED LEAD — the single strongest RECENT moment (30 days). Recency is the
- * point of the lead: an all-time best photo at the top of the page would make
- * the page look identical every visit.
+ * FEATURED LEAD — the single strongest RECENT moment (30 days), or NOTHING.
  *
- * The pool is already rank-ordered by the hook, so the lead is simply the first
- * moment inside the window; when nothing is recent the lead is the pool's best,
- * because a page with a hole where its lead should be is worse than a lead that
- * is a month and a day old.
+ * Recency is the point of the lead: an all-time best photo at the top of the
+ * page would make the page look identical every visit. When nothing in the
+ * (possibly filtered) pool is inside the window the lead is ABSENT — an older
+ * moment dressed as the lead, or one from outside the active filter, would be a
+ * lie about what the member is looking at.
  */
 export function featuredMoment(moments: Moment[]): Moment | null {
   if (moments.length === 0) return null;
   const since = Date.now() - FEATURED_WINDOW_DAYS * DAY;
-  return (
-    moments.find((m) => new Date(m.post.createdAt).getTime() >= since) ?? moments[0]
-  );
+  return moments.find((m) => new Date(m.post.createdAt).getTime() >= since) ?? null;
 }
