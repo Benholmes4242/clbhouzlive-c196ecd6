@@ -167,11 +167,19 @@ export function SettingsTabContent() {
     ? ` \u00B7 ${formatHcp(resolvedHcp.value)} hcp`
     : '';
 
+  // The row must never name a federation a member has nothing to do with:
+  // sixteen more governing bodies are pending, so the title is sourced from the
+  // connection's OWN provider (bodyNameForProvider) and is neutral until one
+  // exists. Adding the next federation needs no edit here.
+  const whsRowTitle = whsConnection
+    ? bodyNameForProvider((whsConnection as { provider?: string | null }).provider)
+    : 'Official handicap';
   const whsSubtitle = whsConnection
     ? whsConnection.last_synced_at
       ? `Connected \u00B7 synced ${formatRelativeAgoLong(whsConnection.last_synced_at)}`
       : 'Connected'
-    : 'Not connected';
+    : 'Sync your official handicap';
+
 
   return (
     <>
