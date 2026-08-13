@@ -15,11 +15,13 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { useRoundHoleShapes, type HoleShape, type EventKind } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
@@ -136,6 +138,10 @@ function monotonePath(pts: { x: number; y: number }[]): string {
    most of the afternoon; colouring that round entirely ink erases it.
    TO-PAR CONVENTION ONLY. The index-delta pair (A.IMPROVED / A.DRIFTED) means
    MOVEMENT and must never appear on this tile.                              */
+/* TOPAR_UNDER_LIGHT (#D2222D) is too dark to read on glass over a photograph,
+   so the CHIP'S under-par figure — and only that — uses a lighter red. */
+const GLASS_UNDER = '#FF8A80';
+
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
 
@@ -387,6 +393,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
   );
   const reactions = useContentReactions(reactionTargets);
 
+  // HOLE SHAPES: ONE batched read for the whole rail, mirroring the reactions
+  // read above. Never one query per card in a horizontally scrolling rail.
+  const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
+  const holeShapes = useRoundHoleShapes(scoreIds);
+
   // THE INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET): resolved for the rail as a
   // whole, not per card, so the repetition cap can see its neighbours.
   const insights = useMemo(() => buildInsightMap(rows, t as never), [rows, t]);
@@ -419,7 +430,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
           // over par is INK, level is muted. The index-delta pair
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
           const toPar = toParFor(r);
-          const shapeTone = toPar?.tone ?? A.MUTE;
+          const toParUnder = toPar?.tone === TOPAR_RED;
           const insight = insights.get(r.round_id)?.text ?? null;
 
           return (
@@ -511,7 +522,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           ...NUMF,
                           fontSize: 12.5,
                           fontWeight: 700,
-                          color: '#FFFFFF',
+                          color: toParUnder ? GLASS_UNDER : 'rgba(255,255,255,0.92)',
                           lineHeight: 1,
                         }}
                       >
@@ -557,7 +568,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
               {/* THE SHAPE, full bleed, directly under the photo. Collapses to
                   nothing when either nine is unmeasured. */}
-              <RoundShape row={r} tone={shapeTone} />
+              <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
 
               <div style={{ padding: '9px 11px 10px' }}>
                 {/* THE SUBLINE. Its wording is generated elsewhere and is
