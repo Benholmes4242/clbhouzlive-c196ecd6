@@ -477,6 +477,15 @@ function AppRoutes() {
     { path: '/', element: <RootGate /> },
   ], []);
 
+  // Web gate: on the web the app shell never mounts. Every path resolves to
+  // the AppDownloadGate except the exempt list (see gateRoutes.ts) — most
+  // importantly /post/:postId, which keeps its real logged-out preview.
+  if (webEnvStatus === 'pending') return <BootHold />;
+  if (webEnvStatus === 'web' && !isGateExemptPath(location.pathname)) {
+    return <AppDownloadGate />;
+  }
+
+
   return (
     <>
       {/* Set navigate ref for use in toast actions and other non-component code */}
