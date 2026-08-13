@@ -153,7 +153,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
             style={{ letterSpacing: DISPLAY_TRACKING, color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
-            {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'baseline', marginLeft: 2 }} />
+            {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#FFFFFF', verticalAlign: 'baseline', marginLeft: 2 }} />
           </h1>
         </div>
 
@@ -243,7 +243,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   setHasEditedSinceError(true);
                 }}
                 onKeyDown={handleEmailKeyDown}
-                onFocus={(e) => { e.currentTarget.style.borderColor = '#F7931E'; }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = '#FFFFFF'; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'; }}
                 placeholder={t('auth:hero.emailPlaceholder')}
                 disabled={submitting}
@@ -278,10 +278,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label={t('auth:hero.continue')}
               className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
-                background: continueActiveLook ? '#F7931E' : 'rgba(255,255,255,0.06)',
-                color: continueActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
+                background: continueActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
+                color: continueActiveLook ? '#0A0D12' : 'rgba(255,255,255,0.38)',
                 border: continueActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
-                boxShadow: continueActiveLook ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
+                boxShadow: continueActiveLook ? '0 6px 20px rgba(255,255,255,0.18)' : 'none',
                 cursor: !canContinue ? 'not-allowed' : 'pointer',
               }}
             >
@@ -314,8 +314,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 i18nKey="auth:hero.termsBlock"
                 defaults="By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>. clbhouz has zero tolerance for objectionable content and abusive behavior. Reports are reviewed within 24 hours."
                 components={{
-                  terms: <Link to="/terms" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }} />,
-                  privacy: <Link to="/privacy" style={{ color: '#F7931E', fontWeight: 600, textDecoration: 'none' }} />,
+                  terms: <Link to="/terms" style={{ color: '#FFFFFF', fontWeight: 600, textDecoration: 'none' }} />,
+                  privacy: <Link to="/privacy" style={{ color: '#FFFFFF', fontWeight: 600, textDecoration: 'none' }} />,
                 }}
               />
             </p>
