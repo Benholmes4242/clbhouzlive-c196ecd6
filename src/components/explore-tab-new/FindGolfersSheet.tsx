@@ -480,7 +480,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
       surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

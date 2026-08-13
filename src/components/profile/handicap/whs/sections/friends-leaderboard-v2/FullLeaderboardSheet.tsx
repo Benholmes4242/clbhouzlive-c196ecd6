@@ -51,7 +51,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
       variant="dark"
       surfaceColor="#15171F"
       style={{
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
       }}

@@ -88,7 +88,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1201,
           background: SLATE_50,
           borderTopLeftRadius: 20, borderTopRightRadius: 20,
-          maxHeight: '95dvh', display: 'flex', flexDirection: 'column',
+          maxHeight: '85dvh', display: 'flex', flexDirection: 'column',
           boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
         }}
       >

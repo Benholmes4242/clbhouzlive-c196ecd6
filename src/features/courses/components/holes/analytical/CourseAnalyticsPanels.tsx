@@ -532,11 +532,11 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         open={holesSheetOpen}
         onClose={() => setHolesSheetOpen(false)}
         variant="light"
-        maxHeight="95dvh"
+        maxHeight="85dvh"
         ariaLabelledBy="course-holes-sheet-title"
         style={{
           height: 'auto',
-          maxHeight: '95dvh',
+          maxHeight: '85dvh',
           display: 'flex',
           flexDirection: 'column',
           background: A.PANEL,

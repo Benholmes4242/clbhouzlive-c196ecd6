@@ -31,7 +31,7 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
       surfaceColor={HONOURS_WASH}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

@@ -129,7 +129,7 @@ export const GolfDNASheet: React.FC<GolfDNASheetProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl max-h-[95dvh] overflow-y-auto"
+        className="rounded-t-3xl max-h-[85dvh] overflow-y-auto"
         style={{ background: 'var(--dgp-bg-surface)' }}
       >
         <SheetHeader className="pb-4">

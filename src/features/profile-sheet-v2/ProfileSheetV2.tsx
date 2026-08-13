@@ -246,7 +246,7 @@ export default function ProfileSheetV2({
             background: SHEET_BG,
             borderRadius: '24px 24px 0 0',
             boxShadow: '0 -12px 40px rgba(0,0,0,0.3)',
-            maxHeight: '95dvh',
+            maxHeight: '85dvh',
             overflow: 'hidden',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             display: 'flex',

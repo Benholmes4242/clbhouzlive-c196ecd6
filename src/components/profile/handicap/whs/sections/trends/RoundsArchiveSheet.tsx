@@ -53,7 +53,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
 
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: CHART_FONT,

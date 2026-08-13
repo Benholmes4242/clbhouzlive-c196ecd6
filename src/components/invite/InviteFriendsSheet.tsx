@@ -97,10 +97,10 @@ export function InviteFriendsSheet({ open, onClose, source }: Props) {
       ariaLabelledBy="invite-friends-title"
       // Stacks OVER the profile sheet, which sits at 9998/9999.
       zIndexBase={10000}
-      maxHeight="95dvh"
+      maxHeight="85dvh"
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

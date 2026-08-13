@@ -77,12 +77,12 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
       variant="light"
       surfaceColor={A.PANEL}
       ariaLabelledBy="tournament-full-board-sheet-title"
-      style={{ height: 'auto', maxHeight: '95dvh' }}
+      style={{ height: 'auto', maxHeight: '85dvh' }}
     >
       <div
         style={{
           background: A.PANEL, fontFamily: FONT,
-          height: 'auto', maxHeight: '95dvh',
+          height: 'auto', maxHeight: '85dvh',
           display: 'flex', flexDirection: 'column',
         }}
       >

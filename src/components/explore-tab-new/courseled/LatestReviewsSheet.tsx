@@ -149,7 +149,7 @@ export function LatestReviewsSheet({
       zIndexBase={SHEET_Z_UNDER_REVIEW}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

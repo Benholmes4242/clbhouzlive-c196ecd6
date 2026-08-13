@@ -247,7 +247,7 @@ function SeasonResultsSheet({
       ariaLabelledBy="player-season-sheet-title"
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         background: SURFACE,
