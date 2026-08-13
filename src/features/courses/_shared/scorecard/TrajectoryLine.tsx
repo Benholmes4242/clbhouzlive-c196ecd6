@@ -1,13 +1,23 @@
 import React from 'react';
-import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { beadForScore } from '@/features/courses/_shared/beadForScore';
+import { monotonePath } from '@/lib/charts/monotonePath';
 
 /**
  * Cumulative to-par across the round.
  *
- * Two series: the viewing member (or the player) in AMBER, and the field in a
- * muted grey. The gap between the lines is the story, so no copy is needed.
- * Over par plots UP.
+ * THE PLAYER LINE IS SPLIT AT LEVEL PAR — RED (TOPAR_UNDER_LIGHT) where the
+ * round sat BELOW level, INK (TOPAR_OVER_LIGHT) where it sat above — and is
+ * FILLED TO THE LEVEL RULE so the distance from par is the story. This matches
+ * the friends tile exactly: one fill, one meaning, across both surfaces.
+ * The old amber "own round" tone is GONE; amber meant the viewer, and the
+ * to-par split now owns the colour.
+ *
+ * RED IS EARNED: a round that never went under par draws in one tone with one
+ * fill and no red anywhere.
+ *
+ * The field average stays ONE grey stroke — unfilled, unsplit, behind the
+ * player's white halo. Over par plots UP.
  *
  * Beads mark only the holes that swung the round:
  *   birdie or better -> TOPAR_UNDER red, good in golf (eagle+ drawn larger)
@@ -22,6 +32,8 @@ import { beadForScore } from '@/features/courses/_shared/beadForScore';
 
 const FIELD_LINE = '#C3CAD2';
 const BASELINE = 'rgba(15,23,42,0.10)';
+const OVER_TONE = A.INK;
+const UNDER_TONE = TOPAR_RED;
 
 export interface TrajectoryHole {
   holeNo: number;
@@ -34,15 +46,13 @@ export interface TrajectoryHole {
 interface Props {
   holes: TrajectoryHole[];
   height?: number;
-  /**
-   * AMBER MEANS THE VIEWING MEMBER. This sheet opens over other members'
-   * rounds as often as the viewer's own, so the round line is INK by default
-   * and only goes amber when the round belongs to the viewer.
-   */
+  /** Retained for callers; the line's colour is now the to-par split. */
   own?: boolean;
 }
 
-export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = false }) => {
+let uidSeq = 0;
+
+export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
 
   const plottable = holes.filter(
     (h) => h.par != null && h.strokes != null && (h.strokes as number) > 0,
@@ -86,10 +96,27 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = fal
   const max = Math.max(...all);
   const span = Math.max(max - min, 1);
 
+  // RED IS EARNED, NOT RESERVED — same rule as the friends tile.
+  const wentUnder = Math.min(...you) < 0;
+
   const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
   const y = (v: number) => padY + ((max - v) / span) * (height - padY * 2);
-  const path = (arr: number[]) =>
-    arr.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const zeroY = y(0);
+
+  // THE FILL IS BUILT FROM THE PLAYER SERIES ONLY. The field series is often
+  // SHORTER (see fieldOpen), so it must never enter this geometry.
+  const youPts = you.map((v, i) => ({ x: x(i), y: y(v) }));
+  const youD = monotonePath(youPts);
+  const fillD = `${youD} L${youPts[youPts.length - 1].x.toFixed(2)},${zeroY.toFixed(2)} L${youPts[0].x.toFixed(2)},${zeroY.toFixed(2)} Z`;
+  const fieldD = hasField
+    ? monotonePath(field.map((v, i) => ({ x: x(i), y: y(v) })))
+    : '';
+
+  const uid = `traj-${(uidSeq = (uidSeq + 1) % 100000)}`;
+  const clipAbove = `${uid}-ca`;
+  const clipBelow = `${uid}-cb`;
+  const gradAbove = `${uid}-ga`;
+  const gradBelow = `${uid}-gb`;
 
   const ticks = [...new Set([0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1])];
 
@@ -102,20 +129,51 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = fal
         style={{ display: 'block' }}
         aria-hidden="true"
       >
-        {/* level par */}
+        <defs>
+          <clipPath id={clipAbove}>
+            <rect x={0} y={0} width={w} height={Math.max(zeroY, 0)} />
+          </clipPath>
+          {wentUnder && (
+            <clipPath id={clipBelow}>
+              <rect x={0} y={zeroY} width={w} height={Math.max(height - zeroY, 0)} />
+            </clipPath>
+          )}
+          {/* ABOVE LEVEL: density at the TOP, fading down to the level rule. */}
+          <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={OVER_TONE} stopOpacity={0.2} />
+            <stop offset="100%" stopColor={OVER_TONE} stopOpacity={0.02} />
+          </linearGradient>
+          {wentUnder && (
+            /* BELOW LEVEL: density at the LOW POINT, fading UP to the rule. */
+            <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor={UNDER_TONE} stopOpacity={0.26} />
+              <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.02} />
+            </linearGradient>
+          )}
+        </defs>
+
+        {/* fill to the level line */}
+        <path d={fillD} fill={`url(#${gradAbove})`} stroke="none" clipPath={`url(#${clipAbove})`} />
+        {wentUnder && (
+          <path d={fillD} fill={`url(#${gradBelow})`} stroke="none" clipPath={`url(#${clipBelow})`} />
+        )}
+
+        {/* level par — unconditional: the field line needs a reference even on
+            an all-over-par round. */}
         <line
           x1={padX}
           x2={w - padX}
-          y1={y(0)}
-          y2={y(0)}
+          y1={zeroY}
+          y2={zeroY}
           stroke={BASELINE}
           strokeWidth={1}
           strokeDasharray="3 4"
         />
 
+        {/* the field: one grey stroke, BEHIND the player's halo */}
         {hasField && (
           <path
-            d={path(field)}
+            d={fieldD}
             fill="none"
             stroke={FIELD_LINE}
             strokeWidth={1.6}
@@ -124,16 +182,41 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, own = fal
           />
         )}
 
+        {/* WHITE HALO — drawn ONCE, unclipped. Without it the stroke
+            disappears into its own fill. */}
         <path
-          d={path(you)}
+          d={youD}
           fill="none"
-          stroke={own ? A.AMBER : A.INK}
-          strokeWidth={2}
+          stroke="#FFFFFF"
+          strokeOpacity={0.85}
+          strokeWidth={6}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
 
+        {/* the player, split at level par */}
+        <path
+          d={youD}
+          fill="none"
+          stroke={OVER_TONE}
+          strokeWidth={2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          clipPath={wentUnder ? `url(#${clipAbove})` : undefined}
+        />
+        {wentUnder && (
+          <path
+            d={youD}
+            fill="none"
+            stroke={UNDER_TONE}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            clipPath={`url(#${clipBelow})`}
+          />
+        )}
 
+        {/* beads last, so they sit on top */}
         {beads.map((b) => (
           <circle
             key={b.i}

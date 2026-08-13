@@ -22,6 +22,7 @@ import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
