@@ -11,6 +11,12 @@ import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMom
  *
  * The aspect is CLAMPED to [9:16, 16:9]: unclamped, one panorama would be
  * 1200px wide and one accidental 1:4 crop would be a sliver.
+ *
+ * THE SCROLLER IS ASYMMETRIC ON PURPOSE (BRIEF_COMMUNITY_PAGE_REFINE §1):
+ * 16px on the left so the first tile shares a left edge with the heading, and
+ * ZERO on the right so the last tile bleeds off the viewport. A rail padded on
+ * both sides reads as a finished row that happens to be clipped; a rail that
+ * runs off the edge announces that it scrolls. Do not "fix" this.
  */
 
 /** Tile height. One baseline for every shape in the rail. */
@@ -26,6 +32,28 @@ export function clampAspect(aspect: number | null | undefined): number {
   return Math.min(MAX_ASPECT, Math.max(MIN_ASPECT, aspect));
 }
 
+/** The page's ONE heading treatment (§5.2). Every section uses this. */
+export const HEADING_STYLE = {
+  fontSize: 15,
+  fontWeight: 700,
+  letterSpacing: '-0.02em',
+  color: '#0E1216',
+  margin: '0 0 9px',
+  padding: '0 16px',
+} as const;
+
+/** Gutters shared by EVERY horizontal scroller on the page (§1). */
+export const SCROLLER_GUTTER = {
+  overflowX: 'auto',
+  paddingLeft: 16,
+  paddingRight: 0,
+  scrollPaddingLeft: 16,
+  // Mobile scroll surface — canon requires the transform hint.
+  willChange: 'transform',
+  WebkitOverflowScrolling: 'touch',
+  scrollbarWidth: 'none',
+} as const;
+
 interface Props {
   moments: Moment[];
   title: string;
@@ -38,30 +66,15 @@ export function CommunityRail({ moments, title, onTilePress, autoplayGroup }: Pr
 
   return (
     <section style={{ marginBottom: 26 }}>
-      <h2
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '-0.01em',
-          color: '#0E1216',
-          margin: '0 0 8px',
-          padding: '0 16px',
-        }}
-      >
-        {title}
-      </h2>
+      <h2 style={HEADING_STYLE}>{title}</h2>
 
       <div
         style={{
           display: 'flex',
           gap: 6,
-          overflowX: 'auto',
-          padding: '0 16px 2px',
+          paddingBottom: 2,
           scrollSnapType: 'x proximity',
-          // Mobile scroll surface — canon requires the transform hint.
-          willChange: 'transform',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
+          ...SCROLLER_GUTTER,
         }}
       >
         {moments.map((m) => (

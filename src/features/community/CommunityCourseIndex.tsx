@@ -1,145 +1,144 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 
 import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { countByCourse } from './useCommunityRails';
+import { HEADING_STYLE, SCROLLER_GUTTER } from './CommunityRail';
 
 /**
- * COURSE INDEX — every course with member media, grouped by region.
+ * BROWSE BY CLUB — a horizontal rail of at most TWELVE clubs.
  *
- * This is the page's DIRECTORY, not another media surface: rows are text and a
- * count. Discover is course-led, so the honest answer to "where has everyone
- * been" is a list of clubs, not more tiles.
+ * WAS a vertical directory of every club with media, sub-grouped by country. At
+ * 57 clubs that list was longer than the rest of the page combined, and the app
+ * already has a searchable course directory on the Courses tab. This page must
+ * not be a second one, so the twelve cards here are a SUGGESTION, not an index:
+ * no country headers, no expander, no "show all".
  *
- * REGION GROUPING uses golf_courses.sub_country as carried on the moment.
- * Courses with no region fall into a single trailing "Elsewhere" group rather
- * than being dropped — a missing region is a data gap, not a reason to hide a
- * club that members have posted from.
- *
- * ROWS ARE HAIRLINE-SEPARATED, never carded (Dispatch): a card per club would
- * turn 57 clubs into 57 boxes.
+ * ORDER is moment count desc, name breaking the tie so the order is stable.
+ * THUMBNAIL is the club's top-ranked moment — the pool arrives rank-ordered, so
+ * the first moment seen for a course is that club's best.
  */
 
-const HAIR = '#EDF0F3';
 const INK = '#0E1216';
-const DIM = '#A2A9B2';
+const MUTE = '#A2A9B2';
+const PANEL = '#EDF0F3';
+
+/** Twelve clubs. A thirteenth would start to read as a list again. */
+const MAX_CLUBS = 12;
+const CARD_W = 118;
 
 interface Props {
   moments: Moment[];
-  /** Label for courses whose region is unknown. */
-  elsewhereLabel: string;
+  title: string;
   countLabel: (n: number) => string;
 }
 
-interface CourseRow {
+interface ClubCard {
   courseId: string;
   name: string;
   count: number;
+  thumbnail: string | null;
 }
 
-export function CommunityCourseIndex({ moments, elsewhereLabel, countLabel }: Props) {
+export function CommunityCourseIndex({ moments, title, countLabel }: Props) {
   const navigate = useNavigate();
 
-  const groups = useMemo(() => {
+  const clubs = useMemo<ClubCard[]>(() => {
     const counts = countByCourse(moments);
-    const nameById = new Map<string, string>();
-    const regionById = new Map<string, string | null>();
-    for (const m of moments) {
-      if (m.courseName) nameById.set(m.courseId, m.courseName);
-      regionById.set(m.courseId, m.region ?? null);
-    }
+    const best = new Map<string, Moment>();
+    for (const m of moments) if (!best.has(m.courseId)) best.set(m.courseId, m);
 
-    const byRegion = new Map<string, CourseRow[]>();
+    const rows: ClubCard[] = [];
     for (const [courseId, count] of counts) {
-      const name = nameById.get(courseId);
-      // No name = nothing to render in a text directory.
-      if (!name) continue;
-      const region = regionById.get(courseId) || '';
-      const list = byRegion.get(region) ?? [];
-      list.push({ courseId, name, count });
-      byRegion.set(region, list);
+      const top = best.get(courseId);
+      // No name = nothing legible to put on a card.
+      if (!top?.courseName) continue;
+      rows.push({
+        courseId,
+        name: top.courseName,
+        count,
+        thumbnail: top.thumbnail ?? null,
+      });
     }
 
-    const out = [...byRegion.entries()].map(([region, rows]) => ({
-      region,
-      // Busiest club first inside a region; name breaks the tie so the order is
-      // stable between renders.
-      rows: rows.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
-    }));
-
-    // Named regions by size, then the unknown group LAST regardless of size.
-    return out.sort((a, b) => {
-      if (!a.region) return 1;
-      if (!b.region) return -1;
-      return b.rows.length - a.rows.length || a.region.localeCompare(b.region);
-    });
+    return rows
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+      .slice(0, MAX_CLUBS);
   }, [moments]);
 
-  if (groups.length === 0) return null;
+  if (clubs.length === 0) return null;
 
   return (
-    <div>
-      {groups.map((g) => (
-        <div key={g.region || '__elsewhere'} style={{ marginBottom: 14 }}>
-          <div
+    <section style={{ marginBottom: 26 }}>
+      <h2 style={HEADING_STYLE}>{title}</h2>
+
+      <div style={{ display: 'flex', gap: 8, paddingBottom: 2, ...SCROLLER_GUTTER }}>
+        {clubs.map((c) => (
+          <button
+            key={c.courseId}
+            type="button"
+            onClick={() => navigate(`/courses/${c.courseId}?tab=media`)}
             style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: DIM,
-              padding: '0 16px 6px',
+              width: CARD_W,
+              flex: 'none',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              cursor: 'pointer',
             }}
           >
-            {g.region || elsewhereLabel}
-          </div>
-
-          {g.rows.map((r) => (
-            <button
-              key={r.courseId}
-              type="button"
-              onClick={() => navigate(`/courses/${r.courseId}?tab=media`)}
+            <div
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '10px 16px',
-                background: 'transparent',
-                border: 'none',
-                borderTop: `0.5px solid ${HAIR}`,
-                textAlign: 'left',
-                cursor: 'pointer',
+                width: CARD_W,
+                height: CARD_W,
+                borderRadius: 12,
+                overflow: 'hidden',
+                background: PANEL,
               }}
             >
-              <span
-                style={{
-                  flex: 1,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: INK,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                {r.name}
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: DIM,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {countLabel(r.count)}
-              </span>
-              <ChevronRight size={14} color={DIM} strokeWidth={2} />
-            </button>
-          ))}
-        </div>
-      ))}
-    </div>
+              {c.thumbnail && (
+                <img
+                  src={c.thumbnail}
+                  alt=""
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              )}
+            </div>
+
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                color: INK,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                lineHeight: 1.25,
+              }}
+            >
+              {c.name}
+            </div>
+
+            <div
+              style={{
+                marginTop: 2,
+                fontSize: 11,
+                fontWeight: 700,
+                color: MUTE,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {countLabel(c.count)}
+            </div>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 
