@@ -209,6 +209,7 @@ function baseEvent(row: FeatRow, kind: WireKind, at: string, index: number, user
     courseName: row.course_name ?? null,
     courseImage: row.course_image ?? row.thumbnail_image ?? null,
     scoreId: row.score_id ?? null,
+    featMargin: row.feat_margin ?? null,
   };
 }
 
