@@ -920,6 +920,10 @@ export function AroundTheWorld({
                            the wording IS the title. */
                         detail={tt.detailShown ? tt.detail : tt.who ? '' : tt.detail}
                         onDetailPress={tt.onPress}
+                        /* THE BENCHMARK, through the same `subline` slot Personal
+                           Bests uses for its reference_line. Verbatim; null
+                           renders nothing and bills nothing. */
+                        subline={tt.margin || null}
                         isNew={isNewSince(g.at, lastSeen)}
                         onPress={() => onCoursePress(g.courseId)}
                         trailing={
@@ -936,6 +940,10 @@ export function AroundTheWorld({
                                       readOnly={tt.isOwn}
                                       count={st.count}
                                       reacted={st.mine}
+                                      /* The count column is reserved so the heart
+                                         itself lands on the same x down a column,
+                                         reacted or not (§5b). */
+                                      reserveCount
                                       onToggle={() =>
                                         reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
                                       }
