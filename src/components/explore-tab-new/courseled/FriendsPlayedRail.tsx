@@ -30,9 +30,12 @@ import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SAN
  * A horizontal rail: a week of heavy play grows sideways, never down. One card
  * per friend-round, newest first, capped at ten.
  *
- * THE SCORE LIVES ON THE PHOTO as a glass chip, so the white block belongs
- * entirely to the SHAPE of the round — a curve drawn from the same two figures
- * the subline is written from, and therefore incapable of disagreeing with it.
+ * THE SCORE LIVES ON THE PHOTO as a glass chip, so the band below belongs
+ * entirely to the SHAPE of the round: a 19-point cumulative to-par curve from
+ * ONE batched read of whs_score_holes (BRIEF_FRIENDS_TILE_HOLE_SHAPE), SPLIT at
+ * the level-par rule so under-par golf renders red, with event dots where the
+ * round moved by more than a shot. Rounds without holes keep the three-point
+ * fallback drawn from the same two figures the subline is written from.
  *
  * A hole in one puts the GOLD ring on the when-chip — the only gold on the card.
  * No friends or no rounds: the section does not render at all.
