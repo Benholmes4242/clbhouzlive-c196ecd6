@@ -454,8 +454,9 @@ const TrendCard: React.FC<{
           const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2 - 10);
           return [x, y] as const;
         });
-        const line = xy.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+        const line = smoothPath(xy);
         const area = `${line} L${w - padX},${h} L${padX},${h} Z`;
+
         const mx = xy[active][0];
         const my = xy[active][1];
         const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
