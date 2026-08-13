@@ -226,7 +226,7 @@ export const BackRow: React.FC<{
 export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
     style={{
-      padding: '16px 22px 8px',
+      padding: '16px 24px 8px',
       paddingBottom: 'calc(8px + max(env(safe-area-inset-bottom, 0px), 20px))',
       background: 'transparent',
       flexShrink: 0,
