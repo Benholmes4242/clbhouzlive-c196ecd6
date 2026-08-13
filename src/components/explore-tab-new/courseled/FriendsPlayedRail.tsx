@@ -164,8 +164,8 @@ function RoundShape({ row, tone }: { row: FriendRoundRow; tone: string }) {
   // THE FILL RUNS FLAT TO BOTH CARD EDGES so the colour stays full bleed,
   // while the POINTS are inset so the terminal dot cannot clip.
   const fillD = `M0,${SHAPE_H} L0,${pts[0].y.toFixed(2)} L${d.slice(1)} L${CARD_W},${pts[pts.length - 1].y.toFixed(2)} L${CARD_W},${SHAPE_H} Z`;
+  const end = pts[pts.length - 1];
   const gid = `fps-${row.round_id}`;
-  const levelY = yFor(0);
 
   return (
     <svg
@@ -183,18 +183,6 @@ function RoundShape({ row, tone }: { row: FriendRoundRow; tone: string }) {
         </linearGradient>
       </defs>
       <path d={fillD} fill={`url(#${gid})`} />
-      {/* LEVEL PAR — the dashed baseline the scorecard sheet's trajectory uses,
-          so the two drawings read as one family. */}
-      <line
-        x1={0}
-        x2={CARD_W}
-        y1={levelY}
-        y2={levelY}
-        stroke="rgba(15,23,42,0.10)"
-        strokeWidth={1}
-        strokeDasharray="3 4"
-        vectorEffect="non-scaling-stroke"
-      />
       {/* THE WHITE HALO UNDER THE DATA STROKE is what stops the band looking
           flat against the fill. Do not drop it. */}
       <path
@@ -214,24 +202,11 @@ function RoundShape({ row, tone }: { row: FriendRoundRow; tone: string }) {
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
       />
-      {/* THE BEADS — same grammar as the scorecard sheet trajectory: a tone-filled
-          dot with a white traced ring, sat exactly on the line. */}
-      {pts.map((p, i) => (
-        <circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r={i === pts.length - 1 ? 3.6 : 3}
-          fill={tone}
-          stroke="#FFFFFF"
-          strokeWidth={1.5}
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
+      <circle cx={end.x} cy={end.y} r={5} fill="#FFFFFF" />
+      <circle cx={end.x} cy={end.y} r={2.6} fill={tone} />
     </svg>
   );
 }
-
 
 interface Props {
   userId: string | undefined;
