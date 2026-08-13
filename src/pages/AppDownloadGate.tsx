@@ -112,8 +112,8 @@ const RoundCard: React.FC = () => (
           background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.28)',
           backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)',
         }}>
-          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.05em', color: '#FFF', lineHeight: 1, ...FIGS }}>70</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', ...FIGS }}>E</span>
+          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.05em', color: '#FFF', lineHeight: 1, ...FIGS }}>68</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)', ...FIGS }}>−2</span>
           <span style={{ ...LABEL, fontSize: 7.5, color: 'rgba(255,255,255,0.66)' }}>Par 70</span>
         </div>
         <div style={{
