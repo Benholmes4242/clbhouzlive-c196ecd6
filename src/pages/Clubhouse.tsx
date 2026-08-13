@@ -58,6 +58,13 @@ import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouse
 import { usePostCourseContext, resolvePostCourseId } from '@/hooks/feed/usePostCourseContext';
 import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
+import {
+  readSkeletonShapeHint,
+  writeSkeletonShapeHint,
+  ratioFromDimensions,
+  COLD_START_SHAPE,
+  type SkeletonShape,
+} from '@/lib/clubhouse/skeletonShapeHint';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
@@ -215,6 +222,37 @@ const ClubhouseContent = () => {
   // a round missing WHILE fetching still shows PostRoundShell.
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundsReady = useRoundChainGate(roundChainSettled, !activeFeed.isLoading && posts.length > 0);
+
+  /* SKELETON SHAPE — reserve the shape of the card that is actually coming.
+     Cold start has nothing to derive from, so it falls back to the SHORTEST
+     plausible card (see skeletonShapeHint): content then expands the layout
+     downward instead of collapsing upward. On a warm start the localStorage
+     hint (written below, synchronous and readable before first paint) supplies
+     the previous first card's variant and exact media ratio. The persisted
+     react-query cache hydrates too late to size the first frame, but once it
+     lands posts[0] re-derives the shape here and rewrites the hint. */
+  const hintRef = useRef<SkeletonShape | null>(null);
+  if (hintRef.current === null) hintRef.current = readSkeletonShapeHint() ?? COLD_START_SHAPE;
+
+  const derivedShape = useMemo<SkeletonShape | null>(() => {
+    const first = posts[0];
+    if (!first) return null;
+    if (postScoreIdMap.get?.(first.id) || postScoreIdMap.has?.(first.id)) {
+      return { variant: 'round' };
+    }
+    const m = first.mediaItems?.[0];
+    return {
+      variant: first.isReview ? 'review' : 'regular',
+      mediaRatio: ratioFromDimensions(m?.width, m?.height) ?? COLD_START_SHAPE.mediaRatio,
+      isVideo: m?.type === 'video',
+    };
+  }, [posts, postScoreIdMap]);
+
+  useEffect(() => {
+    if (derivedShape) writeSkeletonShapeHint(derivedShape);
+  }, [derivedShape]);
+
+  const skeletonShape: SkeletonShape = derivedShape ?? hintRef.current!;
 
   const isLoading = activeFeed.isLoading || (posts.length > 0 && !roundsReady);
   const hasNextPage = activeFeed.hasNextPage ?? false;
