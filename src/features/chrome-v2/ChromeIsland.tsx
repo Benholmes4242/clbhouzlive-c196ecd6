@@ -229,21 +229,25 @@ const LeftCapsule: React.FC<{
 //
 // Visibility:
 //   - logged-out user            -> render nothing
-//   - business actor            -> render nothing
-//   - profile still loading      -> render nothing (hide_handicap_chip is
-//                                   undefined while loading and would read as
-//                                   false, flashing the chip at a member who
-//                                   hid it)
+//   - business actor             -> render nothing
+//   - not SETTLED                -> render nothing
 //   - hide_handicap_chip         -> render nothing
-//   - whs loading                -> reserved-width placeholder, no visible mark
 //   - !connection / no index     -> disconnected pill (Connect HCP)
 //   - connected                  -> index + optional trend arrow
 //
-// Width: the cell reserves the WIDEST outcome so the right capsule never
-// resizes. Rather than a magic pixel value, a hidden ghost of the widest
-// label ("Connect HCP", at its rendered type) sits in the same grid area and
-// sets the floor. If either label's text or type changes, the reservation
-// follows automatically.
+// UNRESOLVED IS NOT ABSENT. Every query here is id-gated (profile and
+// connection on the session's user id, trend on the connection id), and a
+// DISABLED React Query v5 query is pending with fetchStatus 'idle' — so
+// `isLoading` is FALSE before it has ever run. Gating on `!isLoading` therefore
+// read `connection === undefined` as "disconnected" and `profile === undefined`
+// as "chip not hidden", and painted the amber Connect HCP pill at connected
+// members and at members who had hidden the chip. The trend query is CHAINED
+// behind the connection, so it must be waited on too — otherwise the pill flips
+// back to "Connect HCP" for the length of a second round trip.
+//
+// Width: nothing is reserved while unsettled — no ghost, no placeholder — so
+// the capsule never holds the wide "Connect HCP" label when the index is short.
+// The gain is that it resizes ONCE, when the answer is known.
 // ---------------------------------------------------------------------------
 const HCP_RESERVE_LABEL = 'Connect HCP';
 const HCP_LABEL_TYPE: React.CSSProperties = {
@@ -261,25 +265,28 @@ const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
 
 const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
-  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
+  const { data: profile, isFetched: profileFetched, isError: profileError } = useUserProfile(user?.id);
 
-  const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
-  const { data: trendData } = useHandicapTrend(connection?.id);
+  const { data: connection, isFetched: connFetched, isError: connError } = useWhsConnection(user?.id);
+  const { data: trendData, isFetched: trendFetched, isError: trendError } = useHandicapTrend(connection?.id);
   const { data: hcpHistory } = useHandicapHistory(connection?.id, 'all');
   const lastMove = lastIndexMove(hcpHistory as any);
 
+  // An errored query must not hang the cell on nothing forever: treat error as
+  // settled and fall through to the disconnected pill (mirrors WhsHandicapTab).
+  const anyError = profileError || connError || trendError;
+  const settled =
+    anyError ||
+    (!sessionLoading && profileFetched && connFetched && (!connection || trendFetched));
+
   if (!user) return null;
   if (isBusinessActor) return null;
-  // Wait for the flag before committing to a visible state.
-  if (profileLoading) return null;
+  if (!settled) return null;
   if (profile?.hide_handicap_chip) return null;
 
-  // Nothing renders until the connection state is known: no ghost width, so the
-  // capsule never reserves the wide "Connect HCP" label when the index is short.
-  if (whsLoading) return null;
 
   const body = (() => {
 
