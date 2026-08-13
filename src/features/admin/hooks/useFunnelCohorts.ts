@@ -27,8 +27,24 @@ export interface CohortRow {
   weeks: (number | null)[];
 }
 
+/**
+ * NOT a funnel step. "Posted or reviewed" is a SIBLING of the last step, not a
+ * child of it: posting does not require having played recently, so it carries
+ * its OWN denominator. `of_key` names the parent step - read it, never assume
+ * which step that is, and never divide by funnel[0].
+ */
+export interface FunnelBranch {
+  key: string;
+  label: string;
+  n: number;
+  of_key: string;
+  of_n: number;
+}
+
 export interface FunnelCohorts {
   funnel: FunnelStep[];
+  /** null when the RPC predates the branch split. */
+  branch: FunnelBranch | null;
   cohorts: CohortRow[];
   computed_at: string;
 }
@@ -64,8 +80,20 @@ function map(raw: unknown): FunnelCohorts | null {
     return [{ week: r.week, size: num(r.size), weeks }];
   });
 
+  const b = (o.branch && typeof o.branch === 'object') ? o.branch as Record<string, unknown> : null;
+  const branch: FunnelBranch | null = (b && typeof b.key === 'string' && typeof b.label === 'string')
+    ? {
+        key: b.key,
+        label: b.label,
+        n: num(b.n),
+        of_key: typeof b.of_key === 'string' ? b.of_key : '',
+        of_n: num(b.of_n),
+      }
+    : null;
+
   return {
     funnel,
+    branch,
     cohorts,
     computed_at: typeof o.computed_at === 'string' ? o.computed_at : '',
   };
