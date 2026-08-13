@@ -3,6 +3,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import {
   PANEL, BORDER, INK, MUTE, DIM, AMBER, TRACK, FONT,
   KICKER, LABEL, NUM,
+  DISPLAY, DISPLAY_SM, LEAD, KICKER_LG,
 } from './designTokens';
 
 /** Panel: white surface, 1px border, radius 16, padding 16. */
@@ -225,7 +226,7 @@ export const BackRow: React.FC<{
 export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
     style={{
-      padding: '16px 22px 8px',
+      padding: '16px 24px 8px',
       paddingBottom: 'calc(8px + max(env(safe-area-inset-bottom, 0px), 20px))',
       background: 'transparent',
       flexShrink: 0,
@@ -235,65 +236,56 @@ export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children })
   </div>
 );
 
-
-
-/** Column shell: fixed header, scrolling body, fixed footer. */
-export const ScreenShell: React.FC<{
-  header?: React.ReactNode;
-  footer?: React.ReactNode;
-  children: React.ReactNode;
-}> = ({ header, footer, children }) => (
-  <div className="flex flex-col flex-1 min-h-0" style={{ fontFamily: FONT }}>
-    {header}
-    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px' }}>{children}</div>
-    {footer}
-  </div>
-);
-
-/** The h1 copy block. Padding keeps it optically aligned with panel content. */
-export const CopyBlock: React.FC<{
-  kicker?: string;
-  kickerColor?: string;
-  children: React.ReactNode;
-}> = ({ kicker, kickerColor, children }) => (
-  <div style={{ padding: '0 4px 20px' }}>
-    {kicker ? (
-      <div style={{ ...KICKER, ...(kickerColor ? { color: kickerColor } : null), marginBottom: 10 }}>
-        {kicker}
-      </div>
-    ) : null}
+/**
+ * THE FULL-BLEED STAGE. One per screen.
+ *
+ * There is no card, no panel and no inset frame around the content of a stage:
+ * the headline and the figure ARE the screen, painted straight onto SURFACE.
+ * 24px sides, and the top pad continues where BackRow (44px control plus the
+ * safe-area inset, owned by the host) stops - together they put the kicker
+ * about 54px below the physical top edge on a notched device.
+ */
+export const Stage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      flex: 1,
+      minHeight: 0,
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      padding: '10px 24px 0',
+    }}
+  >
     {children}
   </div>
 );
 
-/** ONE indeterminate indicator. No percentage, no fake progress. */
-export const Indeterminate: React.FC = () => (
-  <div
-    style={{
-      height: 3,
-      borderRadius: 2,
-      background: TRACK,
-      overflow: 'hidden',
-      marginBottom: 18,
-    }}
-  >
-    <div
-      style={{
-        height: '100%',
-        width: '38%',
-        borderRadius: 2,
-        background: AMBER,
-        animation: 'whsIndet 1400ms ease-in-out infinite',
-      }}
-    />
-    <style>{`
-      @keyframes whsIndet {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(263%); }
-      }
-    `}</style>
+/**
+ * The stage headline block: kicker, DISPLAY headline, one lead sentence.
+ * `small` drops to DISPLAY_SM where the copy runs longer than three lines.
+ */
+export const StageHead: React.FC<{
+  kicker?: string;
+  kickerColor?: string;
+  headline: React.ReactNode;
+  lead?: React.ReactNode;
+  small?: boolean;
+}> = ({ kicker, kickerColor, headline, lead, small }) => (
+  <div>
+    {kicker ? (
+      <div style={{ ...KICKER_LG, ...(kickerColor ? { color: kickerColor } : null), marginBottom: 14 }}>
+        {kicker}
+      </div>
+    ) : null}
+    <h1 style={small ? DISPLAY_SM : DISPLAY}>{headline}</h1>
+    {lead ? <p style={{ ...LEAD, margin: '14px 0 0' }}>{lead}</p> : null}
   </div>
 );
+
+/** Hairline between undecorated rows on the stage. Never above the first row. */
+export const StageRule: React.FC = () => (
+  <div style={{ height: 1, background: BORDER }} />
+);
+
 
 /** Shared collapsible list - light surface variant. */
 export const Collapsible: React.FC<{
@@ -315,56 +307,3 @@ export const Collapsible: React.FC<{
     </>
   );
 };
-
-/**
- * ONE vertical structure for every stage: content flows from the top with
- * identical padding, so the headline lands in the same place on every screen.
- */
-export const FlowBody: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '10px 22px 0' }}>
-    {children}
-  </div>
-);
-
-/** The flow headline block: optional kicker, headline, optional sub. */
-export const FlowHead: React.FC<{
-  kicker?: string;
-  kickerColor?: string;
-  headline: React.ReactNode;
-  sub?: React.ReactNode;
-  /** 29 by default; 26-27 where the headline is shorter. */
-  size?: number;
-}> = ({ kicker, kickerColor, headline, sub, size = 29 }) => (
-  <div>
-    {kicker ? (
-      <div style={{ ...KICKER, fontSize: 9, color: kickerColor ?? MUTE, marginBottom: 10 }}>
-        {kicker}
-      </div>
-    ) : null}
-    <h1
-      style={{
-        margin: 0,
-        fontSize: size,
-        fontWeight: 700,
-        letterSpacing: '-0.035em',
-        lineHeight: 1.08,
-        color: INK,
-      }}
-    >
-      {headline}
-    </h1>
-    {sub ? (
-      <p
-        style={{
-          margin: '11px 0 0',
-          fontSize: 14.5,
-          fontWeight: 500,
-          lineHeight: 1.5,
-          color: MUTE,
-        }}
-      >
-        {sub}
-      </p>
-    ) : null}
-  </div>
-);

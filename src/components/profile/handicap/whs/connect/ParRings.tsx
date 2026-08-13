@@ -30,7 +30,9 @@ const Ring: React.FC<{
   color: string;
   size: number;
 }> = ({ value, holes, label, holesLabel, color, size }) => {
-  const stroke = size >= 84 ? 8 : 7;
+  const stroke = size >= 100 ? 9 : size >= 84 ? 8 : 7;
+  const figure = size >= 100 ? 21 : size >= 84 ? 18 : 16;
+
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const frac = Math.min(1, Math.max(0, Math.abs(value) / RING_MAX));
@@ -58,7 +60,7 @@ const Ring: React.FC<{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: size >= 84 ? 17 : 16,
+            fontSize: figure,
             fontWeight: 700,
             letterSpacing: '-0.02em',
             color: INK,

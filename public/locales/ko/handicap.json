@@ -4,7 +4,8 @@
       "headline": "Your game, in numbers you can use.",
       "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
       "cta": "Choose your country",
-      "decline": "I don't hold an official handicap"
+      "decline": "I don't hold an official handicap",
+      "kicker": "Your record, read properly"
     },
     "rings": {
       "label": "Which holes cost you",
@@ -45,7 +46,9 @@
       "parCourse": "Par {{par}} - {{course}}",
       "courseUnknown": "Unmapped course",
       "floor": "Your scoring breakdown builds as you post rounds.",
-      "cta": "See your full record"
+      "cta": "See your full record",
+      "headlineRounds": "{{rounds}} rounds, all here.",
+      "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
   }
 }

@@ -18,7 +18,7 @@ import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
 import DeclinedScreen from './connect/DeclinedScreen';
 import { BackRow } from './connect/Primitives';
-import { WASH, FONT } from './connect/designTokens';
+import { SURFACE, FONT } from './connect/designTokens';
 
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -233,12 +233,11 @@ export const WhsConnectScreen: React.FC<Props> = ({
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* Immersive host: the wash's gradient origin sits at the PHYSICAL top of
-           the viewport (y=0, behind the notch) because .app-shell drops its
-           safe-area padding on immersive routes. Content clears the inset via
-           BackRow; the background does not. */
-        background: WASH,
-        backgroundAttachment: 'local',
+        /* FULL BLEED, FLAT. The flow paints SURFACE edge to edge - the amber
+           wash is gone, because a gradient behind display type is decoration
+           competing with the figure. #F8FAFC matches the host page and the
+           notch shield exactly, so there is no seam under the header. */
+        background: SURFACE,
         ...(immersive
           ? { minHeight: '100dvh', flex: '1 1 auto' }
           : { flex: '1 1 auto', minHeight: 0 }),
