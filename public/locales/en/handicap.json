@@ -179,7 +179,6 @@
       "parCourse": "Par {{par}} - {{course}}",
       "courseUnknown": "Unmapped course",
       "floor": "Your scoring breakdown builds as you post rounds.",
-      "floorRounds": "Your breakdown reads from {{rounds}} complete rounds so far - it needs {{needed}} before the par splits are worth showing.",
       "cta": "See your full record",
       "headlineRounds": "{{rounds}} rounds, all here.",
       "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
