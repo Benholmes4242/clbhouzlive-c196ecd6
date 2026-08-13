@@ -477,6 +477,8 @@ function AppRoutes() {
     { path: '/', element: <RootGate /> },
   ], []);
 
+  const webEnvStatus = useEnvStatus();
+
   // Web gate: on the web the app shell never mounts. Every path resolves to
   // the AppDownloadGate except the exempt list (see gateRoutes.ts) — most
   // importantly /post/:postId, which keeps its real logged-out preview.
