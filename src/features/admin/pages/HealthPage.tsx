@@ -16,7 +16,11 @@ import {
   type ChipState,
 } from '../lib/healthChips';
 import { pipelineTone } from '../components/SystemPanels';
-import { formatDurationShort } from '../lib/chartPrimitives';
+import { formatDurationShort, Skeleton } from '../lib/chartPrimitives';
+import {
+  useSystemStateHistory, trailingRun,
+  type SystemDayState,
+} from '../hooks/useSystemStateHistory';
 import { useErrorCount24h } from '../hooks/useStability';
 import { AuditLogTab, DevToolsTab, SettingsTab } from './SystemPage';
 import VideoPerfPage from './VideoPerfPage';
