@@ -17,11 +17,13 @@
  *      and shared-key collisions, and nothing else. Read the warning below.
  *   2. REACHABILITY TEST — if the same logical answer can sit under two
  *      different key values, the key contains request shape. Remove it.
- *      A key derived from `ids.join()`, `[...ids]`, a hash of an id array or
- *      `JSON.stringify(rows)` fails this test: the key churns on every
- *      pagination page while the answer for already-loaded rows is unchanged,
- *      `data` goes undefined for a paint, and everything rendered from it
- *      unmounts mid-scroll. Use `batchKey()` instead.
+ *      A key derived from `JSON.stringify(rows)` or any row CONTENT fails this
+ *      test. An id-set DIGEST does not: it is the identity of the answer for a
+ *      batched read, because a different id set is a different answer. What
+ *      the digest costs is a fetch when the set changes, and that is exactly
+ *      what `keepPreviousData` + `useMergedBatch` absorb. Use `batchKey()`
+ *      with `batchDigest(ids)`.
+
  *
  * ══ WHAT A KEY CAN NEVER CATCH — READ BEFORE DELETING A RENDER GUARD ══
  *
