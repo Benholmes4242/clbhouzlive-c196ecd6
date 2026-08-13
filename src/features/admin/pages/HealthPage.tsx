@@ -266,9 +266,175 @@ function StatusTab({
           ))}
         </section>
       )}
+
+      <AllSystemsPanel subsystems={subsystems} />
+      <RecentChangesPanel subsystems={subsystems} />
     </div>
   );
 }
+
+// ─── All systems history ──────────────────────────────────────────────────────
+
+/**
+ * The theme has no `track` token, so the unrecorded-day fill is named here
+ * once: neutralSoft is the console's "nothing here" fill and is what track
+ * would have been. NO border, NO stripe - a pattern would compete with warn.
+ */
+const TRACK = t.neutralSoft;
+
+const KICKER: React.CSSProperties = {
+  color: t.inkFaint, fontSize: 9, fontWeight: 700,
+  letterSpacing: 0.9, textTransform: 'uppercase',
+};
+
+function dayFill(state: SystemDayState): { background: string; opacity: number } {
+  if (state === 'ok')     return { background: t.ok,        opacity: 0.5 };
+  if (state === 'warn')   return { background: t.warn,      opacity: 1 };
+  if (state === 'danger') return { background: t.danger,    opacity: 1 };
+  if (state === 'idle')   return { background: t.inkFaint,  opacity: 0.35 };
+  return { background: TRACK, opacity: 1 };
+}
+
+function AllSystemsPanel({ subsystems }: { subsystems: Subsystem[] }) {
+  const history = useSystemStateHistory(90);
+  const win = history.data?.window_days ?? 90;
+
+  // A missing series does not collapse the block: the subsystem list is the
+  // BOARD's, so a mismatch shows as a subsystem with no history rather than a
+  // silently shorter section.
+  const byId = new Map((history.data?.systems ?? []).map(s => [s.subsystem, s]));
+
+  return (
+    <section style={{ ...PANEL, padding: 16, gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+        <span style={KICKER}>All systems</span>
+        <span style={{ ...LABEL, ...FIG }}>{history.data ? `${win} days` : ''}</span>
+      </div>
+
+      {history.isLoading || !history.data ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {subsystems.map(s => <Skeleton key={s.id} height={40} radius={4} />)}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {subsystems.map(s => (
+            <SystemHistoryBlock key={s.id} label={s.label} series={byId.get(s.id)} windowDays={win} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function SystemHistoryBlock({
+  label, series, windowDays,
+}: {
+  label: string;
+  series?: { recorded_days: number; days: Array<SystemDayState> };
+  windowDays: number;
+}) {
+  const recorded = series?.recorded_days ?? 0;
+  const days = series?.days ?? [];
+  const run = trailingRun(days);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <div style={LABEL}>{label}</div>
+
+      {recorded < 7 ? (
+        // 89 empty segments with one coloured tip reads as a broken chart, not
+        // as missing history. The bar starts on its own at 7 recorded days.
+        <div style={{ color: t.inkFaint, fontSize: 12, fontWeight: 600, height: 20, display: 'flex', alignItems: 'center' }}>
+          {recorded === 0
+            ? 'No recording yet'
+            : recorded === 1
+              ? 'Recording since today'
+              : `Recording for ${recorded} days`}
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'flex', gap: 1, height: 20, alignItems: 'stretch' }}>
+            {days.map((d, i) => {
+              const f = dayFill(d);
+              return (
+                <span key={i} aria-hidden style={{
+                  flex: 1, minWidth: 0, borderRadius: 1,
+                  background: f.background, opacity: f.opacity,
+                }} />
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+            <span style={LABEL}>{windowDays} days ago</span>
+            <span style={{ ...LABEL, ...FIG }}>
+              {run.state === 'ok' ? `ok for ${run.length}d` : `since ${run.length}d`}
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Recent changes ───────────────────────────────────────────────────────────
+
+const CHANGE_VERB: Record<'ok' | 'warn' | 'danger' | 'idle', string> = {
+  ok: 'Recovered', warn: 'Degraded', danger: 'Down', idle: 'Idle',
+};
+
+function RecentChangesPanel({ subsystems }: { subsystems: Subsystem[] }) {
+  const history = useSystemStateHistory(90);
+  const labels = new Map(subsystems.map(s => [s.id as string, s.label]));
+  const changes = history.data?.changes ?? [];
+
+  return (
+    <section style={{ ...PANEL, padding: 16, gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+        <span style={KICKER}>Recent changes</span>
+        <span style={LABEL}>Last 30 days</span>
+      </div>
+
+      {history.isLoading || !history.data ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Skeleton height={34} radius={4} />
+          <Skeleton height={34} radius={4} />
+          <Skeleton height={34} radius={4} />
+        </div>
+      ) : changes.length === 0 ? (
+        // An absence of incidents is information. The panel does not hide.
+        <div style={{ color: t.inkFaint, fontSize: 12, fontWeight: 600 }}>No changes in 30 days</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {changes.map((c, i) => (
+            <div key={`${c.subsystem}-${c.at}-${i}`} style={{
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '9px 0', borderTop: i === 0 ? 'none' : `1px solid ${t.hairline}`,
+            }}>
+              <span aria-hidden style={{
+                width: 7, height: 7, borderRadius: 999, marginTop: 4, flexShrink: 0,
+                background: toneColor(c.tone), opacity: c.tone === 'ok' ? 0.5 : c.tone === 'idle' ? 0.3 : 1,
+              }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+                  <span style={LABEL}>{labels.get(c.subsystem) ?? c.subsystem}</span>
+                  <span style={{
+                    ...LABEL,
+                    color: c.tone === 'ok' ? t.okText : c.tone === 'warn' ? t.warnText : c.tone === 'danger' ? t.dangerText : t.inkFaint,
+                  }}>{CHANGE_VERB[c.tone]}</span>
+                </div>
+                {c.detail ? (
+                  <div style={{ color: t.inkFaint, fontSize: 12, fontWeight: 600 }}>{c.detail}</div>
+                ) : null}
+              </div>
+              <span style={{ ...FIG, color: t.inkFaint, fontSize: 11, flexShrink: 0 }}>{age(c.at)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 
 const DETAIL_TITLE: Record<SubsystemId, string> = {
   eg: 'England Golf sync',
