@@ -132,6 +132,9 @@ export function StandoutTile({
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 color: '#FFFFFF',
+                /* The glass fill is a light tint, so white needs its own floor
+                   over a bright fairway. */
+                textShadow: '0 1px 3px rgba(10,14,10,0.55)',
               }}
             >
               {figure}
@@ -144,7 +147,8 @@ export function StandoutTile({
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.60)',
+                  color: 'rgba(255,255,255,0.82)',
+                  textShadow: '0 1px 2px rgba(10,14,10,0.5)',
                 }}
               >
                 {unit}
