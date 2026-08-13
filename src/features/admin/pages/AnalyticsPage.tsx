@@ -828,6 +828,29 @@ function ActivationPanel({ data, loading }: { data: FunnelCohorts | null; loadin
             </div>
           )}
 
+          {/*
+            The BRANCH, not a fifth step. A plain figure, deliberately not a
+            bar: any bar in this panel would read as another rung at a glance,
+            and this is a sibling of the last step with its own denominator.
+            The parent is NAMED from of_key - the client does not decide which
+            step it hangs off.
+          */}
+          {data.branch && data.branch.of_n > 0 && (
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>{data.branch.label}</div>
+                <div style={{ ...OV_LABEL, ...OV_FIG }}>
+                  {fmtInt(data.branch.n)} of {fmtInt(data.branch.of_n)} who{' '}
+                  {(funnel.find(s => s.key === data.branch!.of_key)?.label ?? data.branch.of_key).toLowerCase()}
+                </div>
+              </div>
+              <span style={{ color: t.ink, fontSize: 17, fontWeight: 700, flexShrink: 0, ...OV_FIG }}>
+                {Math.round((data.branch.n / data.branch.of_n) * 100)}%
+              </span>
+            </div>
+          )}
+
+
           {faults.length > 0 && (
             <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600, lineHeight: 1.5 }}>
               Data fault: {faults.map(f => `${f.key} (${f.n}) exceeds ${f.parentKey} (${f.parentN})`).join('; ')}.
