@@ -356,13 +356,19 @@ export default function DashboardPage() {
 
 // ─── Metric grid ──────────────────────────────────────────────────────────────
 
-function MetricGrid({ loading, data, ops, opsLoading }: {
+function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
   loading: boolean;
   data: ReturnType<typeof useOverviewMetrics>['data'];
   ops?: OpsHealth;
   opsLoading: boolean;
+  /** null while unresolved OR when a cached payload predates the RPC. */
+  aw: ActiveWindows | null;
+  awLoading: boolean;
 }) {
   const act = ops?.activity;
+  // UNRESOLVED IS NOT ABSENT: a missing block keeps the four window tiles in
+  // their loading state rather than rendering a zero.
+  const wLoading = awLoading || !aw;
   return (
     <section
       className="admin-v2-metric-grid"
@@ -372,14 +378,38 @@ function MetricGrid({ loading, data, ops, opsLoading }: {
         gap: 10,
       }}
     >
+      {/*
+        WAU leads: golfers play once or twice a week, so the weekly window is
+        the headline and DAU is a live pulse beside it. WAU and MAU are
+        distinct rolling counts from the database - never summed from a daily
+        series, which would count a member once per day they appeared.
+      */}
+      <MetricCard
+        label="WAU"
+        value={wLoading ? null : aw!.wau.current}
+        delta={wLoading ? undefined : pctDelta(aw!.wau.current, aw!.wau.previous)}
+        deltaLabel="vs prev 7d"
+        sparkline={aw?.daily.map(d => d.wau)}
+        to="/admin-v2/analytics?tab=engagement"
+        loading={wLoading}
+      />
       <MetricCard
         label="DAU"
-        value={loading ? null : (data?.dau.current ?? 0)}
-        delta={loading ? undefined : pctDelta(data?.dau.current ?? 0, data?.dau.previous ?? 0)}
+        value={wLoading ? null : aw!.dau.current}
+        delta={wLoading ? undefined : pctDelta(aw!.dau.current, aw!.dau.previous)}
         deltaLabel="vs same day last week"
-        sparkline={data?.dau.sparkline}
+        sparkline={aw?.daily.map(d => d.dau)}
         to="/admin-v2/analytics?tab=engagement"
-        loading={loading}
+        loading={wLoading}
+      />
+      <MetricCard
+        label="MAU"
+        value={wLoading ? null : aw!.mau.current}
+        delta={wLoading ? undefined : pctDelta(aw!.mau.current, aw!.mau.previous)}
+        deltaLabel="vs prev 30d"
+        sparkline={aw?.daily.map(d => d.mau)}
+        to="/admin-v2/analytics?tab=engagement"
+        loading={wLoading}
       />
       <MetricCard
         label="Signups 7d"
