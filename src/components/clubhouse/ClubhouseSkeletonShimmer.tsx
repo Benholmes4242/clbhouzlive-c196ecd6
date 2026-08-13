@@ -381,84 +381,32 @@ const CardFeedSkeleton: React.FC<{
     ) : (
       <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
     );
+  // No chrome placeholder here: the REAL ChromeIsland is mounted unconditionally
+  // by GlobalHeader and already renders its own smallest settled state (logo
+  // capsule + search glyph + 34px avatar placeholder). Any capsule drawn here
+  // paints behind it (zIndex 40 vs Z.header 1000) and can only be wider than
+  // what it resolves into. topPad still reserves the real island's HEADER_H.
   return (
-    <>
-
-
-      {/* Chrome island skeleton — mirrors ChromeIsland: two dark glass capsules
-          at sat+10, inset 12px, 44h, radius 999. Keep the SkeletonBlock contents
-          inside so labels/icons shimmer while the capsule frames read as chrome. */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-          left: 12,
-          right: 12,
-          height: 44,
-          zIndex: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          pointerEvents: 'none',
-        }}
-      >
-        {/* LEFT capsule: island tabs */}
-        <div
-          style={{
-            height: 44,
-            borderRadius: 999,
-            background: 'rgba(20,22,28,0.72)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            padding: '0 16px',
-          }}
-        >
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 78, height: 14 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 52, height: 14 }} />
-        </div>
-        {/* RIGHT capsule: search + pill + avatar */}
-        <div
-          style={{
-            height: 44,
-            borderRadius: 999,
-            background: 'rgba(20,22,28,0.72)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '0 10px',
-          }}
-        >
-          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 22, height: 22 }} />
-          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 52, height: 24 }} />
-          <SkeletonBlock isStatic={isStatic} style={{ width: 30, height: 30, borderRadius: '34%' }} />
-        </div>
+    /* ONE full card plus a second clipped by the viewport. Anything further
+       down is shimmer nobody sees whose only effect is a bigger upward
+       collapse when real content lands. `overflow: hidden` (not auto) is what
+       keeps the second card clipped rather than scrollable. */
+    <div
+      style={{
+        background: CANVAS,
+        minHeight: '100dvh',
+        maxHeight: '100dvh',
+        width: '100%',
+        overflow: 'hidden',
+        paddingTop: topPad,
+        paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Card isStatic={isStatic} />
+        <Card isStatic={isStatic} />
       </div>
-
-      {/* ONE full card plus a second clipped by the viewport. Anything further
-          down is shimmer nobody sees whose only effect is a bigger upward
-          collapse when real content lands. `overflow: hidden` (not auto) is what
-          keeps the second card clipped rather than scrollable. */}
-      <div
-        style={{
-          background: CANVAS,
-          minHeight: '100dvh',
-          maxHeight: '100dvh',
-          width: '100%',
-          overflow: 'hidden',
-          paddingTop: topPad,
-          paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Card isStatic={isStatic} />
-          <Card isStatic={isStatic} />
-        </div>
-      </div>
-
-    </>
+    </div>
   );
 };
 
