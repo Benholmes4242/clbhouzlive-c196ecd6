@@ -150,7 +150,7 @@ const RoundCard: React.FC = () => (
     </div>
     <div style={{ padding: '9px 13px 13px' }}>
       <div style={{ fontSize: 12, color: BODY, lineHeight: 1.4 }}>
-        Two under through fifteen, then level coming home
+        Three under through fifteen, one dropped coming home
       </div>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
