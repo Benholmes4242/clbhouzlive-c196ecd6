@@ -155,7 +155,7 @@ export function InsightSheet({
           display: 'flex',
           flexDirection: 'column',
           gap: 16,
-          maxHeight: '75dvh',
+          maxHeight: '95dvh',
           overflowY: 'auto',
         }}
       >

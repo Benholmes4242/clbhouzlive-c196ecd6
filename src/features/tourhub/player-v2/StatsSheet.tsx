@@ -299,8 +299,8 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
       onClose={onClose}
       ariaLabelledBy="stats-sheet-title"
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         background: SURFACE,

@@ -30,7 +30,7 @@ export default function RegionSheet({
       open={open}
       onClose={() => onOpenChange(false)}
       ariaLabelledBy="explore-region-sheet-title"
-      maxHeight="90dvh"
+      maxHeight="95dvh"
     >
       <div style={{ padding: '8px 20px 12px' }}>
         <div

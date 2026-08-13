@@ -78,8 +78,8 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       variant="light"
       surfaceColor={SLATE_50}
       style={{
-        height: '80vh',
-        maxHeight: '80vh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,

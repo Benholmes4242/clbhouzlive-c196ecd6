@@ -63,7 +63,7 @@ export function UploadCenterPanel({ isOpen, onClose }: UploadCenterPanelProps) {
             </div>
 
             {/* Content */}
-            <div className="overflow-y-auto max-h-[calc(70vh-56px)]">
+            <div className="overflow-y-auto max-h-[calc(95dvh-56px)]">
               {visibleJobs.length === 0 ? (
                 <div className="px-4 py-8 text-center text-slate-500 text-sm">
                   No uploads yet

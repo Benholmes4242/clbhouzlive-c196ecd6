@@ -124,8 +124,8 @@ export function FullListSheet({
       variant="light"
       surfaceColor={SLATE_50}
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,

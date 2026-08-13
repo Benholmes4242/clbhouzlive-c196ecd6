@@ -223,7 +223,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       variant={theme === 'light' ? 'light' : 'dark'}
       surfaceColor={theme === 'dark' ? SURFACE : undefined}
       style={{
-        maxHeight: '75dvh',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         background: SURFACE,

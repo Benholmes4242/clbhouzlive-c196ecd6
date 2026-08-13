@@ -107,7 +107,7 @@ export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) 
       surfaceColor={CHART.CANVAS}
       style={{ minHeight: 0 }}
     >
-      <div style={{ overflowY: 'auto', maxHeight: '80vh', padding: '4px 16px 28px' }}>
+      <div style={{ overflowY: 'auto', maxHeight: '95dvh', padding: '4px 16px 28px' }}>
         {/* Header */}
         <p style={{ ...LABEL, color: CHART.AMBER }}>{t('stableford.kicker')}</p>
         <h2

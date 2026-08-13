@@ -44,8 +44,8 @@ export const GamSheet: React.FC<GamSheetProps> = ({
       flexDirection: 'column',
       background: surface,
 
-      height: '75dvh',
-      maxHeight: '75dvh',
+      height: 'auto',
+      maxHeight: '95dvh',
       minHeight: 0,
       overflow: 'hidden',
       borderTopLeftRadius: 20,

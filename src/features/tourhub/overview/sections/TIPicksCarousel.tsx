@@ -436,8 +436,8 @@ function SheetShell({
           background: V4.bg,
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
-          height: '75dvh',
-          maxHeight: '90dvh',
+          height: 'auto',
+          maxHeight: '95dvh',
 
           display: 'flex',
           flexDirection: 'column',
