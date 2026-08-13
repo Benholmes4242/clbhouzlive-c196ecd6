@@ -3,15 +3,20 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { ArrowDownRight, ArrowUpRight, CheckCircle2, RefreshCcw, Search, XCircle } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { ArrowDownRight, ArrowUpRight, CheckCircle2, Search, XCircle } from 'lucide-react';
 import { adminTheme as t } from '../theme';
 import ChartCard from '../components/ChartCard';
 import EmptyState from '../components/EmptyState';
 import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
 import { labelForEvent } from '../lib/eventLabels';
-import { useLiveInApp } from '../hooks/useOverviewMetrics';
+import { useLiveInApp, useOverviewMetrics, type MetricsBundle } from '../hooks/useOverviewMetrics';
+import { useOpsHealth, type OpsHealth } from '../hooks/useOpsHealth';
+import { useActiveWindows, type ActiveWindows } from '../hooks/useActiveWindows';
+import { useScreenAnalytics, type ScreenRow } from '../hooks/useScreenAnalytics';
+import { useFunnelCohorts, nestingFaults, type FunnelCohorts } from '../hooks/useFunnelCohorts';
+import { useMemberActions, humaniseActionName, type MemberActions } from '../hooks/useMemberActions';
+import { monotonePath, useElementWidth, EndDot, AxisTicks, fourTickIndices } from '../lib/chartPrimitives';
 import { useLiveWindow30m, useProfilesByIds, type LiveEventRow, type LiteProfile } from '../hooks/useLiveStream';
 import {
   useEventAggregates,
@@ -24,7 +29,6 @@ import {
   periodToDays,
   usePlatformAnalytics,
   useEngagementAnalytics,
-  useRetentionAnalytics,
   useGrowthAnalytics,
   useContentAnalytics,
   useAuthAnalytics,
@@ -32,54 +36,68 @@ import {
 import { useFunnels } from '../hooks/useFunnels';
 import FunnelCard from '../components/FunnelCard';
 import AudiencesSection from '../components/AudiencesSection';
-import RetentionCurve from '../components/RetentionCurve';
 import PostInsightSheet from '../components/PostInsightSheet';
 import CourseInsightSheet from '../components/CourseInsightSheet';
 import { useTopContent } from '../hooks/useTopContent';
 import ScreensTab from '../components/ScreensTab';
 
 
-type TabId = 'live' | 'growth' | 'engagement' | 'screens' | 'retention' | 'funnels' | 'events' | 'auth';
+type TabId = 'overview' | 'growth' | 'engagement' | 'screens' | 'funnels' | 'live' | 'events' | 'auth';
 
+/**
+ * The RAIL. Six tabs, in argument order: activation, growth, engagement,
+ * screens, funnels, then Live last - Live is an ops view, not analytics.
+ *
+ * `events` and `auth` are DIAGNOSTICS and are deliberately absent from the
+ * rail while staying reachable by ?tab=. They belong under System; that move
+ * has not been briefed, so nothing is deleted.
+ */
 const TABS: { id: TabId; label: string }[] = [
-  { id: 'live',       label: 'Live' },
+  { id: 'overview',   label: 'Overview' },
   { id: 'growth',     label: 'Growth' },
   { id: 'engagement', label: 'Engagement' },
   { id: 'screens',    label: 'Screens' },
-  { id: 'retention',  label: 'Retention' },
   { id: 'funnels',    label: 'Funnels' },
-  { id: 'events',     label: 'Events' },
-  { id: 'auth',       label: 'Auth' },
+  { id: 'live',       label: 'Live' },
 ];
 
+const ALL_TAB_IDS: TabId[] = [
+  'overview', 'growth', 'engagement', 'screens', 'funnels', 'live', 'events', 'auth',
+];
 
 const PERIODS: AnalyticsPeriod[] = ['7d', '30d', '90d'];
 const ALL_PERIODS: AnalyticsPeriod[] = ['7d', '14d', '30d', '90d'];
 
 const isTab = (v: string | null): v is TabId =>
-  !!v && TABS.some(x => x.id === v);
+  !!v && (ALL_TAB_IDS as string[]).includes(v);
 const isPeriod = (p: string | null): p is AnalyticsPeriod =>
   !!p && (ALL_PERIODS as string[]).includes(p);
 
-// Legacy ?view= mapping (D5 rename) so old links keep working.
+// Legacy ?view= mapping (D5 rename) so old links keep working. Retention has
+// folded into Overview's cohort grid, so it redirects rather than 404s.
 function legacyViewToTab(v: string | null): TabId | null {
   if (!v) return null;
-  if (v === 'growth' || v === 'engagement' || v === 'retention' || v === 'auth') return v;
+  if (v === 'retention') return 'overview';
+  if (v === 'growth' || v === 'engagement' || v === 'auth') return v;
   if (v === 'platform' || v === 'content') return 'engagement';
   return null;
 }
 
+
 export default function AnalyticsPage() {
   const [params, setParams] = useSearchParams();
-  const qc = useQueryClient();
 
   const tabParam = params.get('tab');
   const viewParam = params.get('view');
-  const tab: TabId = isTab(tabParam)
-    ? tabParam
-    : legacyViewToTab(viewParam) ?? 'live';
+  // ?tab=retention lands on Overview - the cohort grid moved there.
+  const tab: TabId = tabParam === 'retention'
+    ? 'overview'
+    : isTab(tabParam)
+      ? tabParam
+      : legacyViewToTab(viewParam) ?? legacyViewToTab(tabParam) ?? 'overview';
   const period: AnalyticsPeriod = isPeriod(params.get('period')) ? (params.get('period') as AnalyticsPeriod) : '30d';
-  const showPeriodSelector = tab !== 'live';
+  const showPeriodSelector = tab !== 'live' && tab !== 'overview';
+
 
   const setTab = (v: TabId) => {
     const next = new URLSearchParams(params);
@@ -95,67 +113,47 @@ export default function AnalyticsPage() {
     setParams(next, { replace: true });
   };
 
-  const refresh = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v2', 'analytics'] });
-  };
-
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1280, margin: '0 auto' }}>
-      <header style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{
-          color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
-        }}>ADMIN</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <h1 style={{ color: t.ink, fontSize: 26, fontWeight: 700, margin: 0, letterSpacing: -0.2 }}>Analytics</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {showPeriodSelector && (
-              <div style={{
-                display: 'inline-flex', border: `1px solid ${t.line}`, borderRadius: 999,
-                background: t.surface, padding: 2,
-              }}>
-                {PERIODS.map(p => {
-                  const active = p === period;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPeriod(p)}
-                      style={{
-                        padding: '6px 12px',
-                        borderRadius: 999,
-                        border: 'none',
-                        background: active ? t.ink : 'transparent',
-                        color: active ? t.surface : t.inkMuted,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >{p}</button>
-                  );
-                })}
-              </div>
-            )}
-            <button
-              onClick={refresh}
-              aria-label="Refresh"
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 34, height: 34, borderRadius: 999,
-                border: `1px solid ${t.line}`, background: t.surface, color: t.inkMuted, cursor: 'pointer',
-              }}
-            >
-              <RefreshCcw size={15} />
-            </button>
+      {/* No kicker, no heading, no refresh button: AdminShell's fixed header
+          owns all three. Two of each was the Inbox fault. */}
+      {showPeriodSelector && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <div style={{
+            display: 'inline-flex', border: `1px solid ${t.line}`, borderRadius: 999,
+            background: t.surface, padding: 2,
+          }}>
+            {PERIODS.map(p => {
+              const active = p === period;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 999,
+                    border: 'none',
+                    background: active ? t.ink : 'transparent',
+                    color: active ? t.canvas : t.inkMuted,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >{p}</button>
+              );
+            })}
           </div>
         </div>
-      </header>
+      )}
 
+      {/* WRAPS, never scrolls sideways: a tab you cannot see is a tab that
+          does not exist. Active state is t.ink / t.canvas - no tinted capsules. */}
       <nav
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           gap: 6,
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
           padding: '2px 0',
         }}
       >
@@ -166,12 +164,11 @@ export default function AnalyticsPage() {
               key={v.id}
               onClick={() => setTab(v.id)}
               style={{
-                flexShrink: 0,
                 padding: '8px 14px',
                 borderRadius: 999,
                 border: `1px solid ${active ? 'transparent' : t.line}`,
-                background: active ? t.brandSoft : t.surface,
-                color: active ? t.brandText : t.inkMuted,
+                background: active ? t.ink : t.surface,
+                color: active ? t.canvas : t.inkMuted,
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -184,14 +181,16 @@ export default function AnalyticsPage() {
         })}
       </nav>
 
+      {tab === 'overview'   && <OverviewTab />}
       {tab === 'live'       && <LiveTab />}
       {tab === 'growth'     && <GrowthTab     period={period} />}
       {tab === 'engagement' && <EngagementTab period={period} />}
       {tab === 'screens'    && <ScreensTab     days={periodToDays(period)} />}
-      {tab === 'retention'  && <RetentionTab />}
       {tab === 'funnels'    && <FunnelsTab    period={period} />}
+      {/* Diagnostics, reachable by URL only until the move under System is briefed. */}
       {tab === 'events'     && <EventsTab     period={period} />}
       {tab === 'auth'       && <AuthTab       period={period} />}
+
 
       <style>{`@keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
     </div>
@@ -202,10 +201,17 @@ export default function AnalyticsPage() {
 
 function fmtTick(v: number) { return v >= 1000 ? `${Math.round(v / 100) / 10}k` : `${v}`; }
 function fmtInt(n: number) { return n.toLocaleString(); }
-function pctDelta(current: number, prior: number): number {
-  if (prior === 0) return current > 0 ? 100 : 0;
-  return Math.round(((current - prior) / prior) * 100 * 10) / 10;
+/**
+ * Returns null when the prior period is 0: "from nothing" has no percentage
+ * and returning 100 made it indistinguishable from a genuine doubling.
+ * Callers render null as "New". Rounded FIRST, to an INTEGER, so every delta
+ * on the page carries the same precision.
+ */
+function pctDelta(current: number, prior: number): number | null {
+  if (prior === 0) return null;
+  return Math.round(((current - prior) / prior) * 100);
 }
+
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -230,7 +236,17 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
   );
 }
 
-function DeltaChip({ delta, unit = '%' }: { delta: number; unit?: string }) {
+/** null delta = no comparable prior period; renders "New", never a percentage. */
+function DeltaChip({ delta, unit = '%' }: { delta: number | null; unit?: string }) {
+  if (delta === null) {
+    return (
+      <span style={{
+        display: 'inline-flex', alignItems: 'center',
+        color: t.inkMuted, background: t.neutralSoft,
+        borderRadius: 999, padding: '2px 8px', fontSize: 12, fontWeight: 700,
+      }}>New</span>
+    );
+  }
   const positive = delta >= 0;
   return (
     <span style={{
@@ -245,6 +261,7 @@ function DeltaChip({ delta, unit = '%' }: { delta: number; unit?: string }) {
     </span>
   );
 }
+
 
 function Headline({
   eyebrow, value, delta, deltaUnit, note, loading,
@@ -267,9 +284,10 @@ function Headline({
         }}>
           {loading ? '-' : value}
         </div>
-        {!loading && typeof delta === 'number' && (
+        {!loading && delta !== undefined && (
           <DeltaChip delta={delta} unit={deltaUnit ?? '%'} />
         )}
+
       </div>
       {note && (
         <div style={{ color: t.inkMuted, fontSize: 12.5, fontVariantNumeric: 'tabular-nums' }}>
@@ -367,7 +385,8 @@ function GrowthTab({ period }: { period: AnalyticsPeriod }) {
       <Headline
         eyebrow="Signups in period"
         value={fmtInt(signups)}
-        delta={typeof delta === 'number' ? delta : undefined}
+        delta={delta}
+
         note={`vs ${fmtInt(prior)} in the prior period`}
         loading={isLoading}
       />
@@ -654,15 +673,13 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
   );
 }
 
-// ─── Retention ────────────────────────────────────────────────────────────────
+// ─── Overview ─────────────────────────────────────────────────────────────────
+//
+// Six panels answering four questions IN ORDER: do they activate, do they come
+// back, are we growing, what do they do. The order is the argument.
 
-
-
-function heatBg(value: number | null): string {
-  if (value === null || value === 0) return t.canvas;
-  // 0.08 base + value-proportional up to ~0.6
-  const alpha = 0.08 + Math.min(0.52, (value / 100) * 0.52);
-  // adminTheme.brand is a hex, convert to rgba
+/** Brand at an alpha. brand is a hex in both themes. */
+function brandAlpha(alpha: number): string {
   const hex = t.brand.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16);
   const g = parseInt(hex.slice(2, 4), 16);
@@ -670,89 +687,461 @@ function heatBg(value: number | null): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function RetentionTab() {
-  const { data, isLoading } = useRetentionAnalytics();
-  const cohorts = data?.cohorts ?? [];
-  const empty = !isLoading && cohorts.length === 0;
+const OV_KICKER: React.CSSProperties = {
+  color: t.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+};
+const OV_LABEL: React.CSSProperties = {
+  color: t.inkFaint, fontSize: 11, fontWeight: 600, letterSpacing: 0.3,
+};
+const OV_FIG: React.CSSProperties = {
+  fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1',
+};
 
-  // Headline: most recent cohort where retention[1] (W1) is not null.
-  const w1Cohort = cohorts.find(c => c.retention[1] !== null);
-  const w1Prior = w1Cohort
-    ? cohorts.slice(cohorts.indexOf(w1Cohort) + 1).find(c => c.retention[1] !== null)
-    : undefined;
-  const w1Value = w1Cohort?.retention[1] ?? null;
-  const w1DeltaPts = (w1Value !== null && w1Prior?.retention[1] !== undefined && w1Prior.retention[1] !== null)
-    ? Math.round((w1Value - w1Prior.retention[1]!) * 10) / 10
-    : null;
+/**
+ * S6 SKELETON RULE. While a query is in flight the panel renders this - never a
+ * zero, never an empty state. An empty state is a claim about the data.
+ */
+function OvSkeleton({ height }: { height: number }) {
+  return (
+    <div style={{
+      height, background: t.canvas, borderRadius: t.radius.md,
+      animation: 'admin-pulse 1.4s ease-in-out infinite',
+    }} />
+  );
+}
 
-  const maxOffsets = cohorts.reduce((m, c) => Math.max(m, c.retention.length), 0);
-  const offsetCount = Math.max(4, Math.min(maxOffsets, 9));
+function OvPanel({
+  title, subtitle, right, children,
+}: {
+  title: string; subtitle?: string; right?: React.ReactNode; children: React.ReactNode;
+}) {
+  return (
+    <Card style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={OV_KICKER}>{title}</div>
+          {subtitle && <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4 }}>{subtitle}</div>}
+        </div>
+        {right}
+      </div>
+      {children}
+    </Card>
+  );
+}
+
+export function OverviewTab() {
+  const fc      = useFunnelCohorts(8);
+  const windows = useActiveWindows(28);
+  const metrics = useOverviewMetrics();
+  const ops     = useOpsHealth(7);
+  const screens = useScreenAnalytics(30);
+  const actions = useMemberActions(7);
 
   return (
     <>
-      <Headline
-        eyebrow="Week 1 retention"
-        value={w1Value !== null ? `${w1Value}%` : '-'}
-        delta={w1DeltaPts !== null ? w1DeltaPts : undefined}
-        deltaUnit="pt"
-        note={w1Cohort ? `${w1Cohort.cohortLabel} cohort, ${fmtInt(w1Cohort.cohortSize)} members` : 'No qualifying cohort yet'}
-        loading={isLoading}
+      <ActivationPanel data={fc.data ?? null} loading={fc.isLoading} />
+      <ReturnPanel
+        windows={windows.data ?? null}
+        loading={windows.isLoading || fc.isLoading}
+        totalMembers={fc.data?.funnel?.[0]?.n ?? null}
       />
-
-      {!isLoading && cohorts.length >= 2 && <RetentionCurve cohorts={cohorts} />}
-
-      <Card>
-
-        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Cohort retention</div>
-        <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Share of each cohort active in the weeks after joining.</div>
-        {isLoading ? (
-          <div style={{ height: 220, background: t.canvas, borderRadius: t.radius.md }} />
-        ) : empty ? (
-          <EmptyState title="Not enough data yet" subtitle="Cohort retention will populate as members accumulate." />
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 4, fontSize: 12 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '6px 8px', color: t.inkMuted, fontWeight: 600, minWidth: 120, maxWidth: 180 }}>Cohort</th>
-                  {Array.from({ length: offsetCount }, (_, i) => (
-                    <th key={i} style={{ textAlign: 'center', padding: '6px 4px', color: t.inkMuted, fontWeight: 600, minWidth: 36 }}>W{i}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {cohorts.map((r, ri) => (
-                  <tr key={ri}>
-                    <td style={{ padding: '6px 8px', color: t.ink, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 180 }}>
-                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.cohortLabel}</div>
-                      <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{fmtInt(r.cohortSize)} members</div>
-                    </td>
-                    {Array.from({ length: offsetCount }, (_, ci) => {
-                      const v = ci < r.retention.length ? r.retention[ci] : null;
-                      const bg = heatBg(v);
-                      return (
-                        <td key={ci} style={{ padding: 0, minWidth: 36 }}>
-                          <div style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: bg, borderRadius: 6, minHeight: 34,
-                            color: v === null ? t.inkFaint : t.ink,
-                            fontWeight: 700, fontSize: 12, fontVariantNumeric: 'tabular-nums',
-                          }}>
-                            {v === null ? '-' : `${v}%`}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+      <CohortGrid data={fc.data ?? null} loading={fc.isLoading} />
+      <LastSevenDays
+        metrics={metrics.data ?? null}
+        ops={ops.data ?? null}
+        loading={metrics.isLoading || ops.isLoading}
+      />
+      <WhereMembersGo rows={screens.data ?? null} loading={screens.isLoading} />
+      <WhatMembersDid data={actions.data ?? null} loading={actions.isLoading} />
     </>
   );
 }
+
+// ─── 2a Activation ────────────────────────────────────────────────────────────
+
+function convTone(pct: number): string {
+  if (pct < 30) return t.danger;
+  if (pct < 70) return t.warn;
+  return t.ok;
+}
+
+function ActivationPanel({ data, loading }: { data: FunnelCohorts | null; loading: boolean }) {
+  const funnel = data?.funnel ?? [];
+  const faults = useMemo(() => nestingFaults(funnel), [funnel]);
+  const base = funnel[0]?.n ?? 0;
+
+  const signedUp = funnel.find(s => s.key === 'signed_up')?.n ?? base;
+  const connected = funnel.find(s => s.key === 'connected')?.n ?? null;
+  const unconnected = connected === null ? null : Math.max(0, signedUp - connected);
+
+  return (
+    <OvPanel title="Activation" subtitle="Every member, and how far they get">
+      {loading || !data ? (
+        <OvSkeleton height={220} />
+      ) : funnel.length === 0 ? (
+        <EmptyState title="No funnel data" />
+      ) : (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {funnel.map((s, i) => {
+              // Width is a share of STEP 1, so the shape is the funnel. Never
+              // clamped against the parent: a bar wider than its parent is a
+              // data fault and must be visible, not laundered.
+              const width = base > 0 ? (s.n / base) * 100 : 0;
+              const prev = i > 0 ? funnel[i - 1].n : null;
+              const conv = prev && prev > 0 ? Math.round((s.n / prev) * 100) : null;
+              const isGate = s.key === 'connected';
+              return (
+                <div key={s.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{
+                      color: isGate ? t.ink : t.inkMuted,
+                      fontSize: 13, fontWeight: isGate ? 700 : 600,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>{s.label}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10, flexShrink: 0 }}>
+                      <span style={{ color: t.ink, fontSize: 15, fontWeight: 700, ...OV_FIG }}>{fmtInt(s.n)}</span>
+                      {conv !== null && (
+                        <span style={{ color: convTone(conv), fontSize: 12, fontWeight: 700, ...OV_FIG }}>
+                          {conv}%
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div style={{ height: 10, background: t.canvas, borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${width}%`, height: '100%', borderRadius: 999,
+                      background: isGate ? t.brand : brandAlpha(0.45),
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ height: 1, background: t.hairline, margin: '2px 0' }} />
+
+          {unconnected !== null && (
+            <div style={{ color: t.inkMuted, fontSize: 12.5, lineHeight: 1.5, ...OV_FIG }}>
+              {fmtInt(unconnected)} members have never connected a handicap. For them the product has
+              no rounds, no scorecards and no entry to the stat browse.
+            </div>
+          )}
+
+          {faults.length > 0 && (
+            <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600, lineHeight: 1.5 }}>
+              Data fault: {faults.map(f => `${f.key} (${f.n}) exceeds ${f.parentKey} (${f.parentN})`).join('; ')}.
+              A funnel step cannot be wider than the one above it - the bars are drawn as returned, not clamped.
+            </div>
+          )}
+        </>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2b Return ────────────────────────────────────────────────────────────────
+
+function ReturnPanel({
+  windows, loading, totalMembers,
+}: { windows: ActiveWindows | null; loading: boolean; totalMembers: number | null }) {
+  const daily = windows?.daily ?? [];
+  const { ref, width } = useElementWidth<HTMLDivElement>();
+  const H = 120;
+
+  const geom = useMemo(() => {
+    if (daily.length < 2) return null;
+    const vals = daily.map(d => d.wau);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const span = max - min || 1;
+    const pts = vals.map((v, i) => ({
+      x: (i / (vals.length - 1)) * 100,
+      y: 6 + (1 - (v - min) / span) * (H - 12),
+    }));
+    return { d: monotonePath(pts), last: pts[pts.length - 1] };
+  }, [daily]);
+
+  const share = (totalMembers && windows) ? Math.round((windows.mau.current / totalMembers) * 100) : null;
+
+  const ticks = useMemo(() => {
+    if (daily.length === 0) return [];
+    return fourTickIndices(daily.length).map(i => {
+      const d = new Date(daily[i].date);
+      return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'short' })}`;
+    });
+  }, [daily]);
+
+  return (
+    <OvPanel
+      title="Return"
+      subtitle="Members coming back, not just arriving"
+      right={!loading && windows?.stickiness !== null && windows?.stickiness !== undefined ? (
+        <span style={{ ...OV_LABEL, color: t.inkMuted, ...OV_FIG, whiteSpace: 'nowrap' }}>
+          {windows.stickiness}% weekly of monthly
+        </span>
+      ) : undefined}
+    >
+      {loading || !windows ? (
+        <OvSkeleton height={200} />
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
+            <FigureBlock label="This week" value={fmtInt(windows.wau.current)} />
+            <FigureBlock label="This month" value={fmtInt(windows.mau.current)} />
+            <FigureBlock label="Of all members" value={share === null ? null : `${share}%`} />
+          </div>
+          <div ref={ref} style={{ position: 'relative' }}>
+            {geom ? (
+              <>
+                <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+                  <path
+                    d={geom.d}
+                    fill="none"
+                    stroke={t.brand}
+                    strokeWidth={1.75}
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                {width > 0 && <EndDot left={(geom.last.x / 100) * width} top={geom.last.y} color={t.brand} />}
+              </>
+            ) : (
+              <div style={{ ...OV_LABEL, color: t.inkFaint }}>Not enough days for a line yet</div>
+            )}
+            {ticks.length > 0 && <AxisTicks labels={ticks} />}
+          </div>
+        </>
+      )}
+    </OvPanel>
+  );
+}
+
+function FigureBlock({ label, value }: { label: string; value: string | null }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <span style={OV_LABEL}>{label}</span>
+      <span style={{ color: t.ink, fontSize: 26, fontWeight: 700, lineHeight: 1, ...OV_FIG }}>
+        {value ?? '—'}
+      </span>
+    </div>
+  );
+}
+
+// ─── 2c Weekly cohorts ────────────────────────────────────────────────────────
+
+/** 0.08 → 0.58 brand ramp. Never called with null: a null cell is an outline. */
+function cohortFill(pct: number): string {
+  return brandAlpha(0.08 + Math.min(0.5, (pct / 100) * 0.5));
+}
+
+function weekLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'short' })}`;
+}
+
+function CohortGrid({ data, loading }: { data: FunnelCohorts | null; loading: boolean }) {
+  const cohorts = data?.cohorts ?? [];
+  return (
+    <OvPanel title="Weekly cohorts" subtitle="Share of each signup week active in the weeks after. No W0: it is 100% by definition.">
+      {loading || !data ? (
+        <OvSkeleton height={220} />
+      ) : cohorts.length === 0 ? (
+        <EmptyState title="No cohorts yet" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '108px repeat(4, minmax(0, 1fr))', gap: 4 }}>
+            <span />
+            {[1, 2, 3, 4].map(w => (
+              <span key={w} style={{ ...OV_LABEL, textAlign: 'center' }}>W{w}</span>
+            ))}
+          </div>
+          {cohorts.map(c => (
+            <div key={c.week} style={{ display: 'grid', gridTemplateColumns: '108px repeat(4, minmax(0, 1fr))', gap: 4, alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                <span style={{ color: t.ink, fontSize: 12.5, fontWeight: 700, ...OV_FIG }}>{weekLabel(c.week)}</span>
+                {/* A percentage over a six-member cohort is a lie of omission. */}
+                <span style={{ ...OV_LABEL, ...OV_FIG }}>{fmtInt(c.size)} members</span>
+              </div>
+              {[0, 1, 2, 3].map(i => {
+                const v = i < c.weeks.length ? c.weeks[i] : null;
+                if (v === null) {
+                  // The week has NOT ELAPSED. Not 0%, not a dash, not a fill:
+                  // "we do not know yet" is a different claim to "nobody came back".
+                  return (
+                    <div key={i} style={{
+                      minHeight: 36, borderRadius: 8,
+                      border: `1px dashed ${t.line}`, background: 'transparent',
+                    }} />
+                  );
+                }
+                return (
+                  <div key={i} style={{
+                    minHeight: 36, borderRadius: 8, background: cohortFill(v),
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: v > 55 ? t.canvas : t.ink,
+                    fontSize: 12.5, fontWeight: 700, ...OV_FIG,
+                  }}>{v}%</div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2d Last 7 days ───────────────────────────────────────────────────────────
+
+function LastSevenDays({
+  metrics, ops, loading,
+}: { metrics: MetricsBundle | null; ops: OpsHealth | null; loading: boolean }) {
+  const rows = useMemo(() => {
+    if (!metrics || !ops) return [];
+    return [
+      {
+        key: 'rounds',
+        label: 'Rounds',
+        current: ops.activity.rounds_in_window,
+        prior: ops.activity.rounds_prev_window,
+        note: `by ${fmtInt(ops.activity.rounds_members)} members`,
+      },
+      { key: 'posts',   label: 'Posts',   current: metrics.posts.current,   prior: metrics.posts.previous },
+      { key: 'reviews', label: 'Reviews', current: metrics.reviews.current, prior: metrics.reviews.previous },
+      { key: 'signups', label: 'Signups', current: metrics.signups.current, prior: metrics.signups.previous },
+    ];
+  }, [metrics, ops]);
+
+  return (
+    <OvPanel title="Last 7 days" subtitle="Against the 7 days before">
+      {loading || rows.length === 0 ? (
+        <OvSkeleton height={180} />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {rows.map((r, i) => (
+            <div key={r.key} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              padding: '11px 0',
+              borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${t.hairline}`,
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 600 }}>{r.label}</div>
+                {r.note && <div style={{ ...OV_LABEL, ...OV_FIG }}>{r.note}</div>}
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ color: t.ink, fontSize: 17, fontWeight: 700, ...OV_FIG }}>{fmtInt(r.current)}</span>
+                <DeltaChip delta={pctDelta(r.current, r.prior)} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2e Where members go ──────────────────────────────────────────────────────
+
+function WhereMembersGo({ rows, loading }: { rows: ScreenRow[] | null; loading: boolean }) {
+  const top = useMemo(() => {
+    if (!rows) return [];
+    // area === 'Admin' is the manifest's own classification of /admin,
+    // /admin/*, /admin-v2/*, /admin-setup and /error-logs.
+    return rows
+      .filter(r => r.area !== 'Admin' && r.views > 0)
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 7);
+  }, [rows]);
+  const max = top[0]?.views ?? 0;
+
+  return (
+    <OvPanel title="Where members go" subtitle="Top 7 screens by views, last 30 days. The console itself is excluded.">
+      {loading || !rows ? (
+        <OvSkeleton height={220} />
+      ) : top.length === 0 ? (
+        <EmptyState title="No screen views recorded" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {top.map(r => (
+            <div key={r.route_pattern} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                <span style={{
+                  color: t.ink, fontSize: 13, fontWeight: 600, minWidth: 0,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>{r.label}</span>
+                <span style={{ color: t.ink, fontSize: 14, fontWeight: 700, flexShrink: 0, ...OV_FIG }}>
+                  {fmtInt(r.views)}
+                </span>
+              </div>
+              <div style={{ height: 8, background: t.canvas, borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{
+                  width: `${max > 0 ? (r.views / max) * 100 : 0}%`, height: '100%',
+                  background: brandAlpha(0.55), borderRadius: 999,
+                }} />
+              </div>
+              <div style={{ ...OV_LABEL, ...OV_FIG }}>
+                {fmtInt(r.unique_users)} members
+                {/* Nullable by design: no dwell samples renders NOTHING, not "0s". */}
+                {r.median_dwell_sec !== null && ` · ${Math.round(r.median_dwell_sec)}s median`}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
+// ─── 2f What members did ──────────────────────────────────────────────────────
+
+function WhatMembersDid({ data, loading }: { data: MemberActions | null; loading: boolean }) {
+  const actions = (data?.actions ?? []).slice(0, 10);
+  return (
+    <OvPanel
+      title="What members did"
+      subtitle="Deliberate actions in the last 7 days. Times and members are separate: one enthusiast is not adoption."
+    >
+      {loading || !data ? (
+        <OvSkeleton height={240} />
+      ) : actions.length === 0 ? (
+        <div style={{ color: t.inkMuted, fontSize: 13 }}>No actions recorded</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 72px 72px', gap: 8,
+            paddingBottom: 8, borderBottom: `1px solid ${t.line}`,
+          }}>
+            <span style={OV_LABEL}>Action</span>
+            <span style={{ ...OV_LABEL, textAlign: 'right' }}>Times</span>
+            <span style={{ ...OV_LABEL, textAlign: 'right' }}>Members</span>
+          </div>
+          {actions.map((a, i) => (
+            <div key={a.name} style={{
+              display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 72px 72px', gap: 8,
+              alignItems: 'center', padding: '10px 0',
+              borderBottom: i === actions.length - 1 ? 'none' : `1px solid ${t.hairline}`,
+            }}>
+              <span style={{
+                color: t.ink, fontSize: 13.5, fontWeight: 600, minWidth: 0,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>{humaniseActionName(a.name)}</span>
+              <span style={{ color: t.ink, fontSize: 14, fontWeight: 700, textAlign: 'right', ...OV_FIG }}>
+                {fmtInt(a.times)}
+              </span>
+              <span style={{ color: t.inkMuted, fontSize: 14, fontWeight: 700, textAlign: 'right', ...OV_FIG }}>
+                {fmtInt(a.members)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </OvPanel>
+  );
+}
+
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -933,13 +1322,6 @@ function LiveTab() {
         isError={window30.isError}
         onRetry={() => window30.refetch()}
       />
-      <EventStream
-        events={window30.data ?? []}
-        profilesMap={profiles.data ?? {}}
-        loading={window30.isLoading}
-        isError={window30.isError}
-        onRetry={() => window30.refetch()}
-      />
       <TopScreensRightNow
         events={window30.data ?? []}
         loading={window30.isLoading}
@@ -1084,62 +1466,6 @@ function LastThirtyMinutesChart({
   );
 }
 
-function EventStream({
-  events, profilesMap, loading, isError, onRetry,
-}: {
-  events: LiveEventRow[]; profilesMap: Record<string, LiteProfile>;
-  loading: boolean; isError: boolean; onRetry: () => void;
-}) {
-  const latest = events.slice(0, 25);
-  return (
-    <Card>
-      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Event stream</div>
-      <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>Latest 25 events across the platform</div>
-      {isError ? (
-        <AdminErrorState title="Couldn't load stream" onRetry={onRetry} />
-      ) : loading ? (
-        <div style={{ height: 240, background: t.canvas, borderRadius: t.radius.md }} />
-      ) : latest.length === 0 ? (
-        <EmptyState title="No events in the last 30 minutes" />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {latest.map((e, i) => {
-            const isLast = i === latest.length - 1;
-            const p = e.user_id ? profilesMap[e.user_id] : null;
-            const name = e.user_id ? displayNameOf(p) : 'System';
-            const row = (
-              <>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    color: t.ink, fontSize: 13.5, fontWeight: 700,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>{labelForEvent(e.name)}</div>
-                  <div style={{
-                    color: t.inkMuted, fontSize: 12,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>{name}</div>
-                </div>
-                <span style={{
-                  color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
-                  textAlign: 'right', minWidth: 68,
-                }}>{relTimeShort(e.created_at)}</span>
-              </>
-            );
-            const style: React.CSSProperties = {
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 0', textDecoration: 'none',
-              borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
-            };
-            return e.user_id
-              ? <Link key={e.id} to={`/admin-v2/users?member=${e.user_id}`} style={style}>{row}</Link>
-              : <div key={e.id} style={style}>{row}</div>;
-          })}
-        </div>
-      )}
-    </Card>
-  );
-}
-
 // Verified prop key: page_view events carry `path` in props.
 // See src/hooks/usePageTracking.ts line 23:
 //   analyticsEvents.track('page_view', { path });
@@ -1150,6 +1476,9 @@ function TopScreensRightNow({ events, loading }: { events: LiveEventRow[]; loadi
       if (e.name !== 'page_view') continue;
       const path = (e.props as any)?.path;
       if (typeof path !== 'string' || !path) continue;
+      // The console is not member behaviour. /admin* never counts.
+      if (path === '/admin' || path.startsWith('/admin/') || path.startsWith('/admin-v2') || path.startsWith('/admin-setup')) continue;
+
       counts.set(path, (counts.get(path) ?? 0) + 1);
     }
     return Array.from(counts, ([path, count]) => ({ path, count }))
