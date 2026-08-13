@@ -247,7 +247,8 @@ export function SettingsTabContent() {
           <SettingsToggleRow
             icon={<Eye size={15} />}
             title="Handicap button"
-            subtitle="Show the Connect HCP button in your header"
+            subtitle="Removes the connect prompt from your profile sheet and the handicap chip from the top-right island. You can still connect any time from here."
+
             checked={!hideHandicapChip}
             disabled={chipUpdating}
             onCheckedChange={handleToggleHandicapChip}
