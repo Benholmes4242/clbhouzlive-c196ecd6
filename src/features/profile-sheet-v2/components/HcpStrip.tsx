@@ -181,8 +181,10 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
     plot={(w) => {
       const h = PLOT_H;
       const pad = 2;
-      // A quiet decorative shape. No values, no ticks, nothing readable.
-      const ys = [0.62, 0.48, 0.56, 0.36, 0.44, 0.26, 0.32, 0.18];
+      // A sample improving trend: starts far from best (red), passes mid
+      // (amber), and ends near best (green). It previews the real colour
+      // system without pretending to be the member's own data.
+      const ys = [0.78, 0.68, 0.72, 0.52, 0.46, 0.38, 0.28, 0.18];
       const d = ys
         .map((r, i) => {
           const x = (i / (ys.length - 1)) * w;
@@ -196,14 +198,20 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
           <svg width={w} height={h} style={{ display: 'block' }} aria-hidden>
             <defs>
               <linearGradient id="hcp-ghost-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={AMBER} stopOpacity={0.34} />
-                <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+                <stop offset="0%" stopColor={A.DRIFTED} stopOpacity={0.26} />
+                <stop offset="45%" stopColor={AMBER} stopOpacity={0.18} />
+                <stop offset="100%" stopColor={A.IMPROVED} stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="hcp-ghost-stroke" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor={A.DRIFTED} />
+                <stop offset="48%" stopColor={AMBER} />
+                <stop offset="100%" stopColor={A.IMPROVED} />
               </linearGradient>
             </defs>
             <path d={area} fill="url(#hcp-ghost-fill)" />
             {/* The white halo is what stops the line reading flat on its own fill. */}
             <path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={d} fill="none" stroke={AMBER} strokeWidth={3} strokeDasharray="8 6" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={d} fill="none" stroke="url(#hcp-ghost-stroke)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           {/* The action sits INSIDE the plot on its baseline — the row the date
               ticks would use — so it costs no height. */}
@@ -226,6 +234,13 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
         </>
       );
     }}
+    legend={
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <LegendSwatch color={A.DRIFTED} label="Off best" />
+        <LegendSwatch color={AMBER} label="Mid" />
+        <LegendSwatch color={A.IMPROVED} label="Near best" />
+      </div>
+    }
   />
 );
 
