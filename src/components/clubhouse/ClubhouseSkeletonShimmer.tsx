@@ -527,7 +527,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <ActionRailSkeleton isStatic={effectiveStatic} isVideo={isVideo} />
 
               {/* ─── BOTTOM CONTENT ─── */}
-              {variant === 'regular' ? (
+              {variant !== 'review' ? (
                 <RegularBottomSkeleton isStatic={effectiveStatic} />
               ) : (
                 <ReviewBottomSkeleton isStatic={effectiveStatic} />

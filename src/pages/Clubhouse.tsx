@@ -392,7 +392,7 @@ const ClubhouseContent = () => {
   if (authLoading) {
     return (
       <PageRoot>
-        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} variant={skeletonShape.variant} mediaRatio={skeletonShape.mediaRatio} isVideo={skeletonShape.isVideo} surface="card" />
       </PageRoot>
     );
   }
@@ -438,8 +438,9 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer 
         isVisible={skeletonVisible} 
         isStatic={skeletonMode === 'static'} 
-        variant={posts[0]?.isReview ? 'review' : 'regular'}
-        isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'}
+        variant={skeletonShape.variant}
+        mediaRatio={skeletonShape.mediaRatio}
+        isVideo={skeletonShape.isVideo}
         surface="card"
       />
 
@@ -472,7 +473,7 @@ const ClubhouseContent = () => {
 
 
       {/* Rehydration skeleton */}
-      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
+      <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={skeletonShape.variant} mediaRatio={skeletonShape.mediaRatio} isVideo={skeletonShape.isVideo} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {(skeletonTimedOut && posts.length === 0) ? (
@@ -543,7 +544,7 @@ const ClubhouseContent = () => {
       ) : (
         // Guard: only render skeleton while feed is actually loading.
         // The terminal early return above handles !isLoading && posts.length === 0.
-        <ClubhouseSkeletonShimmer isVisible={isLoading} isStatic={false} surface="card" />
+        <ClubhouseSkeletonShimmer isVisible={isLoading} isStatic={false} variant={skeletonShape.variant} mediaRatio={skeletonShape.mediaRatio} isVideo={skeletonShape.isVideo} surface="card" />
       )}
 
 
