@@ -114,22 +114,38 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  * of the strings and flags on the tile — no DOM measurement, no refs, no
  * reflow. Same input, same layout, every render.
  *
- * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4):
+ * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4), then again for the
+ * benchmark line (BRIEF_STANDOUT_TILE_MARGIN §4):
  *
  *   padding 11 + 12 = 23, WHO line 18 (13/700, one line)
  *   DETAIL 2 marginTop + 16 a line (12/600 at lineHeight 1.32), max two
+ *   MARGIN 3 marginTop + 15 a line (11/600 at lineHeight 1.3 = 14.3, rounded
+ *          up to 15), max two — it renders through StandoutTile's `subline`
+ *          slot, so it is billed at THAT slot's real metrics, not at LABEL
+ *          scale
  *   MORE line 15 (6.5 label + 6 marginTop)
  *
  * A tile with NO detail line bills ZERO for it (§2) — the line is omitted, not
- * padded, so the estimate must not charge a minimum of one.
+ * padded, so the estimate must not charge a minimum of one. THE SAME HOLDS FOR
+ * THE MARGIN: aces and albatrosses carry no benchmark (a hole in one has no
+ * previous best) and must not gain phantom height.
  *
  * The DETAIL line count comes from a character threshold at the ~151px inner
  * width (177px column less 13px side padding either side; 12px, ~6.4px/char
- * => ~24 chars a line), clamped at two.
+ * => ~24 chars a line), clamped at two. The MARGIN sets at 11px (~5.9px/char
+ * => ~25 chars a line); the longest live string is "First clean card here" at
+ * 21 characters, so every current benchmark is one line.
  */
-function estimatePanelHeight(detail: string, hasMore: boolean): number {
+function estimatePanelHeight(detail: string, margin: string, hasMore: boolean): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
-  return 23 + 18 + (lines > 0 ? 2 + lines * 16 : 0) + (hasMore ? 15 : 0);
+  const marginLines = margin ? Math.min(2, Math.ceil(margin.length / 25)) : 0;
+  return (
+    23 +
+    18 +
+    (lines > 0 ? 2 + lines * 16 : 0) +
+    (marginLines > 0 ? 3 + marginLines * 15 : 0) +
+    (hasMore ? 15 : 0)
+  );
 }
 
 /**
@@ -828,6 +844,22 @@ export function AroundTheWorld({
              */
             const detailShown = !!detail && !(top && detailAddsNothing(top, figure));
 
+            /**
+             * THE BENCHMARK (BRIEF_STANDOUT_TILE_MARGIN §2). Server-supplied and
+             * rendered VERBATIM — not reformatted, not appended to, not
+             * translated here, and never rebuilt from the other fields. Null on
+             * aces and albatrosses, which bill zero height for it.
+             *
+             * `detailAddsNothing`'s principle extends here: if the benchmark and
+             * the detail are one fact told twice, the BENCHMARK is dropped.
+             */
+            const marginRaw = (top?.featMargin ?? '').trim();
+            const detailText = who && detailShown ? detail : '';
+            const margin =
+              marginRaw && marginRaw.toLowerCase() === detailText.trim().toLowerCase()
+                ? ''
+                : marginRaw;
+
             return {
               g,
               m,
@@ -841,12 +873,11 @@ export function AroundTheWorld({
               isOwn,
               detail,
               detailShown,
+              margin,
               more,
               reactTo,
               onPress,
-              height:
-                photo +
-                estimatePanelHeight(who && detailShown ? detail : '', more > 0),
+              height: photo + estimatePanelHeight(detailText, margin, more > 0),
             };
           });
 
@@ -889,6 +920,10 @@ export function AroundTheWorld({
                            the wording IS the title. */
                         detail={tt.detailShown ? tt.detail : tt.who ? '' : tt.detail}
                         onDetailPress={tt.onPress}
+                        /* THE BENCHMARK, through the same `subline` slot Personal
+                           Bests uses for its reference_line. Verbatim; null
+                           renders nothing and bills nothing. */
+                        subline={tt.margin || null}
                         isNew={isNewSince(g.at, lastSeen)}
                         onPress={() => onCoursePress(g.courseId)}
                         trailing={
@@ -905,6 +940,10 @@ export function AroundTheWorld({
                                       readOnly={tt.isOwn}
                                       count={st.count}
                                       reacted={st.mine}
+                                      /* The count column is reserved so the heart
+                                         itself lands on the same x down a column,
+                                         reacted or not (§5b). */
+                                      reserveCount
                                       onToggle={() =>
                                         reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
                                       }

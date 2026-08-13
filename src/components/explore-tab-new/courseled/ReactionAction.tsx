@@ -39,6 +39,13 @@ interface Props {
   /** Missing target id, signed out, or table unavailable: render nothing. */
   hidden?: boolean;
   size?: number;
+  /**
+   * RESERVES THE COUNT COLUMN whether or not a count renders, so the GLYPH
+   * itself lands on the same x on every row of a column — not just the slot's
+   * right edge (BRIEF_STANDOUT_TILE_MARGIN §5b). Off by default: the friends
+   * rail reads in a single row and must not gain the dead width.
+   */
+  reserveCount?: boolean;
 }
 
 export function ReactionAction({
@@ -50,6 +57,7 @@ export function ReactionAction({
   readOnly = false,
   hidden = false,
   size = 15,
+  reserveCount = false,
 }: Props) {
   if (hidden) return null;
 
@@ -59,7 +67,7 @@ export function ReactionAction({
   const countColor = reacted ? amber : glass ? WHITE_72 : A.MUTE;
 
   const figure =
-    count > 0 ? (
+    count > 0 || reserveCount ? (
       <span
         style={{
           ...FIGS,
@@ -67,9 +75,10 @@ export function ReactionAction({
           fontWeight: 700,
           color: countColor,
           lineHeight: 1,
+          ...(reserveCount ? { minWidth: 13, textAlign: 'left' as const } : null),
         }}
       >
-        {count}
+        {count > 0 ? count : ''}
       </span>
     ) : null;
 

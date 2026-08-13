@@ -80,6 +80,13 @@ export interface WireEvent {
   holeYards?: number | null;
   /** Round this feat came from. Absent on older cache rows — row is then inert. */
   scoreId?: string | null;
+  /**
+   * BENCHMARK for the feat, supplied by the server ("Previous best 4", "Best
+   * here -8", "First clean card here"). RENDERED VERBATIM — already
+   * person-neutral, already length-budgeted, never translated client-side and
+   * never rebuilt from the other fields. Null on aces and albatrosses.
+   */
+  featMargin?: string | null;
 }
 
 
@@ -202,6 +209,7 @@ function baseEvent(row: FeatRow, kind: WireKind, at: string, index: number, user
     courseName: row.course_name ?? null,
     courseImage: row.course_image ?? row.thumbnail_image ?? null,
     scoreId: row.score_id ?? null,
+    featMargin: row.feat_margin ?? null,
   };
 }
 
