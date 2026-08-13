@@ -48,7 +48,7 @@ const LABEL: React.CSSProperties = {
 const APP_STORE_URL = 'https://apps.apple.com/app/id6752538886';
 
 const fmtIndex = (v: number | null | undefined) =>
-  typeof v === 'number' ? v.toFixed(1) : '—';
+  typeof v === 'number' ? v.toFixed(1).replace('-', '\u2212') : '—';
 const fmtInt = (v: number | null | undefined) =>
   typeof v === 'number' ? v.toLocaleString('en-GB') : '—';
 
