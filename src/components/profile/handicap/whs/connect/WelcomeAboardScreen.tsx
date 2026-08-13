@@ -271,7 +271,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         {/* GENUINELY THIN: one honest line. No empty rings, no zero bars. */}
         {belowFloor ? (
           <div style={{ ...CAPTION, color: MUTE, marginTop: 44 }}>
-            {t('whsConnect.done.floor')}
+            {floorCopy}
           </div>
         ) : null}
 
