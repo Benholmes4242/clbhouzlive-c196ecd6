@@ -80,6 +80,13 @@ export interface WireEvent {
   holeYards?: number | null;
   /** Round this feat came from. Absent on older cache rows — row is then inert. */
   scoreId?: string | null;
+  /**
+   * BENCHMARK for the feat, supplied by the server ("Previous best 4", "Best
+   * here -8", "First clean card here"). RENDERED VERBATIM — already
+   * person-neutral, already length-budgeted, never translated client-side and
+   * never rebuilt from the other fields. Null on aces and albatrosses.
+   */
+  featMargin?: string | null;
 }
 
 
