@@ -22,7 +22,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="p-0 rounded-t-[20px] border-0 max-h-[90dvh] overflow-auto"
+        className="p-0 rounded-t-[20px] border-0 max-h-[95dvh] overflow-auto"
         style={{
           fontFamily: FONT,
           color: INK,

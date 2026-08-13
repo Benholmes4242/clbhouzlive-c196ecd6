@@ -40,8 +40,8 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
-          maxHeight: fixedHeight ?? (fullHeight ? '92vh' : '85dvh'),
-          height: fixedHeight ?? (fullHeight ? '92vh' : 'auto'),
+          maxHeight: fixedHeight ?? '95dvh',
+          height: fixedHeight ?? (fullHeight ? '95dvh' : 'auto'),
           background: CT.canvas,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
