@@ -38,7 +38,6 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
-import { MomentsSheet } from './courseled/MomentsSheet';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 import { HonoursBoard, sortHonours } from './courseled/HonoursBoard';
@@ -120,7 +119,6 @@ export default function ExploreTabContent({
   const mostPlayed = mostPlayedQuery.data;
 
   const [friendsSheet, setFriendsSheet] = useState(false);
-  const [momentsSheet, setMomentsSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
@@ -511,7 +509,13 @@ export default function ExploreTabContent({
           isPending={momentsQuery.isPending}
           lastSeen={lastSeen}
           onTilePress={handleMoment}
-          onSeeAll={() => setMomentsSheet(true)}
+          onSeeAll={() => {
+            analyticsEvents.track('community_page_open', {
+              source: 'discover_see_all',
+              moment_count: momentList.length,
+            });
+            navigate('/community');
+          }}
         />
 
         <MostPlayedLeaderboard
@@ -547,13 +551,6 @@ export default function ExploreTabContent({
       />
 
       <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
-
-      <MomentsSheet
-        open={momentsSheet}
-        onClose={() => setMomentsSheet(false)}
-        moments={momentList}
-        onTilePress={handleMoment}
-      />
 
       <MostPlayedSheet
         open={mostPlayedSheet}
