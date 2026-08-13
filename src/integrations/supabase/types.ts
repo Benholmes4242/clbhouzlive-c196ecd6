@@ -18130,6 +18130,8 @@ export type Database = {
           rounds_count: number
         }[]
       }
+      gate_invite_context: { Args: { p_code: string }; Returns: Json }
+      gate_profile_context: { Args: { p_username: string }; Returns: Json }
       generate_weekly_pickem: { Args: never; Returns: number }
       generate_whs_invite_code: { Args: never; Returns: string }
       geo_region_from_coords: {
