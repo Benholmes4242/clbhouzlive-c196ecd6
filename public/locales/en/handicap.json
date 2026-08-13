@@ -18,13 +18,13 @@
     "seasonBirdies": "BIRDIES",
     "seasonBest": "BEST",
     "sparseFootnote": "Post a few more rounds and crowns, Top 100 progress and longer streaks appear here.",
-    "bestRoundLine": "{{date}} \u00b7 {{gross}} gross"
+    "bestRoundLine": "{{date}} · {{gross}} gross"
   },
   "stableford": {
     "kicker": "STABLEFORD POINTS",
     "title": "How you are scoring",
-    "sample_one": "{{count}} round \u00b7 last {{scope}}",
-    "sample_other": "{{count}} rounds \u00b7 last {{scope}}",
+    "sample_one": "{{count}} round · last {{scope}}",
+    "sample_other": "{{count}} rounds · last {{scope}}",
     "scope30d": "30 days",
     "scope90d": "90 days",
     "scopeAll": "all time",
@@ -36,7 +36,7 @@
     "zoneRange": "36+ PTS",
     "zoneBody": "At or above your handicap. These become your counters and pull your index down.",
     "solidLabel": "Solid round",
-    "solidRange": "33\u201335 PTS",
+    "solidRange": "33–35 PTS",
     "solidBody": "Just below your level. The swing was working but a few holes leaked shots.",
     "offLabel": "Off day",
     "offRange": "UNDER 33 PTS",
@@ -54,7 +54,7 @@
     "headlineNone": "Nothing running",
     "headlineOne": "One streak running",
     "headlineMany": "{{count}} streaks running",
-    "longestEver": "Longest ever \u00b7 {{n}} {{unit}} \u00b7 {{name}}",
+    "longestEver": "Longest ever · {{n}} {{unit}} · {{name}}",
     "longestEverLabel": "Longest ever",
     "sectionRunning": "Running now",
     "sectionBroken": "Broken",
@@ -62,7 +62,7 @@
     "moreToBeatIt": "{{n}} more to beat it",
     "atYourBest": "At your best",
     "settingItNow": "Your best ever, still running",
-    "brokenLine": "Best {{n}} {{unit}} \u00b7 broken {{when}}",
+    "brokenLine": "Best {{n}} {{unit}} · broken {{when}}",
     "bestLine": "Best {{n}} {{unit}}",
     "notStartedYet": "Not started yet",
     "freezeHeld_one": "{{count}} freeze held",
@@ -70,7 +70,7 @@
     "freezeRefill": "Next refill {{when}}",
     "freezeTotal_one": "{{count}} freeze",
     "freezeTotal_other": "{{count}} freezes",
-    "closing": "A streak ends the first round it is not extended. Nothing is lost \u2014 your best stays on the record.",
+    "closing": "A streak ends the first round it is not extended. Nothing is lost — your best stays on the record.",
     "unit": {
       "rounds_one": "round",
       "rounds_other": "rounds",
@@ -96,7 +96,7 @@
       "no_up": {
         "label": "No index increases",
         "short": "index holds",
-        "explainer": "Counter rounds that did not increase your handicap index. Defensive streak \u2014 holding the line."
+        "explainer": "Counter rounds that did not increase your handicap index. Defensive streak — holding the line."
       },
       "sub_par": {
         "label": "Sub-par rounds",
@@ -111,7 +111,7 @@
       "round_played": {
         "label": "Weeks played",
         "short": "weeks played",
-        "explainer": "Weeks where you played at least one round. Pure activity streak \u2014 your engagement baseline."
+        "explainer": "Weeks where you played at least one round. Pure activity streak — your engagement baseline."
       }
     }
   },
@@ -120,14 +120,14 @@
     "headlineSent_one": "{{count}} sent",
     "headlineSent_other": "{{count}} sent",
     "headlineNone": "No invites yet",
-    "split": "{{pending}} pending \u00b7 {{joined}} joined",
+    "split": "{{pending}} pending · {{joined}} joined",
     "status": {
       "joined": "Joined",
       "expired": "Expired"
     },
-    "groupJoined": "Joined \u00b7 {{count}}",
-    "groupPending": "Pending \u00b7 {{count}}",
-    "groupExpired": "Expired \u00b7 {{count}}",
+    "groupJoined": "Joined · {{count}}",
+    "groupPending": "Pending · {{count}}",
+    "groupExpired": "Expired · {{count}}",
     "showAll": "Show all {{count}}",
     "showFewer": "Show fewer",
     "empty": "Nothing sent yet. Invite a friend from the panel behind this sheet and it appears here."
@@ -137,7 +137,8 @@
       "headline": "Your game, in numbers you can use.",
       "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
       "cta": "Choose your country",
-      "decline": "I don't hold an official handicap"
+      "decline": "I don't hold an official handicap",
+      "kicker": "Your record, read properly"
     },
     "rings": {
       "label": "Which holes cost you",
@@ -178,7 +179,9 @@
       "parCourse": "Par {{par}} - {{course}}",
       "courseUnknown": "Unmapped course",
       "floor": "Your scoring breakdown builds as you post rounds.",
-      "cta": "See your full record"
+      "cta": "See your full record",
+      "headlineRounds": "{{rounds}} rounds, all here.",
+      "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
     }
   }
 }
