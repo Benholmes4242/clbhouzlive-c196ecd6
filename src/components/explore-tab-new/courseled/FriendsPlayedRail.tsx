@@ -44,6 +44,19 @@ const PHOTO_H = 104;
 const RAIL_SCRIM =
   'linear-gradient(0deg, rgba(10,14,10,0.66) 0%, rgba(10,14,10,0.28) 38%, rgba(10,14,10,0) 72%)';
 
+/* A GLASS CHIP OVER A PHOTO MUST STAY READABLE ON EVERY PHOTO, and the answer
+   is STRENGTHENING THE SCRIM UNDER THE CHIP rather than darkening the glass.
+   Measured on the brightest images in the catalogue and on a synthetic pure-white
+   worst case: this footprint-sized pool holds white text above 4.5:1 even on
+   pure white, while leaving the rest of the frame within ~5% of its brightness.
+   A wider pool cleared contrast too but visibly muddied the photograph. */
+const SCRIM_CHIP =
+  'radial-gradient(92% 132% at 2% 86%, rgba(8,12,8,0.86) 0%, rgba(8,12,8,0.52) 56%, rgba(8,12,8,0) 88%)';
+
+/** The base scrim is bottom-weighted, so the when-chip needs its own top band. */
+const SCRIM_TOP =
+  'linear-gradient(180deg, rgba(8,12,8,0.34) 0%, rgba(8,12,8,0.10) 30%, rgba(8,12,8,0) 52%)';
+
 /* ────────────────────────────── GLASS ────────────────────────────────────
    backdrop-filter is the whole point of this design and it is the property
    most likely to no-op on an older webview. The FLAT, HIGHER-OPACITY fill is
