@@ -41,6 +41,7 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { PostRoundShell } from '@/components/feed/PostRoundShell';
+import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -97,6 +98,11 @@ export interface LightFeedCardProps {
   postRound?: PostRound | null;
   /** True when the round is still in flight — render the shell, not nothing. */
   postRoundPending?: boolean;
+  /**
+   * SETTLED-AND-ABSENT: the round map has finished and has no entry for this
+   * post. Distinct from `postRoundPending` on purpose — see PostRoundDegraded.
+   */
+  postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
@@ -234,6 +240,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   courseContext,
   postRound,
   postRoundPending,
+  postRoundMissing,
   onRoundTap,
 }) => {
   const { activeActor, setActiveActor } = useActiveActor();
@@ -403,6 +410,14 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 
       {/* Attached round — scorecard block sits ABOVE media (parity with Clubhouse) */}
       {!postRound && postRoundPending && <PostRoundShell />}
+      {!postRound && !postRoundPending && postRoundMissing && (
+        <PostRoundDegraded
+          postId={post.id}
+          hasScoreId
+          courseName={post.courseName ?? null}
+          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
+        />
+      )}
       {postRound && (
         <PostRoundCard
           round={postRound}

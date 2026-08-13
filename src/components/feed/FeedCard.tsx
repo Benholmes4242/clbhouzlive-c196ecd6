@@ -51,6 +51,7 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { PostRoundShell } from '@/components/feed/PostRoundShell';
+import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
 
 
 
@@ -135,6 +136,11 @@ export interface FeedCardProps {
    * never paints without its scorecard and then gains one.
    */
   postRoundPending?: boolean;
+  /**
+   * SETTLED-AND-ABSENT: the round map has finished and has no entry for this
+   * post. Distinct from `postRoundPending` on purpose — see PostRoundDegraded.
+   */
+  postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
 }
@@ -278,6 +284,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   courseContext,
   postRound,
   postRoundPending,
+  postRoundMissing,
   onRoundTap,
 }) => {
   
@@ -580,6 +587,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {/* Attached round — scorecard block sits ABOVE media. Waiting posts
           render the shell in the same space (no pop-in, no jump). */}
       {!postRound && postRoundPending && <PostRoundShell />}
+      {!postRound && !postRoundPending && postRoundMissing && (
+        <PostRoundDegraded
+          postId={post.id}
+          hasScoreId
+          courseName={post.courseName ?? null}
+          courseRegion={[post.courseRegion || post.courseSubCountry, post.courseCountry].filter(Boolean).join(', ') || null}
+        />
+      )}
       {postRound && (
         <PostRoundCard
           round={postRound}
