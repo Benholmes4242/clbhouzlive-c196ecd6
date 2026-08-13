@@ -844,6 +844,22 @@ export function AroundTheWorld({
              */
             const detailShown = !!detail && !(top && detailAddsNothing(top, figure));
 
+            /**
+             * THE BENCHMARK (BRIEF_STANDOUT_TILE_MARGIN §2). Server-supplied and
+             * rendered VERBATIM — not reformatted, not appended to, not
+             * translated here, and never rebuilt from the other fields. Null on
+             * aces and albatrosses, which bill zero height for it.
+             *
+             * `detailAddsNothing`'s principle extends here: if the benchmark and
+             * the detail are one fact told twice, the BENCHMARK is dropped.
+             */
+            const marginRaw = (top?.featMargin ?? '').trim();
+            const detailText = who && detailShown ? detail : '';
+            const margin =
+              marginRaw && marginRaw.toLowerCase() === detailText.trim().toLowerCase()
+                ? ''
+                : marginRaw;
+
             return {
               g,
               m,
@@ -857,12 +873,11 @@ export function AroundTheWorld({
               isOwn,
               detail,
               detailShown,
+              margin,
               more,
               reactTo,
               onPress,
-              height:
-                photo +
-                estimatePanelHeight(who && detailShown ? detail : '', more > 0),
+              height: photo + estimatePanelHeight(detailText, margin, more > 0),
             };
           });
 
