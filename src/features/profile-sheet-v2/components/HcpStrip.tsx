@@ -399,6 +399,7 @@ const TrendCard: React.FC<{
         const area = `${line} L${w - padX},${h} L${padX},${h} Z`;
         const mx = xy[active][0];
         const my = xy[active][1];
+        const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
         return (
           <svg width={w} height={h} style={{ display: 'block' }}>
             <defs>
@@ -422,9 +423,9 @@ const TrendCard: React.FC<{
             <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
             <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
             <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
-            <circle cx={mx} cy={my} r={11} fill="#FFFFFF" fillOpacity={0.45} />
-            <circle cx={mx} cy={my} r={6} fill="#FFFFFF" />
-            <circle cx={mx} cy={my} r={3.4} fill={A.INK} />
+            <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
+            <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
+            <circle cx={mx} cy={my} r={2.5} fill={markerTone} />
           </svg>
         );
       }}
