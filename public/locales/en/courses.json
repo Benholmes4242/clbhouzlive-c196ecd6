@@ -1251,9 +1251,6 @@
     "defending": "Defending",
     "nPhotos": "{{count}} photos",
     "nPhotos_one": "{{count}} photo",
-    "momentsOfTheMonth": "Moments of the month",
-    "momentsOverline": "{{count}} courses",
-    "momentsOverline_one": "{{count}} course",
     "mostPlayed": "Most played this week",
     "trackedRounds": "Tracked rounds",
     "roundsLabel": "Rounds",
@@ -1328,8 +1325,6 @@
     "roundFinished": "R{{round}} · F",
     "playersTied": "{{count}} players tied",
     "playersTied_one": "{{count}} players tied",
-    "momentsGroupCount": "{{count}} moments",
-    "momentsGroupCount_one": "{{count}} moment",
     "friendsRail": {
       "par": "Par {{par}}",
       "index": "HCP",
@@ -1389,7 +1384,10 @@
       "emptyBody": "Try their handle, or invite them to clbhouz",
       "inviteQuiet": "Invite a golfer",
       "inviteCta": "Invite a golfer to clbhouz"
-    }
+    },
+    "momentsFromCommunity": "From the community",
+    "momentsCount": "{{count}} moments",
+    "momentsCount_one": "{{count}} moment"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
