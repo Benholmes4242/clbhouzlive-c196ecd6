@@ -114,22 +114,38 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  * of the strings and flags on the tile — no DOM measurement, no refs, no
  * reflow. Same input, same layout, every render.
  *
- * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4):
+ * Recomputed for the BRIEF_STANDOUT_ROUNDS type (§4), then again for the
+ * benchmark line (BRIEF_STANDOUT_TILE_MARGIN §4):
  *
  *   padding 11 + 12 = 23, WHO line 18 (13/700, one line)
  *   DETAIL 2 marginTop + 16 a line (12/600 at lineHeight 1.32), max two
+ *   MARGIN 3 marginTop + 15 a line (11/600 at lineHeight 1.3 = 14.3, rounded
+ *          up to 15), max two — it renders through StandoutTile's `subline`
+ *          slot, so it is billed at THAT slot's real metrics, not at LABEL
+ *          scale
  *   MORE line 15 (6.5 label + 6 marginTop)
  *
  * A tile with NO detail line bills ZERO for it (§2) — the line is omitted, not
- * padded, so the estimate must not charge a minimum of one.
+ * padded, so the estimate must not charge a minimum of one. THE SAME HOLDS FOR
+ * THE MARGIN: aces and albatrosses carry no benchmark (a hole in one has no
+ * previous best) and must not gain phantom height.
  *
  * The DETAIL line count comes from a character threshold at the ~151px inner
  * width (177px column less 13px side padding either side; 12px, ~6.4px/char
- * => ~24 chars a line), clamped at two.
+ * => ~24 chars a line), clamped at two. The MARGIN sets at 11px (~5.9px/char
+ * => ~25 chars a line); the longest live string is "First clean card here" at
+ * 21 characters, so every current benchmark is one line.
  */
-function estimatePanelHeight(detail: string, hasMore: boolean): number {
+function estimatePanelHeight(detail: string, margin: string, hasMore: boolean): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
-  return 23 + 18 + (lines > 0 ? 2 + lines * 16 : 0) + (hasMore ? 15 : 0);
+  const marginLines = margin ? Math.min(2, Math.ceil(margin.length / 25)) : 0;
+  return (
+    23 +
+    18 +
+    (lines > 0 ? 2 + lines * 16 : 0) +
+    (marginLines > 0 ? 3 + marginLines * 15 : 0) +
+    (hasMore ? 15 : 0)
+  );
 }
 
 /**
