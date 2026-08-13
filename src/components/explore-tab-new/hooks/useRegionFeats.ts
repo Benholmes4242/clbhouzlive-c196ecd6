@@ -51,6 +51,13 @@ export interface FeatRow {
   holes_in_one?: number | null;
   beat_par?: boolean | null;
   clean_card?: boolean | null;
+  /**
+   * Server-supplied benchmark for the feat ("Previous best 4", "First round
+   * here"). Person-neutral and length-budgeted by refresh_discover_feats;
+   * rendered VERBATIM. Null on aces and albatrosses — deliberately, since a
+   * hole in one has no previous best.
+   */
+  feat_margin?: string | null;
 }
 
 // Rails are bucketed server-side into per-region cache rows. The client
