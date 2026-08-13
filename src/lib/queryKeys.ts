@@ -17,11 +17,13 @@
  *      and shared-key collisions, and nothing else. Read the warning below.
  *   2. REACHABILITY TEST — if the same logical answer can sit under two
  *      different key values, the key contains request shape. Remove it.
- *      A key derived from `ids.join()`, `[...ids]`, a hash of an id array or
- *      `JSON.stringify(rows)` fails this test: the key churns on every
- *      pagination page while the answer for already-loaded rows is unchanged,
- *      `data` goes undefined for a paint, and everything rendered from it
- *      unmounts mid-scroll. Use `batchKey()` instead.
+ *      A key derived from `JSON.stringify(rows)` or any row CONTENT fails this
+ *      test. An id-set DIGEST does not: it is the identity of the answer for a
+ *      batched read, because a different id set is a different answer. What
+ *      the digest costs is a fetch when the set changes, and that is exactly
+ *      what `keepPreviousData` + `useMergedBatch` absorb. Use `batchKey()`
+ *      with `batchDigest(ids)`.
+
  *
  * ══ WHAT A KEY CAN NEVER CATCH — READ BEFORE DELETING A RENDER GUARD ══
  *
@@ -61,26 +63,38 @@
  * For "one read for the whole visible page" hooks (feed enrichment, comment
  * enrichment, Top 100 enrichment), the key is:
  *
- *     batchKey(domain, scope, viewerId, loadedCount)
+ *     batchKey(domain, scope, viewerId, batchDigest(ids))
  *
  * paired with `placeholderData: keepPreviousData` and a MERGE of the new
  * result over the previous map (see `useMergedBatch` in `./batchQuery`).
- *   - `scope`       what the list IS (feed variant, profile actor, target id)
- *   - `viewerId`    the viewer test, satisfied
- *   - `loadedCount` a MONOTONIC page marker, not the id set — it says "how
- *                   far down the list we are", which is request progress, but
- *                   bounded and ordered so previous data is always a valid
- *                   subset rather than an unrelated cache entry
+ *   - `scope`   what the list IS (feed variant, profile actor, target id)
+ *   - `viewerId` the viewer test, satisfied
+ *   - `digest`  `batchDigest(ids)` — the SORTED, DE-DUPLICATED id set the
+ *               request will actually ask about, compressed to
+ *               `<count>:<hash>` so a 20-row page does not produce a
+ *               700-character key
+ *
+ * A COUNT IS NOT A VALID MARKER. This used to read `loadedCount`, and that is
+ * the defect BRIEF_ROUND_POST_HOLLOW_CARD was written about: any refetch
+ * returning the SAME NUMBER of rows with a DIFFERENT id set hits the same
+ * cache entry, is served the old map, and the new rows' data is never
+ * requested. Worse, a cache hit is not `isPending`, so every "settled" test
+ * built on the query reports done while the map is incomplete, and the UI
+ * shows neither data nor a waiting state. Membership changes without the
+ * count moving on pull-to-refresh, on a new row arriving at the top, and on a
+ * delete-and-replace. Key on the digest.
+ *
  * Residual, and it is accepted deliberately: rows on a NEWLY loaded page have
- * no entry until the fetch resolves, so their block grows in. That shift is
- * below the viewport at the append point. Do NOT "fix" it by reserving a
- * min-height for un-fetched rows — that reintroduces a height guess for
- * exactly the rows whose height is unknown.
+ * no entry until the fetch resolves, so their block grows in. `keepPreviousData`
+ * plus `mergeOverPrevious` keep every already-resolved row on screen while the
+ * new digest fetches, so nothing that was rendered unmounts. Do NOT "fix" the
+ * grow-in by reserving a min-height for un-fetched rows — that reintroduces a
+ * height guess for exactly the rows whose height is unknown.
  *
  * ══ SCALARS ONLY ══
  *
  * Every builder parameter is a scalar by TYPE. An id array is therefore not
- * expressible as a key argument. That is the mechanism, not a style rule.
+ * expressible as a key argument — it enters as `batchDigest(ids)`.
  */
 
 /** The only value types allowed in a key segment. */
@@ -99,40 +113,61 @@ export function viewerId(id: string | null | undefined): ViewerId {
 }
 
 /**
+ * Compress an id SET into one short key segment: `<count>:<hash>`.
+ *
+ * The ids must already be the exact set the request will ask about; callers
+ * sort and de-duplicate before this (order-independence matters — the same set
+ * in a different order is the same answer). FNV-1a, non-cryptographic, no
+ * dependency. The count is kept in front of the hash so a key is readable in
+ * devtools and so two different sets of different sizes can never collide.
+ */
+export function batchDigest(ids: readonly string[]): string {
+  if (ids.length === 0) return 'none';
+  let h = 0x811c9dc5;
+  const joined = ids.join(',');
+  for (let i = 0; i < joined.length; i++) {
+    h ^= joined.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return `${ids.length}:${(h >>> 0).toString(36)}`;
+}
+
+/**
  * The batch idiom key. See THE BATCH IDIOM above.
  *
- * @param domain      stable domain name, e.g. 'post-rounds'
- * @param scope       what the list is — NEVER derived from row contents
- * @param viewer      viewer identity (`viewerId(user?.id)`)
- * @param loadedCount how many rows are loaded (monotonic page marker)
+ * @param domain stable domain name, e.g. 'post-rounds'
+ * @param scope  what the list is — NEVER derived from row contents
+ * @param viewer viewer identity (`viewerId(user?.id)`)
+ * @param digest `batchDigest(ids)` for the id set being requested
  */
 export function batchKey(
   domain: string,
   scope: string,
   viewer: ViewerId,
-  loadedCount: number,
+  digest: string,
 ): readonly KeySegment[] {
-  return [domain, scope, viewer, loadedCount] as const;
+  return [domain, scope, viewer, digest] as const;
 }
 
 /* ───────────────────────── Clubhouse feed batches ───────────────────────── */
 
 export const feedKeys = {
   /** post_id -> whs_score_id for the loaded page. */
-  postScoreIds: (scope: string, viewer: ViewerId, loadedCount: number) =>
-    batchKey('post-score-ids', scope, viewer, loadedCount),
+  postScoreIds: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('post-score-ids', scope, viewer, digest),
 
   /** whs_score_id -> round stats + hole shape for the loaded page. */
-  postRounds: (scope: string, viewer: ViewerId, loadedCount: number) =>
-    batchKey('post-rounds', scope, viewer, loadedCount),
+  postRounds: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('post-rounds', scope, viewer, digest),
 
   /**
    * course_id -> community + viewer course context for the loaded page.
    * Viewer-scoped: `your_rounds` / `your_best` come back per identity.
    */
-  postCourseContext: (scope: string, viewer: ViewerId, loadedCount: number) =>
-    batchKey('post-course-context', scope, viewer, loadedCount),
+  postCourseContext: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('post-course-context', scope, viewer, digest),
 } as const;
+
 
 /* ─────────────────────────────── Comments v2 ─────────────────────────────── */
 
@@ -184,8 +219,9 @@ export const commentsKeys = {
 
 export const top100Keys = {
   /** Batched Top 100 card enrichment for the loaded page set. */
-  enrichment: (scope: string, viewer: ViewerId, loadedCount: number) =>
-    batchKey('top100-enrichment', scope, viewer, loadedCount),
+  enrichment: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('top100-enrichment', scope, viewer, digest),
+
 } as const;
 
 /* ─────────────────────────────── Discover ─────────────────────────────── */
