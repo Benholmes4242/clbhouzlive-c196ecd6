@@ -106,10 +106,14 @@ export function StandoutTile({
       >
         <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
 
-        {/* FIGURE CHIP — the reason the tile exists: 10px radius on a blurred
-            glass substrate, so the age beside it stops competing. */}
+        {/* FIGURE CHIP — the reason the tile exists: 10px radius on a GLASS
+            substrate, so the age beside it stops competing. The fill, hairline
+            and blur live in `.standout-figure-chip` (liquid-glass.css) because
+            the blur must be an @supports enhancement over a flat base fill —
+            inline styles cannot express that (BRIEF_STANDOUT_TILE_MARGIN §5a). */}
         {figure && (
           <span
+            className="standout-figure-chip"
             style={{
               position: 'absolute',
               top: 8,
@@ -119,9 +123,6 @@ export function StandoutTile({
               gap: 4,
               padding: '5px 10px',
               borderRadius: 10,
-              background: 'rgba(10,14,10,0.58)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
             }}
           >
             <span
