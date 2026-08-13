@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { INK, MUTE, DIM, BORDER, TRACK, GOOD, BAD, LABEL, CAPTION, NUM } from './designTokens';
-import { PrimaryButton, FooterBar, FlowBody, FlowHead, Panel, PanelGap } from './Primitives';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  INK, MUTE, DIM, PANEL, BORDER, GOOD, BAD,
+  LABEL_LG, CAPTION, HERO_FIG, NUM,
+} from './designTokens';
+import { PrimaryButton, FooterBar, Stage, StageHead } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
 import {
   useHandicapHistory,
@@ -10,6 +14,7 @@ import {
 } from '@/lib/whs/hooks';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import ParRings from './ParRings';
+import { useRingSize } from './useRingSize';
 
 interface Props {
   firstName: string;
@@ -32,12 +37,28 @@ const YEAR = 365 * 86400_000;
 const PENDING_CEILING_MS = 45_000;
 
 /**
+ * THE BREAKDOWN IS NOT READY WHEN THIS SCREEN MOUNTS.
+ *
+ * get_my_scoring_breakdown_all_courses only counts scores with
+ * hole_by_hole_fetched = true. The hole rows themselves are written inside
+ * connect-whs (within ~4s of the connection row), but the FLAG flips in a later
+ * pass: on the most recent real connection the earliest flagged score was
+ * +2m25s after connect-whs returned. So for a couple of minutes the RPC
+ * honestly reports 0 complete rounds.
+ *
+ * That is a LAG, not a thin record - so the screen polls for it and says it is
+ * still reading, and only falls back to the record-is-thin line once the poll
+ * ceiling passes. It never shows empty rings or a zeroed figure.
+ */
+const BREAKDOWN_POLL_MS = 5_000;
+const BREAKDOWN_CEILING_MS = 180_000;
+
+/**
  * THE FLOOR. Derived from the connected population, not invented: the smallest
- * record in the base today is 29 complete 18-hole rounds, and the RPC's par
- * splits only steady once each par type has a few dozen holes behind it. Eight
+ * record in the base today is 55 complete 18-hole rounds and nothing sits under
+ * 20, so this floor never fires for a real newly connected member. Eight
  * complete rounds is ~144 holes (~32 par 3s) - the point at which avg_over per
- * par type stops moving with a single bad hole. Every real newly connected
- * member clears it on import; a thin record does not get rings built on noise.
+ * par type stops moving with a single bad hole.
  */
 const RINGS_MIN_COMPLETE_ROUNDS = 8;
 /** A par split also needs its own holes behind it, not just the round count. */
@@ -51,7 +72,10 @@ const fmtIndex = (h: number | null) => {
   return h < 0 ? `+${Math.abs(h).toFixed(1)}` : h.toFixed(1);
 };
 
-/** SCREEN 5 - THE PAYOFF. Index, then where the shots go, then what costs most. */
+/**
+ * STAGE 5 - THE PAYOFF. The index IS the screen: a HERO_FIG on SURFACE, then
+ * where the shots go, then the holes that cost most. No card carries the index.
+ */
 export const WelcomeAboardScreen: React.FC<Props> = ({
   handicapIndex,
   connectionId,
@@ -59,6 +83,8 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('handicap');
   const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
+  const ringSize = useRingSize(92, 78);
   const { data: counts, isFetching: countsFetching } = useImportedCounts(connectionId);
   const { data: history, isFetching: historyFetching } = useHandicapHistory(
     connectionId ?? undefined,
@@ -79,6 +105,22 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
      connection id is not known yet, or the counts query is still polling. */
   const countersPending =
     !ceilingHit && !counts && (!connectionId || countsFetching || historyFetching || !history);
+
+  /* The hole-by-hole flag lands after this screen does. Poll for it, bounded. */
+  const completeRounds = breakdown?.complete_rounds ?? 0;
+  const [breakdownCeilingHit, setBreakdownCeilingHit] = useState(false);
+  useEffect(() => {
+    if (completeRounds > 0) return;
+    const stop = setTimeout(() => setBreakdownCeilingHit(true), BREAKDOWN_CEILING_MS);
+    const poll = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['scoring-breakdown-all-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['whs-nemesis-holes'] });
+    }, BREAKDOWN_POLL_MS);
+    return () => {
+      clearTimeout(stop);
+      clearInterval(poll);
+    };
+  }, [completeRounds, queryClient]);
 
   const { delta, years, sinceYear } = useMemo(() => {
     const pts = (history ?? []).filter((p) => Number.isFinite(p.handicap_index));
@@ -105,15 +147,16 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
   /* The copy must not assert completion the member cannot see. While the
      figures are still landing the headline states what is happening. */
+  const rounds = counts?.rounds ?? null;
   const headline = countersPending
     ? t('whsConnect.done.headlinePending')
+    : rounds
+    ? t('whsConnect.done.headlineRounds', { rounds })
     : years && years > 1
     ? t('whsConnect.done.headlineYears', { years })
     : t('whsConnect.done.headline');
 
-  const sub = countersPending
-    ? t('whsConnect.done.subPending')
-    : t('whsConnect.done.sub');
+  const lead = countersPending ? t('whsConnect.done.subPending') : t('whsConnect.done.sub');
 
   const par3 = breakdown?.par3 ?? null;
   const par4 = breakdown?.par4 ?? null;
@@ -121,7 +164,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
   const ringsReady =
     !!breakdown &&
-    (breakdown.complete_rounds ?? 0) >= RINGS_MIN_COMPLETE_ROUNDS &&
+    completeRounds >= RINGS_MIN_COMPLETE_ROUNDS &&
     !!par3 && !!par4 && !!par5 &&
     par3.holes_played >= RINGS_MIN_HOLES_PER_PAR &&
     par4.holes_played >= RINGS_MIN_HOLES_PER_PAR &&
@@ -129,143 +172,184 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
   const holes = (nemesis ?? []).filter((h) => Number.isFinite(h.my_avg_over));
   const holesReady = ringsReady && holes.length >= 3;
-  const maxCost = holes.length ? Math.max(...holes.map((h) => Math.abs(h.my_avg_over))) : 0;
 
-  const belowFloor = !ringsReady && !!breakdown;
+  /* Still arriving vs genuinely thin. Only the second gets the floor line. */
+  const breakdownLanding = !ringsReady && !breakdownCeilingHit;
+  const belowFloor = !ringsReady && breakdownCeilingHit;
 
   return (
     <>
-      <FlowBody>
-        <FlowHead kicker={t('whsConnect.done.kicker')} kickerColor={GOOD} headline={headline} sub={sub} />
+      <Stage>
+        <StageHead
+          kicker={t('whsConnect.done.kicker')}
+          kickerColor={GOOD}
+          headline={headline}
+          lead={lead}
+        />
 
-        <div style={{ marginTop: 22 }}>
-          {/* a. HANDICAP INDEX */}
-          <Panel
-            kicker={t('whsConnect.done.indexLabel')}
-            aside={
-              counts?.courses && sinceYear
-                ? t('whsConnect.done.coursesSince', { courses: counts.courses, year: sinceYear })
-                : undefined
-            }
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+        {/* a. THE INDEX. No card - the figure is the screen. */}
+        <div style={{ marginTop: 40 }}>
+          <div style={{ ...LABEL_LG, marginBottom: 12 }}>{t('whsConnect.done.indexLabel')}</div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
+            <div style={HERO_FIG}>
+              {countersPending && handicapIndex === null ? DASH : fmtIndex(handicapIndex)}
+            </div>
+            {delta !== null ? (
+              <div style={{ paddingBottom: 8 }}>
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: deltaColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    ...NUM,
+                  }}
+                >
+                  <span aria-hidden>{improved ? '\u25BC' : '\u25B2'}</span>
+                  {`${improved ? MINUS : '+'}${Math.abs(delta).toFixed(1)}`}
+                </div>
+                <div style={{ ...LABEL_LG, marginTop: 6 }}>{t('whsConnect.done.span')}</div>
+              </div>
+            ) : null}
+          </div>
+          {counts?.courses && sinceYear ? (
+            <div style={{ ...LABEL_LG, color: DIM, marginTop: 14 }}>
+              {t('whsConnect.done.coursesSince', { courses: counts.courses, year: sinceYear })}
+            </div>
+          ) : null}
+        </div>
+
+        {/* b. WHERE YOUR SHOTS GO */}
+        {ringsReady ? (
+          <div style={{ marginTop: 44 }}>
+            <div style={{ ...LABEL_LG, marginBottom: 6 }}>{t('whsConnect.done.shotsLabel')}</div>
+            <div style={{ ...CAPTION, color: MUTE, marginBottom: 22 }}>
+              {t('whsConnect.rings.caption')}
+            </div>
+            <ParRings
+              par3={{ value: par3!.avg_over, holes: par3!.holes_played }}
+              par4={{ value: par4!.avg_over, holes: par4!.holes_played }}
+              par5={{ value: par5!.avg_over, holes: par5!.holes_played }}
+              size={ringSize}
+              labels={{
+                par3: t('whsConnect.rings.par3'),
+                par4: t('whsConnect.rings.par4'),
+                par5: t('whsConnect.rings.par5'),
+              }}
+              holesLabel={(n) => t('whsConnect.rings.holes', { n })}
+            />
+          </div>
+        ) : null}
+
+        {/* STILL LANDING: the flag on each score flips after this screen mounts. */}
+        {breakdownLanding ? (
+          <div style={{ marginTop: 44 }}>
+            <div style={{ ...LABEL_LG, marginBottom: 10 }}>{t('whsConnect.done.shotsLabel')}</div>
+            <div style={{ ...CAPTION, color: MUTE }}>{t('whsConnect.done.shotsLanding')}</div>
+          </div>
+        ) : null}
+
+        {/* GENUINELY THIN: one honest line. No empty rings, no zero bars. */}
+        {belowFloor ? (
+          <div style={{ ...CAPTION, color: MUTE, marginTop: 44 }}>
+            {t('whsConnect.done.floor')}
+          </div>
+        ) : null}
+
+        {/* c. THE HOLES THAT COST MOST. White squares on SURFACE. */}
+        {holesReady ? (
+          <div style={{ marginTop: 44 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                marginBottom: 14,
+              }}
+            >
+              <div style={LABEL_LG}>{t('whsConnect.done.damagingLabel')}</div>
+              <div style={LABEL_LG}>{t('whsConnect.done.damagingAside')}</div>
+            </div>
+            {holes.slice(0, 3).map((h) => (
               <div
+                key={`${h.course_id}-${h.hole_no}`}
                 style={{
-                  fontSize: 40,
-                  fontWeight: 700,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1,
-                  color: INK,
-                  ...NUM,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  background: PANEL,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 14,
+                  padding: 14,
+                  marginBottom: 10,
                 }}
               >
-                {countersPending && handicapIndex === null ? DASH : fmtIndex(handicapIndex)}
-              </div>
-              {delta !== null ? (
-                <div style={{ paddingBottom: 3 }}>
+                {/* The white square: the hole number, nothing else. */}
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    flexShrink: 0,
+                    borderRadius: 12,
+                    background: '#F8FAFC',
+                    border: `1px solid ${BORDER}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 700,
+                      letterSpacing: '-0.03em',
+                      color: INK,
+                      ...NUM,
+                    }}
+                  >
+                    {h.hole_no}
+                  </span>
+                  <span style={{ ...LABEL_LG, fontSize: 7 }}>{`PAR ${h.par}`}</span>
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       fontSize: 15,
                       fontWeight: 700,
-                      color: deltaColor,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      ...NUM,
+                      letterSpacing: '-0.015em',
+                      color: INK,
                     }}
                   >
-                    <span aria-hidden>{improved ? '\u25BC' : '\u25B2'}</span>
-                    {`${improved ? MINUS : '+'}${Math.abs(delta).toFixed(1)}`}
+                    {h.course_name ?? t('whsConnect.done.courseUnknown')}
                   </div>
-                  <div style={{ ...LABEL, marginTop: 4 }}>{t('whsConnect.done.span')}</div>
+                  <div style={{ ...LABEL_LG, color: DIM, marginTop: 6 }}>
+                    {t('whsConnect.rings.holes', { n: h.times_played })}
+                  </div>
                 </div>
-              ) : null}
-            </div>
-          </Panel>
 
-          {/* BELOW THE FLOOR: one honest line. No empty rings, no zero bars. */}
-          {belowFloor ? (
-            <>
-              <div style={{ ...CAPTION, color: MUTE, marginTop: 14 }}>
-                {t('whsConnect.done.floor')}
-              </div>
-            </>
-          ) : null}
-
-          {/* b. WHERE YOUR SHOTS GO */}
-          {ringsReady ? (
-            <>
-              <PanelGap />
-              <Panel kicker={t('whsConnect.done.shotsLabel')}>
-                <div style={{ ...CAPTION, color: MUTE, marginBottom: 16 }}>
-                  {t('whsConnect.rings.caption')}
-                </div>
-                <ParRings
-                  par3={{ value: par3!.avg_over, holes: par3!.holes_played }}
-                  par4={{ value: par4!.avg_over, holes: par4!.holes_played }}
-                  par5={{ value: par5!.avg_over, holes: par5!.holes_played }}
-                  size={78}
-                  labels={{
-                    par3: t('whsConnect.rings.par3'),
-                    par4: t('whsConnect.rings.par4'),
-                    par5: t('whsConnect.rings.par5'),
+                <div
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    letterSpacing: '-0.03em',
+                    color: BAD,
+                    flexShrink: 0,
+                    ...NUM,
                   }}
-                  holesLabel={(n) => t('whsConnect.rings.holes', { n })}
-                />
-              </Panel>
-            </>
-          ) : null}
-
-          {/* c. YOUR MOST DAMAGING HOLES */}
-          {holesReady ? (
-            <>
-              <PanelGap />
-              <Panel
-                kicker={t('whsConnect.done.damagingLabel')}
-                aside={t('whsConnect.done.damagingAside')}
-              >
-                {holes.slice(0, 3).map((h, i) => (
-                  <div
-                    key={`${h.course_id}-${h.hole_no}`}
-                    style={{
-                      padding: i === 0 ? '0 0 13px' : '13px 0',
-                      borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: INK, ...NUM }}>
-                          {t('whsConnect.done.holeNo', { n: h.hole_no })}
-                        </div>
-                        <div style={{ ...LABEL, color: DIM, marginTop: 4, whiteSpace: 'normal' }}>
-                          {t('whsConnect.done.parCourse', {
-                            par: h.par,
-                            course: h.course_name ?? t('whsConnect.done.courseUnknown'),
-                          })}
-                        </div>
-                      </div>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: BAD, flexShrink: 0, ...NUM }}>
-                        {`+${Math.abs(h.my_avg_over).toFixed(2)}`}
-                      </div>
-                    </div>
-                    <div style={{ height: 3, borderRadius: 2, background: TRACK, marginTop: 9 }}>
-                      <div
-                        style={{
-                          height: '100%',
-                          borderRadius: 2,
-                          background: BAD,
-                          width: `${maxCost > 0 ? Math.max(6, (Math.abs(h.my_avg_over) / maxCost) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </Panel>
-            </>
-          ) : null}
-        </div>
-        <div style={{ height: 24 }} />
-      </FlowBody>
+                >
+                  {`+${Math.abs(h.my_avg_over).toFixed(2)}`}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <div style={{ height: 28 }} />
+      </Stage>
 
       <FooterBar>
         <PrimaryButton onClick={onContinue}>{t('whsConnect.done.cta')}</PrimaryButton>

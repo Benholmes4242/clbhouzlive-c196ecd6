@@ -1,6 +1,6 @@
 import React from 'react';
 import { MUTE, BORDER, INK } from './designTokens';
-import { PrimaryButton, Action, FooterBar, FlowBody, FlowHead } from './Primitives';
+import { PrimaryButton, Action, FooterBar, Stage, StageHead } from './Primitives';
 
 interface Props {
   /** Into the app. */
@@ -22,21 +22,22 @@ const WORKS = [
  */
 export const DeclinedScreen: React.FC<Props> = ({ onContinue, onReconsider }) => (
   <>
-    <FlowBody>
-      <FlowHead
+    <Stage>
+      <StageHead
         headline="No handicap, no problem."
-        sub="Almost none of clbhouz needs one. Connect whenever you get one - it takes a minute."
+        lead="Almost none of clbhouz needs one. Connect whenever you get one - it takes a minute."
       />
 
-      <div style={{ marginTop: 22 }}>
+      <div style={{ marginTop: 36 }}>
         {WORKS.map((line, i) => (
           <div
             key={line}
             style={{
-              fontSize: 13.5,
+              fontSize: 15,
               fontWeight: 600,
+              letterSpacing: '-0.01em',
               color: INK,
-              padding: i === 0 ? '0 0 12px' : '12px 0',
+              padding: i === 0 ? '0 0 15px' : '15px 0',
               borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
             }}
           >
@@ -44,11 +45,12 @@ export const DeclinedScreen: React.FC<Props> = ({ onContinue, onReconsider }) =>
           </div>
         ))}
       </div>
-    </FlowBody>
+      <div style={{ height: 28 }} />
+    </Stage>
 
     <FooterBar>
       <PrimaryButton onClick={onContinue}>Carry on to the app</PrimaryButton>
-      <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center' }}>
+      <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
         <Action onClick={onReconsider} color={MUTE}>
           Actually, I do hold one
         </Action>

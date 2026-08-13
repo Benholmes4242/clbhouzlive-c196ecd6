@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { INK, MUTE, DIM, BORDER, BAD, FONT, LABEL } from './designTokens';
-import { Panel, PrimaryButton, FooterBar, Action, FlowBody, FlowHead } from './Primitives';
+import { INK, MUTE, DIM, BORDER, BAD, FONT, LABEL_LG } from './designTokens';
+import { PrimaryButton, FooterBar, Action, Stage, StageHead } from './Primitives';
 
 interface Props {
   onSubmit: (membershipNumber: string, password: string) => void;
@@ -14,21 +14,52 @@ interface Props {
   onChangeCountry?: () => void;
 }
 
-const inputStyle = (invalid: boolean): React.CSSProperties => ({
+/**
+ * Undecorated field: no box. A hairline under the input is the whole chrome, so
+ * the field belongs to the stage rather than sitting in a panel.
+ */
+const Field: React.FC<{
+  label: string;
+  hint: React.ReactNode;
+  hintColor?: string;
+  invalid?: boolean;
+  input: React.ReactNode;
+  first?: boolean;
+}> = ({ label, hint, hintColor, invalid, input, first }) => (
+  <div style={{ paddingTop: first ? 0 : 30 }}>
+    <div style={{ ...LABEL_LG, marginBottom: 10 }}>{label}</div>
+    {input}
+    <div style={{ height: 1, background: invalid ? BAD : BORDER, marginTop: 10 }} />
+    <div style={{ fontSize: 12.5, color: hintColor ?? DIM, marginTop: 10, lineHeight: 1.5 }}>
+      {hint}
+    </div>
+  </div>
+);
+
+const inputStyle: React.CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
-  padding: '12px 14px',
-  border: `1px solid ${invalid ? BAD : BORDER}`,
-  borderRadius: 10,
-  fontSize: 15,
+  padding: 0,
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  fontSize: 24,
+  fontWeight: 700,
+  letterSpacing: '-0.02em',
   color: INK,
   fontFamily: FONT,
-  outline: 'none',
-  background: '#FFF',
   fontVariantNumeric: 'tabular-nums lining-nums',
-});
+};
 
-/** SCREEN 3 - SIGN IN, and its rejected-credential state. */
+/**
+ * STAGE 3 - SIGN IN, and its rejected-credential state.
+ *
+ * CREDENTIAL TRUTH: the password IS stored. connect-whs writes it to Supabase
+ * Vault against the connection row, and sync-whs-due decrypts it for each
+ * scheduled sync (whs_connections.vault_secret_id). Disconnect and account
+ * deletion both call vault_delete_secret. The hint says exactly that - it must
+ * never imply the password is used once and discarded.
+ */
 export const EnglandGolfForm: React.FC<Props> = ({
   onSubmit,
   error,
@@ -56,74 +87,72 @@ export const EnglandGolfForm: React.FC<Props> = ({
       className="flex flex-col flex-1 min-h-0"
       style={{ fontFamily: FONT }}
     >
-      <FlowBody>
-        <FlowHead
+      <Stage>
+        <StageHead
+          small
           kicker={bodyName}
-          size={27}
           headline="Sign in once."
-          sub={`The same details you use for the ${bodyName} app.`}
+          lead={`The same details you use for the ${bodyName} app.`}
         />
 
-        <div style={{ marginTop: 22 }}>
-          <Panel>
-            <div style={{ ...LABEL, marginBottom: 7 }}>Membership number</div>
-            <input
-              value={membershipNumber}
-              onChange={(e) => setMembershipNumber(e.target.value)}
-              inputMode="numeric"
-              autoComplete="username"
-              aria-label="Membership number"
-              style={inputStyle(false)}
-            />
-            <div style={{ fontSize: 11.5, color: MUTE, marginTop: 7 }}>
-              Ten digits, on your member card
-            </div>
+        <div style={{ marginTop: 36 }}>
+          <Field
+            first
+            label="Membership number"
+            hint="Ten digits, on your member card"
+            input={
+              <input
+                value={membershipNumber}
+                onChange={(e) => setMembershipNumber(e.target.value)}
+                inputMode="numeric"
+                autoComplete="username"
+                aria-label="Membership number"
+                style={inputStyle}
+              />
+            }
+          />
 
-            <div style={{ ...LABEL, margin: '18px 0 7px' }}>Password</div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              aria-label="Password"
-              aria-invalid={rejected}
-              style={inputStyle(rejected)}
-            />
-            <div
-              style={{
-                fontSize: 11.5,
-                color: rejected ? BAD : DIM,
-                marginTop: 7,
-                lineHeight: 1.5,
-              }}
-            >
-              {rejected
+          <Field
+            label="Password"
+            invalid={rejected}
+            hintColor={rejected ? BAD : DIM}
+            hint={
+              rejected
                 ? `${bodyName} did not accept those details.`
-                : 'Encrypted, never leaves our servers, delete it any time.'}
+                : `Kept encrypted in a vault and decrypted only to run a sync. Disconnect and it is deleted.`
+            }
+            input={
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                aria-label="Password"
+                aria-invalid={rejected}
+                style={inputStyle}
+              />
+            }
+          />
+
+          {error && !rejected ? (
+            <div style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}</div>
+          ) : null}
+
+          {rejected ? (
+            <div style={{ marginTop: 24 }}>
+              <Action
+                onClick={() =>
+                  window.open('https://www.englandgolf.org/forgotten-password/', '_blank', 'noopener')
+                }
+                color={MUTE}
+              >
+                Forgotten your password?
+              </Action>
             </div>
-
-            {error && !rejected ? (
-              <div style={{ fontSize: 12.5, color: BAD, marginTop: 14, lineHeight: 1.5 }}>
-                {error}
-              </div>
-            ) : null}
-
-            {rejected ? (
-              <div style={{ marginTop: 14 }}>
-                <Action
-                  onClick={() =>
-                    window.open('https://www.englandgolf.org/forgotten-password/', '_blank', 'noopener')
-                  }
-                  color={MUTE}
-                >
-                  Forgotten your password?
-                </Action>
-              </div>
-            ) : null}
-          </Panel>
+          ) : null}
         </div>
-        <div style={{ height: 24 }} />
-      </FlowBody>
+        <div style={{ height: 28 }} />
+      </Stage>
 
       <FooterBar>
         <PrimaryButton type="submit" disabled={disabled}>

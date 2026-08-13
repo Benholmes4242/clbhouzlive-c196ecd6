@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL } from './designTokens';
-import { FlowBody, FlowHead } from './Primitives';
+import { INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL_LG } from './designTokens';
+import { Stage, StageHead } from './Primitives';
 
 /**
- * SCREEN 4 - SYNCING. No spinner, NO FIGURE.
+ * STAGE 4 - SYNCING. NO RING, no spinner, NO FIGURE.
  *
- * connect-whs is ONE synchronous call that returns only when the whole import
- * is finished - it streams nothing back, and the connection row (and therefore
+ * connect-whs is ONE synchronous call that returns only when the import is
+ * finished - it streams nothing back, and the connection row (and therefore
  * whs_imported_counts) does not exist until it resolves. So there is NO real
  * rounds-so-far figure, and a fabricated one on this screen would be the worst
  * possible place for one. There is therefore no figure slot at all.
@@ -30,16 +30,15 @@ export const SyncingScreen: React.FC = () => {
   }, []);
 
   return (
-    <FlowBody>
-      <FlowHead
+    <Stage>
+      <StageHead
         kicker={t('whsConnect.sync.kicker')}
         kickerColor={GOOD}
-        size={27}
         headline={t('whsConnect.sync.headline')}
-        sub={t('whsConnect.sync.sub')}
+        lead={t('whsConnect.sync.sub')}
       />
 
-      <div style={{ marginTop: 24 }}>
+      <div style={{ marginTop: 40 }}>
         {STEP_KEYS.map((key, i) => {
           const passed = i < current;
           const isCurrent = i === current;
@@ -49,33 +48,32 @@ export const SyncingScreen: React.FC = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: i === 0 ? '0 0 13px' : '13px 0',
+                gap: 14,
+                padding: i === 0 ? '0 0 16px' : '16px 0',
                 borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
               }}
             >
               <span
                 style={{
-                  width: 15,
-                  height: 15,
+                  width: 17,
+                  height: 17,
                   borderRadius: 999,
                   flexShrink: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: passed ? GOOD : 'transparent',
-                  border: passed
-                    ? 'none'
-                    : `1.5px solid ${isCurrent ? GOOD : TRACK}`,
+                  border: passed ? 'none' : `1.5px solid ${isCurrent ? GOOD : TRACK}`,
                   transition: 'background 200ms ease, border-color 200ms ease',
                 }}
               >
-                {passed ? <Check size={9} strokeWidth={3.2} color="#FFF" /> : null}
+                {passed ? <Check size={10} strokeWidth={3.2} color="#FFF" /> : null}
               </span>
               <span
                 style={{
-                  fontSize: 13.5,
+                  fontSize: 15,
                   fontWeight: isCurrent ? 700 : 400,
+                  letterSpacing: '-0.01em',
                   color: passed || isCurrent ? INK : MUTE,
                 }}
               >
@@ -86,10 +84,10 @@ export const SyncingScreen: React.FC = () => {
         })}
       </div>
 
-      <div style={{ ...LABEL, color: DIM, marginTop: 18, paddingBottom: 24 }}>
+      <div style={{ ...LABEL_LG, color: DIM, marginTop: 22, paddingBottom: 28 }}>
         {t('whsConnect.sync.note')}
       </div>
-    </FlowBody>
+    </Stage>
   );
 };
 
