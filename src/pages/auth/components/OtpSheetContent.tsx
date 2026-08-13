@@ -169,7 +169,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           <button
             type="button"
             onClick={onUseDifferentEmail}
-            style={{ ...BODY, fontWeight: 600, color: '#F7931E', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            style={{ ...BODY, fontWeight: 600, color: '#FFFFFF', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             {t('otp.changeEmail')}
           </button>
@@ -204,10 +204,10 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               ...FIGURE,
               fontSize: 21,
               fontWeight: 600,
-              caretColor: '#F7931E',
+              caretColor: '#FFFFFF',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#F7931E';
+              e.currentTarget.style.borderColor = '#FFFFFF';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)';
@@ -236,9 +236,9 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         aria-label={t('otp.verifyAria')}
         className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
-          background: verifyActiveLook ? '#F7931E' : 'rgba(255,255,255,0.06)',
-          boxShadow: verifyActiveLook ? '0 6px 20px rgba(247,147,30,0.30)' : 'none',
-          color: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
+          background: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
+          boxShadow: verifyActiveLook ? '0 6px 20px rgba(255,255,255,0.18)' : 'none',
+          color: verifyActiveLook ? '#0A0D12' : 'rgba(255,255,255,0.38)',
           border: verifyActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
           cursor: canSubmit ? 'pointer' : 'not-allowed',
         }}
@@ -260,7 +260,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         >
           {resendCooldown > 0
             ? t('otp.resendCountdown', { seconds: resendCooldown })
-            : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#F7931E', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
+            : <>{t('otp.resendPromptPrefix')}<span style={{ color: '#FFFFFF', fontWeight: 600 }}>{t('otp.resendPromptCta')}</span></>}
         </button>
       </div>
     </div>
