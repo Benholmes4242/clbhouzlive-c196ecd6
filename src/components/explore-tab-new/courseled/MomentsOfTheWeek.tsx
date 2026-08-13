@@ -54,7 +54,7 @@ export function MomentsOfTheWeek({
       <Eyebrow
         dot={newCount > 0}
         aside={
-          (totalCount ?? moments.length) > shown.length ? (
+          (totalCount ?? moments.length) > PAGE_CAP ? (
             <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>
           ) : undefined
         }
