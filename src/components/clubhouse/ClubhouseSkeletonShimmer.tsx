@@ -15,13 +15,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/utils/env';
 import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
+import PostRoundShell from '@/components/feed/PostRoundShell';
+import { COLD_START_SHAPE, type SkeletonCardVariant } from '@/lib/clubhouse/skeletonShapeHint';
 
 interface ClubhouseSkeletonShimmerProps {
   isVisible: boolean;
   isStatic?: boolean; // Fallback mode after max timeout
   className?: string;
   /** Which post shape to skeleton. Defaults to 'regular'. */
-  variant?: 'regular' | 'review';
+  variant?: SkeletonCardVariant;
+  /** CSS aspect-ratio for the media block (media variants only). */
+  mediaRatio?: string;
   /** When true, the rail skeleton renders a mute placeholder at the top. */
   isVideo?: boolean;
   /** 'card' = inline feed card stack; 'fullscreen' = immersive overlay (default). */
@@ -304,13 +308,83 @@ export const CardSkeleton: React.FC<{
   </div>
 );
 
+/**
+ * Round-post skeleton — mirrors PostRoundCard's block order and heights.
+ *
+ * The scorecard block is PostRoundShell ITSELF, not a re-measurement of it:
+ * that file already tracks PostRoundCard's element tree, paddings, font sizes
+ * and trajectory viewBox, so its height tracks the real card at every width. A
+ * second, hand-estimated copy of those heights is exactly the defect this
+ * section fixes.
+ */
+const RoundCardSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic = false }) => (
+  <div style={{ background: CARD_BG, overflow: 'hidden', marginInline: 0 }}>
+    {/* Header — identical to CardSkeleton's */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
+      <SkeletonBlock
+        isStatic={isStatic}
+        style={{ width: 34, height: 34, borderRadius: '34%', flexShrink: 0 }}
+      />
+      <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 120, height: 13 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 80, height: 10 }} />
+      </div>
+    </div>
+
+    {/* Date / course / region / par-slope / trajectory / OUT / IN — real geometry. */}
+    <PostRoundShell />
+
+    {/* Course band row — PostRoundCard's band: 10px pad, 12.5px line. */}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 10,
+        padding: '10px 14px',
+        borderTop: `1px solid ${HAIRLINE}`,
+      }}
+    >
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 140, height: 13 }} />
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 34, height: 12 }} />
+    </div>
+
+    {/* Action row — identical to CardSkeleton's footer */}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px 14px 12px',
+        borderTop: `1px solid ${HAIRLINE}`,
+      }}
+    >
+      <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 90, height: 12 }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+        <SkeletonBlock isStatic={isStatic} className="rounded-md" style={{ width: 20, height: 20 }} />
+      </div>
+    </div>
+  </div>
+);
+
 const CardFeedSkeleton: React.FC<{
   isStatic?: boolean;
-  variant?: 'regular' | 'review';
-}> = ({ isStatic = false, variant = 'regular' }) => {
+  variant?: SkeletonCardVariant;
+  mediaRatio?: string;
+}> = ({ isStatic = false, variant = 'regular', mediaRatio }) => {
   const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
+  const Card: React.FC<{ isStatic?: boolean }> = ({ isStatic: st }) =>
+    variant === 'round' ? (
+      <RoundCardSkeleton isStatic={st} />
+    ) : (
+      <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
+    );
   return (
     <>
+
+
       {/* Chrome island skeleton — mirrors ChromeIsland: two dark glass capsules
           at sat+10, inset 12px, 44h, radius 999. Keep the SkeletonBlock contents
           inside so labels/icons shimmer while the capsule frames read as chrome. */}
@@ -363,24 +437,27 @@ const CardFeedSkeleton: React.FC<{
         </div>
       </div>
 
+      {/* ONE full card plus a second clipped by the viewport. Anything further
+          down is shimmer nobody sees whose only effect is a bigger upward
+          collapse when real content lands. `overflow: hidden` (not auto) is what
+          keeps the second card clipped rather than scrollable. */}
       <div
         style={{
           background: CANVAS,
           minHeight: '100dvh',
+          maxHeight: '100dvh',
           width: '100%',
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
+          overflow: 'hidden',
           paddingTop: topPad,
           paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="1/1" />
+          <Card isStatic={isStatic} />
+          <Card isStatic={isStatic} />
         </div>
       </div>
+
     </>
   );
 };
@@ -390,6 +467,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   isStatic = false,
   className,
   variant = 'regular',
+  mediaRatio,
   isVideo = false,
   surface = 'fullscreen',
 }) => {
@@ -408,7 +486,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
           {surface === 'card' ? (
-            <CardFeedSkeleton isStatic={effectiveStatic} variant={variant} />
+            <CardFeedSkeleton isStatic={effectiveStatic} variant={variant} mediaRatio={mediaRatio} />
           ) : (
             <div className="relative w-full h-full">
               {/* Hero media area */}
@@ -449,7 +527,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <ActionRailSkeleton isStatic={effectiveStatic} isVideo={isVideo} />
 
               {/* ─── BOTTOM CONTENT ─── */}
-              {variant === 'regular' ? (
+              {variant !== 'review' ? (
                 <RegularBottomSkeleton isStatic={effectiveStatic} />
               ) : (
                 <ReviewBottomSkeleton isStatic={effectiveStatic} />
