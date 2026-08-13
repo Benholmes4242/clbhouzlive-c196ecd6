@@ -15,13 +15,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/utils/env';
 import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
+import PostRoundShell from '@/components/feed/PostRoundShell';
+import { COLD_START_SHAPE, type SkeletonCardVariant } from '@/lib/clubhouse/skeletonShapeHint';
 
 interface ClubhouseSkeletonShimmerProps {
   isVisible: boolean;
   isStatic?: boolean; // Fallback mode after max timeout
   className?: string;
   /** Which post shape to skeleton. Defaults to 'regular'. */
-  variant?: 'regular' | 'review';
+  variant?: SkeletonCardVariant;
+  /** CSS aspect-ratio for the media block (media variants only). */
+  mediaRatio?: string;
   /** When true, the rail skeleton renders a mute placeholder at the top. */
   isVideo?: boolean;
   /** 'card' = inline feed card stack; 'fullscreen' = immersive overlay (default). */
@@ -371,6 +375,12 @@ const CardFeedSkeleton: React.FC<{
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio }) => {
   const topPad = 'calc(env(safe-area-inset-top, 0px) + 70px)';
+  const Card: React.FC<{ isStatic?: boolean }> = ({ isStatic: st }) =>
+    variant === 'round' ? (
+      <RoundCardSkeleton isStatic={st} />
+    ) : (
+      <CardSkeleton isStatic={st} variant={variant} mediaRatio={mediaRatio ?? COLD_START_SHAPE.mediaRatio} />
+    );
   return (
     <>
 
@@ -443,8 +453,8 @@ const CardFeedSkeleton: React.FC<{
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Card isStatic={isStatic} variant={variant} mediaRatio={mediaRatio} />
-          <Card isStatic={isStatic} variant={variant} mediaRatio={mediaRatio} />
+          <Card isStatic={isStatic} />
+          <Card isStatic={isStatic} />
         </div>
       </div>
 
@@ -457,6 +467,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
   isStatic = false,
   className,
   variant = 'regular',
+  mediaRatio,
   isVideo = false,
   surface = 'fullscreen',
 }) => {
@@ -475,7 +486,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
           {surface === 'card' ? (
-            <CardFeedSkeleton isStatic={effectiveStatic} variant={variant} />
+            <CardFeedSkeleton isStatic={effectiveStatic} variant={variant} mediaRatio={mediaRatio} />
           ) : (
             <div className="relative w-full h-full">
               {/* Hero media area */}
