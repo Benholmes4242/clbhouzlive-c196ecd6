@@ -106,11 +106,15 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   const countersPending =
     !ceilingHit && !counts && (!connectionId || countsFetching || historyFetching || !history);
 
-  /* The hole-by-hole flag lands after this screen does. Poll for it, bounded. */
+  /* The hole-by-hole flag lands after this screen does. Poll for it, bounded.
+     DATA SETTLES the moment the RPC returns a non-zero complete_rounds: from
+     that point the figure is real, so the screen stops saying "still reading"
+     and switches to the derived floor line if the record is genuinely thin. */
   const completeRounds = breakdown?.complete_rounds ?? 0;
   const [breakdownCeilingHit, setBreakdownCeilingHit] = useState(false);
+  const breakdownSettled = completeRounds > 0 || breakdownCeilingHit;
   useEffect(() => {
-    if (completeRounds > 0) return;
+    if (breakdownSettled) return;
     const stop = setTimeout(() => setBreakdownCeilingHit(true), BREAKDOWN_CEILING_MS);
     const poll = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ['scoring-breakdown-all-courses'] });
@@ -120,7 +124,8 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
       clearTimeout(stop);
       clearInterval(poll);
     };
-  }, [completeRounds, queryClient]);
+  }, [breakdownSettled, queryClient]);
+
 
   const { delta, years, sinceYear } = useMemo(() => {
     const pts = (history ?? []).filter((p) => Number.isFinite(p.handicap_index));
