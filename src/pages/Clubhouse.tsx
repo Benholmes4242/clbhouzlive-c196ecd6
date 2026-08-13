@@ -237,7 +237,7 @@ const ClubhouseContent = () => {
   const derivedShape = useMemo<SkeletonShape | null>(() => {
     const first = posts[0];
     if (!first) return null;
-    if (postScoreIdMap.get?.(first.id) || postScoreIdMap.has?.(first.id)) {
+    if (postScoreIdMap.has(first.id)) {
       return { variant: 'round' };
     }
     const m = first.mediaItems?.[0];
