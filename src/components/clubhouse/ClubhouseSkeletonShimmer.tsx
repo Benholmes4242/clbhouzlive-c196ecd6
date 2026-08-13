@@ -427,24 +427,27 @@ const CardFeedSkeleton: React.FC<{
         </div>
       </div>
 
+      {/* ONE full card plus a second clipped by the viewport. Anything further
+          down is shimmer nobody sees whose only effect is a bigger upward
+          collapse when real content lands. `overflow: hidden` (not auto) is what
+          keeps the second card clipped rather than scrollable. */}
       <div
         style={{
           background: CANVAS,
           minHeight: '100dvh',
+          maxHeight: '100dvh',
           width: '100%',
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
+          overflow: 'hidden',
           paddingTop: topPad,
           paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="1/1" />
+          <Card isStatic={isStatic} variant={variant} mediaRatio={mediaRatio} />
+          <Card isStatic={isStatic} variant={variant} mediaRatio={mediaRatio} />
         </div>
       </div>
+
     </>
   );
 };
