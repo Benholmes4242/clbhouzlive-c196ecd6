@@ -803,8 +803,6 @@
     "roundFinished": "R{{round}} · 종료",
     "playersTied": "{{count}}명 공동",
     "playersTied_one": "{{count}}명 공동",
-    "momentsGroupCount": "{{count}} moments",
-    "momentsGroupCount_one": "{{count}} moment",
     "row": {
       "underPar": "Round under par",
       "bogeyFree": "Bogey-free round",
@@ -872,7 +870,10 @@
       "emptyBody": "Handeul-lo chatgo isseumyeon clbhouz-e chodae haeboseyo",
       "inviteQuiet": "Golpeo chodae",
       "inviteCta": "Golpeo-reul clbhouz-e chodae hagi"
-    }
+    },
+    "momentsFromCommunity": "From the community",
+    "momentsCount": "{{count}} moments",
+    "momentsCount_one": "{{count}} moment"
   },
   "statBrowse": {
     "colArea": "지역",

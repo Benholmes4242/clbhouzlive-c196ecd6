@@ -229,15 +229,15 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
   );
 }
 
-/** Section 5 — moments mosaic: tall 220 lead tile, 106 shorts, 8px gap. */
+/** Section 5 — moments mosaic: tall 220 lead tile, 109 shorts, 2px gap. */
 export function MomentsMosaic() {
   return (
     <section>
-      <EyebrowBar w={158} aside />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <Bar style={{ height: 220, borderRadius: 14, gridRow: 'span 2' }} />
-        <Bar style={{ height: 106, borderRadius: 14 }} />
-        <Bar style={{ height: 106, borderRadius: 14 }} />
+      <EyebrowBar w={142} aside />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+        <Bar style={{ height: 220, borderRadius: 8, gridRow: 'span 2' }} />
+        <Bar style={{ height: 109, borderRadius: 8 }} />
+        <Bar style={{ height: 109, borderRadius: 8 }} />
       </div>
     </section>
   );

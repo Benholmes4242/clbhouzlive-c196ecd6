@@ -1251,9 +1251,6 @@
     "defending": "[~~Đéƒéñđíñĝ~~]",
     "nPhotos": "[~~{{count}} ƥĥőţőš~~]",
     "nPhotos_one": "[~~{{count}} ƥĥőţő~~]",
-    "momentsOfTheMonth": "[~~Ṁőɱéñţš őƒ ţĥé ɱőñţĥ~~]",
-    "momentsOverline": "[~~{{count}} ĉőúřšéš~~]",
-    "momentsOverline_one": "[~~{{count}} ĉőúřšé~~]",
     "mostPlayed": "[~~Ṁőšţ ƥļáýéđ ţĥíš ŵééǩ~~]",
     "trackedRounds": "[~~Ţřáĉǩéđ řőúñđš~~]",
     "roundsLabel": "[~~Řőúñđš~~]",
@@ -1328,8 +1325,6 @@
     "roundFinished": "[~~Ř{{round}} · Ƒ~~]",
     "playersTied": "[~~{{count}} ƥļáýéřš ţíéđ~~]",
     "playersTied_one": "[~~{{count}} ƥļáýéřš ţíéđ~~]",
-    "momentsGroupCount": "[~~{{count}} ɱőɱéñţš~~]",
-    "momentsGroupCount_one": "[~~{{count}} ɱőɱéñţ~~]",
     "friendsRail": {
       "par": "[~~Ƥář {{par}}~~]",
       "index": "[~~ĤĈƤ~~]",
@@ -1389,7 +1384,10 @@
       "emptyBody": "[~~Ţřý ţĥéíř ĥáñđļé, őř íñṽíţé ţĥéɱ ţő ĉļƀĥőúž~~]",
       "inviteQuiet": "[~~Íñṽíţé á ĝőļƒéř~~]",
       "inviteCta": "[~~Íñṽíţé á ĝőļƒéř ţő ĉļƀĥőúž~~]"
-    }
+    },
+    "momentsFromCommunity": "[~~Ƒřőɱ ţĥé ĉőɱɱúñíţý~~]",
+    "momentsCount": "[~~{{count}} ɱőɱéñţš~~]",
+    "momentsCount_one": "[~~{{count}} ɱőɱéñţ~~]"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",

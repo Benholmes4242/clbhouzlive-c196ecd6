@@ -848,8 +848,6 @@
     "roundFinished": "R{{round}} · F",
     "playersTied": "{{count}} jugadores empatados",
     "playersTied_one": "{{count}} jugadores empatados",
-    "momentsGroupCount": "{{count}} momentos",
-    "momentsGroupCount_one": "{{count}} momento",
     "row": {
       "underPar": "Round under par",
       "bogeyFree": "Bogey-free round",
@@ -917,7 +915,10 @@
       "emptyBody": "Prueba su usuario o invitalo a clbhouz",
       "inviteQuiet": "Invitar a un golfista",
       "inviteCta": "Invita a un golfista a clbhouz"
-    }
+    },
+    "momentsFromCommunity": "From the community",
+    "momentsCount": "{{count}} momentos",
+    "momentsCount_one": "{{count}} momento"
   },
   "statBrowse": {
     "colArea": "Zona",
