@@ -136,6 +136,7 @@ import SuspendedScreen from "@/components/SuspendedScreen";
 
 import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/native/isNativeApp';
 import AppDownloadGate from '@/pages/AppDownloadGate';
+import { isGateExemptPath } from '@/pages/gate/gateRoutes';
 import { useEnvStatus, isAppShellVisible } from '@/utils/native/envStatus';
 
 // ── Median push deep-link bridge ────────────────────────────────────────
@@ -476,6 +477,17 @@ function AppRoutes() {
   const keepAliveRoutes = useMemo(() => [
     { path: '/', element: <RootGate /> },
   ], []);
+
+  const webEnvStatus = useEnvStatus();
+
+  // Web gate: on the web the app shell never mounts. Every path resolves to
+  // the AppDownloadGate except the exempt list (see gateRoutes.ts) — most
+  // importantly /post/:postId, which keeps its real logged-out preview.
+  if (webEnvStatus === 'pending') return <BootHold />;
+  if (webEnvStatus === 'web' && !isGateExemptPath(location.pathname)) {
+    return <AppDownloadGate />;
+  }
+
 
   return (
     <>
