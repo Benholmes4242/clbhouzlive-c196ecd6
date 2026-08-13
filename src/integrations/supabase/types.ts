@@ -11938,6 +11938,54 @@ export type Database = {
         }
         Relationships: []
       }
+      system_state_daily: {
+        Row: {
+          day: string
+          detail: string | null
+          figures: Json | null
+          subsystem: string
+          tone: string
+        }
+        Insert: {
+          day: string
+          detail?: string | null
+          figures?: Json | null
+          subsystem: string
+          tone: string
+        }
+        Update: {
+          day?: string
+          detail?: string | null
+          figures?: Json | null
+          subsystem?: string
+          tone?: string
+        }
+        Relationships: []
+      }
+      system_state_history: {
+        Row: {
+          detail: string | null
+          id: number
+          observed_at: string
+          subsystem: string
+          tone: string
+        }
+        Insert: {
+          detail?: string | null
+          id?: number
+          observed_at?: string
+          subsystem: string
+          tone: string
+        }
+        Update: {
+          detail?: string | null
+          id?: number
+          observed_at?: string
+          subsystem?: string
+          tone?: string
+        }
+        Relationships: []
+      }
       taggable_entities: {
         Row: {
           created_at: string
@@ -17723,6 +17771,13 @@ export type Database = {
         }[]
       }
       backfill_round_posts: { Args: { p_per_user?: number }; Returns: number }
+      backfill_system_state_daily: {
+        Args: { p_days?: number }
+        Returns: {
+          out_days: number
+          out_subsystem: string
+        }[]
+      }
       backfill_unmapped_round_stats: { Args: never; Returns: Json }
       base_club_name: { Args: { p_course_name: string }; Returns: string }
       block_user: { Args: { p_blocked_id: string }; Returns: undefined }
@@ -20406,6 +20461,7 @@ export type Database = {
           width: number
         }[]
       }
+      get_system_state_history: { Args: { p_days?: number }; Returns: Json }
       get_thread: {
         Args: { p_before?: string; p_conversation_id: string; p_limit?: number }
         Returns: {
@@ -21916,6 +21972,7 @@ export type Database = {
         Args: { p_post_ids: string[] }
         Returns: undefined
       }
+      record_system_state: { Args: never; Returns: Json }
       recount_round_post_likes: {
         Args: { p_score_id: string }
         Returns: undefined

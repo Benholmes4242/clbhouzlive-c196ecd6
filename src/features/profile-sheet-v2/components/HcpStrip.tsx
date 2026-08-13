@@ -141,6 +141,7 @@ const Shell: React.FC<{
             height: LEGEND_H,
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             gap: 12,
             padding: `0 ${PAD}px`,
             marginBottom: PAD - 4,
@@ -236,7 +237,8 @@ const TrendCard: React.FC<{
   windowDays: 30 | 90;
   onWindow: (d: 30 | 90) => void;
   fallbackIndex: number | null;
-}> = ({ points, windowDays, onWindow, fallbackIndex }) => {
+  onNavigate: (route: string) => void;
+}> = ({ points, windowDays, onWindow, fallbackIndex, onNavigate }) => {
   const [scrub, setScrub] = useState<number | null>(null);
   const plotRef = useRef<HTMLDivElement | null>(null);
   const dragging = useRef(false);
@@ -351,15 +353,29 @@ const TrendCard: React.FC<{
             <span
               style={{
                 marginLeft: 'auto',
-                background: deltaTone,
-                color: '#FFFFFF',
                 borderRadius: 999,
                 padding: '4px 10px',
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
-                boxShadow: `0 3px 10px ${deltaTone}59`,
                 ...FIGS,
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                background:
+                  deltaTone === A.IMPROVED
+                    ? 'rgba(15,143,74,0.14)'
+                    : deltaTone === A.DRIFTED
+                      ? 'rgba(200,55,43,0.14)'
+                      : 'rgba(162,169,178,0.14)',
+                border: `1px solid ${
+                  deltaTone === A.IMPROVED
+                    ? 'rgba(15,143,74,0.28)'
+                    : deltaTone === A.DRIFTED
+                      ? 'rgba(200,55,43,0.28)'
+                      : 'rgba(162,169,178,0.28)'
+                }`,
+                color: deltaTone,
+                boxShadow: `0 2px 8px ${deltaTone}26`,
               }}
             >
               {formatDelta(delta)}
@@ -370,16 +386,17 @@ const TrendCard: React.FC<{
       plot={(w) => {
         if (n < 2 || !stats) return null;
         const h = PLOT_H;
-        const pad = 8;
+        const padY = 8;
+        const padX = 11;
         const span = stats.worst - stats.best || 1;
         // NATURAL AXIS: high index at the TOP. A dip is a good spell.
         const xy = points.map((p, i) => {
-          const x = (i / (n - 1)) * w;
-          const y = pad + ((stats.worst - p.v) / span) * (h - pad * 2 - 10);
-          return [x, h - (h - y)] as const;
+          const x = padX + (i / (n - 1)) * (w - 2 * padX);
+          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2 - 10);
+          return [x, y] as const;
         });
         const line = xy.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-        const area = `${line} L${w},${h} L0,${h} Z`;
+        const area = `${line} L${w - padX},${h} L${padX},${h} Z`;
         const mx = xy[active][0];
         const my = xy[active][1];
         return (
@@ -402,8 +419,8 @@ const TrendCard: React.FC<{
               </linearGradient>
             </defs>
             <path d={area} fill="url(#hcp-trend-fill)" />
-            <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
             <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
             <circle cx={mx} cy={my} r={11} fill="#FFFFFF" fillOpacity={0.45} />
             <circle cx={mx} cy={my} r={6} fill="#FFFFFF" />
@@ -413,9 +430,28 @@ const TrendCard: React.FC<{
       }}
       legend={
         <>
-          <LegendSwatch color={A.DRIFTED} label="Off best" />
-          <LegendSwatch color={AMBER} label="Mid" />
-          <LegendSwatch color={A.IMPROVED} label="Near best" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <LegendSwatch color={A.DRIFTED} label="Off best" />
+            <LegendSwatch color={AMBER} label="Mid" />
+            <LegendSwatch color={A.IMPROVED} label="Near best" />
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('/manage/handicap')}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontFamily: SANS,
+            }}
+          >
+            <span style={{ ...LABEL, color: A.INK }}>View Handicap</span>
+            <ChevronRight size={12} strokeWidth={2.6} color={A.INK} />
+          </button>
         </>
       }
     />
@@ -467,6 +503,7 @@ export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
       windowDays={windowDays}
       onWindow={setWindowDays}
       fallbackIndex={fallbackIndex}
+      onNavigate={onNavigate}
     />
   );
 }
