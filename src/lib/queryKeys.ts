@@ -219,8 +219,9 @@ export const commentsKeys = {
 
 export const top100Keys = {
   /** Batched Top 100 card enrichment for the loaded page set. */
-  enrichment: (scope: string, viewer: ViewerId, loadedCount: number) =>
-    batchKey('top100-enrichment', scope, viewer, loadedCount),
+  enrichment: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('top100-enrichment', scope, viewer, digest),
+
 } as const;
 
 /* ─────────────────────────────── Discover ─────────────────────────────── */
