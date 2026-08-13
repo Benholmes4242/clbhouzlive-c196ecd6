@@ -148,8 +148,8 @@ export function LatestReviewsSheet({
       surfaceColor={A.CANVAS}
       zIndexBase={SHEET_Z_UNDER_REVIEW}
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

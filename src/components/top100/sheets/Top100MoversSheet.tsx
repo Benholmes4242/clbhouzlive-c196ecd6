@@ -43,8 +43,8 @@ export const Top100MoversSheet: React.FC<Props> = ({
   }, [open]);
 
   return (
-    <BottomSheet open={open} onClose={onClose} maxHeight="90dvh">
-      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(90dvh - 30px)' }}>
+    <BottomSheet open={open} onClose={onClose} maxHeight="95dvh">
+      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(95dvh - 30px)' }}>
         <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
           <div style={{ ...TITLE, color: INK }}>
             {t('top100.movers.title')}

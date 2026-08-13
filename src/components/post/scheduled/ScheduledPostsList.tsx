@@ -37,7 +37,7 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent 
-        className="max-h-[85vh] bg-[#F8FAFC] border-t border-[#e2e8f0] z-[10002]" 
+        className="max-h-[95dvh] bg-[#F8FAFC] border-t border-[#e2e8f0] z-[10002]" 
         style={{ zIndex: 10002 }}
       >
         <VisuallyHidden>
@@ -45,7 +45,7 @@ const ScheduledPostsList: React.FC<ScheduledPostsListProps> = ({
           <DrawerDescription>Manage your scheduled posts</DrawerDescription>
         </VisuallyHidden>
 
-        <div className="flex flex-col h-full max-h-[85vh]">
+        <div className="flex flex-col h-full max-h-[95dvh]">
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
             <div className="w-10 h-1 rounded-full bg-[#e2e8f0]" />

@@ -30,7 +30,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="p-0 rounded-t-[20px] border-0 max-h-[90dvh] overflow-auto"
+        className="p-0 rounded-t-[20px] border-0 max-h-[95dvh] overflow-auto"
         style={{
           fontFamily: FONT,
           color: INK,

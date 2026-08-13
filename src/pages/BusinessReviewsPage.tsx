@@ -106,7 +106,7 @@ function ReplySheet({
     <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <SheetContent
         side="bottom"
-        className="p-0 border-0 rounded-t-2xl max-h-[92vh] overflow-hidden"
+        className="p-0 border-0 rounded-t-2xl max-h-[95dvh] overflow-hidden"
         style={{ background: '#F8FAFC' }}
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ borderBottom: `1px solid ${HAIR}` }}>

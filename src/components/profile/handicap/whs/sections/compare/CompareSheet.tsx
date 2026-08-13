@@ -533,10 +533,10 @@ export const CompareSheet: React.FC<Props> = ({
       ariaLabelledBy="handicap-compare-title"
       variant="dark"
       surfaceColor={CHART.CANVAS}
-      maxHeight="90dvh"
+      maxHeight="95dvh"
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: CHART_FONT,

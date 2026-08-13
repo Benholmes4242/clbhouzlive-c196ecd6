@@ -94,8 +94,8 @@ export function CourseNewsSheet({
       variant="light"
       surfaceColor={A.CANVAS}
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

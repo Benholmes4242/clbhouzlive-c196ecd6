@@ -165,9 +165,9 @@ export function AllTeeTimesSheet({
       variant="light"
       surfaceColor={A.PANEL}
       ariaLabelledBy="tournament-tee-times-sheet-title"
-      style={{ height: '75dvh', maxHeight: '75dvh' }}
+      style={{ height: 'auto', maxHeight: '95dvh' }}
     >
-      <div style={{ background: A.PANEL, fontFamily: FONT, height: '75dvh', maxHeight: '75dvh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ background: A.PANEL, fontFamily: FONT, height: 'auto', maxHeight: '95dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
           <div style={KICKER}>{t('tournament.allTeeTimes.title')}</div>
           {tournamentName && (

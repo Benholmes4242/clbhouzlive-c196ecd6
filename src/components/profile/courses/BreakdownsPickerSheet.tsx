@@ -50,7 +50,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
         // sheet (CourseDirectorySheet). The inner height stops a short list
         // from shrinking the sheet to its content; dvh so dynamic browser
         // chrome is measured correctly.
-        style={{ height: '75dvh', maxHeight: '75dvh' }}
+        style={{ height: 'auto', maxHeight: '95dvh' }}
       >
 
         {/* Drag handle */}

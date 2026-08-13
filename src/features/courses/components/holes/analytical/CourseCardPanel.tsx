@@ -680,8 +680,8 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         variant="light"
         ariaLabelledBy="course-card-sheet-title"
         style={{
-          height: '75dvh',
-          maxHeight: '75dvh',
+          height: 'auto',
+          maxHeight: '95dvh',
           display: 'flex',
           flexDirection: 'column',
           background: A.CANVAS,

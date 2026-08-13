@@ -39,7 +39,7 @@ export const TrophyDetailSheet: React.FC<TrophyDetailSheetProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-0 max-h-[70vh]"
+        className="rounded-t-3xl border-0 max-h-[95dvh]"
         style={{
           background: 'var(--dgp-bg-surface)',
           borderTop: '1px solid var(--dgp-glass-stroke)',

@@ -52,8 +52,8 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
       className="hcp-dark"
 
       style={{
-        height: '75dvh',
-        maxHeight: '75dvh',
+        height: 'auto',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: CHART_FONT,
