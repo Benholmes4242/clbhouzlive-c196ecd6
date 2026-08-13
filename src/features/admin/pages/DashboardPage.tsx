@@ -17,7 +17,7 @@ import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
 import {
-  useOverviewMetrics, useLiveInApp, useRightNowHourly, useActiveMembers28d, pctDelta,
+  useOverviewMetrics, useLiveInApp, useRightNowHourly, pctDelta,
 } from '../hooks/useOverviewMetrics';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
@@ -25,6 +25,7 @@ import {
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
 import { useOpsHealth } from '../hooks/useOpsHealth';
+import { useActiveWindows, type ActiveWindows } from '../hooks/useActiveWindows';
 import { useRetention } from '../hooks/useRetention';
 import { SystemPanel, ActivationPanel, PipelinePanel } from '../components/SystemPanels';
 import { RightNowPanel, RetentionPanel, ActiveMembersPanel } from '../components/ChartPanels';
@@ -269,7 +270,7 @@ export default function DashboardPage() {
   const overview = useOverviewMetrics();
   const live = useLiveInApp();
   const intraday = useRightNowHourly();
-  const actives = useActiveMembers28d();
+  const activeWindows = useActiveWindows(28);
 
   const feed = useQuery({
     queryKey: ['admin-v2', 'dashboard', 'clubhouse-feed'],
@@ -327,15 +328,25 @@ export default function DashboardPage() {
         topUsersLoading={dashboard.glance.isLoading}
       />
 
-      <MetricGrid loading={loading} data={m} ops={ops.data} opsLoading={ops.isLoading} />
+      <MetricGrid
+        loading={loading}
+        data={m}
+        ops={ops.data}
+        opsLoading={ops.isLoading}
+        aw={activeWindows.data ?? null}
+        awLoading={activeWindows.isLoading}
+      />
 
       <RetentionPanel data={retention.data} loading={retention.isLoading} />
 
+      {/* WAU, not daily actives: the DAU tile now carries the daily series
+          and two charts of one series on one page is a duplication. */}
       <ActiveMembersPanel
-        data={actives.data ?? []}
-        loading={actives.isLoading}
-        isError={actives.isError}
-        onRetry={() => actives.refetch()}
+        data={activeWindows.data?.daily ?? []}
+        stickiness={activeWindows.data?.stickiness ?? null}
+        loading={activeWindows.isLoading || !activeWindows.data}
+        isError={activeWindows.isError}
+        onRetry={() => activeWindows.refetch()}
       />
 
       <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
