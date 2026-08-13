@@ -115,9 +115,12 @@ export function usePostScoreIds(postIds: string[], scope: string): PostScoreIdMa
   const batch = useMergedBatch<string>();
 
   const query = useQuery({
-    // BATCH IDIOM (src/lib/queryKeys.ts): scope + viewer + loaded count. The id
-    // set drives the REQUEST, never the key.
-    queryKey: feedKeys.postScoreIds(scope, viewerId(user?.id), ids.length),
+    // BATCH IDIOM (src/lib/queryKeys.ts): scope + viewer + a DIGEST of the id
+    // set. The digest is load-bearing: a count-keyed entry is reused when the
+    // membership changes without the size changing (pull-to-refresh, a new post
+    // at the top), and the new posts' score ids are then never requested.
+    queryKey: feedKeys.postScoreIds(scope, viewerId(user?.id), batchDigest(ids)),
+
     placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
