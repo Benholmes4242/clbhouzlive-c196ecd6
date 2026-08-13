@@ -15,11 +15,13 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
+import { useRoundHoleShapes, type HoleShape, type EventKind } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
@@ -28,9 +30,12 @@ import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SAN
  * A horizontal rail: a week of heavy play grows sideways, never down. One card
  * per friend-round, newest first, capped at ten.
  *
- * THE SCORE LIVES ON THE PHOTO as a glass chip, so the white block belongs
- * entirely to the SHAPE of the round — a curve drawn from the same two figures
- * the subline is written from, and therefore incapable of disagreeing with it.
+ * THE SCORE LIVES ON THE PHOTO as a glass chip, so the band below belongs
+ * entirely to the SHAPE of the round: a 19-point cumulative to-par curve from
+ * ONE batched read of whs_score_holes (BRIEF_FRIENDS_TILE_HOLE_SHAPE), SPLIT at
+ * the level-par rule so under-par golf renders red, with event dots where the
+ * round moved by more than a shot. Rounds without holes keep the three-point
+ * fallback drawn from the same two figures the subline is written from.
  *
  * A hole in one puts the GOLD ring on the when-chip — the only gold on the card.
  * No friends or no rounds: the section does not render at all.
@@ -130,29 +135,66 @@ function monotonePath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
+/* ── UNDER PAR: SPLIT AT THE LEVEL LINE, NOT TONED BY THE FINAL SCORE ──────
+   The curve is RED where it sits BELOW level par and INK where it sits ABOVE.
+   A member two under through twelve who finishes plus one WAS in front for
+   most of the afternoon; colouring that round entirely ink erases it.
+   TO-PAR CONVENTION ONLY. The index-delta pair (A.IMPROVED / A.DRIFTED) means
+   MOVEMENT and must never appear on this tile.                              */
+/* TOPAR_UNDER_LIGHT (#D2222D) is too dark to read on glass over a photograph,
+   so the CHIP'S under-par figure — and only that — uses a lighter red. */
+const GLASS_UNDER = '#FF8A80';
+
+const OVER_TONE = A.INK;
+const UNDER_TONE = TOPAR_RED;
+
 /**
- * THE ROUND'S SHAPE. Null on either nine means NO CURVE — a straight line from
- * zero to the total would be a claim about a round that was not measured.
+ * THE ROUND'S SHAPE.
+ *
+ *   holes present, 9+ played          → the 19-point cumulative curve with dots
+ *   holes absent, both nines present  → the THREE-POINT fallback, no dots
+ *   holes absent AND a nine null      → no curve, the band collapses
+ *
+ * A straight line from zero to the total would be a claim about a round that
+ * was not measured, so the last case draws nothing at all.
  */
-function RoundShape({ row, tone }: { row: FriendRoundRow; tone: string }) {
+function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | null }) {
+  const { t } = useTranslation('courses');
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
 
-  // WHEN EITHER NINE IS NULL: draw nothing and let the area collapse.
-  if (front == null || back == null || !Number.isFinite(front) || !Number.isFinite(back)) {
-    return null;
+  let values: number[] | null = null;
+  let events: { i: number; kind: EventKind }[] = [];
+  let holesPlayed: number | null = null;
+  let birdies = 0;
+
+  if (shape) {
+    values = shape.series;
+    events = shape.events;
+    holesPlayed = shape.played;
+    birdies = shape.birdies;
+  } else if (
+    front != null &&
+    back != null &&
+    Number.isFinite(front) &&
+    Number.isFinite(back)
+  ) {
+    values = [0, front, front + back];
   }
 
-  const values = [0, front, front + back];
-  const lo = Math.min(...values);
-  const hi = Math.max(...values);
-  // A flat round still needs a band to sit in, so never divide by zero.
+  if (!values || values.length < 2) return null;
+
+  // THE SCALE ALWAYS INCLUDES ZERO: without the clamp a −2 round and a +4
+  // round each fill their own band and look identical side by side.
+  const lo = Math.min(0, ...values);
+  const hi = Math.max(0, ...values);
   const span = Math.max(hi - lo, 2);
   const top = 7;
   const bottom = SHAPE_H - 7;
 
   // MORE OVER PAR IS HIGHER: the larger value maps to the SMALLER y.
   const yFor = (v: number) => bottom - ((v - lo) / span) * (bottom - top);
+  const zeroY = yFor(0);
 
   const innerW = CARD_W - SHAPE_PAD_X * 2;
   const pts = values.map((v, i) => ({
@@ -165,48 +207,154 @@ function RoundShape({ row, tone }: { row: FriendRoundRow; tone: string }) {
   // while the POINTS are inset so the terminal dot cannot clip.
   const fillD = `M0,${SHAPE_H} L0,${pts[0].y.toFixed(2)} L${d.slice(1)} L${CARD_W},${pts[pts.length - 1].y.toFixed(2)} L${CARD_W},${SHAPE_H} Z`;
   const end = pts[pts.length - 1];
-  const gid = `fps-${row.round_id}`;
+  const finalTone = values[values.length - 1] < 0 ? UNDER_TONE : OVER_TONE;
+
+  // CLIP IDS MUST BE UNIQUE PER TILE — ten tiles sharing an id looks exactly
+  // like the clip being ignored, and is the likeliest defect here.
+  const uid = `fps-${String(row.round_id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const clipAbove = `${uid}-ca`;
+  const clipBelow = `${uid}-cb`;
+  const gradAbove = `${uid}-ga`;
+  const gradBelow = `${uid}-gb`;
 
   return (
-    <svg
-      width="100%"
-      height={SHAPE_H}
-      viewBox={`0 0 ${CARD_W} ${SHAPE_H}`}
-      preserveAspectRatio="none"
-      style={{ display: 'block' }}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={tone} stopOpacity={0.3} />
-          <stop offset="100%" stopColor={tone} stopOpacity={0.02} />
-        </linearGradient>
-      </defs>
-      <path d={fillD} fill={`url(#${gid})`} />
-      {/* THE WHITE HALO UNDER THE DATA STROKE is what stops the band looking
-          flat against the fill. Do not drop it. */}
-      <path
-        d={d}
-        fill="none"
-        stroke="#FFFFFF"
-        strokeOpacity={0.75}
-        strokeWidth={5}
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-      />
-      <path
-        d={d}
-        fill="none"
-        stroke={tone}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-      />
-      <circle cx={end.x} cy={end.y} r={5} fill="#FFFFFF" />
-      <circle cx={end.x} cy={end.y} r={2.6} fill={tone} />
-    </svg>
+    <>
+      <svg
+        width="100%"
+        height={SHAPE_H}
+        viewBox={`0 0 ${CARD_W} ${SHAPE_H}`}
+        preserveAspectRatio="none"
+        style={{ display: 'block' }}
+        aria-hidden
+      >
+        <defs>
+          <clipPath id={clipAbove}>
+            <rect x={0} y={0} width={CARD_W} height={Math.max(zeroY, 0)} />
+          </clipPath>
+          <clipPath id={clipBelow}>
+            <rect x={0} y={zeroY} width={CARD_W} height={Math.max(SHAPE_H - zeroY, 0)} />
+          </clipPath>
+          <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={OVER_TONE} stopOpacity={0.26} />
+            <stop offset="100%" stopColor={OVER_TONE} stopOpacity={0.02} />
+          </linearGradient>
+          {/* BOTTOM to top, so the density sits at the low point rather than
+              at the level line. */}
+          <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor={UNDER_TONE} stopOpacity={0.3} />
+            <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.03} />
+          </linearGradient>
+        </defs>
+
+        <g clipPath={`url(#${clipAbove})`}>
+          <path d={fillD} fill={`url(#${gradAbove})`} />
+        </g>
+        <g clipPath={`url(#${clipBelow})`}>
+          <path d={fillD} fill={`url(#${gradBelow})`} />
+        </g>
+
+        {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
+            The only gridline on the tile. */}
+        <line
+          x1={0}
+          x2={CARD_W}
+          y1={zeroY}
+          y2={zeroY}
+          stroke={A.DIM}
+          strokeOpacity={0.7}
+          strokeWidth={1}
+          strokeDasharray="2 3"
+          vectorEffect="non-scaling-stroke"
+        />
+
+        {/* THE WHITE HALO, drawn ONCE and UNCLIPPED, underneath both strokes —
+            it is what stops the band looking flat against the fill. */}
+        <path
+          d={d}
+          fill="none"
+          stroke="#FFFFFF"
+          strokeOpacity={0.75}
+          strokeWidth={5}
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <g clipPath={`url(#${clipAbove})`}>
+          <path
+            d={d}
+            fill="none"
+            stroke={OVER_TONE}
+            strokeWidth={2.2}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
+        <g clipPath={`url(#${clipBelow})`}>
+          <path
+            d={d}
+            fill="none"
+            stroke={UNDER_TONE}
+            strokeWidth={2.2}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
+
+        {/* THE EVENT DOTS sit on the CUMULATIVE value AFTER the hole. Eagles
+            take the SAME red as a birdie — no third colour; gold is reserved
+            for the hole in one on the when-chip. */}
+        {events.map((e) =>
+          pts[e.i] ? (
+            <circle
+              key={e.i}
+              cx={pts[e.i].x}
+              cy={pts[e.i].y}
+              r={3.2}
+              fill={e.kind === 'under' ? UNDER_TONE : OVER_TONE}
+              stroke="#FFFFFF"
+              strokeWidth={1.4}
+            />
+          ) : null,
+        )}
+
+        <circle cx={end.x} cy={end.y} r={5} fill="#FFFFFF" />
+        <circle cx={end.x} cy={end.y} r={2.6} fill={finalTone} />
+      </svg>
+
+      {holesPlayed != null && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            padding: '4px 11px 0',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+          }}
+        >
+          {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
+              round, so an empty left slot rather than "0 birdies". */}
+          <span style={{ ...FIGS, color: UNDER_TONE }}>
+            {birdies > 0
+              ? `\u25CF ${t('discover.friendsRail.birdies', {
+                  defaultValue: '{{count}} birdies',
+                  count: birdies,
+                })}`
+              : ''}
+          </span>
+          <span style={{ ...FIGS, color: A.DIM }}>
+            {t('discover.friendsRail.holes', {
+              defaultValue: '{{count}} holes',
+              count: holesPlayed,
+            })}
+          </span>
+        </div>
+      )}
+    </>
   );
 }
+
 
 interface Props {
   userId: string | undefined;
@@ -248,6 +396,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
   );
   const reactions = useContentReactions(reactionTargets);
 
+  // HOLE SHAPES: ONE batched read for the whole rail, mirroring the reactions
+  // read above. Never one query per card in a horizontally scrolling rail.
+  const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
+  const holeShapes = useRoundHoleShapes(scoreIds);
+
   // THE INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET): resolved for the rail as a
   // whole, not per card, so the repetition cap can see its neighbours.
   const insights = useMemo(() => buildInsightMap(rows, t as never), [rows, t]);
@@ -280,7 +433,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
           // over par is INK, level is muted. The index-delta pair
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
           const toPar = toParFor(r);
-          const shapeTone = toPar?.tone ?? A.MUTE;
+          const toParUnder = toPar?.tone === TOPAR_RED;
           const insight = insights.get(r.round_id)?.text ?? null;
 
           return (
@@ -372,7 +525,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                           ...NUMF,
                           fontSize: 12.5,
                           fontWeight: 700,
-                          color: '#FFFFFF',
+                          color: toParUnder ? GLASS_UNDER : 'rgba(255,255,255,0.92)',
                           lineHeight: 1,
                         }}
                       >
@@ -418,7 +571,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
               {/* THE SHAPE, full bleed, directly under the photo. Collapses to
                   nothing when either nine is unmeasured. */}
-              <RoundShape row={r} tone={shapeTone} />
+              <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
 
               <div style={{ padding: '9px 11px 10px' }}>
                 {/* THE SUBLINE. Its wording is generated elsewhere and is
