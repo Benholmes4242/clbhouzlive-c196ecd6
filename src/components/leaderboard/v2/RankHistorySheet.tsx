@@ -100,7 +100,7 @@ export function RankHistorySheet({
 }: RankHistorySheetProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[95dvh]">
+      <DrawerContent className="max-h-[85dvh]">
         <DrawerHeader className="pb-2">
           <DrawerTitle className="text-center">Your Rank History</DrawerTitle>
           <p className="text-xs text-muted-foreground text-center mt-1">

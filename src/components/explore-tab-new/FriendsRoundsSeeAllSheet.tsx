@@ -40,7 +40,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       surfaceColor={SLATE_50}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,

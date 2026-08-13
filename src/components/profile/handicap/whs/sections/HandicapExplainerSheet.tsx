@@ -93,7 +93,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
           zIndex: 9999,
           animation: 'slideUp 280ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           boxShadow: '0 -8px 32px rgba(0,0,0,0.4)',
-          maxHeight: '95dvh',
+          maxHeight: '85dvh',
           overflowY: 'auto',
           overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',

@@ -146,11 +146,11 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       open={open}
       onClose={onClose}
       variant="light"
-      maxHeight="95dvh"
+      maxHeight="85dvh"
       ariaLabelledBy="course-directory-title"
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         background: SURFACE,

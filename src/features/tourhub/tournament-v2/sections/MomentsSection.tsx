@@ -107,9 +107,9 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
         variant="light"
         surfaceColor={A.PANEL}
         ariaLabelledBy="tournament-moments-sheet-title"
-        style={{ height: 'auto', maxHeight: '95dvh' }}
+        style={{ height: 'auto', maxHeight: '85dvh' }}
       >
-        <div style={{ background: A.PANEL, fontFamily: FONT, height: 'auto', maxHeight: '95dvh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: A.PANEL, fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '0 16px 12px' }}>
             <div style={KICKER}>{t('tournament.moments.eyebrow')}</div>
             <h2

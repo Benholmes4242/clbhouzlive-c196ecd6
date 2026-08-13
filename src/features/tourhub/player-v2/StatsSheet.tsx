@@ -300,7 +300,7 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
       ariaLabelledBy="stats-sheet-title"
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         background: SURFACE,

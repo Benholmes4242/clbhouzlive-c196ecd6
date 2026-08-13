@@ -98,8 +98,8 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
           : t('top100.listSheet.emptyAll');
 
   return (
-    <BottomSheet open={open} onClose={onClose} maxHeight="95dvh">
-      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(95dvh - 30px)' }}>
+    <BottomSheet open={open} onClose={onClose} maxHeight="85dvh">
+      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(85dvh - 30px)' }}>
         <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
           <div style={{ ...TITLE, color: INK }}>
             {listName}

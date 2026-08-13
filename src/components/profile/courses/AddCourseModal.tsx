@@ -601,10 +601,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       zIndexBase={1400}
       ariaLabelledBy="add-course-title"
       variant="light"
-      maxHeight="95dvh"
+      maxHeight="85dvh"
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         background: BG_SURFACE,

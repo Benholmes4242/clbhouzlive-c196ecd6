@@ -30,7 +30,7 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
       surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

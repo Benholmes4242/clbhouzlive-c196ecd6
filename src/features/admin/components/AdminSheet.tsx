@@ -57,7 +57,7 @@ export default function AdminSheet({ open, onClose, title, subtitle, children, f
           maxWidth,
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '95dvh',
+          maxHeight: '85dvh',
           borderTopLeftRadius: 18,
           borderTopRightRadius: 18,
           overflow: 'hidden',

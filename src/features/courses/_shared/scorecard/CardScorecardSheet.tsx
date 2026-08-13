@@ -694,7 +694,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       open={open}
       onClose={onClose}
       variant="light"
-      style={{ background: A.CANVAS, height: 'auto', maxHeight: '95dvh', display: 'flex', flexDirection: 'column' }}
+      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/* HEADER — course-first */}

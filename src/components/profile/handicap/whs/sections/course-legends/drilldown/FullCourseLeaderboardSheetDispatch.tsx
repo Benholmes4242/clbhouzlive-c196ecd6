@@ -113,7 +113,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
       surfaceColor={A.PANEL}
       style={{
         height: 'auto',
-        maxHeight: '95dvh',
+        maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: SANS,

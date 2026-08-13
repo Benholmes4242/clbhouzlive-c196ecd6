@@ -227,7 +227,7 @@ function CommentsSheetV2Inner({
             style={{
               background: CANVAS,
               borderRadius: '20px 20px 0 0',
-              maxHeight: '95dvh',
+              maxHeight: '85dvh',
               minHeight: MIN_SHEET_HEIGHT,
               paddingBottom: kb > 0 ? kb : 0,
               transition: 'padding-bottom 120ms ease-out',

@@ -149,7 +149,7 @@ export const GenderPromptSheet: React.FC = () => {
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="p-0 max-h-[95dvh] rounded-t-2xl"
+        className="p-0 max-h-[85dvh] rounded-t-2xl"
         style={{
           background: '#FFFFFF',
           color: INK,

@@ -162,8 +162,8 @@ export const CourseStatsSheet: React.FC<Props> = ({
     : null;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="dark" surfaceColor={CHARCOAL} maxHeight="95dvh">
-      <div style={{ overflowY: 'auto', maxHeight: 'calc(95dvh - 40px)' }}>
+    <BottomSheet open={open} onClose={onClose} variant="dark" surfaceColor={CHARCOAL} maxHeight="85dvh">
+      <div style={{ overflowY: 'auto', maxHeight: 'calc(85dvh - 40px)' }}>
         {/* Header */}
         <div style={{ padding: '4px 18px 14px' }}>
           <div style={kickerStyle}>{t('feed.courseSheet.kicker')}</div>
