@@ -136,6 +136,7 @@ import SuspendedScreen from "@/components/SuspendedScreen";
 
 import { isNativeAppSync, isPreviewHost, waitForNativeBridge } from '@/utils/native/isNativeApp';
 import AppDownloadGate from '@/pages/AppDownloadGate';
+import { isGateExemptPath } from '@/pages/gate/gateRoutes';
 import { useEnvStatus, isAppShellVisible } from '@/utils/native/envStatus';
 
 // ── Median push deep-link bridge ────────────────────────────────────────
