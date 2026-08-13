@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { top100Keys, viewerId } from '@/lib/queryKeys';
+import { batchDigest, top100Keys, viewerId } from '@/lib/queryKeys';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -58,7 +58,14 @@ export function useTop100Enrichment(
   const previousRef = useRef<Map<string, Top100Enrichment>>(EMPTY);
 
   const { data } = useQuery({
-    queryKey: top100Keys.enrichment(scopeKey, viewerId(userId), courseIds.length),
+    // BATCH IDIOM: keyed on a DIGEST of the sorted, de-duplicated id set — a
+    // count-keyed entry is reused when the membership changes without the size
+    // changing, and the new ids are then never requested.
+    queryKey: top100Keys.enrichment(
+      scopeKey,
+      viewerId(userId),
+      batchDigest(Array.from(new Set(courseIds.filter(Boolean))).sort()),
+    ),
     placeholderData: keepPreviousData,
     enabled,
     staleTime: 5 * 60 * 1000,
