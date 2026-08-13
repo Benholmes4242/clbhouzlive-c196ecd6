@@ -179,8 +179,20 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   const holesReady = ringsReady && holes.length >= 3;
 
   /* Still arriving vs genuinely thin. Only the second gets the floor line. */
-  const breakdownLanding = !ringsReady && !breakdownCeilingHit;
-  const belowFloor = !ringsReady && breakdownCeilingHit;
+  const breakdownLanding = !ringsReady && !breakdownSettled;
+  const belowFloor = !ringsReady && breakdownSettled;
+
+  /* The floor line is DERIVED once we can read a figure: say what is behind the
+     record and what it takes. Only when the RPC never produced a round at all
+     do we fall back to the generic line. */
+  const floorCopy =
+    completeRounds > 0
+      ? t('whsConnect.done.floorRounds', {
+          rounds: completeRounds,
+          needed: RINGS_MIN_COMPLETE_ROUNDS,
+        })
+      : t('whsConnect.done.floor');
+
 
   return (
     <>
