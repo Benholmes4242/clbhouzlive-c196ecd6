@@ -45,3 +45,24 @@
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
 }
+
+/* ============================================================================
+   STANDOUT FIGURE CHIP (BRIEF_STANDOUT_TILE_MARGIN §5a)
+   The figure chip on Standout Rounds / Personal Bests tiles, matched to the
+   friends rail's glass score chip. The FLAT, higher-opacity fill is the BASE —
+   backdrop-filter is the enhancement, because it is the property most likely
+   to no-op on the Median WebView and the chip sits over a photograph where
+   unreadable is the failure mode.
+   ============================================================================ */
+.standout-figure-chip {
+  background: rgba(24, 30, 26, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .standout-figure-chip {
+    background: rgba(255, 255, 255, 0.17);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+  }
+}
