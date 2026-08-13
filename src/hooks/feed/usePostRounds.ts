@@ -24,7 +24,7 @@ import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { feedKeys, viewerId } from '@/lib/queryKeys';
+import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
 
 /** One hole of the round shape, ordered by hole_no. */
@@ -162,8 +162,9 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
 
   const query = useQuery({
     // BATCH IDIOM (src/lib/queryKeys.ts). Viewer-scoped: RLS decides which
-    // rounds resolve, so the answer differs per identity.
-    queryKey: feedKeys.postRounds(scope, viewerId(user?.id), ids.length),
+    // rounds resolve, so the answer differs per identity. Keyed on a DIGEST of
+    // the score-id set — see usePostScoreIds above for why a count is unsafe.
+    queryKey: feedKeys.postRounds(scope, viewerId(user?.id), batchDigest(ids)),
     placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
@@ -256,7 +257,10 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           crown: crowns.get(id) ?? null,
         });
       }
-      return map;
+      // Merge over the previous map so rounds already on screen survive the
+      // fetch triggered by a changed digest (keepPreviousData covers the paint,
+      // this covers the rows the new request did not ask about).
+      return batch.mergeOverPrevious(map);
     },
   });
 

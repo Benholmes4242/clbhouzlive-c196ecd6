@@ -9,7 +9,7 @@ import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { feedKeys, viewerId } from '@/lib/queryKeys';
+import { batchDigest, feedKeys, viewerId } from '@/lib/queryKeys';
 import { useMergedBatch } from '@/lib/batchQuery';
 
 export interface PostCourseContext {
@@ -46,10 +46,10 @@ export function usePostCourseContext(courseIds: string[], scope: string) {
   }, [courseIds]);
 
   const query = useQuery({
-    // BATCH IDIOM (src/lib/queryKeys.ts). Keyed on scope + viewer + how many
-    // courses are loaded — NEVER on which ones, or every pagination page would
-    // blank every rendered course band for a paint.
-    queryKey: feedKeys.postCourseContext(scope, viewerId(user?.id), ids.length),
+    // BATCH IDIOM (src/lib/queryKeys.ts). Keyed on scope + viewer + a DIGEST of
+    // the course-id set. keepPreviousData + mergeOverPrevious keep every already
+    // resolved course band on screen while a changed set fetches.
+    queryKey: feedKeys.postCourseContext(scope, viewerId(user?.id), batchDigest(ids)),
     placeholderData: keepPreviousData,
     enabled: ids.length > 0,
     staleTime: 5 * 60 * 1000,
