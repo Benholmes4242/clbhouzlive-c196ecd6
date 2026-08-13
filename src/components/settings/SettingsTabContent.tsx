@@ -8,6 +8,8 @@ import {
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { bodyNameForProvider } from '@/lib/whs/whsCountries';
+
 import { formatHcp } from '@/lib/formatHcp';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -167,11 +169,19 @@ export function SettingsTabContent() {
     ? ` \u00B7 ${formatHcp(resolvedHcp.value)} hcp`
     : '';
 
+  // The row must never name a federation a member has nothing to do with:
+  // sixteen more governing bodies are pending, so the title is sourced from the
+  // connection's OWN provider (bodyNameForProvider) and is neutral until one
+  // exists. Adding the next federation needs no edit here.
+  const whsRowTitle = whsConnection
+    ? bodyNameForProvider((whsConnection as { provider?: string | null }).provider)
+    : 'Official handicap';
   const whsSubtitle = whsConnection
     ? whsConnection.last_synced_at
       ? `Connected \u00B7 synced ${formatRelativeAgoLong(whsConnection.last_synced_at)}`
       : 'Connected'
-    : 'Not connected';
+    : 'Sync your official handicap';
+
 
   return (
     <>
@@ -237,7 +247,8 @@ export function SettingsTabContent() {
           <SettingsToggleRow
             icon={<Eye size={15} />}
             title="Handicap button"
-            subtitle="Show the Connect HCP button in your header"
+            subtitle="Removes the connect prompt from your profile sheet and the handicap chip from the top-right island. You can still connect any time from here."
+
             checked={!hideHandicapChip}
             disabled={chipUpdating}
             onCheckedChange={handleToggleHandicapChip}
@@ -286,7 +297,7 @@ export function SettingsTabContent() {
         <SettingsSection title="Connections">
           <SettingsChevronRow
             icon={<Link2 size={15} />}
-            title="England Golf"
+            title={whsRowTitle}
             subtitle={whsSubtitle}
             onClick={() => navigate('/manage/handicap')}
           />

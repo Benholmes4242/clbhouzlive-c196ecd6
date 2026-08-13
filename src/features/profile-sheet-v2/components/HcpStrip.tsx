@@ -1,25 +1,37 @@
 /**
- * ProfileSheetV2 · HcpStrip — "Your game" stat panel.
+ * ProfileSheetV2 · HcpStrip — the 90-day index trend card.
  *
- * Three figures from data already fetched (no new query):
- *   HANDICAP  current index + 90d delta
- *   ROUNDS    rounds in the last 90 days
- *   COURSES   distinct courses in the member's official record
+ * ONE SUBJECT (the index), ONE INTERACTION (scrub the window), and a
+ * zone-graded plot that carries colour rather than whispering it. The old
+ * three-figure strip (HANDICAP / ROUNDS / INDEX MOVE) is gone; ROUNDS is
+ * dropped entirely.
  *
- * The courses count is derived client-side from useAllScores by counting
- * distinct course_id. Those are WHS-side course ids, not golf_courses ids —
- * that is deliberate and honest: it is the number of courses in the member's
- * own official record, and bridging through whs_to_golf_course_map would add
- * a dependency for an identical number.
+ * THE AXIS IS NATURAL, NOT INVERTED. High index at the TOP, low at the
+ * BOTTOM, so an improving index FALLS. Golfers say "I got my handicap DOWN
+ * to 2" — a DIP IS A GOOD SPELL. Do not flip this on the theory that
+ * "up = good"; it makes the values count backwards.
  *
- * Hidden entirely for business actors and for members with no WHS connection.
- * Taps through to /handicap.
+ * COLOUR is INDEX_DELTA.light, via A.IMPROVED / A.DRIFTED. The index delta is
+ * a MOVEMENT, not a score: never TOPAR_RED, never A.RED / A.GREEN, and never
+ * the dark pair, which fails on white.
+ *
+ * GATING. A disabled React Query v5 query is PENDING with fetchStatus 'idle',
+ * so `isLoading` is FALSE before it has ever run. Gating the connected /
+ * unconnected choice on `!isLoading` reads `connection === undefined` as
+ * "disconnected" and flashes the CONNECT card at a connected member on every
+ * mount. We gate on isFetched, exactly as ChromeIsland:230-246 documents, and
+ * while unsettled render NOTHING — no skeleton, no reserved height.
+ *
+ * Both states are the SAME HEIGHT, so connecting does not make the sheet
+ * below jump.
  */
 
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
-import { A, Panel, StatRow, KICKER, Action } from '@/features/courses/components/holes/analytical/tokens';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { formatDayMonthShortGB } from '@/i18n/format';
 
 interface Props {
   actorType: 'personal' | 'business';
@@ -27,142 +39,434 @@ interface Props {
   onNavigate: (route: string) => void;
 }
 
-export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
-  const { t } = useTranslation('common');
-  const isBusiness = actorType === 'business';
+// ---------------------------------------------------------------------------
+// Fixed geometry. The two states share every band so the card cannot change
+// height when a member connects.
+// ---------------------------------------------------------------------------
+const CARD_RADIUS = 12;
+const HEADER_H = 26;
+const FIGURE_H = 46;
+const PLOT_H = 96;
+const LEGEND_H = 18;
+const PAD = 14;
 
-  const { data: connection, isLoading: connectionLoading } = useWhsConnection(isBusiness ? undefined : actorId);
-  const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
-  const { data: history90, isLoading: historyLoading } = useHandicapHistory(connection?.id, 90);
-  const { data: scores, isLoading: scoresLoading } = useAllScores(connection?.id);
+const AMBER = A.AMBER;
+const AMBER_TEXT = A.AMBER_DEEP;
 
-  // 90-day delta: replicate HeroHandicapCardDark exactly —
-  //   history90[last].handicap_index - history90[0].handicap_index
-  const delta90 = useMemo<number | null>(() => {
-    if (!history90 || history90.length < 2) return null;
-    return history90[history90.length - 1].handicap_index - history90[0].handicap_index;
-  }, [history90]);
+interface Point { t: string; v: number }
 
-  const rounds90d = useMemo<number | null>(() => {
-    if (!scores) return null;
-    const cutoff = Date.now() - 90 * 86_400_000;
-    return scores.filter(
-      (s: any) => s.play_date && new Date(s.play_date).getTime() >= cutoff,
-    ).length;
-  }, [scores]);
+/** Zone of a revision between the window's worst (0) and best (1) index. */
+function zoneColor(v: number, best: number, worst: number): string {
+  const span = worst - best;
+  const toBest = span <= 0 ? 1 : (worst - v) / span;
+  if (toBest >= 0.66) return A.IMPROVED;
+  if (toBest >= 0.33) return AMBER;
+  return A.DRIFTED;
+}
 
+function formatIndex(v: number): string {
+  return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
+}
 
-  if (isBusiness) return null;
+function formatDelta(v: number): string {
+  const r = Math.round(v * 10) / 10;
+  if (r === 0) return '0.0';
+  return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
+}
 
-  const wrap: React.CSSProperties = { margin: '12px 20px 0' };
+// ---------------------------------------------------------------------------
+// Shell — owns the border, the radius and the band heights. The plot is handed
+// the full inner width so it can run EDGE TO EDGE to the card's own border.
+// ---------------------------------------------------------------------------
+const Shell: React.FC<{
+  header: React.ReactNode;
+  figure: React.ReactNode;
+  plot: (width: number) => React.ReactNode;
+  legend?: React.ReactNode;
+  onClick?: () => void;
+  plotRef?: React.Ref<HTMLDivElement>;
+  plotHandlers?: React.HTMLAttributes<HTMLDivElement>;
+}> = ({ header, figure, plot, legend, onClick, plotRef, plotHandlers }) => {
+  const outerRef = useRef<HTMLDivElement | null>(null);
+  const [width, setWidth] = useState(0);
 
-  // A skeleton while any of the four queries is in flight — never a partial
-  // stat row and never a zero.
-  const pending =
-    connectionLoading ||
-    (!!connection && (trendLoading || historyLoading || scoresLoading));
-
-  if (pending) {
-    return (
-      <div style={wrap} aria-hidden>
-        <Panel>
-          <div
-            className="clb-shimmer-light"
-            style={{ height: 64, borderRadius: 8, background: A.TRACK }}
-          />
-        </Panel>
-      </div>
-    );
-  }
-
-  // No official record at all — the panel is absent, not a row of dashes.
-  if (!connection) return null;
-
-  const current = trend?.current;
-  const indexText = typeof current === 'number'
-    ? (current < 0 ? `+${Math.abs(current).toFixed(1)}` : current.toFixed(1))
-    : null;
-  if (indexText == null) return null;
-
-  // Delta tone. A handicap going UP means playing WORSE, so the tone follows
-  // the MEANING, not the sign: rising -> OVER (red), falling -> UNDER (green).
-  // This is the opposite reasoning to every other figure in the system (where
-  // "+" is red because over par is worse) and arrives at the same colours for
-  // different causes. Do NOT "fix" this to the generic rule — that inverts the
-  // meaning.
-  const rounded = delta90 == null ? null : Math.round(delta90 * 10) / 10;
-  let deltaValue: string | null;
-  let deltaTone: string;
-  if (rounded == null) {
-    deltaValue = null;
-    deltaTone = A.DIM;
-  } else if (rounded === 0) {
-    deltaValue = '0.0';
-    deltaTone = A.DIM;
-  } else if (rounded > 0) {
-    deltaValue = `+${rounded.toFixed(1)}`;
-    deltaTone = A.DRIFTED;
-  } else {
-    deltaValue = `\u2212${Math.abs(rounded).toFixed(1)}`;
-    deltaTone = A.IMPROVED;
-  }
-
-  const go = () => onNavigate('/handicap');
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const measure = () => setWidth(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   return (
-    <div style={wrap}>
-      <Panel>
-        <header
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-            gap: 12,
-            marginBottom: 16,
-          }}
-        >
-          <span style={KICKER}>{t('profileSheet.yourGame')}</span>
-          <Action label={t('profileSheet.handicap')} onClick={go} />
-        </header>
-        <div
-          onClick={go}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              go();
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          style={{ cursor: 'pointer' }}
-        >
-          <StatRow
-            size={24}
-            items={[
-              {
-                label: t('profileSheet.handicap'),
-                value: indexText,
-                sub: t('profileSheet.current'),
-              },
-              ...(rounds90d
-                ? [{
-                    label: t('profileSheet.rounds'),
-                    value: rounds90d,
-                    sub: t('profileSheet.ninetyDays'),
-                  }]
-                : []),
-              ...(deltaValue != null
-                ? [{
-                    label: t('profileSheet.indexMove'),
-                    value: deltaValue,
-                    tone: deltaTone,
-                    sub: t('profileSheet.ninetyDays'),
-                  }]
-                : []),
-            ]}
-          />
+    <div style={{ margin: '12px 20px 0', fontFamily: SANS }}>
+      <div
+        ref={outerRef}
+        onClick={onClick}
+        style={{
+          background: A.PANEL,
+          border: `1px solid ${A.BORDER}`,
+          borderRadius: CARD_RADIUS,
+          overflow: 'hidden',
+          cursor: onClick ? 'pointer' : 'default',
+        }}
+      >
+        <div style={{ padding: `${PAD}px ${PAD}px 0` }}>
+          <div
+            style={{
+              height: HEADER_H,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 10,
+            }}
+          >
+            {header}
+          </div>
+          <div style={{ height: FIGURE_H, display: 'flex', alignItems: 'center', gap: 10 }}>
+            {figure}
+          </div>
         </div>
-      </Panel>
+        <div
+          ref={plotRef}
+          style={{ height: PLOT_H, position: 'relative', touchAction: 'none' }}
+          {...plotHandlers}
+        >
+          {width > 0 && plot(width)}
+        </div>
+        <div
+          style={{
+            height: LEGEND_H,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: `0 ${PAD}px`,
+            marginBottom: PAD - 4,
+          }}
+        >
+          {legend}
+        </div>
+      </div>
     </div>
+  );
+};
+
+const LegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+    <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
+    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em' }}>{label}</span>
+  </span>
+);
+
+// ---------------------------------------------------------------------------
+// The unconnected card. Amber throughout, and NO FIGURES ANYWHERE — nothing
+// on it may be mistaken for the member's own data. The kicker is
+// FEDERATION-NEUTRAL: sixteen more governing bodies are pending, so nothing
+// before a member picks a country may name England Golf.
+// ---------------------------------------------------------------------------
+const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
+  <Shell
+    onClick={onOpen}
+    header={<span style={KICKER}>Official handicap index</span>}
+    figure={
+      <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, lineHeight: 1.3 }}>
+        Connect your official handicap
+        <br />
+        for stats, analytics and your circle.
+      </div>
+    }
+    plot={(w) => {
+      const h = PLOT_H;
+      const pad = 2;
+      // A quiet decorative shape. No values, no ticks, nothing readable.
+      const ys = [0.62, 0.48, 0.56, 0.36, 0.44, 0.26, 0.32, 0.18];
+      const d = ys
+        .map((r, i) => {
+          const x = (i / (ys.length - 1)) * w;
+          const y = pad + r * (h - pad * 2);
+          return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+        })
+        .join(' ');
+      const area = `${d} L${w},${h} L0,${h} Z`;
+      return (
+        <>
+          <svg width={w} height={h} style={{ display: 'block' }} aria-hidden>
+            <defs>
+              <linearGradient id="hcp-ghost-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={AMBER} stopOpacity={0.34} />
+                <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <path d={area} fill="url(#hcp-ghost-fill)" />
+            {/* The white halo is what stops the line reading flat on its own fill. */}
+            <path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={d} fill="none" stroke={AMBER} strokeWidth={3} strokeDasharray="8 6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {/* The action sits INSIDE the plot on its baseline — the row the date
+              ticks would use — so it costs no height. */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 6,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              color: AMBER_TEXT,
+            }}
+          >
+            <span style={{ ...LABEL, color: AMBER_TEXT }}>Connect your handicap</span>
+            <ChevronRight size={12} strokeWidth={2.6} />
+          </div>
+        </>
+      );
+    }}
+  />
+);
+
+// ---------------------------------------------------------------------------
+// The connected card.
+// ---------------------------------------------------------------------------
+const TrendCard: React.FC<{
+  points: Point[];
+  windowDays: 30 | 90;
+  onWindow: (d: 30 | 90) => void;
+  fallbackIndex: number | null;
+}> = ({ points, windowDays, onWindow, fallbackIndex }) => {
+  const [scrub, setScrub] = useState<number | null>(null);
+  const plotRef = useRef<HTMLDivElement | null>(null);
+  const dragging = useRef(false);
+
+  const n = points.length;
+  const active = scrub == null ? n - 1 : Math.min(Math.max(scrub, 0), n - 1);
+
+  // Delta: last minus first across the window. Unchanged arithmetic.
+  const delta = n >= 2 ? points[n - 1].v - points[0].v : null;
+  const deltaTone = delta == null || Math.abs(delta) < 0.05
+    ? A.DIM
+    : delta < 0 ? A.IMPROVED : A.DRIFTED;
+
+  const headIndex = n > 0 ? points[active].v : fallbackIndex;
+  const headDate = n > 0 ? formatDayMonthShortGB(points[active].t) : null;
+
+  const moveTo = useCallback((clientX: number) => {
+    const el = plotRef.current;
+    if (!el || n < 2) return;
+    const r = el.getBoundingClientRect();
+    const ratio = (clientX - r.left) / Math.max(1, r.width);
+    setScrub(Math.round(Math.min(1, Math.max(0, ratio)) * (n - 1)));
+  }, [n]);
+
+  // Move and up listeners live on WINDOW, not the element — otherwise the
+  // scrub drops the moment a thumb leaves the plot bounds. Release does NOT
+  // reset: the member can park the marker on any revision.
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      if (!dragging.current) return;
+      e.preventDefault();
+      moveTo(e.clientX);
+    };
+    const onUp = () => { dragging.current = false; };
+    window.addEventListener('pointermove', onMove, { passive: false });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [moveTo]);
+
+  // The window changed under us — park back on the latest revision.
+  useEffect(() => { setScrub(null); }, [windowDays, n]);
+
+  const stats = useMemo(() => {
+    if (n === 0) return null;
+    const vals = points.map((p) => p.v);
+    return { best: Math.min(...vals), worst: Math.max(...vals) };
+  }, [points, n]);
+
+  return (
+    <Shell
+      plotRef={plotRef}
+      plotHandlers={{
+        onPointerDown: (e) => {
+          if (n < 2) return;
+          dragging.current = true;
+          moveTo(e.clientX);
+        },
+      }}
+      header={
+        <>
+          <span style={KICKER}>Handicap index</span>
+          <span style={{ display: 'inline-flex', gap: 2, background: A.TRACK, borderRadius: 7, padding: 2 }}>
+            {([30, 90] as const).map((d) => {
+              const on = windowDays === d;
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => onWindow(d)}
+                  style={{
+                    border: 'none',
+                    background: on ? A.PANEL : 'transparent',
+                    borderRadius: 5,
+                    padding: '3px 9px',
+                    fontFamily: SANS,
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    color: on ? A.INK : A.DIM,
+                    boxShadow: on ? '0 1px 2px rgba(14,18,22,0.10)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {d}D
+                </button>
+              );
+            })}
+          </span>
+        </>
+      }
+      figure={
+        <>
+          <span
+            style={{
+              fontSize: 36,
+              fontWeight: 700,
+              letterSpacing: '-0.05em',
+              color: A.INK,
+              lineHeight: 1,
+              ...FIGS,
+            }}
+          >
+            {headIndex != null ? formatIndex(headIndex) : '\u2014'}
+          </span>
+          {headDate && <span style={{ ...LABEL, paddingBottom: 2 }}>{headDate}</span>}
+          {delta != null && (
+            <span
+              style={{
+                marginLeft: 'auto',
+                background: deltaTone,
+                color: '#FFFFFF',
+                borderRadius: 999,
+                padding: '4px 10px',
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                boxShadow: `0 3px 10px ${deltaTone}59`,
+                ...FIGS,
+              }}
+            >
+              {formatDelta(delta)}
+            </span>
+          )}
+        </>
+      }
+      plot={(w) => {
+        if (n < 2 || !stats) return null;
+        const h = PLOT_H;
+        const pad = 8;
+        const span = stats.worst - stats.best || 1;
+        // NATURAL AXIS: high index at the TOP. A dip is a good spell.
+        const xy = points.map((p, i) => {
+          const x = (i / (n - 1)) * w;
+          const y = pad + ((stats.worst - p.v) / span) * (h - pad * 2 - 10);
+          return [x, h - (h - y)] as const;
+        });
+        const line = xy.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+        const area = `${line} L${w},${h} L0,${h} Z`;
+        const mx = xy[active][0];
+        const my = xy[active][1];
+        return (
+          <svg width={w} height={h} style={{ display: 'block' }}>
+            <defs>
+              <linearGradient id="hcp-trend-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={deltaTone} stopOpacity={0.42} />
+                <stop offset="100%" stopColor={deltaTone} stopOpacity={0.03} />
+              </linearGradient>
+              {/* One stop per revision, coloured by its zone, so a good spell
+                  renders green and a bad one red along one continuous line. */}
+              <linearGradient id="hcp-trend-stroke" x1="0" y1="0" x2="1" y2="0">
+                {points.map((p, i) => (
+                  <stop
+                    key={i}
+                    offset={`${(i / (n - 1)) * 100}%`}
+                    stopColor={zoneColor(p.v, stats.best, stats.worst)}
+                  />
+                ))}
+              </linearGradient>
+            </defs>
+            <path d={area} fill="url(#hcp-trend-fill)" />
+            <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
+            <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
+            <circle cx={mx} cy={my} r={11} fill="#FFFFFF" fillOpacity={0.45} />
+            <circle cx={mx} cy={my} r={6} fill="#FFFFFF" />
+            <circle cx={mx} cy={my} r={3.4} fill={A.INK} />
+          </svg>
+        );
+      }}
+      legend={
+        <>
+          <LegendSwatch color={A.DRIFTED} label="Off best" />
+          <LegendSwatch color={AMBER} label="Mid" />
+          <LegendSwatch color={A.IMPROVED} label="Near best" />
+        </>
+      }
+    />
+  );
+};
+
+export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
+  const isBusiness = actorType === 'business';
+  const [windowDays, setWindowDays] = useState<30 | 90>(90);
+
+  const { data: profile, isFetched: profileFetched, isError: profileError } =
+    useUserProfile(isBusiness ? undefined : actorId);
+  const { data: connection, isFetched: connFetched, isError: connError } =
+    useWhsConnection(isBusiness ? undefined : actorId);
+  const { data: trend, isFetched: trendFetched, isError: trendError } =
+    useHandicapTrend(connection?.id);
+  const { data: history90, isFetched: histFetched, isError: histError } =
+    useHandicapHistory(connection?.id, 90);
+
+  // The 30-day window is a client-side slice of the SAME 90-day query — the
+  // segmented control costs no extra round trip.
+  const points = useMemo<Point[]>(() => {
+    if (!history90) return [];
+    const cutoff = windowDays === 90 ? 0 : Date.now() - windowDays * 86_400_000;
+    return history90
+      .filter((p: any) => !cutoff || new Date(p.observed_at).getTime() >= cutoff)
+      .map((p: any) => ({ t: p.observed_at, v: p.handicap_index }));
+  }, [history90, windowDays]);
+
+  const anyError = profileError || connError || trendError || histError;
+  const settled =
+    anyError ||
+    (profileFetched && connFetched && (!connection || (trendFetched && histFetched)));
+
+  if (isBusiness) return null;
+  // UNRESOLVED IS NOT ABSENT: render nothing at all while unsettled.
+  if (!settled) return null;
+  // The hide toggle governs BOTH surfaces — the island chip and this card.
+  if (profile?.hide_handicap_chip) return null;
+
+  if (!connection) return <GhostCard onOpen={() => onNavigate('/manage/handicap')} />;
+
+  const fallbackIndex = typeof trend?.current === 'number' ? trend.current : null;
+  if (points.length < 2 && fallbackIndex == null) return null;
+
+  return (
+    <TrendCard
+      points={points}
+      windowDays={windowDays}
+      onWindow={setWindowDays}
+      fallbackIndex={fallbackIndex}
+    />
   );
 }
