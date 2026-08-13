@@ -29,9 +29,17 @@ export interface Moment {
   mediaId?: string;
   /**
    * True for the single best tile of its course. The PAGE mosaic renders only
-   * these (one tile per course); the SHEET renders the full ranked list.
+   * these (one tile per course); the COMMUNITY PAGE renders the full ranked list.
    */
   isCourseLead: boolean;
+  /** golf_courses.sub_country, for the community page's course index grouping. */
+  region: string | null;
+  /**
+   * TRUE media aspect (width / height) from the row, or null when unmeasured.
+   * Deliberately NOT defaulted to 9:16 — the community grid must be able to
+   * tell "portrait" from "we do not know".
+   */
+  aspect: number | null;
 }
 
 const DAY = 86_400_000;
@@ -44,10 +52,16 @@ const BAND_WARM = 2;
 const BAND_COOL = 1; // <= 30 days (the fetch window)
 const COMMENT_WEIGHT = 2;
 const MAX_TILES_PER_POST = 3;
-/** PAGE mosaic cap: one tile per course. The SHEET is uncapped. */
+/** PAGE mosaic cap: one tile per course. The COMMUNITY PAGE is uncapped. */
 const MAX_TILES_PER_COURSE = 1;
-/** 30-day window, uncapped sheet: candidate ceiling sized for the whole pool. */
+/** 30-day window: candidate ceiling sized for the whole pool. */
 const CANDIDATE_LIMIT = 500;
+/**
+ * ALL-TIME ceiling. Higher than the 30-day one because the window no longer
+ * does the narrowing, and the server-side course filter means every row
+ * returned is a row we can actually use.
+ */
+const CANDIDATE_LIMIT_ALL_TIME = 2000;
 const WINDOW_DAYS = 30;
 
 function freshnessBand(createdAt: string, now: number): number {
@@ -65,12 +79,18 @@ function streamThumb(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
 }
 
-export function useMomentsOfTheWeek() {
+/**
+ * @param windowDays  30 (default) for the Discover section's recency window;
+ *                    null for the ALL-TIME pool the /community page reads.
+ *                    The window is part of the query key, so the two callers
+ *                    hold separate cache entries and never overwrite one
+ *                    another.
+ */
+export function useMomentsOfTheWeek(windowDays: number | null = WINDOW_DAYS) {
   return useQuery({
-    queryKey: [...MOMENTS_KEY, WINDOW_DAYS],
+    queryKey: [...MOMENTS_KEY, windowDays ?? 'all'],
     queryFn: async (): Promise<Moment[]> => {
-      const since = new Date(Date.now() - WINDOW_DAYS * DAY).toISOString();
-      const { data, error } = await supabase
+      let q = supabase
         .from('posts')
         .select(
           `id, user_id, actor_id, actor_type, content, created_at, course_id, tagged_course_ids,
@@ -78,9 +98,16 @@ export function useMomentsOfTheWeek() {
            post_media ( id, media_type, media_url, poster_url, hls_url, stream_id, width, height, duration_seconds, display_order )`,
         )
         .eq('status', 'published')
-        .gte('created_at', since)
+        // SERVER-SIDE course filter. Previously every published post came back
+        // and the untagged majority was thrown away in JS — at all-time scale
+        // that is the difference between a usable pool and a wasted ceiling.
+        .or('course_id.not.is.null,tagged_course_ids.neq.{}');
+      if (windowDays !== null) {
+        q = q.gte('created_at', new Date(Date.now() - windowDays * DAY).toISOString());
+      }
+      const { data, error } = await q
         .order('created_at', { ascending: false })
-        .limit(CANDIDATE_LIMIT);
+        .limit(windowDays === null ? CANDIDATE_LIMIT_ALL_TIME : CANDIDATE_LIMIT);
       if (error) throw error;
 
       type Row = {
@@ -159,19 +186,26 @@ export function useMomentsOfTheWeek() {
 
 
 
-      // Course names and author identities, one round-trip each.
+      // Course names/regions and author identities, one round-trip each.
       const courseIds = picked.map((p) => p.courseId);
       const userIds = Array.from(new Set(picked.map((p) => p.row.user_id)));
       const [{ data: courses }, { data: profiles }] = await Promise.all([
-        supabase.from('golf_courses').select('id, name').in('id', courseIds),
+        // sub_country rides along on the EXISTING join — no third round trip.
+        supabase.from('golf_courses').select('id, name, sub_country').in('id', courseIds),
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url, is_verified')
           .in('id', userIds),
       ]);
       const courseName = new Map<string, string>();
-      for (const c of (courses ?? []) as Array<{ id: string; name: string }>) {
+      const courseRegion = new Map<string, string>();
+      for (const c of (courses ?? []) as Array<{
+        id: string;
+        name: string;
+        sub_country: string | null;
+      }>) {
         courseName.set(c.id, c.name);
+        if (c.sub_country) courseRegion.set(c.id, c.sub_country);
       }
       const profileById = new Map<
         string,
@@ -246,10 +280,18 @@ export function useMomentsOfTheWeek() {
           courseName: courseName.get(courseId) ?? undefined,
         };
         const tile = mediaItems[mediaIndex] ?? mediaItems[0];
+        // TRUE ASPECT, computed from the RAW row BEFORE the 1080x1920 defaults
+        // above are applied. Those defaults are a viewer contract, not a
+        // measurement, so they must not leak into tile sizing.
+        const raw = media[mediaIndex] ?? media[0];
+        const aspect =
+          raw?.width && raw?.height && raw.height > 0 ? raw.width / raw.height : null;
         return {
           key: `${row.id}-${courseId}-${mediaIndex}`,
           courseId,
           courseName: courseName.get(courseId) ?? null,
+          region: courseRegion.get(courseId) ?? null,
+          aspect,
           post,
           thumbnail: tile?.imageUrl ?? tile?.thumbnailUrl ?? null,
           mediaType: tile?.type === 'video' ? 'video' : 'image',

@@ -1524,5 +1524,20 @@
   },
   "search": {
     "yourRounds": "Your rounds"
+  },
+  "community": {
+    "count": "{{count}} moments",
+    "count_one": "{{count}} moment",
+    "courseIndex": "Every course",
+    "everything": "Everything",
+    "elsewhere": "Elsewhere",
+    "empty": "No member media yet.",
+    "rails": {
+      "played": "Courses you have played",
+      "nearby": "Near you",
+      "top100": "From the Top 100",
+      "busiest": "Busiest clubs",
+      "video": "In motion"
+    }
   }
 }
