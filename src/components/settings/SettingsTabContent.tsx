@@ -297,7 +297,7 @@ export function SettingsTabContent() {
         <SettingsSection title="Connections">
           <SettingsChevronRow
             icon={<Link2 size={15} />}
-            title="England Golf"
+            title={whsRowTitle}
             subtitle={whsSubtitle}
             onClick={() => navigate('/manage/handicap')}
           />
