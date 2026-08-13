@@ -53,8 +53,8 @@ const fmtInt = (v: number | null | undefined) =>
   typeof v === 'number' ? v.toLocaleString('en-GB') : '—';
 
 /* ── the artefact: an example round, drawn with the app's own tokens ─── */
-const HOLES = [0, -1, 0, 0, 1, -1, 0, 0, 1, -1, 0, 1, 0, 0, -1, 1, 0, 0];
-const FIELD_HOLES = [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0];
+const HOLES = [0, -1, 0, 0, 1, -1, 0, 0, 0, -1, 0, 1, 0, 0, -1, 0, 0, 0];
+const FIELD_HOLES = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0];
 const cum = (a: number[]) =>
   a.reduce<number[]>((acc, h) => [...acc, (acc[acc.length - 1] ?? 0) + h], [0]);
 const P = cum(HOLES);
