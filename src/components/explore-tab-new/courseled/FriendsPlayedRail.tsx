@@ -309,6 +309,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 style={{ height: PHOTO_H, flexShrink: 0 }}
               >
                 <div style={{ position: 'absolute', inset: 0, background: RAIL_SCRIM }} />
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM_CHIP }} />
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM_TOP }} />
 
                 {/* THE WHEN-CHIP, GLASS. The GOLD ring for a hole in one is the
                     only gold on the card and is unchanged. */}
