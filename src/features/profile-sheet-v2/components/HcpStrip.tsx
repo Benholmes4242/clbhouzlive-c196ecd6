@@ -229,14 +229,14 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
       // (amber), and ends near best (green). It previews the real colour
       // system without pretending to be the member's own data.
       const ys = [0.78, 0.68, 0.72, 0.52, 0.46, 0.38, 0.28, 0.18];
-      const d = ys
-        .map((r, i) => {
-          const x = (i / (ys.length - 1)) * w;
-          const y = pad + r * (h - pad * 2);
-          return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-        })
-        .join(' ');
+      const ghostPoints = ys.map((r, i) => {
+        const x = (i / (ys.length - 1)) * w;
+        const y = pad + r * (h - pad * 2);
+        return [x, y] as const;
+      });
+      const d = smoothPath(ghostPoints);
       const area = `${d} L${w},${h} L0,${h} Z`;
+
       return (
         <>
           <svg width={w} height={h} style={{ display: 'block' }} aria-hidden>
