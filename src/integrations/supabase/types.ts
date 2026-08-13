@@ -18271,6 +18271,8 @@ export type Database = {
         Args: { p_spark_days?: number }
         Returns: Json
       }
+      get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
+      get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
       get_admin_ops_health: { Args: { p_days?: number }; Returns: Json }
       get_admin_retention: { Args: { p_days?: number }; Returns: Json }
       get_admin_role: {
