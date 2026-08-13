@@ -184,17 +184,31 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
 
   if (!values || values.length < 2) return null;
 
-  // THE SCALE ALWAYS INCLUDES ZERO: without the clamp a −2 round and a +4
-  // round each fill their own band and look identical side by side.
-  const lo = Math.min(0, ...values);
-  const hi = Math.max(0, ...values);
-  const span = Math.max(hi - lo, 2);
+  // A round that never went under par gets NO red treatment. The cumulative
+  // series STARTS at level by construction, so zero is already in the domain;
+  // the old clamp only added a dead pink band below it.
+  const wentUnder = Math.min(...values) < 0;
+
   const top = 7;
   const bottom = SHAPE_H - 7;
 
+  // When the round never went under, the scale uses the full band and a small
+  // symmetric floor for breathing room. When it did go under, the scale still
+  // keeps zero in the domain so the split line is meaningful.
+  let lo: number;
+  let hi: number;
+  if (wentUnder) {
+    lo = Math.min(0, ...values) - 0.7;
+    hi = Math.max(0, ...values) + 0.7;
+  } else {
+    lo = Math.min(...values) - 0.7;
+    hi = Math.max(...values) + 0.7;
+  }
+  const span = Math.max(hi - lo, 2);
+
   // MORE OVER PAR IS HIGHER: the larger value maps to the SMALLER y.
   const yFor = (v: number) => bottom - ((v - lo) / span) * (bottom - top);
-  const zeroY = yFor(0);
+  const zeroY = wentUnder ? yFor(0) : 0;
 
   const innerW = CARD_W - SHAPE_PAD_X * 2;
   const pts = values.map((v, i) => ({
@@ -228,44 +242,56 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
         aria-hidden
       >
         <defs>
-          <clipPath id={clipAbove}>
-            <rect x={0} y={0} width={CARD_W} height={Math.max(zeroY, 0)} />
-          </clipPath>
-          <clipPath id={clipBelow}>
-            <rect x={0} y={zeroY} width={CARD_W} height={Math.max(SHAPE_H - zeroY, 0)} />
-          </clipPath>
+          {wentUnder && (
+            <>
+              <clipPath id={clipAbove}>
+                <rect x={0} y={0} width={CARD_W} height={Math.max(zeroY, 0)} />
+              </clipPath>
+              <clipPath id={clipBelow}>
+                <rect x={0} y={zeroY} width={CARD_W} height={Math.max(SHAPE_H - zeroY, 0)} />
+              </clipPath>
+            </>
+          )}
           <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={OVER_TONE} stopOpacity={0.26} />
             <stop offset="100%" stopColor={OVER_TONE} stopOpacity={0.02} />
           </linearGradient>
-          {/* BOTTOM to top, so the density sits at the low point rather than
-              at the level line. */}
-          <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor={UNDER_TONE} stopOpacity={0.3} />
-            <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.03} />
-          </linearGradient>
+          {wentUnder && (
+            // BOTTOM to top, so the density sits at the low point rather than
+            // at the level line.
+            <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor={UNDER_TONE} stopOpacity={0.3} />
+              <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.03} />
+            </linearGradient>
+          )}
         </defs>
 
-        <g clipPath={`url(#${clipAbove})`}>
-          <path d={fillD} fill={`url(#${gradAbove})`} />
-        </g>
-        <g clipPath={`url(#${clipBelow})`}>
-          <path d={fillD} fill={`url(#${gradBelow})`} />
-        </g>
+        {wentUnder ? (
+          <>
+            <g clipPath={`url(#${clipAbove})`}>
+              <path d={fillD} fill={`url(#${gradAbove})`} />
+            </g>
+            <g clipPath={`url(#${clipBelow})`}>
+              <path d={fillD} fill={`url(#${gradBelow})`} />
+            </g>
 
-        {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
-            The only gridline on the tile. */}
-        <line
-          x1={0}
-          x2={CARD_W}
-          y1={zeroY}
-          y2={zeroY}
-          stroke={A.DIM}
-          strokeOpacity={0.7}
-          strokeWidth={1}
-          strokeDasharray="2 3"
-          vectorEffect="non-scaling-stroke"
-        />
+            {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
+                The only gridline on the tile. */}
+            <line
+              x1={0}
+              x2={CARD_W}
+              y1={zeroY}
+              y2={zeroY}
+              stroke={A.DIM}
+              strokeOpacity={0.7}
+              strokeWidth={1}
+              strokeDasharray="2 3"
+              vectorEffect="non-scaling-stroke"
+            />
+          </>
+        ) : (
+          <path d={fillD} fill={`url(#${gradAbove})`} />
+        )}
 
         {/* THE WHITE HALO, drawn ONCE and UNCLIPPED, underneath both strokes —
             it is what stops the band looking flat against the fill. */}
@@ -278,7 +304,31 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
-        <g clipPath={`url(#${clipAbove})`}>
+
+        {wentUnder ? (
+          <>
+            <g clipPath={`url(#${clipAbove})`}>
+              <path
+                d={d}
+                fill="none"
+                stroke={OVER_TONE}
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
+            <g clipPath={`url(#${clipBelow})`}>
+              <path
+                d={d}
+                fill="none"
+                stroke={UNDER_TONE}
+                strokeWidth={2.2}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
+          </>
+        ) : (
           <path
             d={d}
             fill="none"
@@ -287,17 +337,7 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
-        </g>
-        <g clipPath={`url(#${clipBelow})`}>
-          <path
-            d={d}
-            fill="none"
-            stroke={UNDER_TONE}
-            strokeWidth={2.2}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </g>
+        )}
 
         {/* THE EVENT DOTS sit on the CUMULATIVE value AFTER the hole. Eagles
             take the SAME red as a birdie — no third colour; gold is reserved
