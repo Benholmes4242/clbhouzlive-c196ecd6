@@ -38,9 +38,10 @@ export default function MetricCard({
   const gid = `spark-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${uid}`;
 
   const sparkData = (sparkline ?? []).map((v, i) => ({ i, v }));
-  // Round FIRST, then branch — deciding direction before rounding renders
-  // "-0.0%" for a value fractionally below zero.
-  const rounded = typeof delta === 'number' ? Math.round(delta * 10) / 10 : null;
+  // Round FIRST, to an INTEGER, then branch — deciding direction before
+  // rounding renders "-0.0%" for a value fractionally below zero, and a
+  // one-decimal round mixes "233.3%" with "80%" in one grid.
+  const rounded = typeof delta === 'number' ? Math.round(delta) : null;
   const state = rounded === null ? null : deltaState(rounded);
   const showNew = delta === null && !loading && value !== null && value > 0;
 

@@ -207,7 +207,8 @@ export function useActiveMembers28d() {
 // genuine doubling indistinguishable. Callers render "New" for null.
 export function pctDelta(current: number, previous: number): number | null {
   if (previous === 0) return null;
-  // Round FIRST so callers branch on the rendered value, never on a raw
-  // fraction that would print "-0.0%".
-  return Math.round(((current - previous) / previous) * 100 * 10) / 10;
+  // Round FIRST, to an INTEGER, so callers branch on the rendered value and
+  // every delta in the grid carries the same precision. A one-decimal round
+  // here printed "233.3%" beside "80%" - four tiles apart, one grid.
+  return Math.round(((current - previous) / previous) * 100);
 }

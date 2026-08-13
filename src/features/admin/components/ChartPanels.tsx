@@ -248,17 +248,24 @@ export function RetentionPanel({ data, loading }: { data?: Retention; loading: b
 
 // ─── 7 ACTIVE MEMBERS ─────────────────────────────────────────────────────────
 
+/**
+ * Plots the ROLLING WEEKLY active count - WAU - not daily actives: the DAU
+ * tile sparklines the daily series, and one series charted twice on one page
+ * is a duplication. Avg / Peak / Low describe the WAU series.
+ */
 export function ActiveMembersPanel({
-  data, loading, isError, onRetry,
+  data, stickiness, loading, isError, onRetry,
 }: {
-  data: { date: string; d1: number }[];
+  data: { date: string; wau: number }[];
+  /** WAU as a share of MAU. null renders nothing. */
+  stickiness: number | null;
   loading: boolean; isError: boolean; onRetry: () => void;
 }) {
   const H = 44;
   const CHART_PX = 160;
   const { ref, width } = useElementWidth<HTMLDivElement>();
 
-  const vals = data.map(d => d.d1);
+  const vals = data.map(d => d.wau);
   const peak = vals.length ? Math.max(...vals) : 0;
   const low = vals.length ? Math.min(...vals) : 0;
   const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
@@ -280,6 +287,9 @@ export function ActiveMembersPanel({
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
         <span style={KICKER}>Active members</span>
         <span style={{ flex: 1 }} />
+        {stickiness !== null ? (
+          <span style={{ ...LABEL, ...FIG }}>{stickiness}% weekly of monthly</span>
+        ) : null}
         <span style={{ ...LABEL, ...FIG }}>Last 28d</span>
       </div>
 

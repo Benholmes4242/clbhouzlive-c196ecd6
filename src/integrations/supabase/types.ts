@@ -18267,6 +18267,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_admin_active_windows: {
+        Args: { p_spark_days?: number }
+        Returns: Json
+      }
       get_admin_ops_health: { Args: { p_days?: number }; Returns: Json }
       get_admin_retention: { Args: { p_days?: number }; Returns: Json }
       get_admin_role: {
