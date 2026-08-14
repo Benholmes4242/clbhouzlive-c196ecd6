@@ -301,7 +301,7 @@ export function ReviewTile({
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: ratingTone(r.rating),
+              color: bandColor(r.rating),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,
