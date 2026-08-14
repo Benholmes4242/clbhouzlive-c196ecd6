@@ -27,6 +27,51 @@ interface Props {
   showEyebrow?: boolean;
 }
 
+/** One decimal, TRUE MINUS, "E" at level. */
+function formatToPar(v: number): string {
+  const r = Math.round(v * 10) / 10;
+  if (r === 0) return 'E';
+  const n = formatNumber(Math.abs(r), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return `${r > 0 ? '+' : '\u2212'}${n}`;
+}
+
+/**
+ * MOVEMENT — a MOVEMENT, not a score: INDEX_DELTA.light green up / red down.
+ * NEW is amber (the absence of a prior week), LEVEL is dim. Absolute figures
+ * only; a percentage at this volume would lie (see §5).
+ */
+function MoveMark({
+  row,
+  t,
+}: {
+  row: MostPlayedRow;
+  t: (key: string, def: string, opts?: Record<string, unknown>) => string;
+}) {
+  const base: React.CSSProperties = {
+    ...LABEL,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 2,
+    fontSize: 9,
+    marginTop: 4,
+    fontVariantNumeric: 'tabular-nums lining-nums',
+  };
+  if (row.move === 'new')
+    return <span style={{ ...base, color: A.AMBER }}>{t('discover.mostPlayedNew', 'New')}</span>;
+  if (row.move === 'level')
+    return <span style={{ ...base, color: A.DIM }}>{t('discover.mostPlayedLevel', 'Level')}</span>;
+  const up = row.move === 'up';
+  const color = up ? INDEX_DELTA.light.improved : INDEX_DELTA.light.drifted;
+  const Icon = up ? ArrowUp : ArrowDown;
+  return (
+    <span style={{ ...base, color }}>
+      <Icon size={9} strokeWidth={2.75} />
+      {formatNumber(Math.abs(row.change))}
+    </span>
+  );
+}
+
 export function MostPlayedLeaderboard({
   rows,
   limit = 5,
