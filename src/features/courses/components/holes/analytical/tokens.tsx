@@ -62,13 +62,53 @@ export const A = {
   HAIRLINE: 'rgba(14,18,22,0.08)',
 } as const;
 
-/** Neutral ink ramp for score-distribution bars. NEVER semantic colour. */
+/**
+ * NEUTRAL ink ramp for score-distribution bars.
+ *
+ * DECISION (BRIEF_HOLE_BY_HOLE_COLOUR): the MEMBER hole-by-hole row no longer
+ * uses this - it takes RAMP_TOPAR below, because the row prints a legend naming
+ * Birdie+/Par/Bogey/Double+ and one hue cannot honour it. This neutral set is
+ * KEPT, not replaced, because the TOUR hole row (TournamentHoleRow) still draws
+ * it and that surface was not in scope of the brief.
+ */
 export const RAMP = {
   birdie: 'rgba(14,18,22,0.10)',
   par: 'rgba(14,18,22,0.24)',
   bogey: 'rgba(14,18,22,0.44)',
   double: 'rgba(14,18,22,0.70)',
 } as const;
+
+/**
+ * TO-PAR ramp for score-distribution bars (BRIEF_HOLE_BY_HOLE_COLOUR §1).
+ *
+ * UNDER par is RED at the GOOD end. That is the convention on the scorecard,
+ * the friends tile, the round post and the scorecard sheet - it is NOT an error
+ * and must not be "corrected" to green. OVER par darkens to ink.
+ */
+export const RAMP_TOPAR = {
+  birdie: TOPAR_UNDER_LIGHT,
+  par: '#B4BEC9',
+  bogey: '#7C8B9C',
+  double: '#0F172A',
+} as const;
+
+/**
+ * DIFFICULTY RAMP - one hue, varying intensity, across the course's OWN spread.
+ * Pale = easiest hole, deep red = hardest. Red means DEMANDING, not bad, and
+ * deliberately NOT the green/amber/red zone ramp: a hole is easy or hard, not
+ * good or bad. Shared so the "How it plays" chart and the hole rows grade
+ * identically.
+ */
+const DIFF_EASY: [number, number, number] = [228, 233, 239];
+const DIFF_HARD: [number, number, number] = [154, 32, 26];
+export const DIFFICULTY_HARD_HEX = '#9A201A';
+
+export function difficultyRampColor(t: number): string {
+  const k = Math.max(0, Math.min(1, t));
+  const c = DIFF_EASY.map((a, i) => Math.round(a + (DIFF_HARD[i] - a) * k));
+  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+}
+
 
 export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
