@@ -1274,7 +1274,6 @@
     "honoursCaptionCount": "[~~{{count}} áĉéš áñđ áļƀáţřőššéš őñ ţĥé ƀőářđ~~]",
     "honoursOnTheBoard": "[~~{{count}} őñ ţĥé ƀőářđ~~]",
     "honoursWhatItIs": "[~~Éṽéřý áĉé áñđ áļƀáţřőšš íñ ĉļƀĥőúž ĥíšţőřý~~]",
-    "mostPlayedDelta": "[~~+{{count}} őñ ļášţ ŵééǩ~~]",
     "mostPlayedSheetCaption": "[~~{{count}} ĉőúřšéš~~]",
     "honoursSeeAll": "[~~Šéé áļļ {{count}}~~]",
     "honoursSheetCaption": "[~~{{count}} éñţříéš~~]",
@@ -1386,7 +1385,10 @@
     },
     "momentsFromCommunity": "[~~Ƒřőɱ ţĥé ĉőɱɱúñíţý~~]",
     "momentsCount": "[~~{{count}} ɱőɱéñţš~~]",
-    "momentsCount_one": "[~~{{count}} ɱőɱéñţ~~]"
+    "momentsCount_one": "[~~{{count}} ɱőɱéñţ~~]",
+    "mostPlayedAvgToPar": "Played to {{value}}",
+    "mostPlayedNew": "New",
+    "mostPlayedLevel": "Level"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",

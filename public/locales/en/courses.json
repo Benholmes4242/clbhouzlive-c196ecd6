@@ -1279,7 +1279,6 @@
     "honoursCaptionCount": "{{count}} aces and albatrosses on the board",
     "honoursOnTheBoard": "{{count}} on the board",
     "honoursWhatItIs": "Every ace and albatross in clbhouz history",
-    "mostPlayedDelta": "+{{count}} on last week",
     "mostPlayedSheetCaption": "{{count}} courses",
     "honoursSeeAll": "See all {{count}}",
     "honoursSheetCaption": "{{count}} entries",
@@ -1391,7 +1390,10 @@
     },
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} moments",
-    "momentsCount_one": "{{count}} moment"
+    "momentsCount_one": "{{count}} moment",
+    "mostPlayedAvgToPar": "Played to {{value}}",
+    "mostPlayedNew": "New",
+    "mostPlayedLevel": "Level"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
