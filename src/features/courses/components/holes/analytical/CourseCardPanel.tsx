@@ -657,16 +657,33 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
   const tees = useMemo<TeeSet[]>(() => data ?? [], [data]);
 
   const [open, setOpen] = useState(false);
-  // Bumped when the sheet closes so the resolved tee is re-read from storage.
-  const [readToken, setReadToken] = useState(0);
+
+  /* THE SELECTED TEE LIVES HERE (§2). The tee list and the sheet's pills are
+     two doors onto ONE selection; two places holding a selected tee diverge.
+     The member's remembered tee, via resolveDefaultTee and its storageKey, is
+     the initial value, and a pick from either surface persists the same way. */
+  const [picked, setPicked] = useState<string | null>(null);
+
+  const resolved = useMemo<string>(() => {
+    if (!courseId || tees.length === 0) return '';
+    return resolveDefaultTee(tees, courseId, profile?.gender ?? null);
+  }, [courseId, tees, profile?.gender]);
+
+  const activeLabel = picked && tees.some((x) => x.tee_label === picked) ? picked : resolved;
 
   const active = useMemo<TeeSet | null>(() => {
     if (!courseId || tees.length === 0) return null;
-    const label = resolveDefaultTee(tees, courseId, profile?.gender ?? null);
-    return tees.find((x) => x.tee_label === label) ?? tees[0];
-    // readToken is a deliberate re-read trigger.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, tees, profile?.gender, readToken]);
+    return tees.find((x) => x.tee_label === activeLabel) ?? tees[0];
+  }, [courseId, tees, activeLabel]);
+
+  const pickTee = (label: string) => {
+    setPicked(label);
+    try {
+      window.localStorage.setItem(storageKey(courseId ?? ''), label);
+    } catch {
+      /* private mode - the selection is in-memory only */
+    }
+  };
 
   const slope = active?.slope_rating && active.slope_rating > 0 ? Math.round(active.slope_rating) : null;
 
@@ -687,10 +704,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
     analyticsEvents.track('course_card_sheet_opened', { course_id: courseId });
     setOpen(true);
   };
-  const closeSheet = () => {
-    setOpen(false);
-    setReadToken((n) => n + 1);
-  };
+  const closeSheet = () => setOpen(false);
 
   const yards = active.total_yards ?? null;
   const delta = slope != null ? slope - STANDARD_SLOPE : null;
@@ -812,6 +826,10 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         {/* SLOPE SCALE - only when there is a slope to place. */}
         {slope != null ? <SlopeScale slope={slope} /> : null}
 
+        {/* EVERY TEE SET, on the one graded scale. Tapping a row re-reads the
+            whole panel: headline, scale, sentence and counter strip. */}
+        <TeeList tees={tees} activeLabel={active.tee_label} onPick={pickTee} />
+
         {slope != null && sentence ? (
           <p
             style={{
@@ -886,7 +904,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         </div>
 
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', fontFamily: SANS, ...FIGS }}>
-          <SheetBody courseId={courseId} tees={tees} initialTee={active.tee_label} />
+          <SheetBody tees={tees} selected={active.tee_label} onPick={pickTee} />
         </div>
       </BottomSheet>
     </>
