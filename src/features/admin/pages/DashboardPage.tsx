@@ -529,6 +529,107 @@ const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
   review: { text: 'REVIEW', color: t.ink },
 };
 
+/**
+ * 4a CONSECUTIVE, NOT GLOBAL. Runs of the same member in the ALREADY SORTED
+ * order collapse; if another member posts between two of Matt's, that is three
+ * groups, not two, and the feed stays strictly chronological.
+ *
+ * 4e Grouping is PRESENTATION and runs AFTER the 8-item slice. The panel does
+ * not fetch more to fill the space grouping frees - that would change what
+ * "latest 8" means.
+ */
+function groupConsecutive(items: FeedItem[]): FeedItem[][] {
+  const groups: FeedItem[][] = [];
+  for (const it of items) {
+    const last = groups[groups.length - 1];
+    if (last && last[0].memberId && last[0].memberId === it.memberId) last.push(it);
+    else groups.push([it]);
+  }
+  return groups;
+}
+
+/**
+ * 4d ONE NOUN. Mixed kinds read "{n} items" - never "2 posts and a review",
+ * which does not fit the row and reads as a sentence rather than a figure.
+ */
+function groupLabel(group: FeedItem[]): string {
+  const kinds = new Set(group.map(g => g.kind));
+  if (kinds.size > 1) return `${group.length} items`;
+  const kind = group[0].kind;
+  if (kind === 'post') return `${group.length} posts`;
+  if (kind === 'review') return `${group.length} reviews`;
+  return `${group.length} items`;
+}
+
+/** 4c/4f One collapsed row per run. Collapsed ALWAYS on mount - the newest
+ *  group does not auto-expand, or the panel reverts to its dominated state. */
+function FeedGroup({
+  group, first, onOpenPost, onOpenCourse,
+}: {
+  group: FeedItem[]; first: boolean;
+  onOpenPost: (id: string) => void;
+  onOpenCourse: (id: string) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const head = group[0];
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          padding: '10px 0', textAlign: 'left', cursor: 'pointer',
+          background: 'transparent', border: 'none',
+          borderTop: first ? 'none' : `1px solid ${t.hairline}`,
+          borderTopStyle: first ? 'none' : 'solid',
+          borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline,
+          color: 'inherit',
+        }}
+      >
+        {head.avatarUrl ? (
+          <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
+        ) : (
+          <span aria-hidden style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }} />
+        )}
+        <span style={{
+          color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {head.memberName}
+        </span>
+        <span style={{ ...LABEL, flexShrink: 0 }}>{groupLabel(group)}</span>
+        <span style={{ flex: 1 }} />
+        {/* The age of the MOST RECENT item: the group sits where its newest
+            member sits, so any other age would misplace it. */}
+        <span style={{ ...LABEL, ...FIG, flexShrink: 0 }}>{relTime(head.created_at)}</span>
+        <ChevronDown
+          size={14} color={t.inkFaint} aria-hidden
+          style={{
+            flexShrink: 0,
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 160ms ease',
+          }}
+        />
+      </button>
+
+      {open ? (
+        <div style={{ paddingLeft: 38 }}>
+          {group.map((it, i) => (
+            <FeedRow
+              key={it.id} item={it} first={i === 0}
+              onOpenPost={onOpenPost}
+              onOpenCourse={onOpenCourse}
+            />
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+}
+
 function LatestInClubhouse({
   items, loading, isError, onRetry,
 }: {
@@ -537,6 +638,8 @@ function LatestInClubhouse({
 }) {
   const [openPost, setOpenPost] = React.useState<string | null>(null);
   const [openCourse, setOpenCourse] = React.useState<string | null>(null);
+  const groups = React.useMemo(() => groupConsecutive(items), [items]);
+
 
   return (
     <section style={CARD}>
