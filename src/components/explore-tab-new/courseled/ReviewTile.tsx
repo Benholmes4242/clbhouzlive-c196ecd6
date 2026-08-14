@@ -8,7 +8,7 @@ import { ReactionAction } from './ReactionAction';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
-import { ratingTone } from './reviewRatingTone';
+import { bandColor, SubScoreBar } from '@/features/courses/_shared/scoreBands';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -31,9 +31,10 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score figure and the bars carry the RATING TONE scale declared in
- * reviewRatingTone.ts (>=8.5 green, 7.0-8.4 amber, below grey). That scale has
- * NO RED by design — see the reasoning there. The "/10" stays white.
+ * The score figure and the bars carry the app-wide member-score scale from
+ * src/features/courses/_shared/scoreBands.tsx (bandColor / SubScoreBar) — the
+ * same scale as the review composer, Top 100 stats and course detail. Do not
+ * re-declare those hexes here. The "/10" stays white.
  *
  * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
  * (a figure on a review tile can only be a rating).
@@ -365,59 +366,18 @@ export function ReviewTile({
       </span>
 
       {/* BREAKDOWN — the four category scores, already on the row and never
-          rendered until now. A null category RENDERS NO ROW; a review with no
-          categories at all renders NO BLOCK and no gap. */}
+          rendered until now. The ROW is scoreBands' shipped SubScoreBar (the
+          same component the review composer uses), so the label/track/figure
+          metrics and the band colour come from there, not from this file.
+          A null category RENDERS NO ROW; a review with no categories at all
+          renders NO BLOCK and no gap. */}
       {rows.length > 0 && (
         <div
           data-testid="review-tile-breakdown"
           style={{ padding: '8px 11px 9px', display: 'grid', rowGap: 6 }}
         >
           {rows.map((row) => (
-            <div key={row.key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <span
-                style={{
-                  ...LABEL,
-                  fontSize: 7.5,
-                  lineHeight: 1,
-                  color: A.DIM,
-                  width: 34,
-                  flexShrink: 0,
-                }}
-              >
-                {row.label}
-              </span>
-              <span
-                style={{
-                  flex: 1,
-                  height: 4,
-                  borderRadius: 999,
-                  background: A.BORDER,
-                  overflow: 'hidden',
-                }}
-              >
-                <span
-                  style={{
-                    display: 'block',
-                    height: '100%',
-                    width: `${Math.max(0, Math.min(100, (row.value / 10) * 100))}%`,
-                    borderRadius: 999,
-                    background: ratingTone(row.value),
-                  }}
-                />
-              </span>
-              <span
-                style={{
-                  ...FIGS,
-                  fontSize: 10.5,
-                  lineHeight: 1,
-                  fontWeight: 700,
-                  color: A.BODY,
-                  flexShrink: 0,
-                }}
-              >
-                {row.value.toFixed(1)}
-              </span>
-            </div>
+            <SubScoreBar key={row.key} label={row.label} score={row.value} />
           ))}
         </div>
       )}
