@@ -13,9 +13,15 @@
  * The feed RPCs do not project posts.whs_score_id, so the id resolution is a
  * single `in (...)` read over the page's post ids rather than a per-card one.
  *
- * Hole shape: DROP IF PARTIAL. `holeShape` is non-null only when every PLAYED
- * hole carries a score (and at least one played hole exists), so the card
- * renders without the strip instead of a broken one. Synced rounds arrive as
+ * Hole shape: RENDER IF MOSTLY SCORED (BRIEF_ROUND_STRIP_PARTIAL_HOLES).
+ * `holeShape` is non-null when at least one played hole carries a score AND at
+ * least SCORED_FLOOR played holes do; the unscored played holes stay in the
+ * shape with `gross: null` and the card marks them as gaps. The EMPTY case is
+ * unchanged: a round where NO played hole has a score (a freshly synced round
+ * of pars) still resolves to null and renders no strip, no nine totals and no
+ * trajectory. Picking up on a hole is ordinary golf, so a partial card is
+ * honest as long as any nine containing a gap refuses to print a total.
+
  * 18 rows of pars with no scores and resolve to null. RLS decides visibility;
  * a round the viewer may not read simply resolves to nothing and the post
  * renders as it did before C3.
