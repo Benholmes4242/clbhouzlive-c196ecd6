@@ -50,15 +50,18 @@ export const Last5AgainstTarget: React.FC<Props> = ({
   values,
   cut,
   footLabel,
+  targetCaption,
   height = 96,
 }) => {
   const clean = values.filter((v) => typeof v === 'number' && !Number.isNaN(v));
   if (clean.length === 0) return null;
   if (!(typeof cut === 'number' && !Number.isNaN(cut))) return null;
 
-  const maxPos = Math.max(0, ...clean);
-  const minNeg = Math.min(0, ...clean);
-  const hasNeg = minNeg < 0;
+  /* The TARGET is part of the scale, so the line always lands inside the plot.
+     The zero line's rule is unaffected: it depends on a negative VALUE only. */
+  const maxPos = Math.max(0, cut, ...clean);
+  const minNeg = Math.min(0, cut, ...clean);
+  const hasNeg = Math.min(0, ...clean) < 0;
   const span = maxPos - minNeg;
   if (!(span > 0)) return null;
 
@@ -67,9 +70,40 @@ export const Last5AgainstTarget: React.FC<Props> = ({
   const upPx = Math.round(height * upShare);
   const downPx = height - upPx;
 
+  /* Single linear mapping; agrees with upPx at zero. */
+  const cutTop = Math.round((height * (maxPos - cut)) / span);
+
   return (
     <div style={{ fontFamily: CHART_FONT }}>
       <div style={{ position: 'relative', height }}>
+        {/* Target line — BEHIND the bars. */}
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: cutTop,
+            height: 0,
+            borderTop: `1px dashed rgba(255,255,255,0.50)`,
+          }}
+        />
+        {targetCaption && (
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: Math.max(0, cutTop - 11),
+              ...VALUE_STYLE,
+              fontSize: 8,
+              color: CHART.DIM,
+            }}
+          >
+            {targetCaption}
+          </span>
+        )}
+
         {hasNeg && (
           <span
             aria-hidden
@@ -83,6 +117,7 @@ export const Last5AgainstTarget: React.FC<Props> = ({
             }}
           />
         )}
+
 
         <div style={{ display: 'flex', gap: 10, height: '100%' }}>
           {clean.map((v, i) => {
