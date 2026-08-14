@@ -167,44 +167,69 @@ export const CourseRecordBook: React.FC<Props> = ({
   }
 
   /**
-   * One quiet line telling the viewer where they stand: they hold it, they are
-   * on the board with a gap, or nothing at all when they have no entry.
+   * Where the viewer stands: they hold it (full amber track), they are on the
+   * board (two-point track, their value, the gap and their rank), or NOTHING
+   * AT ALL when they have no entry. A track with no marker would read as "you
+   * are last", which is not what "no entry" means - so there is no track.
    */
   const viewerLine = (category: LegendCategory, isYou: boolean) => {
     if (isYou) {
       return (
-        <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP, marginTop: 3 }}>
-          {t('courseDetail.records.youHold')}
+        <div style={{ marginTop: 4 }}>
+          <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP }}>
+            {t('courseDetail.records.youHold')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+            <StandingTrack held />
+          </div>
         </div>
       );
     }
     const standing = viewerByCategory.get(category);
     if (!standing) return null;
-    // TWO facts, not one phrase: the member's own value, then the gap. The
-    // separator is 9px of space - no middot, no rule, no dash.
+    // The gap comes from useCourseRecordSummary as an UNSIGNED magnitude with
+    // `behind` owning the direction (lower-is-better boards invert). Never
+    // re-derived here, never signed.
+    const rank = standing.row.rank;
+    const total = standing.row.total_count_in_category ?? null;
+    const rankLabel =
+      rank > 0
+        ? total && total > 0
+          ? t('courseDetail.records.youRankOf', {
+              rank,
+              suffix: ordinalSuffix(rank),
+              count: total,
+            })
+          : t('courseDetail.records.youRank', { rank, suffix: ordinalSuffix(rank) })
+        : null;
     return (
-      <div
-        style={{
-          fontSize: 10.5,
-          fontWeight: 600,
-          color: A.BODY,
-          marginTop: 3,
-          ...FIGS,
-        }}
-      >
-        <span>
-          {t('courseDetail.records.youValue', {
-            value: formatLegendValueCompact(category, standing.row.value),
-          })}
-        </span>
-        <span style={{ marginLeft: 9, color: A.MUTE }}>
-          {standing.behind
-            ? t('courseDetail.records.youBehind', { gap: standing.gap })
-            : t('courseDetail.records.youAhead')}
-        </span>
+      <div style={{ marginTop: 3 }}>
+        {/* TWO facts, not one phrase: the member's own value, then the gap. The
+            separator is 9px of space - no middot, no rule, no dash. */}
+        <div style={{ fontSize: 10.5, fontWeight: 600, color: A.BODY, ...FIGS }}>
+          <span>
+            {t('courseDetail.records.youValue', {
+              value: formatLegendValueCompact(category, standing.row.value),
+            })}
+          </span>
+          <span style={{ marginLeft: 9, color: A.MUTE }}>
+            {standing.behind
+              ? t('courseDetail.records.youBehind', { gap: standing.gap })
+              : t('courseDetail.records.youAhead')}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+          <StandingTrack />
+          {rankLabel && (
+            <span style={{ ...LABEL, fontSize: 7.5, color: A.MUTE, ...FIGS, whiteSpace: 'nowrap' }}>
+              {rankLabel}
+            </span>
+          )}
+        </div>
       </div>
     );
   };
+
 
   const footer =
     unclaimedCount > 0
