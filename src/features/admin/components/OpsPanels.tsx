@@ -106,7 +106,10 @@ export function OpsErrorsPanel({ data, loading }: { data?: OpsHealth; loading: b
   const e = data?.errors;
   const rate =
     e && e.sessions_24h > 0 ? (e.errors_24h / e.sessions_24h) * 100 : null;
-  const tone = rate === null ? t.inkMuted : rate >= 5 ? t.dangerText : rate >= 1 ? t.warnText : t.okText;
+  // NO AMBER, AND NO TWO-STEP SEVERITY: the 1-5% tier was warn amber and is
+  // now the same red as 5%+. The detail line below carries the magnitude - the
+  // hue only has to say "bad". Below 1% stays green.
+  const tone = rate === null ? t.inkMuted : rate >= 1 ? t.dangerText : t.okText;
 
   return (
     <section style={CARD}>
