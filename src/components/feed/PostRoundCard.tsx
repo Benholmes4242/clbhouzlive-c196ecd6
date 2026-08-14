@@ -102,8 +102,36 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
   </div>
 );
 
+/**
+ * A played hole with no score (the member picked up). BRIEF_ROUND_STRIP_PARTIAL_HOLES
+ * §2.1: a distinct muted glyph sized as the score digits — never a zero, never a
+ * dash that could be read as level par, never adjusted_gross.
+ */
+const HoleGap: React.FC<{ size?: number }> = ({ size = 27 }) => (
+  <span
+    aria-label="No score"
+    style={{
+      width: size,
+      height: size,
+      flex: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      lineHeight: 1,
+      fontSize: Math.round(size * 0.42),
+      fontWeight: 700,
+      color: 'rgba(255,255,255,0.32)',
+    }}
+  >
+    {'\u00D7'}
+  </span>
+);
+
 const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) => {
   if (holes.length === 0) return null;
+  // §3.1 — a nine containing an unscored played hole prints NO total and NO
+  // to-par. Not the partial sum, not a dash. The other nine is unaffected.
+  const hasGap = holes.some((h) => h.gross == null);
   let total = 0;
   let par = 0;
   let any = false;
@@ -114,9 +142,14 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
       any = true;
     }
   }
+  const showTotals = any && !hasGap;
   return (
     <div style={{ marginTop: 12 }}>
-      <LabelRow label={label} total={any ? total : null} toPar={any ? total - par : null} />
+      <LabelRow
+        label={label}
+        total={showTotals ? total : null}
+        toPar={showTotals ? total - par : null}
+      />
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
           <div
@@ -131,7 +164,11 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             >
               {h.par ?? '·'}
             </span>
-            <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+            {h.gross == null ? (
+              <HoleGap />
+            ) : (
+              <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+            )}
           </div>
         ))}
       </div>
