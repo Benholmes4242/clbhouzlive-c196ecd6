@@ -185,7 +185,11 @@
       "s3SentenceLate": "You fade late: {{worst}} cost {{spread}} shots more than {{best}}. Take on water and something to eat around the 12th, before the drop-off starts.",
       "s3SentenceEarly": "You start slowly: {{best}} are {{spread}} shots better than {{worst}}. Hit a few balls and roll some putts before you tee off - your opening holes are doing your warm-up for you.",
       "s3SentenceMiddle": "Your middle six cost {{spread}} shots more than {{best}}. That's usually where focus drifts - pick a target on every shot through the turn.",
-      "s3SentenceEven": "You score evenly across the round - no weak stretch. To go lower, warm up properly before the first tee and keep eating and drinking every few holes so it stays that way."
+      "s3SentenceEven": "You score evenly across the round - no weak stretch. To go lower, warm up properly before the first tee and keep eating and drinking every few holes so it stays that way.",
+      "vsFieldLegend": "Field here",
+      "vsBetter": "Better than the field here",
+      "vsWorse": "Worse than the field here",
+      "vsLevel": "Level with the field"
     },
     "gameEverywhere": {
       "eyebrow": "Your scoring breakdown",
