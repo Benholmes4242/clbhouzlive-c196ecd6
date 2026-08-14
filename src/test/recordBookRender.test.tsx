@@ -7,6 +7,8 @@ vi.mock('@/hooks/useSupabaseSession', () => ({
   useSupabaseSession: () => ({ user: { id: 'me' } }),
 }));
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
+  Trans: (p: { children?: unknown }) => p.children ?? null,
   useTranslation: () => ({
     t: (k: string, o?: Record<string, unknown>) => {
       const map: Record<string, string> = {
