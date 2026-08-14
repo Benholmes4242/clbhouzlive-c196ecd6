@@ -1541,7 +1541,13 @@
     "col30d": "30d",
     "noneYet": "None yet.",
     "jumpToYou": "Jump to you · #{{rank}}",
-    "close": "Close"
+    "close": "Close",
+    "yourCrown": "Your crown",
+    "yourLead": "Your lead",
+    "overName": "over {{name}}",
+    "levelWithName": "Level with {{name}}",
+    "nearest": "Nearest {{value}}",
+    "youHoldIt": "You hold it"
   },
   "search": {
     "yourRounds": "Your rounds"
