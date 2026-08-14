@@ -17,6 +17,18 @@ import { supabase } from '@/integrations/supabase/client';
  * during an off-week.
  */
 
+/** One POSITION on the board, ties included. Places skip by tie size. */
+export interface PeekPosition {
+  /** Derived place: 1, then 1 + everyone above, so a six-way T2 is followed by 8. */
+  place: number;
+  tied: boolean;
+  /** Up to three names, alphabetical. */
+  names: string[];
+  /** How many further names the position holds beyond the three shown. */
+  extra: number;
+  score: number | null;
+}
+
 export interface LivePeek {
   leaderName: string;
   /** Number of players tied with the leader beyond the named one. */
@@ -29,6 +41,8 @@ export interface LivePeek {
   chasingScore: number | null;
   /** Newest sr_leaderboards.updated_at across this tournament's rows. */
   updatedAt: string | null;
+  /** The top three POSITIONS (not players), derived from the same rows. */
+  positions: PeekPosition[];
 }
 
 const STALE_MS = 10 * 60 * 1000;
@@ -100,6 +114,37 @@ export function useTourLivePeek(tournamentIds: string[]) {
           .filter((v): v is string => !!v)
           .sort();
 
+        // TOP THREE POSITIONS, from the rows already fetched. Places are
+        // DERIVED by cumulative count rather than trusting the feed's numbering,
+        // so six tied for second is followed by EIGHTH, never third.
+        const groups = new Map<number, Row[]>();
+        for (const r of named) {
+          const key = r.position as number;
+          const list = groups.get(key) ?? [];
+          list.push(r);
+          groups.set(key, list);
+        }
+        const ordered = [...groups.entries()].sort((a, b) => a[0] - b[0]);
+        const positions: PeekPosition[] = [];
+        let above = 0;
+        for (const [, rowsAt] of ordered) {
+          if (positions.length < 3) {
+            const names = rowsAt
+              .map((r) => String(r.player?.full_name ?? ''))
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b));
+            positions.push({
+              place: above + 1,
+              tied: names.length > 1,
+              names: names.slice(0, 3),
+              extra: Math.max(0, names.length - 3),
+              score: rowsAt[0].score ?? null,
+            });
+          }
+          above += rowsAt.length;
+          if (positions.length >= 3) break;
+        }
+
         out.set(id, {
           leaderName: String(leader.player?.full_name ?? ''),
           leaderTiedExtra: Math.max(0, leaders.length - 1),
@@ -109,6 +154,7 @@ export function useTourLivePeek(tournamentIds: string[]) {
           chasingName: chasing?.player?.full_name ?? null,
           chasingScore: chasing?.score ?? null,
           updatedAt: stamps.length > 0 ? stamps[stamps.length - 1] : null,
+          positions,
         });
       }
 

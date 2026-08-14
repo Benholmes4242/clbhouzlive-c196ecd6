@@ -53,6 +53,8 @@ export interface TourWeekEvent {
   currentRound: number | null;
   /** True when getTournamentDisplayState says play is happening. */
   isLive: boolean;
+  /** True when the event has FINISHED inside the result window. */
+  isResult: boolean;
 }
 
 const DAY = 86_400_000;
@@ -114,6 +116,7 @@ export function useTourThisWeek(limit = 8) {
           status: r.status ?? null,
           currentRound: r.current_round != null ? Number(r.current_round) : null,
           isLive: state === 'live' || state === 'unresolved',
+          isResult: state === 'result',
         };
       });
 
