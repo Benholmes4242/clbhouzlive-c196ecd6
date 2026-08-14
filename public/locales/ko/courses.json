@@ -107,6 +107,12 @@
     },
     "yourCourses": {
       "roundsLabel": "Raundeu"
+    },
+    "scoringBreakdown": {
+      "vsFieldLegend": "평균",
+      "vsBetter": "이 홀은 평균보다 좋음",
+      "vsWorse": "이 홀은 평균보다 나쁨",
+      "vsLevel": "평균과 동일"
     }
   },
   "scorecard": {
