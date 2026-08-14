@@ -445,13 +445,15 @@ const TrendCard: React.FC<{
       plot={(w) => {
         if (n < 2 || !stats) return null;
         const h = PLOT_H;
-        const padY = 8;
+        const padY = 16;
         const padX = 11;
         const span = stats.worst - stats.best || 1;
         // NATURAL AXIS: high index at the TOP. A dip is a good spell.
+        // 16px vertical headroom at each end guarantees the high/low callouts
+        // never clip out of the plot.
         const xy = points.map((p, i) => {
           const x = padX + (i / (n - 1)) * (w - 2 * padX);
-          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2 - 10);
+          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2);
           return [x, y] as const;
         });
         const line = smoothPath(xy);
@@ -479,11 +481,9 @@ const TrendCard: React.FC<{
           const nearRight = cx >= w - padX - 18;
           const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
           const tx = nearLeft ? 2 : nearRight ? w - 2 : cx;
-          // Vertical side: default high above, low below. Flip when the point is
-          // within 13px of the top/bottom so the label never leaves the viewBox.
-          const nearTop = cy <= 13;
-          const nearBottom = cy >= h - 13;
-          const above = kind === 'high' ? !nearTop : nearBottom;
+          // Vertical placement is fixed: high is always above its dot, low
+          // always below. PAD_Y = 16 reserves headroom at both edges so this
+          // never clips.
           return (
             <g key={idx} opacity={onMarker ? 0.42 : 1}>
               {/* When today IS the extreme, the scrub marker owns the point:
@@ -493,7 +493,7 @@ const TrendCard: React.FC<{
               )}
               <text
                 x={tx}
-                y={above ? cy - 8 : cy + 15}
+                y={kind === 'high' ? cy - 8 : cy + 15}
                 textAnchor={anchor}
                 fill={tone}
                 style={{ fontSize: 9.5, fontWeight: 700, ...FIGS }}
