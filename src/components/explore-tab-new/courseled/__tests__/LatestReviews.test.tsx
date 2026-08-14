@@ -127,8 +127,11 @@ describe('LatestReviews mosaic', () => {
       />,
     );
     const html = screen.getByTestId('review-tile-breakdown').innerHTML;
-    expect(html).toContain(BAND_GREEN);
-    expect(html).toContain(BAND_AMBER);
-    expect(html).toContain(BAND_RED);
+    // jsdom serialises inline colours as rgb(); assert the band values.
+    const rgb = (hex: string) =>
+      `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
+    expect(html).toContain(rgb(BAND_GREEN));
+    expect(html).toContain(rgb(BAND_AMBER));
+    expect(html).toContain(rgb(BAND_RED));
   });
 });
