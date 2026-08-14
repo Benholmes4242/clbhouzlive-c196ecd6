@@ -170,10 +170,10 @@ function markerLeft(value: number, scaleMax: number): string {
 export const HoleRampLegend: React.FC<{ hasYou?: boolean }> = () => {
   const { t } = useTranslation(['courses']);
   const items = [
-    { bg: RAMP.birdie, label: t('courses:holes.preview.legendBirdie') },
-    { bg: RAMP.par, label: t('courses:holes.preview.legendPar') },
-    { bg: RAMP.bogey, label: t('courses:holes.preview.legendBogey') },
-    { bg: RAMP.double, label: t('courses:holes.preview.legendDouble') },
+    { bg: RAMP_TOPAR.birdie, label: t('courses:holes.preview.legendBirdie') },
+    { bg: RAMP_TOPAR.par, label: t('courses:holes.preview.legendPar') },
+    { bg: RAMP_TOPAR.bogey, label: t('courses:holes.preview.legendBogey') },
+    { bg: RAMP_TOPAR.double, label: t('courses:holes.preview.legendDouble') },
   ];
   return (
     <div
@@ -217,25 +217,25 @@ export const HoleRowV2: React.FC<{
     {
       key: 'birdie',
       pctValue: pct(row, ['ace', 'albatross', 'eagle', 'birdie']),
-      bg: RAMP.birdie,
+      bg: RAMP_TOPAR.birdie,
       label: t('courses:holes.preview.legendBirdie'),
     },
     {
       key: 'par',
       pctValue: row.dist.par ?? 0,
-      bg: RAMP.par,
+      bg: RAMP_TOPAR.par,
       label: t('courses:holes.preview.legendPar'),
     },
     {
       key: 'bogey',
       pctValue: row.dist.bogey ?? 0,
-      bg: RAMP.bogey,
+      bg: RAMP_TOPAR.bogey,
       label: t('courses:holes.preview.legendBogey'),
     },
     {
       key: 'double',
       pctValue: row.dist.double ?? 0,
-      bg: RAMP.double,
+      bg: RAMP_TOPAR.double,
       label: t('courses:holes.preview.legendDouble'),
     },
   ];
