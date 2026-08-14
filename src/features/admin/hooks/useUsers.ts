@@ -5,6 +5,7 @@ import { toast } from '@/lib/toast';
 import type { Database } from '@/integrations/supabase/types';
 import {
   isNewThisWeek, isDormant14dPlus, isActive24h, hasEgIssue, isSuspended,
+  isConnected, isNotConnected,
   EG_AUTH_FAILED_STATUSES as EG_AUTH_FAILED_STATUSES_SHARED,
 } from '../lib/memberPredicates';
 
@@ -61,7 +62,9 @@ export type UserFilterStatus =
   | 'eg_issues'
   | 'suspended'
   | 'verified'
-  | 'admin';
+  | 'admin'
+  | 'connected'
+  | 'not_connected';
 
 
 const ANALYTICS_LOOKBACK_DAYS = 14;
@@ -127,6 +130,19 @@ async function fetchEgIssueUserIds(): Promise<string[]> {
     .from('whs_connections')
     .select('user_id')
     .in('last_sync_status', EG_AUTH_FAILED_STATUSES as unknown as string[])
+    .limit(10000);
+  return [...new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[])];
+}
+
+/**
+ * The FULL set of members with a live handicap connection - one query against
+ * whs_connections, no pagination and no per-page slicing, so `not_connected`
+ * is the true complement rather than "not connected, on this page only".
+ */
+async function fetchConnectedUserIds(): Promise<string[]> {
+  const { data } = await supabase
+    .from('whs_connections')
+    .select('user_id')
     .limit(10000);
   return [...new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[])];
 }
@@ -206,6 +222,12 @@ export function useUsers() {
     staleTime: 3 * 60_000,
   });
 
+  const { data: connectedIds = [] } = useQuery({
+    queryKey: ['admin-v2', 'users', 'connected'],
+    queryFn: fetchConnectedUserIds,
+    staleTime: 3 * 60_000,
+  });
+
   const { data: userDetail, isLoading: detailLoading, isError: detailError, refetch: refetchDetail } = useQuery({
     queryKey: ['admin-v2', 'users', 'detail', drawerUserId],
     queryFn: () => fetchUserDetail(drawerUserId!),
@@ -235,10 +257,18 @@ export function useUsers() {
       const s = new Set(egIssueIds);
       rows = rows.filter(u => hasEgIssue(u, s));
     }
+    if (filter === 'connected') {
+      const s = new Set(connectedIds);
+      rows = rows.filter(u => isConnected(u, s));
+    }
+    if (filter === 'not_connected') {
+      const s = new Set(connectedIds);
+      rows = rows.filter(u => isNotConnected(u, s));
+    }
     if (filter === 'suspended') rows = rows.filter(u => isSuspended(u));
     if (filter === 'verified') rows = rows.filter(u => u.is_verified);
     return rows;
-  }, [allUsers, search, filter, activeIds, egIssueIds]);
+  }, [allUsers, search, filter, activeIds, egIssueIds, connectedIds]);
 
   // Roster sort: last activity desc; users without activity sink to the bottom
   // ordered by join date desc.
@@ -261,6 +291,7 @@ export function useUsers() {
   const counts = useMemo(() => {
     const activeSet = new Set(activeIds);
     const egSet = new Set(egIssueIds);
+    const connSet = new Set(connectedIds);
     return {
       all: allUsers.length,
       new_this_week: allUsers.filter(u => isNewThisWeek(u)).length,
@@ -270,9 +301,11 @@ export function useUsers() {
       suspended: allUsers.filter(u => isSuspended(u)).length,
       verified: allUsers.filter(u => u.is_verified).length,
       admin: allUsers.filter(u => !!u.role).length,
+      connected: allUsers.filter(u => isConnected(u, connSet)).length,
+      not_connected: allUsers.filter(u => isNotConnected(u, connSet)).length,
     };
 
-  }, [allUsers, activeIds, egIssueIds]);
+  }, [allUsers, activeIds, egIssueIds, connectedIds]);
 
   const roleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {

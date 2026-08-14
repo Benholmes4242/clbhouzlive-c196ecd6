@@ -20441,6 +20441,7 @@ export type Database = {
           post_tags: Json
           post_type: string
           post_user_id: string
+          post_whs_score_id: string
           poster_url: string
           rated_post_course: boolean
           review_clubhouse_score: number

@@ -15,7 +15,9 @@ export type SegmentSlug =
   | 'dormant_14d'
   | 'eg_linked'
   | 'eg_issues'
-  | 'suspended';
+  | 'suspended'
+  | 'connected'
+  | 'not_connected';
 
 /** Statuses on `whs_connections.last_sync_status` that mean "EG is broken". */
 export const EG_AUTH_FAILED_STATUSES = ['auth_failed'] as const;
@@ -69,12 +71,26 @@ export function hasEgIssue(u: UserSegmentInputs, egIssueIds: ReadonlySet<string>
 }
 
 /**
+ * Handicap connection = a live `whs_connections` row, whatever its sync status.
+ * The two predicates are exact complements over the same id set, so
+ * connected + not_connected always sums to the member total.
+ */
+export function isConnected(u: UserSegmentInputs, connectedIds: ReadonlySet<string>): boolean {
+  return connectedIds.has(u.id);
+}
+export function isNotConnected(u: UserSegmentInputs, connectedIds: ReadonlySet<string>): boolean {
+  return !connectedIds.has(u.id);
+}
+
+/**
  * Members-page URL filter slugs kept in sync with UserFilterStatus. Exported
  * so Audiences cards can navigate to the roster with the matching filter.
  * `eg_linked` has NO Members filter today (display-only card).
  */
 export const SEGMENT_TO_MEMBERS_FILTER: Record<Exclude<SegmentSlug, 'eg_linked'>, string> = {
   new_this_week: 'new_this_week',
+  connected:     'connected',
+  not_connected: 'not_connected',
   active_24h:    'active_24h',
   dormant_14d:   'dormant_14d',
   eg_issues:     'eg_issues',

@@ -176,7 +176,16 @@ export default function UsersPage() {
 const LEGACY_FILTER_VALUES = new Set(['unverified', 'new_today']);
 const VALID_FILTERS: UserFilterStatus[] = [
   'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'verified', 'admin',
+  // Handicap connection. Deep-link only: the cohort board is unchanged, these
+  // arrive from the Dashboard's Activation panel.
+  'connected', 'not_connected',
 ];
+
+/** Labels for filters that have no cohort tile of their own. */
+const EXTRA_FILTER_LABELS: Partial<Record<UserFilterStatus, string>> = {
+  connected:     'Handicap connected',
+  not_connected: 'No handicap connected',
+};
 
 function MembersTab() {
   const [params, setParams] = useSearchParams();
@@ -255,7 +264,8 @@ function MembersTab() {
     { id: 'verified',      label: 'Verified',       count: counts.verified },
     { id: 'admin',         label: 'Admins',         count: counts.admin },
   ];
-  const activeCohortLabel = cohorts.find(c => c.id === filter)?.label ?? 'All members';
+  const activeCohortLabel =
+    cohorts.find(c => c.id === filter)?.label ?? EXTRA_FILTER_LABELS[filter] ?? 'All members';
 
   const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
 

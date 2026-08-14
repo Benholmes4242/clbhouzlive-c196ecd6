@@ -18,6 +18,13 @@ const MEMBERS_COL = 38;
 const CLIENTS_REGION_ID = 'admin-system-clients';
 const CLIENTS_OPEN_KEY = 'admin-v2:system:clients-open';
 
+/**
+ * ONE sentence, one definition. Exported so the Health board's Pipeline detail
+ * describes the subsystem in exactly the same words.
+ */
+export const PIPELINE_EXPLAINER =
+  'Rounds waiting to become scorecards, crowns and feed posts.';
+
 
 
 // ─── 1 SYSTEM ─────────────────────────────────────────────────────────────────
@@ -252,6 +259,20 @@ export function SystemPanel({
 export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: boolean }) {
   const a = ops?.activation;
   const pct = a && a.members_total > 0 ? a.connected / a.members_total : 0;
+  const neverConnected = a ? Math.max(0, a.members_total - a.connected) : 0;
+
+  /**
+   * Sub-figure destinations. Syncing and Failing point at the roster's nearest
+   * expressible sets rather than at their own precise ones: DELIBERATE, not an
+   * oversight - both figures are 0 today and two more roster filters for a
+   * zero is cost with no reader.
+   */
+  const subs: { label: string; value: number; color: string; to: string }[] = a ? [
+    { label: 'Synced',  value: a.synced,  color: t.ink, to: '/admin-v2/users?filter=connected' },
+    { label: 'Syncing', value: a.syncing, color: t.ink, to: '/admin-v2/users?filter=connected' },
+    { label: 'Failing', value: a.failing, color: a.failing > 0 ? t.dangerText : t.ink, to: '/admin-v2/users?filter=eg_issues' },
+  ] : [];
+
   return (
     <section style={CARD}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -260,42 +281,67 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
         {a && a.connected_in_window > 0 ? (
           <span style={{ ...LABEL, ...FIG }}>+{num(a.connected_in_window)} in {ops?.window_days ?? 7}d</span>
         ) : null}
+        <ChevronRight size={14} color={t.inkFaint} aria-hidden />
       </div>
 
       {loading || !a ? (
         <Skeleton height={104} />
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 }}>
-              {num(a.connected)}
-            </span>
-            <span style={{ color: t.inkMuted, fontSize: 12 }}>of {num(a.members_total)} members</span>
-          </div>
+          {/* The headline and the bar are ONE control: they state the same
+              figure, so they open the same list. The sub-figures below keep
+              their own destinations, which is why the panel is not a button. */}
+          <Link
+            to="/admin-v2/users?filter=connected"
+            aria-label={`${a.connected} of ${a.members_total} members have connected a handicap`}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 }}>
+                {num(a.connected)}
+              </span>
+              <span style={{ color: t.inkMuted, fontSize: 12 }}>of {num(a.members_total)} members</span>
+            </div>
 
-          {/* Starts at zero, no target marker, no percentage label: the figures
-              above already state it. A mostly-empty bar is the true picture. */}
-          <div style={{ height: 6, borderRadius: 3, background: t.neutralSoft, overflow: 'hidden' }}>
-            <div style={{ width: `${Math.min(100, pct * 100)}%`, height: '100%', borderRadius: 3, background: t.brand }} />
-          </div>
+            {/* Starts at zero, no target marker, no percentage label: the figures
+                above already state it. A mostly-empty bar is the true picture. */}
+            <div style={{ height: 6, borderRadius: 3, background: t.neutralSoft, overflow: 'hidden', marginTop: 8 }}>
+              <div style={{ width: `${Math.min(100, pct * 100)}%`, height: '100%', borderRadius: 3, background: t.brand }} />
+            </div>
+          </Link>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-            {([
-              ['Synced', a.synced, t.ink],
-              ['Syncing', a.syncing, t.ink],
-              ['Failing', a.failing, a.failing > 0 ? t.dangerText : t.ink],
-            ] as const).map(([label, value, color]) => (
-              <div key={label}>
-                <div style={LABEL}>{label}</div>
-                <div style={{ ...FIG, color, fontSize: 17, fontWeight: 700, marginTop: 2 }}>{num(value)}</div>
-              </div>
+            {subs.map(s => (
+              <Link key={s.label} to={s.to} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                <div style={LABEL}>{s.label}</div>
+                <div style={{ ...FIG, color: s.color, fontSize: 17, fontWeight: 700, marginTop: 2 }}>{num(s.value)}</div>
+              </Link>
             ))}
           </div>
+
+          {/* The most useful link on the page: everything else here is
+              downstream of the members who never got started. */}
+          {neverConnected > 0 ? (
+            <Link
+              to="/admin-v2/users?filter=not_connected"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                borderTop: HAIRLINE, paddingTop: 10, textDecoration: 'none', color: 'inherit',
+              }}
+            >
+              <span style={{ color: t.inkMuted, fontSize: 12, flex: 1, minWidth: 0 }}>
+                <span style={{ ...FIG, color: t.ink, fontWeight: 700 }}>{num(neverConnected)}</span>
+                {' '}member{neverConnected === 1 ? ' has' : 's have'} never connected a handicap
+              </span>
+              <ChevronRight size={14} color={t.inkFaint} aria-hidden />
+            </Link>
+          ) : null}
         </>
       )}
     </section>
   );
 }
+
 
 // ─── 3 PIPELINE ───────────────────────────────────────────────────────────────
 
@@ -316,11 +362,23 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
 
   return (
     <section style={CARD}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={KICKER}>Pipeline</span>
-        <span style={{ flex: 1 }} />
-        <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
-      </div>
+      <Link
+        to="/admin-v2/health?tab=status"
+        style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={KICKER}>Pipeline</span>
+          <span style={{ flex: 1 }} />
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
+          <ChevronRight size={14} color={t.inkFaint} aria-hidden />
+        </div>
+        {/* Names the WORK, not the table: "evaluation queue" explains nothing
+            to anyone who does not already know what it is. */}
+        <div style={{ color: t.inkMuted, fontSize: 11.5, marginTop: 2 }}>
+          {PIPELINE_EXPLAINER}
+        </div>
+      </Link>
+
 
       {loading || !p ? (
         <Skeleton height={72} />

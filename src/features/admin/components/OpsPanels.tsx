@@ -115,10 +115,10 @@ export function OpsErrorsPanel({ data, loading }: { data?: OpsHealth; loading: b
         <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Errors</div>
         <span style={{ flex: 1 }} />
         <Link
-          to="/admin-v2/health?tab=stability"
+          to="/admin-v2/health?tab=status"
           style={{ ...LABEL, display: 'inline-flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}
         >
-          Stability <ChevronRight size={12} />
+          Health <ChevronRight size={12} />
         </Link>
       </div>
 

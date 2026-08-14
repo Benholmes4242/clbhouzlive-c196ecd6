@@ -15,7 +15,7 @@ import {
   computeErrorsChip, toneColor,
   type ChipState,
 } from '../lib/healthChips';
-import { pipelineTone } from '../components/SystemPanels';
+import { pipelineTone, PIPELINE_EXPLAINER } from '../components/SystemPanels';
 import { formatDurationShort, Skeleton } from '../lib/chartPrimitives';
 import {
   useSystemStateHistory, trailingRun,
@@ -780,6 +780,8 @@ function PipelineDetail({ ops }: { ops: ReturnType<typeof useOpsHealth> }) {
 
   return (
     <>
+      {/* Same sentence as the Dashboard panel, from the same constant. */}
+      <div style={{ color: t.inkMuted, fontSize: 11.5 }}>{PIPELINE_EXPLAINER}</div>
       <StatRow stats={[
         { label: 'Waiting', value: p.unprocessed.toLocaleString(), bad: p.unprocessed > 0 && p.oldest_wait_sec >= 3600 },
         { label: 'Oldest wait', value: p.unprocessed > 0 ? formatDurationShort(p.oldest_wait_sec) : '-' },
