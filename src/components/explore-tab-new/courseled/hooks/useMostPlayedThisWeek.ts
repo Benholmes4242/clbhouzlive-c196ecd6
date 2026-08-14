@@ -67,7 +67,7 @@ export function useMostPlayedThisWeek(limit = 25) {
       // keeps nine-hole cards out of that average only.
       const { data, error } = await supabase
         .from('gam_round_stats' as never)
-        .select('course_id, course_name, play_date, gross_score, course_par, holes_played')
+        .select('course_id, course_name, play_date, gross_score, course_par, holes_played, user_id')
         .gte('play_date', startPrev)
         .not('course_id', 'is', null);
       if (error) throw error;
@@ -76,6 +76,7 @@ export function useMostPlayedThisWeek(limit = 25) {
         course_id: string | null;
         course_name: string | null;
         play_date: string;
+        user_id: string | null;
         gross_score: number | null;
         course_par: number | null;
         holes_played: number | null;
@@ -86,12 +87,19 @@ export function useMostPlayedThisWeek(limit = 25) {
       const names = new Map<string, string | null>();
       /** Running to-par sum/count for the CURRENT week, 18-hole scored only. */
       const par = new Map<string, { sum: number; n: number }>();
+      /** DISTINCT members per course, CURRENT week only. */
+      const members = new Map<string, Set<string>>();
       for (const r of rows) {
         if (!r.course_id) continue;
         names.set(r.course_id, r.course_name ?? names.get(r.course_id) ?? null);
         const isCurrent = r.play_date >= startCur;
         const bucket = isCurrent ? cur : prev;
         bucket.set(r.course_id, (bucket.get(r.course_id) ?? 0) + 1);
+        if (isCurrent && r.user_id) {
+          const set = members.get(r.course_id) ?? new Set<string>();
+          set.add(r.user_id);
+          members.set(r.course_id, set);
+        }
         if (
           isCurrent &&
           r.holes_played === 18 &&
@@ -122,6 +130,7 @@ export function useMostPlayedThisWeek(limit = 25) {
             move:
               before === 0 ? 'new' : change > 0 ? 'up' : change < 0 ? 'down' : 'level',
             avgToPar: agg && agg.n > 0 ? agg.sum / agg.n : null,
+            members: members.get(courseId)?.size ?? 0,
           } satisfies MostPlayedRow;
         })
         .sort((a, b) => b.count - a.count || (a.courseName ?? '').localeCompare(b.courseName ?? ''))
