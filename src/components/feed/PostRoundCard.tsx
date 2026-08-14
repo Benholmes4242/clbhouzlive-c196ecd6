@@ -408,51 +408,30 @@ export const PostRoundCard: React.FC<Props> = ({
             </div>
           )}
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginTop: 6,
-            }}
-          >
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  letterSpacing: '-0.02em',
-                  color: '#FFFFFF',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {courseName ?? ''}
-              </div>
-              {courseRegion && (
-                <div style={{ fontSize: 11.5, color: MUTE, marginTop: 2 }}>{courseRegion}</div>
-              )}
+          {/* THE COURSE BLOCK TAKES THE FULL WIDTH (§2). The score used to sit
+              on this row and squeezed the name into half of it — a long name
+              like "Sundridge Park Golf Club (East Course)" then wrapped or
+              truncated. The score now lives in the author row, which had empty
+              space on its right and costs no height at all. */}
+          <div style={{ minWidth: 0, marginTop: 6 }}>
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#FFFFFF',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {courseName ?? ''}
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, flexShrink: 0 }}>
-              <span
-                style={{
-                  ...NUM,
-                  fontSize: 34,
-                  fontWeight: 700,
-                  letterSpacing: '-0.03em',
-                  color: '#FFFFFF',
-                  lineHeight: 1,
-                }}
-              >
-                {gross ?? '—'}
-              </span>
-              <span style={{ ...NUM, fontSize: 15, fontWeight: 700, color: toParColor(toPar) }}>
-                {fmtToPar(toPar)}
-              </span>
-            </div>
+            {courseRegion && (
+              <div style={{ fontSize: 12.5, color: MUTE, marginTop: 2 }}>{courseRegion}</div>
+            )}
           </div>
+
 
           <div
             style={{
