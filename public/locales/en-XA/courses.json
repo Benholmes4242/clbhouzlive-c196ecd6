@@ -954,7 +954,9 @@
         "points": "[~~Ƥőíñţš~~]",
         "birdies": "[~~Ɓířđíéš~~]",
         "diff": "[~~Đíƒƒ~~]"
-      }
+      },
+      "youRankOf": "[~~{{rank}}{{suffix}} őƒ {{count}}~~]",
+      "youRank": "[~~{{rank}}{{suffix}}~~]"
     },
     "rating": {
       "kicker": "[~~ĈŐṀṀÚÑÍŢÝ ŘÁŢÍÑĜ~~]",

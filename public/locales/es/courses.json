@@ -684,7 +684,9 @@
         "points": "Points",
         "birdies": "Birdies",
         "diff": "Diff"
-      }
+      },
+      "youRankOf": "{{rank}}.º de {{count}}",
+      "youRank": "{{rank}}.º"
     },
     "you": {
       "oneToGoHole": "One to go · hole {{n}}",

@@ -954,7 +954,9 @@
         "points": "Points",
         "birdies": "Birdies",
         "diff": "Diff"
-      }
+      },
+      "youRankOf": "{{rank}}{{suffix}} of {{count}}",
+      "youRank": "{{rank}}{{suffix}}"
     },
     "rating": {
       "kicker": "COMMUNITY RATING",
