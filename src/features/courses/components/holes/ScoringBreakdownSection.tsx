@@ -68,6 +68,88 @@ function toneFor(v: number, digits = 1): string {
   return r > 0 ? A.INK : r < 0 ? TOPAR_RED : A.MUTE;
 }
 
+/**
+ * A MARGIN IS NOT A SCORE (BRIEF_YOU_TAB_MARGIN_AND_GAPS s1).
+ *
+ * toneFor implements the to-par convention and is correct for every to-par
+ * FIGURE. It is wrong for a comparison BETWEEN two scores: a bigger margin is
+ * BETTER, so the to-par rule inverts and paints the good outcome red - red
+ * meaning "you are beating the field" ten pixels from red meaning "you make
+ * too many doubles".
+ *
+ * A margin is MOVEMENT-shaped, so it takes INDEX_DELTA (A.IMPROVED /
+ * A.DRIFTED) via the analytical tokens. `gap` here is field minus you, so
+ * POSITIVE means the member is better than the field.
+ */
+function marginTone(gap: number): string {
+  if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) return A.MUTE;
+  return gap > 0 ? A.IMPROVED : A.DRIFTED;
+}
+
+/** The field's bar. Neutral - the comparison, not a verdict. */
+const FIELD_BAR = '#C6CFD8';
+
+/**
+ * One bar on a scale shared with its sibling.
+ *
+ * THE MEMBER'S BAR IS SHORTER WHEN THEY ARE BETTER. These are to-par values,
+ * so a LOWER figure is the better one - do not invert this. A short "Yours"
+ * bar beside a long "The field here" bar is the member winning.
+ */
+const CompareBar: React.FC<{
+  label: string;
+  value: number;
+  scale: number;
+  fill: string;
+  figure: string;
+  figureTone: string;
+  size?: 'md' | 'sm';
+}> = ({ label, value, scale, fill, figure, figureTone, size = 'md' }) => {
+  const pct = scale > 0 ? Math.max(0, Math.min(100, (value / scale) * 100)) : 0;
+  const h = size === 'md' ? 7 : 5;
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: size === 'md' ? '84px 1fr 44px' : '66px 1fr 42px',
+        alignItems: 'center',
+        gap: 9,
+      }}
+    >
+      <span style={{ ...LABEL, fontSize: size === 'md' ? 8 : 7.5 }}>{label}</span>
+      <span
+        style={{
+          display: 'block',
+          height: h,
+          borderRadius: h / 2,
+          background: A.TRACK,
+        }}
+      >
+        <span
+          style={{
+            display: 'block',
+            height: h,
+            borderRadius: h / 2,
+            width: `${pct}%`,
+            background: fill,
+          }}
+        />
+      </span>
+      <span
+        style={{
+          ...NUM,
+          fontSize: size === 'md' ? 15 : 13,
+          color: figureTone,
+          textAlign: 'right',
+        }}
+      >
+        {figure}
+      </span>
+    </div>
+  );
+};
+
+
 interface Props {
   golfCourseId: string | undefined;
 }
