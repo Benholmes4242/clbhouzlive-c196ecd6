@@ -1081,6 +1081,12 @@
     "colYourAvg": "YOUR AVG",
     "colLastPlayed": "LAST PLAYED",
     "openAnalytics": "Open course analytics",
+    "trendLabel": "YOUR ROUNDS HERE",
+    "trendNone": "One round here — no trend yet",
+    "trendOffBest": "Off best",
+    "trendMid": "Mid",
+    "trendNearBest": "Near best",
+
     "footnote": "Compared with your {{avg}} average across all {{rounds}} rounds.",
     "buildingTitle": "Your analytics build as your rounds sync",
     "buildingBody": "Play a counting round and this fills up.",

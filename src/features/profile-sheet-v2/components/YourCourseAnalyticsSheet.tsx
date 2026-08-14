@@ -18,7 +18,6 @@ import {
   A,
   CAPTION,
   NUM,
-  RAMP,
   SANS,
   StatRow,
   Action,
@@ -29,6 +28,10 @@ import { formatMonthYearShortGB, formatDayMonthYearShortGB } from '@/i18n/format
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
+import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import monotonePath from '@/lib/charts/monotonePath';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
@@ -37,6 +40,38 @@ const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const CHEVRON = '\u203A';
 const DOT = '\u00B7';
+
+/**
+ * THE DISTRIBUTION PALETTE. Four saturated tones, distinguished by HUE not by
+ * opacity — a washed red next to the neutral grey reads as faded and was
+ * rejected.
+ *
+ * EAGLES+ takes SC_FILL_GOLD (#FFD200), the scorecard's broadcast gold, NOT
+ * the achievement gold and NOT an invented #D8A93C. See the report: the bucket
+ * straddles the eagle/albatross line and gold is the rarity mark for the
+ * bucket as a whole.
+ */
+const DIST = {
+  eagles: SC_FILL_GOLD,
+  birdies: TOPAR_UNDER_LIGHT,
+  pars: '#B4BEC9',
+  bogeys: TOPAR_OVER_LIGHT,
+} as const;
+
+/** The index card's zone tones. Borrowed, not owned. */
+const ZONE_BEST = '#0F8F4A';
+const ZONE_MID = '#F7931E';
+const ZONE_OFF = '#C8372B';
+
+/** Zone of one round between the member's worst (0) and best (1) at a course. */
+function zoneColor(v: number, best: number, worst: number): string {
+  const span = worst - best;
+  const p = span <= 0 ? 1 : (worst - v) / span;
+  if (p >= 0.66) return ZONE_BEST;
+  if (p >= 0.33) return ZONE_MID;
+  return ZONE_OFF;
+}
+
 
 
 interface Props {
@@ -187,6 +222,156 @@ function hasScoringData(course: UserAnalyticsCourse): boolean {
   );
 }
 
+interface Seg {
+  key: 'eagles' | 'birdies' | 'pars' | 'bogeys';
+  bg: string;
+  label: string;
+  pct: number;
+  pctExact: number;
+  count: number;
+}
+
+/**
+ * THE DISTRIBUTION BAR. Four segments flexed by their percentages.
+ *
+ * A bucket with a non-zero count NEVER flexes to nothing — that would undo
+ * fmtBucketPct's rule that one eagle in 1,800 holes reads "0.1%". It keeps a
+ * 3px floor. A genuinely EMPTY bucket renders a hairline at 0.18 opacity so
+ * the bar always reads as four segments rather than three.
+ */
+const DistributionBar: React.FC<{ segs: Seg[] }> = ({ segs }) => {
+  const total = segs.reduce((s, x) => s + (x.pctExact ?? x.pct ?? 0), 0) || 1;
+  return (
+    <span
+      style={{
+        display: 'flex',
+        height: 9,
+        borderRadius: 3,
+        overflow: 'hidden',
+        background: A.TRACK,
+      }}
+    >
+      {segs.map((s) => {
+        const empty = (s.count ?? 0) === 0;
+        const share = ((s.pctExact ?? s.pct ?? 0) / total) * 100;
+        return (
+          <i
+            key={s.key}
+            style={{
+              width: empty ? 2 : `${share}%`,
+              minWidth: empty ? 2 : 3,
+              flexShrink: 0,
+              background: s.bg,
+              opacity: empty ? 0.18 : 1,
+            }}
+          />
+        );
+      })}
+    </span>
+  );
+};
+
+const TREND_H = 74;
+const TREND_PAD_X = 2;
+const TREND_PAD_Y = 8;
+
+/**
+ * "YOUR ROUNDS HERE" — the index card's exact treatment, graded against the
+ * member's OWN range at this course: their worst round renders red, their best
+ * green.
+ *
+ * THE AXIS: WORSE IS HIGHER. SVG y grows downward, so the mapping SUBTRACTS.
+ * Getting that backwards pins the plot into a sliver at the top and the stroke
+ * clips out of existence.
+ */
+const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> = ({
+  points,
+  gradientId,
+}) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [w, setW] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setW(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const n = points.length;
+  const lo = Math.min(...points.map((p) => p.toPar));
+  const hi = Math.max(...points.map((p) => p.toPar));
+
+  let body: React.ReactNode = null;
+  if (w > 0 && n >= 2) {
+    const ht = TREND_H - TREND_PAD_Y * 2;
+    const span = hi - lo || 1;
+    const xy = points.map((p, i) => ({
+      x: TREND_PAD_X + (i / (n - 1)) * (w - TREND_PAD_X * 2),
+      // WORSE (higher toPar) sits HIGHER on the chart.
+      y: TREND_PAD_Y + (ht - ((p.toPar - lo) / span) * ht),
+    }));
+    const line = monotonePath(xy);
+    const area = `${line} L${xy[n - 1].x.toFixed(2)},${TREND_H} L${xy[0].x.toFixed(2)},${TREND_H} Z`;
+    body = (
+      <svg width={w} height={TREND_H} style={{ display: 'block' }}>
+        <defs>
+          {/* THE COLOUR LIVES IN THE LINE. The fill is one amber wash. */}
+          <linearGradient id={`${gradientId}-fill`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={ZONE_MID} stopOpacity={0.3} />
+            <stop offset="100%" stopColor={ZONE_MID} stopOpacity={0.02} />
+          </linearGradient>
+          {/* One stop per round, so the stroke changes zone along its length. */}
+          <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
+            {points.map((p, i) => (
+              <stop
+                key={i}
+                offset={`${(i / (n - 1)) * 100}%`}
+                stopColor={zoneColor(p.toPar, lo, hi)}
+              />
+            ))}
+          </linearGradient>
+        </defs>
+        <path d={area} fill={`url(#${gradientId}-fill)`} />
+        <path
+          d={line}
+          fill="none"
+          stroke="#FFFFFF"
+          strokeOpacity={0.9}
+          strokeWidth={6}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d={line}
+          fill="none"
+          stroke={`url(#${gradientId}-stroke)`}
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <div ref={ref} style={{ height: TREND_H, position: 'relative' }}>
+      {body}
+    </div>
+  );
+};
+
+const TrendLegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+    <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
+    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em' }}>{label}</span>
+  </span>
+);
+
+
 /**
  * Row for the "my courses" list.
  *
@@ -203,16 +388,23 @@ function AnalyticsCourseRow({
   expanded,
   onToggle,
   onOpen,
+  trend,
 }: {
   course: UserAnalyticsCourse;
   expanded: boolean;
   onToggle: () => void;
   onOpen: (from: 'expanded' | 'row') => void;
+  /** The member's own rounds at this course, oldest first. */
+  trend?: CourseRoundPoint[];
 }) {
+
   const { t } = useTranslation('courses');
   const hasAvg = course.avg_to_par !== null && course.avg_to_par !== undefined;
   const avgVal = hasAvg ? (course.avg_to_par as number) : null;
   const hasScoring = hasScoringData(course);
+  const trendPoints = trend ?? [];
+
+
 
   const meta = [
     t('yourCourses.roundsCount', { count: course.rounds_count }),
@@ -224,11 +416,11 @@ function AnalyticsCourseRow({
     .join(` ${DOT} `);
 
 
-  const segs = hasScoring
+  const segs: Seg[] = hasScoring
     ? [
         {
           key: 'eagles',
-          bg: RAMP.birdie,
+          bg: DIST.eagles,
           label: t('yourCourses.pillEaglesLong'),
           pct: course.eagles_plus_pct as number,
           pctExact: course.eagles_plus_pct_exact as number,
@@ -236,7 +428,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'birdies',
-          bg: RAMP.birdie,
+          bg: DIST.birdies,
           label: t('yourCourses.pillBirdiesLong'),
           pct: course.birdies_pct as number,
           pctExact: course.birdies_pct_exact as number,
@@ -244,7 +436,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'pars',
-          bg: RAMP.par,
+          bg: DIST.pars,
           label: t('yourCourses.pillParsLong'),
           pct: course.pars_pct as number,
           pctExact: course.pars_pct_exact as number,
@@ -252,7 +444,7 @@ function AnalyticsCourseRow({
         },
         {
           key: 'bogeys',
-          bg: RAMP.bogey,
+          bg: DIST.bogeys,
           label: t('yourCourses.pillBogeysLong'),
           pct: course.bogeys_plus_pct as number,
           pctExact: course.bogeys_plus_pct_exact as number,
@@ -260,7 +452,7 @@ function AnalyticsCourseRow({
         },
       ]
     : [];
-  const segTotal = segs.reduce((s, x) => s + (x.pct ?? 0), 0) || 1;
+
 
   const body = (
     <div
@@ -349,23 +541,36 @@ function AnalyticsCourseRow({
         </span>
       )}
 
-      {hasScoring && (
-        <span
-          style={{
-            gridColumn: '1 / -1',
-            marginTop: 9,
-            height: 5,
-            borderRadius: 3,
-            overflow: 'hidden',
-            display: 'flex',
-            background: A.TRACK,
-          }}
-        >
-          {segs.map((s) => (
-            <i key={s.key} style={{ width: `${((s.pct ?? 0) / segTotal) * 100}%`, background: s.bg }} />
-          ))}
+      {/*
+        COLLAPSED: the bar sits under the header — it is the only thing making
+        a 33-course list scannable.
+        EXPANDED: the trend takes this slot and the bar moves down to sit
+        directly above the percentages it describes.
+      */}
+      {hasScoring && !expanded && (
+        <span style={{ gridColumn: '1 / -1', marginTop: 9 }}>
+          <DistributionBar segs={segs} />
         </span>
       )}
+
+      {hasScoring && expanded && (
+        <span style={{ gridColumn: '1 / -1', marginTop: 10, display: 'block' }}>
+          <div style={{ ...LABEL, marginBottom: 2 }}>{t('yourCourses.trendLabel')}</div>
+          {trendPoints.length >= 2 ? (
+            <RoundsTrend points={trendPoints} gradientId={`ycat-${course.course_id}`} />
+          ) : (
+            <div style={{ ...CAPTION, paddingTop: 6 }}>{t('yourCourses.trendNone')}</div>
+          )}
+          {trendPoints.length >= 2 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 2 }}>
+              <TrendLegendSwatch color={ZONE_OFF} label={t('yourCourses.trendOffBest')} />
+              <TrendLegendSwatch color={ZONE_MID} label={t('yourCourses.trendMid')} />
+              <TrendLegendSwatch color={ZONE_BEST} label={t('yourCourses.trendNearBest')} />
+            </div>
+          )}
+        </span>
+      )}
+
     </div>
   );
 
@@ -403,6 +608,10 @@ function AnalyticsCourseRow({
       </button>
       {expanded && (
         <div style={{ padding: '0 20px 14px' }}>
+          {/* The bar and its percentages belong together. */}
+          <div style={{ marginBottom: 8 }}>
+            <DistributionBar segs={segs} />
+          </div>
           <div
             style={{
               display: 'grid',
@@ -413,18 +622,14 @@ function AnalyticsCourseRow({
           >
             {segs.map((s) => (
               <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                {/*
-                  EAGLES+ folds into the BIRDIE band on the bar, so a solid
-                  swatch here would repeat the birdie colour on two labels.
-                  It reads instead as a hairline rule: part of that band, not
-                  a band of its own.
-                */}
+                {/* Each bucket now owns a hue on the bar, so each label owns
+                    the matching swatch — eagles included. */}
                 <div
                   style={{
                     height: 3,
                     borderRadius: 2,
-                    background: s.key === 'eagles' ? 'transparent' : s.bg,
-                    borderTop: s.key === 'eagles' ? `1px solid ${A.HAIRLINE}` : undefined,
+                    background: s.bg,
+                    opacity: (s.count ?? 0) === 0 ? 0.18 : 1,
                     marginBottom: 6,
                   }}
                 />
@@ -435,6 +640,7 @@ function AnalyticsCourseRow({
               </div>
             ))}
           </div>
+
           <StatRow
             size={16}
             items={[
@@ -472,6 +678,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
 
   const { data: myCourses = [], isLoading } = useUserAnalyticsCourses({ enabled: open });
   const { data: searchResults = [], isFetching: searching } = useCourseSearch(q);
+  // ONE batched read for every course's trend — not one query per row.
+  const { data: roundsByCourse } = useMyRoundsByCourse({ enabled: open });
+
 
   const showBuildingState = synced && !isLoading && myCourses.length === 0;
   const showList = myCourses.length > 0;
@@ -735,7 +944,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                     expanded={expandedIds.has(c.course_id)}
                     onToggle={() => toggle(c)}
                     onOpen={(from) => go(c.course_id, from)}
+                    trend={roundsByCourse?.get(c.course_id)}
                   />
+
                 ))}
               </div>
 
