@@ -370,7 +370,7 @@ export function ReviewTile({
       {rows.length > 0 && (
         <div
           data-testid="review-tile-breakdown"
-          style={{ padding: '9px 11px 10px', display: 'grid', rowGap: 6 }}
+          style={{ padding: '8px 11px 9px', display: 'grid', rowGap: 6 }}
         >
           {rows.map((row) => (
             <div key={row.key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -378,6 +378,7 @@ export function ReviewTile({
                 style={{
                   ...LABEL,
                   fontSize: 7.5,
+                  lineHeight: 1,
                   color: A.DIM,
                   width: 34,
                   flexShrink: 0,
@@ -408,6 +409,7 @@ export function ReviewTile({
                 style={{
                   ...FIGS,
                   fontSize: 10.5,
+                  lineHeight: 1,
                   fontWeight: 700,
                   color: A.BODY,
                   flexShrink: 0,
