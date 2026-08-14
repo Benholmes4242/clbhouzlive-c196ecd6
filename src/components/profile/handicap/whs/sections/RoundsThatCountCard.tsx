@@ -314,6 +314,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({
         : 'THEIR'
       : 'YOUR';
   const legendOwnerLabel = `COUNTS TOWARD ${ownerToken} INDEX`;
+  const queueSubject =
+    viewMode === 'friend'
+      ? ownerFirstName
+        ? `for ${ownerFirstName}`
+        : 'for them'
+      : '';
+  const queueNote = `These rounds count ${queueSubject ? `${queueSubject} ` : ''}today. When they drop out, worse rounds take their place.`;
 
   const fadeId = `rtc-fade-${connectionId}`;
 
