@@ -17,7 +17,12 @@ import type { LatestReview } from './hooks/useLatestReviews';
  *
  * Photo-led tile with its text on the photograph. The course name IS the
  * headline; the quote no longer appears here (it lives in the review sheet).
- * Every tile is the SAME fixed height regardless of how the name wraps.
+ * The PHOTO is the same fixed height on every tile regardless of how the name
+ * wraps. Beneath it sits the CATEGORY BREAKDOWN (BRIEF_REVIEW_TILE_BREAKDOWN):
+ * one label/track/figure row per scored category, so two courses on 8.7 no
+ * longer look identical. Categories are optional in the composer, so a null
+ * renders no row and a review with none renders no block at all — the tile is
+ * then exactly what it was before, with no gap.
  *
  * Image chain: the review's own first photo -> the course image (via
  * CourseImageFallback) -> the deterministic gradient. Video reviews use their
@@ -26,14 +31,13 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score figure carries the BAND COLOUR, matching the review wizard and the
- * review sheet. On dark glass it resolves through `reviewLabelColor(rating,
- * 'dark')` — the app's existing dark-surface band tokens (#5EE9A6 / #F7931E /
- * #FF6B6B), not the light-surface hexes, which vanish on rgba(10,14,10,0.58).
- * Same thresholds everywhere: >= 9 green, >= 5 amber, below 5 red.
+ * The score figure and the bars carry the RATING TONE scale declared in
+ * reviewRatingTone.ts (>=8.5 green, 7.0-8.4 amber, below grey). That scale has
+ * NO RED by design — see the reasoning there. The "/10" stays white.
  *
  * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
  * (a figure on a review tile can only be a rating).
+
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
