@@ -110,24 +110,24 @@ export function RightNowPanel({
         <div>
           <div ref={ref} style={{ position: 'relative', height: CHART_PX }}>
             <svg width="100%" height={CHART_PX} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
-              {areaPath ? <path d={areaPath} fill={t.brand} fillOpacity={0.16} stroke="none" /> : null}
+              {areaPath ? <path d={areaPath} fill={t.ink} fillOpacity={0.10} stroke="none" /> : null}
               {last.segs.map((s, i) => (
                 <path key={`l${i}`} d={monotonePath(s)} fill="none" stroke={t.inkFaint} strokeWidth={1.25}
                   strokeDasharray="3 3" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
               ))}
               {today.segs.map((s, i) => (
-                <path key={`t${i}`} d={monotonePath(s)} fill="none" stroke={t.brand} strokeWidth={2}
+                <path key={`t${i}`} d={monotonePath(s)} fill="none" stroke={t.ink} strokeWidth={2}
                   vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
               ))}
             </svg>
             {endPt && width > 0 ? (
-              <EndDot left={(endPt.x / 100) * width} top={(endPt.y / H) * CHART_PX} color={t.brand} />
+              <EndDot left={(endPt.x / 100) * width} top={(endPt.y / H) * CHART_PX} color={t.ink} />
             ) : null}
           </div>
           <AxisTicks labels={tickLabels} />
           <div style={{ display: 'flex', gap: 14, marginTop: 8 }}>
-            <span style={{ ...LABEL, color: t.brandText, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span aria-hidden style={{ width: 14, height: 2, background: t.brand, borderRadius: 999 }} />
+            <span style={{ ...LABEL, color: t.ink, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span aria-hidden style={{ width: 14, height: 2, background: t.ink, borderRadius: 999 }} />
               Today
             </span>
             <span style={{ ...LABEL, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -238,11 +238,11 @@ export function RetentionPanel({ data, loading }: { data?: Retention; loading: b
                     // spacing must stay even or the shape lies.
                     <div key={d.date} style={{ flex: 1, minWidth: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                       <div style={{
-                        height: Math.max(0, h - retH), background: t.brand, opacity: 0.35,
+                        height: Math.max(0, h - retH), background: t.ink, opacity: 0.35,
                         borderRadius: '3px 3px 0 0',
                       }} />
                       <div style={{
-                        height: retH, background: t.brand,
+                        height: retH, background: t.ink,
                         borderRadius: nw > 0 ? '0 0 1px 1px' : '3px 3px 1px 1px',
                       }} />
                     </div>
@@ -251,11 +251,11 @@ export function RetentionPanel({ data, loading }: { data?: Retention; loading: b
               </div>
               <div style={{ display: 'flex', gap: 14, marginTop: 8 }}>
                 <span style={{ ...LABEL, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <span aria-hidden style={{ width: 10, height: 10, borderRadius: 3, background: t.brand }} />
+                  <span aria-hidden style={{ width: 10, height: 10, borderRadius: 3, background: t.ink }} />
                   Returning
                 </span>
                 <span style={{ ...LABEL, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <span aria-hidden style={{ width: 10, height: 10, borderRadius: 3, background: t.brand, opacity: 0.35 }} />
+                  <span aria-hidden style={{ width: 10, height: 10, borderRadius: 3, background: t.ink, opacity: 0.35 }} />
                   New
                 </span>
               </div>
@@ -347,14 +347,14 @@ export function ActiveMembersPanel({
           <div>
             <div ref={ref} style={{ position: 'relative', height: CHART_PX }}>
               <svg width="100%" height={CHART_PX} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
-                {areaPath ? <path d={areaPath} fill={t.brand} fillOpacity={0.16} stroke="none" /> : null}
+                {areaPath ? <path d={areaPath} fill={t.ink} fillOpacity={0.10} stroke="none" /> : null}
                 {seg.length > 1 ? (
-                  <path d={monotonePath(seg)} fill="none" stroke={t.brand} strokeWidth={2}
+                  <path d={monotonePath(seg)} fill="none" stroke={t.ink} strokeWidth={2}
                     vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
                 ) : null}
               </svg>
               {endPt && width > 0 ? (
-                <EndDot left={(endPt.x / 100) * width} top={(endPt.y / H) * CHART_PX} color={t.brand} />
+                <EndDot left={(endPt.x / 100) * width} top={(endPt.y / H) * CHART_PX} color={t.ink} />
               ) : null}
             </div>
             <AxisTicks labels={tickLabels} />
