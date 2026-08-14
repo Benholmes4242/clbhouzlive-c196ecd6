@@ -309,23 +309,32 @@ export const HoleRowV2: React.FC<{
         {/* The ramp: a pure distribution of rounds. Nothing is plotted on it. */}
         <span style={{ display: 'block', minWidth: 0 }}>
           <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
-            {segs.map((s, i) => (
-              <i
-                key={s.key}
-                style={{
-                  width: `${(s.pctValue / total) * 100}%`,
-                  background: s.pctValue > 0 ? s.bg : A.TRACK,
-                  borderRadius:
-                    i === 0
-                      ? '4px 0 0 4px'
-                      : i === lastIdx
-                        ? '0 4px 4px 0'
-                        : 0,
-                }}
-              />
-            ))}
+            {segs.map((s, i) => {
+              const empty = s.pctValue <= 0;
+              return (
+                <i
+                  key={s.key}
+                  style={{
+                    // A ZERO bucket keeps a hairline in its own tone at reduced
+                    // opacity, so the bar always reads as four parts and agrees
+                    // with the 0% the expanded detail prints.
+                    width: empty ? 2 : `${(s.pctValue / total) * 100}%`,
+                    flexShrink: 0,
+                    background: s.bg,
+                    opacity: empty ? 0.28 : 1,
+                    borderRadius:
+                      i === 0
+                        ? '4px 0 0 4px'
+                        : i === lastIdx
+                          ? '0 4px 4px 0'
+                          : 0,
+                  }}
+                />
+              );
+            })}
           </span>
         </span>
+
 
         {/* The figures live on the row's right end as a labelled pair. */}
         <span
