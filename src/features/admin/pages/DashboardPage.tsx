@@ -454,6 +454,11 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
+      {/*
+        NO SHARE FIGURE HERE. Signups is a FLOW, not a stock: "4 signups, 5% of
+        members" invites a comparison between a week's arrivals and the whole
+        membership that means nothing.
+      */}
       <MetricCard
         label="Signups 7d"
         value={loading ? null : (data?.signups.current ?? 0)}
