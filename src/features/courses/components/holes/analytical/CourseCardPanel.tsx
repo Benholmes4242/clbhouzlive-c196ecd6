@@ -251,33 +251,148 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
 };
 
 
+/* ── The tee list (BRIEF_COURSE_CARD_EVERY_TEE §2) ───────────────────────
+   The panel already receives EVERY tee set. WHICH TEES TO PLAY OFF is the
+   decision a golfer is making on this screen, so all of them go on the panel,
+   on one graded scale, hardest first.
+
+   Ordered BY SLOPE, never by the tee's colour name: "Blue, White, Yellow, Red"
+   is a convention at some clubs and meaningless at others, and this catalogue
+   spans ten countries.
+
+   The resolved tee is at full opacity and the rest at 0.34 - that is what makes
+   the block a comparison rather than a list. */
+const TEE_LABEL_W = 40;
+const TEE_YARDS_W = 46;
+const FADED = 0.34;
+
+const TeeRow: React.FC<{
+  tee: TeeSet;
+  slope: number | null;
+  on: boolean;
+  onPick: () => void;
+}> = ({ tee, slope, on, onPick }) => (
+  <button
+    type="button"
+    onClick={onPick}
+    aria-pressed={on}
+    style={{
+      display: 'grid',
+      gridTemplateColumns: `${TEE_LABEL_W}px 1fr auto ${TEE_YARDS_W}px`,
+      alignItems: 'center',
+      gap: 10,
+      width: '100%',
+      border: 'none',
+      background: 'transparent',
+      padding: '7px 0',
+      cursor: 'pointer',
+      fontFamily: SANS,
+      textAlign: 'left',
+      opacity: on ? 1 : FADED,
+      transition: 'opacity 160ms ease',
+      ...FIGS,
+    }}
+  >
+    <span
+      style={{
+        ...LABEL,
+        fontSize: 8.5,
+        color: A.INK,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {tee.tee_label}
+    </span>
+    {/* A TEE WITH NO SLOPE DRAWS NO TRACK (§5). A zero-width bar is worse than
+        an empty column: it reads as "no difficulty" rather than "not rated". */}
+    {slope != null ? (
+      <span style={{ position: 'relative', height: 6, borderRadius: 3, background: A.TRACK }}>
+        <ZoneBed radius={3} />
+        <span
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: `${scalePct(slope)}%`,
+            borderRadius: 3,
+            background: zoneColour(slope),
+          }}
+        />
+      </span>
+    ) : (
+      <span aria-hidden="true" />
+    )}
+    <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, minWidth: 24, textAlign: 'right' }}>
+      {slope != null ? slope : ''}
+    </span>
+    <span style={{ ...LABEL, fontSize: 8.5, color: A.DIM, textAlign: 'right' }}>
+      {tee.total_yards == null ? '' : fmtInt(tee.total_yards)}
+    </span>
+  </button>
+);
+
+const TeeList: React.FC<{
+  tees: TeeSet[];
+  activeLabel: string;
+  onPick: (label: string) => void;
+}> = ({ tees, activeLabel, onPick }) => {
+  const rows = useMemo(() => {
+    const withSlope = (x: TeeSet) =>
+      x.slope_rating && x.slope_rating > 0 ? Math.round(x.slope_rating) : null;
+    return [...tees]
+      .map((tee) => ({ tee, slope: withSlope(tee) }))
+      // Hardest first; unrated tees fall to the bottom, then longest first.
+      .sort(
+        (a, b) =>
+          (b.slope ?? -1) - (a.slope ?? -1) || (b.tee.total_yards ?? 0) - (a.tee.total_yards ?? 0),
+      );
+  }, [tees]);
+
+  // ONE TEE ONLY (§6): no comparison to make, and one row at full opacity is
+  // just the headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
+  // a column of empty tracks is worse than the panel as it ships.
+  if (tees.length < 2) return null;
+  if (!rows.some((r) => r.slope != null)) return null;
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      {rows.map(({ tee, slope }) => (
+        <TeeRow
+          key={tee.tee_label}
+          tee={tee}
+          slope={slope}
+          on={tee.tee_label === activeLabel}
+          onPick={() => onPick(tee.tee_label)}
+        />
+      ))}
+    </div>
+  );
+};
+
 const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
 
 /** Fixed, load-bearing grid: HOLE / yards / PAR / SI. No cell sizes to content. */
 const CARD_GRID = '30px 1fr 46px 46px';
 const CARD_GAP = 10;
 
-const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string }> = ({
-  courseId,
-  tees,
-  initialTee,
-}) => {
+/* The sheet does NOT hold its own selected tee (§2): the panel owns it and the
+   pills and the tee list write to the same state, so the two can never diverge. */
+const SheetBody: React.FC<{
+  tees: TeeSet[];
+  selected: string;
+  onPick: (label: string) => void;
+}> = ({ tees, selected, onPick }) => {
   const { t } = useTranslation(['courses']);
-  const [selected, setSelected] = useState(initialTee);
 
   const active = useMemo(
     () => tees.find((x) => x.tee_label === selected) ?? tees[0],
     [tees, selected],
   );
 
-  const pick = (label: string) => {
-    setSelected(label);
-    try {
-      window.localStorage.setItem(storageKey(courseId), label);
-    } catch {
-      /* private mode - selection is in-memory only */
-    }
-  };
+  const pick = onPick;
 
   const holes = useMemo(
     () => [...(active?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
