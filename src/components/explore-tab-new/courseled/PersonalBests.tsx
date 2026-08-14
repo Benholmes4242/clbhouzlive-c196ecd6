@@ -172,7 +172,20 @@ export function PersonalBests({
                       }
                     : undefined
                 }
-                onPress={() => onCoursePress(tt.r.course_id)}
+                /* THE TAP OPENS THE ROUND (BRIEF_STANDOUT_TILE_TAP_AND_MORE
+                   §2), the same sheet onDetailPress already opened. Only a row
+                   with no round id falls back to the course page. */
+                onPress={() => {
+                  if (onFeatPress && tt.r.whs_score_id) {
+                    analyticsEvents.track('discover_personal_best_tap', {
+                      feat: tt.r.feat_kind,
+                      source: 'personal_bests',
+                    });
+                    onFeatPress(tt.r.whs_score_id, tt.r.user_id);
+                    return;
+                  }
+                  onCoursePress(tt.r.course_id);
+                }}
               />
             ))}
           </div>
