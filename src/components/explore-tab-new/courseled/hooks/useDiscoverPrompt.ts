@@ -147,6 +147,15 @@ export function useDiscoverPrompt(userId: string | undefined): {
     );
   }, [needPhoto, rounds.data, posted.data]);
 
+  // The SAME query the rail runs — identical key and options, so this reads the
+  // rail's cache and adds no round-trip.
+  const circleRounds = useCircleLatestRounds(userId, {
+    limit: RAIL_CAP,
+    allowMultiplePerFriend: true,
+  });
+
+
+
   if (!userId) return { prompt: null, resolved: true };
 
   if (unratedLoading) return { prompt: null, resolved: false };
