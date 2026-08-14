@@ -39,8 +39,6 @@ interface Row {
   played: boolean;
 }
 
-export type EventKind = 'under' | 'double';
-
 /** A bead on the tile curve. Tone and radius come from the SHARED
  *  beadForScore rule (BRIEF_UNIFY_ROUND_CURVE_BEADS) — the tile no longer has
  *  a rule of its own, so an ace draws gold and an eagle draws larger than a

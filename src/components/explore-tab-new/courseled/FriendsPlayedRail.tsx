@@ -15,7 +15,7 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import { useRoundHoleShapes, type HoleShape, type EventKind } from './hooks/useRoundHoleShapes';
+import { useRoundHoleShapes, type HoleShape, type ShapeBead } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
@@ -34,8 +34,8 @@ import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SAN
  * THE SCORE LIVES ON THE PHOTO as a glass chip, so the band below belongs
  * entirely to the SHAPE of the round: a 19-point cumulative to-par curve from
  * ONE batched read of whs_score_holes (BRIEF_FRIENDS_TILE_HOLE_SHAPE), SPLIT at
- * the level-par rule so under-par golf renders red, with event dots where the
- * round moved by more than a shot. Rounds without holes keep the three-point
+ * the level-par rule so under-par golf renders red, with beads from the SHARED
+ * beadForScore rule. Rounds without holes keep the three-point
  * fallback drawn from the same two figures the subline is written from.
  *
  * A hole in one puts the GOLD ring on the when-chip — the only gold on the card.
@@ -137,13 +137,13 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
   const back = row.back_nine_to_par;
 
   let values: number[] | null = null;
-  let events: { i: number; kind: EventKind }[] = [];
+  let beads: ShapeBead[] = [];
   let holesPlayed: number | null = null;
   let birdies = 0;
 
   if (shape) {
     values = shape.series;
-    events = shape.events;
+    beads = shape.beads;
     holesPlayed = shape.played;
     birdies = shape.birdies;
   } else if (
@@ -312,25 +312,39 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
           />
         )}
 
-        {/* THE EVENT DOTS sit on the CUMULATIVE value AFTER the hole. Eagles
-            take the SAME red as a birdie — no third colour; gold is reserved
-            for the hole in one on the when-chip. */}
-        {events.map((e) =>
-          pts[e.i] ? (
+        {/* THE BEADS come from the SHARED beadForScore rule, positioned on the
+            CUMULATIVE value AFTER the hole — identical tones and radii to the
+            scorecard sheet (BRIEF_UNIFY_ROUND_CURVE_BEADS §2). GOLD NOW APPEARS
+            ON THE CURVE for an ace or albatross. */}
+        {beads.map((b) =>
+          pts[b.i] ? (
             <circle
-              key={e.i}
-              cx={pts[e.i].x}
-              cy={pts[e.i].y}
-              r={3.2}
-              fill={e.kind === 'under' ? UNDER_TONE : OVER_TONE}
+              key={b.i}
+              cx={pts[b.i].x}
+              cy={pts[b.i].y}
+              r={b.r}
+              fill={b.tone}
               stroke="#FFFFFF"
-              strokeWidth={1.4}
+              strokeWidth={1.5}
             />
           ) : null,
         )}
 
-        <circle cx={end.x} cy={end.y} r={5} fill="#FFFFFF" />
-        <circle cx={end.x} cy={end.y} r={2.6} fill={finalTone} />
+        {/* THE ROUND-END MARKER, DRAWN LAST so a bead on the final hole cannot
+            obscure it. A white disc with a small tone-filled centre — NOT a
+            bead: the tile has no axis, so a member needs to see where the round
+            finishes, and it must not read as a hole event. */}
+        <circle cx={end.x} cy={end.y} r={5.4} fill="#FFFFFF" />
+        <circle
+          cx={end.x}
+          cy={end.y}
+          r={5.4}
+          fill="none"
+          stroke={finalTone}
+          strokeOpacity={0.28}
+          strokeWidth={1}
+        />
+        <circle cx={end.x} cy={end.y} r={2.2} fill={finalTone} />
       </svg>
 
       {holesPlayed != null && (
