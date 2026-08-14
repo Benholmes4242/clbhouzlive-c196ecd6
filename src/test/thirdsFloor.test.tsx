@@ -10,8 +10,17 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, o?: Record<string, unknown>) => {
       const path = k.replace(/^courses:/, '').split('.');
+      const c0 = Number(o?.count);
+      const last = path[path.length - 1];
       let node: unknown = EN;
       for (const seg of path) node = (node as Record<string, unknown>)?.[seg];
+      if (node == null) {
+        let alt: unknown = EN;
+        for (const seg of path.slice(0, -1)) alt = (alt as Record<string, unknown>)?.[seg];
+        node =
+          (alt as Record<string, unknown>)?.[`${last}_${c0 === 1 ? 'one' : 'other'}`] ??
+          (alt as Record<string, unknown>)?.[last];
+      }
       let s = typeof node === 'string' ? node : undefined;
       if (!s) {
         const c = Number(o?.count);
