@@ -713,14 +713,50 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             <div style={{ ...LABEL, marginTop: 20, marginBottom: 10 }}>
               {t('courses:courseDetail.you.doublesFrom')}
             </div>
-            <StatRow
-              size={18}
-              items={topDoubles.map((h) => ({
-                label: t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no }),
-                value: String(h.doubles_plus),
-                tone: OVER,
-              }))}
-            />
+            {topDoubles.map((h) => {
+              const n = h.doubles_plus || 0;
+              const barW = Math.max(4, Math.min(100, (n / topDoublesMax) * 100));
+              /**
+               * SHARE OF THE VIEWER'S OWN DOUBLES (s3), the same rule the s1
+               * share follows: `sumDbl` is this member's count across every hole
+               * they have played here. Never the field's total - "13% of them"
+               * has to mean 13% of the doubles the sentence beneath counts.
+               */
+              const share = sumDbl > 0 ? Math.round((n / sumDbl) * 100) : 0;
+              return (
+                <div
+                  key={h.hole_no}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '52px 1fr 30px 34px',
+                    alignItems: 'center',
+                    gap: 9,
+                    padding: '5px 0',
+                  }}
+                >
+                  <span style={{ ...LABEL, fontSize: 8 }}>
+                    {t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no })}
+                  </span>
+                  <span
+                    style={{ display: 'block', height: 6, borderRadius: 3, background: A.TRACK }}
+                  >
+                    {/* RED STAYS. This is a count of doubles - a bad thing -
+                        which is the over-par tone doing its job (s3). */}
+                    <span
+                      style={{
+                        display: 'block',
+                        height: 6,
+                        borderRadius: 3,
+                        width: `${barW}%`,
+                        background: OVER,
+                      }}
+                    />
+                  </span>
+                  <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>{n}</span>
+                  <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>{share}%</span>
+                </div>
+              );
+            })}
           </>
         )}
 
