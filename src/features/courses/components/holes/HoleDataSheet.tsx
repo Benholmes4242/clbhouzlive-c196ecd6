@@ -27,7 +27,17 @@ interface HookCell {
   value: string;
   tone?: string;
   note: string;
+  /**
+   * BRIEF_YOU_TAB_MARGIN_AND_GAPS s3: the battle row's sentence makes a
+   * comparison ("better than most here") and never showed it. Two bars on ONE
+   * scale draw it. The member's bar is SHORTER when they are better - these
+   * are to-par averages, so a lower figure is the better one.
+   */
+  compare?: { youLabel: string; you: number; fieldLabel: string; field: number | null };
+  /** The member's own progress (birdies collected). Amber - progress is amber. */
+  progress?: { done: number; total: number };
 }
+
 
 
 
