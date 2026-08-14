@@ -193,8 +193,6 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
   // THE FILL RUNS FLAT TO BOTH CARD EDGES so the colour stays full bleed,
   // while the POINTS are inset so the terminal dot cannot clip.
   const fillD = `M0,${SHAPE_H} L0,${pts[0].y.toFixed(2)} L${d.slice(1)} L${CARD_W},${pts[pts.length - 1].y.toFixed(2)} L${CARD_W},${SHAPE_H} Z`;
-  const end = pts[pts.length - 1];
-  const finalTone = values[values.length - 1] < 0 ? UNDER_TONE : OVER_TONE;
 
   // CLIP IDS MUST BE UNIQUE PER TILE — ten tiles sharing an id looks exactly
   // like the clip being ignored, and is the likeliest defect here.
