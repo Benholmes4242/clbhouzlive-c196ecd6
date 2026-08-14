@@ -356,20 +356,25 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
         return {
           text: signed(0),
-          tone: toneFor(0),
+          tone: marginTone(0),
           label: t('courses:courseDetail.you.gapLevel'),
         };
       }
       return {
-        text: signed(gap),
-        tone: toneFor(-gap),
+        // THE MAGNITUDE ALONE. A plus sign means MORE SHOTS everywhere else on
+        // this page, so "+3.6 better than the field" reads as a penalty. The
+        // direction lives in the label and in the tone.
+        text: Math.abs(gap).toFixed(1),
+        tone: marginTone(gap),
         label:
           gap > 0
-            ? t('courses:courseDetail.you.gapBetter')
-            : t('courses:courseDetail.you.gapWorse'),
+            ? t('courses:courseDetail.you.gapBetterShots')
+            : t('courses:courseDetail.you.gapWorseShots'),
       };
     }
 
+    // No field reference: this figure is the member's own to-par SCORE, not a
+    // margin, so it keeps signed() and toneFor().
     // Round before branching so -0.04 never renders "-0.0".
     const roundedTotal = Math.round(total * 10) / 10;
     return {
@@ -383,6 +388,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             : t('courses:courseDetail.you.levelPar'),
     };
   })();
+
 
 
   const split = [
