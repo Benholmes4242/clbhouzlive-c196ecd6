@@ -78,7 +78,14 @@ export interface CircleRoundRow {
   is_course_record: boolean;
   /** Their first ever sub-80 round. */
   is_first_sub_80: boolean;
+  /**
+   * TRUE when the round comes from OUTSIDE the member's circle, filling a
+   * shortfall so the rail is never empty (BRIEF_WHOS_BEEN_PLAYING §3). The
+   * tile marks it; the tap behaves identically.
+   */
+  suggested: boolean;
 }
+
 
 
 
