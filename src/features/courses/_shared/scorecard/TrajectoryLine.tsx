@@ -62,12 +62,18 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
   const w = 340;
   const padX = 4;
   const padY = 14;
-  const n = plottable.length;
+  /** Holes plotted. The SERIES carry ONE MORE POINT than this: a round starts
+   *  at LEVEL PAR before the first tee (BRIEF_UNIFY_ROUND_CURVE_BEADS §4), so
+   *  hole n sits at series index n and index 0 is the tee. */
+  const m = plottable.length;
+  const n = m + 1;
 
   let cumYou = 0;
   let cumField = 0;
-  const you: number[] = [];
-  const field: number[] = [];
+  // THE LEADING LEVEL-PAR POINT. The two series are often DIFFERENT LENGTHS
+  // (the field stops early), so each gets its own leading zero.
+  const you: number[] = [0];
+  const field: number[] = [0];
   const beads: { i: number; cum: number; tone: string; r: number }[] = [];
 
   // The field series stops at the first hole with no field average — a live
@@ -87,10 +93,12 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
     }
 
     const bead = beadForScore(h.strokes, h.par, 'light');
-    if (bead) beads.push({ i, cum: cumYou, tone: bead.tone, r: bead.radius });
+    // hole at plottable index i is at SERIES index i + 1.
+    if (bead) beads.push({ i: i + 1, cum: cumYou, tone: bead.tone, r: bead.radius });
   });
 
-  const hasField = field.length >= 2;
+  // >= 3: the leading level-par point does not on its own make a series.
+  const hasField = field.length >= 3;
   const all = hasField ? [...you, ...field, 0] : [...you, 0];
   const min = Math.min(...all);
   const max = Math.max(...all);
@@ -118,7 +126,10 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
   const gradAbove = `${uid}-ga`;
   const gradBelow = `${uid}-gb`;
 
-  const ticks = [...new Set([0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1])];
+  // TICKS INDEX `plottable`, NOT THE SERIES — the leading point is not a hole,
+  // so every tick must still resolve to plottable[i].holeNo (1 / 5 / 10 / 14 / 18
+  // on a full round).
+  const ticks = [...new Set([0, Math.floor(m / 4), Math.floor(m / 2), Math.floor((3 * m) / 4), m - 1])];
 
   return (
     <>
@@ -234,7 +245,7 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
         {ticks.map((i) => (
           <span
             key={i}
-            style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: i === n - 1 ? A.INK : A.DIM }}
+            style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: i === m - 1 ? A.INK : A.DIM }}
           >
             {plottable[i].holeNo}
           </span>

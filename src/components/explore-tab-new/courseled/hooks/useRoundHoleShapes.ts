@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
+import { beadForScore } from '@/features/courses/_shared/beadForScore';
 
 /**
  * useRoundHoleShapes (BRIEF_FRIENDS_TILE_HOLE_SHAPE, section 2).
@@ -38,13 +39,22 @@ interface Row {
   played: boolean;
 }
 
-export type EventKind = 'under' | 'double';
+/** A bead on the tile curve. Tone and radius come from the SHARED
+ *  beadForScore rule (BRIEF_UNIFY_ROUND_CURVE_BEADS) — the tile no longer has
+ *  a rule of its own, so an ace draws gold and an eagle draws larger than a
+ *  birdie exactly as it does on the scorecard sheet. */
+export interface ShapeBead {
+  /** Index into `series` (1-based hole position). */
+  i: number;
+  tone: string;
+  r: number;
+}
 
 export interface HoleShape {
   /** Cumulative strokes over par, INCLUDING the leading 0 before the first tee. */
   series: number[];
-  /** Index into `series` (1-based hole position) → event dot tone. */
-  events: { i: number; kind: EventKind }[];
+  /** Beads from the shared rule, positioned on the cumulative value AFTER the hole. */
+  beads: ShapeBead[];
   /** Holes actually played. */
   played: number;
   /** Holes under par — the birdie count in the meta row. */
@@ -58,25 +68,20 @@ function buildShape(rows: Row[]): HoleShape | null {
   if (holes.length < MIN_PLAYED_HOLES) return null;
 
   const series: number[] = [0];
-  const events: { i: number; kind: EventKind }[] = [];
+  const beads: ShapeBead[] = [];
   let birdies = 0;
   let cum = 0;
   holes.forEach((h, idx) => {
     const d = (h.actual_gross as number) - h.par;
     cum += d;
     series.push(cum);
-    // A DOT ON EVERY HOLE THAT MOVED THE ROUND BY MORE THAN ONE SHOT.
-    // Bogeys and pars get NO dot, deliberately: a bogey is the ordinary unit
-    // of amateur golf and dotting them would drown the signal.
-    if (d < 0) {
-      birdies += 1;
-      events.push({ i: idx + 1, kind: 'under' });
-    } else if (d >= 2) {
-      events.push({ i: idx + 1, kind: 'double' });
-    }
+    if (d < 0) birdies += 1;
+    // ONE RULE, THREE CALLERS. The tile's panel is white, so 'light'.
+    const bead = beadForScore(h.actual_gross, h.par, 'light');
+    if (bead) beads.push({ i: idx + 1, tone: bead.tone, r: bead.radius });
   });
 
-  return { series, events, played: holes.length, birdies };
+  return { series, beads, played: holes.length, birdies };
 }
 
 export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined)[]) {
