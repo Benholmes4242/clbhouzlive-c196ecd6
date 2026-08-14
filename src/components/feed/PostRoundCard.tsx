@@ -93,17 +93,49 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     >
       {label}
     </span>
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total ?? '—'}</span>
-      <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
-        {fmtToPar(toPar)}
+    {total == null ? null : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total}</span>
+        <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
+          {fmtToPar(toPar)}
+        </span>
       </span>
-    </span>
+    )}
   </div>
+);
+
+
+
+/**
+ * A played hole with no score (the member picked up). BRIEF_ROUND_STRIP_PARTIAL_HOLES
+ * §2.1: a distinct muted glyph sized as the score digits — never a zero, never a
+ * dash that could be read as level par, never adjusted_gross.
+ */
+const HoleGap: React.FC<{ size?: number }> = ({ size = 27 }) => (
+  <span
+    aria-label="No score"
+    style={{
+      width: size,
+      height: size,
+      flex: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      lineHeight: 1,
+      fontSize: Math.round(size * 0.42),
+      fontWeight: 700,
+      color: 'rgba(255,255,255,0.32)',
+    }}
+  >
+    {'\u00D7'}
+  </span>
 );
 
 const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) => {
   if (holes.length === 0) return null;
+  // §3.1 — a nine containing an unscored played hole prints NO total and NO
+  // to-par. Not the partial sum, not a dash. The other nine is unaffected.
+  const hasGap = holes.some((h) => h.gross == null);
   let total = 0;
   let par = 0;
   let any = false;
@@ -114,9 +146,14 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
       any = true;
     }
   }
+  const showTotals = any && !hasGap;
   return (
     <div style={{ marginTop: 12 }}>
-      <LabelRow label={label} total={any ? total : null} toPar={any ? total - par : null} />
+      <LabelRow
+        label={label}
+        total={showTotals ? total : null}
+        toPar={showTotals ? total - par : null}
+      />
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
           <div
@@ -131,7 +168,11 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             >
               {h.par ?? '·'}
             </span>
-            <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+            {h.gross == null ? (
+              <HoleGap />
+            ) : (
+              <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+            )}
           </div>
         ))}
       </div>
@@ -139,32 +180,51 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
   );
 };
 
-const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
+const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, toPar }) => {
   // Beads come from the shared beadForScore helper — one rule across the sheet
   // trajectory and this one (CORRECTION_ONE_SCORING_MARK §5).
-  const pts = useMemo(() => {
+  //
+  // §4.2/§4.3 — THE LINE STOPS AT THE FIRST GAP. A cumulative to-par line has no
+  // honest continuation past a hole with no score: the running total after the
+  // gap is unknown by exactly the missing stroke count, so a resumed segment
+  // would sit at a position the member never held. We therefore draw only the
+  // segment up to the gap and stop. No bridge, no dot on the missing hole.
+  const { pts, truncated } = useMemo(() => {
     let cum = 0;
-    const out: { cum: number; bead: { tone: string; radius: number } | null }[] = [];
-    for (const h of holes) {
-      if (h.gross == null || h.par == null) continue;
+    const out: { i: number; cum: number; bead: { tone: string; radius: number } | null }[] = [];
+    let cut = false;
+    holes.forEach((h, idx) => {
+      if (cut) return;
+      if (h.gross == null || h.par == null) {
+        cut = true;
+        return;
+      }
       cum += h.gross - h.par;
-      out.push({ cum, bead: beadForScore(h.gross, h.par, 'dark') });
-    }
-    return out;
+      out.push({ i: idx, cum, bead: beadForScore(h.gross, h.par, 'dark') });
+    });
+    return { pts: out, truncated: cut };
   }, [holes]);
 
   if (pts.length < 2) return null;
+
 
   const w = 320;
   const height = 74;
   const padX = 5;
   const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
-  const n = pts.length;
+  // Hole-index space, not point-index space: a truncated line must occupy only
+  // the part of the axis it actually covers.
+  const n = Math.max(holes.length, 2);
   const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
   const y0 = height / 2;
   const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 10);
-  const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)},${y(p.cum).toFixed(1)}`).join(' ');
-  const final = pts[pts.length - 1].cum;
+  const path = pts
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)},${y(p.cum).toFixed(1)}`)
+    .join(' ');
+  // §4.4 — with a gap the line's last point is NOT the round's to-par, so the
+  // heading figure falls back to the score row. Complete rounds are unchanged.
+  const final = truncated ? toPar : pts[pts.length - 1].cum;
+
 
   return (
     <div
@@ -211,11 +271,11 @@ const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
           strokeLinejoin="round"
           strokeLinecap="round"
         />
-        {pts.map((p, i) =>
+        {pts.map((p) =>
           p.bead ? (
             <circle
-              key={i}
-              cx={x(i)}
+              key={p.i}
+              cx={x(p.i)}
               cy={y(p.cum)}
               r={p.bead.radius}
               fill={p.bead.tone}
@@ -243,6 +303,11 @@ export const PostRoundCard: React.FC<Props> = ({
 
   const holes = round.holeShape ?? [];
   const hasHoles = holes.length > 0;
+  // §5 — has_holes is now true for PARTIAL cards too, so a reading needs both
+  // counts to tell a complete card from a partial one. played_holes is the shape
+  // length (played = false holes are already excluded upstream).
+  const playedHoles = holes.length;
+  const scoredHoles = holes.filter((h) => h.gross != null).length;
   const showCrown = (notability ?? 0) === 3 && !!crown && !!crown.previousHolderName;
 
   useEffect(() => {
@@ -255,6 +320,8 @@ export const PostRoundCard: React.FC<Props> = ({
         io.disconnect();
         analyticsEvents.track('feed_round_card_shown', {
           has_holes: hasHoles,
+          played_holes: playedHoles,
+          scored_holes: scoredHoles,
         });
         const key = postId ?? round.whsScoreId;
         if (!seenRoundPosts.has(key)) {
@@ -264,6 +331,8 @@ export const PostRoundCard: React.FC<Props> = ({
             post_id: postId ?? null,
             notability: notability ?? null,
             has_holes: hasHoles,
+            played_holes: playedHoles,
+            scored_holes: scoredHoles,
             has_crown: showCrown,
           });
         }
@@ -272,7 +341,7 @@ export const PostRoundCard: React.FC<Props> = ({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasHoles, postId, notability, showCrown, round.whsScoreId]);
+  }, [hasHoles, playedHoles, scoredHoles, postId, notability, showCrown, round.whsScoreId]);
 
   const gross = round.grossScore;
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
@@ -429,7 +498,7 @@ export const PostRoundCard: React.FC<Props> = ({
 
           {hasHoles && (
             <>
-              <Trajectory holes={holes} />
+              <Trajectory holes={holes} toPar={toPar} />
               <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
               <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
             </>

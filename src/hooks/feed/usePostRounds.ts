@@ -13,9 +13,15 @@
  * The feed RPCs do not project posts.whs_score_id, so the id resolution is a
  * single `in (...)` read over the page's post ids rather than a per-card one.
  *
- * Hole shape: DROP IF PARTIAL. `holeShape` is non-null only when every PLAYED
- * hole carries a score (and at least one played hole exists), so the card
- * renders without the strip instead of a broken one. Synced rounds arrive as
+ * Hole shape: RENDER IF MOSTLY SCORED (BRIEF_ROUND_STRIP_PARTIAL_HOLES).
+ * `holeShape` is non-null when at least one played hole carries a score AND at
+ * least SCORED_FLOOR played holes do; the unscored played holes stay in the
+ * shape with `gross: null` and the card marks them as gaps. The EMPTY case is
+ * unchanged: a round where NO played hole has a score (a freshly synced round
+ * of pars) still resolves to null and renders no strip, no nine totals and no
+ * trajectory. Picking up on a hole is ordinary golf, so a partial card is
+ * honest as long as any nine containing a gap refuses to print a total.
+
  * 18 rows of pars with no scores and resolve to null. RLS decides visibility;
  * a round the viewer may not read simply resolves to nothing and the post
  * renders as it did before C3.
@@ -89,19 +95,36 @@ function stableIds(ids: (string | null | undefined)[]): string[] {
 }
 
 /**
- * The hole-strip gate (BRIEF_ROUND_POST_EMPTY_SCORECARD §1-2). Returns the
- * ordered shape ONLY when it is complete: every played hole scored, at least
- * one played hole. Anything partial - including a synced round of pars with no
- * scores - returns null so no consumer (strip, trajectory, analytics) can draw
- * a scorecard out of nothing.
+ * Minimum PLAYED holes that must carry a score for the strip to render.
+ *
+ * NOT DERIVED. The production distribution cannot distinguish a floor of 4 from
+ * a floor of 17: every affected round is missing either one to four holes or
+ * all eighteen. 12 is "most of a round", chosen so a strip that is mostly gaps
+ * can never render. Nothing in the data pins it.
  */
-function completeShape(
+const SCORED_FLOOR = 12;
+
+/**
+ * The hole-strip gate (BRIEF_ROUND_STRIP_PARTIAL_HOLES §1).
+ *
+ * Returns the ordered PLAYED holes, gaps included (gross null), when:
+ *   - a shape exists with at least one played hole, AND
+ *   - at least one played hole carries a score (the EMPTY case still drops -
+ *     BRIEF_ROUND_POST_EMPTY_SCORECARD stands for it), AND
+ *   - at least SCORED_FLOOR played holes carry a score.
+ *
+ * played = false holes are excluded: a hole nobody played is not part of the
+ * round. adjusted_gross is NEVER substituted for a missing cell.
+ */
+function renderableShape(
   shape: (PostRoundHole & { played: boolean })[] | null,
 ): PostRoundHole[] | null {
   if (!shape || shape.length === 0) return null;
   const playedHoles = shape.filter((h) => h.played);
   if (playedHoles.length === 0) return null;
-  if (playedHoles.some((h) => h.gross == null)) return null;
+  const scored = playedHoles.filter((h) => h.gross != null).length;
+  if (scored === 0) return null;
+  if (scored < Math.min(SCORED_FLOOR, playedHoles.length)) return null;
   return playedHoles
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
@@ -248,12 +271,11 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           cleanCard: (r.clean_card as boolean | null) ?? null,
           slopeRating: (r.slope_rating as number | null) ?? null,
           longestBirdieRun: (r.longest_birdie_run as number | null) ?? null,
-          // DROP IF PARTIAL: the strip is complete or it does not render.
-          // Every PLAYED hole must carry a score, and at least one played hole
-          // must exist. A synced round has 18 rows of pars with no scores and
-          // resolves to null here; a genuine 9-hole round (9 played + scored,
-          // 9 unplayed) keeps its shape. Sorted defensively.
-          holeShape: completeShape(shape),
+          // RENDER IF MOSTLY SCORED: played holes only, gaps kept as null gross
+          // so the card can mark them. A round with NO scored played hole still
+          // resolves to null (the empty case). A genuine 9-hole round (9 played
+          // + scored, 9 unplayed) keeps its shape. Sorted defensively.
+          holeShape: renderableShape(shape),
           crown: crowns.get(id) ?? null,
         });
       }
