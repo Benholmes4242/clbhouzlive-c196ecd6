@@ -37,8 +37,23 @@ const CAPTION: React.CSSProperties = {
 
 const DAMAGE_GRID = '30px 1fr 52px';
 
-/** Noise floor shared with the s3 caption logic - do not change. */
-const THIRDS_NOISE_FLOOR = 1.5;
+/**
+ * Noise floor shared with the s3 caption logic - the two MUST move together,
+ * and they do: this one constant drives both the caption branch and the ink
+ * ladder's gate (BRIEF_THIRDS_FLOOR_AND_DOUBLES_SOURCE s0).
+ *
+ * DERIVED, NOT CHOSEN. Over every (member, course) pair with 5+ hole-by-hole
+ * rounds, the spread a member would show from SAMPLING ALONE - 1.693 * sd of a
+ * third's per-round total / sqrt(rounds), the expected range of three means -
+ * has a median of 0.78 and a mean of 0.84. Below ~0.8 the worst third is not
+ * reliably the worst third, so a directional caption would be describing
+ * noise. At or above it the ordering is claiming something.
+ *
+ * The old 1.5 called the MEDIAN card (spread 1.10) even, which is why a full
+ * shot of back-six fade was reported as "no weak stretch" while the bars above
+ * plainly showed it.
+ */
+const THIRDS_NOISE_FLOOR = 0.8;
 
 /** Neutral ink ladder for the thirds bars, worst first. Never semantic colour. */
 const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
@@ -267,6 +282,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     .filter((h) => (h.doubles_plus || 0) > 0)
     .sort((a, b) => b.doubles_plus - a.doubles_plus)
     .slice(0, 4);
+  /** Bars are on the worst source's count, so the leader always fills. */
+  const topDoublesMax = Math.max(...topDoubles.map((h) => h.doubles_plus || 0), 1);
 
   // Stratum 3: thirds
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
@@ -294,6 +311,13 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
   /** Same threshold the caption uses: below it, ink nothing. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
+  /**
+   * THE MAGNITUDE, ALWAYS TO ONE DECIMAL. `spread` is a NUMBER (+"1.0" is 1),
+   * so interpolating it raw prints "cost 1 shots more" at exactly the spreads
+   * the lower floor now admits. The strings already carry {{spread}}; they just
+   * needed a figure that survives the trip.
+   */
+  const spreadFig = spread.toFixed(1);
 
   /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
   const thirdRank = [0, 1, 2]
@@ -342,18 +366,18 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceLate', {
         worst: worstLabel,
         best: bestLabel,
-        spread,
+        spread: spreadFig,
       });
     } else if (worstIdx === 0) {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEarly', {
         best: bestLabel,
         worst: worstLabel,
-        spread,
+        spread: spreadFig,
       });
     } else {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceMiddle', {
         best: bestLabel,
-        spread,
+        spread: spreadFig,
       });
     }
   }
@@ -691,14 +715,50 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             <div style={{ ...LABEL, marginTop: 20, marginBottom: 10 }}>
               {t('courses:courseDetail.you.doublesFrom')}
             </div>
-            <StatRow
-              size={18}
-              items={topDoubles.map((h) => ({
-                label: t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no }),
-                value: String(h.doubles_plus),
-                tone: OVER,
-              }))}
-            />
+            {topDoubles.map((h) => {
+              const n = h.doubles_plus || 0;
+              const barW = Math.max(4, Math.min(100, (n / topDoublesMax) * 100));
+              /**
+               * SHARE OF THE VIEWER'S OWN DOUBLES (s3), the same rule the s1
+               * share follows: `sumDbl` is this member's count across every hole
+               * they have played here. Never the field's total - "13% of them"
+               * has to mean 13% of the doubles the sentence beneath counts.
+               */
+              const share = sumDbl > 0 ? Math.round((n / sumDbl) * 100) : 0;
+              return (
+                <div
+                  key={h.hole_no}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '52px 1fr 30px 34px',
+                    alignItems: 'center',
+                    gap: 9,
+                    padding: '5px 0',
+                  }}
+                >
+                  <span style={{ ...LABEL, fontSize: 8 }}>
+                    {t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no })}
+                  </span>
+                  <span
+                    style={{ display: 'block', height: 6, borderRadius: 3, background: A.TRACK }}
+                  >
+                    {/* RED STAYS. This is a count of doubles - a bad thing -
+                        which is the over-par tone doing its job (s3). */}
+                    <span
+                      style={{
+                        display: 'block',
+                        height: 6,
+                        borderRadius: 3,
+                        width: `${barW}%`,
+                        background: OVER,
+                      }}
+                    />
+                  </span>
+                  <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>{n}</span>
+                  <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>{share}%</span>
+                </div>
+              );
+            })}
           </>
         )}
 
