@@ -1,14 +1,23 @@
 /**
  * Last5AgainstTarget - the member's last five differentials, oldest left.
  *
- * ZERO is the only horizontal line, and it is drawn ONLY when at least one
- * value is negative. Positive bars grow up from zero, negative bars grow down.
+ * TWO HORIZONTALS, EACH MEANING SOMETHING DIFFERENT:
+ *   THE TARGET LINE (1px dashed, ink ~50%, captioned "BEAT {n}") is drawn
+ *   ALWAYS, BEHIND the bars. It used to be omitted for sparseness, but the
+ *   card names the target four times and the chart encoded it only as fill
+ *   colour: a member could see which bars were green but not how close the
+ *   grey one came. One line turns five coloured bars into five measured ones.
+ *   THE ZERO LINE keeps its old rule: drawn ONLY when at least one value is
+ *   negative. Positive bars grow up from zero, negative bars grow down.
+ * With no negative value there is ONE horizontal, which is the common case.
  *
  * A LOWER differential is better, so a bar that BEATS the target (strictly
  * below it) is green (CHART.DOWN). That is the documented handicap inversion,
- * not a mistake. Equal to the target is NOT a beat.
- *
- * No target line, no shaded band.
+ * not a mistake. Equal to the target is NOT a beat — a bar sitting exactly on
+ * the target line stays muted, matching the scenario row where shooting the
+ * target yields NO CHANGE. The axis is NOT inverted: the member's best round
+ * is the smallest bar, and the target line is what gives that sliver its
+ * reference.
  *
  * Renders NOTHING when there is no round to draw.
  */
@@ -22,8 +31,11 @@ interface Props {
   cut: number;
   /** "{n} of your last 5 beat {cut}" label. */
   footLabel: string;
+  /** Right-aligned caption above the target line, e.g. "BEAT 3.5". */
+  targetCaption?: string;
   height?: number;
 }
+
 
 const VALUE_STYLE = {
   fontFamily: CHART_FONT,
