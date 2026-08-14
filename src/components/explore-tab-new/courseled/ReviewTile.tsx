@@ -164,7 +164,6 @@ export function ReviewTile({
       style={{
         ...(isNew ? NEW_CARD_RING : null),
         position: 'relative',
-        height,
         padding: 0,
         border: 'none',
         borderRadius: radius,
@@ -174,8 +173,13 @@ export function ReviewTile({
         textAlign: 'left',
         display: 'block',
         width: '100%',
+        background: A.PANEL,
       }}
     >
+      <span
+        data-testid="review-tile-photo"
+        style={{ position: 'relative', display: 'block', height }}
+      >
       <CourseImageFallback
         courseId={r.courseId}
         courseName={r.courseName}
@@ -183,6 +187,7 @@ export function ReviewTile({
         initialsSize={28}
         style={{ position: 'absolute', inset: 0 }}
       >
+
         {/* VIDEO COVER — muted, looping, playsInline. Same box as the poster,
             so the first frame cannot shift the layout. The poster stays
             visible until that frame paints: no flash of black. */}
