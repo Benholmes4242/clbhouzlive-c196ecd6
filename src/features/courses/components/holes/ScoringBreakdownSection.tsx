@@ -458,7 +458,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             {
               label: t('courses:courseDetail.you.doublesARound'),
               value: (+doublesPerRound.toFixed(1)).toFixed(1),
-              tone: OVER,
+              // A count, not a to-par figure - see the headline above. Neutral.
             },
             { label: t('courses:courseDetail.you.roundsLabel'), value: String(rounds) },
           ]}
