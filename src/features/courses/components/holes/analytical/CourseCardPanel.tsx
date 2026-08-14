@@ -10,6 +10,12 @@
  * the counter strip becomes PAR / COURSE RATING / SLOPE - a panel whose hero
  * figure is missing must never render blank.
  *
+ * BRIEF_COURSE_CARD_EVERY_TEE: the panel now holds EVERY tee set and shows one.
+ * All of them sit beneath the headline as label / graded track / slope / yardage,
+ * ordered hardest first, with the resolved tee at full opacity and the rest
+ * faded. Tapping a row re-reads the whole panel and writes the same remembered
+ * tee the sheet's pills do - ONE selection, owned by CourseCardPanel.
+ *
  * The sheet is a refined table: tee pills carrying their yardage, a four-cell
  * summary panel, then the scorecard with a hairline above OUT / IN / TOTAL and
  * nothing between hole rows. No zebra striping, no length bars.
@@ -30,6 +36,31 @@ import { A, FIGS, Hairline, KICKER, LABEL, SANS } from './tokens';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
 const STANDARD_SLOPE = 113;
+
+/**
+ * THE DIFFICULTY ZONES (BRIEF_COURSE_CARD_EVERY_TEE §3).
+ *
+ * Slope is DIFFICULTY, so it takes neither of the app's other two coloured
+ * pairs: it is not a score (no to-par pair, where UNDER par is red) and it is
+ * not a movement (no index-delta pair). It takes ZONE language, the same shape
+ * the handicap index tile uses, because both answer one question: where does
+ * this sit on a range.
+ *
+ * RED HERE MEANS DEMANDING, NOT BAD. A hard course is a good course - no
+ * warning tone, no icon, no copy treating a high slope as a problem.
+ *
+ * Declared here because no shared difficulty scale exists in the codebase; the
+ * hexes themselves come from the analytical tokens (A.GREEN / A.AMBER / A.RED)
+ * rather than being retyped.
+ */
+const ZONE_EASIER_MAX = 104; // below 105: easier than standard
+const ZONE_STANDARD_MAX = 129; // 105-129: around standard; 130 and up: harder
+
+function zoneColour(slope: number): string {
+  if (slope <= ZONE_EASIER_MAX) return A.GREEN;
+  if (slope <= ZONE_STANDARD_MAX) return A.AMBER;
+  return A.RED;
+}
 
 interface Props {
   courseId: string | undefined;
@@ -95,15 +126,50 @@ const SCALE_MIN = 55;
 const SCALE_MAX = 155;
 const DOT = 11;
 
+/** Zone band edges as track percentages, shared by the scale and the rows. */
+const scalePct = (v: number) =>
+  ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
+
+/** The three zones behind a track, at 0.22 so a fill still reads over them.
+    Only the outer edges round: the joins between zones are butt ends. */
+const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => {
+  const bands = [
+    { from: SCALE_MIN, to: ZONE_EASIER_MAX + 1, colour: A.GREEN },
+    { from: ZONE_EASIER_MAX + 1, to: ZONE_STANDARD_MAX + 1, colour: A.AMBER },
+    { from: ZONE_STANDARD_MAX + 1, to: SCALE_MAX, colour: A.RED },
+  ];
+  return (
+    <>
+      {bands.map((z, i) => (
+        <div
+          key={z.colour}
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${scalePct(z.from)}%`,
+            width: `${scalePct(z.to) - scalePct(z.from)}%`,
+            background: z.colour,
+            opacity: 0.22,
+            borderTopLeftRadius: i === 0 ? radius : 0,
+            borderBottomLeftRadius: i === 0 ? radius : 0,
+            borderTopRightRadius: i === bands.length - 1 ? radius : 0,
+            borderBottomRightRadius: i === bands.length - 1 ? radius : 0,
+          }}
+        />
+      ))}
+    </>
+  );
+};
+
 const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
   const { t } = useTranslation(['courses']);
 
-  const pct = (v: number) =>
-    ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
-  const here = pct(slope);
-  const std = pct(STANDARD_SLOPE);
+  const here = scalePct(slope);
+  const std = scalePct(STANDARD_SLOPE);
   const left = Math.min(here, std);
   const width = Math.abs(here - std);
+  const zone = zoneColour(slope);
 
   return (
     <div style={{ marginTop: 14 }} aria-hidden="true">
@@ -112,10 +178,14 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
           position: 'relative',
           height: 6,
           borderRadius: 3,
-          background: 'linear-gradient(90deg, #EEF2F6 0%, #E4E9EF 100%)',
+          background: A.TRACK,
         }}
       >
-        {/* Span between standard and this course - works in both directions. */}
+        {/* THE TRACK IS GRADED (§4). A grey track with a dot tells a member
+            WHERE the number is but not WHAT IT MEANS. */}
+        <ZoneBed radius={3} />
+        {/* Span between standard and this course, in this tee's zone colour -
+            works in both directions. */}
         <div
           style={{
             position: 'absolute',
@@ -124,8 +194,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
             left: `${left}%`,
             width: `${width}%`,
             borderRadius: 3,
-            background:
-              'linear-gradient(90deg, rgba(14,18,22,0.30) 0%, rgba(14,18,22,0.62) 100%)',
+            background: zone,
           }}
         />
         {/* Standard notch, overhanging 3px top and bottom. */}
@@ -151,7 +220,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
             marginLeft: -DOT / 2,
             marginTop: -DOT / 2,
             borderRadius: '50%',
-            background: A.INK,
+            background: zone,
             border: '2.5px solid #FFFFFF',
             boxShadow: '0 1px 3px rgba(14,18,22,0.22)',
             boxSizing: 'border-box',
@@ -188,33 +257,162 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
 };
 
 
+/* ── The tee list (BRIEF_COURSE_CARD_EVERY_TEE §2) ───────────────────────
+   The panel already receives EVERY tee set. WHICH TEES TO PLAY OFF is the
+   decision a golfer is making on this screen, so all of them go on the panel,
+   on one graded scale, hardest first.
+
+   Ordered BY SLOPE, never by the tee's colour name: "Blue, White, Yellow, Red"
+   is a convention at some clubs and meaningless at others, and this catalogue
+   spans ten countries.
+
+   The resolved tee is at full opacity and the rest at 0.34 - that is what makes
+   the block a comparison rather than a list. */
+/* 40px is the floor, not the rule: the rule is that every track starts on the
+   same x. Where the catalogue maps several WHS courses onto one club the labels
+   arrive composited ("Black - Himalayas") and 40px truncates them all to
+   "BLAC...", which destroys the comparison the rows exist to make. The column
+   takes the widest label in THIS list, capped, and every row shares it. */
+const TEE_LABEL_W_MIN = 40;
+const TEE_LABEL_W_MAX = 104;
+const TEE_YARDS_W = 46;
+const FADED = 0.34;
+
+const TeeRow: React.FC<{
+  tee: TeeSet;
+  slope: number | null;
+  on: boolean;
+  labelW: number;
+  onPick: () => void;
+}> = ({ tee, slope, on, labelW, onPick }) => (
+  <button
+    type="button"
+    onClick={onPick}
+    aria-pressed={on}
+    style={{
+      display: 'grid',
+      gridTemplateColumns: `${labelW}px 1fr auto ${TEE_YARDS_W}px`,
+      alignItems: 'center',
+      gap: 10,
+      width: '100%',
+      border: 'none',
+      background: 'transparent',
+      padding: '7px 0',
+      cursor: 'pointer',
+      fontFamily: SANS,
+      textAlign: 'left',
+      opacity: on ? 1 : FADED,
+      transition: 'opacity 160ms ease',
+      ...FIGS,
+    }}
+  >
+    <span
+      style={{
+        ...LABEL,
+        fontSize: 8.5,
+        color: A.INK,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {tee.tee_label}
+    </span>
+    {/* A TEE WITH NO SLOPE DRAWS NO TRACK (§5). A zero-width bar is worse than
+        an empty column: it reads as "no difficulty" rather than "not rated". */}
+    {slope != null ? (
+      <span style={{ position: 'relative', height: 6, borderRadius: 3, background: A.TRACK }}>
+        <ZoneBed radius={3} />
+        <span
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: `${scalePct(slope)}%`,
+            borderRadius: 3,
+            background: zoneColour(slope),
+          }}
+        />
+      </span>
+    ) : (
+      <span aria-hidden="true" />
+    )}
+    <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, minWidth: 24, textAlign: 'right' }}>
+      {slope != null ? slope : ''}
+    </span>
+    <span style={{ ...LABEL, fontSize: 8.5, color: A.DIM, textAlign: 'right' }}>
+      {tee.total_yards == null ? '' : fmtInt(tee.total_yards)}
+    </span>
+  </button>
+);
+
+const TeeList: React.FC<{
+  tees: TeeSet[];
+  activeLabel: string;
+  onPick: (label: string) => void;
+}> = ({ tees, activeLabel, onPick }) => {
+  const rows = useMemo(() => {
+    const withSlope = (x: TeeSet) =>
+      x.slope_rating && x.slope_rating > 0 ? Math.round(x.slope_rating) : null;
+    return [...tees]
+      .map((tee) => ({ tee, slope: withSlope(tee) }))
+      // Hardest first; unrated tees fall to the bottom, then longest first.
+      .sort(
+        (a, b) =>
+          (b.slope ?? -1) - (a.slope ?? -1) || (b.tee.total_yards ?? 0) - (a.tee.total_yards ?? 0),
+      );
+  }, [tees]);
+
+  // ONE TEE ONLY (§6): no comparison to make, and one row at full opacity is
+  // just the headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
+  // a column of empty tracks is worse than the panel as it ships.
+  if (tees.length < 2) return null;
+  if (!rows.some((r) => r.slope != null)) return null;
+
+  // ~5.4px per character at LABEL 8.5 uppercase with 0.13em tracking.
+  const labelW = Math.min(
+    TEE_LABEL_W_MAX,
+    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 5.4) + 2)),
+  );
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      {rows.map(({ tee, slope }) => (
+        <TeeRow
+          key={tee.tee_label}
+          tee={tee}
+          slope={slope}
+          on={tee.tee_label === activeLabel}
+          labelW={labelW}
+          onPick={() => onPick(tee.tee_label)}
+        />
+      ))}
+    </div>
+  );
+};
+
 const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
 
 /** Fixed, load-bearing grid: HOLE / yards / PAR / SI. No cell sizes to content. */
 const CARD_GRID = '30px 1fr 46px 46px';
 const CARD_GAP = 10;
 
-const SheetBody: React.FC<{ courseId: string; tees: TeeSet[]; initialTee: string }> = ({
-  courseId,
-  tees,
-  initialTee,
-}) => {
+/* The sheet does NOT hold its own selected tee (§2): the panel owns it and the
+   pills and the tee list write to the same state, so the two can never diverge. */
+const SheetBody: React.FC<{
+  tees: TeeSet[];
+  selected: string;
+  onPick: (label: string) => void;
+}> = ({ tees, selected, onPick }) => {
   const { t } = useTranslation(['courses']);
-  const [selected, setSelected] = useState(initialTee);
 
   const active = useMemo(
     () => tees.find((x) => x.tee_label === selected) ?? tees[0],
     [tees, selected],
   );
 
-  const pick = (label: string) => {
-    setSelected(label);
-    try {
-      window.localStorage.setItem(storageKey(courseId), label);
-    } catch {
-      /* private mode - selection is in-memory only */
-    }
-  };
+  const pick = onPick;
 
   const holes = useMemo(
     () => [...(active?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
@@ -479,16 +677,33 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
   const tees = useMemo<TeeSet[]>(() => data ?? [], [data]);
 
   const [open, setOpen] = useState(false);
-  // Bumped when the sheet closes so the resolved tee is re-read from storage.
-  const [readToken, setReadToken] = useState(0);
+
+  /* THE SELECTED TEE LIVES HERE (§2). The tee list and the sheet's pills are
+     two doors onto ONE selection; two places holding a selected tee diverge.
+     The member's remembered tee, via resolveDefaultTee and its storageKey, is
+     the initial value, and a pick from either surface persists the same way. */
+  const [picked, setPicked] = useState<string | null>(null);
+
+  const resolved = useMemo<string>(() => {
+    if (!courseId || tees.length === 0) return '';
+    return resolveDefaultTee(tees, courseId, profile?.gender ?? null);
+  }, [courseId, tees, profile?.gender]);
+
+  const activeLabel = picked && tees.some((x) => x.tee_label === picked) ? picked : resolved;
 
   const active = useMemo<TeeSet | null>(() => {
     if (!courseId || tees.length === 0) return null;
-    const label = resolveDefaultTee(tees, courseId, profile?.gender ?? null);
-    return tees.find((x) => x.tee_label === label) ?? tees[0];
-    // readToken is a deliberate re-read trigger.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, tees, profile?.gender, readToken]);
+    return tees.find((x) => x.tee_label === activeLabel) ?? tees[0];
+  }, [courseId, tees, activeLabel]);
+
+  const pickTee = (label: string) => {
+    setPicked(label);
+    try {
+      window.localStorage.setItem(storageKey(courseId ?? ''), label);
+    } catch {
+      /* private mode - the selection is in-memory only */
+    }
+  };
 
   const slope = active?.slope_rating && active.slope_rating > 0 ? Math.round(active.slope_rating) : null;
 
@@ -509,10 +724,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
     analyticsEvents.track('course_card_sheet_opened', { course_id: courseId });
     setOpen(true);
   };
-  const closeSheet = () => {
-    setOpen(false);
-    setReadToken((n) => n + 1);
-  };
+  const closeSheet = () => setOpen(false);
 
   const yards = active.total_yards ?? null;
   const delta = slope != null ? slope - STANDARD_SLOPE : null;
@@ -634,6 +846,10 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         {/* SLOPE SCALE - only when there is a slope to place. */}
         {slope != null ? <SlopeScale slope={slope} /> : null}
 
+        {/* EVERY TEE SET, on the one graded scale. Tapping a row re-reads the
+            whole panel: headline, scale, sentence and counter strip. */}
+        <TeeList tees={tees} activeLabel={active.tee_label} onPick={pickTee} />
+
         {slope != null && sentence ? (
           <p
             style={{
@@ -708,7 +924,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
         </div>
 
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', fontFamily: SANS, ...FIGS }}>
-          <SheetBody courseId={courseId} tees={tees} initialTee={active.tee_label} />
+          <SheetBody tees={tees} selected={active.tee_label} onPick={pickTee} />
         </div>
       </BottomSheet>
     </>
