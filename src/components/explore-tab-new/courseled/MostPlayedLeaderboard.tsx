@@ -1,4 +1,6 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
