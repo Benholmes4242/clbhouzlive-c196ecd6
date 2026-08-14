@@ -268,7 +268,13 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
 
    The resolved tee is at full opacity and the rest at 0.34 - that is what makes
    the block a comparison rather than a list. */
-const TEE_LABEL_W = 40;
+/* 40px is the floor, not the rule: the rule is that every track starts on the
+   same x. Where the catalogue maps several WHS courses onto one club the labels
+   arrive composited ("Black - Himalayas") and 40px truncates them all to
+   "BLAC...", which destroys the comparison the rows exist to make. The column
+   takes the widest label in THIS list, capped, and every row shares it. */
+const TEE_LABEL_W_MIN = 40;
+const TEE_LABEL_W_MAX = 104;
 const TEE_YARDS_W = 46;
 const FADED = 0.34;
 
@@ -276,15 +282,16 @@ const TeeRow: React.FC<{
   tee: TeeSet;
   slope: number | null;
   on: boolean;
+  labelW: number;
   onPick: () => void;
-}> = ({ tee, slope, on, onPick }) => (
+}> = ({ tee, slope, on, labelW, onPick }) => (
   <button
     type="button"
     onClick={onPick}
     aria-pressed={on}
     style={{
       display: 'grid',
-      gridTemplateColumns: `${TEE_LABEL_W}px 1fr auto ${TEE_YARDS_W}px`,
+      gridTemplateColumns: `${labelW}px 1fr auto ${TEE_YARDS_W}px`,
       alignItems: 'center',
       gap: 10,
       width: '100%',
@@ -363,6 +370,12 @@ const TeeList: React.FC<{
   if (tees.length < 2) return null;
   if (!rows.some((r) => r.slope != null)) return null;
 
+  // ~5.4px per character at LABEL 8.5 uppercase with 0.13em tracking.
+  const labelW = Math.min(
+    TEE_LABEL_W_MAX,
+    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 5.4) + 2)),
+  );
+
   return (
     <div style={{ marginTop: 14 }}>
       {rows.map(({ tee, slope }) => (
@@ -371,6 +384,7 @@ const TeeList: React.FC<{
           tee={tee}
           slope={slope}
           on={tee.tee_label === activeLabel}
+          labelW={labelW}
           onPick={() => onPick(tee.tee_label)}
         />
       ))}
