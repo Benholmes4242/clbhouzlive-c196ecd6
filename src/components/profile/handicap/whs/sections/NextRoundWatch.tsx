@@ -171,6 +171,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         <Last5AgainstTarget
           values={last5}
           cut={cutTarget}
+          targetCaption={t('common:handicap.nextRound.beatCaption', { cut })}
           footLabel={t('common:handicap.nextRound.beatLabel', {
             count: beating,
             total: last5.length,
@@ -185,10 +186,64 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             borderTop: `1px solid ${CHART.BORDER}`,
           }}
         >
+          {/* The range the three rows describe. Nothing when they agree. */}
+          {rangeWorst != null && rangeBest != null && (
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  position: 'relative',
+                  height: 6,
+                  borderRadius: 999,
+                  background: CHART.TRACK,
+                }}
+              >
+                {rows.map((r, i) => {
+                  const frac =
+                    (rangeWorst - r.becomes) / (rangeWorst - rangeBest);
+                  return (
+                    <span
+                      key={i}
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        top: -2,
+                        left: `${Math.min(100, Math.max(0, frac * 100))}%`,
+                        marginLeft: -1.5,
+                        width: 3,
+                        height: 10,
+                        borderRadius: 2,
+                        background: r.noChange ? CHART.DIM : CHART.DOWN,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: 7,
+                }}
+              >
+                <span style={LABEL}>
+                  {t('common:handicap.nextRound.staysAt', {
+                    value: rangeWorst.toFixed(1),
+                  })}
+                </span>
+                <span style={{ ...LABEL, color: CHART.DOWN }}>
+                  {t('common:handicap.nextRound.downTo', {
+                    value: rangeBest.toFixed(1),
+                  })}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={LABEL}>{t('common:handicap.nextRound.scaleShoot')}</span>
             <span style={LABEL}>{t('common:handicap.nextRound.scaleBecomes')}</span>
           </div>
+
 
           {rows.map((r, i) => {
             const moves = !r.noChange;
