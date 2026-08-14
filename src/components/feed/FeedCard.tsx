@@ -891,7 +891,10 @@ const FooterButton: React.FC<{
     innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
     <Icon
-      size={19}
+      /* §6 condense. The engagement row is SHARED by every feed card, so it
+         steps 24 -> 21 rather than to the mock's 19: a round-post-only figure
+         would restyle photo and review posts too. */
+      size={21}
       strokeWidth={1.75}
       color={active ? activeColor ?? T100 : T60}
       fill={active ? activeColor ?? 'none' : 'none'}
