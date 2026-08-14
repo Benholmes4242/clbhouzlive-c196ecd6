@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import type { WhsConnection } from '@/lib/whs/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -242,7 +243,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                       key={w.key}
                       type="button"
                       disabled={disabled}
-                      onClick={() => setWin(w.key)}
+                      onClick={() => scopeWindow(w.key)}
                       style={{
                         border: 'none',
                         borderRadius: 999,
