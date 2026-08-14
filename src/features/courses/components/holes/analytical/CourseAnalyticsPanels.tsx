@@ -556,16 +556,14 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
               >
                 {beastFig && (
                   <span>
-                    {hardestLabel}{' '}
-                    {t('courses:courseDetail.plays.holeN', { hole: stats.hardest.hole_no })}{' '}
+                    {hardestLabel} {formatNumber(stats.hardest.hole_no)}{' '}
                     <span style={{ color: beastFig.tone, fontWeight: 700 }}>{beastFig.text}</span>
                   </span>
                 )}
                 {beastFig && bestFig ? ' \u00B7 ' : null}
                 {bestFig && (
                   <span>
-                    {easiestLabel}{' '}
-                    {t('courses:courseDetail.plays.holeN', { hole: stats.easiest.hole_no })}{' '}
+                    {easiestLabel} {formatNumber(stats.easiest.hole_no)}{' '}
                     <span style={{ color: bestFig.tone, fontWeight: 700 }}>{bestFig.text}</span>
                   </span>
                 )}
