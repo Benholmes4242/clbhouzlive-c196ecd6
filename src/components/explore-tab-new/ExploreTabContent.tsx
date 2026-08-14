@@ -246,13 +246,18 @@ export default function ExploreTabContent({
     if (lens === 'top_100') {
       return pool.filter((e) => !!e.courseId && sets.top100.has(e.courseId));
     }
-    // FOR YOU: shortlist + Top 100 + played. Proximity is omitted — no member
-    // coordinates exist without a new permission prompt.
-    return pool.filter(
-      (e) =>
-        !!e.courseId &&
-        (isShortlisted(e.courseId) || sets.top100.has(e.courseId) || sets.played.has(e.courseId)),
-    );
+    /* SUGGESTED SORTS, IT DOES NOT FILTER (BRIEF_STANDOUT_ROUNDS_BACKFILL §1).
+       Relevance decides ORDER, not membership: the whole pool is kept so the
+       section reaches eight tiles, and the rarity floor applies ONLY to the
+       backfill portion — their courses at any rarity, the world at high
+       rarity only. Ordering itself stays with priorityFor downstream. */
+    return pool.filter((e) => {
+      if (!e.courseId) return false;
+      const relevant =
+        isShortlisted(e.courseId) || sets.top100.has(e.courseId) || sets.played.has(e.courseId);
+      if (relevant) return true;
+      return !WORLDWIDE_RARITY_FLOOR.includes(e.kind);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pool, lens, sets.played, sets.top100, isShortlisted]);
 
@@ -270,17 +275,15 @@ export default function ExploreTabContent({
 
   const lensMeta = lensLabelKey(lens);
   const lensLabel = t(lensMeta.key, lensMeta.fallback);
+  /* SUGGESTED IS EMPTY ONLY WHEN THE WHOLE POOL IS (§3): the old
+     "rate a course" copy became unreachable and untrue with the backfill. */
   const lensEmptyCopy =
-    lens === 'suggested'
-      ? t(
-          'discover.lens.emptySuggested',
-          'No news yet from courses you know. Rate a course or add one to your list to see more here.',
-        )
-      : lens === 'top_100'
-        ? t('discover.lens.emptyTop100', 'No Top 100 news in the last 90 days.')
-        : lens === 'played'
-          ? t('discover.lens.emptyPlayed', 'Nothing at your courses in the last 90 days.')
-          : t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.');
+    lens === 'top_100'
+      ? t('discover.lens.emptyTop100', 'No Top 100 news in the last 90 days.')
+      : lens === 'played'
+        ? t('discover.lens.emptyPlayed', 'Nothing at your courses in the last 90 days.')
+        : t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.');
+
 
 
 

@@ -943,10 +943,15 @@ export function AroundTheWorld({
                           if (onFeatPress && tt.scoreId) {
                             analyticsEvents.track('discover_world_tile_tap', {
                               source: 'around_the_world',
+                              /* BACKFILL MARKER (BRIEF_STANDOUT_ROUNDS_BACKFILL
+                                 §4): priority 3 means the tile arrived from the
+                                 worldwide pool, not from a course they know. */
+                              backfilled: priorityFor ? priorityFor(g.courseId) === 3 : false,
                             });
                             onFeatPress(tt.scoreId, tt.ownerId);
                             return;
                           }
+
                           onCoursePress(g.courseId);
                         }}
                         trailing={
