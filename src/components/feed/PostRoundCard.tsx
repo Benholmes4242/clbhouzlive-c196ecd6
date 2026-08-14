@@ -20,7 +20,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Crown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
-import { beadForScore } from '@/features/courses/_shared/beadForScore';
+import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -214,53 +214,40 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
 };
 
 const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, toPar }) => {
-  // Beads come from the shared beadForScore helper — one rule across the sheet
-  // trajectory and this one (CORRECTION_ONE_SCORING_MARK §5).
+  // ONE IMPLEMENTATION, TWO SURFACES (BRIEF_TRAJECTORY_CONTINUITY_AND_REUSE §2).
+  // The local chart is gone: the scorecard sheet's TrajectoryLine already carries
+  // the treatment — the to-par split, the fill to the level rule, earned red, the
+  // field stroke, the beads — so this panel is chrome plus that component on the
+  // dark surface.
   //
-  // §4.2/§4.3 — THE LINE STOPS AT THE FIRST GAP. A cumulative to-par line has no
-  // honest continuation past a hole with no score: the running total after the
-  // gap is unknown by exactly the missing stroke count, so a resumed segment
-  // would sit at a position the member never held. We therefore draw only the
-  // segment up to the gap and stop. No bridge, no dot on the missing hole.
-  const { pts, truncated } = useMemo(() => {
+  // §1.2 — THE LINE READS lineGross (gross ?? adjusted_gross). Cells and nine
+  // totals read `gross`. A picked-up hole prints no number but the round's shape
+  // still passes through where it actually stood.
+  const { series, endpoint } = useMemo(() => {
+    const s = holes.map((h) => ({
+      holeNo: h.holeNo,
+      par: h.par,
+      strokes: h.lineGross,
+      played: h.played,
+    }));
+    // The final cumulative, computed from the same values the line draws. When a
+    // played hole has neither value the line genuinely breaks, and the endpoint
+    // is not the round's to-par — fall back to the score row's figure (§4.2).
     let cum = 0;
-    const out: { i: number; cum: number; bead: { tone: string; radius: number } | null }[] = [];
-    let cut = false;
-    holes.forEach((h, idx) => {
-      if (cut) return;
-      // A NOT-PLAYED hole adds no strokes and no par — the line carries
-      // straight past it, no point plotted, no cut.
-      if (!h.played) return;
-      if (h.gross == null || h.par == null) {
-        cut = true;
-        return;
+    let broken = false;
+    for (const h of holes) {
+      if (h.played === false) continue;
+      if (h.lineGross == null || h.par == null) {
+        broken = true;
+        continue;
       }
-      cum += h.gross - h.par;
-      out.push({ i: idx, cum, bead: beadForScore(h.gross, h.par, 'dark') });
-    });
-    return { pts: out, truncated: cut };
-  }, [holes]);
+      cum += h.lineGross - h.par;
+    }
+    return { series: s, endpoint: broken ? toPar : cum };
+  }, [holes, toPar]);
 
-  if (pts.length < 2) return null;
-
-
-  const w = 320;
-  const height = 74;
-  const padX = 5;
-  const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
-  // Hole-index space, not point-index space: a truncated line must occupy only
-  // the part of the axis it actually covers.
-  const n = Math.max(holes.length, 2);
-  const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
-  const y0 = height / 2;
-  const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 10);
-  const path = pts
-    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)},${y(p.cum).toFixed(1)}`)
-    .join(' ');
-  // §4.4 — with a gap the line's last point is NOT the round's to-par, so the
-  // heading figure falls back to the score row. Complete rounds are unchanged.
-  const final = truncated ? toPar : pts[pts.length - 1].cum;
-
+  const scored = series.filter((h) => h.played !== false && h.strokes != null && h.par != null);
+  if (scored.length < 2) return null;
 
   return (
     <div
@@ -284,43 +271,11 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
         >
           Trajectory
         </span>
-        <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(final) }}>
-          {fmtToPar(final)}
+        <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(endpoint) }}>
+          {fmtToPar(endpoint)}
         </span>
       </div>
-      <svg width="100%" viewBox={`0 0 ${w} ${height}`} style={{ display: 'block' }} aria-hidden>
-        <line
-          x1={padX}
-          x2={w - padX}
-          y1={y0}
-          y2={y0}
-          stroke="rgba(255,255,255,0.18)"
-          strokeWidth="1"
-          strokeDasharray="3 4"
-        />
-        <path
-          d={path}
-          fill="none"
-          stroke={INK}
-          strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-        {pts.map((p) =>
-          p.bead ? (
-            <circle
-              key={p.i}
-              cx={x(p.i)}
-              cy={y(p.cum)}
-              r={p.bead.radius}
-              fill={p.bead.tone}
-              stroke="#0B0D10"
-              strokeWidth={1.5}
-            />
-          ) : null,
-        )}
-      </svg>
+      <TrajectoryLine holes={series} height={84} surface="dark" />
     </div>
   );
 };
