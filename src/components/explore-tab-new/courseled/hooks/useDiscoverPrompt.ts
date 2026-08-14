@@ -17,6 +17,8 @@ import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 import { useFriendIdSet } from './useFriendIdSet';
+import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { RAIL_CAP } from '../FriendsPlayedRail';
 
 export type DiscoverPromptKind = 'rate' | 'finish' | 'photo' | 'friends';
 
