@@ -687,6 +687,91 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               )}
             </div>
 
+            {/* 4b. Drop queue — full window only, soonest first, max three */}
+            {dropQueue.length > 0 && (
+              <div style={{ marginTop: 10, padding: '0 4px' }}>
+                {dropQueue.map((r) => {
+                  const v = r.diff ?? 0;
+                  const frac = clamp((v - dataMin) / range, 0.06, 1);
+                  return (
+                    <div
+                      key={`dq-${r.id}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '4px 0',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          background: AMBER,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          flex: 1,
+                          height: 3,
+                          borderRadius: 2,
+                          background: 'rgba(255,255,255,0.06)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'block',
+                            height: '100%',
+                            width: `${frac * 100}%`,
+                            background: AMBER,
+                            opacity: 0.7,
+                            borderRadius: 2,
+                          }}
+                        />
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: AMBER,
+                          ...NUM,
+                        }}
+                      >
+                        {r.diff != null ? fmtDiff(r.diff) : '—'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          color: FAINT,
+                          minWidth: 62,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {r.fallsIn === 1 ? 'NEXT ROUND' : `IN ${r.fallsIn}`}
+                      </span>
+                    </div>
+                  );
+                })}
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: DIM,
+                    marginTop: 6,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {queueNote}
+                </div>
+              </div>
+            )}
+
+
             {/* 5. Next-round row */}
             <div
               style={{
