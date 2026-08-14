@@ -309,6 +309,13 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
   /** Same threshold the caption uses: below it, ink nothing. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
+  /**
+   * THE MAGNITUDE, ALWAYS TO ONE DECIMAL. `spread` is a NUMBER (+"1.0" is 1),
+   * so interpolating it raw prints "cost 1 shots more" at exactly the spreads
+   * the lower floor now admits. The strings already carry {{spread}}; they just
+   * needed a figure that survives the trip.
+   */
+  const spreadFig = spread.toFixed(1);
 
   /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
   const thirdRank = [0, 1, 2]
@@ -357,18 +364,18 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceLate', {
         worst: worstLabel,
         best: bestLabel,
-        spread,
+        spread: spreadFig,
       });
     } else if (worstIdx === 0) {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEarly', {
         best: bestLabel,
         worst: worstLabel,
-        spread,
+        spread: spreadFig,
       });
     } else {
       s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceMiddle', {
         best: bestLabel,
-        spread,
+        spread: spreadFig,
       });
     }
   }
