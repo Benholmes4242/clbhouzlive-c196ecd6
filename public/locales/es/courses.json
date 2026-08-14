@@ -823,7 +823,13 @@
     "reviews": {
       "ratedChip": "Rated",
       "someone": "A member",
-      "sheetCaption": "{{count}} reviews"
+      "sheetCaption": "{{count}} reviews",
+      "cat": {
+        "design": "Design",
+        "conditions": "Cond",
+        "clubhouse": "House",
+        "facilities": "Fac"
+      }
     },
     "prompt": {
       "whenPlayed": "Played {{when}}",
