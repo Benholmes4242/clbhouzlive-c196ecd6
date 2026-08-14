@@ -16,6 +16,12 @@ interface MetricCardProps {
   sparkline?: number[];
   to: string;
   loading?: boolean;
+  /**
+   * Share of TOTAL MEMBERS, already a whole percent. A stock figure (DAU / WAU
+   * / MAU) carries one; a FLOW figure (Signups 7d, Posts 7d) must not - "4
+   * signups, 5% of members" invites a comparison that means nothing.
+   */
+  sharePct?: number | null;
 }
 
 const num = (n: number) => n.toLocaleString();
