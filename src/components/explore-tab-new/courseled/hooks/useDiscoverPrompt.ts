@@ -197,9 +197,16 @@ export function useDiscoverPrompt(userId: string | undefined): {
     };
   }
 
-  if (friendIds.isLoading) return { prompt: null, resolved: false };
+  if (friendIds.isLoading || circleRounds.isPending) return { prompt: null, resolved: false };
 
-  if ((friendIds.data?.size ?? 0) === 0) {
+  // 4 friends — LAST, and it STANDS DOWN while "Who's been playing" is showing
+  // suggested tiles (BRIEF_WHOS_BEEN_PLAYING 4.1/4.2). Its copy promises rounds
+  // that would then be visible directly beneath it, and two asks for the same
+  // thing on one screen is one too many. The kind, its copy and its route to
+  // the Find golfers sheet all remain: this is still the right prompt when the
+  // rail genuinely cannot fill.
+  const railRows = circleRounds.data ?? [];
+  if ((friendIds.data?.size ?? 0) === 0 && railRows.length === 0) {
     return {
       resolved: true,
       prompt: {
@@ -211,6 +218,7 @@ export function useDiscoverPrompt(userId: string | undefined): {
       },
     };
   }
+
 
   return { prompt: null, resolved: true };
 }
