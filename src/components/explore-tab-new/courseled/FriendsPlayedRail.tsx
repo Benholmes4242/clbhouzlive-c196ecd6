@@ -13,6 +13,8 @@ import {
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
+import { SCRIM_BASE, SCRIM_HOTSPOT, SCRIM_TOP_BAND } from './photoScrim';
+
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape, type ShapeBead } from './hooks/useRoundHoleShapes';
