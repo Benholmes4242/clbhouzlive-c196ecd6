@@ -31,6 +31,31 @@ import { A, FIGS, Hairline, KICKER, LABEL, SANS } from './tokens';
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
 const STANDARD_SLOPE = 113;
 
+/**
+ * THE DIFFICULTY ZONES (BRIEF_COURSE_CARD_EVERY_TEE §3).
+ *
+ * Slope is DIFFICULTY, so it takes neither of the app's other two coloured
+ * pairs: it is not a score (no to-par pair, where UNDER par is red) and it is
+ * not a movement (no index-delta pair). It takes ZONE language, the same shape
+ * the handicap index tile uses, because both answer one question: where does
+ * this sit on a range.
+ *
+ * RED HERE MEANS DEMANDING, NOT BAD. A hard course is a good course - no
+ * warning tone, no icon, no copy treating a high slope as a problem.
+ *
+ * Declared here because no shared difficulty scale exists in the codebase; the
+ * hexes themselves come from the analytical tokens (A.GREEN / A.AMBER / A.RED)
+ * rather than being retyped.
+ */
+const ZONE_EASIER_MAX = 104; // below 105: easier than standard
+const ZONE_STANDARD_MAX = 129; // 105-129: around standard; 130 and up: harder
+
+function zoneColour(slope: number): string {
+  if (slope <= ZONE_EASIER_MAX) return A.GREEN;
+  if (slope <= ZONE_STANDARD_MAX) return A.AMBER;
+  return A.RED;
+}
+
 interface Props {
   courseId: string | undefined;
   /** Names the sheet. Falls back to the tee title when absent. */
@@ -95,15 +120,43 @@ const SCALE_MIN = 55;
 const SCALE_MAX = 155;
 const DOT = 11;
 
+/** Zone band edges as track percentages, shared by the scale and the rows. */
+const scalePct = (v: number) =>
+  ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
+
+/** The three zones behind a track, at 0.22 so a fill still reads over them. */
+const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => (
+  <>
+    {[
+      { from: SCALE_MIN, to: ZONE_EASIER_MAX + 1, colour: A.GREEN },
+      { from: ZONE_EASIER_MAX + 1, to: ZONE_STANDARD_MAX + 1, colour: A.AMBER },
+      { from: ZONE_STANDARD_MAX + 1, to: SCALE_MAX, colour: A.RED },
+    ].map((z) => (
+      <div
+        key={z.colour}
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: `${scalePct(z.from)}%`,
+          width: `${scalePct(z.to) - scalePct(z.from)}%`,
+          background: z.colour,
+          opacity: 0.22,
+          borderRadius: radius,
+        }}
+      />
+    ))}
+  </>
+);
+
 const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
   const { t } = useTranslation(['courses']);
 
-  const pct = (v: number) =>
-    ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
-  const here = pct(slope);
-  const std = pct(STANDARD_SLOPE);
+  const here = scalePct(slope);
+  const std = scalePct(STANDARD_SLOPE);
   const left = Math.min(here, std);
   const width = Math.abs(here - std);
+  const zone = zoneColour(slope);
 
   return (
     <div style={{ marginTop: 14 }} aria-hidden="true">
@@ -112,10 +165,15 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
           position: 'relative',
           height: 6,
           borderRadius: 3,
-          background: 'linear-gradient(90deg, #EEF2F6 0%, #E4E9EF 100%)',
+          background: A.TRACK,
+          overflow: 'hidden',
         }}
       >
-        {/* Span between standard and this course - works in both directions. */}
+        {/* THE TRACK IS GRADED (§4). A grey track with a dot tells a member
+            WHERE the number is but not WHAT IT MEANS. */}
+        <ZoneBed radius={0} />
+        {/* Span between standard and this course, in this tee's zone colour -
+            works in both directions. */}
         <div
           style={{
             position: 'absolute',
@@ -124,8 +182,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
             left: `${left}%`,
             width: `${width}%`,
             borderRadius: 3,
-            background:
-              'linear-gradient(90deg, rgba(14,18,22,0.30) 0%, rgba(14,18,22,0.62) 100%)',
+            background: zone,
           }}
         />
         {/* Standard notch, overhanging 3px top and bottom. */}
@@ -151,7 +208,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
             marginLeft: -DOT / 2,
             marginTop: -DOT / 2,
             borderRadius: '50%',
-            background: A.INK,
+            background: zone,
             border: '2.5px solid #FFFFFF',
             boxShadow: '0 1px 3px rgba(14,18,22,0.22)',
             boxSizing: 'border-box',
