@@ -480,27 +480,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const scale = buildHoleScale(holes, myByHole);
 
-  // Extremes are LABELLED, never carried by an emoji.
-  const extremes = [
-    beastFig
-      ? {
-          key: 'beast',
-          label: t('courses:courseDetail.plays.toughestHole'),
-          hole: stats.hardest.hole_no,
-          text: beastFig.text,
-          tone: beastFig.tone,
-        }
-      : null,
-    bestFig
-      ? {
-          key: 'best',
-          label: t('courses:courseDetail.plays.easiestHole'),
-          hole: stats.easiest.hole_no,
-          text: bestFig.text,
-          tone: bestFig.tone,
-        }
-      : null,
-  ].filter((c): c is NonNullable<typeof c> => c != null);
+  const hardestLabel = t('courses:courseDetail.plays.hardestHole');
+  const easiestLabel = t('courses:courseDetail.plays.easiestHole');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
@@ -511,8 +492,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           count: totalRounds,
           rounds: formatNumber(totalRounds),
         })}
-        headerGap={16}
-        style={{ padding: '18px 16px 12px' }}
+        headerGap={12}
+        style={{ padding: '14px 13px 11px' }}
       >
         <ShapeChart
           holes={holes}
@@ -522,14 +503,12 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           hasYou={hasYou}
         />
 
-        {/* Legend: what the bars are, and what the line is. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 10 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <i style={{ width: 12, height: 6, borderRadius: 2, background: A.TRACK }} />
-            <span style={{ ...LABEL, fontSize: 7 }}>
-              {t('courses:courseDetail.plays.legendField')}
-            </span>
-          </span>
+        {/* Legend: the bar ramp, and - only when there is one - the member line. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
+          <RampLegend
+            easier={t('courses:courseDetail.plays.legendEasier')}
+            harder={t('courses:courseDetail.plays.legendHarder')}
+          />
           {hasYou && (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <i style={{ width: 12, height: 2, borderRadius: 1, background: A.AMBER }} />
@@ -540,79 +519,83 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           )}
         </div>
 
-        <Hairline style={{ margin: '10px 0 8px' }} />
+        <Hairline style={{ margin: '11px 0 9px' }} />
 
-        {/* Toughest/easiest live ONLY in the pair beneath, with their figures. */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: hasYou ? 'repeat(3, minmax(0, 1fr))' : '1fr',
-          }}
-        >
-          <Figure
-            label={t('courses:courseDetail.plays.fieldAvg')}
-            value={field ? field.text : '\u2014'}
-            tone={field ? field.tone : A.INK}
-          />
-          {hasYou && you && (
-            <Figure
-              label={t('courses:courseDetail.plays.yourAvg')}
-              value={you.text}
-              tone={A.AMBER_DEEP}
-            />
-          )}
-          {hasYou && (
-            <Figure
-              label={t('courses:courseDetail.plays.youBeat')}
-              value={`${stats.beat}/${stats.withYou}`}
-            />
-          )}
-        </div>
-
-        {extremes.length > 0 && (
+        {hasYou ? (
+          /* WITH personal data: three averages in a row, hole callouts demote
+             to the meta line beneath. Five cells across a phone is unreadable. */
           <>
-            <Hairline style={{ margin: '8px 0' }} />
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${extremes.length}, minmax(0, 1fr))`,
-                gap: 14,
-              }}
-            >
-              {extremes.map((c) => (
-                <div key={c.key} style={{ textAlign: 'center', minWidth: 0 }}>
-                  <div style={{ ...LABEL, fontSize: 7.5 }}>{c.label}</div>
-                  <div
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 700,
-                      letterSpacing: '-0.025em',
-                      color: A.INK,
-                      marginTop: 3,
-                      whiteSpace: 'nowrap',
-                      ...FIGS,
-                    }}
-                  >
-                    {t('courses:courseDetail.plays.holeN', { hole: c.hole })}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 700,
-                      letterSpacing: '-0.025em',
-                      color: c.tone,
-                      marginTop: 4,
-                      whiteSpace: 'nowrap',
-                      ...FIGS,
-                    }}
-                  >
-                    {c.text}
-                  </div>
-                </div>
-              ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+              <Figure
+                label={t('courses:courseDetail.plays.fieldAvg')}
+                value={field ? field.text : '\u2014'}
+                tone={field ? field.tone : A.INK}
+              />
+              {you && (
+                <Figure
+                  label={t('courses:courseDetail.plays.yourAvg')}
+                  value={you.text}
+                  tone={A.AMBER_DEEP}
+                />
+              )}
+              <Figure
+                label={t('courses:courseDetail.plays.youBeat')}
+                value={`${stats.beat}/${stats.withYou}`}
+              />
             </div>
+            {(beastFig || bestFig) && (
+              <div
+                style={{
+                  marginTop: 8,
+                  textAlign: 'center',
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: A.MUTE,
+                  ...FIGS,
+                }}
+              >
+                {beastFig && (
+                  <span>
+                    {hardestLabel}{' '}
+                    {t('courses:courseDetail.plays.holeN', { hole: stats.hardest.hole_no })}{' '}
+                    <span style={{ color: beastFig.tone, fontWeight: 700 }}>{beastFig.text}</span>
+                  </span>
+                )}
+                {beastFig && bestFig ? ' \u00B7 ' : null}
+                {bestFig && (
+                  <span>
+                    {easiestLabel}{' '}
+                    {t('courses:courseDetail.plays.holeN', { hole: stats.easiest.hole_no })}{' '}
+                    <span style={{ color: bestFig.tone, fontWeight: 700 }}>{bestFig.text}</span>
+                  </span>
+                )}
+              </div>
+            )}
           </>
+        ) : (
+          /* WITHOUT personal data: the field average slots BETWEEN the two hole
+             callouts - one row, one hairline, no amber anywhere. */
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+            <Figure
+              label={hardestLabel}
+              value={beastFig ? beastFig.text : '\u2014'}
+              tone={beastFig ? beastFig.tone : A.INK}
+              sub={t('courses:courseDetail.plays.holeN', { hole: stats.hardest.hole_no })}
+            />
+            <Figure
+              label={t('courses:courseDetail.plays.fieldAvg')}
+              value={field ? field.text : '\u2014'}
+              tone={field ? field.tone : A.INK}
+            />
+            <Figure
+              label={easiestLabel}
+              value={bestFig ? bestFig.text : '\u2014'}
+              tone={bestFig ? bestFig.tone : A.INK}
+              sub={t('courses:courseDetail.plays.holeN', { hole: stats.easiest.hole_no })}
+            />
+          </div>
         )}
+
 
       </Panel>
 
