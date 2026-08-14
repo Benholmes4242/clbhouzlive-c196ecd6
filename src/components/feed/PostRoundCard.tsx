@@ -179,7 +179,7 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
   }
   const showTotals = any && !hasGap;
   return (
-    <div style={{ marginTop: 12 }}>
+    <div style={{ marginTop: 10 }}>
       <LabelRow
         label={label}
         total={showTotals ? total : null}
@@ -484,7 +484,7 @@ export const PostRoundCard: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 10,
-            padding: '10px 14px',
+            padding: '10px 13px',
             borderTop: `1px solid ${HAIRLINE}`,
             background: 'transparent',
           }}
