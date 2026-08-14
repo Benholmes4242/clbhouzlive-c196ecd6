@@ -9,8 +9,15 @@
  *   cannot rise -> "Your handicap can't go up next round."
  *   will rise   -> "Your handicap goes up to {settle} next round" + sub.
  *
- * The card carries ONE sentence and ONE chart. No state label, no explanation
- * paragraph, no raise threshold - none is computed.
+ * The card carries ONE sentence and ONE chart. NO state label and NO
+ * explanation paragraph — that rule stands. What it now also carries is a
+ * SCENARIO TRACK above the SHOOT / BECOMES rows: the three rows describe a
+ * RANGE (one round moves the index from the no-change figure down to the best
+ * case), and that is the most motivating fact on the page. The track is a
+ * SUMMARY, not a replacement — the rows keep their exact figures beneath it.
+ * It is drawn from the scenarios ACTUALLY RENDERED, and NOT AT ALL when all
+ * three land on the same index. No pace, no projection, no verdict.
+
  *
  * Renders NOTHING below 20 rounds or when the projection is unusable.
  */
