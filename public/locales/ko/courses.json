@@ -654,9 +654,11 @@
     "plays": {
       "legendField": "Field",
       "legendYou": "You",
-      "toughestHole": "Toughest hole",
       "easiestHole": "Easiest hole",
-      "holeN": "Hole {{hole}}"
+      "holeN": "Hole {{hole}}",
+      "hardestHole": "Hardest hole",
+      "legendEasier": "Easier",
+      "legendHarder": "Harder"
     },
     "holes": {
       "difficultyRank": "Difficulty rank",

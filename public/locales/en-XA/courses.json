@@ -914,9 +914,10 @@
       "bestLabel": "[~~Éášíéšţ · ĥőļé {{hole}}~~]",
       "legendField": "[~~Ƒíéļđ~~]",
       "legendYou": "[~~Ýőú~~]",
-      "toughestHole": "[~~Ţőúĝĥéšţ ĥőļé~~]",
       "easiestHole": "[~~Éášíéšţ ĥőļé~~]",
-      "holeN": "[~~Ĥőļé {{hole}}~~]"
+      "holeN": "[~~Ĥőļé {{hole}}~~]",
+      "legendEasier": "[~~Éášíéř~~]",
+      "legendHarder": "[~~Ĥářđéř~~]"
     },
     "holes": {
       "tapHint": "[~~Ţáƥ á ĥőļé ƒőř đéţáíļ~~]",
