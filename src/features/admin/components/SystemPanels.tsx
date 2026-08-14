@@ -3,13 +3,28 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { adminTheme as t } from '../theme';
 import { CARD, KICKER, LABEL, FIG, Skeleton, num, formatDurationShort } from '../lib/chartPrimitives';
-import { toneColor, type ChipState, type ChipTone } from '../lib/healthChips';
+import { type ChipState, type ChipTone } from '../lib/healthChips';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import type { OpsHealth } from '../hooks/useOpsHealth';
 import type { EgSyncHealth } from '../hooks/useDashboard';
 import type { useTriageCounts } from '../hooks/useTriageCounts';
 
 const HAIRLINE = `1px solid ${t.hairline}`;
+
+/**
+ * NO AMBER ON THE DASHBOARD, and NO TWO-STEP SEVERITY EITHER: warn and danger
+ * both render red here. On live data warn fires constantly and danger almost
+ * never, so two near-identical reds would carry less than one - the DETAIL LINE
+ * ("7 in 24h" vs "backlog above 6 hours") carries the distinction, not the hue.
+ *
+ * Local to this file, NOT a change to healthChips' toneColor: the Health board
+ * keeps its amber warn tier and imports that one.
+ */
+function dashToneColor(tone: ChipTone): string {
+  if (tone === 'ok') return t.ok;
+  if (tone === 'warn' || tone === 'danger') return t.danger;
+  return t.inkFaint;
+}
 
 /** Column widths for the client split, shared by the header row and the rows. */
 const SESSIONS_COL = 62;
@@ -37,7 +52,7 @@ function Cap({ state, to }: { state: ChipState; to: string }) {
   const opacity = state.tone === 'ok' ? 0.5 : state.tone === 'idle' ? 0.3 : 1;
   return (
     <Link to={to} style={{ textDecoration: 'none', minWidth: 0, display: 'block' }}>
-      <div style={{ height: 2.5, borderRadius: 2, background: toneColor(state.tone), opacity }} />
+      <div style={{ height: 2.5, borderRadius: 2, background: dashToneColor(state.tone), opacity }} />
       <div style={{ ...LABEL, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {state.label}
       </div>
@@ -126,7 +141,7 @@ export function SystemPanel({
         <span style={KICKER}>System</span>
         <span style={{ flex: 1 }} />
         {nonOkChips > 0 ? (
-          <span style={{ ...LABEL, ...FIG, color: t.warn, fontWeight: 700 }}>
+          <span style={{ ...LABEL, ...FIG, color: t.danger, fontWeight: 700 }}>
             {nonOkChips} not ok
           </span>
         ) : null}
@@ -156,7 +171,7 @@ export function SystemPanel({
                 textDecoration: 'none', color: 'inherit',
               }}
             >
-              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: t.warn, flexShrink: 0 }} />
+              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: t.danger, flexShrink: 0 }} />
               <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {b.label}
               </span>
@@ -306,7 +321,7 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
             {/* Starts at zero, no target marker, no percentage label: the figures
                 above already state it. A mostly-empty bar is the true picture. */}
             <div style={{ height: 6, borderRadius: 3, background: t.neutralSoft, overflow: 'hidden', marginTop: 8 }}>
-              <div style={{ width: `${Math.min(100, pct * 100)}%`, height: '100%', borderRadius: 3, background: t.brand }} />
+              <div style={{ width: `${Math.min(100, pct * 100)}%`, height: '100%', borderRadius: 3, background: t.ink }} />
             </div>
           </Link>
 
@@ -369,7 +384,7 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={KICKER}>Pipeline</span>
           <span style={{ flex: 1 }} />
-          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: dashToneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
           <ChevronRight size={14} color={t.inkFaint} aria-hidden />
         </div>
         {/* Names the WORK, not the table: "evaluation queue" explains nothing
@@ -387,7 +402,7 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
           <div style={{ display: 'flex', gap: 24 }}>
             <div>
               <div style={LABEL}>Waiting</div>
-              <div style={{ ...FIG, color: tone === 'ok' ? t.ink : toneColor(tone), fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+              <div style={{ ...FIG, color: tone === 'ok' ? t.ink : dashToneColor(tone), fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                 {num(p.unprocessed)}
               </div>
             </div>
@@ -418,7 +433,7 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
                 </span>
               ))}
               {p.retrying > 0 ? (
-                <span style={{ ...LABEL, ...FIG, color: t.warnText }}>
+                <span style={{ ...LABEL, ...FIG, color: t.dangerText }}>
                   Retrying <span style={{ fontWeight: 700 }}>{num(p.retrying)}</span>
                 </span>
               ) : null}
