@@ -213,3 +213,56 @@ export function ordinalSuffix(n: number): string {
   const v = n % 100;
   return s[(v - 20) % 10] || s[v] || s[0];
 }
+
+/**
+ * HELD GAUGE (BRIEF_MOVEMENT_RED_AND_HELD_BOARD).
+ *
+ * When the member holds the crown there is no gap to close, so the track stops
+ * being a chase and becomes a LEAD: full amber, with a 2px ink notch at the
+ * runner-up's position on the member's own scale. A tie at the top draws NO
+ * notch - a notch at 100% is indistinguishable from the end of the track.
+ *
+ * Amber here means the viewing member, the same rule as everywhere else on
+ * this surface.
+ */
+export const HeldGauge: React.FC<{
+  /** Runner-up's position on the member's scale, 0-100. Null = tie, no notch. */
+  notchPct: number | null;
+  nearestLabel: string;
+  holdLabel: string;
+}> = ({ notchPct, nearestLabel, holdLabel }) => {
+  const n = notchPct == null ? null : Math.max(2, Math.min(97, notchPct));
+  return (
+    <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
+      <div style={{ height: 6, background: A.TRACK, borderRadius: 3, position: 'relative' }}>
+        <span
+          style={{
+            display: 'block',
+            height: 6,
+            borderRadius: 3,
+            width: '100%',
+            background: A.AMBER,
+          }}
+        />
+        {n != null && (
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: -2,
+              left: `calc(${n}% - 1px)`,
+              width: 2,
+              height: 10,
+              background: A.INK,
+              borderRadius: 1,
+            }}
+          />
+        )}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+        <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums' }}>{nearestLabel}</span>
+        <span style={{ ...LABEL, color: A.AMBER }}>{holdLabel}</span>
+      </div>
+    </div>
+  );
+};
