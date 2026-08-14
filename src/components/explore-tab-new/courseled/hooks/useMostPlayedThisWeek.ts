@@ -40,6 +40,12 @@ export interface MostPlayedRow {
   /** Which of the four states the row renders. */
   move: MostPlayedMove;
   /**
+   * DISTINCT members with a tracked round here in the CURRENT seven days.
+   * The count on the right is ROUNDS, so this is the figure that says
+   * "4 rounds, by 3 members". No avatars, no profile join — a count.
+   */
+  members: number;
+  /**
    * Average to par over the CURRENT seven days, eighteen-hole scored rounds
    * only. Null when the course has no comparable scored round this week.
    */
