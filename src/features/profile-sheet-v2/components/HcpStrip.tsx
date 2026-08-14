@@ -201,7 +201,7 @@ const Shell: React.FC<{
 const LegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
     <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em' }}>{label}</span>
+    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em', color: '#3A424C' }}>{label}</span>
   </span>
 );
 
