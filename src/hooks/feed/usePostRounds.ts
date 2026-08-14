@@ -95,19 +95,36 @@ function stableIds(ids: (string | null | undefined)[]): string[] {
 }
 
 /**
- * The hole-strip gate (BRIEF_ROUND_POST_EMPTY_SCORECARD §1-2). Returns the
- * ordered shape ONLY when it is complete: every played hole scored, at least
- * one played hole. Anything partial - including a synced round of pars with no
- * scores - returns null so no consumer (strip, trajectory, analytics) can draw
- * a scorecard out of nothing.
+ * Minimum PLAYED holes that must carry a score for the strip to render.
+ *
+ * NOT DERIVED. The production distribution cannot distinguish a floor of 4 from
+ * a floor of 17: every affected round is missing either one to four holes or
+ * all eighteen. 12 is "most of a round", chosen so a strip that is mostly gaps
+ * can never render. Nothing in the data pins it.
  */
-function completeShape(
+const SCORED_FLOOR = 12;
+
+/**
+ * The hole-strip gate (BRIEF_ROUND_STRIP_PARTIAL_HOLES §1).
+ *
+ * Returns the ordered PLAYED holes, gaps included (gross null), when:
+ *   - a shape exists with at least one played hole, AND
+ *   - at least one played hole carries a score (the EMPTY case still drops -
+ *     BRIEF_ROUND_POST_EMPTY_SCORECARD stands for it), AND
+ *   - at least SCORED_FLOOR played holes carry a score.
+ *
+ * played = false holes are excluded: a hole nobody played is not part of the
+ * round. adjusted_gross is NEVER substituted for a missing cell.
+ */
+function renderableShape(
   shape: (PostRoundHole & { played: boolean })[] | null,
 ): PostRoundHole[] | null {
   if (!shape || shape.length === 0) return null;
   const playedHoles = shape.filter((h) => h.played);
   if (playedHoles.length === 0) return null;
-  if (playedHoles.some((h) => h.gross == null)) return null;
+  const scored = playedHoles.filter((h) => h.gross != null).length;
+  if (scored === 0) return null;
+  if (scored < Math.min(SCORED_FLOOR, playedHoles.length)) return null;
   return playedHoles
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
