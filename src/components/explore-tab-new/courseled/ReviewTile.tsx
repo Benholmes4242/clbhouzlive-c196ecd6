@@ -168,9 +168,9 @@ export function ReviewTile({
   const rows = (
     [
       ['design', t('discover.reviews.cat.design', 'Design'), r.breakdown?.design],
-      ['conditions', t('discover.reviews.cat.conditions', 'Cond'), r.breakdown?.conditions],
-      ['clubhouse', t('discover.reviews.cat.clubhouse', 'House'), r.breakdown?.clubhouse],
-      ['facilities', t('discover.reviews.cat.facilities', 'Fac'), r.breakdown?.facilities],
+      ['conditions', t('discover.reviews.cat.conditions', 'Condi'), r.breakdown?.conditions],
+      ['clubhouse', t('discover.reviews.cat.clubhouse', 'Club'), r.breakdown?.clubhouse],
+      ['facilities', t('discover.reviews.cat.facilities', 'Facil'), r.breakdown?.facilities],
     ] as Array<[string, string, number | null | undefined]>
   )
     .filter((row): row is [string, string, number] => row[2] != null && !Number.isNaN(Number(row[2])))

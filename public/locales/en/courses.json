@@ -1303,9 +1303,9 @@
       "sheetCaption": "{{count}} reviews",
       "cat": {
         "design": "Design",
-        "conditions": "Cond",
-        "clubhouse": "House",
-        "facilities": "Fac"
+        "conditions": "Condi",
+        "clubhouse": "Club",
+        "facilities": "Facil"
       }
     },
     "reactions": {
