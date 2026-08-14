@@ -296,7 +296,11 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
         {a && a.connected_in_window > 0 ? (
           <span style={{ ...LABEL, ...FIG }}>+{num(a.connected_in_window)} in {ops?.window_days ?? 7}d</span>
         ) : null}
-        <ChevronRight size={14} color={t.inkFaint} aria-hidden />
+        {/* NO HEADER CHEVRON. A CHEVRON MUST BE INSIDE THE THING IT
+            NAVIGATES, and this panel has THREE destinations with no single
+            panel-level one - a header chevron here pointed at nothing while the
+            rows that do navigate carried no affordance. The chevrons now sit
+            inside the headline link and the never-connected link. */}
       </div>
 
       {loading || !a ? (
@@ -315,8 +319,10 @@ export function ActivationPanel({ ops, loading }: { ops?: OpsHealth; loading: bo
               <span style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1 }}>
                 {num(a.connected)}
               </span>
-              <span style={{ color: t.inkMuted, fontSize: 12 }}>of {num(a.members_total)} members</span>
+              <span style={{ color: t.inkMuted, fontSize: 12, flex: 1, minWidth: 0 }}>of {num(a.members_total)} members</span>
+              <ChevronRight size={14} color={t.inkFaint} aria-hidden style={{ flexShrink: 0 }} />
             </div>
+
 
             {/* Starts at zero, no target marker, no percentage label: the figures
                 above already state it. A mostly-empty bar is the true picture. */}
