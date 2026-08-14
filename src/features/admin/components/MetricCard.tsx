@@ -35,7 +35,7 @@ function deltaState(rounded: number): DeltaState {
 }
 
 export default function MetricCard({
-  label, value, delta, deltaLabel, sparkline, to, loading,
+  label, value, delta, deltaLabel, sparkline, to, loading, sharePct,
 }: MetricCardProps) {
   // Slug the gradient id: `url(#spark-Sessions 7d)` is not a valid functional
   // IRI, the reference fails and the fill falls back to black. useId keeps it
