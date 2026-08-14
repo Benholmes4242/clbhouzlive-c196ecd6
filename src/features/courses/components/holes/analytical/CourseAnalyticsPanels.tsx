@@ -19,7 +19,7 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, FIGS, Hairline, KICKER, LABEL, Panel, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
 
 /** Labelled figure cell used by the How-it-plays strip and the extremes row. */
@@ -175,15 +175,10 @@ function monotoneSampler(pts: { x: number; y: number }[]): (x: number) => number
  * strip that colour of its one meaning. Red here reads DEMANDING, not bad -
  * the slope scale's convention.
  */
-const RAMP_EASY: [number, number, number] = [228, 233, 239];
-const RAMP_HARD: [number, number, number] = [154, 32, 26];
-const RAMP_HARD_HEX = '#9A201A';
-
-function rampColor(t: number): string {
-  const k = Math.max(0, Math.min(1, t));
-  const c = RAMP_EASY.map((a, i) => Math.round(a + (RAMP_HARD[i] - a) * k));
-  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
-}
+/* Values live in ./tokens as difficultyRampColor so the hole rows grade on the
+   SAME ramp as this chart (BRIEF_HOLE_BY_HOLE_COLOUR §2). Unchanged tones. */
+const RAMP_HARD_HEX = DIFFICULTY_HARD_HEX;
+const rampColor = difficultyRampColor;
 
 /** Shape chart - graded bars are the field, the amber line is the member. */
 const ShapeChart: React.FC<{
@@ -478,7 +473,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const beastFig = toParParts(stats.hardest.avg_to_par);
   const bestFig = toParParts(stats.easiest.avg_to_par);
 
-  const scale = buildHoleScale(holes, myByHole);
+  const scale = buildHoleScale(holes, myByHole, totalRounds);
 
   const hardestLabel = t('courses:courseDetail.plays.hardestHole');
   const easiestLabel = t('courses:courseDetail.plays.easiestHole');
