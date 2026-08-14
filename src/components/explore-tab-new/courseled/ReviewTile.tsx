@@ -6,9 +6,9 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
-import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
+import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
+import { ratingTone } from './reviewRatingTone';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -156,6 +156,20 @@ export function ReviewTile({
       v.preload = 'none';
     }
   }, [active, r.mediaUrl]);
+
+  // BREAKDOWN ROWS — only the categories the member actually scored. Nulls are
+  // the common case in the composer, so an absent category is simply absent:
+  // no empty track, no zero, no "n/a".
+  const rows = (
+    [
+      ['design', t('discover.reviews.cat.design', 'Design'), r.breakdown?.design],
+      ['conditions', t('discover.reviews.cat.conditions', 'Cond'), r.breakdown?.conditions],
+      ['clubhouse', t('discover.reviews.cat.clubhouse', 'House'), r.breakdown?.clubhouse],
+      ['facilities', t('discover.reviews.cat.facilities', 'Fac'), r.breakdown?.facilities],
+    ] as Array<[string, string, number | null | undefined]>
+  )
+    .filter((row): row is [string, string, number] => row[2] != null && !Number.isNaN(Number(row[2])))
+    .map(([key, label, value]) => ({ key, label, value: Number(value) }));
 
   return (
     <button
