@@ -303,6 +303,11 @@ export const PostRoundCard: React.FC<Props> = ({
 
   const holes = round.holeShape ?? [];
   const hasHoles = holes.length > 0;
+  // §5 — has_holes is now true for PARTIAL cards too, so a reading needs both
+  // counts to tell a complete card from a partial one. played_holes is the shape
+  // length (played = false holes are already excluded upstream).
+  const playedHoles = holes.length;
+  const scoredHoles = holes.filter((h) => h.gross != null).length;
   const showCrown = (notability ?? 0) === 3 && !!crown && !!crown.previousHolderName;
 
   useEffect(() => {
@@ -315,6 +320,8 @@ export const PostRoundCard: React.FC<Props> = ({
         io.disconnect();
         analyticsEvents.track('feed_round_card_shown', {
           has_holes: hasHoles,
+          played_holes: playedHoles,
+          scored_holes: scoredHoles,
         });
         const key = postId ?? round.whsScoreId;
         if (!seenRoundPosts.has(key)) {
@@ -324,6 +331,8 @@ export const PostRoundCard: React.FC<Props> = ({
             post_id: postId ?? null,
             notability: notability ?? null,
             has_holes: hasHoles,
+            played_holes: playedHoles,
+            scored_holes: scoredHoles,
             has_crown: showCrown,
           });
         }
@@ -332,7 +341,7 @@ export const PostRoundCard: React.FC<Props> = ({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasHoles, postId, notability, showCrown, round.whsScoreId]);
+  }, [hasHoles, playedHoles, scoredHoles, postId, notability, showCrown, round.whsScoreId]);
 
   const gross = round.grossScore;
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
