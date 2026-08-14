@@ -46,22 +46,15 @@ const RAIL_CAP = 10;
 const CARD_W = 224;
 const PHOTO_H = 104;
 
-/** Rail scrim — reaches further up now that the score chip sits on the photo. */
-const RAIL_SCRIM =
-  'linear-gradient(0deg, rgba(10,14,10,0.66) 0%, rgba(10,14,10,0.28) 38%, rgba(10,14,10,0) 72%)';
+/* Rail scrim — THREE LAYERS, now defined once in ./photoScrim and shared with
+   OnTourThisWeek so the two rails can never drift apart. The rationale for the
+   hotspot is preserved there: a glass chip over a photo must stay readable on
+   EVERY photo, and the answer is STRENGTHENING THE SCRIM UNDER THE CHIP rather
+   than darkening the glass. */
+const RAIL_SCRIM = SCRIM_BASE;
+const SCRIM_CHIP = SCRIM_HOTSPOT;
+const SCRIM_TOP = SCRIM_TOP_BAND;
 
-/* A GLASS CHIP OVER A PHOTO MUST STAY READABLE ON EVERY PHOTO, and the answer
-   is STRENGTHENING THE SCRIM UNDER THE CHIP rather than darkening the glass.
-   Measured on the brightest images in the catalogue and on a synthetic pure-white
-   worst case: this footprint-sized pool holds white text above 4.5:1 even on
-   pure white, while leaving the rest of the frame within ~5% of its brightness.
-   A wider pool cleared contrast too but visibly muddied the photograph. */
-const SCRIM_CHIP =
-  'radial-gradient(92% 132% at 2% 86%, rgba(8,12,8,0.86) 0%, rgba(8,12,8,0.52) 56%, rgba(8,12,8,0) 88%)';
-
-/** The base scrim is bottom-weighted, so the when-chip needs its own top band. */
-const SCRIM_TOP =
-  'linear-gradient(180deg, rgba(8,12,8,0.34) 0%, rgba(8,12,8,0.10) 30%, rgba(8,12,8,0) 52%)';
 
 /* ────────────────────────────── GLASS ────────────────────────────────────
    backdrop-filter is the whole point of this design and it is the property
