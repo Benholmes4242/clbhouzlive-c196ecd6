@@ -10,6 +10,12 @@
  * the counter strip becomes PAR / COURSE RATING / SLOPE - a panel whose hero
  * figure is missing must never render blank.
  *
+ * BRIEF_COURSE_CARD_EVERY_TEE: the panel now holds EVERY tee set and shows one.
+ * All of them sit beneath the headline as label / graded track / slope / yardage,
+ * ordered hardest first, with the resolved tee at full opacity and the rest
+ * faded. Tapping a row re-reads the whole panel and writes the same remembered
+ * tee the sheet's pills do - ONE selection, owned by CourseCardPanel.
+ *
  * The sheet is a refined table: tee pills carrying their yardage, a four-cell
  * summary panel, then the scorecard with a hairline above OUT / IN / TOTAL and
  * nothing between hole rows. No zebra striping, no length bars.
