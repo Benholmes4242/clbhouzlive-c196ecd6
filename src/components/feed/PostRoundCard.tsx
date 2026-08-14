@@ -93,14 +93,14 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     >
       {label}
     </span>
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total ?? '—'}</span>
-      <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
-        {fmtToPar(toPar)}
+    {total == null ? null : (
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total}</span>
+        <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
+          {fmtToPar(toPar)}
+        </span>
       </span>
-    </span>
-  </div>
-);
+    )}
 
 /**
  * A played hole with no score (the member picked up). BRIEF_ROUND_STRIP_PARTIAL_HOLES
