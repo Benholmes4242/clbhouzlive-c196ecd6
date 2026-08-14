@@ -1,17 +1,31 @@
 /**
  * HoleRowV2 - the hole-by-hole row in the analytical treatment
- * (BRIEF_COURSE_TAB_ANALYTICAL_V2 section 4, BRIEF_HOLE_BY_HOLE_REFINE).
+ * (BRIEF_COURSE_TAB_ANALYTICAL_V2 section 4, BRIEF_HOLE_BY_HOLE_REFINE,
+ * BRIEF_HOLE_BY_HOLE_COLOUR).
  *
  * The collapsed row is ONE line: HOLE / PAR / SI / distribution ramp / the two
- * figures. The ramp is a NEUTRAL INK RAMP (light = birdie or better, dark =
- * double or worse) and its segment widths are proportions of ROUNDS.
+ * figures. Segment widths are proportions of ROUNDS.
+ *
+ * THE RAMP TAKES THE TO-PAR CONVENTION (RAMP_TOPAR: under-par RED, par neutral,
+ * bogey mid, double+ ink). It used to be a NEUTRAL INK RAMP - that decision is
+ * OVERTURNED, not forgotten: the row prints a legend naming Birdie+, Par, Bogey
+ * and Double+, and a single hue made a birdie hole indistinguishable from a
+ * double hole until you read the figure. The round post and the scorecard sheet
+ * already draw these four buckets in the to-par convention, so this panel joins
+ * one rather than inventing one. Red at the GOOD end is that convention - do
+ * not "fix" it to green. A ZERO bucket keeps a hairline at reduced opacity so
+ * the bar always reads as four parts and agrees with the expanded percentages.
  *
  * NO MARKERS SIT ON THE RAMP. They used to, positioned against scaleMax (a
  * to-par domain shared across every hole), which put two unrelated quantities
  * on one x axis: a member reading "my dot lands where par meets bogey" was
- * reading a coincidence. scaleMax survives - it now drives a SEPARATE thin
- * difficulty track inside the expanded detail, where the track is visibly its
- * own scale and carries a caption saying what it measures.
+ * reading a coincidence. That reasoning survives the colour change intact.
+ * scaleMax drives a SEPARATE thin difficulty track inside the expanded detail,
+ * which keeps its caption and is GRADED on the shared difficulty ramp (pale =
+ * easiest hole on the course, deep red = hardest). Grading is SUPPRESSED below
+ * DIFFICULTY_ROUNDS_FLOOR, because ranking 18 holes from a handful of rounds
+ * produces a confident-looking ordering out of noise. Colouring the ramp is not
+ * suppressed: a single bogey IS a bogey.
  *
  * Derivation only - the rows come from get_course_hole_analysis and
  * get_my_hole_performance, both already loaded by the page.
@@ -20,7 +34,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
-import { A, FIGS, Hairline, LABEL, RAMP, SANS, toParParts } from './tokens';
+import { A, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, toParParts } from './tokens';
+
 
 /** HOLE / PAR / SI / ramp / figures. Load-bearing: columns never size to content. */
 export const HOLE_GRID_V2 = '28px 26px 24px 1fr auto';
