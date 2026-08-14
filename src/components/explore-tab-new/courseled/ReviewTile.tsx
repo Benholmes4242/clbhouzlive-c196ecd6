@@ -167,10 +167,13 @@ export function ReviewTile({
   // no empty track, no zero, no "n/a".
   const rows = (
     [
-      ['design', t('discover.reviews.cat.design', 'Design'), r.breakdown?.design],
-      ['conditions', t('discover.reviews.cat.conditions', 'Condi'), r.breakdown?.conditions],
-      ['clubhouse', t('discover.reviews.cat.clubhouse', 'Club'), r.breakdown?.clubhouse],
-      ['facilities', t('discover.reviews.cat.facilities', 'Facil'), r.breakdown?.facilities],
+      // SAME KEYS AS Top100CourseStatsPanel — the two surfaces render these
+      // labels through the same SubScoreBar, so they cannot drift and every
+      // language comes free.
+      ['design', t('top100.stats.design', 'Design'), r.breakdown?.design],
+      ['conditions', t('top100.stats.condition', 'Condition'), r.breakdown?.conditions],
+      ['clubhouse', t('top100.stats.clubhouse', 'Clubhouse'), r.breakdown?.clubhouse],
+      ['facilities', t('top100.stats.facilities', 'Facilities'), r.breakdown?.facilities],
     ] as Array<[string, string, number | null | undefined]>
   )
     .filter((row): row is [string, string, number] => row[2] != null && !Number.isNaN(Number(row[2])))

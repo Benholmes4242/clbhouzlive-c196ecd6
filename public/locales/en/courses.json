@@ -1399,7 +1399,11 @@
     "momentsCount_one": "{{count}} moment",
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedNew": "New",
-    "mostPlayedLevel": "Level"
+    "mostPlayedLevel": "Level",
+    "mostPlayedAvgToParBy_one": "Played to {{value}} by {{count}} member",
+    "mostPlayedAvgToParBy_other": "Played to {{value}} by {{count}} members",
+    "mostPlayedMembers_one": "{{count}} member",
+    "mostPlayedMembers_other": "{{count}} members"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

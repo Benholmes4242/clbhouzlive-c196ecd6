@@ -1394,7 +1394,11 @@
     "momentsCount_one": "[~~{{count}} ɱőɱéñţ~~]",
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedNew": "New",
-    "mostPlayedLevel": "Level"
+    "mostPlayedLevel": "Level",
+    "mostPlayedAvgToParBy_one": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéř~~]",
+    "mostPlayedAvgToParBy_other": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéřš~~]",
+    "mostPlayedMembers_one": "[~~{{count}} ménƀéř~~]",
+    "mostPlayedMembers_other": "[~~{{count}} ménƀéřš~~]"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",
