@@ -3,9 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 
 /**
- * useFriendsLatestRounds
- * ----------------------
- * Powers the "Friends' latest rounds" section on Discover AND its View-all sheet.
+ * useCircleLatestRounds
+ * ---------------------
+ * Powers "Who's been playing" on Discover AND its View-all sheet.
+ *
+ * THE CIRCLE (BRIEF_WHOS_BEEN_PLAYING) = accepted friendships UNION the people
+ * the member FOLLOWS (outbound only). When the circle supplies fewer than
+ * `limit` rounds the shortfall is filled with SUGGESTED rounds from outside it,
+ * one per member, feats first — so the section is never empty for a new member.
+ * Circle rounds always come first and are never displaced.
  * A single hook, one round-trip per data source, grouped client-side. Read
  * usePulseFriends.ts for the friend-resolution reference — this hook does
  * not modify or share cache with it.
@@ -31,7 +37,7 @@ import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 export type { RoundFeatKey, RoundFeat } from '@/lib/gam/roundFeats';
 export { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 
-export interface FriendRoundRow {
+export interface CircleRoundRow {
   round_id: string;
   score_id: string | null;
   connection_id: string | null;
@@ -78,7 +84,14 @@ export interface FriendRoundRow {
   is_course_record: boolean;
   /** Their first ever sub-80 round. */
   is_first_sub_80: boolean;
+  /**
+   * TRUE when the round comes from OUTSIDE the member's circle, filling a
+   * shortfall so the rail is never empty (BRIEF_WHOS_BEEN_PLAYING §3). The
+   * tile marks it; the tap behaves identically.
+   */
+  suggested: boolean;
 }
+
 
 
 
@@ -92,52 +105,42 @@ interface Options {
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS = 60;
 
-export function useFriendsLatestRounds(
+export function useCircleLatestRounds(
   userId: string | undefined,
   { limit = 4, allowMultiplePerFriend = false }: Options = {},
 ) {
   return useQuery({
-    queryKey: ['friends-latest-rounds', userId, limit, allowMultiplePerFriend],
-    queryFn: async (): Promise<FriendRoundRow[]> => {
+    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend],
+    queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
 
-      // 1. Accepted friendships (bidirectional)
-      const { data: friendships } = await supabase
-        .from('user_friends')
-        .select('user_id, friend_id')
-        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-        .eq('status', 'accepted');
+      // 1. THE CIRCLE = accepted friendships (bidirectional) UNION the people
+      //    the member FOLLOWS. Outbound follows only: following is a choice the
+      //    member made, being followed is somebody else's choice and must never
+      //    put a stranger's rounds here (BRIEF_WHOS_BEEN_PLAYING 1.2).
+      //
+      //    NO EXTRA VISIBILITY PREDICATE (1.3). gam_round_stats RLS already
+      //    grants through can_view_handicap(), which requires an accepted
+      //    friendship for anyone on handicap_visibility 'friends'. A followed
+      //    member who restricted themselves drops out on their own terms.
+      const [friendsRes, followsRes] = await Promise.all([
+        supabase
+          .from('user_friends')
+          .select('user_id, friend_id')
+          .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+          .eq('status', 'accepted'),
+        supabase.from('user_follows').select('following_id').eq('follower_id', userId),
+      ]);
 
-      const friendIds = Array.from(
-        new Set(
-          (friendships ?? []).map((f: { user_id: string; friend_id: string }) =>
-            f.user_id === userId ? f.friend_id : f.user_id,
-          ),
-        ),
-      ).filter(Boolean) as string[];
-      if (friendIds.length === 0) return [];
-
-      // 2. Profiles (name + avatar)
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, profile_photo_url')
-        .in('id', friendIds);
-      const profileById = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
-      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null }>) {
-        profileById.set(p.id, { display_name: p.display_name, profile_photo_url: p.profile_photo_url });
+      const circleSet = new Set<string>();
+      for (const f of (friendsRes.data ?? []) as Array<{ user_id: string; friend_id: string }>) {
+        const other = f.user_id === userId ? f.friend_id : f.user_id;
+        if (other && other !== userId) circleSet.add(other);
       }
-
-      // 3. Rounds — WINDOW_DAYS lookback, ordered newest first.
-      const windowStartIso = new Date(Date.now() - WINDOW_DAYS * DAY_MS).toISOString().slice(0, 10);
-      const { data: rounds } = await supabase
-        .from('gam_round_stats' as never)
-        .select(
-          'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80',
-        )
-        .in('user_id', friendIds)
-        .gte('play_date', windowStartIso)
-        .eq('holes_played', 18)
-        .order('play_date', { ascending: false });
+      for (const f of (followsRes.data ?? []) as Array<{ following_id: string | null }>) {
+        if (f.following_id && f.following_id !== userId) circleSet.add(f.following_id);
+      }
+      const circleIds = Array.from(circleSet);
 
       type Round = {
         user_id: string;
@@ -159,36 +162,103 @@ export function useFriendsLatestRounds(
         sub_80: boolean | null;
       };
 
+      const ROUND_COLS =
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80';
 
-      const allRounds = ((rounds ?? []) as unknown) as Round[];
-      if (allRounds.length === 0) return [];
+      // 2. Circle rounds — WINDOW_DAYS lookback, ordered newest first.
+      const windowStartIso = new Date(Date.now() - WINDOW_DAYS * DAY_MS).toISOString().slice(0, 10);
+      let circleRounds: Round[] = [];
+      if (circleIds.length > 0) {
+        const { data: rounds } = await supabase
+          .from('gam_round_stats' as never)
+          .select(ROUND_COLS)
+          .in('user_id', circleIds)
+          .gte('play_date', windowStartIso)
+          .eq('holes_played', 18)
+          .order('play_date', { ascending: false });
+        circleRounds = ((rounds ?? []) as unknown) as Round[];
+      }
 
-      // 4. Pick rounds per friend. Default: newest round per friend.
-      // Sheet-mode fallback: if fewer than `limit` friends have any rounds,
-      // allow up to 3 rounds per friend to fill the sheet.
-      const byFriend = new Map<string, Round[]>();
-      for (const r of allRounds) {
-        const arr = byFriend.get(r.user_id) ?? [];
+      // 3. Pick rounds per circle member. Default: newest round each.
+      // Sheet-mode fallback: if fewer than `limit` members have any rounds,
+      // allow up to 3 rounds per member to fill the sheet.
+      const byMember = new Map<string, Round[]>();
+      for (const r of circleRounds) {
+        const arr = byMember.get(r.user_id) ?? [];
         arr.push(r);
-        byFriend.set(r.user_id, arr);
+        byMember.set(r.user_id, arr);
       }
 
       const pickedRounds: Round[] = [];
-      const friendsWithRounds = Array.from(byFriend.keys());
-      if (allowMultiplePerFriend && friendsWithRounds.length > 0 && friendsWithRounds.length < limit) {
-        for (const fid of friendsWithRounds) {
-          const list = byFriend.get(fid) ?? [];
+      const membersWithRounds = Array.from(byMember.keys());
+      if (allowMultiplePerFriend && membersWithRounds.length > 0 && membersWithRounds.length < limit) {
+        for (const fid of membersWithRounds) {
+          const list = byMember.get(fid) ?? [];
           pickedRounds.push(...list.slice(0, 3));
         }
       } else {
-        for (const fid of friendsWithRounds) {
-          const list = byFriend.get(fid) ?? [];
+        for (const fid of membersWithRounds) {
+          const list = byMember.get(fid) ?? [];
           if (list[0]) pickedRounds.push(list[0]);
         }
       }
       pickedRounds.sort((a, b) => b.play_date.localeCompare(a.play_date));
-      const rowsWindow = pickedRounds.slice(0, limit);
+      const circleWindow = pickedRounds.slice(0, limit);
+
+      // 4. SUGGESTED FILL (BRIEF_WHOS_BEEN_PLAYING §3). Circle rounds always
+      //    come first and are never displaced; suggested rounds only occupy the
+      //    shortfall, so they fall away on their own as the circle grows.
+      //    ONE ROUND PER MEMBER, feats first then most recent. Same window,
+      //    same holes_played, no `.in('user_id', …)` — RLS decides visibility.
+      const shortfall = limit - circleWindow.length;
+      const suggestedWindow: Round[] = [];
+      if (shortfall > 0) {
+        const { data: pool } = await supabase
+          .from('gam_round_stats' as never)
+          .select(ROUND_COLS)
+          .gte('play_date', windowStartIso)
+          .eq('holes_played', 18)
+          .order('play_date', { ascending: false })
+          .limit(400);
+        const excluded = new Set<string>([userId, ...circleIds]);
+        const bestByMember = new Map<string, Round>();
+        for (const r of ((pool ?? []) as unknown) as Round[]) {
+          if (excluded.has(r.user_id)) continue;
+          const cur = bestByMember.get(r.user_id);
+          if (!cur) {
+            bestByMember.set(r.user_id, r);
+            continue;
+          }
+          // A stranger's round needs a reason to be interesting: prefer the
+          // one carrying feats, and only then the more recent.
+          const curFeats = deriveRoundFeats(cur).length;
+          const nextFeats = deriveRoundFeats(r).length;
+          if (nextFeats > curFeats) bestByMember.set(r.user_id, r);
+        }
+        const ranked = Array.from(bestByMember.values()).sort((a, b) => {
+          const fa = deriveRoundFeats(a).length > 0 ? 1 : 0;
+          const fb = deriveRoundFeats(b).length > 0 ? 1 : 0;
+          if (fa !== fb) return fb - fa;
+          return b.play_date.localeCompare(a.play_date);
+        });
+        suggestedWindow.push(...ranked.slice(0, shortfall));
+      }
+
+      const rowsWindow = [...circleWindow, ...suggestedWindow];
       if (rowsWindow.length === 0) return [];
+      const suggestedIds = new Set(suggestedWindow.map((r) => r.whs_score_id ?? `${r.user_id}-${r.play_date}`));
+
+      // 5. Profiles (name + avatar) — ONE read covering circle AND suggested.
+      const surfacedUserIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, profile_photo_url')
+        .in('id', surfacedUserIds);
+      const profileById = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
+      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null }>) {
+        profileById.set(p.id, { display_name: p.display_name, profile_photo_url: p.profile_photo_url });
+      }
+
 
       // 5. whs_scores lookup for net (option 1.2a) + connection_id for opener.
       const scoreIds = rowsWindow.map((r) => r.whs_score_id).filter((v): v is string => !!v);
@@ -388,7 +458,7 @@ export function useFriendsLatestRounds(
 
 
       // 8. Assemble rows.
-      const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
+      const out: CircleRoundRow[] = rowsWindow.map((r): CircleRoundRow => {
         const profile = profileById.get(r.user_id);
         const score = r.whs_score_id ? scoreById.get(r.whs_score_id) : undefined;
         const net =
@@ -436,6 +506,8 @@ export function useFriendsLatestRounds(
           is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
           is_first_sub_80:
             r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
+          suggested: suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+
         };
 
       });

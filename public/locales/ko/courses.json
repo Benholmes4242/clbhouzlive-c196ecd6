@@ -872,7 +872,9 @@
     },
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} moments",
-    "momentsCount_one": "{{count}} moment"
+    "momentsCount_one": "{{count}} moment",
+    "whosBeenPlaying": "플레이한 사람",
+    "suggestedMark": "추천"
   },
   "statBrowse": {
     "colArea": "지역",

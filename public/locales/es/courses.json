@@ -769,7 +769,6 @@
   "discover": {
     "friendsRounds": {
       "overline": "TU CÍRCULO",
-      "title": "Últimas rondas de amigos",
       "viewAll": "Ver todo",
       "entrySingular": "RONDA",
       "entryPlural": "RONDAS",
@@ -917,7 +916,9 @@
     },
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} momentos",
-    "momentsCount_one": "{{count}} momento"
+    "momentsCount_one": "{{count}} momento",
+    "whosBeenPlaying": "Quién ha jugado",
+    "suggestedMark": "SUGERIDO"
   },
   "statBrowse": {
     "colArea": "Zona",

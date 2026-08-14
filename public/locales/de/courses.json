@@ -769,7 +769,6 @@
   "discover": {
     "friendsRounds": {
       "overline": "DEIN KREIS",
-      "title": "Neueste Runden von Freunden",
       "viewAll": "Alle ansehen",
       "entrySingular": "RUNDE",
       "entryPlural": "RUNDEN",
@@ -917,7 +916,9 @@
     },
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} Momente",
-    "momentsCount_one": "{{count}} Moment"
+    "momentsCount_one": "{{count}} Moment",
+    "whosBeenPlaying": "Wer gespielt hat",
+    "suggestedMark": "VORSCHLAG"
   },
   "statBrowse": {
     "colArea": "Gebiet",

@@ -1100,7 +1100,6 @@
   "discover": {
     "friendsRounds": {
       "overline": "[~~ÝŐÚŘ ĈÍŘĈĻÉ~~]",
-      "title": "[~~Ƒříéñđš' ļáţéšţ řőúñđš~~]",
       "viewAll": "[~~Ṽíéŵ áļļ~~]",
       "entrySingular": "[~~ŘŐÚÑĐ~~]",
       "entryPlural": "[~~ŘŐÚÑĐŠ~~]",
@@ -1206,7 +1205,6 @@
     "seeAll": "[~~Šéé áļļ~~]",
     "aMember": "[~~Á ɱéɱƀéř~~]",
     "unknownCourse": "[~~Ĉőúřšé~~]",
-    "friendsPlayed": "[~~Ŵĥéřé ýőúř ƒříéñđš ƥļáýéđ~~]",
     "aroundTheWorld": "[~~Šţáñđőúţ řőúñđš~~]",
     "last90": "[~~Ļášţ 90 đáýš~~]",
     "last90lower": "[~~ļášţ 90 đáýš~~]",
@@ -1392,7 +1390,9 @@
     "mostPlayedAvgToParBy_one": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéř~~]",
     "mostPlayedAvgToParBy_other": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéřš~~]",
     "mostPlayedMembers_one": "[~~{{count}} ménƀéř~~]",
-    "mostPlayedMembers_other": "[~~{{count}} ménƀéřš~~]"
+    "mostPlayedMembers_other": "[~~{{count}} ménƀéřš~~]",
+    "whosBeenPlaying": "[Ẁḩǿ'ş ƀḗḗƞ ƥŀȧẏīƞğ]",
+    "suggestedMark": "[ŞŲĠĠḖŞŢḖḐ]"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap } from './friendRoundParts';
-import { useFriendsLatestRounds } from '@/hooks/gam/useFriendsLatestRounds';
+import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -23,7 +23,7 @@ const SHEET_LIMIT = 30;
 
 export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: Props) {
   const { t } = useTranslation('courses');
-  const { data: rounds } = useFriendsLatestRounds(userId, {
+  const { data: rounds } = useCircleLatestRounds(userId, {
     limit: SHEET_LIMIT,
     allowMultiplePerFriend: true,
   });
@@ -70,7 +70,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             color: INK,
           }}
         >
-          {t('discover.friendsRounds.title', "Friends' latest rounds")}
+          {t('discover.whosBeenPlaying', "Who's been playing")}
         </div>
       </div>
 

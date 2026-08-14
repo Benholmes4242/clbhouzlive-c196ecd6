@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import {
   toParFor,
   buildInsightMap,
@@ -25,13 +25,16 @@ import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
-import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
+import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
- * Section 1 — WHERE YOUR FRIENDS PLAYED (BRIEF_FRIENDS_PLAYED_TILE_GLASS).
+ * Section 1 — WHO'S BEEN PLAYING (BRIEF_FRIENDS_PLAYED_TILE_GLASS +
+ * BRIEF_WHOS_BEEN_PLAYING). One heading for all three states: circle only,
+ * circle plus suggested, suggested only — a heading that flips as a member
+ * adds people is a change they have to notice and decode.
  *
  * A horizontal rail: a week of heavy play grows sideways, never down. One card
- * per friend-round, newest first, capped at ten.
+ * per round, circle first then suggested, capped at ten.
  *
  * THE SCORE LIVES ON THE PHOTO as a glass chip, so the band below belongs
  * entirely to the SHAPE of the round: a 19-point cumulative to-par curve from
@@ -41,10 +44,11 @@ import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SAN
  * fallback drawn from the same two figures the subline is written from.
  *
  * A hole in one puts the GOLD ring on the when-chip — the only gold on the card.
- * No friends or no rounds: the section does not render at all.
+ * Nothing at all to show — no circle rounds and no suggested pool — and the
+ * section does not render.
  */
 
-const RAIL_CAP = 10;
+export const RAIL_CAP = 10;
 const CARD_W = 224;
 const PHOTO_H = 104;
 
@@ -84,7 +88,7 @@ const GLASS_CSS = `
 `;
 
 /* ───────────────────────────── THE SHAPE ─────────────────────────────────
-   THREE POINTS, NOT EIGHTEEN. FriendRoundRow carries front_nine_to_par and
+   THREE POINTS, NOT EIGHTEEN. CircleRoundRow carries front_nine_to_par and
    back_nine_to_par and nothing between them, so the curve is level → the turn
    → the finish. That is EXACTLY what the subline is generated from, so the
    drawing and the sentence can never disagree, and it costs no extra query.
@@ -126,7 +130,7 @@ const UNDER_TONE = TOPAR_RED;
  * A straight line from zero to the total would be a claim about a round that
  * was not measured, so the last case draws nothing at all.
  */
-function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | null }) {
+function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | null }) {
   const { t } = useTranslation('courses');
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
@@ -370,13 +374,13 @@ interface Props {
   userId: string | undefined;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
   lastSeen?: number | null;
-  onCardPress: (row: FriendRoundRow) => void;
+  onCardPress: (row: CircleRoundRow) => void;
   onSeeAll: () => void;
 }
 
 export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
-  const roundsQuery = useFriendsLatestRounds(userId, {
+  const roundsQuery = useCircleLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
   });
@@ -428,7 +432,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
         dot={newCount > 0}
         aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}
       >
-        {t('discover.friendsPlayed', 'Where your friends played')}
+        {t('discover.whosBeenPlaying', "Who's been playing")}
       </Eyebrow>
 
       <div
@@ -495,6 +499,30 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 >
                   {relativeDay(r.play_date, t)}
                 </span>
+
+                {/* THE SUGGESTED MARK (BRIEF_WHOS_BEEN_PLAYING 3.5). A round
+                    from outside the circle says so, in the KICKER token, inside
+                    the tile's EXISTING chrome — the same glass chip the when
+                    label uses, so it stays legible over a bright sky where a
+                    bare white label would disappear. No follow button: this
+                    card's whole job is to show a round. */}
+                {r.suggested && (
+                  <span
+                    className="fpg-chip"
+                    style={{
+                      ...KICKER,
+                      position: 'absolute',
+                      top: 8,
+                      left: 8,
+                      color: '#FFFFFF',
+                      borderRadius: 999,
+                      padding: '3px 7px',
+                    }}
+                  >
+                    {t('discover.suggestedMark', 'SUGGESTED')}
+                  </span>
+                )}
+
 
                 {/* THE GLASS SCORE CHIP. Lifting the score onto the photo makes
                     the photo carry data rather than decoration, and gives the

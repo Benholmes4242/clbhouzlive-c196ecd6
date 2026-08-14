@@ -17,6 +17,8 @@ import { DISCOVER_PROMPT_KEY } from '../discoverQueryKeys';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCareerRounds } from '@/hooks/gam/useCareerRounds';
 import { useFriendIdSet } from './useFriendIdSet';
+import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { RAIL_CAP } from '../FriendsPlayedRail';
 
 export type DiscoverPromptKind = 'rate' | 'finish' | 'photo' | 'friends';
 
@@ -147,6 +149,15 @@ export function useDiscoverPrompt(userId: string | undefined): {
     );
   }, [needPhoto, rounds.data, posted.data]);
 
+  // The SAME query the rail runs — identical key and options, so this reads the
+  // rail's cache and adds no round-trip.
+  const circleRounds = useCircleLatestRounds(userId, {
+    limit: RAIL_CAP,
+    allowMultiplePerFriend: true,
+  });
+
+
+
   if (!userId) return { prompt: null, resolved: true };
 
   if (unratedLoading) return { prompt: null, resolved: false };
@@ -197,9 +208,16 @@ export function useDiscoverPrompt(userId: string | undefined): {
     };
   }
 
-  if (friendIds.isLoading) return { prompt: null, resolved: false };
+  if (friendIds.isLoading || circleRounds.isPending) return { prompt: null, resolved: false };
 
-  if ((friendIds.data?.size ?? 0) === 0) {
+  // 4 friends — LAST, and it STANDS DOWN while "Who's been playing" is showing
+  // suggested tiles (BRIEF_WHOS_BEEN_PLAYING 4.1/4.2). Its copy promises rounds
+  // that would then be visible directly beneath it, and two asks for the same
+  // thing on one screen is one too many. The kind, its copy and its route to
+  // the Find golfers sheet all remain: this is still the right prompt when the
+  // rail genuinely cannot fill.
+  const railRows = circleRounds.data ?? [];
+  if ((friendIds.data?.size ?? 0) === 0 && railRows.length === 0) {
     return {
       resolved: true,
       prompt: {
@@ -211,6 +229,7 @@ export function useDiscoverPrompt(userId: string | undefined): {
       },
     };
   }
+
 
   return { prompt: null, resolved: true };
 }

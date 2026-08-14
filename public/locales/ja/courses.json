@@ -872,7 +872,9 @@
     },
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} moments",
-    "momentsCount_one": "{{count}} moment"
+    "momentsCount_one": "{{count}} moment",
+    "whosBeenPlaying": "プレーした人",
+    "suggestedMark": "おすすめ"
   },
   "statBrowse": {
     "colArea": "エリア",
