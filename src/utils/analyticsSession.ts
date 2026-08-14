@@ -46,3 +46,20 @@ export function getSessionId(): string {
   safeLocalStorage.set(SEEN_KEY, String(now));
   return id;
 }
+
+/**
+ * THE user agent accessor for analytics props. One definition, because the
+ * server-side bot filters read `ua ILIKE ...` and a NULL ua makes the whole
+ * predicate NULL — `NOT NULL` is NULL, so an unlabelled row is silently
+ * dropped from WAU, MAU, cohorts and the funnel. Every emitter must stamp it.
+ *
+ * Never throws and never returns undefined: a missing navigator yields ''.
+ */
+export function getUserAgent(): string {
+  try {
+    if (typeof navigator === 'undefined' || !navigator) return '';
+    return (navigator.userAgent || '').slice(0, 200);
+  } catch {
+    return '';
+  }
+}
