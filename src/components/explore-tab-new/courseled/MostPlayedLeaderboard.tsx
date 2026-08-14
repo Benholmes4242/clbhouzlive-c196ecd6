@@ -43,6 +43,10 @@ export function MostPlayedLeaderboard({
   // gam_round_stats, so only the THUMBNAIL waits — the shimmer sits in that slot
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
+  // BAR SCALE: the RENDERED SET. This section is a ranking, not an absolute
+  // measure, so the top row always fills. The sheet shows more courses and so
+  // may scale differently — stated in the brief report.
+  const maxCount = shown.reduce((m, r) => Math.max(m, r.count), 0) || 1;
 
   if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
