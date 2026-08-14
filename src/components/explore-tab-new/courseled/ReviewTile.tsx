@@ -261,10 +261,12 @@ export function ReviewTile({
           </span>
         )}
 
-        {/* SCORE CHIP — glass badge: the figure, then the scale. A 10px radius
-            rectangle, not a pill: a pill against a square tile corner reads as
-            a foreign shape. */}
+        {/* SCORE CHIP — GLASS, matching the friends rail, the standout tiles
+            and the tour tiles. The flat, higher-opacity fill is the BASE and
+            the blur is the @supports enhancement: this chip sits over a
+            photograph and unreadable is the failure mode. */}
         <span
+          className="review-tile-chip"
           style={{
             position: 'absolute',
             top: 8,
@@ -274,16 +276,13 @@ export function ReviewTile({
             gap: 2,
             padding: '5px 10px',
             borderRadius: 10,
-            background: 'rgba(10,14,10,0.58)',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
           }}
         >
           <span
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: reviewLabelColor(r.rating, 'dark'),
+              color: ratingTone(r.rating),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,
@@ -291,12 +290,14 @@ export function ReviewTile({
           >
             {r.rating.toFixed(1)}
           </span>
-          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.55)' }}>/10</span>
+          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
         </span>
 
 
 
-        {/* REACTION — glass corner, opposite the score chip. */}
+        {/* REACTION — glass corner, opposite the score chip. The count column
+            is RESERVED so the glyph lands on the same x on every tile,
+            including the tiles at zero. */}
         <span style={{ position: 'absolute', top: 8, right: 10 }}>
           <ReactionAction
             tone="glass"
@@ -305,6 +306,7 @@ export function ReviewTile({
             count={reactionCount}
             reacted={reacted}
             onToggle={() => onToggleReaction?.()}
+            reserveCount
             label={t('discover.reactions.actionReview', 'Like this review')}
           />
         </span>
@@ -342,7 +344,65 @@ export function ReviewTile({
         </div>
 
       </CourseImageFallback>
+      </span>
+
+      {/* BREAKDOWN — the four category scores, already on the row and never
+          rendered until now. A null category RENDERS NO ROW; a review with no
+          categories at all renders NO BLOCK and no gap. */}
+      {rows.length > 0 && (
+        <div
+          data-testid="review-tile-breakdown"
+          style={{ padding: '9px 11px 10px', display: 'grid', rowGap: 6 }}
+        >
+          {rows.map((row) => (
+            <div key={row.key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <span
+                style={{
+                  ...LABEL,
+                  fontSize: 7.5,
+                  color: A.DIM,
+                  width: 34,
+                  flexShrink: 0,
+                }}
+              >
+                {row.label}
+              </span>
+              <span
+                style={{
+                  flex: 1,
+                  height: 4,
+                  borderRadius: 999,
+                  background: A.BORDER,
+                  overflow: 'hidden',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    height: '100%',
+                    width: `${Math.max(0, Math.min(100, (row.value / 10) * 100))}%`,
+                    borderRadius: 999,
+                    background: ratingTone(row.value),
+                  }}
+                />
+              </span>
+              <span
+                style={{
+                  ...FIGS,
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: A.BODY,
+                  flexShrink: 0,
+                }}
+              >
+                {row.value.toFixed(1)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </button>
+
   );
 }
 
