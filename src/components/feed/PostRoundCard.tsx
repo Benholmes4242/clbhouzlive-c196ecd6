@@ -95,7 +95,7 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     </span>
     {total == null ? null : (
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ ...NUM, fontSize: 13.5, fontWeight: 700, color: INK }}>{total}</span>
+        <span style={{ ...NUM, fontSize: 12.5, fontWeight: 700, color: INK }}>{total}</span>
         <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
           {fmtToPar(toPar)}
         </span>
@@ -111,7 +111,7 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
  * §2.1: a distinct muted glyph sized as the score digits — never a zero, never a
  * dash that could be read as level par, never adjusted_gross.
  */
-const HoleGap: React.FC<{ size?: number }> = ({ size = 27 }) => (
+const HoleGap: React.FC<{ size?: number }> = ({ size = 22 }) => (
   <span
     aria-label="No score"
     style={{
@@ -136,7 +136,7 @@ const HoleGap: React.FC<{ size?: number }> = ({ size = 27 }) => (
  * look like a picked-up hole — different fact, different mark. A hollow muted
  * squircle: not a digit, not a zero, not a dash.
  */
-const HoleNotPlayed: React.FC<{ size?: number }> = ({ size = 27 }) => (
+const HoleNotPlayed: React.FC<{ size?: number }> = ({ size = 22 }) => (
   <span
     aria-label="Not played"
     style={{
@@ -191,11 +191,11 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             key={h.holeNo}
             style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
-            <span style={{ ...NUM, fontSize: 9, fontWeight: 700, color: DIM, lineHeight: 1.2 }}>
+            <span style={{ ...NUM, fontSize: 8.5, fontWeight: 700, color: DIM, lineHeight: 1.15 }}>
               {h.holeNo}
             </span>
             <span
-              style={{ ...NUM, fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.26)', lineHeight: 1.3 }}
+              style={{ ...NUM, fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.26)', lineHeight: 1.2 }}
             >
               {h.par ?? '·'}
             </span>
@@ -204,7 +204,7 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             ) : h.gross == null ? (
               <HoleGap />
             ) : (
-              <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
+              <ScoreMark strokes={h.gross} par={h.par ?? 4} size={22} surface="dark" />
             )}
           </div>
         ))}
@@ -252,9 +252,9 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
   return (
     <div
       style={{
-        marginTop: 12,
+        marginTop: 10,
         borderRadius: 14,
-        padding: '12px 14px 10px',
+        padding: '10px 12px 6px',
         border: `1px solid ${HAIRLINE}`,
         background: 'rgba(11,13,16,0.66)',
       }}
@@ -275,7 +275,7 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
           {fmtToPar(endpoint)}
         </span>
       </div>
-      <TrajectoryLine holes={series} height={84} surface="dark" />
+      <TrajectoryLine holes={series} height={70} surface="dark" />
     </div>
   );
 };
@@ -342,7 +342,7 @@ export const PostRoundCard: React.FC<Props> = ({
   // transparent and never applies a backdrop filter of its own.
   const panelStyle: React.CSSProperties = {
     background: 'transparent',
-    padding: '14px 14px 16px',
+    padding: '13px 13px 14px',
   };
 
 
