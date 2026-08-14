@@ -506,6 +506,40 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 </g>
               ))}
 
+              {/* a2. Counting band + cut line — the worst counting differential */}
+              {cutLine != null && (
+                <>
+                  <rect
+                    x={PADX}
+                    y={y(cutLine)}
+                    width={W - PADX - PADR + 4}
+                    height={Math.max(H - 22 - y(cutLine), 0)}
+                    fill={GOOD}
+                    opacity={0.07}
+                    pointerEvents="none"
+                  />
+                  <line
+                    x1={PADX}
+                    x2={W - PADR + 4}
+                    y1={y(cutLine)}
+                    y2={y(cutLine)}
+                    stroke={GOOD}
+                    strokeOpacity={0.8}
+                    strokeWidth={1.2}
+                    strokeDasharray="3 3"
+                  />
+                  <text
+                    x={PADX}
+                    y={y(cutLine) - 5}
+                    fill={GOOD}
+                    opacity={0.8}
+                    style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.12em' }}
+                  >
+                    COUNTS BELOW
+                  </text>
+                </>
+              )}
+
               {/* b. Scrub hairline */}
               <line
                 x1={x(selIdx)}
@@ -516,15 +550,16 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 strokeWidth={1}
               />
 
-              {/* c. Line */}
+              {/* c. Line — ordering only; quieter than the cut line */}
               <path
                 d={linePath}
                 fill="none"
-                stroke="rgba(242,244,247,0.28)"
-                strokeWidth={1.6}
+                stroke="rgba(242,244,247,0.16)"
+                strokeWidth={1.5}
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
+
 
               {/* d. Counter dots */}
               {rounds.map((r, i) => {
