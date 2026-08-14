@@ -3,6 +3,10 @@
  *
  * Analytical treatment (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 3a):
  *   - one Panel, no zebra bands, no tinted pills, no internal dividers
+ *     EXCEPTION (BRIEF_RECORD_BOOK_STANDING, section 0): a board the VIEWER
+ *     HOLDS gains a tinted plate and an amber left edge. That marks one state
+ *     on the rows that have it; it does not alternate, and no other row gains
+ *     a plate, a tint or a divider.
  *   - rows are a 26px / 1fr / 58px grid: avatar, label + name, value
  *   - colour means one thing: amber = the viewing member holds this record
  *   - the crown marks the course record row (lowest gross, all time) only
@@ -18,6 +22,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { ordinalSuffix } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts';
 import type { LegendCategory } from '@/lib/gam/types';
 import { A, EmptyState, FIGS, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -32,6 +37,84 @@ const UNIT_KEY: Record<string, string> = {
   most_birdies_all_time: 'birdies',
   best_score_diff_all_time: 'diff',
 };
+
+/** Amber at 6% - the held-board plate. */
+const PLATE_BG = 'rgba(247, 147, 30, 0.06)';
+/** Amber at 18% - the gap fill between the champion's mark and the viewer's dot. */
+const GAP_FILL = 'rgba(247, 147, 30, 0.18)';
+
+/**
+ * The standing track. TWO POINTS, NOT A RANGE: the champion holds the left end
+ * and the viewer the right, because ViewerStanding carries the gap and the
+ * viewer's rank but NOT the board's spread - there is no worst value, so any
+ * marker floating at a position along a range would be invented.
+ *
+ * held = the viewer IS the champion: one full amber track. An empty or
+ * near-empty track would read as zero, which is the opposite of the truth.
+ */
+const StandingTrack: React.FC<{ held?: boolean }> = ({ held = false }) => (
+  <div
+    style={{
+      position: 'relative',
+      height: 7,
+      flex: 1,
+      minWidth: 34,
+      display: 'flex',
+      alignItems: 'center',
+    }}
+    aria-hidden="true"
+  >
+    {/* The track itself is NEUTRAL on a chased board - amber is the member. */}
+    <div
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        height: 3,
+        borderRadius: 2,
+        background: held ? A.AMBER : A.TRACK,
+      }}
+    />
+    {!held && (
+      <>
+        {/* the gap, amber at 18% */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            height: 3,
+            borderRadius: 2,
+            background: GAP_FILL,
+          }}
+        />
+        {/* the champion: a 3px ink mark at the left end */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            width: 3,
+            height: 7,
+            borderRadius: 1,
+            background: A.INK,
+          }}
+        />
+        {/* the viewer: an amber dot at the right end */}
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: A.AMBER,
+          }}
+        />
+      </>
+    )}
+  </div>
+);
+
 
 interface Props {
   courseId: string;
