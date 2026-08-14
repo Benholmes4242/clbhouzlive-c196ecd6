@@ -428,7 +428,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
         dot={newCount > 0}
         aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}
       >
-        {t('discover.friendsPlayed', 'Where your friends played')}
+        {t('discover.whosBeenPlaying', "Who's been playing")}
       </Eyebrow>
 
       <div
