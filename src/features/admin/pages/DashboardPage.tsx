@@ -594,11 +594,7 @@ function FeedGroup({
           color: 'inherit',
         }}
       >
-        {head.avatarUrl ? (
-          <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
-        ) : (
-          <span aria-hidden style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }} />
-        )}
+        <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
         <span style={{
           color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -715,15 +711,10 @@ function FeedRow({
 
   const inner = (
     <>
-      {/* 4.2h The 28px slot is reserved either way so bodies align. */}
-      {item.avatarUrl ? (
-        <SquircleAvatar src={item.avatarUrl} alt={item.subject} size={28} hairlineRing ringColor={t.line} />
-      ) : (
-        <span
-          aria-hidden
-          style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }}
-        />
-      )}
+      {/* The avatar belongs to the MEMBER, always: `subject` is the COURSE on a
+          review row, so alt is memberName. SquircleAvatar always occupies the
+          28px slot, so rows align with and without a photo. */}
+      <SquircleAvatar src={item.avatarUrl} alt={item.memberName} size={28} hairlineRing ringColor={t.line} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
           <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

@@ -151,9 +151,11 @@ export function RightNowPanel({
               to={`/admin-v2/users?member=${u.userId}`}
               style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none', color: 'inherit' }}
             >
-              {u.avatarUrl
-                ? <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing ringColor={LIGHT_HAIRLINE} />
-                : <span aria-hidden style={{ width: 20, height: 20, borderRadius: 7, background: t.neutralSoft, flexShrink: 0 }} />}
+              {/* ALWAYS render the avatar: SquircleAvatar draws deterministic
+                  initials on a null src, and it occupies the 20px slot either
+                  way, so rows still align. */}
+              <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing ringColor={LIGHT_HAIRLINE} />
+
               <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {u.displayName}
               </span>
