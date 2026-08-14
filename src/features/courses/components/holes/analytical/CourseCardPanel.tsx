@@ -124,30 +124,37 @@ const DOT = 11;
 const scalePct = (v: number) =>
   ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
 
-/** The three zones behind a track, at 0.22 so a fill still reads over them. */
-const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => (
-  <>
-    {[
-      { from: SCALE_MIN, to: ZONE_EASIER_MAX + 1, colour: A.GREEN },
-      { from: ZONE_EASIER_MAX + 1, to: ZONE_STANDARD_MAX + 1, colour: A.AMBER },
-      { from: ZONE_STANDARD_MAX + 1, to: SCALE_MAX, colour: A.RED },
-    ].map((z) => (
-      <div
-        key={z.colour}
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: `${scalePct(z.from)}%`,
-          width: `${scalePct(z.to) - scalePct(z.from)}%`,
-          background: z.colour,
-          opacity: 0.22,
-          borderRadius: radius,
-        }}
-      />
-    ))}
-  </>
-);
+/** The three zones behind a track, at 0.22 so a fill still reads over them.
+    Only the outer edges round: the joins between zones are butt ends. */
+const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => {
+  const bands = [
+    { from: SCALE_MIN, to: ZONE_EASIER_MAX + 1, colour: A.GREEN },
+    { from: ZONE_EASIER_MAX + 1, to: ZONE_STANDARD_MAX + 1, colour: A.AMBER },
+    { from: ZONE_STANDARD_MAX + 1, to: SCALE_MAX, colour: A.RED },
+  ];
+  return (
+    <>
+      {bands.map((z, i) => (
+        <div
+          key={z.colour}
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${scalePct(z.from)}%`,
+            width: `${scalePct(z.to) - scalePct(z.from)}%`,
+            background: z.colour,
+            opacity: 0.22,
+            borderTopLeftRadius: i === 0 ? radius : 0,
+            borderBottomLeftRadius: i === 0 ? radius : 0,
+            borderTopRightRadius: i === bands.length - 1 ? radius : 0,
+            borderBottomRightRadius: i === bands.length - 1 ? radius : 0,
+          }}
+        />
+      ))}
+    </>
+  );
+};
 
 const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
   const { t } = useTranslation(['courses']);
