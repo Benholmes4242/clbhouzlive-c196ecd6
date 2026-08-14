@@ -114,10 +114,14 @@ export function rankHolesByDifficulty(
  * ONE scale for every marker on the page: the largest average on the course,
  * field or member, floored at 0.1 so a course that plays to par cannot divide
  * by zero. Ranks are derived here too so the row and the sheet agree.
+ *
+ * `totalRounds` gates the DIFFICULTY GRADE only (see DIFFICULTY_ROUNDS_FLOOR).
+ * Omit it and the grade is withheld, which is the safe default.
  */
 export function buildHoleScale(
   holes: CourseHole[],
   myByHole: Map<number, MyHolePerformanceRow>,
+  totalRounds?: number,
 ): HoleScale {
   const values: number[] = [];
   holes.forEach((h) => {
@@ -127,8 +131,27 @@ export function buildHoleScale(
   });
   const scaleMax = Math.max(0.1, ...values, 0.1);
 
-  return { scaleMax, rankByHole: rankHolesByDifficulty(holes) };
+  const gradeDifficulty = (totalRounds ?? 0) >= DIFFICULTY_ROUNDS_FLOOR;
+  const tintByHole = new Map<number, number>();
+  if (gradeDifficulty) {
+    const fieldAvgs = holes
+      .map((h) => h.avg_to_par)
+      .filter((v): v is number => Number.isFinite(v));
+    if (fieldAvgs.length > 0) {
+      const lo = Math.min(...fieldAvgs);
+      const hi = Math.max(...fieldAvgs);
+      const span = hi - lo;
+      holes.forEach((h) => {
+        if (!Number.isFinite(h.avg_to_par)) return;
+        // Flat course: everything sits mid-ramp rather than all pale or all deep.
+        tintByHole.set(h.hole_no, span <= 0.0001 ? 0.5 : (h.avg_to_par - lo) / span);
+      });
+    }
+  }
+
+  return { scaleMax, rankByHole: rankHolesByDifficulty(holes), tintByHole, gradeDifficulty };
 }
+
 
 function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
