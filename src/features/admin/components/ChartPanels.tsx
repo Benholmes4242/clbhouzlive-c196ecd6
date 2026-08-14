@@ -1,5 +1,6 @@
 import React from 'react';
-import { Radio } from 'lucide-react';
+import { Radio, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import AdminErrorState from './AdminErrorState';
@@ -78,6 +79,14 @@ export function RightNowPanel({
           <span style={{ ...LABEL, ...FIG }}>Peak today {num(peakToday)}</span>
         ) : null}
         <Radio size={14} color={t.inkFaint} />
+        {/* Real link, not a div with onClick: focusable and announced. */}
+        <Link
+          to="/admin-v2/analytics?tab=live"
+          aria-label="Open live analytics"
+          style={{ display: 'inline-flex', color: t.inkFaint, textDecoration: 'none' }}
+        >
+          <ChevronRight size={14} aria-hidden />
+        </Link>
       </div>
 
       {liveLoading ? (
@@ -137,7 +146,11 @@ export function RightNowPanel({
         <div style={{ borderTop: HAIRLINE, paddingTop: 6 }}>
           <div style={{ ...LABEL, paddingTop: 4 }}>Busiest today</div>
           {topUsers.slice(0, 3).map(u => (
-            <div key={u.userId} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
+            <Link
+              key={u.userId}
+              to={`/admin-v2/users?member=${u.userId}`}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none', color: 'inherit' }}
+            >
               {u.avatarUrl
                 ? <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing ringColor={LIGHT_HAIRLINE} />
                 : <span aria-hidden style={{ width: 20, height: 20, borderRadius: 7, background: t.neutralSoft, flexShrink: 0 }} />}
@@ -145,7 +158,8 @@ export function RightNowPanel({
                 {u.displayName}
               </span>
               <span style={{ ...FIG, color: t.ink, fontSize: 13, fontWeight: 700 }}>{num(u.eventCount)}</span>
-            </div>
+              <ChevronRight size={14} color={t.inkFaint} aria-hidden />
+            </Link>
           ))}
           <div style={LABEL}>events since midnight</div>
         </div>
@@ -178,6 +192,13 @@ export function RetentionPanel({ data, loading }: { data?: Retention; loading: b
         <span style={KICKER}>Retention</span>
         <span style={{ flex: 1 }} />
         {data ? <span style={{ ...LABEL, ...FIG }}>Last {daily.length}d</span> : null}
+        <Link
+          to="/admin-v2/analytics?tab=overview"
+          aria-label="Open retention in analytics"
+          style={{ display: 'inline-flex', color: t.inkFaint, textDecoration: 'none' }}
+        >
+          <ChevronRight size={14} aria-hidden />
+        </Link>
       </div>
 
       {loading || !c ? (
@@ -291,6 +312,13 @@ export function ActiveMembersPanel({
           <span style={{ ...LABEL, ...FIG }}>{stickiness}% weekly of monthly</span>
         ) : null}
         <span style={{ ...LABEL, ...FIG }}>Last 28d</span>
+        <Link
+          to="/admin-v2/analytics?tab=overview"
+          aria-label="Open active members in analytics"
+          style={{ display: 'inline-flex', color: t.inkFaint, textDecoration: 'none' }}
+        >
+          <ChevronRight size={14} aria-hidden />
+        </Link>
       </div>
 
       {loading ? (
