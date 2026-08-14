@@ -412,23 +412,37 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         {disp && (
           <>
             <Hairline style={{ margin: '16px 0 14px' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-              <div style={{ textAlign: 'center', minWidth: 0 }}>
-                <div style={LABEL}>{t('courses:courseDetail.you.yours')}</div>
-                <div style={{ ...NUM, fontSize: 20, color: toneFor(disp.you), marginTop: 4 }}>
-                  {signed(disp.you)}
+            {/* The distance the two figures state and never showed: ONE shared
+                scale, headroom so neither bar touches the edge. The FIGURES
+                keep the to-par convention (toneFor); only the bars carry the
+                margin tone. */}
+            {(() => {
+              const scale = Math.max(disp.you, disp.field, 0.1) * 1.08;
+              const tone = marginTone(disp.gap);
+              return (
+                <div style={{ display: 'grid', gap: 10 }}>
+                  <CompareBar
+                    label={t('courses:courseDetail.you.yours')}
+                    value={disp.you}
+                    scale={scale}
+                    fill={tone}
+                    figure={signed(disp.you)}
+                    figureTone={toneFor(disp.you)}
+                  />
+                  <CompareBar
+                    label={t('courses:courseDetail.you.fieldHere')}
+                    value={disp.field}
+                    scale={scale}
+                    fill={FIELD_BAR}
+                    figure={signed(disp.field)}
+                    figureTone={toneFor(disp.field)}
+                  />
                 </div>
-              </div>
-              <div style={{ textAlign: 'center', minWidth: 0 }}>
-                <div style={LABEL}>{t('courses:courseDetail.you.fieldHere')}</div>
-                <div style={{ ...NUM, fontSize: 20, color: toneFor(disp.field), marginTop: 4 }}>
-                  {signed(disp.field)}
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </>
-
         )}
+
 
         <Hairline style={{ margin: '16px 0 14px' }} />
         <StatRow
