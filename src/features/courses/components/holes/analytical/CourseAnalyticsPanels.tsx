@@ -19,7 +19,7 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, FIGS, Hairline, KICKER, LABEL, Panel, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
 
 /** Labelled figure cell used by the How-it-plays strip and the extremes row. */
