@@ -132,7 +132,8 @@ const SCORED_FLOOR = 12;
  * played = false holes are KEPT (BRIEF §1.4): every hole is returned so the
  * strip renders eighteen cells with unbroken numbering, each marked by its own
  * state. Only PLAYED holes carrying a score count towards SCORED_FLOOR - a
- * not-played hole is not a gap. adjusted_gross is NEVER substituted.
+ * not-played hole is not a gap. adjusted_gross is NEVER substituted into a cell;
+ * it reaches `lineGross` only, for the trajectory.
  */
 function renderableShape(
   shape: (PostRoundHole & { played: boolean })[] | null,
