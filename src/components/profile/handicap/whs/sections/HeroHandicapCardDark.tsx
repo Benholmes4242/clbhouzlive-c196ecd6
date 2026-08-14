@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import type { WhsConnection } from '@/lib/whs/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -119,6 +120,21 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const active: WindowKey = win === '12m' && !slices.has12m ? '90d' : win;
   const chartPoints = slices[active];
 
+  /* Continues the handicap_chart_scoped series that IndexHistoryCard used to
+     fire from the Form tab (that card is gone — the hero owns the windows now).
+     The windows are identical, so the OLD VOCABULARY is kept on the wire
+     (1M/3M/1Y) to keep the series comparable across the change. */
+  const WIRE: Record<WindowKey, string> = { '30d': '1M', '90d': '3M', '12m': '1Y' };
+  const scopeWindow = (next: WindowKey) => {
+    if (next === active) return;
+    analyticsEvents.track('handicap_chart_scoped', {
+      chart: 'index_history',
+      from: WIRE[active],
+      to: WIRE[next],
+    });
+    setWin(next);
+  };
+
   /* The two header deltas read their OWN windows regardless of the toggle,
      but from the SAME slices the chart draws, so they cannot drift. */
   const netOf = (pts: IndexPoint[]): number | null =>
@@ -227,7 +243,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                       key={w.key}
                       type="button"
                       disabled={disabled}
-                      onClick={() => setWin(w.key)}
+                      onClick={() => scopeWindow(w.key)}
                       style={{
                         border: 'none',
                         borderRadius: 999,

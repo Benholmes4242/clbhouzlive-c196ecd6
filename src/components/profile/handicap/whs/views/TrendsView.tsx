@@ -1,6 +1,5 @@
 import React from 'react';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
-import IndexHistoryCard from '../sections/IndexHistoryCard';
 import GameEverywhereCard from '../sections/trends/GameEverywhereCard';
 import RoundShapePanel from '../sections/trends/RoundShapePanel';
 import RoundsArchivePanel from '../sections/trends/RoundsArchivePanel';
@@ -57,10 +56,7 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 2. Index History */}
-      <IndexHistoryCard connectionId={connectionId} />
-
-      {/* 3. Stableford distribution */}
+      {/* 2. Stableford distribution */}
       <section style={{ padding: '0 16px', marginTop: 32, fontFamily: FONT }}>
         {scoresLoading ? (
           <Skeleton variant="dark" style={{ height: 420, borderRadius: 16, marginBottom: 12 }} />
@@ -69,13 +65,13 @@ export const TrendsView: React.FC<Props> = ({
         )}
       </section>
 
-      {/* 4. Where the shots go — par-type rings, one shared max */}
+      {/* 3. Where the shots go — par-type rings, one shared max */}
       <GameEverywhereCard readOnly={readOnly} />
 
-      {/* 5. When the shots go — thirds of the round */}
+      {/* 4. When the shots go — thirds of the round */}
       <RoundShapePanel readOnly={readOnly} />
 
-      {/* 6. Personal bests */}
+      {/* 5. Personal bests */}
       <PersonalBests
         connectionId={connectionId}
         currentHandicap={currentHandicap}
@@ -83,7 +79,7 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 7. Posted history — figures here, list in the 75dvh sheet */}
+      {/* 6. Posted history — figures here, list in the 75dvh sheet */}
       <RoundsArchivePanel
         connectionId={connectionId}
         userId={userId}
@@ -91,7 +87,7 @@ export const TrendsView: React.FC<Props> = ({
         ownerFirstName={ownerFirstName}
       />
 
-      {/* 8. Your courses — cross-link rail to each course's Analytics tab */}
+      {/* 7. Your courses — cross-link rail to each course's Analytics tab */}
       <YourCoursesRail readOnly={readOnly} />
     </div>
   );
