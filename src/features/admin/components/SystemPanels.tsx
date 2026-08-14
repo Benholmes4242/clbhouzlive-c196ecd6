@@ -18,6 +18,13 @@ const MEMBERS_COL = 38;
 const CLIENTS_REGION_ID = 'admin-system-clients';
 const CLIENTS_OPEN_KEY = 'admin-v2:system:clients-open';
 
+/**
+ * ONE sentence, one definition. Exported so the Health board's Pipeline detail
+ * describes the subsystem in exactly the same words.
+ */
+export const PIPELINE_EXPLAINER =
+  'Rounds waiting to become scorecards, crowns and feed posts.';
+
 
 
 // ─── 1 SYSTEM ─────────────────────────────────────────────────────────────────
