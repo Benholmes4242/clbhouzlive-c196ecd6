@@ -128,6 +128,16 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const bestOfFive = last5.length ? Math.min(...last5) : null;
   const rows = nextRoundScale(currentHandicap, cutTarget, bestOfFive);
 
+  /* The range comes from the scenarios ACTUALLY RENDERED, never a fixed span.
+     All three landing on one index means there is no range and no track. */
+  const becomes = rows.map((r) => r.becomes);
+  const worstBecomes = Math.max(...becomes);
+  const bestBecomes = Math.min(...becomes);
+  const hasRange = worstBecomes - bestBecomes > 0.05;
+  const rangeWorst = hasRange ? worstBecomes : null;
+  const rangeBest = hasRange ? bestBecomes : null;
+
+
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
       <DarkSectionHeader
