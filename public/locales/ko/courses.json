@@ -693,7 +693,11 @@
       "parOrBetterShort": "Par or better",
       "doublesARound": "Doubles a round",
       "roundsLabel": "Rounds",
-      "colCostARound": "Cost a round"
+      "colCostARound": "Cost a round",
+      "gapBetterShots": "이 코스 평균보다 좋은 타수",
+      "gapWorseShots": "이 코스 평균보다 나쁜 타수",
+      "youHere": "나",
+      "fieldOnHole": "평균"
     }
   },
   "network": {

@@ -698,7 +698,11 @@
       "parOrBetterShort": "Par or better",
       "doublesARound": "Doubles a round",
       "roundsLabel": "Rounds",
-      "colCostARound": "Cost a round"
+      "colCostARound": "Cost a round",
+      "gapBetterShots": "Golpes mejor que el campo aquí",
+      "gapWorseShots": "Golpes peor que el campo aquí",
+      "youHere": "Tú aquí",
+      "fieldOnHole": "Campo aquí"
     }
   },
   "network": {

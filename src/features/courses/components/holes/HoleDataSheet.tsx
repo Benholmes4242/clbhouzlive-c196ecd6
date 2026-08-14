@@ -27,8 +27,62 @@ interface HookCell {
   value: string;
   tone?: string;
   note: string;
+  /**
+   * BRIEF_YOU_TAB_MARGIN_AND_GAPS s3: the battle row's sentence makes a
+   * comparison ("better than most here") and never showed it. Two bars on ONE
+   * scale draw it. The member's bar is SHORTER when they are better - these
+   * are to-par averages, so a lower figure is the better one.
+   */
+  compare?: { youLabel: string; you: number; fieldLabel: string; field: number | null };
+  /** The member's own progress (birdies collected). Amber - progress is amber. */
+  progress?: { done: number; total: number };
 }
 
+/** The field's bar on a hook row. Neutral - the comparison, not a verdict. */
+const FIELD_BAR_A = '#C6CFD8';
+
+/**
+ * One small bar of a two-bar comparison on a hook row, sharing its sibling's
+ * scale. The member's bar is SHORTER when they are better: these are to-par
+ * averages, so a lower figure is the better one. Do not invert it.
+ */
+const HookBar: React.FC<{
+  label: string;
+  value: number;
+  scale: number;
+  fill: string;
+  figure: string;
+}> = ({ label, value, scale, fill, figure }) => {
+  const pct = scale > 0 ? Math.max(0, Math.min(100, (value / scale) * 100)) : 0;
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '58px 1fr 38px',
+        alignItems: 'center',
+        gap: 8,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 7.5,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: A.DIM,
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ display: 'block', height: 4, borderRadius: 2, background: A.TRACK }}>
+        <span
+          style={{ display: 'block', height: 4, borderRadius: 2, width: `${pct}%`, background: fill }}
+        />
+      </span>
+      <span style={{ ...NUM_A, fontSize: 12, color: A.BODY, textAlign: 'right' }}>{figure}</span>
+    </div>
+  );
+};
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
@@ -727,6 +781,7 @@ const StoryTiles: React.FC<{
   // hairline. No emoji - BRIEF_COURSE_YOU_TAB_ANALYTICAL_V2 s1. The sentences
   // and their noise-floor logic are untouched; only the container changed.
   if (scope === 'personal') {
+
     const hooks: HookCell[] = [];
 
     if (nemesis) {
@@ -743,6 +798,15 @@ const StoryTiles: React.FC<{
         note: youBeats
           ? t('courses:holes.battle.youBeat')
           : t('courses:holes.battle.fieldBeats', { field: fieldStr }),
+        // The FIELD average for THIS hole, taken from the hole row itself -
+        // never derived from the course-wide field average, which is a
+        // different number and would make the sentence false.
+        compare: {
+          youLabel: t('courses:courseDetail.you.youHere'),
+          you: nemesis.avg_to_par,
+          fieldLabel: t('courses:courseDetail.you.fieldOnHole'),
+          field: fieldRow ? fieldRow.avg_to_par : null,
+        },
       });
     }
 
@@ -752,6 +816,7 @@ const StoryTiles: React.FC<{
         label: t('courses:courseDetail.you.fullHouse'),
         value: `${birdiedCount}/${totalHoles}`,
         note: "You've birdied every hole on this course.",
+        progress: { done: birdiedCount, total: totalHoles },
       });
     } else if (birdiedCount === totalHoles - 1 && missingBirdieHole) {
       hooks.push({
@@ -759,6 +824,7 @@ const StoryTiles: React.FC<{
         label: t('courses:courseDetail.you.oneToGoHole', { n: missingBirdieHole }),
         value: `${birdiedCount}/${totalHoles}`,
         note: `Only the ${ord(missingBirdieHole)} has never given you a birdie.`,
+        progress: { done: birdiedCount, total: totalHoles },
       });
     } else if (totalHoles > 0) {
       hooks.push({
@@ -766,6 +832,7 @@ const StoryTiles: React.FC<{
         label: t('courses:courseDetail.you.birdieMap'),
         value: `${birdiedCount}/${totalHoles}`,
         note: `${totalHoles - birdiedCount} holes still waiting for your first birdie.`,
+        progress: { done: birdiedCount, total: totalHoles },
       });
     }
 
@@ -792,6 +859,53 @@ const StoryTiles: React.FC<{
                 <div style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.BODY, marginTop: 5 }}>
                   {h.note}
                 </div>
+                {h.compare && (
+                  <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
+                    <HookBar
+                      label={h.compare.youLabel}
+                      value={h.compare.you}
+                      scale={
+                        Math.max(h.compare.you, h.compare.field ?? h.compare.you, 0.05) * 1.08
+                      }
+                      fill={A.RED}
+                      figure={fmtToPar(h.compare.you)}
+                    />
+                    {h.compare.field != null && (
+                      <HookBar
+                        label={h.compare.fieldLabel}
+                        value={h.compare.field}
+                        scale={Math.max(h.compare.you, h.compare.field, 0.05) * 1.08}
+                        fill={FIELD_BAR_A}
+                        figure={fmtToPar(h.compare.field)}
+                      />
+                    )}
+                  </div>
+                )}
+                {h.progress && (
+                  <span
+                    style={{
+                      display: 'block',
+                      width: 54,
+                      height: 4,
+                      borderRadius: 2,
+                      background: A.TRACK,
+                      marginTop: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'block',
+                        height: 4,
+                        borderRadius: 2,
+                        width: `${Math.max(
+                          0,
+                          Math.min(100, (h.progress.done / Math.max(1, h.progress.total)) * 100),
+                        )}%`,
+                        background: A.AMBER,
+                      }}
+                    />
+                  </span>
+                )}
               </div>
               <div style={{ ...NUM_A, fontSize: 20, color: h.tone ?? A.INK, whiteSpace: 'nowrap' }}>
                 {h.value}
@@ -800,6 +914,7 @@ const StoryTiles: React.FC<{
           </React.Fragment>
         ))}
       </Panel>
+
     );
   }
 
