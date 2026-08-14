@@ -543,7 +543,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         aside={t('courses:courseDetail.you.everyHole')}
       >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ ...NUM, fontSize: 40, lineHeight: 1, color: sumDbl > 0 ? OVER : A.INK }}>
+          {/* A COUNT, not a to-par figure. Red on this page means "under par"
+              (good), so painting a bad-thing count red says the opposite of
+              what it means. Neutral ink; the label carries the sense. */}
+          <div style={{ ...NUM, fontSize: 40, lineHeight: 1, color: A.INK }}>
             {(+doublesPerRound.toFixed(1)).toFixed(1)}
           </div>
           <div style={{ ...LABEL, marginTop: 8 }}>{t('courses:courseDetail.you.doublesARound')}</div>
