@@ -44,6 +44,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({
   useSupabaseSession: () => ({ user: { id: 'u1' } }),
 }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: { id: 'c1' } }) }));
+vi.mock('@/i18n/format', () => ({ formatNumber: (n: number) => String(n) }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, o?: Record<string, unknown>) => {
