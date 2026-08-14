@@ -180,21 +180,33 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
   );
 };
 
-const Trajectory: React.FC<{ holes: Hole[] }> = ({ holes }) => {
+const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, toPar }) => {
   // Beads come from the shared beadForScore helper — one rule across the sheet
   // trajectory and this one (CORRECTION_ONE_SCORING_MARK §5).
-  const pts = useMemo(() => {
+  //
+  // §4.2/§4.3 — THE LINE STOPS AT THE FIRST GAP. A cumulative to-par line has no
+  // honest continuation past a hole with no score: the running total after the
+  // gap is unknown by exactly the missing stroke count, so a resumed segment
+  // would sit at a position the member never held. We therefore draw only the
+  // segment up to the gap and stop. No bridge, no dot on the missing hole.
+  const { pts, truncated } = useMemo(() => {
     let cum = 0;
-    const out: { cum: number; bead: { tone: string; radius: number } | null }[] = [];
-    for (const h of holes) {
-      if (h.gross == null || h.par == null) continue;
+    const out: { i: number; cum: number; bead: { tone: string; radius: number } | null }[] = [];
+    let cut = false;
+    holes.forEach((h, idx) => {
+      if (cut) return;
+      if (h.gross == null || h.par == null) {
+        cut = true;
+        return;
+      }
       cum += h.gross - h.par;
-      out.push({ cum, bead: beadForScore(h.gross, h.par, 'dark') });
-    }
-    return out;
+      out.push({ i: idx, cum, bead: beadForScore(h.gross, h.par, 'dark') });
+    });
+    return { pts: out, truncated: cut };
   }, [holes]);
 
   if (pts.length < 2) return null;
+
 
   const w = 320;
   const height = 74;
