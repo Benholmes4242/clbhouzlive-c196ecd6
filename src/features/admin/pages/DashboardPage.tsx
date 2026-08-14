@@ -494,7 +494,7 @@ function toParParts(gross: number, par: number): { text: string; color: string }
 const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
   member: { text: 'JOINED', color: t.ok },
   post:   { text: 'POST',   color: t.inkFaint },
-  review: { text: 'REVIEW', color: t.brandText },
+  review: { text: 'REVIEW', color: t.ink },
 };
 
 function LatestInClubhouse({
@@ -599,7 +599,7 @@ function FeedRow({
             }}
           >
             {item.warnings.map(w => (
-              <span key={w} style={{ color: t.warnText, fontWeight: 700 }}>{w}</span>
+              <span key={w} style={{ color: t.dangerText, fontWeight: 700 }}>{w}</span>
             ))}
             {item.meta.map(mt => <span key={mt}>{mt}</span>)}
             {round && (() => {
