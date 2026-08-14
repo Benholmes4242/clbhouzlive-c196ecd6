@@ -38,7 +38,51 @@ interface HookCell {
   progress?: { done: number; total: number };
 }
 
+/** The field's bar on a hook row. Neutral - the comparison, not a verdict. */
+const FIELD_BAR_A = '#C6CFD8';
 
+/**
+ * One small bar of a two-bar comparison on a hook row, sharing its sibling's
+ * scale. The member's bar is SHORTER when they are better: these are to-par
+ * averages, so a lower figure is the better one. Do not invert it.
+ */
+const HookBar: React.FC<{
+  label: string;
+  value: number;
+  scale: number;
+  fill: string;
+  figure: string;
+}> = ({ label, value, scale, fill, figure }) => {
+  const pct = scale > 0 ? Math.max(0, Math.min(100, (value / scale) * 100)) : 0;
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '58px 1fr 38px',
+        alignItems: 'center',
+        gap: 8,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 7.5,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: A.DIM,
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ display: 'block', height: 4, borderRadius: 2, background: A.TRACK }}>
+        <span
+          style={{ display: 'block', height: 4, borderRadius: 2, width: `${pct}%`, background: fill }}
+        />
+      </span>
+      <span style={{ ...NUM_A, fontSize: 12, color: A.BODY, textAlign: 'right' }}>{figure}</span>
+    </div>
+  );
+};
 
 
 // ── Tokens ────────────────────────────────────────────────────────────
