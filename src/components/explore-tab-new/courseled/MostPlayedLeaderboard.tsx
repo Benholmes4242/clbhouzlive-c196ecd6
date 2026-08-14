@@ -33,7 +33,7 @@ interface Props {
 function formatToPar(v: number): string {
   const r = Math.round(v * 10) / 10;
   if (r === 0) return 'E';
-  const n = formatNumber(Math.abs(r), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const n = Math.abs(r).toFixed(1);
   return `${r > 0 ? '+' : '\u2212'}${n}`;
 }
 
