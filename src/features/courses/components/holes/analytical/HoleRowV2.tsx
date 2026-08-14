@@ -269,7 +269,7 @@ export const HoleRowV2: React.FC<{
     if (!field) return A.DIM;
     if (field.tone !== A.INK) return field.tone;
     if (tint == null) return field.tone;
-    return difficultyRampColor(0.42 + tint * 0.58);
+    return difficultyRampColor(0.52 + tint * 0.48);
   })();
 
   const lastIdx = segs.length - 1;
