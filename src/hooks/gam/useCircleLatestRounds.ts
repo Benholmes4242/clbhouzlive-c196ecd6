@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 
 /**
- * useFriendsLatestRounds
+ * useCircleLatestRounds
  * ----------------------
  * Powers the "Friends' latest rounds" section on Discover AND its View-all sheet.
  * A single hook, one round-trip per data source, grouped client-side. Read
@@ -31,7 +31,7 @@ import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 export type { RoundFeatKey, RoundFeat } from '@/lib/gam/roundFeats';
 export { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 
-export interface FriendRoundRow {
+export interface CircleRoundRow {
   round_id: string;
   score_id: string | null;
   connection_id: string | null;
@@ -92,13 +92,13 @@ interface Options {
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS = 60;
 
-export function useFriendsLatestRounds(
+export function useCircleLatestRounds(
   userId: string | undefined,
   { limit = 4, allowMultiplePerFriend = false }: Options = {},
 ) {
   return useQuery({
-    queryKey: ['friends-latest-rounds', userId, limit, allowMultiplePerFriend],
-    queryFn: async (): Promise<FriendRoundRow[]> => {
+    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend],
+    queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
 
       // 1. Accepted friendships (bidirectional)
@@ -388,7 +388,7 @@ export function useFriendsLatestRounds(
 
 
       // 8. Assemble rows.
-      const out: FriendRoundRow[] = rowsWindow.map((r): FriendRoundRow => {
+      const out: CircleRoundRow[] = rowsWindow.map((r): CircleRoundRow => {
         const profile = profileById.get(r.user_id);
         const score = r.whs_score_id ? scoreById.get(r.whs_score_id) : undefined;
         const net =
