@@ -212,12 +212,19 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
   const height = 74;
   const padX = 5;
   const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
-  const n = pts.length;
+  // Hole-index space, not point-index space: a truncated line must occupy only
+  // the part of the axis it actually covers.
+  const n = Math.max(holes.length, 2);
   const x = (i: number) => padX + (i / (n - 1)) * (w - padX * 2);
   const y0 = height / 2;
   const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 10);
-  const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)},${y(p.cum).toFixed(1)}`).join(' ');
-  const final = pts[pts.length - 1].cum;
+  const path = pts
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)},${y(p.cum).toFixed(1)}`)
+    .join(' ');
+  // §4.4 — with a gap the line's last point is NOT the round's to-par, so the
+  // heading figure falls back to the score row. Complete rounds are unchanged.
+  const final = truncated ? toPar : pts[pts.length - 1].cum;
+
 
   return (
     <div
