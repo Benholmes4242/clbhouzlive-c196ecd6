@@ -11,7 +11,7 @@ vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: () => ({
       select: () => ({ in: async () => ({ data: rows, error: null }) }),
-      insert: async () => ({ error: null }),
+      insert: async (r: any) => { rows.push(r); return { error: null }; },
       delete: () => ({ eq: () => ({ eq: () => ({ eq: async () => ({ error: null }) }) }) }),
     }),
   },
