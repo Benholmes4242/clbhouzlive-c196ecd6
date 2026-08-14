@@ -6,9 +6,9 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 
-import { SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
+import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
+import { ratingTone } from './reviewRatingTone';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -17,7 +17,12 @@ import type { LatestReview } from './hooks/useLatestReviews';
  *
  * Photo-led tile with its text on the photograph. The course name IS the
  * headline; the quote no longer appears here (it lives in the review sheet).
- * Every tile is the SAME fixed height regardless of how the name wraps.
+ * The PHOTO is the same fixed height on every tile regardless of how the name
+ * wraps. Beneath it sits the CATEGORY BREAKDOWN (BRIEF_REVIEW_TILE_BREAKDOWN):
+ * one label/track/figure row per scored category, so two courses on 8.7 no
+ * longer look identical. Categories are optional in the composer, so a null
+ * renders no row and a review with none renders no block at all — the tile is
+ * then exactly what it was before, with no gap.
  *
  * Image chain: the review's own first photo -> the course image (via
  * CourseImageFallback) -> the deterministic gradient. Video reviews use their
@@ -26,14 +31,13 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * reviewVideoAutoplay.ts, never by InlineVideo/VideoEngine: those are bound to
  * the three physical feed lanes and do not map onto a two-column grid.
  *
- * The score figure carries the BAND COLOUR, matching the review wizard and the
- * review sheet. On dark glass it resolves through `reviewLabelColor(rating,
- * 'dark')` — the app's existing dark-surface band tokens (#5EE9A6 / #F7931E /
- * #FF6B6B), not the light-surface hexes, which vanish on rgba(10,14,10,0.58).
- * Same thresholds everywhere: >= 9 green, >= 5 amber, below 5 red.
+ * The score figure and the bars carry the RATING TONE scale declared in
+ * reviewRatingTone.ts (>=8.5 green, 7.0-8.4 amber, below grey). That scale has
+ * NO RED by design — see the reasoning there. The "/10" stays white.
  *
  * The chip states its scale with a "/10" suffix; it carries no clbhouz mark
  * (a figure on a review tile can only be a rating).
+
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
@@ -157,6 +161,20 @@ export function ReviewTile({
     }
   }, [active, r.mediaUrl]);
 
+  // BREAKDOWN ROWS — only the categories the member actually scored. Nulls are
+  // the common case in the composer, so an absent category is simply absent:
+  // no empty track, no zero, no "n/a".
+  const rows = (
+    [
+      ['design', t('discover.reviews.cat.design', 'Design'), r.breakdown?.design],
+      ['conditions', t('discover.reviews.cat.conditions', 'Cond'), r.breakdown?.conditions],
+      ['clubhouse', t('discover.reviews.cat.clubhouse', 'House'), r.breakdown?.clubhouse],
+      ['facilities', t('discover.reviews.cat.facilities', 'Fac'), r.breakdown?.facilities],
+    ] as Array<[string, string, number | null | undefined]>
+  )
+    .filter((row): row is [string, string, number] => row[2] != null && !Number.isNaN(Number(row[2])))
+    .map(([key, label, value]) => ({ key, label, value: Number(value) }));
+
   return (
     <button
       type="button"
@@ -164,7 +182,6 @@ export function ReviewTile({
       style={{
         ...(isNew ? NEW_CARD_RING : null),
         position: 'relative',
-        height,
         padding: 0,
         border: 'none',
         borderRadius: radius,
@@ -174,8 +191,13 @@ export function ReviewTile({
         textAlign: 'left',
         display: 'block',
         width: '100%',
+        background: A.PANEL,
       }}
     >
+      <span
+        data-testid="review-tile-photo"
+        style={{ position: 'relative', display: 'block', height }}
+      >
       <CourseImageFallback
         courseId={r.courseId}
         courseName={r.courseName}
@@ -183,6 +205,7 @@ export function ReviewTile({
         initialsSize={28}
         style={{ position: 'absolute', inset: 0 }}
       >
+
         {/* VIDEO COVER — muted, looping, playsInline. Same box as the poster,
             so the first frame cannot shift the layout. The poster stays
             visible until that frame paints: no flash of black. */}
@@ -256,10 +279,12 @@ export function ReviewTile({
           </span>
         )}
 
-        {/* SCORE CHIP — glass badge: the figure, then the scale. A 10px radius
-            rectangle, not a pill: a pill against a square tile corner reads as
-            a foreign shape. */}
+        {/* SCORE CHIP — GLASS, matching the friends rail, the standout tiles
+            and the tour tiles. The flat, higher-opacity fill is the BASE and
+            the blur is the @supports enhancement: this chip sits over a
+            photograph and unreadable is the failure mode. */}
         <span
+          className="review-tile-chip"
           style={{
             position: 'absolute',
             top: 8,
@@ -269,16 +294,13 @@ export function ReviewTile({
             gap: 2,
             padding: '5px 10px',
             borderRadius: 10,
-            background: 'rgba(10,14,10,0.58)',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
           }}
         >
           <span
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: reviewLabelColor(r.rating, 'dark'),
+              color: ratingTone(r.rating),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,
@@ -286,12 +308,14 @@ export function ReviewTile({
           >
             {r.rating.toFixed(1)}
           </span>
-          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.55)' }}>/10</span>
+          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
         </span>
 
 
 
-        {/* REACTION — glass corner, opposite the score chip. */}
+        {/* REACTION — glass corner, opposite the score chip. The count column
+            is RESERVED so the glyph lands on the same x on every tile,
+            including the tiles at zero. */}
         <span style={{ position: 'absolute', top: 8, right: 10 }}>
           <ReactionAction
             tone="glass"
@@ -300,6 +324,7 @@ export function ReviewTile({
             count={reactionCount}
             reacted={reacted}
             onToggle={() => onToggleReaction?.()}
+            reserveCount
             label={t('discover.reactions.actionReview', 'Like this review')}
           />
         </span>
@@ -337,7 +362,67 @@ export function ReviewTile({
         </div>
 
       </CourseImageFallback>
+      </span>
+
+      {/* BREAKDOWN — the four category scores, already on the row and never
+          rendered until now. A null category RENDERS NO ROW; a review with no
+          categories at all renders NO BLOCK and no gap. */}
+      {rows.length > 0 && (
+        <div
+          data-testid="review-tile-breakdown"
+          style={{ padding: '8px 11px 9px', display: 'grid', rowGap: 6 }}
+        >
+          {rows.map((row) => (
+            <div key={row.key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <span
+                style={{
+                  ...LABEL,
+                  fontSize: 7.5,
+                  lineHeight: 1,
+                  color: A.DIM,
+                  width: 34,
+                  flexShrink: 0,
+                }}
+              >
+                {row.label}
+              </span>
+              <span
+                style={{
+                  flex: 1,
+                  height: 4,
+                  borderRadius: 999,
+                  background: A.BORDER,
+                  overflow: 'hidden',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    height: '100%',
+                    width: `${Math.max(0, Math.min(100, (row.value / 10) * 100))}%`,
+                    borderRadius: 999,
+                    background: ratingTone(row.value),
+                  }}
+                />
+              </span>
+              <span
+                style={{
+                  ...FIGS,
+                  fontSize: 10.5,
+                  lineHeight: 1,
+                  fontWeight: 700,
+                  color: A.BODY,
+                  flexShrink: 0,
+                }}
+              >
+                {row.value.toFixed(1)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </button>
+
   );
 }
 

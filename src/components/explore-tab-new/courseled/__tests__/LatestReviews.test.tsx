@@ -54,9 +54,9 @@ describe('LatestReviews mosaic', () => {
   it('caps the page at four tiles of identical height', () => {
     const reviews = Array.from({ length: 9 }, (_, i) => make(i));
     render(<LatestReviews reviews={reviews} totalCount={9} onTilePress={() => {}} onSeeAll={() => {}} />);
-    const tiles = screen.getAllByRole('button').filter((b) => b.style.height);
-    expect(tiles).toHaveLength(4);
-    for (const tile of tiles) expect(tile.style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
+    const photos = screen.getAllByTestId('review-tile-photo');
+    expect(photos).toHaveLength(4);
+    for (const photo of photos) expect(photo.style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
   });
 
   it('renders the viewing member name in on-dark amber', () => {
@@ -70,5 +70,63 @@ describe('LatestReviews mosaic', () => {
     );
     const own = screen.getByText('Ben');
     expect(own.getAttribute('style')).toContain('255, 178, 94');
+  });
+
+  it('renders one breakdown row per scored category', () => {
+    render(
+      <LatestReviews
+        reviews={[
+          make(1, {
+            breakdown: { design: 9.1, conditions: 7.2, clubhouse: 5.5, facilities: 8.8 },
+          }),
+        ]}
+        onTilePress={() => {}}
+        onSeeAll={() => {}}
+      />,
+    );
+    const block = screen.getByTestId('review-tile-breakdown');
+    expect(block.children).toHaveLength(4);
+    expect(screen.getByText('5.5')).toBeTruthy();
+  });
+
+  it('renders only the scored rows when some categories are null', () => {
+    render(
+      <LatestReviews
+        reviews={[
+          make(1, {
+            breakdown: { design: 8.0, conditions: null, clubhouse: null, facilities: 6.4 },
+          }),
+        ]}
+        onTilePress={() => {}}
+        onSeeAll={() => {}}
+      />,
+    );
+    expect(screen.getByTestId('review-tile-breakdown').children).toHaveLength(2);
+  });
+
+  it('renders no breakdown block at all when no category is scored', () => {
+    render(
+      <LatestReviews
+        reviews={[make(1)]}
+        onTilePress={() => {}}
+        onSeeAll={() => {}}
+      />,
+    );
+    expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
+  });
+
+  it('never renders a red bar, including for a low score', () => {
+    render(
+      <LatestReviews
+        reviews={[
+          make(1, { rating: 5.5, breakdown: { design: 5.5, conditions: null, clubhouse: null, facilities: null } }),
+        ]}
+        onTilePress={() => {}}
+        onSeeAll={() => {}}
+      />,
+    );
+    const html = screen.getByTestId('review-tile-breakdown').innerHTML;
+    expect(html).toContain('124, 139, 156');
+    expect(html.toLowerCase()).not.toContain('#c8372b');
   });
 });

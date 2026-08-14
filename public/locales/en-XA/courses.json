@@ -1295,7 +1295,13 @@
     "reviews": {
       "ratedChip": "[~~Řáţéđ~~]",
       "someone": "[~~Á ɱéɱƀéř~~]",
-      "sheetCaption": "[~~{{count}} řéṽíéŵš~~]"
+      "sheetCaption": "[~~{{count}} řéṽíéŵš~~]",
+      "cat": {
+        "design": "Design",
+        "conditions": "Cond",
+        "clubhouse": "House",
+        "facilities": "Fac"
+      }
     },
     "reactions": {
       "action": "[~~Ļíǩé ţĥíš řőúñđ~~]",
