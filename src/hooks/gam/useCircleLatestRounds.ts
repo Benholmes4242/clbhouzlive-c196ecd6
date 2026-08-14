@@ -500,6 +500,8 @@ export function useCircleLatestRounds(
           is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
           is_first_sub_80:
             r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
+          suggested: suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+
         };
 
       });
