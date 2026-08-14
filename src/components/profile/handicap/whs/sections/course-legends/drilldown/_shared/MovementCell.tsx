@@ -1,15 +1,29 @@
 import React from 'react';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
  * Movement glyph rendered between the name block and the score in
  * champion boards. Compete-tab language:
  *   climbed  → ▲n  in emerald  (light #059669 · dark #34D399)
- *   dropped  → ▼n  in dim slate/white (0.45)     — never red
+ *   dropped  → ▼n  in RED      (INDEX_DELTA drifted: light #C8372B · dark #F87171)
  *   unchanged → em-dash in faint slate/white (0.30)
  *   absent from 30d board → nothing (name-side NEW badge covers it)
  *
+ * WHY RED (BRIEF_MOVEMENT_RED_AND_HELD_BOARD). A dropped rank used to render
+ * dim slate, on the reasoning that these boards rank a member against their
+ * friends, so a drop often means someone else played well rather than that the
+ * member played badly. That reading was heard and set aside: a rank move is a
+ * MOVEMENT, and the app has exactly one pair for movement - INDEX_DELTA, green
+ * improved / red drifted, the same pair the handicap index card uses.
+ * Green-up with grey-down made the column signal only good news and muted half
+ * of what it exists to say. Dropped is red on both themes; do not revert it.
+ *
+ * The dark drifted value is lighter than the light one because it sits on
+ * near-black - the two theme pairs are not interchangeable.
+ *
  * Movement cell keeps a fixed min-width so the score column stays
- * aligned across rows even when a row has no glyph.
+ * aligned across rows even when a row has no glyph. The red glyph is the same
+ * ▼n form as before, so it cannot widen the column.
  */
 interface Props {
   delta: number | null | undefined;
