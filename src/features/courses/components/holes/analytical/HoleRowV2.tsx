@@ -250,7 +250,28 @@ export const HoleRowV2: React.FC<{
       ? toParParts(mine.avg_to_par - row.avg_to_par)
       : null;
 
+  /**
+   * The hole's own position on the course's difficulty spread, or null below the
+   * rounds floor - in which case the track and the field figure stay ungraded.
+   */
+  const tint = scale.gradeDifficulty ? scale.tintByHole.get(row.hole_no) ?? null : null;
+  const diffTone = tint == null ? null : difficultyRampColor(tint);
+  /**
+   * The COLLAPSED FIELD FIGURE takes the difficulty tone so the list can be
+   * scanned for hard holes without expanding anything - EXCEPT where the average
+   * is under par, which keeps the to-par red: that convention is separate from,
+   * and outranks, the difficulty ramp. Text sits at a raised floor on the ramp so
+   * the easiest hole's figure is still legible.
+   */
+  const fieldTone = (() => {
+    if (!field) return A.DIM;
+    if (field.tone !== A.INK) return field.tone;
+    if (tint == null) return field.tone;
+    return difficultyRampColor(0.42 + tint * 0.58);
+  })();
+
   const lastIdx = segs.length - 1;
+
 
   return (
     <div>
