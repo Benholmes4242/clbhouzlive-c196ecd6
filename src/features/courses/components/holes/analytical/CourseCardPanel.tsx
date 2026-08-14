@@ -166,12 +166,11 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
           height: 6,
           borderRadius: 3,
           background: A.TRACK,
-          overflow: 'hidden',
         }}
       >
         {/* THE TRACK IS GRADED (§4). A grey track with a dot tells a member
             WHERE the number is but not WHAT IT MEANS. */}
-        <ZoneBed radius={0} />
+        <ZoneBed radius={3} />
         {/* Span between standard and this course, in this tee's zone colour -
             works in both directions. */}
         <div
