@@ -48,6 +48,10 @@ const SURFACE_TOKENS = {
     beadStroke: '#FFFFFF',
     tickInk: A.INK,
     tickDim: A.DIM,
+    // The signed-off LIGHT values. They do not move: the friends rail, the
+    // scorecard sheet and the course analytics all draw on light.
+    fillAbove: 0.2,
+    fillBelow: 0.26,
   },
   dark: {
     field: 'rgba(255,255,255,0.34)',
@@ -59,6 +63,11 @@ const SURFACE_TOKENS = {
     beadStroke: '#0B0D10',
     tickInk: 'rgba(255,255,255,0.82)',
     tickDim: 'rgba(255,255,255,0.40)',
+    // BRIEF_ROUND_POST_ENRICHMENT §5: the light figures read far fainter on
+    // near-black, so the dark surface carries its own, richer pair — here in
+    // the map, never as a caller-side prop override.
+    fillAbove: 0.3,
+    fillBelow: 0.42,
   },
 } as const;
 
@@ -207,13 +216,13 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, surface =
           )}
           {/* ABOVE LEVEL: density at the TOP, fading down to the level rule. */}
           <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={T.over} stopOpacity={0.2} />
+            <stop offset="0%" stopColor={T.over} stopOpacity={T.fillAbove} />
             <stop offset="100%" stopColor={T.over} stopOpacity={0.02} />
           </linearGradient>
           {wentUnder && (
             /* BELOW LEVEL: density at the LOW POINT, fading UP to the rule. */
             <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stopColor={T.under} stopOpacity={0.26} />
+              <stop offset="0%" stopColor={T.under} stopOpacity={T.fillBelow} />
               <stop offset="100%" stopColor={T.under} stopOpacity={0.02} />
             </linearGradient>
           )}
