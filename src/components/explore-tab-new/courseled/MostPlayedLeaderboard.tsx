@@ -129,7 +129,9 @@ export function MostPlayedLeaderboard({
                 >
                   {name}
                 </span>
-                {m?.region && (
+                {/* META LINE: region · played to +n. NO TRAILING MIDDOT when
+                    the course has no scored eighteen this week. */}
+                {(m?.region || r.avgToPar != null) && (
                   <span
                     style={{
                       ...LABEL,
@@ -140,52 +142,59 @@ export function MostPlayedLeaderboard({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {m.region}
-                  </span>
-                )}
-                {r.delta != null && r.delta > 0 && (
-                  <span
-                    style={{
-                      ...LABEL,
-                      display: 'block',
-                      fontSize: 9,
-                      color: A.DIM,
-                      marginTop: 2,
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                    {t('discover.mostPlayedDelta', '+{{count}} on last week', {
-                      count: r.delta,
-                    })}
+                    {m?.region}
+                    {m?.region && r.avgToPar != null ? ' · ' : ''}
+                    {/* A SCORE, NOT A MOVEMENT: to-par convention, BODY ink,
+                        never the movement green beside it. */}
+                    {r.avgToPar != null && (
+                      <span style={{ color: A.BODY }}>
+                        {t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
+                          value: formatToPar(r.avgToPar),
+                        })}
+                      </span>
+                    )}
                   </span>
                 )}
+                {/* VOLUME BAR: count / busiest in the rendered set. */}
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'block',
+                    height: 5,
+                    marginTop: 7,
+                    borderRadius: 999,
+                    background: A.BORDER,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      height: '100%',
+                      width: `${Math.max(4, (r.count / maxCount) * 100)}%`,
+                      borderRadius: 999,
+                      background: A.INK,
+                    }}
+                  />
+                </span>
               </span>
-              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 30 }}>
+              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
                 <span
                   style={{
                     ...NUMF,
                     display: 'block',
-                    fontSize: 24,
-                    letterSpacing: '-0.035em',
-                    lineHeight: 0.95,
+                    fontSize: 20,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
                     color: A.INK,
                   }}
                 >
                   {formatNumber(r.count)}
                 </span>
-                <span
-                  style={{
-                    ...LABEL,
-                    display: 'block',
-                    fontSize: 9,
-                    color: A.DIM,
-                    marginTop: 3,
-                  }}
-                >
-                  {t('discover.roundsLabel', 'Rounds')}
-                </span>
+                <MoveMark row={r} t={t} />
               </span>
             </button>
           );
