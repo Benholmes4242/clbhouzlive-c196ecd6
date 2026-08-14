@@ -201,7 +201,7 @@ const Shell: React.FC<{
 const LegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
     <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em' }}>{label}</span>
+    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em', color: '#3A424C' }}>{label}</span>
   </span>
 );
 
@@ -468,14 +468,22 @@ const TrendCard: React.FC<{
         const worstIdx = flat ? -1 : points.findIndex((p) => p.v === stats.worst);
         const bestIdx = flat ? -1 : points.findIndex((p) => p.v === stats.best);
 
-        const callout = (idx: number, above: boolean) => {
+        const callout = (idx: number, kind: 'high' | 'low') => {
           if (idx < 0) return null;
           const [cx, cy] = xy[idx];
           const tone = zoneColor(points[idx].v, stats.best, stats.worst);
           const onMarker = idx === active;
-          // Edge inset: a centred label at either end would clip the plot.
-          const anchor = cx <= padX + 14 ? 'start' : cx >= w - padX - 14 ? 'end' : 'middle';
-          const tx = anchor === 'start' ? Math.max(cx - 3, 2) : anchor === 'end' ? Math.min(cx + 3, w - 2) : cx;
+          // Horizontal edge guard: the last revision is often the best, so the
+          // right-hand rim is hit immediately. Anchor into the plot by 2px.
+          const nearLeft = cx <= padX + 18;
+          const nearRight = cx >= w - padX - 18;
+          const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
+          const tx = nearLeft ? 2 : nearRight ? w - 2 : cx;
+          // Vertical side: default high above, low below. Flip when the point is
+          // within 13px of the top/bottom so the label never leaves the viewBox.
+          const nearTop = cy <= 13;
+          const nearBottom = cy >= h - 13;
+          const above = kind === 'high' ? !nearTop : nearBottom;
           return (
             <g key={idx} opacity={onMarker ? 0.42 : 1}>
               {/* When today IS the extreme, the scrub marker owns the point:
@@ -519,8 +527,8 @@ const TrendCard: React.FC<{
             <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
             <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
             {/* Under the marker triple, so the marker is never obscured. */}
-            {callout(worstIdx, true)}
-            {callout(bestIdx, false)}
+            {callout(worstIdx, 'high')}
+            {callout(bestIdx, 'low')}
             <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
             <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
             <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
