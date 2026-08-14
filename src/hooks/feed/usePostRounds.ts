@@ -38,6 +38,14 @@ export interface PostRoundHole {
   holeNo: number;
   par: number | null;
   gross: number | null;
+  /**
+   * BRIEF §1.4 — the shape keeps ALL EIGHTEEN positions, so the cell carries
+   * its own state:
+   *   played true,  gross present -> the score
+   *   played true,  gross null    -> PICKED UP (started, did not hole out)
+   *   played false                -> NOT PLAYED (never started it)
+   */
+  played: boolean;
 }
 
 export interface PostRound {
@@ -113,8 +121,10 @@ const SCORED_FLOOR = 12;
  *     BRIEF_ROUND_POST_EMPTY_SCORECARD stands for it), AND
  *   - at least SCORED_FLOOR played holes carry a score.
  *
- * played = false holes are excluded: a hole nobody played is not part of the
- * round. adjusted_gross is NEVER substituted for a missing cell.
+ * played = false holes are KEPT (BRIEF §1.4): every hole is returned so the
+ * strip renders eighteen cells with unbroken numbering, each marked by its own
+ * state. Only PLAYED holes carrying a score count towards SCORED_FLOOR - a
+ * not-played hole is not a gap. adjusted_gross is NEVER substituted.
  */
 function renderableShape(
   shape: (PostRoundHole & { played: boolean })[] | null,
@@ -125,10 +135,10 @@ function renderableShape(
   const scored = playedHoles.filter((h) => h.gross != null).length;
   if (scored === 0) return null;
   if (scored < Math.min(SCORED_FLOOR, playedHoles.length)) return null;
-  return playedHoles
+  return shape
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
-    .map(({ holeNo, par, gross }) => ({ holeNo, par, gross }));
+    .map(({ holeNo, par, gross, played }) => ({ holeNo, par, gross, played }));
 }
 
 /** Batched post_id -> whs_score_id for one feed page. */
@@ -271,10 +281,9 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           cleanCard: (r.clean_card as boolean | null) ?? null,
           slopeRating: (r.slope_rating as number | null) ?? null,
           longestBirdieRun: (r.longest_birdie_run as number | null) ?? null,
-          // RENDER IF MOSTLY SCORED: played holes only, gaps kept as null gross
-          // so the card can mark them. A round with NO scored played hole still
-          // resolves to null (the empty case). A genuine 9-hole round (9 played
-          // + scored, 9 unplayed) keeps its shape. Sorted defensively.
+          // RENDER IF MOSTLY SCORED: all eighteen positions kept, each cell
+          // carrying its state (scored / picked up / not played). A round with
+          // NO scored played hole still resolves to null (the empty case).
           holeShape: renderableShape(shape),
           crown: crowns.get(id) ?? null,
         });
