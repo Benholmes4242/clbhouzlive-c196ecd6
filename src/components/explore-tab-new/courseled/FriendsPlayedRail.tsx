@@ -25,7 +25,7 @@ import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
-import { A, FIGS, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
+import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
  * Section 1 — WHERE YOUR FRIENDS PLAYED (BRIEF_FRIENDS_PLAYED_TILE_GLASS).
