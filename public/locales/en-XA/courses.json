@@ -1016,7 +1016,11 @@
       "parOrBetterShort": "[~~Ƥář őř ƀéţţéř~~]",
       "doublesARound": "[~~Đőúƀļéš á řőúñđ~~]",
       "roundsLabel": "[~~Řőúñđš~~]",
-      "colCostARound": "[~~Ĉőšţ á řőúñđ~~]"
+      "colCostARound": "[~~Ĉőšţ á řőúñđ~~]",
+      "gapBetterShots": "[~~Šĥőţš ƀéţţéř ţĥáñ ţĥé ƒíéļđ ĥéřé~~]",
+      "gapWorseShots": "[~~Šĥőţš ŵőřšé ţĥáñ ţĥé ƒíéļđ ĥéřé~~]",
+      "youHere": "[~~Ýőú ĥéřé~~]",
+      "fieldOnHole": "[~~Ƒíéļđ ĥéřé~~]"
     }
   },
   "network": {

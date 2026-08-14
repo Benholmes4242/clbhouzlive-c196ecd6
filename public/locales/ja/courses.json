@@ -693,7 +693,11 @@
       "parOrBetterShort": "Par or better",
       "doublesARound": "Doubles a round",
       "roundsLabel": "Rounds",
-      "colCostARound": "Cost a round"
+      "colCostARound": "Cost a round",
+      "gapBetterShots": "ここでのフィールドとの差（良い）",
+      "gapWorseShots": "ここでのフィールドとの差（悪い）",
+      "youHere": "あなた",
+      "fieldOnHole": "フィールド"
     }
   },
   "network": {
