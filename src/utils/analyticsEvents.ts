@@ -1,7 +1,7 @@
 // Analytics event tracking utility
 // Rewired to write directly to Supabase analytics_events table
 import { supabase } from '@/integrations/supabase/client';
-import { getSessionId } from './analyticsSession';
+import { getSessionId, getUserAgent } from './analyticsSession';
 
 /**
  * Bot traffic is dropped at WRITE time. Read-time filtering means every future
@@ -38,7 +38,7 @@ export const analyticsEvents = {
           session_id: getSessionId(),
           page: window.location.pathname,
           build: __BUILD_ID__,
-          ua: navigator.userAgent.slice(0, 200),
+          ua: getUserAgent(),
         },
       });
     } catch {
