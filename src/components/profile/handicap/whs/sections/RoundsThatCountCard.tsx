@@ -288,6 +288,25 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     riseT = sortedAsc[8] ?? null;
   }
 
+  // ── The cut line ────────────────────────────────────────────────────────
+  // The boundary that actually decides THESE dots: the worst (highest)
+  // counting differential in the current window — the edge of the set
+  // useCounters returned. Derived FROM the counter set, never recomputed,
+  // so no green dot can ever sit above it. This is NOT cutTarget (which is
+  // forward-looking and stays in the footer).
+  const counterDiffs = rounds
+    .filter((r) => r.is_counter && r.diff != null)
+    .map((r) => r.diff as number);
+  const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
+
+  // ── Drop queue ──────────────────────────────────────────────────────────
+  // Full window only (fallingSet is empty below 20 by construction).
+  // Soonest first == chronologically oldest first. Capped at three rows.
+  const dropQueue = rounds
+    .map((r, i) => ({ ...r, fallsIn: i + 1 }))
+    .filter((r) => fallingSet.has(r.id))
+    .slice(0, 3);
+
   const ownerToken =
     viewMode === 'friend'
       ? ownerFirstName
@@ -295,6 +314,13 @@ export const RoundsThatCountCard: React.FC<Props> = ({
         : 'THEIR'
       : 'YOUR';
   const legendOwnerLabel = `COUNTS TOWARD ${ownerToken} INDEX`;
+  const queueSubject =
+    viewMode === 'friend'
+      ? ownerFirstName
+        ? `for ${ownerFirstName}`
+        : 'for them'
+      : '';
+  const queueNote = `These rounds count ${queueSubject ? `${queueSubject} ` : ''}today. When they drop out, worse rounds take their place.`;
 
   const fadeId = `rtc-fade-${connectionId}`;
 
@@ -487,6 +513,40 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 </g>
               ))}
 
+              {/* a2. Counting band + cut line — the worst counting differential */}
+              {cutLine != null && (
+                <>
+                  <rect
+                    x={PADX}
+                    y={y(cutLine)}
+                    width={W - PADX - PADR + 4}
+                    height={Math.max(H - 22 - y(cutLine), 0)}
+                    fill={GOOD}
+                    opacity={0.07}
+                    pointerEvents="none"
+                  />
+                  <line
+                    x1={PADX}
+                    x2={W - PADR + 4}
+                    y1={y(cutLine)}
+                    y2={y(cutLine)}
+                    stroke={GOOD}
+                    strokeOpacity={0.8}
+                    strokeWidth={1.2}
+                    strokeDasharray="3 3"
+                  />
+                  <text
+                    x={PADX}
+                    y={y(cutLine) - 5}
+                    fill={GOOD}
+                    opacity={0.8}
+                    style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.12em' }}
+                  >
+                    COUNTS BELOW
+                  </text>
+                </>
+              )}
+
               {/* b. Scrub hairline */}
               <line
                 x1={x(selIdx)}
@@ -497,15 +557,16 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 strokeWidth={1}
               />
 
-              {/* c. Line */}
+              {/* c. Line — ordering only; quieter than the cut line */}
               <path
                 d={linePath}
                 fill="none"
-                stroke="rgba(242,244,247,0.28)"
-                strokeWidth={1.6}
+                stroke="rgba(242,244,247,0.16)"
+                strokeWidth={1.5}
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
+
 
               {/* d. Counter dots */}
               {rounds.map((r, i) => {
@@ -632,6 +693,91 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 </span>
               )}
             </div>
+
+            {/* 4b. Drop queue — full window only, soonest first, max three */}
+            {dropQueue.length > 0 && (
+              <div style={{ marginTop: 10, padding: '0 4px' }}>
+                {dropQueue.map((r) => {
+                  const v = r.diff ?? 0;
+                  const frac = clamp((v - dataMin) / range, 0.06, 1);
+                  return (
+                    <div
+                      key={`dq-${r.id}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '4px 0',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          background: AMBER,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          flex: 1,
+                          height: 3,
+                          borderRadius: 2,
+                          background: 'rgba(255,255,255,0.06)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'block',
+                            height: '100%',
+                            width: `${frac * 100}%`,
+                            background: AMBER,
+                            opacity: 0.7,
+                            borderRadius: 2,
+                          }}
+                        />
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: AMBER,
+                          ...NUM,
+                        }}
+                      >
+                        {r.diff != null ? fmtDiff(r.diff) : '—'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          color: FAINT,
+                          minWidth: 62,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {r.fallsIn === 1 ? 'NEXT ROUND' : `IN ${r.fallsIn}`}
+                      </span>
+                    </div>
+                  );
+                })}
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: DIM,
+                    marginTop: 6,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {queueNote}
+                </div>
+              </div>
+            )}
+
 
             {/* 5. Next-round row */}
             <div
