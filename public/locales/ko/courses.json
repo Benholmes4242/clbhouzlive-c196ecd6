@@ -679,7 +679,9 @@
         "points": "Points",
         "birdies": "Birdies",
         "diff": "Diff"
-      }
+      },
+      "youRankOf": "{{count}}명 중 {{rank}}위",
+      "youRank": "{{rank}}위"
     },
     "you": {
       "oneToGoHole": "One to go · hole {{n}}",
