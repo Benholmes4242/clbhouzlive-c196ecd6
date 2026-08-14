@@ -374,7 +374,7 @@ export const HoleRowV2: React.FC<{
                 fontSize: 14,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
-                color: field ? field.tone : A.DIM,
+                color: fieldTone,
                 lineHeight: 1.1,
               }}
             >
