@@ -1,4 +1,6 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
@@ -6,6 +8,7 @@ import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
  * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
@@ -26,6 +29,51 @@ interface Props {
   showEyebrow?: boolean;
 }
 
+/** One decimal, TRUE MINUS, "E" at level. */
+function formatToPar(v: number): string {
+  const r = Math.round(v * 10) / 10;
+  if (r === 0) return 'E';
+  const n = Math.abs(r).toFixed(1);
+  return `${r > 0 ? '+' : '\u2212'}${n}`;
+}
+
+/**
+ * MOVEMENT — a MOVEMENT, not a score: INDEX_DELTA.light green up / red down.
+ * NEW is amber (the absence of a prior week), LEVEL is dim. Absolute figures
+ * only; a percentage at this volume would lie (see §5).
+ */
+function MoveMark({
+  row,
+  t,
+}: {
+  row: MostPlayedRow;
+  t: (key: string, def: string, opts?: Record<string, unknown>) => string;
+}) {
+  const base: React.CSSProperties = {
+    ...LABEL,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 2,
+    fontSize: 9,
+    marginTop: 4,
+    fontVariantNumeric: 'tabular-nums lining-nums',
+  };
+  if (row.move === 'new')
+    return <span style={{ ...base, color: A.AMBER }}>{t('discover.mostPlayedNew', 'New')}</span>;
+  if (row.move === 'level')
+    return <span style={{ ...base, color: A.DIM }}>{t('discover.mostPlayedLevel', 'Level')}</span>;
+  const up = row.move === 'up';
+  const color = up ? INDEX_DELTA.light.improved : INDEX_DELTA.light.drifted;
+  const Icon = up ? ArrowUp : ArrowDown;
+  return (
+    <span style={{ ...base, color }}>
+      <Icon size={9} strokeWidth={2.75} />
+      {formatNumber(Math.abs(row.change))}
+    </span>
+  );
+}
+
 export function MostPlayedLeaderboard({
   rows,
   limit = 5,
@@ -42,6 +90,10 @@ export function MostPlayedLeaderboard({
   // gam_round_stats, so only the THUMBNAIL waits — the shimmer sits in that slot
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
+  // BAR SCALE: the RENDERED SET. This section is a ranking, not an absolute
+  // measure, so the top row always fills. The sheet shows more courses and so
+  // may scale differently — stated in the brief report.
+  const maxCount = shown.reduce((m, r) => Math.max(m, r.count), 0) || 1;
 
   if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
@@ -124,7 +176,9 @@ export function MostPlayedLeaderboard({
                 >
                   {name}
                 </span>
-                {m?.region && (
+                {/* META LINE: region · played to +n. NO TRAILING MIDDOT when
+                    the course has no scored eighteen this week. */}
+                {(m?.region || r.avgToPar != null) && (
                   <span
                     style={{
                       ...LABEL,
@@ -135,52 +189,59 @@ export function MostPlayedLeaderboard({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {m.region}
-                  </span>
-                )}
-                {r.delta != null && r.delta > 0 && (
-                  <span
-                    style={{
-                      ...LABEL,
-                      display: 'block',
-                      fontSize: 9,
-                      color: A.DIM,
-                      marginTop: 2,
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                    {t('discover.mostPlayedDelta', '+{{count}} on last week', {
-                      count: r.delta,
-                    })}
+                    {m?.region}
+                    {m?.region && r.avgToPar != null ? ' · ' : ''}
+                    {/* A SCORE, NOT A MOVEMENT: to-par convention, BODY ink,
+                        never the movement green beside it. */}
+                    {r.avgToPar != null && (
+                      <span style={{ color: A.BODY }}>
+                        {t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
+                          value: formatToPar(r.avgToPar),
+                        })}
+                      </span>
+                    )}
                   </span>
                 )}
+                {/* VOLUME BAR: count / busiest in the rendered set. */}
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'block',
+                    height: 5,
+                    marginTop: 7,
+                    borderRadius: 999,
+                    background: A.BORDER,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      height: '100%',
+                      width: `${Math.max(4, (r.count / maxCount) * 100)}%`,
+                      borderRadius: 999,
+                      background: A.INK,
+                    }}
+                  />
+                </span>
               </span>
-              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 30 }}>
+              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
                 <span
                   style={{
                     ...NUMF,
                     display: 'block',
-                    fontSize: 24,
-                    letterSpacing: '-0.035em',
-                    lineHeight: 0.95,
+                    fontSize: 20,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
                     color: A.INK,
                   }}
                 >
                   {formatNumber(r.count)}
                 </span>
-                <span
-                  style={{
-                    ...LABEL,
-                    display: 'block',
-                    fontSize: 9,
-                    color: A.DIM,
-                    marginTop: 3,
-                  }}
-                >
-                  {t('discover.roundsLabel', 'Rounds')}
-                </span>
+                <MoveMark row={r} t={t} />
               </span>
             </button>
           );

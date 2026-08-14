@@ -26,12 +26,24 @@ import { supabase } from '@/integrations/supabase/client';
 /** A course needs at least this many rounds in the 7-day window to appear. */
 const MIN_ROUNDS = 2;
 
+/** Every outcome of the week-on-week comparison, none discarded. */
+export type MostPlayedMove = 'new' | 'up' | 'down' | 'level';
+
 export interface MostPlayedRow {
   courseId: string;
   courseName: string | null;
   count: number;
-  /** Positive change vs the prior 7 days; null when flat, negative, or new. */
-  delta: number | null;
+  /** Rounds in the prior 7 days. */
+  prior: number;
+  /** Raw signed change vs the prior 7 days (count - prior). */
+  change: number;
+  /** Which of the four states the row renders. */
+  move: MostPlayedMove;
+  /**
+   * Average to par over the CURRENT seven days, eighteen-hole scored rounds
+   * only. Null when the course has no comparable scored round this week.
+   */
+  avgToPar: number | null;
 }
 
 const DAY = 86_400_000;
@@ -44,9 +56,12 @@ export function useMostPlayedThisWeek(limit = 25) {
       const startPrev = new Date(now - 14 * DAY).toISOString().slice(0, 10);
       const startCur = new Date(now - 7 * DAY).toISOString().slice(0, 10);
 
+      // SAME READ, TWO MORE COLUMNS. gam_round_stats carries NO to-par field,
+      // so the average is derived from gross_score - course_par; holes_played
+      // keeps nine-hole cards out of that average only.
       const { data, error } = await supabase
         .from('gam_round_stats' as never)
-        .select('course_id, course_name, play_date')
+        .select('course_id, course_name, play_date, gross_score, course_par, holes_played')
         .gte('play_date', startPrev)
         .not('course_id', 'is', null);
       if (error) throw error;
@@ -55,16 +70,33 @@ export function useMostPlayedThisWeek(limit = 25) {
         course_id: string | null;
         course_name: string | null;
         play_date: string;
+        gross_score: number | null;
+        course_par: number | null;
+        holes_played: number | null;
       }>;
 
       const cur = new Map<string, number>();
       const prev = new Map<string, number>();
       const names = new Map<string, string | null>();
+      /** Running to-par sum/count for the CURRENT week, 18-hole scored only. */
+      const par = new Map<string, { sum: number; n: number }>();
       for (const r of rows) {
         if (!r.course_id) continue;
         names.set(r.course_id, r.course_name ?? names.get(r.course_id) ?? null);
-        const bucket = r.play_date >= startCur ? cur : prev;
+        const isCurrent = r.play_date >= startCur;
+        const bucket = isCurrent ? cur : prev;
         bucket.set(r.course_id, (bucket.get(r.course_id) ?? 0) + 1);
+        if (
+          isCurrent &&
+          r.holes_played === 18 &&
+          r.gross_score != null &&
+          r.course_par != null
+        ) {
+          const agg = par.get(r.course_id) ?? { sum: 0, n: 0 };
+          agg.sum += r.gross_score - r.course_par;
+          agg.n += 1;
+          par.set(r.course_id, agg);
+        }
       }
 
       return [...cur.entries()]
@@ -72,14 +104,19 @@ export function useMostPlayedThisWeek(limit = 25) {
         .map(([courseId, count]) => {
           const before = prev.get(courseId) ?? 0;
           const change = count - before;
+          const agg = par.get(courseId);
           return {
             courseId,
             courseName: names.get(courseId) ?? null,
             count,
-            // Only a genuine comparison renders: the course must have been
-            // played in the prior seven days too.
-            delta: before > 0 && change > 0 ? change : null,
-          };
+            prior: before,
+            change,
+            // FOUR STATES, NONE DISCARDED: a drop and a first appearance are
+            // both reportable facts about the week.
+            move:
+              before === 0 ? 'new' : change > 0 ? 'up' : change < 0 ? 'down' : 'level',
+            avgToPar: agg && agg.n > 0 ? agg.sum / agg.n : null,
+          } satisfies MostPlayedRow;
         })
         .sort((a, b) => b.count - a.count || (a.courseName ?? '').localeCompare(b.courseName ?? ''))
         .slice(0, limit);
