@@ -284,24 +284,15 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           </span>
         </div>
 
-        <div
-          style={{
-            height: 3,
-            background: 'var(--hcp-bg-3)',
-            borderRadius: 999,
-            overflow: 'hidden',
-            marginBottom: 6,
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              width: `${progressPct}%`,
-              background: tokens.progressFill,
-              transition: 'width 280ms ease',
-            }}
-          />
-        </div>
+        <StreakTrack
+          current={current}
+          milestone={milestone}
+          best={best}
+          state={state}
+          fill={tokens.progressFill}
+          progressPct={progressPct}
+        />
+
         <div
           style={{
             display: 'flex',
