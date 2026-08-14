@@ -30,6 +30,7 @@ import {
   BoardHeaderRow,
   BoardRow,
   CrownGauge,
+  HeldGauge,
   ordinalSuffix,
 } from './_shared/boardParts';
 
@@ -128,6 +129,23 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const gapFigure = gapSigned ? gapSigned.replace(/^[+\-\u2212]/, '') : '';
   const gapUnit = gapRaw != null ? gapUnitWord(category, gapRaw) : '';
 
+  // HELD STATE (BRIEF_MOVEMENT_RED_AND_HELD_BOARD).
+  // When the member holds the crown, "how far to the crown" is not a question
+  // they have - they ARE the crown. The card answers the one that is left: how
+  // big is the lead, and who is closest. Two cells, not three; the chasing
+  // state keeps all three.
+  const holdsIt = champion != null && champion.isSelf;
+  const runnerUp = holdsIt ? (rows[1] ?? null) : null;
+  const leadRaw = runnerUp && selfRow ? Math.abs(selfRow.value - runnerUp.value) : null;
+  const leadTied = leadRaw != null && leadRaw < 0.005;
+  const leadFigure = leadRaw != null ? formatLegendGap(category, leadRaw).replace(/^[+\-\u2212]/, '') : '';
+  const leadUnit = leadRaw != null ? gapUnitWord(category, leadRaw) : '';
+  // The runner-up's position on the MEMBER's scale: they are the chaser now.
+  const notchPct =
+    runnerUp && selfRow && !leadTied
+      ? chaseProgress(category, selfRow.value, runnerUp.value) * 100
+      : null;
+
   const thirdCell = level
     ? { label: t('champions.toTheCrown'), value: t('champions.level'), tone: A.AMBER }
     : selfRow
@@ -151,33 +169,79 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             : undefined
         }
       >
-        <StatRow
-          items={[
-            {
-              label: t('champions.champion'),
-              value: champion?.valueDisplay ?? '',
-              sub: champion ? firstName(champion.name) : undefined,
-            },
-            {
-              label: t('champions.you'),
-              value: selfRow?.valueDisplay ?? '',
-              tone: A.AMBER,
-              sub: selfRow ? unitLabel || undefined : undefined,
-            },
-            thirdCell,
-          ]}
-        />
-
-        {selfRow && champion && (
-          <CrownGauge
-            pct={pct}
-            level={level}
-            youLabel={t('champions.you')}
-            crownLabel={t('champions.crown')}
+        {holdsIt ? (
+          <StatRow
+            items={
+              runnerUp
+                ? [
+                    {
+                      label: t('champions.yourCrown'),
+                      value: champion?.valueDisplay ?? '',
+                      tone: A.AMBER,
+                      sub: unitLabel || undefined,
+                    },
+                    leadTied
+                      ? {
+                          label: t('champions.yourLead'),
+                          value: (
+                            <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, letterSpacing: 0 }}>
+                              {t('champions.levelWithName', { name: firstName(runnerUp.name) })}
+                            </span>
+                          ),
+                        }
+                      : {
+                          label: t('champions.yourLead'),
+                          value: leadFigure,
+                          sub: t('champions.overName', { name: firstName(runnerUp.name) }),
+                        },
+                  ]
+                : [
+                    {
+                      label: t('champions.yourCrown'),
+                      value: champion?.valueDisplay ?? '',
+                      tone: A.AMBER,
+                      sub: unitLabel || undefined,
+                    },
+                  ]
+            }
+          />
+        ) : (
+          <StatRow
+            items={[
+              {
+                label: t('champions.champion'),
+                value: champion?.valueDisplay ?? '',
+                sub: champion ? firstName(champion.name) : undefined,
+              },
+              {
+                label: t('champions.you'),
+                value: selfRow?.valueDisplay ?? '',
+                tone: A.AMBER,
+                sub: selfRow ? unitLabel || undefined : undefined,
+              },
+              thirdCell,
+            ]}
           />
         )}
 
-        <div style={{ marginTop: selfRow && champion ? 14 : 18 }}>
+        {holdsIt && runnerUp ? (
+          <HeldGauge
+            notchPct={notchPct}
+            nearestLabel={t('champions.nearest', { value: runnerUp.valueDisplay })}
+            holdLabel={t('champions.youHoldIt')}
+          />
+        ) : (
+          selfRow && champion && (
+            <CrownGauge
+              pct={pct}
+              level={level}
+              youLabel={t('champions.you')}
+              crownLabel={t('champions.crown')}
+            />
+          )
+        )}
+
+        <div style={{ marginTop: (holdsIt && runnerUp) || (selfRow && champion) ? 14 : 18 }}>
           <BoardHeaderRow
             rankLabel={t('champions.colRank')}
             memberLabel={t('champions.colMember')}
