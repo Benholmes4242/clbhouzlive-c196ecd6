@@ -37,8 +37,23 @@ const CAPTION: React.CSSProperties = {
 
 const DAMAGE_GRID = '30px 1fr 52px';
 
-/** Noise floor shared with the s3 caption logic - do not change. */
-const THIRDS_NOISE_FLOOR = 1.5;
+/**
+ * Noise floor shared with the s3 caption logic - the two MUST move together,
+ * and they do: this one constant drives both the caption branch and the ink
+ * ladder's gate (BRIEF_THIRDS_FLOOR_AND_DOUBLES_SOURCE s0).
+ *
+ * DERIVED, NOT CHOSEN. Over every (member, course) pair with 5+ hole-by-hole
+ * rounds, the spread a member would show from SAMPLING ALONE - 1.693 * sd of a
+ * third's per-round total / sqrt(rounds), the expected range of three means -
+ * has a median of 0.78 and a mean of 0.84. Below ~0.8 the worst third is not
+ * reliably the worst third, so a directional caption would be describing
+ * noise. At or above it the ordering is claiming something.
+ *
+ * The old 1.5 called the MEDIAN card (spread 1.10) even, which is why a full
+ * shot of back-six fade was reported as "no weak stretch" while the bars above
+ * plainly showed it.
+ */
+const THIRDS_NOISE_FLOOR = 0.8;
 
 /** Neutral ink ladder for the thirds bars, worst first. Never semantic colour. */
 const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
