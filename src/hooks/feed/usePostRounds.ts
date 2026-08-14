@@ -271,12 +271,11 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           cleanCard: (r.clean_card as boolean | null) ?? null,
           slopeRating: (r.slope_rating as number | null) ?? null,
           longestBirdieRun: (r.longest_birdie_run as number | null) ?? null,
-          // DROP IF PARTIAL: the strip is complete or it does not render.
-          // Every PLAYED hole must carry a score, and at least one played hole
-          // must exist. A synced round has 18 rows of pars with no scores and
-          // resolves to null here; a genuine 9-hole round (9 played + scored,
-          // 9 unplayed) keeps its shape. Sorted defensively.
-          holeShape: completeShape(shape),
+          // RENDER IF MOSTLY SCORED: played holes only, gaps kept as null gross
+          // so the card can mark them. A round with NO scored played hole still
+          // resolves to null (the empty case). A genuine 9-hole round (9 played
+          // + scored, 9 unplayed) keeps its shape. Sorted defensively.
+          holeShape: renderableShape(shape),
           crown: crowns.get(id) ?? null,
         });
       }
