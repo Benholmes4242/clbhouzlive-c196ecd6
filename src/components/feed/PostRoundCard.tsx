@@ -101,6 +101,10 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
         </span>
       </span>
     )}
+  </div>
+);
+
+
 
 /**
  * A played hole with no score (the member picked up). BRIEF_ROUND_STRIP_PARTIAL_HOLES
