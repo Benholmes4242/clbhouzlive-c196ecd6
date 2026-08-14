@@ -128,23 +128,41 @@ export function useContentReactions(targets: readonly ReactionTarget[]) {
       // The unique constraint makes a double-fire harmless.
       if (error && String((error as { code?: string }).code ?? '') !== DUPLICATE_KEY) throw error;
     },
+    /**
+     * EVERY CACHE ENTRY HOLDING THIS ID IS PATCHED, not just the caller's.
+     *
+     * The query key is the sorted id-set of one section's visible window, so
+     * two sections rendering the SAME round hold two entries. Patching only
+     * `queryKey` left the sibling section stale, and the same heart on the same
+     * round read differently on one screen. content_reactions is canonical for
+     * rounds, so the write is patched into every window that contains the id
+     * and the whole family is invalidated on settle.
+     */
     onMutate: ({ type, id, mine }) => {
-      const previous = queryClient.getQueryData<CacheShape>(queryKey);
-      if (!previous || !viewerId) return { previous };
-      const rows = mine
-        ? previous.rows.filter(
-            (r) => !(r.target_type === type && r.target_id === id && r.user_id === viewerId),
-          )
-        : [...previous.rows, { target_type: type, target_id: id, user_id: viewerId }];
-      queryClient.setQueryData<CacheShape>(queryKey, { ...previous, rows });
+      if (!viewerId) return { previous: [] as [readonly unknown[], CacheShape | undefined][] };
+      const entries = queryClient.getQueriesData<CacheShape>({ queryKey: ['content-reactions'] });
+      const previous: [readonly unknown[], CacheShape | undefined][] = [];
+      for (const [key, prev] of entries) {
+        if (!prev) continue;
+        // The id-set lives in the key, so only windows showing this target move.
+        const window = String((key as unknown[])[1] ?? '').split(',');
+        if (!window.includes(id)) continue;
+        previous.push([key, prev]);
+        const rows = mine
+          ? prev.rows.filter(
+              (r) => !(r.target_type === type && r.target_id === id && r.user_id === viewerId),
+            )
+          : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId }];
+        queryClient.setQueryData<CacheShape>(key as readonly unknown[], { ...prev, rows });
+      }
       return { previous };
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.previous) queryClient.setQueryData(queryKey, ctx.previous);
+      for (const [key, prev] of ctx?.previous ?? []) queryClient.setQueryData(key, prev);
       toast.error('Could not save that reaction. Please try again.');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
     },
   });
 

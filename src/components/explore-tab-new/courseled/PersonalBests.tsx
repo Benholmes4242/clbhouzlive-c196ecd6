@@ -7,6 +7,8 @@ import { ATW_PHOTO_HEIGHTS, relativeWhen } from './AroundTheWorld';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonalBests';
 import { createMasonryAssignment, placeStable } from './stableMasonry';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 
@@ -91,6 +93,25 @@ export function PersonalBests({
   );
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
+
+  /**
+   * REACTIONS (BRIEF_PERSONAL_BESTS_REACTIONS). ONE read for the whole section,
+   * built from this section's own kept rows — never one per tile.
+   *
+   * The target is { type: 'round', id: whs_score_id }: IDENTICAL to Standout
+   * Rounds and the friends rail, because content_reactions is canonical for
+   * rounds. A round that appears in BOTH sections therefore SHARES one state —
+   * react here and the heart fills there. That is the system working; do not
+   * scope or namespace these targets to separate them.
+   */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      kept
+        .filter((r) => !!r.whs_score_id)
+        .map((r) => ({ type: 'round', id: r.whs_score_id }) as ReactionTarget),
+    [kept],
+  );
+  const reactions = useContentReactions(reactionTargets);
 
   /**
    * UNRESOLVED IS NOT ABSENT (§6.2). `isFetched`, never `!isLoading` — a
@@ -186,6 +207,37 @@ export function PersonalBests({
                   }
                   onCoursePress(tt.r.course_id);
                 }}
+                trailing={
+                  /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a
+                     control appears inside it, so member names never go ragged
+                     between a tile with a reaction and one without. The heart's
+                     44px tap target is cancelled by a negative margin, so the
+                     WHO row (billed at 18) does not grow: the estimate at :118
+                     is unchanged. */
+                  <ReactionSlot>
+                    {tt.r.whs_score_id
+                      ? (() => {
+                          const st = reactions.stateFor('round', tt.r.whs_score_id);
+                          return (
+                            <ReactionAction
+                              hidden={!reactions.viewerId || reactions.unavailable}
+                              /* OWN FEAT: the count reads, the glyph is not
+                                 tappable. `is_self` comes from the RPC and is
+                                 never re-derived from the viewer id. */
+                              readOnly={tt.r.is_self}
+                              count={st.count}
+                              reacted={st.mine}
+                              /* Reserved count column so the glyph lands on the
+                                 same x down a column, reacted or not. */
+                              reserveCount
+                              onToggle={() => reactions.toggle('round', tt.r.whs_score_id)}
+                              label={t('discover.reactions.action', 'Like this round')}
+                            />
+                          );
+                        })()
+                      : null}
+                  </ReactionSlot>
+                }
               />
             ))}
           </div>
