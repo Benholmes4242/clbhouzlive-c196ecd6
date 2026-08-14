@@ -455,7 +455,10 @@
       "scaleShoot": "Shoot",
       "scaleBecomes": "Handicap becomes",
       "noChange": "no change",
-      "yourBest": "your best"
+      "yourBest": "your best",
+      "beatCaption": "Beat {{cut}}",
+      "staysAt": "Stays {{value}}",
+      "downTo": "Down to {{value}}"
     },
     "achievements": {
       "trophyRoom": "Trophy room",

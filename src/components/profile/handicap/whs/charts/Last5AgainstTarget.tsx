@@ -1,14 +1,23 @@
 /**
  * Last5AgainstTarget - the member's last five differentials, oldest left.
  *
- * ZERO is the only horizontal line, and it is drawn ONLY when at least one
- * value is negative. Positive bars grow up from zero, negative bars grow down.
+ * TWO HORIZONTALS, EACH MEANING SOMETHING DIFFERENT:
+ *   THE TARGET LINE (1px dashed, ink ~50%, captioned "BEAT {n}") is drawn
+ *   ALWAYS, BEHIND the bars. It used to be omitted for sparseness, but the
+ *   card names the target four times and the chart encoded it only as fill
+ *   colour: a member could see which bars were green but not how close the
+ *   grey one came. One line turns five coloured bars into five measured ones.
+ *   THE ZERO LINE keeps its old rule: drawn ONLY when at least one value is
+ *   negative. Positive bars grow up from zero, negative bars grow down.
+ * With no negative value there is ONE horizontal, which is the common case.
  *
  * A LOWER differential is better, so a bar that BEATS the target (strictly
  * below it) is green (CHART.DOWN). That is the documented handicap inversion,
- * not a mistake. Equal to the target is NOT a beat.
- *
- * No target line, no shaded band.
+ * not a mistake. Equal to the target is NOT a beat — a bar sitting exactly on
+ * the target line stays muted, matching the scenario row where shooting the
+ * target yields NO CHANGE. The axis is NOT inverted: the member's best round
+ * is the smallest bar, and the target line is what gives that sliver its
+ * reference.
  *
  * Renders NOTHING when there is no round to draw.
  */
@@ -22,8 +31,11 @@ interface Props {
   cut: number;
   /** "{n} of your last 5 beat {cut}" label. */
   footLabel: string;
+  /** Right-aligned caption above the target line, e.g. "BEAT 3.5". */
+  targetCaption?: string;
   height?: number;
 }
+
 
 const VALUE_STYLE = {
   fontFamily: CHART_FONT,
@@ -38,15 +50,18 @@ export const Last5AgainstTarget: React.FC<Props> = ({
   values,
   cut,
   footLabel,
+  targetCaption,
   height = 96,
 }) => {
   const clean = values.filter((v) => typeof v === 'number' && !Number.isNaN(v));
   if (clean.length === 0) return null;
   if (!(typeof cut === 'number' && !Number.isNaN(cut))) return null;
 
-  const maxPos = Math.max(0, ...clean);
-  const minNeg = Math.min(0, ...clean);
-  const hasNeg = minNeg < 0;
+  /* The TARGET is part of the scale, so the line always lands inside the plot.
+     The zero line's rule is unaffected: it depends on a negative VALUE only. */
+  const maxPos = Math.max(0, cut, ...clean);
+  const minNeg = Math.min(0, cut, ...clean);
+  const hasNeg = Math.min(0, ...clean) < 0;
   const span = maxPos - minNeg;
   if (!(span > 0)) return null;
 
@@ -55,9 +70,40 @@ export const Last5AgainstTarget: React.FC<Props> = ({
   const upPx = Math.round(height * upShare);
   const downPx = height - upPx;
 
+  /* Single linear mapping; agrees with upPx at zero. */
+  const cutTop = Math.round((height * (maxPos - cut)) / span);
+
   return (
     <div style={{ fontFamily: CHART_FONT }}>
       <div style={{ position: 'relative', height }}>
+        {/* Target line — BEHIND the bars. */}
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: cutTop,
+            height: 0,
+            borderTop: `1px dashed rgba(255,255,255,0.50)`,
+          }}
+        />
+        {targetCaption && (
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: Math.max(0, cutTop - 11),
+              ...VALUE_STYLE,
+              fontSize: 8,
+              color: CHART.DIM,
+            }}
+          >
+            {targetCaption}
+          </span>
+        )}
+
         {hasNeg && (
           <span
             aria-hidden
@@ -71,6 +117,7 @@ export const Last5AgainstTarget: React.FC<Props> = ({
             }}
           />
         )}
+
 
         <div style={{ display: 'flex', gap: 10, height: '100%' }}>
           {clean.map((v, i) => {

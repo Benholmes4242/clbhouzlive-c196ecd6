@@ -9,8 +9,15 @@
  *   cannot rise -> "Your handicap can't go up next round."
  *   will rise   -> "Your handicap goes up to {settle} next round" + sub.
  *
- * The card carries ONE sentence and ONE chart. No state label, no explanation
- * paragraph, no raise threshold - none is computed.
+ * The card carries ONE sentence and ONE chart. NO state label and NO
+ * explanation paragraph — that rule stands. What it now also carries is a
+ * SCENARIO TRACK above the SHOOT / BECOMES rows: the three rows describe a
+ * RANGE (one round moves the index from the no-change figure down to the best
+ * case), and that is the most motivating fact on the page. The track is a
+ * SUMMARY, not a replacement — the rows keep their exact figures beneath it.
+ * It is drawn from the scenarios ACTUALLY RENDERED, and NOT AT ALL when all
+ * three land on the same index. No pace, no projection, no verdict.
+
  *
  * Renders NOTHING below 20 rounds or when the projection is unusable.
  */
@@ -121,6 +128,16 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
   const bestOfFive = last5.length ? Math.min(...last5) : null;
   const rows = nextRoundScale(currentHandicap, cutTarget, bestOfFive);
 
+  /* The range comes from the scenarios ACTUALLY RENDERED, never a fixed span.
+     All three landing on one index means there is no range and no track. */
+  const becomes = rows.map((r) => r.becomes);
+  const worstBecomes = Math.max(...becomes);
+  const bestBecomes = Math.min(...becomes);
+  const hasRange = worstBecomes - bestBecomes > 0.05;
+  const rangeWorst = hasRange ? worstBecomes : null;
+  const rangeBest = hasRange ? bestBecomes : null;
+
+
   return (
     <section style={{ marginTop: 32, fontFamily: CHART_FONT }}>
       <DarkSectionHeader
@@ -164,6 +181,7 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
         <Last5AgainstTarget
           values={last5}
           cut={cutTarget}
+          targetCaption={t('common:handicap.nextRound.beatCaption', { cut })}
           footLabel={t('common:handicap.nextRound.beatLabel', {
             count: beating,
             total: last5.length,
@@ -178,10 +196,64 @@ const NextRoundWatch: React.FC<Props> = ({ connectionId, currentHandicap }) => {
             borderTop: `1px solid ${CHART.BORDER}`,
           }}
         >
+          {/* The range the three rows describe. Nothing when they agree. */}
+          {rangeWorst != null && rangeBest != null && (
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  position: 'relative',
+                  height: 6,
+                  borderRadius: 999,
+                  background: CHART.TRACK,
+                }}
+              >
+                {rows.map((r, i) => {
+                  const frac =
+                    (rangeWorst - r.becomes) / (rangeWorst - rangeBest);
+                  return (
+                    <span
+                      key={i}
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        top: -2,
+                        left: `${Math.min(100, Math.max(0, frac * 100))}%`,
+                        marginLeft: -1.5,
+                        width: 3,
+                        height: 10,
+                        borderRadius: 2,
+                        background: r.noChange ? CHART.DIM : CHART.DOWN,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: 7,
+                }}
+              >
+                <span style={LABEL}>
+                  {t('common:handicap.nextRound.staysAt', {
+                    value: rangeWorst.toFixed(1),
+                  })}
+                </span>
+                <span style={{ ...LABEL, color: CHART.DOWN }}>
+                  {t('common:handicap.nextRound.downTo', {
+                    value: rangeBest.toFixed(1),
+                  })}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={LABEL}>{t('common:handicap.nextRound.scaleShoot')}</span>
             <span style={LABEL}>{t('common:handicap.nextRound.scaleBecomes')}</span>
           </div>
+
 
           {rows.map((r, i) => {
             const moves = !r.noChange;
