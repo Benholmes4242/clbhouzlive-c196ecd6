@@ -7,13 +7,17 @@ export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI
 export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // -----------------------------------------------------------------------------
-// "World Feed" scoring palette.
+// Scoring palette - the SC_* TEXT tokens below are the live scale.
 //
-// Fill chips - surface-agnostic (identical on light canvas and #1B1E27):
-//   birdie disc red, bogey square blue, double-plus square navy,
-//   ace/albatross/eagle disc broadcast gold.
-// Chip numeral ink: #FFFFFF on red/blue/navy, INK (#0F172A) on gold.
+// Buckets, loudest to faintest: birdie+ red, double+ deeper blue,
+// bogey blue, par neutral gray. Blue on the over-par buckets is a chosen
+// scale for this card, not an inheritance from an older fill grammar.
 //
+// The light set and the dark set are two THEMES OF ONE SCALE and MUST run in
+// the same direction: damage gains emphasis as it worsens (light deepens,
+// dark gains saturation). Never move one bucket without its pair.
+//
+// SC_FILL_GOLD and SC_FILL_BIRDIE are the only live FILL tokens.
 // IMPORTANT: SC_FILL_GOLD #FFD200 is scorecard-genre broadcast gold. It is
 // NOT the achievement gold (#B36B00 / #F5D061) used for majors, champions
 // and No.1 surfaces. Do not substitute one for the other.
@@ -23,8 +27,6 @@ export const SC_FILL_GOLD   = '#FFD200'; // ace / albatross rarity ring
 // Canonical under-par red lives in tourhub/_shared/tokens (TOPAR_UNDER_LIGHT).
 // SC_FILL_BIRDIE is a re-export alias so #D2222D is declared exactly once.
 export { TOPAR_UNDER_LIGHT as SC_FILL_BIRDIE } from '@/features/tourhub/_shared/tokens';
-export const SC_FILL_BOGEY  = '#1D5DBF'; // legacy fill grammar - see ship report
-export const SC_FILL_DOUBLE = '#0F2E63'; // legacy fill grammar - see ship report
 
 
 // Text tokens - light surfaces (stats, totals, distribution labels).
@@ -43,5 +45,5 @@ export const SC_ALBATROSS_DARK = '#FFD84D';
 export const SC_EAGLE_DARK     = '#F5C842';
 export const SC_BIRDIE_DARK    = '#FF6B5E';
 export const SC_PAR_DARK       = 'rgba(242,244,247,0.42)';
-export const SC_BOGEY_DARK     = '#7AA6EC';
-export const SC_DOUBLE_DARK    = '#A6C2F0';
+export const SC_BOGEY_DARK     = '#A6C2F0'; // paler blue - lighter damage
+export const SC_DOUBLE_DARK    = '#7AA6EC'; // more saturated blue - worse damage
