@@ -496,6 +496,30 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   {relativeDay(r.play_date, t)}
                 </span>
 
+                {/* THE SUGGESTED MARK (BRIEF_WHOS_BEEN_PLAYING 3.5). A round
+                    from outside the circle says so, in the KICKER token, inside
+                    the tile's EXISTING chrome — the same glass chip the when
+                    label uses, so it stays legible over a bright sky where a
+                    bare white label would disappear. No follow button: this
+                    card's whole job is to show a round. */}
+                {r.suggested && (
+                  <span
+                    className="fpg-chip"
+                    style={{
+                      ...KICKER,
+                      position: 'absolute',
+                      top: 8,
+                      left: 8,
+                      color: '#FFFFFF',
+                      borderRadius: 999,
+                      padding: '3px 7px',
+                    }}
+                  >
+                    {t('discover.suggestedMark', 'SUGGESTED')}
+                  </span>
+                )}
+
+
                 {/* THE GLASS SCORE CHIP. Lifting the score onto the photo makes
                     the photo carry data rather than decoration, and gives the
                     white block entirely to the shape. */}
