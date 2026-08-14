@@ -271,8 +271,13 @@ export const CourseRecordBook: React.FC<Props> = ({
                   width: '100%',
                   textAlign: 'left',
                   border: 'none',
-                  background: 'transparent',
-                  padding: 0,
+                  // The held-board plate: amber at 6% with a 2.5px amber left
+                  // edge. Its own boundary, so no divider. Rows that are not
+                  // held keep exactly what they had - no plate, no tint.
+                  background: isYou ? PLATE_BG : 'transparent',
+                  borderLeft: isYou ? `2.5px solid ${A.AMBER}` : undefined,
+                  borderRadius: isYou ? 9 : undefined,
+                  padding: isYou ? '9px 11px' : 0,
                   cursor: 'pointer',
                   fontFamily: SANS,
                 }}
@@ -285,9 +290,20 @@ export const CourseRecordBook: React.FC<Props> = ({
                   thinRing
                 />
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ ...LABEL, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div
+                    style={{
+                      ...LABEL,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      // On a held board the category goes amber too, not just
+                      // the name.
+                      color: isYou ? A.AMBER_DEEP : undefined,
+                    }}
+                  >
                     {isCourseRecord && <Crown size={10} color={A.AMBER} strokeWidth={2.6} />}
                     {legendCategoryLabel[category]}
+
                   </div>
                   <div
                     style={{
