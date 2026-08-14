@@ -70,7 +70,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             color: INK,
           }}
         >
-          {t('discover.friendsRounds.title', "Friends' latest rounds")}
+          {t('discover.whosBeenPlaying', "Who's been playing")}
         </div>
       </div>
 
