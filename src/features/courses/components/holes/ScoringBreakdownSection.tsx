@@ -90,6 +90,14 @@ function marginTone(gap: number): string {
 const FIELD_BAR = '#C6CFD8';
 
 /**
+ * A row inside the noise floor: neutral ink, NO direction claimed. This is the
+ * common case on real courses - a fifth of a shot across a hole average is
+ * noise, so most damaging holes are level with the field.
+ */
+const LEVEL_BAR = 'rgba(14,18,22,0.34)';
+
+
+/**
  * One bar on a scale shared with its sibling.
  *
  * THE MEMBER'S BAR IS SHORTER WHEN THEY ARE BETTER. These are to-par values,
