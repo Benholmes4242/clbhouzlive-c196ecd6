@@ -540,6 +540,43 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </div>
         </div>
 
+        {/* THE ROUND SCORE SITS HERE (BRIEF_ROUND_POST_ENRICHMENT §2). The
+            author row already had empty space on its right, so the score costs
+            no height at all and the course name below keeps the full width. The
+            username truncates rather than pushing the score. */}
+        {postRound && postRound.grossScore != null && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 6,
+              flexShrink: 0,
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"zero" 0',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                color: '#FFFFFF',
+              }}
+            >
+              {postRound.grossScore}
+            </span>
+            {postRound.coursePar != null && (
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.62)' }}>
+                {(() => {
+                  const d = postRound.grossScore! - postRound.coursePar!;
+                  return d === 0 ? 'E' : d > 0 ? `+${d}` : `${d}`;
+                })()}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           {isDeal && (
@@ -854,7 +891,10 @@ const FooterButton: React.FC<{
     innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
     <Icon
-      size={24}
+      /* §6 condense. The engagement row is SHARED by every feed card, so it
+         steps 24 -> 21 rather than to the mock's 19: a round-post-only figure
+         would restyle photo and review posts too. */
+      size={21}
       strokeWidth={1.75}
       color={active ? activeColor ?? T100 : T60}
       fill={active ? activeColor ?? 'none' : 'none'}

@@ -223,6 +223,29 @@ function nineFragment(toPar: number, t: T): string {
     : t('discover.friendsRail.insight.parOver', { defaultValue: '{{n}} over', n: toPar });
 }
 
+/**
+ * THE ONE SHAPE SENTENCE (BRIEF_ROUND_POST_ENRICHMENT §4).
+ *
+ * "Two under after nine, then three over coming home." Generated HERE and
+ * nowhere else: the friends rail's 'nines' insight calls it, and so does the
+ * Clubhouse round post, so the two surfaces can never word the same round
+ * differently. Returns null when the nines are absent or the spread is too
+ * narrow to be a story — the caller then renders nothing at all.
+ */
+export function shapeSentence(
+  front: number | null | undefined,
+  back: number | null | undefined,
+  t: T,
+): string | null {
+  if (front == null || back == null || !Number.isFinite(front) || !Number.isFinite(back)) return null;
+  if (Math.abs(front - back) < NINES_MIN_SPREAD) return null;
+  return t('discover.friendsRail.insight.nines', {
+    defaultValue: '{{front}} after nine, then {{back}} coming home',
+    front: nineFragment(front, t),
+    back: nineFragment(back, t).toLowerCase(),
+  });
+}
+
 /** Ordered candidate list for one round; the caller picks the first allowed. */
 function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
   const out: RoundInsight[] = [];
@@ -281,16 +304,8 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
   }
 
   // 6. Two different nines. Only when the spread is wide enough to be a story.
-  if (row.front_nine_to_par != null && row.back_nine_to_par != null) {
-    const spread = Math.abs(row.front_nine_to_par - row.back_nine_to_par);
-    if (spread >= NINES_MIN_SPREAD) {
-      push('nines', t('discover.friendsRail.insight.nines', {
-        defaultValue: '{{front}} after nine, then {{back}} coming home',
-        front: nineFragment(row.front_nine_to_par, t),
-        back: nineFragment(row.back_nine_to_par, t).toLowerCase(),
-      }));
-    }
-  }
+  const nines = shapeSentence(row.front_nine_to_par, row.back_nine_to_par, t);
+  if (nines) push('nines', nines);
 
   // 7. Bogey free.
   if (row.clean_card === true) {
