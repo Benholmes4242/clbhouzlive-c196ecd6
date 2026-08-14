@@ -90,6 +90,14 @@ function marginTone(gap: number): string {
 const FIELD_BAR = '#C6CFD8';
 
 /**
+ * A row inside the noise floor: neutral ink, NO direction claimed. This is the
+ * common case on real courses - a fifth of a shot across a hole average is
+ * noise, so most damaging holes are level with the field.
+ */
+const LEVEL_BAR = 'rgba(14,18,22,0.34)';
+
+
+/**
  * One bar on a scale shared with its sibling.
  *
  * THE MEMBER'S BAR IS SHORTER WHEN THEY ARE BETTER. These are to-par values,
@@ -213,11 +221,38 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { rounds, total, avgGross, holes } = parsed;
   const hasInterpretation = rounds >= 5;
 
-  // Stratum 1: top 5 by shots_over_par desc
+  // Stratum 1: top 5 by shots_over_par desc. THE RANKING IS UNCHANGED - still
+  // by shots lost, per the subhead. The field is a second dimension, not a
+  // reordering (BRIEF_DAMAGING_HOLES_VS_FIELD s6).
   const damaging = [...holes]
     .sort((a, b) => b.shots_over_par - a.shots_over_par)
     .slice(0, 5);
   const top1 = damaging[0]?.shots_over_par || 1;
+
+  /**
+   * Per-hole field cost: the field's average shots over par on that hole.
+   * Same derivation as the member's `shots_over_par`, so the two are
+   * commensurable HOLE BY HOLE - which is the only claim each row makes. This
+   * map is deliberately independent of the panel-wide `reference` gate above:
+   * that gate refuses a whole-round total when the hole SETS differ, while a
+   * row only needs its own hole covered.
+   */
+  const fieldCostByHole = new Map<number, number>();
+  if (analysis?.available) {
+    for (const f of analysis.holes ?? []) {
+      if (f?.avg_to_par != null) fieldCostByHole.set(f.hole_no, Number(f.avg_to_par));
+    }
+  }
+  const damagingFieldCosts = damaging
+    .map((h) => fieldCostByHole.get(h.hole_no))
+    .filter((v): v is number => v != null);
+  const anyField = damagingFieldCosts.length > 0;
+  /**
+   * The scale must include the FIELD values, or a notch on a hole where the
+   * field loses more than the member sits off the end of its own track.
+   */
+  const damageScale = Math.max(top1, ...damagingFieldCosts, 0.1) * 1.1;
+
 
   // Stratum 2: totals across all played holes
   const sumPar = holes.reduce((s, h) => s + (h.par_or_better || 0), 0);
@@ -484,7 +519,30 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
         </div>
         {damaging.map((h) => {
-          const barW = Math.max(4, Math.min(100, (h.shots_over_par / top1) * 100));
+          /**
+           * COMMENSURABILITY, PER ROW (BRIEF_DAMAGING_HOLES_VS_FIELD s3).
+           *
+           * The row gets a notch and a verdict ONLY when the field analysis has
+           * a reading for THIS hole number. Never fall back to the course-wide
+           * field average: that is a different quantity and it would make the
+           * verdict false. No reading -> renders as it did before, red bar,
+           * no notch, no verdict.
+           */
+          const fieldCost = fieldCostByHole.get(h.hole_no) ?? null;
+          // Positive gap = the member is BETTER than the field on this hole.
+          const gap = fieldCost == null ? null : fieldCost - h.shots_over_par;
+          const level = gap != null && Math.abs(gap) < REFERENCE_NOISE_FLOOR;
+          const barTone = gap == null ? OVER : level ? LEVEL_BAR : marginTone(gap);
+          const barW = Math.max(4, Math.min(100, (h.shots_over_par / damageScale) * 100));
+          const notchW = fieldCost == null ? 0 : Math.max(0, Math.min(100, (fieldCost / damageScale) * 100));
+          const verdict =
+            gap == null
+              ? null
+              : level
+                ? t('courses:holes.scoringBreakdown.vsLevel')
+                : gap > 0
+                  ? t('courses:holes.scoringBreakdown.vsBetter')
+                  : t('courses:holes.scoringBreakdown.vsWorse');
           return (
             <div
               key={h.hole_no}
@@ -507,8 +565,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 <span
                   style={{
                     display: 'block',
-                    height: 4,
-                    borderRadius: 2,
+                    position: 'relative',
+                    height: 7,
+                    borderRadius: 3.5,
                     background: A.TRACK,
                     marginTop: 5,
                   }}
@@ -516,20 +575,68 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   <span
                     style={{
                       display: 'block',
-                      height: 4,
-                      borderRadius: 2,
+                      height: 7,
+                      borderRadius: 3.5,
                       width: `${barW}%`,
-                      background: OVER,
+                      background: barTone,
                     }}
                   />
+                  {fieldCost != null && (
+                    /* The field's cost on the SAME scale. Where the bar runs
+                       past the notch, that stretch is the member's alone. */
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        top: -1.5,
+                        left: `${notchW}%`,
+                        width: 2,
+                        height: 10,
+                        borderRadius: 1,
+                        background: 'rgba(15,23,42,0.55)',
+                        transform: 'translateX(-1px)',
+                      }}
+                    />
+                  )}
                 </span>
+                {verdict && (
+                  <span
+                    style={{
+                      ...LABEL,
+                      fontSize: 7.5,
+                      display: 'block',
+                      marginTop: 5,
+                      color: level ? A.DIM : barTone,
+                    }}
+                  >
+                    {verdict}
+                  </span>
+                )}
               </span>
-              <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>
+              {/* INK, not red: the bar carries the direction now. */}
+              <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'right' }}>
                 +{h.shots_over_par.toFixed(1)}
               </span>
             </div>
           );
         })}
+        {anyField && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              paddingTop: 6,
+            }}
+          >
+            <span
+              aria-hidden
+              style={{ display: 'block', width: 2, height: 9, borderRadius: 1, background: 'rgba(15,23,42,0.55)' }}
+            />
+            <span style={{ ...LABEL, fontSize: 7.5 }}>{t('courses:holes.scoringBreakdown.vsFieldLegend')}</span>
+          </div>
+        )}
+
         {hasInterpretation ? (
           <Caption>{s1Sentence}</Caption>
         ) : (

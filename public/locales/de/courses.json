@@ -111,6 +111,12 @@
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
       "seeAllShort": "Alle {{count}}"
+    },
+    "scoringBreakdown": {
+      "vsFieldLegend": "Feld hier",
+      "vsBetter": "Besser als das Feld hier",
+      "vsWorse": "Schlechter als das Feld hier",
+      "vsLevel": "Gleichauf mit dem Feld"
     }
   },
   "scorecard": {

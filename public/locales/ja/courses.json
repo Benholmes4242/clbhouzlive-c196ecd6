@@ -107,6 +107,12 @@
     },
     "yourCourses": {
       "roundsLabel": "Raundo"
+    },
+    "scoringBreakdown": {
+      "vsFieldLegend": "フィールド平均",
+      "vsBetter": "ここではフィールドより良い",
+      "vsWorse": "ここではフィールドより悪い",
+      "vsLevel": "フィールドと同等"
     }
   },
   "scorecard": {
