@@ -39,6 +39,14 @@ export interface PostRoundHole {
   par: number | null;
   gross: number | null;
   /**
+   * THE LINE'S VALUE: gross ?? adjusted_gross (BRIEF_TRAJECTORY_CONTINUITY §1.1).
+   * NEVER PRINTED AS A SCORE. A picked-up hole has no gross but does have a
+   * handicapping value, and the round's SHAPE — where it stood — is honest to
+   * draw from it. Cells and nine totals read `gross`; only the trajectory reads
+   * this. Null when adjusted_gross is absent too: the line breaks there.
+   */
+  lineGross: number | null;
+  /**
    * BRIEF §1.4 — the shape keeps ALL EIGHTEEN positions, so the cell carries
    * its own state:
    *   played true,  gross present -> the score
@@ -124,7 +132,8 @@ const SCORED_FLOOR = 12;
  * played = false holes are KEPT (BRIEF §1.4): every hole is returned so the
  * strip renders eighteen cells with unbroken numbering, each marked by its own
  * state. Only PLAYED holes carrying a score count towards SCORED_FLOOR - a
- * not-played hole is not a gap. adjusted_gross is NEVER substituted.
+ * not-played hole is not a gap. adjusted_gross is NEVER substituted into a cell;
+ * it reaches `lineGross` only, for the trajectory.
  */
 function renderableShape(
   shape: (PostRoundHole & { played: boolean })[] | null,
@@ -138,7 +147,7 @@ function renderableShape(
   return shape
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
-    .map(({ holeNo, par, gross, played }) => ({ holeNo, par, gross, played }));
+    .map(({ holeNo, par, gross, lineGross, played }) => ({ holeNo, par, gross, lineGross, played }));
 }
 
 /** Batched post_id -> whs_score_id for one feed page. */
@@ -214,7 +223,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           .in('whs_score_id', ids),
         supabase
           .from('whs_score_holes')
-          .select('score_id, hole_no, par, actual_gross, played')
+          .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
           .in('score_id', ids)
           .order('hole_no', { ascending: true }),
         supabase.rpc('get_round_crowns', { p_score_ids: ids }),
@@ -251,6 +260,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
         hole_no: number;
         par: number | null;
         actual_gross: number | null;
+        adjusted_gross: number | null;
         played: boolean | null;
       }[]) {
         const list = shapes.get(h.score_id) ?? [];
@@ -258,6 +268,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           holeNo: h.hole_no,
           par: h.par ?? null,
           gross: h.actual_gross ?? null,
+          lineGross: h.actual_gross ?? h.adjusted_gross ?? null,
           played: h.played !== false,
         });
         shapes.set(h.score_id, list);
