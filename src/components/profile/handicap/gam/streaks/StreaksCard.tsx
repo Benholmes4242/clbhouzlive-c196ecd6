@@ -118,6 +118,97 @@ const DotPager: React.FC<{
 };
 
 // ──────────────────────────────────────────────────────────────────
+// Streak track
+//
+// A streak is a COUNT OF DISCRETE ROUNDS, so it is drawn as one tick per unit
+// to the milestone — five ticks of ten says "five rounds, five to go", which a
+// solid bar at 50% cannot. Filled ticks take the STATE'S OWN progressFill, so
+// a dormant streak's ticks stay muted rather than turning amber.
+//
+// CEILING: the ladders in streakMilestones.ts run 2,3,4,5,8,10,13,20,26,50,52.
+// Twenty ticks still read across this card; 26 and above become a hatched
+// smear, so those fall back to the continuous bar that shipped before.
+//
+// THE PB NOTCH IS INK, NOT AMBER: amber is the member's progress, the notch is
+// a reference. Suppressed when there is no prior best, when the PB IS the
+// milestone (it would sit on the track's end), and in `atpb` (the member is
+// standing on it — the AT YOUR PB label already carries it).
+// ──────────────────────────────────────────────────────────────────
+
+const TICK_CEILING = 20;
+
+const StreakTrack: React.FC<{
+  current: number;
+  milestone: number | null;
+  best: number;
+  state: StreakState;
+  fill: string;
+  progressPct: number;
+}> = ({ current, milestone, best, state, fill, progressPct }) => {
+  const segmented = milestone != null && milestone <= TICK_CEILING;
+  const showNotch =
+    milestone != null && state !== 'atpb' && best > 0 && best < milestone;
+  const notchLeft = milestone != null ? (best / milestone) * 100 : 0;
+
+  return (
+    <div style={{ position: 'relative', marginBottom: 6 }}>
+      {segmented ? (
+        <div style={{ display: 'flex', gap: 3, height: 5 }}>
+          {Array.from({ length: milestone as number }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                height: 5,
+                borderRadius: 2,
+                background: i < current ? fill : 'var(--hcp-bg-3)',
+                transition: 'background 280ms ease',
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            height: 5,
+            background: 'var(--hcp-bg-3)',
+            borderRadius: 999,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${progressPct}%`,
+              background: fill,
+              transition: 'width 280ms ease',
+            }}
+          />
+        </div>
+      )}
+
+      {showNotch && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: -2,
+            left: `${notchLeft}%`,
+            width: 2,
+            height: 9,
+            marginLeft: -1,
+            borderRadius: 1,
+            background: 'var(--hcp-t-100)',
+            opacity: 0.55,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+
+// ──────────────────────────────────────────────────────────────────
 // Streak hero card
 // ──────────────────────────────────────────────────────────────────
 
