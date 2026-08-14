@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CARD, KICKER, LABEL, FIG, Skeleton } from '../lib/chartPrimitives';
@@ -658,12 +658,22 @@ function LatestInClubhouse({
         <EmptyState title="No activity yet" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {items.map((it, idx) => (
-            <FeedRow
-              key={it.id} item={it} first={idx === 0}
-              onOpenPost={setOpenPost}
-              onOpenCourse={setOpenCourse}
-            />
+          {/* 4b A GROUP OF ONE IS UNCHANGED: no wrapper, no chevron, no
+              expansion - it renders exactly the row it rendered before. */}
+          {groups.map((g, idx) => (
+            g.length === 1 ? (
+              <FeedRow
+                key={g[0].id} item={g[0]} first={idx === 0}
+                onOpenPost={setOpenPost}
+                onOpenCourse={setOpenCourse}
+              />
+            ) : (
+              <FeedGroup
+                key={`group:${g[0].id}`} group={g} first={idx === 0}
+                onOpenPost={setOpenPost}
+                onOpenCourse={setOpenCourse}
+              />
+            )
           ))}
         </div>
       )}
