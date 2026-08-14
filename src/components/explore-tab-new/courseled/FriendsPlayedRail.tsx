@@ -84,7 +84,7 @@ const GLASS_CSS = `
 `;
 
 /* ───────────────────────────── THE SHAPE ─────────────────────────────────
-   THREE POINTS, NOT EIGHTEEN. FriendRoundRow carries front_nine_to_par and
+   THREE POINTS, NOT EIGHTEEN. CircleRoundRow carries front_nine_to_par and
    back_nine_to_par and nothing between them, so the curve is level → the turn
    → the finish. That is EXACTLY what the subline is generated from, so the
    drawing and the sentence can never disagree, and it costs no extra query.
