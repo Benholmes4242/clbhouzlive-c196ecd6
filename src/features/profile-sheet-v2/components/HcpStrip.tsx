@@ -445,13 +445,15 @@ const TrendCard: React.FC<{
       plot={(w) => {
         if (n < 2 || !stats) return null;
         const h = PLOT_H;
-        const padY = 8;
+        const padY = 16;
         const padX = 11;
         const span = stats.worst - stats.best || 1;
         // NATURAL AXIS: high index at the TOP. A dip is a good spell.
+        // 16px vertical headroom at each end guarantees the high/low callouts
+        // never clip out of the plot.
         const xy = points.map((p, i) => {
           const x = padX + (i / (n - 1)) * (w - 2 * padX);
-          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2 - 10);
+          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2);
           return [x, y] as const;
         });
         const line = smoothPath(xy);
