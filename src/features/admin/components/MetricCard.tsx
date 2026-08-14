@@ -50,6 +50,7 @@ export default function MetricCard({
   const rounded = typeof delta === 'number' ? Math.round(delta) : null;
   const state = rounded === null ? null : deltaState(rounded);
   const showNew = delta === null && !loading && value !== null && value > 0;
+  const showShare = sharePct != null && !loading && value !== null;
 
   return (
     <Link
