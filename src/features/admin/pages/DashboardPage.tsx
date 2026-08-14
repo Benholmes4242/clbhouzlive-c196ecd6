@@ -65,6 +65,15 @@ interface FeedItem {
   body: string | null;
   avatarUrl: string | null;
   href: string;
+  /**
+   * 4a GROUPING IDENTITY. The member who caused the item - for a review that
+   * is the AUTHOR, not the course the row is titled with. Carried explicitly
+   * rather than inferred from `href` so grouping never depends on a route
+   * string, and `memberName` exists because a review row's `subject` is the
+   * course name and a collapsed group must name the person.
+   */
+  memberId: string;
+  memberName: string;
   postId?: string;
   courseId?: string;
   /**
@@ -184,6 +193,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body: null,
       avatarUrl: m.profile_photo_url,
       href: `/admin-v2/users?member=${m.id}`,
+      memberId: m.id,
+      memberName: m.display_name ?? m.username ?? 'A member',
       meta: [],
       warnings: [],
     });
@@ -220,6 +231,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
+      memberId: p.user_id,
+      memberName: name,
       postId: p.id,
       meta,
       round: p.whs_score_id ? roundMap.get(p.whs_score_id) : undefined,
@@ -246,6 +259,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body: text ? `${author} - ${text}` : author,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
+      memberId: r.user_id,
+      memberName: author,
       courseId: r.course_id,
       meta,
       warnings: r.is_mock ? ['Mock'] : [],
