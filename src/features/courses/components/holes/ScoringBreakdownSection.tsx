@@ -524,7 +524,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           // Positive gap = the member is BETTER than the field on this hole.
           const gap = fieldCost == null ? null : fieldCost - h.shots_over_par;
           const level = gap != null && Math.abs(gap) < REFERENCE_NOISE_FLOOR;
-          const barTone = gap == null ? OVER : level ? A.TRACK_INK : marginTone(gap);
+          const barTone = gap == null ? OVER : level ? LEVEL_BAR : marginTone(gap);
           const barW = Math.max(4, Math.min(100, (h.shots_over_par / damageScale) * 100));
           const notchW = fieldCost == null ? 0 : Math.max(0, Math.min(100, (fieldCost / damageScale) * 100));
           const verdict =
