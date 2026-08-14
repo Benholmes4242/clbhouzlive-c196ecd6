@@ -1295,13 +1295,7 @@
     "reviews": {
       "ratedChip": "[~~Řáţéđ~~]",
       "someone": "[~~Á ɱéɱƀéř~~]",
-      "sheetCaption": "[~~{{count}} řéṽíéŵš~~]",
-      "cat": {
-        "design": "Design",
-        "conditions": "Condi",
-        "clubhouse": "Club",
-        "facilities": "Facil"
-      }
+      "sheetCaption": "[~~{{count}} řéṽíéŵš~~]"
     },
     "reactions": {
       "action": "[~~Ļíǩé ţĥíš řőúñđ~~]",
