@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
+import HoleColourHarness from '@/pages/__HoleColourHarness';
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
 // for nav-timing chunk-fetch ms. trackedLazy falls back to React.lazy when
@@ -550,6 +551,7 @@ function AppRoutes() {
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
 
+        <Route path="/__holecolour" element={<HoleColourHarness />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
 
