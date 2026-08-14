@@ -481,11 +481,9 @@ const TrendCard: React.FC<{
           const nearRight = cx >= w - padX - 18;
           const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
           const tx = nearLeft ? 2 : nearRight ? w - 2 : cx;
-          // Vertical side: default high above, low below. Flip when the point is
-          // within 13px of the top/bottom so the label never leaves the viewBox.
-          const nearTop = cy <= 13;
-          const nearBottom = cy >= h - 13;
-          const above = kind === 'high' ? !nearTop : nearBottom;
+          // Vertical placement is fixed: high is always above its dot, low
+          // always below. PAD_Y = 16 reserves headroom at both edges so this
+          // never clips.
           return (
             <g key={idx} opacity={onMarker ? 0.42 : 1}>
               {/* When today IS the extreme, the scrub marker owns the point:
@@ -495,7 +493,7 @@ const TrendCard: React.FC<{
               )}
               <text
                 x={tx}
-                y={above ? cy - 8 : cy + 15}
+                y={kind === 'high' ? cy - 8 : cy + 15}
                 textAnchor={anchor}
                 fill={tone}
                 style={{ fontSize: 9.5, fontWeight: 700, ...FIGS }}
