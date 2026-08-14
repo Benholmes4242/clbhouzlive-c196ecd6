@@ -90,10 +90,6 @@ export function MostPlayedLeaderboard({
   // gam_round_stats, so only the THUMBNAIL waits — the shimmer sits in that slot
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
-  // BAR SCALE: the RENDERED SET. This section is a ranking, not an absolute
-  // measure, so the top row always fills. The sheet shows more courses and so
-  // may scale differently — stated in the brief report.
-  const maxCount = shown.reduce((m, r) => Math.max(m, r.count), 0) || 1;
 
   if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
@@ -176,9 +172,8 @@ export function MostPlayedLeaderboard({
                 >
                   {name}
                 </span>
-                {/* META LINE: region · played to +n. NO TRAILING MIDDOT when
-                    the course has no scored eighteen this week. */}
-                {(m?.region || r.avgToPar != null) && (
+                {/* REGION on its own line. */}
+                {m?.region && (
                   <span
                     style={{
                       ...LABEL,
@@ -189,44 +184,41 @@ export function MostPlayedLeaderboard({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m.region}
+                  </span>
+                )}
+                {/* SCORING LINE — its own row where the volume bar used to sit.
+                    A SCORE, NOT A MOVEMENT: to-par convention, BODY ink, never
+                    the movement green beside it. The count on the right is
+                    ROUNDS, so the member count is what this line adds. */}
+                {(r.avgToPar != null || r.members > 0) && (
+                  <span
+                    style={{
+                      ...LABEL,
+                      display: 'block',
+                      fontSize: 9,
+                      color: A.BODY,
+                      marginTop: 4,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                    {m?.region}
-                    {m?.region && r.avgToPar != null ? ' · ' : ''}
-                    {/* A SCORE, NOT A MOVEMENT: to-par convention, BODY ink,
-                        never the movement green beside it. */}
-                    {r.avgToPar != null && (
-                      <span style={{ color: A.BODY }}>
-                        {t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
+                    {r.avgToPar != null && r.members > 0
+                      ? t('discover.mostPlayedAvgToParBy', 'Played to {{value}} by {{count}} members', {
                           value: formatToPar(r.avgToPar),
-                        })}
-                      </span>
-                    )}
+                          count: r.members,
+                        })
+                      : r.avgToPar != null
+                        ? t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
+                            value: formatToPar(r.avgToPar),
+                          })
+                        : t('discover.mostPlayedMembers', '{{count}} members', { count: r.members })}
                   </span>
                 )}
-                {/* VOLUME BAR: count / busiest in the rendered set. */}
-                <span
-                  aria-hidden
-                  style={{
-                    display: 'block',
-                    height: 5,
-                    marginTop: 7,
-                    borderRadius: 999,
-                    background: A.BORDER,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'block',
-                      height: '100%',
-                      width: `${Math.max(4, (r.count / maxCount) * 100)}%`,
-                      borderRadius: 999,
-                      background: A.INK,
-                    }}
-                  />
-                </span>
               </span>
               <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
                 <span
