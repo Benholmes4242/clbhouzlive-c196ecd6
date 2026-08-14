@@ -891,7 +891,7 @@ const FooterButton: React.FC<{
     innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
     <Icon
-      size={24}
+      size={19}
       strokeWidth={1.75}
       color={active ? activeColor ?? T100 : T60}
       fill={active ? activeColor ?? 'none' : 'none'}
