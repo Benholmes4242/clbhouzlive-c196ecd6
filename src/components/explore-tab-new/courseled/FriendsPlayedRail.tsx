@@ -44,7 +44,7 @@ import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, N
  * No friends or no rounds: the section does not render at all.
  */
 
-const RAIL_CAP = 10;
+export const RAIL_CAP = 10;
 const CARD_W = 224;
 const PHOTO_H = 104;
 
