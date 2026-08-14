@@ -484,7 +484,30 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
         </div>
         {damaging.map((h) => {
-          const barW = Math.max(4, Math.min(100, (h.shots_over_par / top1) * 100));
+          /**
+           * COMMENSURABILITY, PER ROW (BRIEF_DAMAGING_HOLES_VS_FIELD s3).
+           *
+           * The row gets a notch and a verdict ONLY when the field analysis has
+           * a reading for THIS hole number. Never fall back to the course-wide
+           * field average: that is a different quantity and it would make the
+           * verdict false. No reading -> renders as it did before, red bar,
+           * no notch, no verdict.
+           */
+          const fieldCost = fieldCostByHole.get(h.hole_no) ?? null;
+          // Positive gap = the member is BETTER than the field on this hole.
+          const gap = fieldCost == null ? null : fieldCost - h.shots_over_par;
+          const level = gap != null && Math.abs(gap) < REFERENCE_NOISE_FLOOR;
+          const barTone = gap == null ? OVER : level ? A.TRACK_INK : marginTone(gap);
+          const barW = Math.max(4, Math.min(100, (h.shots_over_par / damageScale) * 100));
+          const notchW = fieldCost == null ? 0 : Math.max(0, Math.min(100, (fieldCost / damageScale) * 100));
+          const verdict =
+            gap == null
+              ? null
+              : level
+                ? t('courses:holes.scoringBreakdown.vsLevel')
+                : gap > 0
+                  ? t('courses:holes.scoringBreakdown.vsBetter')
+                  : t('courses:holes.scoringBreakdown.vsWorse');
           return (
             <div
               key={h.hole_no}
@@ -507,8 +530,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 <span
                   style={{
                     display: 'block',
-                    height: 4,
-                    borderRadius: 2,
+                    position: 'relative',
+                    height: 7,
+                    borderRadius: 3.5,
                     background: A.TRACK,
                     marginTop: 5,
                   }}
@@ -516,20 +540,68 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   <span
                     style={{
                       display: 'block',
-                      height: 4,
-                      borderRadius: 2,
+                      height: 7,
+                      borderRadius: 3.5,
                       width: `${barW}%`,
-                      background: OVER,
+                      background: barTone,
                     }}
                   />
+                  {fieldCost != null && (
+                    /* The field's cost on the SAME scale. Where the bar runs
+                       past the notch, that stretch is the member's alone. */
+                    <span
+                      aria-hidden
+                      style={{
+                        position: 'absolute',
+                        top: -1.5,
+                        left: `${notchW}%`,
+                        width: 2,
+                        height: 10,
+                        borderRadius: 1,
+                        background: 'rgba(15,23,42,0.55)',
+                        transform: 'translateX(-1px)',
+                      }}
+                    />
+                  )}
                 </span>
+                {verdict && (
+                  <span
+                    style={{
+                      ...LABEL,
+                      fontSize: 7.5,
+                      display: 'block',
+                      marginTop: 5,
+                      color: level ? A.DIM : barTone,
+                    }}
+                  >
+                    {verdict}
+                  </span>
+                )}
               </span>
-              <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>
+              {/* INK, not red: the bar carries the direction now. */}
+              <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'right' }}>
                 +{h.shots_over_par.toFixed(1)}
               </span>
             </div>
           );
         })}
+        {anyField && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              paddingTop: 6,
+            }}
+          >
+            <span
+              aria-hidden
+              style={{ display: 'block', width: 2, height: 9, borderRadius: 1, background: 'rgba(15,23,42,0.55)' }}
+            />
+            <span style={{ ...LABEL, fontSize: 7.5 }}>{t('courses:holes.scoringBreakdown.vsFieldLegend')}</span>
+          </div>
+        )}
+
         {hasInterpretation ? (
           <Caption>{s1Sentence}</Caption>
         ) : (
