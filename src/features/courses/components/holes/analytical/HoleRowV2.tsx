@@ -61,7 +61,30 @@ export interface HoleScale {
   scaleMax: number;
   /** Hole number -> difficulty rank, 1 = hardest by field average. */
   rankByHole: Map<number, number>;
+  /**
+   * Hole number -> 0..1 position on the course's OWN difficulty spread
+   * (0 = easiest hole, 1 = hardest). EMPTY below the rounds floor, which is how
+   * the row knows to leave the track and the field figure ungraded.
+   */
+  tintByHole: Map<number, number>;
+  /** False below DIFFICULTY_ROUNDS_FLOOR: the ordering would be noise. */
+  gradeDifficulty: boolean;
 }
+
+/**
+ * ROUNDS FLOOR for GRADING difficulty (BRIEF_HOLE_BY_HOLE_COLOUR §3).
+ *
+ * Derived, not picked. Across live hole data the mean per-hole to-par standard
+ * deviation is 0.81 strokes and the median course's easiest-to-hardest spread is
+ * 0.87 strokes. To place a hole inside the correct QUARTILE of its course's
+ * spread (0.87 / 4 = 0.22) at roughly one standard error needs
+ * n = (0.81 / 0.22)^2 = 13.5 rounds. 12 is the nearest floor already used
+ * elsewhere in the app (the round-strip scored floor), and at 12 the standard
+ * error is 0.23 - a quartile. Below it the grade is withheld entirely: an
+ * 18-hole ordering computed from one or two cards looks confident and is noise.
+ */
+export const DIFFICULTY_ROUNDS_FLOOR = 12;
+
 
 /**
  * Marker placement against a SHARED domain. Extracted so the tournament
