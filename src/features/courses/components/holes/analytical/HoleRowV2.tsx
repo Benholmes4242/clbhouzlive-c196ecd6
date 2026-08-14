@@ -255,7 +255,9 @@ export const HoleRowV2: React.FC<{
    * rounds floor - in which case the track and the field figure stay ungraded.
    */
   const tint = scale.gradeDifficulty ? scale.tintByHole.get(row.hole_no) ?? null : null;
-  const diffTone = tint == null ? null : difficultyRampColor(tint);
+  // Marker floor 0.25: the easiest hole's true tone (near-white) would vanish
+  // against the panel, so the ramp is entered a quarter in for the marker only.
+  const diffTone = tint == null ? null : difficultyRampColor(0.25 + tint * 0.75);
   /**
    * The COLLAPSED FIELD FIGURE takes the difficulty tone so the list can be
    * scanned for hard holes without expanding anything - EXCEPT where the average
