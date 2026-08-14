@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS, TOPAR_RED } from './tokens';
+import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
