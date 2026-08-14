@@ -288,6 +288,25 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     riseT = sortedAsc[8] ?? null;
   }
 
+  // ── The cut line ────────────────────────────────────────────────────────
+  // The boundary that actually decides THESE dots: the worst (highest)
+  // counting differential in the current window — the edge of the set
+  // useCounters returned. Derived FROM the counter set, never recomputed,
+  // so no green dot can ever sit above it. This is NOT cutTarget (which is
+  // forward-looking and stays in the footer).
+  const counterDiffs = rounds
+    .filter((r) => r.is_counter && r.diff != null)
+    .map((r) => r.diff as number);
+  const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
+
+  // ── Drop queue ──────────────────────────────────────────────────────────
+  // Full window only (fallingSet is empty below 20 by construction).
+  // Soonest first == chronologically oldest first. Capped at three rows.
+  const dropQueue = rounds
+    .map((r, i) => ({ ...r, fallsIn: i + 1 }))
+    .filter((r) => fallingSet.has(r.id))
+    .slice(0, 3);
+
   const ownerToken =
     viewMode === 'friend'
       ? ownerFirstName
