@@ -4,8 +4,14 @@ import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 
 /**
  * useCircleLatestRounds
- * ----------------------
- * Powers the "Friends' latest rounds" section on Discover AND its View-all sheet.
+ * ---------------------
+ * Powers "Who's been playing" on Discover AND its View-all sheet.
+ *
+ * THE CIRCLE (BRIEF_WHOS_BEEN_PLAYING) = accepted friendships UNION the people
+ * the member FOLLOWS (outbound only). When the circle supplies fewer than
+ * `limit` rounds the shortfall is filled with SUGGESTED rounds from outside it,
+ * one per member, feats first — so the section is never empty for a new member.
+ * Circle rounds always come first and are never displaced.
  * A single hook, one round-trip per data source, grouped client-side. Read
  * usePulseFriends.ts for the friend-resolution reference — this hook does
  * not modify or share cache with it.

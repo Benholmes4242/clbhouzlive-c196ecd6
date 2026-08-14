@@ -28,10 +28,13 @@ import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
- * Section 1 — WHERE YOUR FRIENDS PLAYED (BRIEF_FRIENDS_PLAYED_TILE_GLASS).
+ * Section 1 — WHO'S BEEN PLAYING (BRIEF_FRIENDS_PLAYED_TILE_GLASS +
+ * BRIEF_WHOS_BEEN_PLAYING). One heading for all three states: circle only,
+ * circle plus suggested, suggested only — a heading that flips as a member
+ * adds people is a change they have to notice and decode.
  *
  * A horizontal rail: a week of heavy play grows sideways, never down. One card
- * per friend-round, newest first, capped at ten.
+ * per round, circle first then suggested, capped at ten.
  *
  * THE SCORE LIVES ON THE PHOTO as a glass chip, so the band below belongs
  * entirely to the SHAPE of the round: a 19-point cumulative to-par curve from
@@ -41,7 +44,8 @@ import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, N
  * fallback drawn from the same two figures the subline is written from.
  *
  * A hole in one puts the GOLD ring on the when-chip — the only gold on the card.
- * No friends or no rounds: the section does not render at all.
+ * Nothing at all to show — no circle rounds and no suggested pool — and the
+ * section does not render.
  */
 
 export const RAIL_CAP = 10;
