@@ -7,7 +7,7 @@ import {
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
-import { SC_BIRDIE, SC_ALBATROSS, SC_PAR, SC_BOGEY, SC_DOUBLE, SC_ACE_DARK, SC_ALBATROSS_DARK, SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
+import { SC_ACE_DARK, SC_ALBATROSS_DARK, SC_EAGLE_DARK, SC_BIRDIE_DARK, SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,13 +42,6 @@ const T = {
   ringTrack: 'var(--hcp-bg-3)',
 };
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-const HOLE_C = {
-  birdie: SC_BIRDIE,
-  par: SC_PAR,
-  bogey: SC_BOGEY,
-  double: SC_DOUBLE,
-};
 
 const SECTION_STYLE: React.CSSProperties = {
   marginBottom: 12,
@@ -737,26 +730,6 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   const delta = prevBob != null ? birdiesOrBetter - prevBob : null;
   const showDelta = scope !== 'all' && delta !== null && delta !== 0;
 
-  // Segment definitions
-  type Segment = {
-    key: string;
-    count: number;
-    background: string;
-    border?: string;
-    textColor: string;
-  };
-  const allSegments: Segment[] = [
-    { key: 'birdiePlus', count: birdiesOrBetter, background: HOLE_C.birdie, textColor: '#FFFFFF' },
-    { key: 'par',        count: pars,            background: HOLE_C.par,    textColor: '#FFFFFF' },
-    { key: 'bogey',      count: bogey,           background: HOLE_C.bogey,  textColor: '#FFFFFF' },
-    { key: 'double',     count: doublePlus,      background: HOLE_C.double, textColor: '#FFFFFF' },
-  ];
-
-  const segments = allSegments.filter((s) => s.count > 0);
-  const segTotal = segments.reduce((acc, s) => acc + s.count, 0) || 1;
-
-
-
   // Ring bands, order: birdie+, par, bogey, double+
   const bands = [
     { key: 'birdiePlus', count: birdiesOrBetter, color: SC_BIRDIE_DARK },
@@ -843,7 +816,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
           const pctRaw = totalHoles > 0 ? (c.count / totalHoles) * 100 : 0;
           const pct = pctRaw < 10 ? pctRaw.toFixed(1) : Math.round(pctRaw).toString();
           const isZero = c.count === 0;
-          const countColor = isZero ? T.ink40 : (c.isPar ? T.ink : c.color);
+          const countColor = isZero ? T.ink40 : c.color;
           const labelColor = c.isPar ? T.ink40 : c.color;
           return (
             <div
