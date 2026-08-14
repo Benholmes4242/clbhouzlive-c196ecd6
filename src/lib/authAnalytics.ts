@@ -6,21 +6,36 @@
  * tracking must never block the auth UI.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { getSessionId, getUserAgent } from '@/utils/analyticsSession';
 
 export type AuthMethod = 'apple' | 'google' | 'email';
 
+/**
+ * EVERY row must carry a `ua`. The server-side bot filters read
+ * `ua ILIKE '%headless%' OR ...`; with a NULL ua that predicate is NULL,
+ * `NOT NULL` is NULL, and the row is SILENTLY DROPPED from WAU, MAU, the
+ * retention cohorts and the funnel — which is why auth events were invisible.
+ * `ua` and `session_id` come from the shared accessors in
+ * utils/analyticsSession and are never re-derived here.
+ */
 async function track(name: string, props: Record<string, any> = {}) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('analytics_events').insert({
       name,
       user_id: user?.id ?? null,
-      props: { ...props, page: typeof window !== 'undefined' ? window.location.pathname : null },
+      props: {
+        ...props,
+        session_id: getSessionId(),
+        ua: getUserAgent(),
+        page: typeof window !== 'undefined' ? window.location.pathname : null,
+      },
     });
   } catch {
     // never block auth UI
   }
 }
+
 
 export function trackAuthMethodSelected(method: AuthMethod) {
   track('auth_method_selected', { method });
