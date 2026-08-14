@@ -26,12 +26,24 @@ import { supabase } from '@/integrations/supabase/client';
 /** A course needs at least this many rounds in the 7-day window to appear. */
 const MIN_ROUNDS = 2;
 
+/** Every outcome of the week-on-week comparison, none discarded. */
+export type MostPlayedMove = 'new' | 'up' | 'down' | 'level';
+
 export interface MostPlayedRow {
   courseId: string;
   courseName: string | null;
   count: number;
-  /** Positive change vs the prior 7 days; null when flat, negative, or new. */
-  delta: number | null;
+  /** Rounds in the prior 7 days. */
+  prior: number;
+  /** Raw signed change vs the prior 7 days (count - prior). */
+  change: number;
+  /** Which of the four states the row renders. */
+  move: MostPlayedMove;
+  /**
+   * Average to par over the CURRENT seven days, eighteen-hole scored rounds
+   * only. Null when the course has no comparable scored round this week.
+   */
+  avgToPar: number | null;
 }
 
 const DAY = 86_400_000;
