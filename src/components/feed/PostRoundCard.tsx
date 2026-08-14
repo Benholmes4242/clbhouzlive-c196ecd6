@@ -498,7 +498,7 @@ export const PostRoundCard: React.FC<Props> = ({
 
           {hasHoles && (
             <>
-              <Trajectory holes={holes} />
+              <Trajectory holes={holes} toPar={toPar} />
               <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
               <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
             </>
