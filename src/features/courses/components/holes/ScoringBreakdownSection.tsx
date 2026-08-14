@@ -213,11 +213,38 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { rounds, total, avgGross, holes } = parsed;
   const hasInterpretation = rounds >= 5;
 
-  // Stratum 1: top 5 by shots_over_par desc
+  // Stratum 1: top 5 by shots_over_par desc. THE RANKING IS UNCHANGED - still
+  // by shots lost, per the subhead. The field is a second dimension, not a
+  // reordering (BRIEF_DAMAGING_HOLES_VS_FIELD s6).
   const damaging = [...holes]
     .sort((a, b) => b.shots_over_par - a.shots_over_par)
     .slice(0, 5);
   const top1 = damaging[0]?.shots_over_par || 1;
+
+  /**
+   * Per-hole field cost: the field's average shots over par on that hole.
+   * Same derivation as the member's `shots_over_par`, so the two are
+   * commensurable HOLE BY HOLE - which is the only claim each row makes. This
+   * map is deliberately independent of the panel-wide `reference` gate above:
+   * that gate refuses a whole-round total when the hole SETS differ, while a
+   * row only needs its own hole covered.
+   */
+  const fieldCostByHole = new Map<number, number>();
+  if (analysis?.available) {
+    for (const f of analysis.holes ?? []) {
+      if (f?.avg_to_par != null) fieldCostByHole.set(f.hole_no, Number(f.avg_to_par));
+    }
+  }
+  const damagingFieldCosts = damaging
+    .map((h) => fieldCostByHole.get(h.hole_no))
+    .filter((v): v is number => v != null);
+  const anyField = damagingFieldCosts.length > 0;
+  /**
+   * The scale must include the FIELD values, or a notch on a hole where the
+   * field loses more than the member sits off the end of its own track.
+   */
+  const damageScale = Math.max(top1, ...damagingFieldCosts, 0.1) * 1.1;
+
 
   // Stratum 2: totals across all played holes
   const sumPar = holes.reduce((s, h) => s + (h.par_or_better || 0), 0);
