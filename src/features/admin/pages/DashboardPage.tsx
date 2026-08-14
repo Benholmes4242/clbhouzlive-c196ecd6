@@ -380,6 +380,20 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
   // UNRESOLVED IS NOT ABSENT: a missing block keeps the four window tiles in
   // their loading state rather than rendering a zero.
   const wLoading = awLoading || !aw;
+
+  /**
+   * 27 weekly actives means one thing against 84 members and another against
+   * 8,400, so every ACTIVE-WINDOW figure carries its share of the membership.
+   *
+   * The denominator is the SAME totalUsers the Members tile shows - NOT
+   * ops.activation.members_total, which applies its own deleted_at filter and
+   * would put two different member totals on one screen. Returns null while
+   * the total is unresolved: a share of an unknown denominator is not a figure.
+   */
+  const totalMembers = loading ? null : (data?.totalUsers ?? null);
+  const share = (v: number | null | undefined): number | null =>
+    v == null || totalMembers == null || totalMembers <= 0 ? null : (v / totalMembers) * 100;
+
   return (
     <section
       className="admin-v2-metric-grid"
