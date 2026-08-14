@@ -18,8 +18,14 @@ export const CARD: React.CSSProperties = {
   gap: 12,
 };
 
+/**
+ * NO AMBER ON THE DASHBOARD. The kicker was brand amber; it is now ink white.
+ * Only the Dashboard's own components import KICKER from here (Health and
+ * Analytics import only formatDurationShort / the chart helpers), so this is a
+ * Dashboard-scoped change despite living in a shared module.
+ */
 export const KICKER: React.CSSProperties = {
-  color: t.brandText,
+  color: t.ink,
   fontSize: 11,
   fontWeight: 700,
   letterSpacing: 0.6,

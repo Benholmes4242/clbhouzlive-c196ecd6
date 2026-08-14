@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CARD, KICKER, LABEL, FIG, Skeleton } from '../lib/chartPrimitives';
@@ -65,6 +65,15 @@ interface FeedItem {
   body: string | null;
   avatarUrl: string | null;
   href: string;
+  /**
+   * 4a GROUPING IDENTITY. The member who caused the item - for a review that
+   * is the AUTHOR, not the course the row is titled with. Carried explicitly
+   * rather than inferred from `href` so grouping never depends on a route
+   * string, and `memberName` exists because a review row's `subject` is the
+   * course name and a collapsed group must name the person.
+   */
+  memberId: string;
+  memberName: string;
   postId?: string;
   courseId?: string;
   /**
@@ -184,6 +193,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body: null,
       avatarUrl: m.profile_photo_url,
       href: `/admin-v2/users?member=${m.id}`,
+      memberId: m.id,
+      memberName: m.display_name ?? m.username ?? 'A member',
       meta: [],
       warnings: [],
     });
@@ -220,6 +231,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${p.user_id}`,
+      memberId: p.user_id,
+      memberName: name,
       postId: p.id,
       meta,
       round: p.whs_score_id ? roundMap.get(p.whs_score_id) : undefined,
@@ -246,6 +259,8 @@ async function fetchClubhouseFeed(): Promise<FeedItem[]> {
       body: text ? `${author} - ${text}` : author,
       avatarUrl: prof?.profile_photo_url ?? null,
       href: `/admin-v2/users?member=${r.user_id}`,
+      memberId: r.user_id,
+      memberName: author,
       courseId: r.course_id,
       meta,
       warnings: r.is_mock ? ['Mock'] : [],
@@ -380,6 +395,20 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
   // UNRESOLVED IS NOT ABSENT: a missing block keeps the four window tiles in
   // their loading state rather than rendering a zero.
   const wLoading = awLoading || !aw;
+
+  /**
+   * 27 weekly actives means one thing against 84 members and another against
+   * 8,400, so every ACTIVE-WINDOW figure carries its share of the membership.
+   *
+   * The denominator is the SAME totalUsers the Members tile shows - NOT
+   * ops.activation.members_total, which applies its own deleted_at filter and
+   * would put two different member totals on one screen. Returns null while
+   * the total is unresolved: a share of an unknown denominator is not a figure.
+   */
+  const totalMembers = loading ? null : (data?.totalUsers ?? null);
+  const share = (v: number | null | undefined): number | null =>
+    v == null || totalMembers == null || totalMembers <= 0 ? null : (v / totalMembers) * 100;
+
   return (
     <section
       className="admin-v2-metric-grid"
@@ -401,6 +430,7 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.wau.current, aw!.wau.previous)}
         deltaLabel="vs prev 7d"
         sparkline={aw?.daily.map(d => d.wau)}
+        sharePct={wLoading ? null : share(aw!.wau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
@@ -410,6 +440,7 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.dau.current, aw!.dau.previous)}
         deltaLabel="vs same day last week"
         sparkline={aw?.daily.map(d => d.dau)}
+        sharePct={wLoading ? null : share(aw!.dau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
@@ -419,9 +450,15 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.mau.current, aw!.mau.previous)}
         deltaLabel="vs prev 30d"
         sparkline={aw?.daily.map(d => d.mau)}
+        sharePct={wLoading ? null : share(aw!.mau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
+      {/*
+        NO SHARE FIGURE HERE. Signups is a FLOW, not a stock: "4 signups, 5% of
+        members" invites a comparison between a week's arrivals and the whole
+        membership that means nothing.
+      */}
       <MetricCard
         label="Signups 7d"
         value={loading ? null : (data?.signups.current ?? 0)}
@@ -494,8 +531,109 @@ function toParParts(gross: number, par: number): { text: string; color: string }
 const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
   member: { text: 'JOINED', color: t.ok },
   post:   { text: 'POST',   color: t.inkFaint },
-  review: { text: 'REVIEW', color: t.brandText },
+  review: { text: 'REVIEW', color: t.ink },
 };
+
+/**
+ * 4a CONSECUTIVE, NOT GLOBAL. Runs of the same member in the ALREADY SORTED
+ * order collapse; if another member posts between two of Matt's, that is three
+ * groups, not two, and the feed stays strictly chronological.
+ *
+ * 4e Grouping is PRESENTATION and runs AFTER the 8-item slice. The panel does
+ * not fetch more to fill the space grouping frees - that would change what
+ * "latest 8" means.
+ */
+function groupConsecutive(items: FeedItem[]): FeedItem[][] {
+  const groups: FeedItem[][] = [];
+  for (const it of items) {
+    const last = groups[groups.length - 1];
+    if (last && last[0].memberId && last[0].memberId === it.memberId) last.push(it);
+    else groups.push([it]);
+  }
+  return groups;
+}
+
+/**
+ * 4d ONE NOUN. Mixed kinds read "{n} items" - never "2 posts and a review",
+ * which does not fit the row and reads as a sentence rather than a figure.
+ */
+function groupLabel(group: FeedItem[]): string {
+  const kinds = new Set(group.map(g => g.kind));
+  if (kinds.size > 1) return `${group.length} items`;
+  const kind = group[0].kind;
+  if (kind === 'post') return `${group.length} posts`;
+  if (kind === 'review') return `${group.length} reviews`;
+  return `${group.length} items`;
+}
+
+/** 4c/4f One collapsed row per run. Collapsed ALWAYS on mount - the newest
+ *  group does not auto-expand, or the panel reverts to its dominated state. */
+function FeedGroup({
+  group, first, onOpenPost, onOpenCourse,
+}: {
+  group: FeedItem[]; first: boolean;
+  onOpenPost: (id: string) => void;
+  onOpenCourse: (id: string) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const head = group[0];
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          padding: '10px 0', textAlign: 'left', cursor: 'pointer',
+          background: 'transparent', border: 'none',
+          borderTop: first ? 'none' : `1px solid ${t.hairline}`,
+          borderTopStyle: first ? 'none' : 'solid',
+          borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline,
+          color: 'inherit',
+        }}
+      >
+        {head.avatarUrl ? (
+          <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
+        ) : (
+          <span aria-hidden style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }} />
+        )}
+        <span style={{
+          color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {head.memberName}
+        </span>
+        <span style={{ ...LABEL, flexShrink: 0 }}>{groupLabel(group)}</span>
+        <span style={{ flex: 1 }} />
+        {/* The age of the MOST RECENT item: the group sits where its newest
+            member sits, so any other age would misplace it. */}
+        <span style={{ ...LABEL, ...FIG, flexShrink: 0 }}>{relTime(head.created_at)}</span>
+        <ChevronDown
+          size={14} color={t.inkFaint} aria-hidden
+          style={{
+            flexShrink: 0,
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 160ms ease',
+          }}
+        />
+      </button>
+
+      {open ? (
+        <div style={{ paddingLeft: 38 }}>
+          {group.map((it, i) => (
+            <FeedRow
+              key={it.id} item={it} first={i === 0}
+              onOpenPost={onOpenPost}
+              onOpenCourse={onOpenCourse}
+            />
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+}
 
 function LatestInClubhouse({
   items, loading, isError, onRetry,
@@ -505,6 +643,8 @@ function LatestInClubhouse({
 }) {
   const [openPost, setOpenPost] = React.useState<string | null>(null);
   const [openCourse, setOpenCourse] = React.useState<string | null>(null);
+  const groups = React.useMemo(() => groupConsecutive(items), [items]);
+
 
   return (
     <section style={CARD}>
@@ -523,12 +663,22 @@ function LatestInClubhouse({
         <EmptyState title="No activity yet" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {items.map((it, idx) => (
-            <FeedRow
-              key={it.id} item={it} first={idx === 0}
-              onOpenPost={setOpenPost}
-              onOpenCourse={setOpenCourse}
-            />
+          {/* 4b A GROUP OF ONE IS UNCHANGED: no wrapper, no chevron, no
+              expansion - it renders exactly the row it rendered before. */}
+          {groups.map((g, idx) => (
+            g.length === 1 ? (
+              <FeedRow
+                key={g[0].id} item={g[0]} first={idx === 0}
+                onOpenPost={setOpenPost}
+                onOpenCourse={setOpenCourse}
+              />
+            ) : (
+              <FeedGroup
+                key={`group:${g[0].id}`} group={g} first={idx === 0}
+                onOpenPost={setOpenPost}
+                onOpenCourse={setOpenCourse}
+              />
+            )
           ))}
         </div>
       )}
@@ -599,7 +749,7 @@ function FeedRow({
             }}
           >
             {item.warnings.map(w => (
-              <span key={w} style={{ color: t.warnText, fontWeight: 700 }}>{w}</span>
+              <span key={w} style={{ color: t.dangerText, fontWeight: 700 }}>{w}</span>
             ))}
             {item.meta.map(mt => <span key={mt}>{mt}</span>)}
             {round && (() => {
