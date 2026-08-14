@@ -193,8 +193,6 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
   // THE FILL RUNS FLAT TO BOTH CARD EDGES so the colour stays full bleed,
   // while the POINTS are inset so the terminal dot cannot clip.
   const fillD = `M0,${SHAPE_H} L0,${pts[0].y.toFixed(2)} L${d.slice(1)} L${CARD_W},${pts[pts.length - 1].y.toFixed(2)} L${CARD_W},${SHAPE_H} Z`;
-  const end = pts[pts.length - 1];
-  const finalTone = values[values.length - 1] < 0 ? UNDER_TONE : OVER_TONE;
 
   // CLIP IDS MUST BE UNIQUE PER TILE — ten tiles sharing an id looks exactly
   // like the clip being ignored, and is the likeliest defect here.
@@ -330,21 +328,11 @@ function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | nu
           ) : null,
         )}
 
-        {/* THE ROUND-END MARKER, DRAWN LAST so a bead on the final hole cannot
-            obscure it. A white disc with a small tone-filled centre — NOT a
-            bead: the tile has no axis, so a member needs to see where the round
-            finishes, and it must not read as a hole event. */}
-        <circle cx={end.x} cy={end.y} r={5.4} fill="#FFFFFF" />
-        <circle
-          cx={end.x}
-          cy={end.y}
-          r={5.4}
-          fill="none"
-          stroke={finalTone}
-          strokeOpacity={0.28}
-          strokeWidth={1}
-        />
-        <circle cx={end.x} cy={end.y} r={2.2} fill={finalTone} />
+        {/* NO ROUND-END MARKER. A dot where no event happened is a false
+            positive — it read as a bogey on hole 18 that was never played.
+            The curve simply ends, exactly as it does on the scorecard sheet.
+            If hole 18 earned a bead, beadForScore already drew one above. */}
+
       </svg>
 
       {holesPlayed != null && (
