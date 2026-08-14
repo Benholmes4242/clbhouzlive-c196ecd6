@@ -737,6 +737,7 @@ const StoryTiles: React.FC<{
   // hairline. No emoji - BRIEF_COURSE_YOU_TAB_ANALYTICAL_V2 s1. The sentences
   // and their noise-floor logic are untouched; only the container changed.
   if (scope === 'personal') {
+
     const hooks: HookCell[] = [];
 
     if (nemesis) {
