@@ -282,6 +282,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     .filter((h) => (h.doubles_plus || 0) > 0)
     .sort((a, b) => b.doubles_plus - a.doubles_plus)
     .slice(0, 4);
+  /** Bars are on the worst source's count, so the leader always fills. */
+  const topDoublesMax = Math.max(...topDoubles.map((h) => h.doubles_plus || 0), 1);
 
   // Stratum 3: thirds
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
