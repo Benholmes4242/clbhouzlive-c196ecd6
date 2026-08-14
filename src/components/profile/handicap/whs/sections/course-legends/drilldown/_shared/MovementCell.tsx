@@ -42,7 +42,7 @@ export const MovementCell: React.FC<Props> = ({
 }) => {
   const isLight = theme === 'light';
   const climbed = isLight ? '#059669' : '#34D399';
-  const dropped = isLight ? 'rgba(15,23,42,0.45)' : 'rgba(255,255,255,0.45)';
+  const dropped = isLight ? INDEX_DELTA.light.drifted : INDEX_DELTA.dark.drifted;
   const dash    = isLight ? 'rgba(15,23,42,0.30)' : 'rgba(255,255,255,0.30)';
 
   const fontSize = size === 'chip' ? 10 : size === 'figure' ? 11.5 : 11;
