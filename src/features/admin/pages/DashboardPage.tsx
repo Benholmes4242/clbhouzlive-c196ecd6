@@ -415,6 +415,7 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.wau.current, aw!.wau.previous)}
         deltaLabel="vs prev 7d"
         sparkline={aw?.daily.map(d => d.wau)}
+        sharePct={wLoading ? null : share(aw!.wau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
@@ -424,6 +425,7 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.dau.current, aw!.dau.previous)}
         deltaLabel="vs same day last week"
         sparkline={aw?.daily.map(d => d.dau)}
+        sharePct={wLoading ? null : share(aw!.dau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
@@ -433,6 +435,7 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         delta={wLoading ? undefined : pctDelta(aw!.mau.current, aw!.mau.previous)}
         deltaLabel="vs prev 30d"
         sparkline={aw?.daily.map(d => d.mau)}
+        sharePct={wLoading ? null : share(aw!.mau.current)}
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
