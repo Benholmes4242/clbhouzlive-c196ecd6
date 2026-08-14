@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useFriendsLatestRounds, type FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import {
   toParFor,
   buildInsightMap,
@@ -126,7 +126,7 @@ const UNDER_TONE = TOPAR_RED;
  * A straight line from zero to the total would be a claim about a round that
  * was not measured, so the last case draws nothing at all.
  */
-function RoundShape({ row, shape }: { row: FriendRoundRow; shape: HoleShape | null }) {
+function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | null }) {
   const { t } = useTranslation('courses');
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
@@ -370,13 +370,13 @@ interface Props {
   userId: string | undefined;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
   lastSeen?: number | null;
-  onCardPress: (row: FriendRoundRow) => void;
+  onCardPress: (row: CircleRoundRow) => void;
   onSeeAll: () => void;
 }
 
 export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeAll }: Props) {
   const { t } = useTranslation('courses');
-  const roundsQuery = useFriendsLatestRounds(userId, {
+  const roundsQuery = useCircleLatestRounds(userId, {
     limit: RAIL_CAP,
     allowMultiplePerFriend: true,
   });

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChartNoAxesColumn } from 'lucide-react';
 import { A, TOPAR_RED, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 /**
  * Shared parts for the Discover friends surfaces (BRIEF_UNDER_PAR_RED, part 2).
@@ -54,7 +54,7 @@ export function InsightGlyph() {
 }
 
 
-export function toParFor(row: FriendRoundRow): { text: string; tone: string } | null {
+export function toParFor(row: CircleRoundRow): { text: string; tone: string } | null {
   if (row.gross == null || row.course_par == null) return null;
   const d = row.gross - row.course_par;
   if (d > 0) return { text: `+${d}`, tone: A.INK };
@@ -68,7 +68,7 @@ export function toParFor(row: FriendRoundRow): { text: string; tone: string } | 
  * Null below the 0.05 floor.
  */
 export function movementFor(
-  row: FriendRoundRow,
+  row: CircleRoundRow,
 ): { arrow: string; figure: string; tone: string } | null {
   const d = row.hcp_delta;
   if (d == null || Math.abs(d) < MOVEMENT_FLOOR) return null;
@@ -79,7 +79,7 @@ export function movementFor(
   };
 }
 
-export function IndexMovement({ row }: { row: FriendRoundRow }) {
+export function IndexMovement({ row }: { row: CircleRoundRow }) {
   const { t } = useTranslation('courses');
   const mv = movementFor(row);
   if (!mv) return null;
@@ -120,7 +120,7 @@ export function IndexMovement({ row }: { row: FriendRoundRow }) {
  *   d. nothing (caller renders no line)
  */
 export function referenceLine(
-  row: FriendRoundRow,
+  row: CircleRoundRow,
   t: (k: string, o?: Record<string, unknown>) => string,
 ): string | null {
   const { gross, rounds_here, best_here, avg_gross_here } = row;
@@ -224,7 +224,7 @@ function nineFragment(toPar: number, t: T): string {
 }
 
 /** Ordered candidate list for one round; the caller picks the first allowed. */
-function candidatesFor(row: FriendRoundRow, t: T): RoundInsight[] {
+function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
   const out: RoundInsight[] = [];
   const push = (kind: InsightKind, text: string) => out.push({ kind, text });
 
@@ -361,7 +361,7 @@ function candidatesFor(row: FriendRoundRow, t: T): RoundInsight[] {
  * nothing rather than a dash.
  */
 export function buildInsightMap(
-  rows: FriendRoundRow[],
+  rows: CircleRoundRow[],
   t: T,
 ): Map<string, RoundInsight> {
   const used = new Map<InsightKind, number>();
@@ -380,6 +380,6 @@ export function buildInsightMap(
 }
 
 /** Single-row resolution, for surfaces that render one card in isolation. */
-export function insightFor(row: FriendRoundRow, t: T): RoundInsight | null {
+export function insightFor(row: CircleRoundRow, t: T): RoundInsight | null {
   return candidatesFor(row, t)[0] ?? null;
 }

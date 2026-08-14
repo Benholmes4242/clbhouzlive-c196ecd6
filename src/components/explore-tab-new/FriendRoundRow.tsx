@@ -3,7 +3,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useTranslation } from 'react-i18next';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { formatRelativeMonths } from '@/i18n/format';
-import type { FriendRoundRow } from '@/hooks/gam/useFriendsLatestRounds';
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import {
   IndexMovement,
   insightFor,
@@ -43,7 +43,7 @@ const SCORE_COL_W = 76;
 
 
 interface Props {
-  row: FriendRoundRow;
+  row: CircleRoundRow;
   isLast?: boolean;
   onPress?: () => void;
   /**
