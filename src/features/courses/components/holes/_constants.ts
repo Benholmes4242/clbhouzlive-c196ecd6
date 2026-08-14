@@ -45,5 +45,5 @@ export const SC_ALBATROSS_DARK = '#FFD84D';
 export const SC_EAGLE_DARK     = '#F5C842';
 export const SC_BIRDIE_DARK    = '#FF6B5E';
 export const SC_PAR_DARK       = 'rgba(242,244,247,0.42)';
-export const SC_BOGEY_DARK     = '#7AA6EC';
-export const SC_DOUBLE_DARK    = '#A6C2F0';
+export const SC_BOGEY_DARK     = '#A6C2F0'; // paler blue - lighter damage
+export const SC_DOUBLE_DARK    = '#7AA6EC'; // more saturated blue - worse damage
