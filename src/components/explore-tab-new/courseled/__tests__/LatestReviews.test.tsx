@@ -115,18 +115,19 @@ describe('LatestReviews mosaic', () => {
     expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
   });
 
-  it('never renders a red bar, including for a low score', () => {
+  it('tints bars with the app-wide score bands, not a local scale', () => {
     render(
       <LatestReviews
         reviews={[
-          make(1, { rating: 5.5, breakdown: { design: 5.5, conditions: null, clubhouse: null, facilities: null } }),
+          make(1, { rating: 4.2, breakdown: { design: 9.4, conditions: 6.1, clubhouse: 4.2, facilities: null } }),
         ]}
         onTilePress={() => {}}
         onSeeAll={() => {}}
       />,
     );
     const html = screen.getByTestId('review-tile-breakdown').innerHTML;
-    expect(html).toContain('124, 139, 156');
-    expect(html.toLowerCase()).not.toContain('#c8372b');
+    expect(html).toContain(BAND_GREEN);
+    expect(html).toContain(BAND_AMBER);
+    expect(html).toContain(BAND_RED);
   });
 });
