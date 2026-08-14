@@ -83,38 +83,67 @@ export default function MetricCard({
       }}>
         {loading || value === null ? '-' : num(value)}
       </div>
-      {state && !loading ? (
+      {/*
+        NOTE LINE. The SHARE leads and the delta follows: the share is the
+        reference point, so when the line will not fit at 390px the delta wraps
+        to a second line and the share keeps its place. flexWrap, not ellipsis.
+      */}
+      {showShare || state || showNew || deltaLabel ? (
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 2,
-          color: state === 'up' ? t.okText : state === 'down' ? t.dangerText : t.inkMuted,
-          fontSize: 11, fontWeight: 600,
-          fontVariantNumeric: 'tabular-nums',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center',
+          columnGap: 6, rowGap: 1, minWidth: 0,
         }}>
-          {state === 'up' && <ArrowUpRight size={11} />}
-          {state === 'down' && <ArrowDownRight size={11} />}
-          {state === 'level' ? 'Level' : `${Math.abs(rounded!)}%`}
-          {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500, marginLeft: 4 }}>{deltaLabel}</span>}
+          {showShare ? (
+            <span style={{
+              color: t.inkMuted, fontSize: 11, fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {Math.round(sharePct!)}% of members
+            </span>
+          ) : null}
+
+          {state && !loading ? (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 2,
+              color: state === 'up' ? t.okText : state === 'down' ? t.dangerText : t.inkMuted,
+              fontSize: 11, fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums',
+              minWidth: 0,
+            }}>
+              {state === 'up' && <ArrowUpRight size={11} />}
+              {state === 'down' && <ArrowDownRight size={11} />}
+              {state === 'level' ? 'Level' : `${Math.abs(rounded!)}%`}
+              {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500, marginLeft: 4 }}>{deltaLabel}</span>}
+            </span>
+          ) : showNew ? (
+            <span style={{ color: t.ink, fontSize: 11, fontWeight: 700 }}>
+              New
+              {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500, marginLeft: 4 }}>{deltaLabel}</span>}
+            </span>
+          ) : deltaLabel ? (
+            <span style={{ color: t.inkFaint, fontSize: 11, fontWeight: 500 }}>{deltaLabel}</span>
+          ) : null}
         </div>
-      ) : showNew ? (
-        <div style={{ color: t.brandText, fontSize: 11, fontWeight: 700 }}>
-          New
-          {deltaLabel && <span style={{ color: t.inkFaint, fontWeight: 500, marginLeft: 4 }}>{deltaLabel}</span>}
-        </div>
-      ) : deltaLabel ? (
-        <div style={{ color: t.inkFaint, fontSize: 11, fontWeight: 500 }}>{deltaLabel}</div>
       ) : null}
       {sparkData.length > 1 ? (
         <div style={{ height: 28, marginTop: 6, marginLeft: -12, marginRight: -12 }}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={sparkData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
               <defs>
+                {/*
+                  White at 0.10, NOT the 0.16 the amber fill used: white throws
+                  far more light than amber at the same opacity and 0.16 reads
+                  as a smear rather than a fill.
+                */}
                 <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={t.brand} stopOpacity={0.35} />
-                  <stop offset="100%" stopColor={t.brand} stopOpacity={0} />
+                  <stop offset="0%" stopColor={t.ink} stopOpacity={0.10} />
+                  <stop offset="100%" stopColor={t.ink} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <Area type="monotone" dataKey="v" stroke={t.brand} strokeWidth={1.5}
+              {/* 1.25px, not 1.5: a white stroke at tile scale dominated the
+                  figure it sits under. Dimming the colour instead would
+                  reintroduce a third grey tier. */}
+              <Area type="monotone" dataKey="v" stroke={t.ink} strokeWidth={1.25}
                 fill={`url(#${gid})`} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
