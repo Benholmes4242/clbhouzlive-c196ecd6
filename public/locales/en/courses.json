@@ -1105,7 +1105,6 @@
   "discover": {
     "friendsRounds": {
       "overline": "YOUR CIRCLE",
-      "title": "Friends' latest rounds",
       "viewAll": "View all",
       "entrySingular": "ROUND",
       "entryPlural": "ROUNDS",
@@ -1211,7 +1210,6 @@
     "seeAll": "See all",
     "aMember": "A member",
     "unknownCourse": "Course",
-    "friendsPlayed": "Where your friends played",
     "aroundTheWorld": "Standout rounds",
     "last90": "Last 90 days",
     "last90lower": "last 90 days",
@@ -1397,7 +1395,9 @@
     "mostPlayedAvgToParBy_one": "Played to {{value}} by {{count}} member",
     "mostPlayedAvgToParBy_other": "Played to {{value}} by {{count}} members",
     "mostPlayedMembers_one": "{{count}} member",
-    "mostPlayedMembers_other": "{{count}} members"
+    "mostPlayedMembers_other": "{{count}} members",
+    "whosBeenPlaying": "Who's been playing",
+    "suggestedMark": "SUGGESTED"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

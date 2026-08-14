@@ -303,6 +303,8 @@ export default function ExploreTabContent({
       analyticsEvents.track('discover_friend_round_tapped', {
         course_id: r.course_id ?? null,
         has_score: !!r.score_id,
+        // BRIEF_WHOS_BEEN_PLAYING 5.1 — is a stranger's round ever opened?
+        suggested: r.suggested,
       });
       if (r.score_id) opener.openByScore(r.score_id, r.connection_id, r.user_id);
       else if (r.course_id) navigate(`/courses/${r.course_id}`);
