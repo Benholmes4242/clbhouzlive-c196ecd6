@@ -111,7 +111,81 @@ function monotonePath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-/** Shape chart - bars are the field, the amber line is the member. */
+/**
+ * Monotone Hermite EVALUATOR - same tangents as monotonePath, but samplable at
+ * arbitrary x. Needed for the gap shading: the field edge of the fill must
+ * follow the field's own curve, not the tops of the bars, so both curves are
+ * sampled at the same x positions and the polygon is built between them.
+ */
+function monotoneSampler(pts: { x: number; y: number }[]): (x: number) => number {
+  const n = pts.length;
+  if (n === 0) return () => 0;
+  if (n === 1) return () => pts[0].y;
+  const dx: number[] = [];
+  const slope: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    dx.push(pts[i + 1].x - pts[i].x);
+    slope.push(dx[i] === 0 ? 0 : (pts[i + 1].y - pts[i].y) / dx[i]);
+  }
+  const m: number[] = new Array(n);
+  m[0] = slope[0];
+  m[n - 1] = slope[n - 2];
+  for (let i = 1; i < n - 1; i++) {
+    m[i] = slope[i - 1] * slope[i] <= 0 ? 0 : (slope[i - 1] + slope[i]) / 2;
+  }
+  for (let i = 0; i < n - 1; i++) {
+    if (slope[i] === 0) {
+      m[i] = 0;
+      m[i + 1] = 0;
+      continue;
+    }
+    const a = m[i] / slope[i];
+    const b = m[i + 1] / slope[i];
+    const s = a * a + b * b;
+    if (s > 9) {
+      const tau = 3 / Math.sqrt(s);
+      m[i] = tau * a * slope[i];
+      m[i + 1] = tau * b * slope[i];
+    }
+  }
+  return (x: number) => {
+    if (x <= pts[0].x) return pts[0].y;
+    if (x >= pts[n - 1].x) return pts[n - 1].y;
+    let i = 0;
+    while (i < n - 2 && x > pts[i + 1].x) i++;
+    const h = dx[i] || 1;
+    const tt = (x - pts[i].x) / h;
+    const t2 = tt * tt;
+    const t3 = t2 * tt;
+    return (
+      (2 * t3 - 3 * t2 + 1) * pts[i].y +
+      (t3 - 2 * t2 + tt) * h * m[i] +
+      (-2 * t3 + 3 * t2) * pts[i + 1].y +
+      (t3 - t2) * h * m[i + 1]
+    );
+  };
+}
+
+/**
+ * DIFFICULTY RAMP - one hue, varying intensity, across the course's OWN spread.
+ *
+ * Deliberately NOT the green/amber/red zone ramp used by the course card and
+ * the handicap tile: amber on this panel means THE MEMBER (the line, the
+ * your-avg figure, the legend swatch). Amber bars behind an amber line would
+ * strip that colour of its one meaning. Red here reads DEMANDING, not bad -
+ * the slope scale's convention.
+ */
+const RAMP_EASY: [number, number, number] = [228, 233, 239];
+const RAMP_HARD: [number, number, number] = [154, 32, 26];
+const RAMP_HARD_HEX = '#9A201A';
+
+function rampColor(t: number): string {
+  const k = Math.max(0, Math.min(1, t));
+  const c = RAMP_EASY.map((a, i) => Math.round(a + (RAMP_HARD[i] - a) * k));
+  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+}
+
+/** Shape chart - graded bars are the field, the amber line is the member. */
 const ShapeChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
@@ -120,9 +194,10 @@ const ShapeChart: React.FC<{
   hasYou: boolean;
 }> = ({ holes, myByHole, hardestHole, hardestText, hasYou }) => {
   const W = 340;
-  const H = 116;
+  /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
+  const H = 78;
   /** Headroom for the hardest hole's own figure - the line shares it. */
-  const TOP = 20;
+  const TOP = 18;
   const n = holes.length;
   if (n === 0) return null;
 
@@ -136,10 +211,18 @@ const ShapeChart: React.FC<{
 
   const slot = W / n;
   const barW = Math.max(5, slot - 4);
-  const y = (v: number) => TOP + 4 + (1 - (v - domainMin) / span) * (H - TOP - 10);
+  const y = (v: number) => TOP + 3 + (1 - (v - domainMin) / span) * (H - TOP - 8);
   const yBase = y(0);
   const cx = (i: number) => i * slot + slot / 2;
 
+  // Bar tint spread: the course's own easiest -> hardest, not an absolute scale.
+  const fieldVals = holes.map((h) => h.avg_to_par);
+  const fMin = Math.min(...fieldVals);
+  const fMax = Math.max(...fieldVals);
+  const fSpan = Math.max(0.01, fMax - fMin);
+  const tint = (v: number) => 0.06 + 0.94 * ((v - fMin) / fSpan);
+
+  const fieldPts = holes.map((h, i) => ({ x: cx(i), y: y(h.avg_to_par) }));
   const linePts = hasYou
     ? holes
         .map((h, i) => {
@@ -150,6 +233,38 @@ const ShapeChart: React.FC<{
     : [];
   const linePath = linePts.length > 1 ? monotonePath(linePts) : '';
   const endPt = linePts.length > 1 ? linePts[linePts.length - 1] : null;
+
+  /**
+   * THE GAP. Shaded only where the member's line sits BELOW the field's curve
+   * (lower on screen = fewer shots = gained). No member line, no shading.
+   */
+  const gapPaths: string[] = [];
+  if (linePts.length > 1) {
+    const fieldAt = monotoneSampler(fieldPts);
+    const mineAt = monotoneSampler(linePts);
+    const x0 = linePts[0].x;
+    const x1 = linePts[linePts.length - 1].x;
+    const STEPS = 160;
+    let run: { x: number; f: number; m: number }[] = [];
+    const flush = () => {
+      if (run.length > 1) {
+        const top = run.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.f.toFixed(2)}`);
+        const bottom = [...run]
+          .reverse()
+          .map((p) => `L ${p.x.toFixed(2)} ${p.m.toFixed(2)}`);
+        gapPaths.push([...top, ...bottom, 'Z'].join(' '));
+      }
+      run = [];
+    };
+    for (let s = 0; s <= STEPS; s++) {
+      const x = x0 + ((x1 - x0) * s) / STEPS;
+      const f = fieldAt(x);
+      const m = mineAt(x);
+      if (m > f + 0.15) run.push({ x, f, m });
+      else flush();
+    }
+    flush();
+  }
 
   const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
   const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
@@ -174,13 +289,9 @@ const ShapeChart: React.FC<{
           aria-hidden="true"
         >
           <defs>
-            <linearGradient id="hip-bar" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E4E9EF" />
-              <stop offset="100%" stopColor="#EEF2F6" />
-            </linearGradient>
-            <linearGradient id="hip-bar-ink" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(14,18,22,0.78)" />
-              <stop offset="100%" stopColor="rgba(14,18,22,0.62)" />
+            <linearGradient id="hip-gap" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(247,147,30,0.26)" />
+              <stop offset="100%" stopColor="rgba(247,147,30,0.04)" />
             </linearGradient>
           </defs>
           {holes.map((h, i) => {
@@ -201,14 +312,11 @@ const ShapeChart: React.FC<{
               `Q ${x} ${top + height} ${x} ${top + height - rb}`,
               'Z',
             ].join(' ');
-            return (
-              <path
-                key={h.hole_no}
-                d={d}
-                fill={h.hole_no === hardestHole ? 'url(#hip-bar-ink)' : 'url(#hip-bar)'}
-              />
-            );
+            return <path key={h.hole_no} d={d} fill={rampColor(tint(h.avg_to_par))} />;
           })}
+          {gapPaths.map((d, i) => (
+            <path key={`gap-${i}`} d={d} fill="url(#hip-gap)" />
+          ))}
           {linePath && (
             <path
               d={linePath}
@@ -222,18 +330,18 @@ const ShapeChart: React.FC<{
           )}
         </svg>
 
-        {/* The hardest hole carries its own value. ONE label only. */}
-        {hardestTopY != null && (
+        {/* The hardest hole carries its own value, in the ramp's deep red. */}
+        {hardestTopY != null && hardestText && (
           <span
             style={{
               position: 'absolute',
               left: `${(cx(hardestIdx) / W) * 100}%`,
-              top: Math.max(0, hardestTopY - 15),
+              top: Math.max(0, hardestTopY - 14),
               transform: 'translateX(-50%)',
-              fontSize: 11,
+              fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
-              color: A.INK,
+              color: RAMP_HARD_HEX,
               whiteSpace: 'nowrap',
               ...FIGS,
             }}
@@ -260,7 +368,7 @@ const ShapeChart: React.FC<{
         )}
       </div>
 
-      <div style={{ position: 'relative', height: 12, margin: '9px 0 0' }}>
+      <div style={{ position: 'relative', height: 11, margin: '7px 0 0' }}>
         {axisIdx.map((i) => {
           const end = i === 0 || i === n - 1;
           return (
@@ -284,6 +392,23 @@ const ShapeChart: React.FC<{
     </>
   );
 };
+
+/** Bar-ramp legend: easier -> harder, one hue. Carries no amber. */
+const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, harder }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+    <span style={{ ...LABEL, fontSize: 7 }}>{easier}</span>
+    <i
+      style={{
+        width: 34,
+        height: 5,
+        borderRadius: 2,
+        background: `linear-gradient(90deg, ${rampColor(0.06)}, ${rampColor(1)})`,
+      }}
+    />
+    <span style={{ ...LABEL, fontSize: 7 }}>{harder}</span>
+  </span>
+);
+
 
 
 export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
