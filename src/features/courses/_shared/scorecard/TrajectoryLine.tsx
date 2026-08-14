@@ -97,7 +97,8 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104 }) => {
     if (bead) beads.push({ i: i + 1, cum: cumYou, tone: bead.tone, r: bead.radius });
   });
 
-  const hasField = field.length >= 2;
+  // >= 3: the leading level-par point does not on its own make a series.
+  const hasField = field.length >= 3;
   const all = hasField ? [...you, ...field, 0] : [...you, 0];
   const min = Math.min(...all);
   const max = Math.max(...all);
