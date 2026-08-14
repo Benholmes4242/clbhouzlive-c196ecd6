@@ -463,7 +463,13 @@ export const HoleRowV2: React.FC<{
 
           <Hairline style={{ margin: '12px 0 10px' }} />
 
-          {/* Its own scale: to-par against scaleMax, shared by every hole. */}
+          {/*
+            Its own scale: to-par against scaleMax, shared by every hole, and
+            GRADED pale-to-deep-red across the course's own spread - the same ramp
+            as "How it plays" directly above. The track keeps its caption so it
+            still reads as its own scale. Red means DEMANDING, not bad. Below the
+            rounds floor the grade is withheld and the track stays neutral.
+          */}
           <div>
             <div style={{ ...MICRO, fontSize: 8, marginBottom: 6 }}>
               {t('courses:courseDetail.holes.scaleLabel')}
@@ -477,7 +483,10 @@ export const HoleRowV2: React.FC<{
                   right: 0,
                   height: 2,
                   borderRadius: 1,
-                  background: A.TRACK,
+                  background: scale.gradeDifficulty
+                    ? `linear-gradient(90deg, ${difficultyRampColor(0.06)}, ${difficultyRampColor(1)})`
+                    : A.TRACK,
+                  opacity: scale.gradeDifficulty ? 0.3 : 1,
                   display: 'block',
                 }}
               />
@@ -491,11 +500,12 @@ export const HoleRowV2: React.FC<{
                     width: 2,
                     height: 12,
                     marginLeft: -1,
-                    background: A.BODY,
+                    background: diffTone ?? A.BODY,
                     borderRadius: 1,
                   }}
                 />
               )}
+
               {mine?.avg_to_par != null && (
                 <i
                   aria-hidden="true"
