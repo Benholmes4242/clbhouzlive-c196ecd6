@@ -594,11 +594,7 @@ function FeedGroup({
           color: 'inherit',
         }}
       >
-        {head.avatarUrl ? (
-          <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
-        ) : (
-          <span aria-hidden style={{ width: 28, height: 28, borderRadius: 9, border: `1px solid ${t.hairline}`, flexShrink: 0 }} />
-        )}
+        <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
         <span style={{
           color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
