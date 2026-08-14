@@ -131,16 +131,47 @@ const HoleGap: React.FC<{ size?: number }> = ({ size = 27 }) => (
   </span>
 );
 
+/**
+ * A hole the member never started (played = false). BRIEF §1.4: it must NOT
+ * look like a picked-up hole — different fact, different mark. A hollow muted
+ * squircle: not a digit, not a zero, not a dash.
+ */
+const HoleNotPlayed: React.FC<{ size?: number }> = ({ size = 27 }) => (
+  <span
+    aria-label="Not played"
+    style={{
+      width: size,
+      height: size,
+      flex: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <span
+      style={{
+        width: Math.round(size * 0.42),
+        height: Math.round(size * 0.42),
+        borderRadius: '34%',
+        border: '1px solid rgba(255,255,255,0.26)',
+        background: 'transparent',
+      }}
+    />
+  </span>
+);
+
 const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) => {
   if (holes.length === 0) return null;
   // §3.1 — a nine containing an unscored played hole prints NO total and NO
   // to-par. Not the partial sum, not a dash. The other nine is unaffected.
-  const hasGap = holes.some((h) => h.gross == null);
+  // A NOT-PLAYED hole is not a gap: it takes no strokes and carries no par for
+  // this round, so the nine still totals honestly. Only a PICKED-UP hole voids.
+  const hasGap = holes.some((h) => h.played && h.gross == null);
   let total = 0;
   let par = 0;
   let any = false;
   for (const h of holes) {
-    if (h.gross != null && h.par != null) {
+    if (h.played && h.gross != null && h.par != null) {
       total += h.gross;
       par += h.par;
       any = true;
@@ -168,7 +199,9 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             >
               {h.par ?? '·'}
             </span>
-            {h.gross == null ? (
+            {!h.played ? (
+              <HoleNotPlayed />
+            ) : h.gross == null ? (
               <HoleGap />
             ) : (
               <ScoreMark strokes={h.gross} par={h.par ?? 4} size={27} surface="dark" />
@@ -195,6 +228,9 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
     let cut = false;
     holes.forEach((h, idx) => {
       if (cut) return;
+      // A NOT-PLAYED hole adds no strokes and no par — the line carries
+      // straight past it, no point plotted, no cut.
+      if (!h.played) return;
       if (h.gross == null || h.par == null) {
         cut = true;
         return;
@@ -304,10 +340,10 @@ export const PostRoundCard: React.FC<Props> = ({
   const holes = round.holeShape ?? [];
   const hasHoles = holes.length > 0;
   // §5 — has_holes is now true for PARTIAL cards too, so a reading needs both
-  // counts to tell a complete card from a partial one. played_holes is the shape
-  // length (played = false holes are already excluded upstream).
-  const playedHoles = holes.length;
-  const scoredHoles = holes.filter((h) => h.gross != null).length;
+  // counts to tell a complete card from a partial one. The shape now carries
+  // all eighteen positions, so played_holes counts the played ones.
+  const playedHoles = holes.filter((h) => h.played).length;
+  const scoredHoles = holes.filter((h) => h.played && h.gross != null).length;
   const showCrown = (notability ?? 0) === 3 && !!crown && !!crown.previousHolderName;
 
   useEffect(() => {
