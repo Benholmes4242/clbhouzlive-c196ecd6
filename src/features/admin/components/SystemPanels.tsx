@@ -355,11 +355,23 @@ export function PipelinePanel({ ops, loading }: { ops?: OpsHealth; loading: bool
 
   return (
     <section style={CARD}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={KICKER}>Pipeline</span>
-        <span style={{ flex: 1 }} />
-        <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
-      </div>
+      <Link
+        to="/admin-v2/health?tab=status"
+        style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={KICKER}>Pipeline</span>
+          <span style={{ flex: 1 }} />
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(tone), opacity: tone === 'ok' ? 0.5 : 1 }} />
+          <ChevronRight size={14} color={t.inkFaint} aria-hidden />
+        </div>
+        {/* Names the WORK, not the table: "evaluation queue" explains nothing
+            to anyone who does not already know what it is. */}
+        <div style={{ color: t.inkMuted, fontSize: 11.5, marginTop: 2 }}>
+          {PIPELINE_EXPLAINER}
+        </div>
+      </Link>
+
 
       {loading || !p ? (
         <Skeleton height={72} />
