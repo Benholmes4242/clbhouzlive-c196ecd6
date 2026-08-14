@@ -70,17 +70,31 @@ export function HonoursRow({
   const isAce = e.kind === 'ace';
   const tappable = !!onPress && !!e.scoreId;
 
-  const feat =
-    e.holeNo != null
-      ? t(
-          isAce ? 'discover.row.aceTight' : 'discover.row.albatrossTight',
-          isAce ? 'Hole in one, {{hole}} hole' : 'Albatross, {{hole}} hole',
-          { hole: formatOrdinal(e.holeNo) },
-        )
-      : t(
-          isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
-          isAce ? 'Hole in one' : 'Albatross',
-        );
+  /**
+   * THE FEAT LINE — feat name, then hole, par and yardage, middot joined.
+   * BUILT BY JOINING PRESENT PARTS so a null yardage (older imported rounds
+   * carry no distance) can never leave a dangling middot. Par comes off the
+   * event, never hardcoded — an albatross is a par 5, not a par 3. Yards is
+   * what the column holds (`distance_yards`); nothing is converted.
+   * The ordinal stays formed at the call site — ordinals are language-specific.
+   * NO GOLD: this detail is MUTE, like the line it replaces.
+   */
+  const feat = [
+    t(
+      isAce ? 'discover.row.aceNoHole' : 'discover.row.albatrossNoHole',
+      isAce ? 'Hole in one' : 'Albatross',
+    ),
+    e.holeNo != null ? formatOrdinal(e.holeNo) : null,
+    e.holeNo != null && e.holePar != null
+      ? t('holes.parLabel', 'Par {{par}}', { par: e.holePar })
+      : null,
+    e.holeNo != null && e.holePar != null && e.holeYards != null
+      ? t('holes.yards', '{{yards}} yds', { yards: e.holeYards })
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
 
 
   const who = e.isOwn ? t('discover.wire.you', 'You') : e.actorName;
