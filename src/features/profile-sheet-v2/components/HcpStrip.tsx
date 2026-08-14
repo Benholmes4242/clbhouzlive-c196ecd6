@@ -460,6 +460,42 @@ const TrendCard: React.FC<{
         const mx = xy[active][0];
         const my = xy[active][1];
         const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
+
+        // CALLOUTS: the high and the low, on the curve, no axis furniture.
+        // A flat window has no extremes — draw neither. Tied extremes label
+        // their FIRST occurrence only.
+        const flat = stats.worst - stats.best <= 0;
+        const worstIdx = flat ? -1 : points.findIndex((p) => p.v === stats.worst);
+        const bestIdx = flat ? -1 : points.findIndex((p) => p.v === stats.best);
+
+        const callout = (idx: number, above: boolean) => {
+          if (idx < 0) return null;
+          const [cx, cy] = xy[idx];
+          const tone = zoneColor(points[idx].v, stats.best, stats.worst);
+          const onMarker = idx === active;
+          // Edge inset: a centred label at either end would clip the plot.
+          const anchor = cx <= padX + 14 ? 'start' : cx >= w - padX - 14 ? 'end' : 'middle';
+          const tx = anchor === 'start' ? Math.max(cx - 3, 2) : anchor === 'end' ? Math.min(cx + 3, w - 2) : cx;
+          return (
+            <g key={idx} opacity={onMarker ? 0.42 : 1}>
+              {/* When today IS the extreme, the scrub marker owns the point:
+                  one dot, not two stacked. */}
+              {!onMarker && (
+                <circle cx={cx} cy={cy} r={3.4} fill={tone} stroke="#FFFFFF" strokeWidth={1.6} />
+              )}
+              <text
+                x={tx}
+                y={above ? cy - 8 : cy + 15}
+                textAnchor={anchor}
+                fill={tone}
+                style={{ fontSize: 9.5, fontWeight: 700, ...FIGS }}
+              >
+                {formatIndex(points[idx].v)}
+              </text>
+            </g>
+          );
+        };
+
         return (
           <svg width={w} height={h} style={{ display: 'block' }}>
             <defs>
@@ -482,12 +518,16 @@ const TrendCard: React.FC<{
             <path d={area} fill="url(#hcp-trend-fill)" />
             <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
             <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+            {/* Under the marker triple, so the marker is never obscured. */}
+            {callout(worstIdx, true)}
+            {callout(bestIdx, false)}
             <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
             <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
             <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
             <circle cx={mx} cy={my} r={2.5} fill={markerTone} />
           </svg>
         );
+
       }}
       legend={
         <>
