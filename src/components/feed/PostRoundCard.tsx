@@ -271,11 +271,11 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
           strokeLinejoin="round"
           strokeLinecap="round"
         />
-        {pts.map((p, i) =>
+        {pts.map((p) =>
           p.bead ? (
             <circle
-              key={i}
-              cx={x(i)}
+              key={p.i}
+              cx={x(p.i)}
               cy={y(p.cum)}
               r={p.bead.radius}
               fill={p.bead.tone}
