@@ -163,10 +163,14 @@ function markerLeft(value: number, scaleMax: number): string {
 
 
 /**
- * Legend for the ink ramp. Rendered ONCE per surface, above the rows.
- * FOUR items only: the field tick and the member dot no longer sit on the ramp,
- * so legending them here would describe something the row does not draw.
+ * Legend for the to-par ramp. Rendered ONCE per surface, above the rows.
+ * SWATCHES TAKE RAMP_TOPAR, the same four tones as the bar and the expanded
+ * percentage dots - three places, one source, or the legend stops explaining
+ * the bar. FOUR items only: the field tick and the member dot no longer sit on
+ * the ramp, so legending them here would describe something the row does not
+ * draw.
  */
+
 export const HoleRampLegend: React.FC<{ hasYou?: boolean }> = () => {
   const { t } = useTranslation(['courses']);
   const items = [
