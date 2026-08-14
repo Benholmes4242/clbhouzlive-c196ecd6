@@ -123,7 +123,9 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  *          up to 15), max two — it renders through StandoutTile's `subline`
  *          slot, so it is billed at THAT slot's real metrics, not at LABEL
  *          scale
- *   MORE line 15 (6.5 label + 6 marginTop)
+ * BRIEF_STANDOUT_TILE_TAP_AND_MORE §3: the "+n more here" footer is gone from
+ * this section, so the 15px MORE charge and its parameter came out with it. The
+ * estimate is now exactly padding + WHO + DETAIL + MARGIN.
  *
  * A tile with NO detail line bills ZERO for it (§2) — the line is omitted, not
  * padded, so the estimate must not charge a minimum of one. THE SAME HOLDS FOR
@@ -136,15 +138,14 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  * => ~25 chars a line); the longest live string is "First clean card here" at
  * 21 characters, so every current benchmark is one line.
  */
-function estimatePanelHeight(detail: string, margin: string, hasMore: boolean): number {
+function estimatePanelHeight(detail: string, margin: string): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
   const marginLines = margin ? Math.min(2, Math.ceil(margin.length / 25)) : 0;
   return (
     23 +
     18 +
     (lines > 0 ? 2 + lines * 16 : 0) +
-    (marginLines > 0 ? 3 + marginLines * 15 : 0) +
-    (hasMore ? 15 : 0)
+    (marginLines > 0 ? 3 + marginLines * 15 : 0)
   );
 }
 
@@ -270,6 +271,11 @@ interface Props {
   scopeKey: string;
   pills: React.ReactNode;
   onCoursePress: (courseId: string) => void;
+  /**
+   * Opens the scorecard sheet on a specific round. Score-backed tiles use this;
+   * anything without a round id falls back to onCoursePress.
+   */
+  onFeatPress?: (scoreId: string, ownerId: string | null) => void;
   onExpand?: (revealed: number) => void;
   /** Human lens label for the sheet caption ('For you', 'Worldwide'). */
   lensLabel?: string;
@@ -324,6 +330,7 @@ export function AroundTheWorld({
   scopeKey,
   pills,
   onCoursePress,
+  onFeatPress,
   onExpand,
   lensLabel,
   emptyCopy,
@@ -875,9 +882,11 @@ export function AroundTheWorld({
               detailShown,
               margin,
               more,
+              scoreId: top?.scoreId ?? null,
+              ownerId: top?.userId ?? null,
               reactTo,
               onPress,
-              height: photo + estimatePanelHeight(detailText, margin, more > 0),
+              height: photo + estimatePanelHeight(detailText, margin),
             };
           });
 
@@ -925,7 +934,21 @@ export function AroundTheWorld({
                            renders nothing and bills nothing. */
                         subline={tt.margin || null}
                         isNew={isNewSince(g.at, lastSeen)}
-                        onPress={() => onCoursePress(g.courseId)}
+                        /* THE TAP OPENS THE ROUND (BRIEF_STANDOUT_TILE_TAP_AND_MORE
+                           §2). A feat without a score id — a rating-only tile —
+                           falls back to the course page rather than rendering a
+                           tile that does nothing. The course stays reachable from
+                           the scorecard sheet's own course link. */
+                        onPress={() => {
+                          if (onFeatPress && tt.scoreId) {
+                            analyticsEvents.track('discover_world_tile_tap', {
+                              source: 'around_the_world',
+                            });
+                            onFeatPress(tt.scoreId, tt.ownerId);
+                            return;
+                          }
+                          onCoursePress(g.courseId);
+                        }}
                         trailing={
                           /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a
                              control appears, so names never go ragged between a tile
@@ -957,25 +980,6 @@ export function AroundTheWorld({
                                 })()
                               : null}
                           </ReactionSlot>
-                        }
-                        footer={
-                          tt.more > 0 ? (
-                            <div
-                              style={{
-                                fontSize: 6.5,
-                                fontWeight: 700,
-                                letterSpacing: '0.14em',
-                                textTransform: 'uppercase',
-                                color: A.MUTE,
-                                marginTop: 6,
-                              }}
-                            >
-                              {t('discover.row.moreHere', {
-                                defaultValue: '+{{count}} more here',
-                                count: tt.more,
-                              })}
-                            </div>
-                          ) : null
                         }
                       />
                     );

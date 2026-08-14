@@ -479,6 +479,7 @@ export default function ExploreTabContent({
             </div>
           }
           onCoursePress={(id) => goCourse(id, 'around_the_world')}
+          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
           lensLabel={lensLabel}
           emptyCopy={lensEmptyCopy}
           priorityFor={priorityFor}
