@@ -18,6 +18,7 @@
  * the page divider.
  */
 import { useEffect, useState, type ReactNode } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
 import { fmtScore, type TickerRow } from '../HybridHero.utils';
@@ -47,6 +48,13 @@ interface HeroWireTickerProps {
   rows: TickerRow[];
   /** When rows is empty, render this "awaiting the field" wire instead. */
   emptyStateFacts?: TickerFact[];
+  /**
+   * Live state only: the strip doubles as the control for the expanded hero
+   * board. When provided, the left accessory becomes a tappable chevron+label.
+   */
+  expandable?: boolean;
+  expanded?: boolean;
+  onToggleExpanded?: () => void;
 }
 
 const PULSE_STYLE_ID = 'hero-wire-ticker-pulse';
@@ -198,7 +206,13 @@ function EmptyStateBar({
   );
 }
 
-export function HeroWireTicker({ rows, emptyStateFacts }: HeroWireTickerProps) {
+export function HeroWireTicker({
+  rows,
+  emptyStateFacts,
+  expandable,
+  expanded,
+  onToggleExpanded,
+}: HeroWireTickerProps) {
   const { t } = useTranslation('tourhub');
 
   const safeRows = rows ?? [];
@@ -242,7 +256,46 @@ export function HeroWireTicker({ rows, emptyStateFacts }: HeroWireTickerProps) {
   ));
 
   const label = t('overview.ticker.top10Label');
-  const leftAccessory = (
+  const controlLabel = expanded
+    ? t('overview.ticker.hideBoard')
+    : t('overview.ticker.showBoard');
+  const leftAccessory = expandable ? (
+    <button
+      type="button"
+      onClick={onToggleExpanded}
+      aria-expanded={!!expanded}
+      style={{
+        padding: '0 10px 0 12px',
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.16em',
+        color: 'rgba(255,255,255,0.72)',
+        background: BG,
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+        flexShrink: 0,
+        border: 'none',
+        borderRight: '0.5px solid rgba(255,255,255,0.10)',
+        zIndex: 2,
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+      }}
+      className="active:bg-white/[0.06] transition-colors"
+    >
+      <span>{controlLabel}</span>
+      <ChevronDown
+        size={12}
+        color={AMBER}
+        strokeWidth={2.5}
+        style={{
+          transform: expanded ? 'rotate(180deg)' : 'none',
+          transition: 'transform 160ms ease',
+        }}
+      />
+    </button>
+  ) : (
     <div
       style={{
         padding: '0 12px',
