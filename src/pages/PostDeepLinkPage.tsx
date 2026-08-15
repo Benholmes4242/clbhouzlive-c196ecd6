@@ -220,8 +220,23 @@ const PostDeepLinkPage: React.FC = () => {
         },
       };
 
-      setFeedPost(mapActivityPostToFeedPost(activityPost));
+      // THE LIKED FLAG (§3.1). Resolved through viewer_liked_post, which is the
+      // only correct route: round-backed posts store the viewer's like in
+      // content_reactions against whs_score_id, not in post_likes, so reading
+      // post_likes directly here would report false for every round post.
+      let likedByMe = false;
+      if (user?.id) {
+        const { data: liked } = await supabase.rpc('viewer_liked_post', {
+          p_post_id: row.id,
+          p_viewer: user.id,
+          p_actor_type: 'personal',
+        });
+        likedByMe = liked === true;
+      }
+
+      setFeedPost(mapActivityPostToFeedPost(activityPost, { isLikedByMe: likedByMe }));
       setIsLoading(false);
+
     }
 
     loadPost();
