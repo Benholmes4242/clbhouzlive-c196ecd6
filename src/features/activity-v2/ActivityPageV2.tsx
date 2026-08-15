@@ -416,8 +416,14 @@ export const ActivityPageV2: React.FC = () => {
     );
   };
 
+  // On the New chip the visible rows ARE buckets.new — the same array the chip
+  // counts (§1.3/§1.4: the All tab's NEW section is authoritative).
+  const isNewChip = chip === 'new';
+  const visibleRows = isNewChip ? buckets.new : allRows;
+
   const isErrored = feed.isError && allRows.length === 0;
-  const isEmpty = !feed.isLoading && !feed.isError && allRows.length === 0;
+  const isEmpty = !feed.isLoading && !feed.isError && visibleRows.length === 0;
+
 
   return (
     <ManagePageShell
