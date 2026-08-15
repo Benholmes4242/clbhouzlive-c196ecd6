@@ -129,9 +129,7 @@ async function scoreOne(supabase: any, tournamentId: string): Promise<any> {
 
     if (lErr || !leaderboard?.length) {
       console.error('[ScorePredictions] No leaderboard data:', lErr?.message);
-      return new Response(JSON.stringify({ error: 'No leaderboard data' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return { skipped: true, reason: 'no_leaderboard_data' };
     }
 
     // Build position lookup
