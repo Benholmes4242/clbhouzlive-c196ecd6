@@ -150,10 +150,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme, r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {today == null ? todayBlank : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme, r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>
