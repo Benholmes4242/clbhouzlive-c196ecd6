@@ -13,15 +13,17 @@
  * Pass 8: the live leaderboard now extends BELOW the hero, so the photo band is
  * shorter. It cannot be live-only — every carousel card shares one definite
  * height — so both numbers drop by the same 46px (306→260, 677→631).
+ * Pass 8.1: 260 read slightly too tight, so both go 10% taller by the same
+ * +26px (260→286, 631→657). The height is HARD — never flex-grown.
  * If upcoming state ever clips, raise this number — don't tear down the
  * load-bearing definite-height contract for HeroCarousel descendants.
  */
-export const PHOTO_BAND_HEIGHT = 260;   // 360 → 306 (Pass 7.0.2) → 260 (Pass 8)
+export const PHOTO_BAND_HEIGHT = 286;   // 360 → 306 (Pass 7.0.2) → 260 (Pass 8) → 286 (Pass 8.1)
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
-export const TOTAL_HERO_HEIGHT_TARGET = 631;  // 731 → 677 → 631 (PHOTO_BAND_HEIGHT 306→260, −46)
+export const TOTAL_HERO_HEIGHT_TARGET = 657;  // 731 → 677 → 631 → 657 (PHOTO_BAND_HEIGHT 260→286, +26)
 
 // Colours — re-exported from _shared/tokens.ts for hero-internal use.
 // These re-exports preserve existing band-file imports (`import { INK, AMBER, ... } from '../HybridHero.constants'`)
