@@ -108,8 +108,10 @@ export function PhotoBand({
       style={{
         position: 'relative',
         width: '100%',
-        flex: 1,
-        minHeight: PHOTO_BAND_HEIGHT,
+        // HARD height, not a floor. `flex: 1` used to let the band absorb the
+        // hero column's slack, so PHOTO_BAND_HEIGHT never actually applied.
+        height: PHOTO_BAND_HEIGHT,
+        flexGrow: 0,
         overflow: 'hidden',
         flexShrink: 0,
       }}
