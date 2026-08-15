@@ -35,7 +35,6 @@ import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { HeroWireTicker, type TickerFact } from './HybridHeroBands/HeroWireTicker';
 import { HERO_BOARD_ROWS } from './HybridHeroBands/HeroBoardBand';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
