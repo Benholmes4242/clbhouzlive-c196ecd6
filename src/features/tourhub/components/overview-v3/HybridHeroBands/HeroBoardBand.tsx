@@ -30,7 +30,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { FONT, CHARCOAL, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_10, WHITE_ALPHA_12, WHITE_ALPHA_55, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
@@ -83,7 +83,7 @@ function StatCell({
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: WHITE_ALPHA_55,
+          color: WHITE_ALPHA_65,
         }}
       >
         {label}
@@ -194,7 +194,7 @@ export function HeroBoardSection({
   return (
     <div
       style={{
-        background: CHARCOAL,
+        background: HERO_BOARD_SURFACE,
         fontFamily: FONT,
         overflow: 'hidden',
       }}
@@ -220,7 +220,7 @@ export function HeroBoardSection({
           padding: '10px 16px',
           background: 'transparent',
           border: 'none',
-          borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
+          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           fontFamily: FONT,
           cursor: 'pointer',
         }}
@@ -231,7 +231,7 @@ export function HeroBoardSection({
             fontSize: 9,
             fontWeight: 700,
             letterSpacing: '0.16em',
-            color: WHITE_ALPHA_55,
+            color: WHITE_ALPHA_65,
             textTransform: 'uppercase',
           }}
         >
@@ -246,7 +246,8 @@ export function HeroBoardSection({
             display: 'flex',
             gap: 10,
             padding: '12px 16px 16px',
-            borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
+            background: HERO_BOARD_SURFACE_SOFT,
+            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           }}
         >
           {field && (
@@ -293,7 +294,7 @@ export function HeroBoardSection({
           padding: '10px 16px',
           background: 'transparent',
           border: 'none',
-          borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
+          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           fontFamily: FONT,
           cursor: 'pointer',
         }}
@@ -304,7 +305,7 @@ export function HeroBoardSection({
             fontSize: 9,
             fontWeight: 700,
             letterSpacing: '0.16em',
-            color: WHITE_ALPHA_55,
+            color: WHITE_ALPHA_65,
             textTransform: 'uppercase',
           }}
         >

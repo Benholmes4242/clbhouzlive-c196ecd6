@@ -27,7 +27,7 @@ import {
   COURSE_SCRIMS,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { FONT } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 
 import { type HeroState } from '../HybridHero.utils';
