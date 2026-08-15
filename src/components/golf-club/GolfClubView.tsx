@@ -597,10 +597,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
     return () => io.disconnect();
   }, []);
   return (
-    <div
-      className="min-h-screen w-full bg-background"
-      style={{ paddingBottom: 'var(--bottom-nav-height, 88px)' }}
-    >
+    <div className="min-h-screen w-full bg-background">
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       <GlassHeaderPlate visible={tabsStuck} />
       {cinematicHero}
