@@ -974,7 +974,10 @@
       "modeLeaders": "리더",
       "featCount_other": "기록",
       "featCountWith_other": "{{count}}개 기록",
-      "latestAt": "최근 {{year}} · {{course}}"
+      "latestAt": "최근 {{year}} · {{course}}",
+      "expandFeats": "{{count}}개 더",
+      "expandFeats_one": "{{count}}개 더",
+      "collapseFeats": "접기"
     }
   },
   "statBrowse": {

@@ -1481,7 +1481,10 @@
       "featCount_other": "feats",
       "featCountWith_one": "{{count}} feat",
       "featCountWith_other": "{{count}} feats",
-      "latestAt": "Latest {{year}} · {{course}}"
+      "latestAt": "Latest {{year}} · {{course}}",
+      "expandFeats": "{{count}} more",
+      "expandFeats_one": "{{count}} more",
+      "collapseFeats": "Less"
     }
   },
   "statBrowse": {

@@ -974,7 +974,10 @@
       "modeLeaders": "リーダー",
       "featCount_other": "記録",
       "featCountWith_other": "{{count}}件の記録",
-      "latestAt": "最新 {{year}} · {{course}}"
+      "latestAt": "最新 {{year}} · {{course}}",
+      "expandFeats": "他 {{count}} 件",
+      "expandFeats_one": "他 {{count}} 件",
+      "collapseFeats": "閉じる"
     }
   },
   "statBrowse": {

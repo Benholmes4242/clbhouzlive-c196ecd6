@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronDown } from 'lucide-react';
+
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -190,35 +192,36 @@ export function FeatPlaque({
     >
       <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <HolderAvatar event={e} />
-        <span
-          style={{
-            ...LABEL,
-            fontSize: 9,
-            color: A.MUTE,
-            marginLeft: 'auto',
-            fontVariantNumeric: 'tabular-nums lining-nums',
-          }}
-        >
-          {formatYearNumeric(e.at)}
+        {/* The date, and DIRECTLY UNDER IT the feat in words. */}
+        <span style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: A.MUTE,
+              display: 'block',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            {formatYearNumeric(e.at)}
+          </span>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: ACH_GOLD_INK,
+              display: 'block',
+              marginTop: 4,
+            }}
+          >
+            {e.kind === 'ace'
+              ? t('discover.honours.badgeAce', 'Ace')
+              : t('discover.honours.badgeAlbatross', 'Albatross')}
+          </span>
         </span>
       </span>
 
-      {/* The feat, IN WORDS. */}
-      <span
-        style={{
-          ...LABEL,
-          fontSize: 9,
-          color: ACH_GOLD_INK,
-          marginTop: 9,
-          display: 'block',
-        }}
-      >
-        {e.kind === 'ace'
-          ? t('discover.honours.badgeAce', 'Ace')
-          : t('discover.honours.badgeAlbatross', 'Albatross')}
-      </span>
-
-      <span style={{ ...NAME_STYLE(!!e.isOwn), display: 'block', marginTop: 3 }}>
+      <span style={{ ...NAME_STYLE(!!e.isOwn), display: 'block', marginTop: 9 }}>
         {e.isOwn ? t('discover.wire.you', 'You') : e.actorName}
       </span>
 
@@ -245,6 +248,7 @@ export function FeatPlaque({
     </button>
   );
 }
+
 
 /* ───────────────────────────── the leaders ───────────────────────────── */
 
@@ -303,6 +307,83 @@ export function groupLeaders(events: WireEvent[]): HonoursLeader[] {
   );
 }
 
+/** §5 — LEADERS: the badge holds the top-right, the name sits under the ring,
+ *  and every feat is stated in its own row: YEAR · CLUB, then hole detail and
+ *  the feat in words. Two rows show; the rest live behind a chevron. */
+const LEADER_FEATS_BEFORE_COLLAPSE = 2;
+
+function LeaderFeatRow({
+  event: e,
+  onPress,
+}: {
+  event: WireEvent;
+  onPress?: (event: WireEvent) => void;
+}) {
+  const { t } = useTranslation('courses');
+  const tappable = !!onPress && !!e.scoreId;
+
+  const detail = [
+    e.holeNo != null ? formatOrdinal(e.holeNo) : null,
+    e.holePar != null ? t('holes.parLabel', 'Par {{par}}', { par: e.holePar }) : null,
+    e.holeYards != null ? t('holes.yards', '{{yards}} yds', { yards: e.holeYards }) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const kindLabel =
+    e.kind === 'ace'
+      ? t('discover.honours.badgeAce', 'Ace')
+      : t('discover.honours.badgeAlbatross', 'Albatross');
+
+  return (
+    <button
+      type="button"
+      onClick={tappable ? () => onPress?.(e) : undefined}
+      style={{
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
+        border: 'none',
+        background: 'transparent',
+        padding: '7px 0 0',
+        borderTop: `1px solid ${GOLD_HAIR}`,
+        cursor: tappable ? 'pointer' : 'default',
+        fontFamily: SANS,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11.5,
+          fontWeight: 700,
+          color: A.INK,
+          letterSpacing: '-0.01em',
+          display: 'block',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+        }}
+      >
+        {formatYearNumeric(e.at)} · {e.courseName ?? t('discover.unknownCourse', 'Course')}
+      </span>
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 8.5,
+          color: A.MUTE,
+          display: 'block',
+          marginTop: 2,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {[detail, kindLabel].filter(Boolean).join(' · ')}
+      </span>
+    </button>
+  );
+}
+
 function LeaderPlaque({
   leader: l,
   onPress,
@@ -311,76 +392,80 @@ function LeaderPlaque({
   onPress?: (event: WireEvent) => void;
 }) {
   const { t } = useTranslation('courses');
-  const latest = l.events[0];
-  const tappable = !!onPress && !!latest?.scoreId;
+  const [open, setOpen] = useState(false);
+  const hidden = Math.max(0, l.events.length - LEADER_FEATS_BEFORE_COLLAPSE);
+  const shown = open ? l.events : l.events.slice(0, LEADER_FEATS_BEFORE_COLLAPSE);
 
   return (
-    <button
-      type="button"
-      onClick={tappable ? () => onPress?.(latest) : undefined}
-      style={{ ...PLAQUE_SHELL, cursor: tappable ? 'pointer' : 'default' }}
-    >
+    <div style={PLAQUE_SHELL}>
       <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <HolderAvatar event={l.lead} />
-        <span style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <span
-            style={{
-              display: 'block',
-              fontSize: 20,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: A.INK,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-              lineHeight: 1,
-            }}
-          >
-            {l.total}
-          </span>
-          <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE, display: 'block', marginTop: 3 }}>
-            {t('discover.honours.featCount', { count: l.total, defaultValue: 'feats', defaultValue_one: 'feat' })}
-          </span>
+        {/* The badge holds the top right. No numeral, no "feats" caption. */}
+        <span
+          style={{
+            marginLeft: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 4,
+          }}
+        >
+          {badgesFor(l.events).map((b) => (
+            <FeatBadge key={b.kind} kind={b.kind} count={b.count} />
+          ))}
         </span>
       </span>
 
-      <span
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 4,
-          marginTop: 9,
-        }}
-      >
-        {badgesFor(l.events).map((b) => (
-          <FeatBadge key={b.kind} kind={b.kind} count={b.count} />
-        ))}
-      </span>
-
-      <span style={{ ...NAME_STYLE(l.isOwn), display: 'block', marginTop: 6, fontSize: 13.5 }}>
+      {/* The name sits UNDER the ring. */}
+      <span style={{ ...NAME_STYLE(l.isOwn), display: 'block', marginTop: 9, fontSize: 13.5 }}>
         {l.isOwn ? t('discover.wire.you', 'You') : l.lead.actorName}
       </span>
 
       <span aria-hidden style={{ marginTop: 'auto', paddingTop: 9 }} />
-      <span style={{ display: 'block', borderTop: `1px solid ${GOLD_HAIR}`, paddingTop: 8 }}>
-        <span
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {shown.map((e) => (
+          <LeaderFeatRow key={e.id} event={e} onPress={onPress} />
+        ))}
+      </div>
+
+      {hidden > 0 ? (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
           style={{
             ...LABEL,
-            fontSize: 9,
-            color: A.BODY,
-            display: 'block',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: 8.5,
+            color: ACH_GOLD_INK,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            marginTop: 7,
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            fontFamily: SANS,
           }}
         >
-          {t('discover.honours.latestAt', 'Latest {{year}} · {{course}}', {
-            year: formatYearNumeric(latest.at),
-            course: latest.courseName ?? t('discover.unknownCourse', 'Course'),
-          })}
-        </span>
-      </span>
-    </button>
+          {open
+            ? t('discover.honours.collapseFeats', 'Less')
+            : t('discover.honours.expandFeats', {
+                count: hidden,
+                defaultValue: '{{count}} more',
+                defaultValue_one: '{{count}} more',
+              })}
+          <ChevronDown
+            size={11}
+            strokeWidth={2.5}
+            style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 140ms' }}
+          />
+        </button>
+      ) : null}
+    </div>
   );
 }
+
 
 /* ────────────────────────── header and the toggle ────────────────────── */
 
