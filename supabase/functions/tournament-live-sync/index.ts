@@ -864,17 +864,23 @@ async function syncLeaderboard(
   // ONE fetch per sync pass of the rows we are about to overwrite, keyed by
   // player_id. Change detection compares against this map — never a per-player
   // SELECT inside the loop.
+  // A LIV pass writes team rows and player rows from the SAME leaderboard, so
+  // the one fetch fills TWO maps off the same result set — one keyed by
+  // player_id, one by team_id. sr_leaderboards holds exactly one of the two per
+  // row, which is why a row can never land in both maps.
   const priorByPlayer = new Map<string, any>();
+  const priorByTeam = new Map<string, any>();
   {
     const { data: priorRows, error: priorErr } = await supabase
       .from('sr_leaderboards')
-      .select('player_id, position, position_tied, score, thru, today')
+      .select('player_id, team_id, position, position_tied, score, thru, today')
       .eq('tournament_id', tournamentDbId);
     if (priorErr) {
       console.error('[LiveSync history] prior-rows fetch failed (history skipped this pass):', priorErr.message);
     } else {
       for (const r of priorRows ?? []) {
         if (r.player_id) priorByPlayer.set(r.player_id as string, r);
+        else if (r.team_id) priorByTeam.set(r.team_id as string, r);
       }
     }
   }
