@@ -79,7 +79,10 @@
       "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőɱƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
     },
     "ticker": {
-      "top10Label": "[~~ŢŐƤ 10~~]"
+      "top10Label": "[~~ŢŐƤ 10~~]",
+      "showBoard": "[BOARD]",
+      "hideBoard": "[HIDE]",
+      "fullLeaderboard": "[Full leaderboard]"
     },
     "fieldStrength": {
       "eyebrow": "[~~ƑÍÉĻĐ~~]",

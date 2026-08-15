@@ -79,7 +79,10 @@
       "reasonDefault": "This event did not complete enough rounds for an official result."
     },
     "ticker": {
-      "top10Label": "TOP 10"
+      "top10Label": "TOP 10",
+      "showBoard": "TABELLE",
+      "hideBoard": "AUSBLENDEN",
+      "fullLeaderboard": "Komplette Rangliste"
     },
     "fieldStrength": {
       "eyebrow": "FIELD",

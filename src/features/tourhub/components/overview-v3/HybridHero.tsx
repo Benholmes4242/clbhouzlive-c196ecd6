@@ -35,7 +35,7 @@ import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { HeroWireTicker, type TickerFact } from './HybridHeroBands/HeroWireTicker';
 import { HeroBoardBand } from './HybridHeroBands/HeroBoardBand';
-import { trackEvent } from '@/lib/analytics';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
@@ -452,7 +452,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     heroBoardExpandedSession = next;
     setBoardExpanded(next);
     if (next) {
-      trackEvent('hero_board_expanded', { tournament_id: tournament.id, round: liveRound });
+      analyticsEvents.track('hero_board_expanded', { tournament_id: tournament.id, round: liveRound });
     }
   };
 
@@ -474,7 +474,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             currentRound={liveRound as number}
             onFullLeaderboard={onCtaTap}
             onRowTap={(playerId) =>
-              trackEvent('hero_board_row_tap', {
+              analyticsEvents.track('hero_board_row_tap', {
                 tournament_id: tournament.id,
                 round: liveRound,
                 player_id: playerId,
