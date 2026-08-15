@@ -53,13 +53,12 @@ const DAMAGE_GRID = '30px 1fr 52px';
  * together, and they do: this one constant drives both the caption branch and
  * the ink ladder's gate (BRIEF_THIRDS_FLOOR_AND_DOUBLES_SOURCE s0).
  *
- * DERIVED, NOT CHOSEN, and DELIBERATELY 0.8 - not the 1.5 the earlier brief
- * set. Over every (member, course) pair with 5+ hole-by-hole rounds the spread
- * expected from SAMPLING ALONE has a median of 0.78. The old 1.5 called the
- * median card (spread 1.10) even, which is why a full shot of back-six fade
- * was reported as "no weak stretch" while the bars plainly showed it.
+ * UPHELD AT 1.5 per BRIEF_YOU_TAB_CHART_LED 0.2. Below a 1.5 spread the round
+ * is even: no third is inked as worst and no fade advice renders. The curve
+ * still draws either way - it is the shape of the round, not a claim about it.
  */
-const THIRDS_NOISE_FLOOR = 0.8;
+const THIRDS_NOISE_FLOOR = 1.5;
+
 
 /** Neutral ink ladder for the thirds, worst first. Never semantic colour. */
 const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
