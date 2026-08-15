@@ -110,7 +110,7 @@ function playDays(e: TourWeekEvent): string {
 const LIVE_DOT = '#E5484D';
 
 /** FULL-BLEED TILE. Supersedes the ~170px budget; the skeleton matches it. */
-const TILE_H = 226;
+const TILE_H = 210;
 const TILE_W = 266;
 
 /* ──────────────────────────── PANEL COLOURS ───────────────────────────────

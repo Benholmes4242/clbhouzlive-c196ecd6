@@ -90,7 +90,7 @@ export function FriendsRail() {
 }
 
 /**
- * Section 3 — tour rail: FULL-BLEED photograph tiles, 266x226, with the dark
+ * Section 3 — tour rail: FULL-BLEED photograph tiles, 266x210, with the dark
  * glass leaderboard panel inset 8px from the left, right and bottom
  * (OnTourThisWeek TILE_W / TILE_H). Was 272x174 (100 image + 56 stat row + 18
  * meta line) against the superseded ~170px budget; if this stayed there the
@@ -104,7 +104,7 @@ export function TourRail() {
         {[0, 1].map((i) => (
           <div
             key={i}
-            style={{ ...CARD_SHELL, position: 'relative', width: 266, height: 226, flexShrink: 0 }}
+            style={{ ...CARD_SHELL, position: 'relative', width: 266, height: 210, flexShrink: 0 }}
           >
             <Bar style={{ borderRadius: 0, height: '100%', width: '100%' }} />
             {/* The glass panel's footprint: three position rows under a lead
