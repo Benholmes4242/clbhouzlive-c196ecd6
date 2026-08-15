@@ -18,8 +18,15 @@ import { PHOTO_BAND_HEIGHT } from '../HybridHero.constants';
 import { FONT, CHARCOAL, WHITE_ALPHA_10, WHITE_ALPHA_55, AMBER } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 
-/** Six rows (~41px) + header (~29px) + footer (~40px) fits 306px. */
-export const HERO_BOARD_ROWS = 6;
+/**
+ * FIVE rows, not six. Six rows fit the 306px box arithmetically (29 header +
+ * 6x40 + 30 footer = 299) but the floating ChromeIsland overlays the top ~46px
+ * of the hero, which would bury the leader row. 46 + 29 + 5x40 + 30 = 305.
+ */
+export const HERO_BOARD_ROWS = 5;
+
+/** Clearance for the floating app chrome that overlays the top of the hero. */
+const CHROME_CLEARANCE = 46;
 
 interface HeroBoardBandProps {
   tournamentId: string;
@@ -50,6 +57,7 @@ export function HeroBoardBand({
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
+        paddingTop: CHROME_CLEARANCE,
       }}
     >
       <div style={{ flex: 1, minHeight: 0 }}>
