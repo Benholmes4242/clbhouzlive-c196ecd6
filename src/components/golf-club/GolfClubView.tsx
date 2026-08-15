@@ -524,8 +524,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             padding: '4px 8px',
             marginLeft: -8,
             border: 0,
-            gap: 6,
-            flexWrap: 'wrap',
+            gap: 4,
+            whiteSpace: 'nowrap',
           }}
         >
           {cells.map((cell, i) => (
