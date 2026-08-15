@@ -1,9 +1,19 @@
 import { corsFor } from '../_shared/cors.ts';
 /**
  * score-predictions — Auto-scores prediction accuracy when a tournament closes.
- * 
- * Called from tournament-round-complete when tournament status changes to 'closed'.
+ *
+ * Called from tournament-round-complete when tournament status changes to 'closed',
+ * and daily from cron with no body (backlog sweep over closed tournaments).
  * Compares stored predictions against actual leaderboard results.
+ *
+ * GUARANTEES
+ *  - CLOSED ONLY: a tournament whose status is not 'closed' is never scored, so a
+ *    grade is never written against a leaderboard that is still moving.
+ *  - HONEST PREDICTION ONLY: ai_predictions is append-only, so a tournament can
+ *    hold several rows. We score the LATEST row that was generated BEFORE the
+ *    tournament started. A prediction generated after the start (a post-hoc
+ *    regeneration) is not a prediction and is never scored.
+ *  - IDEMPOTENT: the accuracy upsert conflicts on tournament_id.
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -16,43 +26,98 @@ serve(async (req) => {
   }
 
   try {
-    const { tournamentId } = await req.json();
-    if (!tournamentId) throw new Error('tournamentId required');
+    let body: any = {};
+    try { body = await req.json(); } catch { /* cron sends no body */ }
+    const tournamentId: string | undefined = body?.tournamentId;
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
+    // ── Backlog sweep: no tournamentId → score every closed tournament that has
+    //    a prediction. Idempotent, so already-scored tournaments simply rewrite
+    //    the same result.
+    if (!tournamentId) {
+      const { data: rows, error: sweepErr } = await supabase
+        .from('ai_predictions')
+        .select('tournament_id, sr_tournaments!inner(id, status)')
+        .eq('sr_tournaments.status', 'closed');
+
+      if (sweepErr) throw sweepErr;
+
+      const ids = [...new Set((rows ?? []).map((r: any) => r.tournament_id))];
+      console.log(`[ScorePredictions] Backlog sweep over ${ids.length} closed tournaments`);
+
+      const results: any[] = [];
+      for (const id of ids) {
+        const r = await scoreOne(supabase, id);
+        results.push({ tournamentId: id, ...r });
+      }
+      return new Response(JSON.stringify({ swept: ids.length, results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const single = await scoreOne(supabase, tournamentId);
+    return new Response(JSON.stringify(single), {
+      status: single.error ? 400 : 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('[ScorePredictions] Error:', error);
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
+
+async function scoreOne(supabase: any, tournamentId: string): Promise<any> {
+  try {
     console.log(`[ScorePredictions] Scoring predictions for tournament ${tournamentId}`);
 
     // 1. Get the tournament details
     const { data: tournament, error: tErr } = await supabase
       .from('sr_tournaments')
-      .select('id, name, venue_name, season:sr_seasons!inner(tour_name, year)')
+      .select('id, name, venue_name, status, start_date, season:sr_seasons!inner(tour_name, year)')
       .eq('id', tournamentId)
       .single();
 
     if (tErr || !tournament) {
       console.error('[ScorePredictions] Tournament not found:', tErr?.message);
-      return new Response(JSON.stringify({ error: 'Tournament not found' }), {
-        status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return { skipped: true, reason: 'tournament_not_found' };
     }
 
-    // 2. Get the stored predictions
-    const { data: prediction, error: pErr } = await supabase
+    // 1b. CLOSED ONLY — never grade a live or scheduled tournament.
+    if (tournament.status !== 'closed') {
+      console.log(`[ScorePredictions] ${tournament.name} is '${tournament.status}' — not closed, skipping`);
+      return { skipped: true, reason: `tournament_not_closed:${tournament.status}` };
+    }
+
+    // 2. Get the prediction that was actually MADE for this tournament:
+    //    latest row generated before the tournament started.
+    const { data: predictionRows, error: pErr } = await supabase
       .from('ai_predictions')
       .select('*')
       .eq('tournament_id', tournamentId)
-      .single();
+      .order('generated_at', { ascending: false });
 
-    if (pErr || !prediction) {
+    if (pErr) throw pErr;
+    if (!predictionRows?.length) {
       console.log('[ScorePredictions] No predictions found for this tournament — skipping');
-      return new Response(JSON.stringify({ message: 'No predictions to score' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return { skipped: true, reason: 'no_prediction_row' };
     }
+
+    const startMs = tournament.start_date ? new Date(tournament.start_date).getTime() : null;
+    const prediction = startMs === null
+      ? predictionRows[0]
+      : predictionRows.find((p: any) => new Date(p.generated_at).getTime() <= startMs);
+
+    if (!prediction) {
+      console.log('[ScorePredictions] Every stored prediction post-dates the start — cannot score honestly');
+      return { skipped: true, reason: 'prediction_generated_after_start' };
+    }
+
 
     // 3. Get the full final leaderboard
     const { data: leaderboard, error: lErr } = await supabase
