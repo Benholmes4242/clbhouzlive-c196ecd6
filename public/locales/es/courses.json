@@ -1000,7 +1000,14 @@
     "momentsCount": "{{count}} momentos",
     "momentsCount_one": "{{count}} momento",
     "whosBeenPlaying": "Quién ha jugado",
-    "suggestedMark": "SUGERIDO"
+    "suggestedMark": "SUGERIDO",
+    "creator": {
+      "chip": "Creador",
+      "clips_one": "{{count}} clip",
+      "clips_other": "{{count}} clips",
+      "photos_one": "{{count}} foto",
+      "photos_other": "{{count}} fotos"
+    }
   },
   "statBrowse": {
     "colArea": "Zona",

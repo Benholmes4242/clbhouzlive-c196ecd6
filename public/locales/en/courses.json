@@ -1453,7 +1453,14 @@
     "mostPlayedMembers_one": "{{count}} member",
     "mostPlayedMembers_other": "{{count}} members",
     "whosBeenPlaying": "Who's been playing",
-    "suggestedMark": "SUGGESTED"
+    "suggestedMark": "SUGGESTED",
+    "creator": {
+      "chip": "Creator",
+      "clips_one": "{{count}} clip",
+      "clips_other": "{{count}} clips",
+      "photos_one": "{{count}} photo",
+      "photos_other": "{{count}} photos"
+    }
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

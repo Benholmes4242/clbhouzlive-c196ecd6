@@ -43,6 +43,12 @@ import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 import { HonoursBoard, sortHonours } from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
 import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
+import { useFriendIdSet } from './courseled/hooks/useFriendIdSet';
+import {
+  useCommunityCreators,
+  type CommunityCreator,
+} from './courseled/hooks/useCommunityCreators';
+import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
 
@@ -179,6 +185,24 @@ export default function ExploreTabContent({
   const momentList = useMemo(() => moments ?? [], [moments]);
   // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
   const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
+
+  // === CREATOR CARDS (BRIEF_COMMUNITY_CREATOR_CARDS) ======================
+  // Aggregated CLIENT-SIDE over the pool the section already holds. Both inputs
+  // to the relevance order are already-cached reads: the friend id set (the
+  // same query Around the world uses) and the member's played-course map from
+  // the stats context. No new query, no per-card fetch.
+  const friendIdsQuery = useFriendIdSet(userId);
+  const playedCourseMap = useUserStatsCourseMap();
+  const playedCourseIds = useMemo(
+    () => new Set(playedCourseMap.keys()),
+    [playedCourseMap],
+  );
+  const creators = useCommunityCreators({
+    pool: momentList,
+    viewerId: userId,
+    friendIds: friendIdsQuery.data,
+    playedCourseIds,
+  });
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
   const handleLensChange = useCallback(
@@ -372,6 +396,36 @@ export default function ExploreTabContent({
   );
 
 
+  // THE WHOLE CARD OPENS THE VIEWER, seeded with that member's moments. Same
+  // readOnly path handleMoment uses, with a creator-scoped list passed to it.
+  const handleCreator = useCallback(
+    (c: CommunityCreator) => {
+      analyticsEvents.track('discover_creator_card_tapped', {
+        creator_id: c.userId,
+        clips: c.clips,
+        photos: c.photos,
+      });
+      const seen = new Set<string>();
+      const posts = [] as Moment['post'][];
+      for (const m of c.moments) {
+        if (seen.has(m.post.id)) continue;
+        seen.add(m.post.id);
+        posts.push(m.post);
+      }
+      openWithOrigin({
+        posts,
+        index: 0,
+        originEl: null,
+        posterUrl: c.frame.thumbnail,
+        mediaIndex: c.frame.mediaIndex ?? 0,
+        mediaId: c.frame.mediaId ?? null,
+        openedFrom: 'discover-moments',
+        options: { readOnly: true },
+      });
+    },
+    [],
+  );
+
   const handleMostPlayed = useCallback(
     (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
     [goCourse],
@@ -514,6 +568,8 @@ export default function ExploreTabContent({
           totalCount={momentList.length}
           isPending={momentsQuery.isPending}
           lastSeen={lastSeen}
+          creators={creators}
+          onCreatorPress={handleCreator}
           onTilePress={handleMoment}
           onSeeAll={() => {
             analyticsEvents.track('community_page_open', {

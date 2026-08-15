@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
 import { MomentsGrid } from './MomentsGrid';
+import { CREATOR_CARD_COUNT, type CommunityCreator } from './hooks/useCommunityCreators';
 import { useMomentsOfTheWeek, type Moment } from './hooks/useMomentsOfTheWeek';
 import { countNewSince, useReportNewCount } from './newSince';
 import { Eyebrow, InkAction } from './tokens';
+
 import { MomentsMosaic as MomentsMosaicShell } from './DiscoverCourseLedSkeleton';
 
 /**
@@ -27,6 +29,13 @@ interface Props {
   onSeeAll: () => void;
   /** Last-seen stamp for the new-since markers; null marks nothing. */
   lastSeen?: number | null;
+  /**
+   * Creator cards in relevance order (BRIEF_COMMUNITY_CREATOR_CARDS). Derived
+   * client-side from the pool the section already holds — no new query. Empty
+   * renders the mosaic exactly as it is today.
+   */
+  creators?: CommunityCreator[];
+  onCreatorPress?: (c: CommunityCreator) => void;
 }
 
 export function MomentsOfTheWeek({
@@ -36,6 +45,8 @@ export function MomentsOfTheWeek({
   onTilePress,
   onSeeAll,
   lastSeen = null,
+  creators,
+  onCreatorPress,
 }: Props) {
   const { t } = useTranslation('courses');
 
@@ -71,6 +82,8 @@ export function MomentsOfTheWeek({
         lastSeen={lastSeen}
         onTilePress={onTilePress}
         autoplayGroup="moments-page"
+        creators={creators?.slice(0, CREATOR_CARD_COUNT)}
+        onCreatorPress={onCreatorPress}
       />
     </section>
   );

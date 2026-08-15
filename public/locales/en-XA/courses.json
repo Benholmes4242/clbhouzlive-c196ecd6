@@ -1448,7 +1448,14 @@
     "mostPlayedMembers_one": "[~~{{count}} ménƀéř~~]",
     "mostPlayedMembers_other": "[~~{{count}} ménƀéřš~~]",
     "whosBeenPlaying": "[Ẁḩǿ'ş ƀḗḗƞ ƥŀȧẏīƞğ]",
-    "suggestedMark": "[ŞŲĠĠḖŞŢḖḐ]"
+    "suggestedMark": "[ŞŲĠĠḖŞŢḖḐ]",
+    "creator": {
+      "chip": "[Ĉŕéàţöŕ]",
+      "clips_one": "[{{count}} çļîþ]",
+      "clips_other": "[{{count}} çļîþŝ]",
+      "photos_one": "[{{count}} þĥöţö]",
+      "photos_other": "[{{count}} þĥöţöŝ]"
+    }
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",
