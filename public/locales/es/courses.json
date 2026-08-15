@@ -1014,7 +1014,21 @@
       "badgeAlbatross": "Albatros",
       "badgeCount": "{{label}} ×{{count}}",
       "more": "{{count}} más",
-      "showLess": "Ver menos"
+      "showLess": "Ver menos",
+      "headlineAces_one": "{{count}} hoyo en uno.",
+      "headlineAces_other": "{{count}} hoyos en uno.",
+      "headlineAlbatrosses_one": "{{count}} albatros.",
+      "headlineAlbatrosses_other": "{{count}} albatros.",
+      "subRecent": "En la historia de clbhouz",
+      "subLeaders_one": "{{count}} golfista",
+      "subLeaders_other": "{{count}} golfistas",
+      "modeRecent": "Recientes",
+      "modeLeaders": "Líderes",
+      "featCount_one": "hazaña",
+      "featCount_other": "hazañas",
+      "featCountWith_one": "{{count}} hazaña",
+      "featCountWith_other": "{{count}} hazañas",
+      "latestAt": "Último {{year}} · {{course}}"
     }
   },
   "statBrowse": {

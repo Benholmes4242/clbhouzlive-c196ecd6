@@ -965,7 +965,16 @@
       "badgeAlbatross": "알바트로스",
       "badgeCount": "{{label}} ×{{count}}",
       "more": "{{count}}개 더",
-      "showLess": "접기"
+      "showLess": "접기",
+      "headlineAces_other": "홀인원 {{count}}회.",
+      "headlineAlbatrosses_other": "알바트로스 {{count}}회.",
+      "subRecent": "clbhouz 역사",
+      "subLeaders_other": "골퍼 {{count}}명",
+      "modeRecent": "최근",
+      "modeLeaders": "리더",
+      "featCount_other": "기록",
+      "featCountWith_other": "{{count}}개 기록",
+      "latestAt": "최근 {{year}} · {{course}}"
     }
   },
   "statBrowse": {

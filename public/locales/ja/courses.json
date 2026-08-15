@@ -965,7 +965,16 @@
       "badgeAlbatross": "アルバトロス",
       "badgeCount": "{{label}} ×{{count}}",
       "more": "他{{count}}件",
-      "showLess": "閉じる"
+      "showLess": "閉じる",
+      "headlineAces_other": "ホールインワン {{count}}回。",
+      "headlineAlbatrosses_other": "アルバトロス {{count}}回。",
+      "subRecent": "clbhouz の歴史",
+      "subLeaders_other": "{{count}}人のゴルファー",
+      "modeRecent": "最近",
+      "modeLeaders": "リーダー",
+      "featCount_other": "記録",
+      "featCountWith_other": "{{count}}件の記録",
+      "latestAt": "最新 {{year}} · {{course}}"
     }
   },
   "statBrowse": {
