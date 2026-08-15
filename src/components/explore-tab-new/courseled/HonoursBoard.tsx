@@ -710,7 +710,7 @@ export function HonoursBoard({
                 }}
               >
                 {renderItem(shownItems[0])}
-                {onSeeAll && hasHidden ? (
+                {onSeeAll ? (
                   <button
                     type="button"
                     onClick={onSeeAll}
