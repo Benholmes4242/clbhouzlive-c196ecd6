@@ -66,3 +66,82 @@
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
+/* ============================================================================
+   ON TOUR THIS WEEK — DARK GLASS PANEL + LOCKSTEP TICKER
+   (BRIEF_ON_TOUR_GLASS_TILE_AND_TICKER §2, §3)
+
+   THE FALLBACK IS THE BASE, THE BLUR IS THE ENHANCEMENT. The flat,
+   higher-opacity fill is the plain rule and @supports adds the blur on top,
+   because backdrop-filter is the property most likely to no-op on the Median
+   WebView — and a leaderboard is a lot of small white text over a photograph
+   we do not choose. Never a solid slab, never a drop shadow.
+
+   DARK, not the friends tile's white glass: white glass with ink text needs a
+   light photograph. Legibility is carried by the SCRIM under the panel
+   (photoScrim's existing layers), not by darkening the glass further.
+   ============================================================================ */
+.otw-panel {
+  background: rgba(11, 15, 19, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .otw-panel {
+    background: rgba(11, 15, 19, 0.44);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
+  }
+}
+
+/* THE EDGES ARE MASKED, NOT TINTED — a coloured overlay would sit on the glass
+   and read as a smear. The text fades to nothing at both ends of the cell. */
+.otw-namecell {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0,
+    #000 9px,
+    #000 calc(100% - 11px),
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0,
+    #000 9px,
+    #000 calc(100% - 11px),
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* SEAMLESS, NOT PING-PONG: the content is duplicated and translated by exactly
+   half the track, so pass two begins where pass one began. Duration is set
+   inline, DERIVED from the longest overflowing row at a target speed, so the
+   row with the most to read never moves faster than that speed. */
+.otw-ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation-name: otwTicker;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes otwTicker {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* REDUCED MOTION STOPS IT DEAD. The component also gates on
+   usePrefersReducedMotion and renders static truncated rows; this is the
+   belt-and-braces CSS half. */
+@media (prefers-reduced-motion: reduce) {
+  .otw-ticker-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}

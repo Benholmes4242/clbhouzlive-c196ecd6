@@ -89,53 +89,51 @@ export function FriendsRail() {
   );
 }
 
-/** Section 3 — tour rail: 272px cards, 100px image, 3-cell stat row, meta line. */
+/**
+ * Section 3 — tour rail: FULL-BLEED photograph tiles, 266x226, with the dark
+ * glass leaderboard panel inset 8px from the left, right and bottom
+ * (OnTourThisWeek TILE_W / TILE_H). Was 272x174 (100 image + 56 stat row + 18
+ * meta line) against the superseded ~170px budget; if this stayed there the
+ * rail would visibly resize on load.
+ */
 export function TourRail() {
   return (
     <section>
       <EyebrowBar w={140} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1].map((i) => (
-          <div key={i} style={{ ...CARD_SHELL, width: 272, flexShrink: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 100, width: '100%' }} />
-            {/* Stat block: the live card pins this at STAT_BLOCK_H = 56 with
-                7px/11px padding (OnTourThisWeek.tsx:88), and the meta line
-                below runs minHeight 18 + 9px bottom padding. The shell was
-                drifting 1px tall (57) and 8px short beneath — corrected. */}
+          <div
+            key={i}
+            style={{ ...CARD_SHELL, position: 'relative', width: 266, height: 226, flexShrink: 0 }}
+          >
+            <Bar style={{ borderRadius: 0, height: '100%', width: '100%' }} />
+            {/* The glass panel's footprint: three position rows under a lead
+                figure, padded 8/10/9 inside a 11px radius. */}
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                alignContent: 'center',
-                height: 56,
+                position: 'absolute',
+                left: 8,
+                right: 8,
+                bottom: 8,
+                borderRadius: 11,
+                background: 'rgba(11,15,19,0.30)',
+                padding: '8px 10px 9px',
                 boxSizing: 'border-box',
-                padding: '7px 11px',
               }}
             >
-              {[0, 1, 2].map((c) => (
-                <div
-                  key={c}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  <TextBar w={26} h={9} />
-                  <TextBar w={38} h={14} />
-                </div>
-              ))}
-            </div>
-            <div
-              style={{
-                minHeight: 18,
-                padding: '0 11px 9px',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <TextBar w={150} h={11} />
+              <Bar style={{ height: 23, width: 74, backgroundColor: 'rgba(255,255,255,0.22)' }} />
+              <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {[0, 1, 2].map((r) => (
+                  <Bar
+                    key={r}
+                    style={{
+                      height: 11,
+                      width: r === 2 ? '72%' : '88%',
+                      backgroundColor: 'rgba(255,255,255,0.18)',
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         ))}
@@ -143,6 +141,7 @@ export function TourRail() {
     </section>
   );
 }
+
 
 /**
  * Slot 3 — LATEST REVIEWS mosaic. Measured off the live section:

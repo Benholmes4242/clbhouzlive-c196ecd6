@@ -22,9 +22,9 @@ export interface PeekPosition {
   /** Derived place: 1, then 1 + everyone above, so a six-way T2 is followed by 8. */
   place: number;
   tied: boolean;
-  /** Up to three names, alphabetical. */
+  /** Names held by this position, alphabetical, capped at NAMES_PER_POSITION. */
   names: string[];
-  /** How many further names the position holds beyond the three shown. */
+  /** How many further names the position holds beyond the ones carried. */
   extra: number;
   score: number | null;
 }
@@ -46,6 +46,17 @@ export interface LivePeek {
 }
 
 const STALE_MS = 10 * 60 * 1000;
+
+/**
+ * NAMES CARRIED PER POSITION (BRIEF_ON_TOUR_GLASS_TILE_AND_TICKER §0a).
+ *
+ * The rows are already fetched; the cap is applied in the derivation below, so
+ * raising it costs NO new query. It is RAISED, not removed: a position could in
+ * principle hold dozens of players and a ticker over forty names never returns
+ * to the first one within a member's attention. `extra` still carries anything
+ * beyond this, so a row can still end "+12".
+ */
+export const NAMES_PER_POSITION = 8;
 
 interface Row {
   tournament_id: string;
@@ -136,8 +147,8 @@ export function useTourLivePeek(tournamentIds: string[]) {
             positions.push({
               place: above + 1,
               tied: names.length > 1,
-              names: names.slice(0, 3),
-              extra: Math.max(0, names.length - 3),
+              names: names.slice(0, NAMES_PER_POSITION),
+              extra: Math.max(0, names.length - NAMES_PER_POSITION),
               score: rowsAt[0].score ?? null,
             });
           }
