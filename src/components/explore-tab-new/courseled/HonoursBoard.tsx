@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown } from 'lucide-react';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, InkAction, LABEL, SANS } from './tokens';
+import { A, LABEL, SANS, GOLD as RING_GOLD } from './tokens';
 import {
   GOLD_INK,
   GOLD_HAIR,
+  GOLD_BORDER,
   HONOURS_SHELL,
-  HONOURS_OWN_WASH,
   HONOURS_OWN_RULE,
+  ACH_GOLD,
+  ACH_GOLD_INK,
   BADGE_ACE_BG,
   BADGE_ALBATROSS_BG,
   BADGE_INK,
@@ -21,100 +22,70 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 /**
  * Section 6 — THE HONOURS BOARD (light mode; no dark values on this page).
  *
- * Every ace and albatross on the platform, never windowed, dated by YEAR.
- * The only gold-bordered panel on Discover — that is its distinction.
+ * BRIEF_HONOURS_BOARD_PLAQUE_RAIL — THE BOARD IS NO LONGER A LIST.
  *
- * BRIEF_HONOURS_BOARD_PLAYER_LED — THE BOARD IS PLAYER-LED AND GROUPED.
- * A group leads with the MEMBER, badged with one badge per distinct feat kind
- * (counted), then lists that member's feats: course, then hole · par · yardage
- * beneath, with the YEAR right-aligned on the course line and MUTED (a year is
- * not an achievement, §0.3). "Hole in one" is never printed as a line — it is
- * the board's subject, so it lives in the badge.
+ * Each feat is a PLAQUE: a fixed-width, fixed-height object led by the
+ * golfer's canonical SquircleAvatar in a 1px gold ring. Plaques sit in a
+ * HORIZONTAL RAIL, so six feats cost the same vertical space as one.
+ * Player-led grouping survives ONLY as the LEADERS mode, where the repetition
+ * of a name IS the subject.
  *
- * GROUPING IS BY THE STABLE MEMBER ID (`userId`) AND NEVER BY DISPLAY NAME.
- * An event with no id is its own group, keyed by the event id, so two unknown
- * holders can never be merged into one person.
+ * THE MEMBER'S OWN PLAQUE IS MARKED BY THE NAME TONE ALONE — no wash, no
+ * border, no reordering, in either mode.
  *
- * The viewing member's group is MARKED (solid wash + solid leading rule + the
- * member tone on the name) and NOT MOVED — a board that reorders itself around
- * whoever is looking at it is not an honours board.
+ * NO NUMERAL SITS INSIDE THE RING. The badge already says ACE, which says
+ * "one shot" in a word; a large 1 beside a large 2 read as first and second.
+ *
+ * ONE COMPONENT, TWO LAYOUTS (§7): `layout="rail"` on Discover, `layout="grid"`
+ * in the sheet, where the same plaque at the same width wraps two across and
+ * groups under a year heading.
  */
 
 export { GOLD_INK, GOLD_HAIR, GOLD_BORDER, HONOURS_WASH, HONOURS_SHELL } from './honoursTokens';
 
-/** §5 — the collapse threshold, named. "More than five", not "five or more". */
-export const HONOURS_FEATS_BEFORE_COLLAPSE = 5;
+/** §2 — every plaque is the same object: same width, same height. */
+export const PLAQUE_W = 168;
+export const PLAQUE_H = 178;
+const PLAQUE_GAP = 10;
+const AVATAR = 54;
 
-/** The holder, 34x34, canonical squircle with the canonical traced hairline. */
-function HolderAvatar({ event: e }: { event: WireEvent }) {
+export type HonoursMode = 'recent' | 'leaders';
+
+/** Rarest first everywhere on this surface. */
+export function sortHonours(events: WireEvent[]): WireEvent[] {
+  return [...events].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+}
+
+const at = (e: WireEvent) => new Date(e.at).getTime();
+
+/* ────────────────────────────── the avatar ────────────────────────────── */
+
+/**
+ * §1 — the CANONICAL SquircleAvatar with a 1px ring in achievement gold.
+ * GoldRingAvatar exists for this case but wraps the avatar in an animated
+ * shimmer that cannot be suppressed by a prop; a rail of six shimmering
+ * plaques is a fairground, and forking it is forbidden — so the canonical
+ * component is used directly with the same gold.
+ */
+function HolderAvatar({ event: e, size = AVATAR }: { event: WireEvent; size?: number }) {
   return (
     <span style={{ flex: '0 0 auto', display: 'block' }}>
       <SquircleAvatar
-        size={34}
+        size={size}
         src={e.actorAvatar}
         alt={e.actorName}
         userId={e.userId}
+        ringColor={RING_GOLD}
         hairlineRing
       />
     </span>
   );
 }
 
-export function sortHonours(events: WireEvent[]): WireEvent[] {
-  const groupRank = (e: WireEvent) => (e.kind === 'ace' ? 0 : 1);
-  return [...events].sort(
-    (a, b) =>
-      groupRank(a) - groupRank(b) || new Date(b.at).getTime() - new Date(a.at).getTime(),
-  );
-}
+/* ────────────────────────────── the badges ────────────────────────────── */
 
-export interface HonoursGroup {
-  key: string;
-  /** NULL only where the wire carried no member id for the holder. */
-  userId: string | null;
-  isOwn: boolean;
-  lead: WireEvent;
-  events: WireEvent[];
-  /** Most recent feat in the group, epoch ms — the tiebreak in §4. */
-  latest: number;
-}
-
-/**
- * §4 — groups order by FEAT COUNT DESCENDING, then MOST RECENT. Feats inside a
- * group order most recent first. The viewing member is NOT pinned.
- */
-export function groupHonours(events: WireEvent[]): HonoursGroup[] {
-  const byMember = new Map<string, HonoursGroup>();
-
-  for (const e of sortHonours(events)) {
-    const key = e.userId ? `u:${e.userId}` : `e:${e.id}`;
-    const at = new Date(e.at).getTime();
-    const existing = byMember.get(key);
-    if (existing) {
-      existing.events.push(e);
-      existing.latest = Math.max(existing.latest, at);
-      existing.isOwn = existing.isOwn || e.isOwn;
-    } else {
-      byMember.set(key, {
-        key,
-        userId: e.userId,
-        isOwn: e.isOwn,
-        lead: e,
-        events: [e],
-        latest: at,
-      });
-    }
-  }
-
-  const groups = [...byMember.values()];
-  for (const g of groups) {
-    g.events.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
-  }
-  return groups.sort((a, b) => b.events.length - a.events.length || b.latest - a.latest);
-}
-
-/** §3 — one badge per distinct feat kind, rarest first, counted. */
-function badgesFor(events: WireEvent[]) {
+/** One badge per distinct feat kind, rarest first, counted (§5.2). */
+export function badgesFor(events: WireEvent[]) {
   const aces = events.filter((e) => e.kind === 'ace').length;
   const albatrosses = events.length - aces;
   return [
@@ -123,7 +94,7 @@ function badgesFor(events: WireEvent[]) {
   ].filter(Boolean) as { kind: 'ace' | 'albatross'; count: number }[];
 }
 
-function FeatBadge({ kind, count }: { kind: 'ace' | 'albatross'; count: number }) {
+function FeatBadge({ kind, count }: { kind: 'ace' | 'albatross'; count?: number }) {
   const { t } = useTranslation('courses');
   const label =
     kind === 'ace'
@@ -144,15 +115,55 @@ function FeatBadge({ kind, count }: { kind: 'ace' | 'albatross'; count: number }
         whiteSpace: 'nowrap',
       }}
     >
-      {count > 1
+      {count && count > 1
         ? t('discover.honours.badgeCount', '{{label}} ×{{count}}', { label, count })
         : label}
     </span>
   );
 }
 
-/** One feat: the course, the year, and the hole detail beneath. */
-function FeatLine({
+/* ────────────────────────────── the plaque ────────────────────────────── */
+
+const PLAQUE_SHELL: React.CSSProperties = {
+  width: PLAQUE_W,
+  minHeight: PLAQUE_H,
+  flex: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '11px 11px 10px',
+  border: `1px solid ${GOLD_BORDER}`,
+  borderRadius: 12,
+  background: '#FFFFFF',
+  textAlign: 'left',
+  fontFamily: SANS,
+  boxSizing: 'border-box',
+};
+
+const NAME_STYLE = (isOwn: boolean): React.CSSProperties => ({
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: '-0.015em',
+  /* §2 — own-plaque marking is the NAME TONE and nothing else. */
+  color: isOwn ? HONOURS_OWN_RULE : A.BODY,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+});
+
+const COURSE_STYLE: React.CSSProperties = {
+  fontSize: 13.5,
+  fontWeight: 700,
+  color: A.INK,
+  letterSpacing: '-0.015em',
+  lineHeight: 1.2,
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+};
+
+/** §2 — one plaque per FEAT. A member with two aces has two plaques. */
+export function FeatPlaque({
   event: e,
   onPress,
 }: {
@@ -162,19 +173,11 @@ function FeatLine({
   const { t } = useTranslation('courses');
   const tappable = !!onPress && !!e.scoreId;
 
-  /**
-   * THE HOLE DETAIL — hole, par and yardage, middot joined and BUILT FROM
-   * PRESENT PARTS so a null yardage can never leave a dangling middot. The feat
-   * name is gone from this line: it is the badge now.
-   */
+  /* Hole detail, middot joined and BUILT FROM PRESENT PARTS. */
   const detail = [
     e.holeNo != null ? formatOrdinal(e.holeNo) : null,
-    e.holeNo != null && e.holePar != null
-      ? t('holes.parLabel', 'Par {{par}}', { par: e.holePar })
-      : null,
-    e.holeNo != null && e.holePar != null && e.holeYards != null
-      ? t('holes.yards', '{{yards}} yds', { yards: e.holeYards })
-      : null,
+    e.holePar != null ? t('holes.parLabel', 'Par {{par}}', { par: e.holePar }) : null,
+    e.holeYards != null ? t('holes.yards', '{{yards}} yds', { yards: e.holeYards }) : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -182,281 +185,498 @@ function FeatLine({
   return (
     <button
       type="button"
-      onClick={
-        tappable
-          ? (ev) => {
-              ev.stopPropagation();
-              onPress?.(e);
-            }
-          : undefined
-      }
-      style={{
-        display: 'block',
-        width: '100%',
-        padding: 0,
-        border: 'none',
-        background: 'transparent',
-        textAlign: 'left',
-        fontFamily: SANS,
-        cursor: tappable ? 'pointer' : 'default',
-      }}
+      onClick={tappable ? () => onPress?.(e) : undefined}
+      style={{ ...PLAQUE_SHELL, cursor: tappable ? 'pointer' : 'default' }}
     >
-      <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, height: 16 }}>
-        <span
-          style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 13,
-            fontWeight: 700,
-            color: A.INK,
-            letterSpacing: '-0.015em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {e.courseName ?? t('discover.unknownCourse', 'Course')}
-        </span>
-        {/* A YEAR IS NOT AN ACHIEVEMENT — muted, never gold (§0.3). */}
+      <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <HolderAvatar event={e} />
         <span
           style={{
             ...LABEL,
             fontSize: 9,
             color: A.MUTE,
-            flexShrink: 0,
+            marginLeft: 'auto',
             fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {formatYearNumeric(e.at)}
         </span>
       </span>
-      {detail ? (
+
+      {/* The feat, IN WORDS. */}
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 9,
+          color: ACH_GOLD_INK,
+          marginTop: 9,
+          display: 'block',
+        }}
+      >
+        {e.kind === 'ace'
+          ? t('discover.honours.badgeAce', 'Ace')
+          : t('discover.honours.badgeAlbatross', 'Albatross')}
+      </span>
+
+      <span style={{ ...NAME_STYLE(!!e.isOwn), display: 'block', marginTop: 3 }}>
+        {e.isOwn ? t('discover.wire.you', 'You') : e.actorName}
+      </span>
+
+      <span style={{ ...COURSE_STYLE, marginTop: 2 }}>
+        {e.courseName ?? t('discover.unknownCourse', 'Course')}
+      </span>
+
+      <span aria-hidden style={{ marginTop: 'auto', paddingTop: 9 }} />
+      <span style={{ display: 'block', borderTop: `1px solid ${GOLD_HAIR}`, paddingTop: 8 }}>
         <span
           style={{
+            ...LABEL,
+            fontSize: 9,
+            color: A.BODY,
             display: 'block',
-            height: 14,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: A.MUTE,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {detail}
+          {detail || '\u00A0'}
         </span>
-      ) : null}
+      </span>
     </button>
   );
 }
 
-export function HonoursGroupRow({
-  group,
-  last,
+/* ───────────────────────────── the leaders ───────────────────────────── */
+
+export interface HonoursLeader {
+  key: string;
+  userId: string | null;
+  isOwn: boolean;
+  lead: WireEvent;
+  events: WireEvent[];
+  total: number;
+  albatrosses: number;
+  latest: number;
+}
+
+/**
+ * §5.3 — THE RANKING, STATED SO IT IS REPRODUCIBLE:
+ *   total feats DESC, then ALBATROSSES DESC, then most recent.
+ * Albatross breaks the tie because it is the rarer feat (roughly 1 in 6
+ * million against 1 in 12,500 for a hole in one). The viewing member is NOT
+ * pinned — their plaque is found by its name tone.
+ *
+ * Grouping is by the STABLE MEMBER ID and never by display name; an event with
+ * no id is its own leader, keyed by the event id.
+ */
+export function groupLeaders(events: WireEvent[]): HonoursLeader[] {
+  const byMember = new Map<string, HonoursLeader>();
+  for (const e of sortHonours(events)) {
+    const key = e.userId ? `u:${e.userId}` : `e:${e.id}`;
+    const found = byMember.get(key);
+    if (found) {
+      found.events.push(e);
+      found.latest = Math.max(found.latest, at(e));
+      found.isOwn = found.isOwn || !!e.isOwn;
+    } else {
+      byMember.set(key, {
+        key,
+        userId: e.userId,
+        isOwn: !!e.isOwn,
+        lead: e,
+        events: [e],
+        total: 0,
+        albatrosses: 0,
+        latest: at(e),
+      });
+    }
+  }
+
+  const leaders = [...byMember.values()];
+  for (const l of leaders) {
+    l.events.sort((a, b) => at(b) - at(a));
+    l.total = l.events.length;
+    l.albatrosses = l.events.filter((e) => e.kind === 'albatross').length;
+  }
+  return leaders.sort(
+    (a, b) => b.total - a.total || b.albatrosses - a.albatrosses || b.latest - a.latest,
+  );
+}
+
+function LeaderPlaque({
+  leader: l,
   onPress,
 }: {
-  group: HonoursGroup;
-  last: boolean;
+  leader: HonoursLeader;
   onPress?: (event: WireEvent) => void;
 }) {
   const { t } = useTranslation('courses');
-  const [open, setOpen] = useState(false);
-
-  const collapsible = group.events.length > HONOURS_FEATS_BEFORE_COLLAPSE;
-  const shown =
-    collapsible && !open
-      ? group.events.slice(0, HONOURS_FEATS_BEFORE_COLLAPSE)
-      : group.events;
-  const hidden = group.events.length - HONOURS_FEATS_BEFORE_COLLAPSE;
-
-  const who = group.isOwn ? t('discover.wire.you', 'You') : group.lead.actorName;
+  const latest = l.events[0];
+  const tappable = !!onPress && !!latest?.scoreId;
 
   return (
-    <div
-      style={{
-        padding: group.isOwn ? '8px 14px 8px 11px' : '8px 0',
-        margin: group.isOwn ? '0 -14px' : undefined,
-        background: group.isOwn ? HONOURS_OWN_WASH : undefined,
-        borderLeft: group.isOwn ? `3px solid ${HONOURS_OWN_RULE}` : undefined,
-        borderBottom: last ? 'none' : `1px solid ${GOLD_HAIR}`,
-      }}
+    <button
+      type="button"
+      onClick={tappable ? () => onPress?.(latest) : undefined}
+      style={{ ...PLAQUE_SHELL, cursor: tappable ? 'pointer' : 'default' }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, minHeight: 34 }}>
-        <HolderAvatar event={group.lead} />
+      <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <HolderAvatar event={l.lead} />
+        <span style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <span
+            style={{
+              display: 'block',
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: A.INK,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+              lineHeight: 1,
+            }}
+          >
+            {l.total}
+          </span>
+          <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE, display: 'block', marginTop: 3 }}>
+            {t('discover.honours.featCount', { count: l.total, defaultValue: 'feats' })}
+          </span>
+        </span>
+      </span>
+
+      <span
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 4,
+          marginTop: 9,
+        }}
+      >
+        {badgesFor(l.events).map((b) => (
+          <FeatBadge key={b.kind} kind={b.kind} count={b.count} />
+        ))}
+      </span>
+
+      <span style={{ ...NAME_STYLE(l.isOwn), display: 'block', marginTop: 6, fontSize: 13.5 }}>
+        {l.isOwn ? t('discover.wire.you', 'You') : l.lead.actorName}
+      </span>
+
+      <span aria-hidden style={{ marginTop: 'auto', paddingTop: 9 }} />
+      <span style={{ display: 'block', borderTop: `1px solid ${GOLD_HAIR}`, paddingTop: 8 }}>
         <span
           style={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: 13.5,
-            fontWeight: 700,
-            letterSpacing: '-0.015em',
-            color: group.isOwn ? HONOURS_OWN_RULE : A.INK,
+            ...LABEL,
+            fontSize: 9,
+            color: A.BODY,
+            display: 'block',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {who}
+          {t('discover.honours.latestAt', 'Latest {{year}} · {{course}}', {
+            year: formatYearNumeric(latest.at),
+            course: latest.courseName ?? t('discover.unknownCourse', 'Course'),
+          })}
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          {badgesFor(group.events).map((b) => (
-            <FeatBadge key={b.kind} kind={b.kind} count={b.count} />
-          ))}
-        </span>
-      </div>
-
-      <div
-        style={{
-          marginTop: 6,
-          marginLeft: 45,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 6,
-        }}
-      >
-        {shown.map((e) => (
-          <FeatLine key={e.id} event={e} onPress={onPress} />
-        ))}
-      </div>
-
-      {collapsible ? (
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            marginTop: 6,
-            marginLeft: 45,
-            padding: 0,
-            border: 'none',
-            background: 'transparent',
-            ...LABEL,
-            fontSize: 9,
-            color: A.INK,
-            cursor: 'pointer',
-            fontFamily: SANS,
-          }}
-        >
-          {open
-            ? t('discover.honours.showLess', 'Show less')
-            : t('discover.honours.more', '{{count}} more', { count: hidden })}
-          <ChevronDown
-            size={12}
-            strokeWidth={2.5}
-            aria-hidden
-            className="honours-chevron"
-            style={{
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 160ms ease',
-            }}
-          />
-        </button>
-      ) : null}
-    </div>
+      </span>
+    </button>
   );
 }
 
+/* ────────────────────────── header and the toggle ────────────────────── */
+
+/**
+ * §4 — the headline is COMPUTED and each part is its OWN interpolated,
+ * independently pluralised string. A zero part is OMITTED. The sentence is
+ * never built by concatenating fragments.
+ */
+export function useHonoursHeadline(events: WireEvent[]) {
+  const { t } = useTranslation('courses');
+  const aces = events.filter((e) => e.kind === 'ace').length;
+  const albatrosses = events.length - aces;
+  const parts: string[] = [];
+  if (aces > 0)
+    parts.push(t('discover.honours.headlineAces', { count: aces, defaultValue: '{{count}} aces.' }));
+  if (albatrosses > 0)
+    parts.push(
+      t('discover.honours.headlineAlbatrosses', {
+        count: albatrosses,
+        defaultValue: '{{count}} albatrosses.',
+      }),
+    );
+  return parts.join(' ');
+}
+
+export function HonoursModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: HonoursMode;
+  onChange: (m: HonoursMode) => void;
+}) {
+  const { t } = useTranslation('courses');
+  const seg = (m: HonoursMode, label: string) => {
+    const on = mode === m;
+    return (
+      <button
+        key={m}
+        type="button"
+        aria-pressed={on}
+        onClick={() => onChange(m)}
+        style={{
+          ...LABEL,
+          fontSize: 8.5,
+          padding: '5px 9px',
+          borderRadius: 999,
+          border: 'none',
+          /* SELECTION IS A SOLID FILL, never a dimming of the other side. */
+          background: on ? ACH_GOLD_INK : 'transparent',
+          color: on ? BADGE_INK : A.MUTE,
+          cursor: 'pointer',
+          fontFamily: SANS,
+        }}
+      >
+        {label}
+      </button>
+    );
+  };
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        gap: 2,
+        padding: 2,
+        borderRadius: 999,
+        border: `1px solid ${GOLD_BORDER}`,
+        flexShrink: 0,
+      }}
+    >
+      {seg('recent', t('discover.honours.modeRecent', 'Recent'))}
+      {seg('leaders', t('discover.honours.modeLeaders', 'Leaders'))}
+    </span>
+  );
+}
+
+/* ──────────────────────────────── the board ──────────────────────────── */
+
 interface Props {
   events: WireEvent[];
-  /** Cap on the page panel — in GROUPS, not feats. The sheet passes them all. */
+  /** Cap on the page rail — in PLAQUES. The sheet passes them all. */
   limit?: number;
   /** TRUE while the wire read has not settled — the gold shell holds the slot. */
   isPending?: boolean;
   showHeader?: boolean;
+  /** 'rail' on Discover, 'grid' in the sheet (§7). Same plaque either way. */
+  layout?: 'rail' | 'grid';
   onRowPress?: (event: WireEvent) => void;
   onSeeAll?: () => void;
+  /** Controlled mode — the sheet owns the toggle it carries in its own header. */
+  mode?: HonoursMode;
+  onModeChange?: (m: HonoursMode) => void;
 }
 
 export function HonoursBoard({
   events,
-  limit = 3,
+  limit,
   isPending = false,
   showHeader = true,
+  layout = 'rail',
   onRowPress,
   onSeeAll,
+  mode: modeProp,
+  onModeChange,
 }: Props) {
   const { t } = useTranslation('courses');
+  /* §5 — the mode does NOT persist across mounts; the section opens on RECENT. */
+  const [modeState, setModeState] = useState<HonoursMode>('recent');
+  const mode = modeProp ?? modeState;
+  const setMode = onModeChange ?? setModeState;
+
+  const headline = useHonoursHeadline(events);
+  const leaders = useMemo(() => groupLeaders(events), [events]);
+  const feats = useMemo(() => sortHonours(events), [events]);
+
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
 
-  const groups = groupHonours(events);
-  const shown = groups.slice(0, limit);
-  const overflow = groups.length > shown.length;
+  const featShown = limit ? feats.slice(0, limit) : feats;
+  const overflow = limit ? feats.length > featShown.length : false;
+
+  /* §7 — the grid groups RECENT by year. A leader is not a year. */
+  const years: { year: string; events: WireEvent[] }[] = [];
+  if (layout === 'grid') {
+    for (const e of featShown) {
+      const y = formatYearNumeric(e.at);
+      const last = years[years.length - 1];
+      if (last && last.year === y) last.events.push(e);
+      else years.push({ year: y, events: [e] });
+    }
+  }
+
+  const railStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: PLAQUE_GAP,
+    overflowX: 'auto',
+    /* §3 — asymmetric gutters: the first plaque shares the heading's left edge,
+       the last bleeds off the right so the rail announces that it scrolls. */
+    paddingLeft: 14,
+    paddingRight: 0,
+    paddingBottom: 12,
+    scrollPaddingLeft: 14,
+    willChange: 'transform',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+  };
+
+  const gridStyle: React.CSSProperties = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: PLAQUE_GAP,
+  };
 
   return (
     <section>
-      <style>{`@media (prefers-reduced-motion: reduce){.honours-chevron{transition:none !important}}`}</style>
-      <div style={{ ...HONOURS_SHELL, padding: '4px 14px', fontFamily: SANS }}>
+      <div
+        style={{
+          ...HONOURS_SHELL,
+          padding: layout === 'grid' ? 0 : '0 0 2px',
+          background: layout === 'grid' ? 'transparent' : HONOURS_SHELL.background,
+          border: layout === 'grid' ? 'none' : HONOURS_SHELL.border,
+          boxShadow: layout === 'grid' ? 'none' : HONOURS_SHELL.boxShadow,
+          fontFamily: SANS,
+        }}
+      >
         {showHeader ? (
-          <div
-            style={{
-              padding: '14px 0 12px',
-              borderBottom: `1px solid ${GOLD_HAIR}`,
-            }}
-          >
-            {/* SECTION GRAMMAR: eyebrow left, sample size right. The COUNT is
-                FEATS on the whole board (`events`), never groups and never
-                `shown` — and it is stated HERE ONLY (§7). */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <div style={{ padding: '14px 14px 12px', borderBottom: `1px solid ${GOLD_HAIR}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div
                 style={{
                   fontSize: 9.5,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
-                  color: GOLD_INK,
+                  color: ACH_GOLD_INK,
                 }}
               >
                 {t('discover.honoursTitle', 'The honours board')}
               </div>
-              <div
+              {/* §4/§5 — the toggle takes the old top-right count slot. */}
+              <span style={{ marginLeft: 'auto' }}>
+                <HonoursModeToggle mode={mode} onChange={setMode} />
+              </span>
+            </div>
+
+            {/* THE COMPUTED HEADLINE — identical in both modes. */}
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: A.INK,
+                marginTop: 6,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {headline}
+            </div>
+            <div style={{ fontSize: 12.5, fontWeight: 500, color: A.MUTE, marginTop: 3 }}>
+              {mode === 'recent'
+                ? t('discover.honours.subRecent', 'In clbhouz history')
+                : t('discover.honours.subLeaders', {
+                    count: leaders.length,
+                    defaultValue: '{{count}} golfers',
+                  })}
+            </div>
+          </div>
+        ) : null}
+
+        {layout === 'rail' ? (
+          <div style={{ ...railStyle, paddingTop: 12 }}>
+            {(mode === 'recent' ? featShown : leaders).map((item) =>
+              mode === 'recent' ? (
+                <FeatPlaque key={(item as WireEvent).id} event={item as WireEvent} onPress={onRowPress} />
+              ) : (
+                <LeaderPlaque key={(item as HonoursLeader).key} leader={item as HonoursLeader} onPress={onRowPress} />
+              ),
+            )}
+            {overflow && onSeeAll ? (
+              <button
+                type="button"
+                onClick={onSeeAll}
                 style={{
+                  ...PLAQUE_SHELL,
+                  width: 108,
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  borderStyle: 'dashed',
+                  cursor: 'pointer',
                   ...LABEL,
                   fontSize: 9,
-                  color: A.MUTE,
-                  marginLeft: 'auto',
-                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  color: A.INK,
                 }}
               >
-                {t('discover.honoursOnTheBoard', '{{count}} on the board', {
-                  count: events.length,
-                })}
+                {t('discover.honoursSeeAllPlain', 'See all')}
+              </button>
+            ) : null}
+          </div>
+        ) : mode === 'leaders' ? (
+          <div style={gridStyle}>
+            {leaders.map((l) => (
+              <LeaderPlaque key={l.key} leader={l} onPress={onRowPress} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {years.map((y) => (
+              <div key={y.year}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: '-0.01em',
+                      color: ACH_GOLD_INK,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {y.year}
+                  </span>
+                  <span
+                    style={{
+                      ...LABEL,
+                      fontSize: 9,
+                      color: A.MUTE,
+                      marginLeft: 'auto',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {t('discover.honours.featCountWith', {
+                      count: y.events.length,
+                      defaultValue: '{{count}} feats',
+                    })}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    borderTop: `1px solid ${GOLD_HAIR}`,
+                    paddingTop: 12,
+                    ...gridStyle,
+                  }}
+                >
+                  {y.events.map((e) => (
+                    <FeatPlaque key={e.id} event={e} onPress={onRowPress} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div
-              style={{ fontSize: 12.5, fontWeight: 500, lineHeight: 1.35, color: A.MUTE, marginTop: 5 }}
-            >
-              {t(
-                'discover.honoursWhatItIs',
-                'Every ace and albatross in clbhouz history',
-              )}
-            </div>
+            ))}
           </div>
-        ) : null}
-
-        {shown.map((g, i) => (
-          <HonoursGroupRow
-            key={g.key}
-            group={g}
-            last={i === shown.length - 1 && !(overflow && onSeeAll)}
-            onPress={onRowPress}
-          />
-        ))}
-
-        {overflow && onSeeAll ? (
-          <div style={{ padding: '11px 0 13px' }}>
-            {/* NO COUNT HERE — the board states its count once, in the header. */}
-            <InkAction onClick={onSeeAll}>
-              {t('discover.honoursSeeAllPlain', 'See all')}
-            </InkAction>
-          </div>
-        ) : null}
+        )}
       </div>
     </section>
   );
 }
 
 export default HonoursBoard;
+
+/** Kept for the gold-chrome consumers that read it from here. */
+export { ACH_GOLD };
