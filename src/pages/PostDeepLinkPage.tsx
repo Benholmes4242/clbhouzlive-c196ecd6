@@ -83,7 +83,6 @@ const PostDeepLinkPage: React.FC = () => {
           whs_score_id,
           like_count,
           comment_count,
-          share_count,
 
           user_profiles!posts_user_profile_id_fkey (
             id,
@@ -183,7 +182,7 @@ const PostDeepLinkPage: React.FC = () => {
         content: row.content ?? '',
         likes: row.like_count ?? 0,
         comments: row.comment_count ?? 0,
-        shares: row.share_count ?? 0,
+        shares: 0, // posts has no share_count column; shares are not surfaced here
         timeAgo: '',
         created_at: row.created_at,
         course_id: row.course_id ?? null,
