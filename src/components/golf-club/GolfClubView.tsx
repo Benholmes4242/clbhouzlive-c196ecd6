@@ -429,7 +429,7 @@ const signedToPar = (raw: number): string => {
 };
 
 const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
     <span style={CELL_LABEL}>{label}</span>
     <span style={MONO_FIGURE}>{value}</span>
   </span>
