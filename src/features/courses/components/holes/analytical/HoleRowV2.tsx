@@ -332,11 +332,28 @@ export const HoleRowV2: React.FC<{
 
 
   return (
-    <div>
+    /* SELECTION IS A LEADING RULE AND A NEUTRAL WASH (§B5), not the heavy outline
+       this row used to take. The rule is a shape, not a colour, so selection does
+       not rely on colour alone, and aria-expanded carries it to assistive tech;
+       the button keeps the platform focus ring for keyboard use. */
+    <div
+      style={
+        open
+          ? {
+              margin: '0 -12px',
+              padding: '0 12px',
+              background: A.CANVAS,
+              boxShadow: `inset 3px 0 0 ${A.INK}`,
+              borderRadius: 4,
+            }
+          : undefined
+      }
+    >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
+
         style={{
           display: 'grid',
           gridTemplateColumns: HOLE_GRID_V2,
