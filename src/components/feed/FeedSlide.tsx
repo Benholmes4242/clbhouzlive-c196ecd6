@@ -537,13 +537,48 @@ const FullscreenVideoSlot: React.FC<{
   // sliver over white. Mirror BorrowedFullscreenSlot (~L905): compute the
   // rect from a layout effect on mount, then re-resolve on visualViewport
   // resize + orientationchange while the slide is active.
+  //
+  // FIT-WIDTH FIX: the post row's width/height default to 1080x1920 in
+  // feedMapper when the DB has no dimensions, so a genuinely LANDSCAPE clip
+  // was resolved as portrait → COVER → cropped to roughly a third of its
+  // width in the viewer. The live element's intrinsic aspect is authoritative
+  // once metadata lands, so we prefer it over the (possibly defaulted) props
+  // and re-resolve. Landscape then takes the CONTAIN branch of
+  // resolveRestingRect → fits width, blurred self-backdrop fills the bars.
+  const [laneAspect, setLaneAspect] = React.useState<number | null>(null);
+  const dims = React.useMemo(() => {
+    if (laneAspect && laneAspect > 0) return { w: laneAspect * 1000, h: 1000 };
+    return { w: mediaW, h: mediaH };
+  }, [laneAspect, mediaW, mediaH]);
   const [settledRect, setSettledRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video'),
+    resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video'),
   );
+  // Poll the engine for the lane's intrinsic aspect until metadata lands.
+  React.useEffect(() => {
+    if (isBorrowSlide || !isActive) return;
+    let cancelled = false;
+    const read = () => {
+      if (cancelled) return true;
+      const a = VideoEngine.getLaneAspect('fullscreen');
+      if (a && a > 0) {
+        setLaneAspect((prev) => (prev && Math.abs(prev - a) < 0.001 ? prev : a));
+        return true;
+      }
+      return false;
+    };
+    if (read()) return;
+    const timers = [60, 160, 320, 600, 1200, 2000].map((ms) =>
+      setTimeout(read, ms),
+    );
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+  }, [isBorrowSlide, isActive, resumeKey]);
   React.useLayoutEffect(() => {
     if (isBorrowSlide) return;
     const measure = () => {
-      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
+      const next = resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video');
       setSettledRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -563,7 +598,8 @@ const FullscreenVideoSlot: React.FC<{
       vv?.removeEventListener('resize', measure);
       window.removeEventListener('orientationchange', measure);
     };
-  }, [mediaW, mediaH, isBorrowSlide, isActive]);
+  }, [dims.w, dims.h, isBorrowSlide, isActive]);
+
 
 
   React.useEffect(() => {
