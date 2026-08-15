@@ -239,7 +239,8 @@
       "axisHarder": "Mas dificil",
       "finishedLabel": "Finalizado",
       "todaySuffix": "{{value}} hoy",
-      "fieldAverageWaiting": "Promedio del campo cuando haya {{n}} rondas"
+      "fieldAverageWaiting": "Promedio del campo cuando haya {{n}} rondas",
+      "courseShapeLabel": "Perfil del campo"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -385,6 +386,9 @@
     "status": {
       "finished": "FINALIZADO",
       "thru": "HASTA {{n}}"
+    },
+    "board": {
+      "clbhouzPick": "selección de clbhouz"
     }
   },
   "empty": {

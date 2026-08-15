@@ -239,7 +239,8 @@
       "axisHarder": "Schwerer",
       "finishedLabel": "Beendet",
       "todaySuffix": "{{value}} heute",
-      "fieldAverageWaiting": "Feld-Durchschnitt, sobald {{n}} Runden vorliegen"
+      "fieldAverageWaiting": "Feld-Durchschnitt, sobald {{n}} Runden vorliegen",
+      "courseShapeLabel": "Platzprofil"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -385,6 +386,9 @@
     "status": {
       "finished": "BEENDET",
       "thru": "BIS {{n}}"
+    },
+    "board": {
+      "clbhouzPick": "clbhouz-Tipp"
     }
   },
   "empty": {

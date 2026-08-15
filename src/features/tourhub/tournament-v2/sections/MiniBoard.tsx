@@ -11,7 +11,7 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  CHARCOAL, WHITE_ALPHA_65, WHITE_ALPHA_55, WHITE_ALPHA_10,
+  CHARCOAL, WHITE_ALPHA_65, WHITE_ALPHA_55, WHITE_ALPHA_10, AMBER,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -43,6 +43,16 @@ interface Props {
    * counterpart for the photo-backed hero board. Same component, not a fork.
    */
   theme?: 'light' | 'dark';
+  /**
+   * Player ids that are Tournament Intelligence picks. DEFAULTS TO UNDEFINED so
+   * the tournament-page consumers are pixel-identical — no fork.
+   *
+   * AMBER MEANS THE LIVE ROUND EVERYWHERE ELSE ON TOUR SURFACES. Here it is
+   * deliberately a SECOND meaning, bounded to this one mark: it reads as the
+   * clbhouz mark, not a status colour, because it is the logo. Do not "correct"
+   * it to a neutral tone.
+   */
+  pickPlayerIds?: Set<string>;
   /** Row tap hook (analytics). Fires before the scorecard sheet opens. */
   onRowTap?: (playerId: string) => void;
 }
@@ -72,7 +82,7 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'light', onRowTap }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'light', pickPlayerIds, onRowTap }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -146,14 +156,28 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 <span style={{ fontSize: 13, fontWeight: 700, color: T.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.player?.full_name ?? BLANK}
                 </span>
+                {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
+                  <span
+                    role="img"
+                    aria-label={t('overview.board.clbhouzPick')}
+                    title={t('overview.board.clbhouzPick')}
+                    style={{
+                      flexShrink: 0,
+                      width: 5,
+                      height: 5,
+                      borderRadius: 999,
+                      background: AMBER,
+                    }}
+                  />
+                )}
               </div>
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {today == null ? todayBlank : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>

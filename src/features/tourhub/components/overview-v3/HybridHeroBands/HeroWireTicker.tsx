@@ -22,13 +22,15 @@ import { useTranslation } from 'react-i18next';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
 import { fmtScore, type TickerRow } from '../HybridHero.utils';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
+import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
 const BG = '#15171F';
 const AMBER = '#F7931E';
 const GOLD = '#FDE68A';
 
 function scoreColor(s: number): string {
-  if (s < 0) return '#DC2626';
+  // ONE red for under par on dark — see TOPAR_UNDER_DARK in _shared/tokens.
+  if (s < 0) return TOPAR_UNDER_DARK;
   if (s > 0) return 'rgba(255,255,255,0.55)';
   return 'rgba(255,255,255,0.90)';
 }

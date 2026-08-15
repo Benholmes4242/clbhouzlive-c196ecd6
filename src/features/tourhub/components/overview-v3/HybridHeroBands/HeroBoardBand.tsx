@@ -10,10 +10,15 @@
  * carousel, tracking the active slide: the photo moves horizontally on swipe
  * while the board cross-fades in place.
  *
- * It reads as one continuous dark block with the photo and the wire ticker
- * above it — square top, rounded bottom where the page canvas resumes. There is
- * NO collapse control: on a live slide the board is always on; on a results or
- * upcoming slide it renders nothing at all (no placeholder, no reserved height).
+ * Order, one continuous dark surface with NO seam:
+ *   photo → board rows → continuation strip (in the hero) → full-leaderboard
+ *   row → stat strip → course shape panel.
+ * STRAIGHT bottom edge — the page canvas breathes below it, it does not tuck
+ * under a radius.
+ *
+ * There is NO collapse control on the board: on a live slide it is always on;
+ * on a results or upcoming slide it renders nothing at all (no placeholder, no
+ * reserved height). The COURSE SHAPE panel is the only thing that opens.
  *
  * Six rows, fixed, never internally scrollable — a vertical scroller under a
  * horizontal pager is a gesture trap. The full-leaderboard row is the route to
@@ -21,12 +26,14 @@
  * live in the removed "On the course" section.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { FONT, CHARCOAL, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
+import { useAIPredictions } from '../../../hooks/useAIPredictions';
+import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
 import {
   fieldAverageToday,
   lowRoundToday,
@@ -53,21 +60,23 @@ function tourFigColor(v: number | null | undefined): string {
   return v < 0 ? TOPAR_UNDER_DARK : '#FFFFFF';
 }
 
+/**
+ * Three equal thirds, not left/centre/right alignment. Figures are NOT heavy:
+ * weight 600 with letter-spacing eased to -0.01em; still tabular.
+ */
 function StatCell({
   label,
   value,
   color,
   sub,
-  align = 'left',
 }: {
   label: string;
   value: string;
   color?: string;
   sub?: string | null;
-  align?: 'left' | 'right';
 }) {
   return (
-    <div style={{ flex: 1, textAlign: align, minWidth: 0 }}>
+    <div style={{ flex: '1 1 0', minWidth: 0, textAlign: 'left' }}>
       <div
         style={{
           fontSize: 7.5,
@@ -82,8 +91,8 @@ function StatCell({
       <div
         style={{
           fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
           lineHeight: 1.05,
           marginTop: 2,
           color: color ?? '#FFFFFF',
@@ -128,9 +137,28 @@ export function HeroBoardSection({
   onRowTap,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
+  const [shapeOpen, setShapeOpen] = useState(false);
+  const shape = useCourseShapeRows(tournamentId, currentRound);
 
   const field = useMemo(() => fieldAverageToday(entries as any, currentRound), [entries, currentRound]);
   const low = useMemo(() => lowRoundToday(entries as any, currentRound), [entries, currentRound]);
+
+  /**
+   * Tournament Intelligence picks. NO NEW QUERY — the overview already makes
+   * this call for TIPicksCarousel, so this is a cache read.
+   */
+  // BRIEF SAID useTournamentPredictions().data.topContenders — that type has no
+  // topContenders (it exposes `predictions`). The overview's TI picks come from
+  // useAIPredictions(tournamentId), which TIPicksCarousel already calls with the
+  // same key, so this is a cache read and not a new query.
+  const { data: predictions } = useAIPredictions(tournamentId);
+  const pickPlayerIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const p of (predictions?.topContenders ?? []) as any[]) {
+      if (p?.playerId) ids.add(String(p.playerId));
+    }
+    return ids.size > 0 ? ids : undefined;
+  }, [predictions]);
 
   /**
    * Surnames of everyone on the low round — one when outright, all when shared.
@@ -168,8 +196,6 @@ export function HeroBoardSection({
       style={{
         background: CHARCOAL,
         fontFamily: FONT,
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
         overflow: 'hidden',
       }}
     >
@@ -179,6 +205,7 @@ export function HeroBoardSection({
         limit={HERO_BOARD_ROWS}
         currentRound={currentRound}
         theme="dark"
+        pickPlayerIds={pickPlayerIds}
         onRowTap={onRowTap}
       />
 
@@ -232,7 +259,6 @@ export function HeroBoardSection({
           )}
           {low && (
             <StatCell
-              align={field ? 'left' : 'left'}
               label={t('overview.onTheCourse.lowRoundLabel')}
               value={formatToPar(low.toPar)}
               color={tourFigColor(low.toPar)}
@@ -241,7 +267,6 @@ export function HeroBoardSection({
           )}
           {field && field.count > 0 && (
             <StatCell
-              align="right"
               label={t('overview.onTheCourse.underParTodayLabel')}
               value={t('overview.onTheCourse.underParTodayValue', {
                 n: field.underPar,
@@ -252,6 +277,49 @@ export function HeroBoardSection({
           )}
         </div>
       )}
+
+      {/* COURSE SHAPE — collapsed by default; the only thing on this block that
+          opens and closes. */}
+      {shape.usable && (
+      <button
+        type="button"
+        onClick={() => setShapeOpen((v) => !v)}
+        aria-expanded={shapeOpen}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          padding: '10px 16px',
+          background: 'transparent',
+          border: 'none',
+          borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
+          fontFamily: FONT,
+          cursor: 'pointer',
+        }}
+        className="active:bg-white/[0.06] transition-colors"
+      >
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: WHITE_ALPHA_55,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('overview.onTheCourse.courseShapeLabel')}
+        </span>
+        <ChevronDown
+          size={14}
+          color={AMBER}
+          strokeWidth={2.5}
+          style={{ transform: shapeOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
+        />
+      </button>
+      )}
+
+      {shape.usable && shapeOpen && <CourseShapePanel rows={shape.rows} />}
     </div>
   );
 }

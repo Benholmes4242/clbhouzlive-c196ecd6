@@ -273,7 +273,8 @@
       "axisHarder": "Harder",
       "finishedLabel": "Finished",
       "todaySuffix": "{{value}} today",
-      "fieldAverageWaiting": "Field average once {{n}} rounds are in"
+      "fieldAverageWaiting": "Field average once {{n}} rounds are in",
+      "courseShapeLabel": "Course shape"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -449,6 +450,9 @@
     "status": {
       "finished": "FINISHED",
       "thru": "THRU {{n}}"
+    },
+    "board": {
+      "clbhouzPick": "clbhouz pick"
     }
   },
   "empty": {
