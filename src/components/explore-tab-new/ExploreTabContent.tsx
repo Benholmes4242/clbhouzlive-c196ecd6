@@ -591,7 +591,7 @@ export default function ExploreTabContent({
           events={honours}
           isPending={wireLoading}
           onRowPress={handleHonoursRow}
-          onSeeAll={honours.length > 5 ? openHonoursSheet : undefined}
+          onSeeAll={openHonoursSheet}
         />
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
