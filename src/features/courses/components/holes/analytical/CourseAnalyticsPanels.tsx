@@ -282,6 +282,9 @@ const ShapeChart: React.FC<{
 
   const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
   const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
+  const easiestIdx = holes.findIndex((h) => h.hole_no === easiestHole);
+  const easiestTopY = easiestIdx >= 0 ? Math.min(y(holes[easiestIdx].avg_to_par), yBase) : null;
+
 
   // 1, 6, 12, 18 - the ends are read, the middles orient.
   const axisIdx = Array.from(
