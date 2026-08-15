@@ -813,6 +813,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 */}
                 <div style={{ margin: '0 -16px' }}>
                   <TrajectoryLine holes={holes} interactive />
+                </div>
+
 
                 {(captions.length > 0 || fieldCaption) && (
                   <>
