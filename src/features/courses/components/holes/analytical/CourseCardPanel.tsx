@@ -314,8 +314,8 @@ const TeeRow: React.FC<{
       gap: 10,
       width: '100%',
       border: 'none',
-      background: 'transparent',
       padding: '7px 0',
+
       cursor: 'pointer',
       fontFamily: SANS,
       textAlign: 'left',
