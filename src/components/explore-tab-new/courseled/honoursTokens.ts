@@ -18,6 +18,17 @@ import type React from 'react';
  */
 
 export const GOLD_INK = '#A87718';
+
+/**
+ * BRIEF_HONOURS_BOARD_PLAQUE_RAIL §6.1 — TWO GOLDS, TWO JOBS.
+ * The RING takes the achievement-ring gold the avatar rule already uses
+ * (tokens.GOLD #D8A93C). The CHROME — eyebrow, feat wording, the toggle's
+ * active fill, year headings in the sheet — takes ACHIEVEMENT GOLD, whose deep
+ * end carries type and whose light end is only ever a solid marker.
+ * SC_FILL_GOLD (scorecard broadcast gold) does not appear on this surface.
+ */
+export const ACH_GOLD_INK = '#B36B00';
+export const ACH_GOLD = '#F5D061';
 export const GOLD_HAIR = '#F5E9CC';
 export const GOLD_BORDER = '#F0DEB4';
 export const HONOURS_WASH = '#FDFBF5';
