@@ -668,17 +668,10 @@ export const HoleRowV2: React.FC<{
                 {t('courses:courseDetail.card.rampHarder')}
               </span>
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 500,
-                lineHeight: 1.35,
-                color: A.MUTE,
-                marginTop: 5,
-              }}
-            >
-              {t('courses:courseDetail.holes.scaleCaption', { total: totalHoles })}
-            </div>
+            {/* scaleCaption DELETED (§B1). The track is FILLED from the easier end,
+                so the length of the fill is the reading; a sentence telling the
+                member which way the bar runs narrated the bar above it. */}
+
           </div>
 
 
