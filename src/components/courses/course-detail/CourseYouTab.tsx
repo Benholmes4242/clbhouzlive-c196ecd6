@@ -177,7 +177,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   const holderName = courseRecord?.user_display_name ?? null;
 
   const wrap = (children: React.ReactNode) => (
-    <div className="animate-in fade-in duration-200" style={{ background: SLATE_50, paddingBottom: 32 }}>
+    <div className="animate-in fade-in duration-200" style={{ background: SLATE_50, paddingBottom: 8 }}>
       {children}
     </div>
   );
