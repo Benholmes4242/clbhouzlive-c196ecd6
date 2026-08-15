@@ -817,10 +817,10 @@ const SheetBody: React.FC<{
       >
         <span style={{ ...SH_LABEL, color: A.INK }}>{label}</span>
         <span aria-hidden="true" />
-        <span style={{ ...shFig(figSize), textAlign: 'right' }}>
+        <span style={{ ...shFig(figSize), textAlign: 'center' }}>
           {y == null ? '' : formatNumber(Math.round(y))}
         </span>
-        <span style={{ ...shFig(figSize), textAlign: 'right' }}>{p == null ? '' : p}</span>
+        <span style={{ ...shFig(figSize), textAlign: 'center' }}>{p == null ? '' : p}</span>
         <span aria-hidden="true" />
       </div>
     );
