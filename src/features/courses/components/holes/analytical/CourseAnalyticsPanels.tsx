@@ -760,81 +760,42 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
         <Hairline style={{ margin: '11px 0 9px' }} />
 
+        {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
+            on their own bars in the chart above, so the figures beneath carry only
+            what the chart cannot say. */}
         {hasYou ? (
-          /* WITH personal data: three averages in a row, hole callouts demote
-             to the meta line beneath. Five cells across a phone is unreadable. */
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-              <Figure
-                label={t('courses:courseDetail.plays.fieldAvg')}
-                value={field ? field.text : '\u2014'}
-                tone={field ? field.tone : A.INK}
-              />
-              {you && (
-                <Figure
-                  label={t('courses:courseDetail.plays.yourAvg')}
-                  value={you.text}
-                  tone={A.AMBER_DEEP}
-                />
-              )}
-              <Figure
-                label={t('courses:courseDetail.plays.youBeat')}
-                value={`${stats.beat}/${stats.withYou}`}
-              />
-            </div>
-            {(beastFig || bestFig) && (
-              <div
-                style={{
-                  marginTop: 8,
-                  textAlign: 'center',
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  color: A.MUTE,
-                  ...FIGS,
-                }}
-              >
-                {beastFig && (
-                  <span>
-                    {hardestLabel} {formatNumber(stats.hardest.hole_no)}{' '}
-                    <span style={{ color: beastFig.tone, fontWeight: 700 }}>{beastFig.text}</span>
-                  </span>
-                )}
-                {beastFig && bestFig ? ' \u00B7 ' : null}
-                {bestFig && (
-                  <span>
-                    {easiestLabel} {formatNumber(stats.easiest.hole_no)}{' '}
-                    <span style={{ color: bestFig.tone, fontWeight: 700 }}>{bestFig.text}</span>
-                  </span>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          /* WITHOUT personal data: the field average slots BETWEEN the two hole
-             callouts - one row, one hairline, no amber anywhere. */
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-            <Figure
-              label={hardestLabel}
-              value={beastFig ? beastFig.text : '\u2014'}
-              tone={beastFig ? beastFig.tone : A.INK}
-              sub={t('courses:courseDetail.plays.holeN', { hole: stats.hardest.hole_no })}
-            />
             <Figure
               label={t('courses:courseDetail.plays.fieldAvg')}
               value={field ? field.text : '\u2014'}
               tone={field ? field.tone : A.INK}
             />
+            {you && (
+              <Figure
+                label={t('courses:courseDetail.plays.yourAvg')}
+                value={you.text}
+                tone={A.AMBER_DEEP}
+              />
+            )}
             <Figure
-              label={easiestLabel}
-              value={bestFig ? bestFig.text : '\u2014'}
-              tone={bestFig ? bestFig.tone : A.INK}
-              sub={t('courses:courseDetail.plays.holeN', { hole: stats.easiest.hole_no })}
+              label={t('courses:courseDetail.plays.youBeat')}
+              value={`${stats.beat}/${stats.withYou}`}
+            />
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)' }}>
+            <Figure
+              label={t('courses:courseDetail.plays.fieldAvg')}
+              value={field ? field.text : '\u2014'}
+              tone={field ? field.tone : A.INK}
             />
           </div>
         )}
-
-
       </Panel>
+
+      {/* §A4 - How each par plays, between How it plays and Hole by hole. */}
+      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} />
+
 
       {/* Block 3 - Hole by hole */}
       <Panel
