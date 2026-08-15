@@ -84,13 +84,16 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
       >
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
 
-        {/* 1. THE CHIP. Solid, unconditional, readable over any frame. */}
+        {/* 1. THE CHIP. Unconditional, readable over any frame. The substrate is
+            the platform's badge GLASS (`.standout-figure-chip`, the 77-gross
+            chip in Personal Bests): flat base fill plus hairline, blur only as
+            an @supports enhancement — never a tint of the photo. */}
         <span
+          className="standout-figure-chip"
           style={{
             position: 'absolute',
             top: 8,
             left: 8,
-            background: '#0A0E0A',
             color: '#FFFFFF',
             fontSize: 8.5,
             fontWeight: 700,
@@ -98,10 +101,14 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
             textTransform: 'uppercase',
             borderRadius: 4,
             padding: '3px 5px',
+            /* The glass fill is a light tint, so white needs its own floor over
+               a bright frame — same treatment as the figure chip. */
+            textShadow: '0 1px 2px rgba(10,14,10,0.55)',
           }}
         >
           {t('discover.creator.chip', 'Creator')}
         </span>
+
 
         <div
           style={{
