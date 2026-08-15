@@ -860,6 +860,48 @@ async function syncLeaderboard(
 
   let records = 0;
 
+  // ── History writer (BRIEF_LEADERBOARD_HISTORY_WRITER) ────────────────
+  // ONE fetch per sync pass of the rows we are about to overwrite, keyed by
+  // player_id. Change detection compares against this map — never a per-player
+  // SELECT inside the loop.
+  const priorByPlayer = new Map<string, any>();
+  {
+    const { data: priorRows, error: priorErr } = await supabase
+      .from('sr_leaderboards')
+      .select('player_id, position, position_tied, score, thru, today')
+      .eq('tournament_id', tournamentDbId);
+    if (priorErr) {
+      console.error('[LiveSync history] prior-rows fetch failed (history skipped this pass):', priorErr.message);
+    } else {
+      for (const r of priorRows ?? []) {
+        if (r.player_id) priorByPlayer.set(r.player_id as string, r);
+      }
+    }
+  }
+
+  const historyRows: any[] = [];
+
+  const numOrNull = (v: any): number | null =>
+    v === null || v === undefined || v === '' ? null : Number.isNaN(Number(v)) ? null : Number(v);
+  const boolOrNull = (v: any): boolean | null =>
+    v === null || v === undefined ? null : !!v;
+
+  /** True when any of the five tracked fields differ, or no prior row exists. */
+  function leaderboardChanged(prior: any | undefined, next: {
+    position: any; position_tied: any; score: any; thru: any; today: any;
+  }): boolean {
+    if (!prior) return true; // 1.3 — first sight of a player opens the sequence
+    return (
+      numOrNull(prior.position) !== numOrNull(next.position) ||
+      boolOrNull(prior.position_tied) !== boolOrNull(next.position_tied) ||
+      numOrNull(prior.score) !== numOrNull(next.score) ||
+      numOrNull(prior.thru) !== numOrNull(next.thru) ||
+      numOrNull(prior.today) !== numOrNull(next.today)
+    );
+  }
+
+
+
 
   for (const entry of leaderboard) {
     const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
@@ -1017,8 +1059,34 @@ async function syncLeaderboard(
         console.log('[LiveSync Debug] Smotherman activeRound:', JSON.stringify(activeRound));
         console.log('[LiveSync Debug] Smotherman derivedThru:', derivedThru);
       }
+      // Same derived values the upsert writes (4.2) — no second derivation.
+      const histToday = activeRound?.score ?? null;
+      const histTodayRound = activeRound ? rounds.indexOf(activeRound) + 1 : null;
+      if (
+        leaderboardChanged(priorByPlayer.get(player.id), {
+          position: entry.position,
+          position_tied: entry.tied || false,
+          score: entry.score,
+          thru: derivedThru,
+          today: histToday,
+        })
+      ) {
+        historyRows.push({
+          tournament_id: tournamentDbId,
+          player_id: player.id,
+          position: entry.position ?? null,
+          position_tied: entry.tied || false,
+          score: entry.score ?? null,
+          thru: derivedThru,
+          today: histToday,
+          status: derivedStatus,
+          today_round: histTodayRound,
+          strokes: entry.strokes ?? null,
+        });
+      }
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
+
         tournament_id: tournamentDbId,
         player_id: player.id,
         team_id: null,
@@ -1048,5 +1116,20 @@ async function syncLeaderboard(
     }
   }
 
+  // ── Best-effort archive write: ONE insert per pass, never blocks the sync ──
+  if (historyRows.length > 0) {
+    try {
+      const { error: histErr } = await supabase.from('sr_leaderboard_history').insert(historyRows);
+      if (histErr) {
+        console.error(`[LiveSync history] insert failed (${historyRows.length} rows dropped):`, histErr.message);
+      } else {
+        console.log(`[LiveSync history] ${historyRows.length} changed rows archived`);
+      }
+    } catch (e: any) {
+      console.error('[LiveSync history] insert threw (ignored):', e?.message ?? String(e));
+    }
+  }
+
   return { records, sportradarStatus };
+
 }
