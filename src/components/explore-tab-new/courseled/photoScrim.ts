@@ -20,3 +20,13 @@ export const SCRIM_HOTSPOT =
 
 export const SCRIM_TOP_BAND =
   'linear-gradient(180deg, rgba(8,12,8,0.34) 0%, rgba(8,12,8,0.10) 30%, rgba(8,12,8,0) 52%)';
+
+/**
+ * THE STANDOUT-TILE SCRIM — one bottom-weighted layer, the treatment used by
+ * Standout Rounds and Personal Bests. "Who's been playing" and "On tour this
+ * week" now paint THIS instead of the three-layer base/hotspot/top stack, so
+ * every photo tile on Discover carries the same scrim. StandoutTile's
+ * TILE_SCRIM re-exports this value, so there is still ONE definition.
+ */
+export const SCRIM_STANDOUT =
+  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';

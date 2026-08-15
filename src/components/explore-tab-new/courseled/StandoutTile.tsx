@@ -17,8 +17,10 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
  * passes nothing for it, so its tiles are byte-identical to before.
  */
 
-export const TILE_SCRIM =
-  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
+import { SCRIM_STANDOUT } from './photoScrim';
+
+/** The tile scrim, held once in ./photoScrim and shared with the photo rails. */
+export const TILE_SCRIM = SCRIM_STANDOUT;
 
 /** A photo at or above this height gets the larger chip and name sizes. */
 export const TALL = 180;
