@@ -16,9 +16,26 @@
  * faded. Tapping a row re-reads the whole panel and writes the same remembered
  * tee the sheet's pills do - ONE selection, owned by CourseCardPanel.
  *
- * The sheet is a refined table: tee pills carrying their yardage, a four-cell
- * summary panel, then the scorecard with a hairline above OUT / IN / TOTAL and
- * nothing between hole rows. No zebra striping, no length bars.
+ * BRIEF_COURSE_CARD_SHEET_VIBRANT: the SHEET now opens the way the panel opens -
+ * the slope section leads it (figure, signed delta, coloured track, every tee as
+ * a row), a compressed SHAPE panel follows, then the scorecard.
+ *
+ * The tee PILLS are gone: the per-tee rows ARE the selector, so one control does
+ * one job. The rows and the track are the SAME components the panel draws -
+ * SlopeScale and TeeList are shared, not forked.
+ *
+ * LENGTH BARS: the old rule here read "No zebra striping, no length bars". That
+ * clause is REPLACED, not deleted: the table now draws a length bar, and it is
+ * SOLID INK rather than ramped, because two coloured dimensions on one row
+ * fight - SI owns the colour on this table and length must not compete with it.
+ * Each bar is normalised WITHIN ITS PAR TYPE; normalised across all eighteen,
+ * every par 3 is a stub and the bar only repeats the PAR column.
+ * Still true: no zebra striping, and no rule between hole rows.
+ *
+ * TYPE: nothing on the sheet renders at weight 800 and nothing below 8.5px.
+ * Figures get bigger and tighter, never heavier. The scale's values are used
+ * locally - the canonical KICKER / LABEL / TITLE exports are NOT repointed,
+ * since ~76 files import them and that is a separate run.
  *
  * Presentation only - every figure comes from useCourseTeeSets, which the page
  * already loads. No new query.
@@ -32,7 +49,16 @@ import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
 import { shortCourseName } from '../../../_shared/courseLabel';
 import { resolveDefaultTee, storageKey } from '../CourseTeeCard';
-import { A, FIGS, Hairline, KICKER, LABEL, SANS } from './tokens';
+import {
+  A,
+  DIFFICULTY_HARD_HEX,
+  FIGS,
+  Hairline,
+  KICKER,
+  LABEL,
+  SANS,
+  difficultyRampColor,
+} from './tokens';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
 const STANDARD_SLOPE = 113;
