@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
 import { MomentsGrid } from './MomentsGrid';
+import { CREATOR_CARD_COUNT, type CommunityCreator } from './hooks/useCommunityCreators';
 import { useMomentsOfTheWeek, type Moment } from './hooks/useMomentsOfTheWeek';
 import { countNewSince, useReportNewCount } from './newSince';
 import { Eyebrow, InkAction } from './tokens';
+
 import { MomentsMosaic as MomentsMosaicShell } from './DiscoverCourseLedSkeleton';
 
 /**
