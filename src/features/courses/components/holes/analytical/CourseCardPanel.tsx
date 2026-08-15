@@ -81,15 +81,6 @@ const STANDARD_SLOPE = 113;
  * hexes themselves come from the analytical tokens (A.GREEN / A.AMBER / A.RED)
  * rather than being retyped.
  */
-const ZONE_EASIER_MAX = 104; // below 105: easier than standard
-const ZONE_STANDARD_MAX = 129; // 105-129: around standard; 130 and up: harder
-
-function zoneColour(slope: number): string {
-  if (slope <= ZONE_EASIER_MAX) return A.GREEN;
-  if (slope <= ZONE_STANDARD_MAX) return A.AMBER;
-  return A.RED;
-}
-
 interface Props {
   courseId: string | undefined;
   /** Names the sheet. Falls back to the tee title when absent. */
@@ -299,7 +290,6 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
 const TEE_LABEL_W_MIN = 40;
 const TEE_LABEL_W_MAX = 104;
 const TEE_YARDS_W = 46;
-const FADED = 0.34;
 
 const TeeRow: React.FC<{
   tee: TeeSet;
@@ -505,22 +495,6 @@ const SHEET_PANEL: React.CSSProperties = {
  */
 const CARD_GRID = '26px 1fr 46px 30px 30px';
 const CARD_GAP = 9;
-
-/**
- * WHITE OR INK ON THE SI CHIP (§4.1) - COMPUTED, never a hardcoded stroke-index
- * threshold, because the ramp is imported and its darkness is not ours to
- * assume. Standard sRGB relative luminance off the ramp's own rgb() string.
- */
-function chipInk(rgb: string): string {
-  const m = rgb.match(/(\d+(?:\.\d+)?)/g);
-  if (!m || m.length < 3) return A.INK;
-  const lin = m.slice(0, 3).map((v) => {
-    const c = Number(v) / 255;
-    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  const L = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-  return L < 0.45 ? '#FFFFFF' : A.INK;
-}
 
 /** SI 1 sits at the ramp's hard end, SI 18 at its light end. */
 function siRampT(si: number, minSi: number, maxSi: number): number {
@@ -907,7 +881,7 @@ const SheetBody: React.FC<{
                 padding: '0 5px',
                 borderRadius: 5,
                 background: siChip,
-                ...shFig(11.5, chipInk(siChip)),
+                ...shFig(11.5, rampInk(siChip)),
                 letterSpacing: '-0.02em',
               }}
             >
