@@ -696,8 +696,27 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const scale = buildHoleScale(holes, myByHole, totalRounds);
 
-  const hardestLabel = t('courses:courseDetail.plays.hardestHole');
-  const easiestLabel = t('courses:courseDetail.plays.easiestHole');
+  /* A FLAT CHART LABELS NEITHER EXTREME (§A2). */
+  const flatShape = stats.hardest.avg_to_par === stats.easiest.avg_to_par;
+
+  /** §A4 and §A5 - both derived from the per-hole data already loaded. */
+  const parRows = buildParTypeRows(holes, myByHole);
+  const courseShares = courseBucketShares(holes);
+
+  /* RECONCILIATION (§A4): each par type weighted by its hole count must return
+     the field average this section states. Reported in dev when it does not. */
+  if (import.meta.env.DEV && parRows.length > 0) {
+    const wHoles = parRows.reduce((s, r) => s + r.holes, 0);
+    const weighted = parRows.reduce((s, r) => s + r.field * r.holes, 0) / (wHoles || 1);
+    const stated =
+      holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).reduce((s, h) => s + h.avg_to_par, 0) /
+      Math.max(1, holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).length);
+    if (Math.abs(weighted - stated) > 0.005) {
+      // eslint-disable-next-line no-console
+      console.warn('[par-type reconciliation]', { weighted, stated, fieldAvg: stats.fieldAvg });
+    }
+  }
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
