@@ -584,7 +584,7 @@ function toughestRun(
   return best ? { from: best.from, to: best.to } : null;
 }
 
-/** Shape cell: figure over a label, with an optional small uppercase tail. */
+/** Shape cell: centred figure over a centred label, with an optional tail. */
 const ShapeCell: React.FC<{
   label: string;
   value: string;
@@ -592,9 +592,17 @@ const ShapeCell: React.FC<{
   size?: number;
   color?: string;
 }> = ({ label, value, tail, size = 20, color = A.INK }) => (
-  <div style={{ minWidth: 0 }}>
-    <div style={SH_LABEL}>{label}</div>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
+  <div style={{ minWidth: 0, textAlign: 'center' }}>
+    <div style={{ ...SH_LABEL, textAlign: 'center' }}>{label}</div>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: 5,
+        marginTop: 6,
+      }}
+    >
       <span style={{ ...shFig(size, color), whiteSpace: 'nowrap' }}>{value}</span>
       {tail ? (
         <span style={{ ...SH_LABEL, fontSize: 8.5, whiteSpace: 'nowrap' }}>{tail}</span>
@@ -809,10 +817,10 @@ const SheetBody: React.FC<{
       >
         <span style={{ ...SH_LABEL, color: A.INK }}>{label}</span>
         <span aria-hidden="true" />
-        <span style={{ ...shFig(figSize), textAlign: 'right' }}>
+        <span style={{ ...shFig(figSize), textAlign: 'center' }}>
           {y == null ? '' : formatNumber(Math.round(y))}
         </span>
-        <span style={{ ...shFig(figSize), textAlign: 'right' }}>{p == null ? '' : p}</span>
+        <span style={{ ...shFig(figSize), textAlign: 'center' }}>{p == null ? '' : p}</span>
         <span aria-hidden="true" />
       </div>
     );
@@ -839,7 +847,7 @@ const SheetBody: React.FC<{
           padding: '8px 0',
         }}
       >
-        <span style={shFig(13)}>{h.hole_no}</span>
+        <span style={{ ...shFig(13), textAlign: 'center' }}>{h.hole_no}</span>
 
         {/* LENGTH: a SOLID ink bar, not a ramp and not a fading gradient - the
             register does not do faded. SI owns the colour on this row. */}
@@ -866,7 +874,7 @@ const SheetBody: React.FC<{
           style={{
             ...shFig(13, isShort ? A.MUTE : A.BODY),
             fontWeight: isShort ? 500 : 600,
-            textAlign: 'right',
+            textAlign: 'center',
           }}
         >
           {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
@@ -876,7 +884,7 @@ const SheetBody: React.FC<{
           style={{
             ...shFig(13, isShort ? A.MUTE : A.INK),
             fontWeight: isShort ? 500 : 700,
-            textAlign: 'right',
+            textAlign: 'center',
           }}
         >
           {h.par}
@@ -884,7 +892,7 @@ const SheetBody: React.FC<{
 
         {/* SI TAKES THE RAMP (§4.1). Numerals go white or ink by COMPUTED
             luminance - never a hardcoded stroke-index threshold. */}
-        <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <span style={{ display: 'flex', justifyContent: 'center' }}>
           {siChip ? (
             <span
               style={{
@@ -995,11 +1003,11 @@ const SheetBody: React.FC<{
             gap: CARD_GAP,
           }}
         >
-          <span style={SH_LABEL}>{t('courses:teeCard.col.hole')}</span>
-          <span style={SH_LABEL}>{t('courses:teeCard.col.length')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.yards')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.par')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.si')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.hole')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.length')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.yards')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.par')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.si')}</span>
         </div>
 
         {out.map(holeRow)}
