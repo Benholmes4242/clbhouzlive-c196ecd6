@@ -157,46 +157,88 @@ function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
+/** The four buckets, in ramp order. ONE definition: the row, the strip and the
+ *  expanded detail all read it, so a bucket can never be defined twice. */
+export const BUCKETS = [
+  { key: 'birdie' as const, keys: ['ace', 'albatross', 'eagle', 'birdie'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.birdie, labelKey: 'courses:holes.preview.legendBirdie' },
+  { key: 'par' as const, keys: ['par'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.par, labelKey: 'courses:holes.preview.legendPar' },
+  { key: 'bogey' as const, keys: ['bogey'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.bogey, labelKey: 'courses:holes.preview.legendBogey' },
+  { key: 'double' as const, keys: ['double'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.double, labelKey: 'courses:holes.preview.legendDouble' },
+] as const;
 
+export type BucketShares = Record<'birdie' | 'par' | 'bogey' | 'double', number>;
 
 /**
- * Legend for the to-par ramp. Rendered ONCE per surface, above the rows.
- * SWATCHES TAKE RAMP_TOPAR, the same four tones as the bar and the expanded
- * percentage dots - three places, one source, or the legend stops explaining
- * the bar. FOUR items only: the field tick and the member dot no longer sit on
- * the ramp, so legending them here would describe something the row does not
- * draw.
+ * THE WHOLE COURSE'S SPREAD (BRIEF_COURSE_TAB_AND_SHEETS_CHART_LED A5): the
+ * per-hole distributions already loaded, summed. Shares are 0..1 fractions of
+ * every hole-round on the course. Returns null when nothing is counted.
  */
+export function courseBucketShares(holes: CourseHole[]): BucketShares | null {
+  const raw = BUCKETS.map((b) => holes.reduce((s, h) => s + pct(h, b.keys), 0));
+  const total = raw.reduce((s, v) => s + v, 0);
+  if (total <= 0) return null;
+  const out = {} as BucketShares;
+  BUCKETS.forEach((b, i) => {
+    out[b.key] = raw[i] / total;
+  });
+  return out;
+}
 
-export const HoleRampLegend: React.FC<{ hasYou?: boolean }> = () => {
+/**
+ * THE DISTRIBUTION STRIP - the whole course before the parts. ONE component,
+ * rendered by the Course tab's hole-by-hole panel and by the sheet, in the same
+ * four tones as every row beneath it, so the strip teaches the rows. Its four
+ * labelled percentages ARE the key: no separate legend row is drawn.
+ */
+export const DistributionStrip: React.FC<{ shares: BucketShares; style?: React.CSSProperties }> = ({
+  shares,
+  style,
+}) => {
   const { t } = useTranslation(['courses']);
-  const items = [
-    { bg: RAMP_TOPAR.birdie, label: t('courses:holes.preview.legendBirdie') },
-    { bg: RAMP_TOPAR.par, label: t('courses:holes.preview.legendPar') },
-    { bg: RAMP_TOPAR.bogey, label: t('courses:holes.preview.legendBogey') },
-    { bg: RAMP_TOPAR.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const lastIdx = BUCKETS.length - 1;
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 12,
-        paddingBottom: 10,
-      }}
-    >
-      {items.map((it) => (
-        <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <i
-            style={{ width: 10, height: 5, borderRadius: 2, background: it.bg, display: 'block' }}
-          />
-          <span style={{ ...MICRO }}>{it.label}</span>
-        </span>
-      ))}
+    <div style={{ paddingBottom: 12, ...style }}>
+      <div style={{ display: 'flex', gap: 1.5, height: 8 }}>
+        {BUCKETS.map((b, i) => {
+          const empty = shares[b.key] <= 0;
+          return (
+            <i
+              key={b.key}
+              style={{
+                width: empty ? 2 : `${shares[b.key] * 100}%`,
+                flexShrink: 0,
+                background: b.bg,
+                opacity: empty ? 0.28 : 1,
+                borderRadius: i === 0 ? '4px 0 0 4px' : i === lastIdx ? '0 4px 4px 0' : 0,
+              }}
+            />
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', marginTop: 7, ...FIGS }}>
+        {BUCKETS.map((b) => (
+          <span
+            key={b.key}
+            style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <i
+                style={{ width: 8, height: 8, borderRadius: 2, background: b.bg, display: 'block', flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
+                {Math.round(shares[b.key] * 100)}%
+              </span>
+            </span>
+            <span style={{ ...MICRO, marginTop: 3, whiteSpace: 'nowrap', textAlign: 'center' }}>
+              {t(b.labelKey)}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
+
 
 
 export const HoleRowV2: React.FC<{
