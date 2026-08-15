@@ -958,6 +958,14 @@
       "chip": "크리에이터",
       "clips_other": "클립 {{count}}개",
       "photos_other": "사진 {{count}}장"
+    },
+    "honoursSeeAllPlain": "전체 보기",
+    "honours": {
+      "badgeAce": "홀인원",
+      "badgeAlbatross": "알바트로스",
+      "badgeCount": "{{label}} ×{{count}}",
+      "more": "{{count}}개 더",
+      "showLess": "접기"
     }
   },
   "statBrowse": {

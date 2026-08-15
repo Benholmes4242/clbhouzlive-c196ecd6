@@ -1455,6 +1455,14 @@
       "clips_other": "[{{count}} çļîþŝ]",
       "photos_one": "[{{count}} þĥöţö]",
       "photos_other": "[{{count}} þĥöţöŝ]"
+    },
+    "honoursSeeAllPlain": "[Šéé åľľ]",
+    "honours": {
+      "badgeAce": "[Åçé]",
+      "badgeAlbatross": "[Åľbåţŕöšš]",
+      "badgeCount": "{{label}} ×{{count}}",
+      "more": "[{{count}} möré]",
+      "showLess": "[Šhöw ľéšš]"
     }
   },
   "statBrowse": {

@@ -274,7 +274,13 @@ export function MostPlayedPanel() {
   );
 }
 
-/** Section 7 — honours board: gold-wash panel, centred header, 2 rows. */
+/**
+ * Section 7 — honours board: gold-wash panel, centred header, 2 GROUPED rows.
+ * BRIEF_HONOURS_BOARD_PLAYER_LED — grouped rows are taller than flat ones: a
+ * one-feat group is 12 + 34 (holder) + 8 + 33 (course line 18 + detail 15) + 12
+ * = 99px, against the old flat row's 52px. The shell holds 99px rows so the
+ * panel does not resize when the wire settles.
+ */
 export function HonoursPanel() {
   return (
     <section>
@@ -296,19 +302,25 @@ export function HonoursPanel() {
           <div
             key={i}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 11,
-              padding: '11px 0',
+              padding: '12px 0',
               borderBottom: i === 1 ? 'none' : `1px solid ${GOLD_HAIR}`,
             }}
           >
-            <Bar style={{ height: 30, width: 30, borderRadius: 999, flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <TextBar w={140} h={13} />
-              <TextBar w={104} h={11} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11, minHeight: 34 }}>
+              <Bar style={{ height: 34, width: 34, borderRadius: 12, flexShrink: 0 }} />
+              <TextBar w={104} h={13} />
+              <div style={{ marginLeft: 'auto' }}>
+                <Bar style={{ height: 15, width: 42, borderRadius: 5 }} />
+              </div>
             </div>
-            <TextBar w={34} h={16} />
+            <div style={{ marginTop: 8, marginLeft: 45 }}>
+              <div style={{ height: 18, display: 'flex', alignItems: 'center' }}>
+                <TextBar w={132} h={13} />
+              </div>
+              <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
+                <TextBar w={96} h={11} />
+              </div>
+            </div>
           </div>
         ))}
       </div>

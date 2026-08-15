@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { HonoursBoard, GOLD_INK, HONOURS_WASH } from './HonoursBoard';
+import { HonoursBoard, GOLD_INK, GOLD_HAIR, HONOURS_WASH } from './HonoursBoard';
 import { A, LABEL, SANS } from './tokens';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -42,7 +42,7 @@ export function HonoursBoardSheet({ open, onClose, events, onRowPress }: Props) 
         style={{
           padding: '10px 16px 12px',
           background: HONOURS_WASH,
-          borderBottom: '1px solid rgba(216,169,60,0.22)',
+          borderBottom: `1px solid ${GOLD_HAIR}`,
         }}
       >
         <div

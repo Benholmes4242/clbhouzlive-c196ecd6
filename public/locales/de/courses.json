@@ -1007,6 +1007,14 @@
       "clips_other": "{{count}} Clips",
       "photos_one": "{{count}} Foto",
       "photos_other": "{{count}} Fotos"
+    },
+    "honoursSeeAllPlain": "Alle ansehen",
+    "honours": {
+      "badgeAce": "Ace",
+      "badgeAlbatross": "Albatros",
+      "badgeCount": "{{label}} ×{{count}}",
+      "more": "{{count}} weitere",
+      "showLess": "Weniger anzeigen"
     }
   },
   "statBrowse": {
