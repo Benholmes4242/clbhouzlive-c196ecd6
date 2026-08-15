@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -305,5 +305,31 @@
         "best": "BESTE JE"
       }
     }
+  },
+  "connectGhost": {
+    "champions": {
+      "headlineSome": "{{total}} Kronen. {{open}} nie gewonnen.",
+      "headlineSomeOne": "{{total}} Kronen. 1 nie gewonnen.",
+      "headlineNone": "{{total}} Kronen. Keine wurde je gewonnen.",
+      "headlineAll": "{{total}} Kronen. Jede ist vergeben.",
+      "headlineOneTotalOpen": "1 Krone. Sie wurde nie gewonnen.",
+      "headlineOneTotalHeld": "1 Krone. Sie ist vergeben.",
+      "boardEyebrow": "Ehrentafel",
+      "neverWon": "Nie gewonnen",
+      "open": "OFFEN",
+      "remaining_one": "{{count}} weitere Krone wurde nie gewonnen.",
+      "remaining_other": "{{count}} weitere Kronen wurden nie gewonnen.",
+      "figRounds": "RUNDEN",
+      "figAvgToPar": "Ø ZU PAR",
+      "figHarderThan": "SCHWERER ALS",
+      "headline": "Kronen in diesem Club",
+      "sub": "Verbinde dein Handicap: jede Runde hier zählt automatisch. Hol dir eine Krone und dein Name steht auf der Tafel.",
+      "slim": "Spiele um die Kronen dieses Clubs"
+    },
+    "eyebrow": "DAS KÖNNTE DIR GEHÖREN",
+    "cta": "Handicap verbinden",
+    "footnote": "DAUERT 30 SEKUNDEN · WIR POSTEN NIE FÜR DICH",
+    "slimCta": "Verbinden →",
+    "dismissA11y": "Schließen"
   }
 }

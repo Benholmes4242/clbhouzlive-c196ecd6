@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,32 +81,32 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "\u30e9\u30a6\u30f3\u30c9\u3092\u81ea\u52d5\u7684\u306b\u6295\u7a3f",
-      "subtitle": "\u8a18\u9332\u3057\u305f\u30e9\u30a6\u30f3\u30c9\u306f\u30af\u30e9\u30d6\u30cf\u30a6\u30b9\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002\u7279\u7b46\u3059\u3079\u304d\u30e9\u30a6\u30f3\u30c9\u306e\u307f\u3001\u30d5\u30a9\u30ed\u30ef\u30fc\u4ee5\u5916\u306b\u3082\u5c4a\u304d\u307e\u3059\u3002"
+      "title": "ラウンドを自動的に投稿",
+      "subtitle": "記録したラウンドはクラブハウスに表示されます。特筆すべきラウンドのみ、フォロワー以外にも届きます。"
     }
   },
   "feed": {
     "crownCategory": {
-      "lowest_gross_all_time": "\u6700\u5c11\u30b0\u30ed\u30b9",
-      "best_score_diff_all_time": "\u6700\u9ad8\u30b9\u30b3\u30a2\u30c7\u30a3\u30d5\u30a1\u30ec\u30f3\u30b7\u30e3\u30eb",
-      "best_stableford_all_time": "\u6700\u9ad8\u30b9\u30c6\u30fc\u30d6\u30eb\u30d5\u30a9\u30fc\u30c9",
-      "most_aces_all_time": "\u30db\u30fc\u30eb\u30a4\u30f3\u30ef\u30f3\u6700\u591a",
-      "most_albatrosses_all_time": "\u30a2\u30eb\u30d0\u30c8\u30ed\u30b9\u6700\u591a",
-      "most_eagles_all_time": "\u30a4\u30fc\u30b0\u30eb\u6700\u591a",
-      "most_birdies_all_time": "\u30d0\u30fc\u30c7\u30a3\u30fc\u6700\u591a"
+      "lowest_gross_all_time": "最少グロス",
+      "best_score_diff_all_time": "最高スコアディファレンシャル",
+      "best_stableford_all_time": "最高ステーブルフォード",
+      "most_aces_all_time": "ホールインワン最多",
+      "most_albatrosses_all_time": "アルバトロス最多",
+      "most_eagles_all_time": "イーグル最多",
+      "most_birdies_all_time": "バーディー最多"
     }
   },
   "business": {
     "hero": {
-      "communityRating": "\u30b3\u30df\u30e5\u30cb\u30c6\u30a3\u8a55\u4fa1",
-      "ratings": "{{count}} \u4ef6\u306e\u8a55\u4fa1",
-      "edit": "\u7de8\u96c6",
-      "follow": "\u30d5\u30a9\u30ed\u30fc",
-      "following": "\u30d5\u30a9\u30ed\u30fc\u4e2d",
-      "manage": "\u7ba1\u7406",
-      "verified": "\u8a8d\u8a3c\u6e08\u307f",
-      "readMore": "\u7d9a\u304d\u3092\u8aad\u3080",
-      "readLess": "\u9589\u3058\u308b"
+      "communityRating": "コミュニティ評価",
+      "ratings": "{{count}} 件の評価",
+      "edit": "編集",
+      "follow": "フォロー",
+      "following": "フォロー中",
+      "manage": "管理",
+      "verified": "認証済み",
+      "readMore": "続きを読む",
+      "readLess": "閉じる"
     },
     "emptyState": {
       "kicker": "FOR BUSINESSES",
@@ -217,15 +217,15 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
-      "lineHold": "\u6b21\u306e\u30e9\u30a6\u30f3\u30c9\u3067\u30cf\u30f3\u30c7\u30a3\u30ad\u30e3\u30c3\u30d7\u306f\u4e0a\u304c\u308a\u307e\u305b\u3093\u3002",
-      "subHold": "{{cut}}\u3092\u4e0a\u56de\u308c\u3070\u4e0b\u304c\u308a\u307e\u3059\u3002",
-      "lineRise": "\u6b21\u306e\u30e9\u30a6\u30f3\u30c9\u3067\u30cf\u30f3\u30c7\u30a3\u30ad\u30e3\u30c3\u30d7\u306f{{settle}}\u306b\u4e0a\u304c\u308a\u307e\u3059",
-      "subRise": "{{cut}}\u3092\u4e0a\u56de\u3089\u306a\u3044\u9650\u308a\u3002",
-      "beatLabel": "\u76f4\u8fd1{{total}}\u30e9\u30a6\u30f3\u30c9\u306e\u3046\u3061{{count}}\u304c{{cut}}\u3092\u4e0a\u56de\u3063\u3066\u3044\u307e\u3059",
-      "scaleShoot": "\u30b9\u30b3\u30a2",
-      "scaleBecomes": "\u30cf\u30f3\u30c7\u30a3\u30ad\u30e3\u30c3\u30d7",
-      "noChange": "\u5909\u5316\u306a\u3057",
-      "yourBest": "\u81ea\u5df1\u6700\u9ad8"
+      "lineHold": "次のラウンドでハンディキャップは上がりません。",
+      "subHold": "{{cut}}を上回れば下がります。",
+      "lineRise": "次のラウンドでハンディキャップは{{settle}}に上がります",
+      "subRise": "{{cut}}を上回らない限り。",
+      "beatLabel": "直近{{total}}ラウンドのうち{{count}}が{{cut}}を上回っています",
+      "scaleShoot": "スコア",
+      "scaleBecomes": "ハンディキャップ",
+      "noChange": "変化なし",
+      "yourBest": "自己最高"
     },
     "pulse": {
       "findPlayer": "Find any player's handicap",
@@ -235,12 +235,12 @@
       "noRecent": "No recent rounds"
     },
     "lastRound": {
-      "playedTo": "\u30d7\u30ec\u30fc\u5024",
-      "gross": "\u30b0\u30ed\u30b9",
-      "stableford": "\u30b9\u30c6\u30fc\u30d6\u30eb\u30d5\u30a9\u30fc\u30c9",
-      "index": "\u30cf\u30f3\u30c7\u30a3\u30ad\u30e3\u30c3\u30d7",
-      "indexHeldAt": "\u30cf\u30f3\u30c7\u30a3\u30ad\u30e3\u30c3\u30d7\u306f",
-      "notBest8": "\u30d9\u30b9\u30c88\u306b\u306f\u5165\u3063\u3066\u3044\u307e\u305b\u3093"
+      "playedTo": "プレー値",
+      "gross": "グロス",
+      "stableford": "ステーブルフォード",
+      "index": "ハンディキャップ",
+      "indexHeldAt": "ハンディキャップは",
+      "notBest8": "ベスト8には入っていません"
     },
     "records": {
       "emptyHint": "Rekodo wa raundo o toroku suru to koko ni hyoji saremasu."
@@ -304,5 +304,31 @@
         "best": "BEST EVER"
       }
     }
+  },
+  "connectGhost": {
+    "champions": {
+      "headlineSome": "王冠{{total}}個。{{open}}個は未獲得。",
+      "headlineSomeOne": "王冠{{total}}個。1個は未獲得。",
+      "headlineNone": "王冠{{total}}個。まだ誰も獲っていません。",
+      "headlineAll": "王冠{{total}}個。すべて保持者がいます。",
+      "headlineOneTotalOpen": "王冠1個。まだ誰も獲っていません。",
+      "headlineOneTotalHeld": "王冠1個。保持者がいます。",
+      "boardEyebrow": "名誉のボード",
+      "neverWon": "未獲得",
+      "open": "空席",
+      "remaining_one": "他に{{count}}個の王冠が未獲得です。",
+      "remaining_other": "他に{{count}}個の王冠が未獲得です。",
+      "figRounds": "ラウンド",
+      "figAvgToPar": "平均対パー",
+      "figHarderThan": "難易度上位",
+      "headline": "このクラブの王冠",
+      "sub": "ハンディキャップを連携すると、ここでのラウンドが自動的に集計されます。王冠を獲れば名前がボードに載ります。",
+      "slim": "このクラブの王冠を狙う"
+    },
+    "eyebrow": "これはあなたのものになり得ます",
+    "cta": "ハンディキャップを連携",
+    "footnote": "30秒で完了 · 代理投稿はしません",
+    "slimCta": "連携 →",
+    "dismissA11y": "閉じる"
   }
 }

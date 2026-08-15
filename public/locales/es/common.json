@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,7 +81,7 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "Publicar mis rondas autom\u00e1ticamente",
+      "title": "Publicar mis rondas automáticamente",
       "subtitle": "Tus rondas aparecen en el Clubhouse cuando las registras. Solo las rondas destacadas llegan a quienes no te siguen."
     }
   },
@@ -305,5 +305,31 @@
         "best": "MEJOR DE SIEMPRE"
       }
     }
+  },
+  "connectGhost": {
+    "champions": {
+      "headlineSome": "{{total}} coronas. {{open}} nunca ganadas.",
+      "headlineSomeOne": "{{total}} coronas. 1 nunca ganada.",
+      "headlineNone": "{{total}} coronas. Ninguna se ha ganado.",
+      "headlineAll": "{{total}} coronas. Todas tienen dueño.",
+      "headlineOneTotalOpen": "1 corona. Nunca se ha ganado.",
+      "headlineOneTotalHeld": "1 corona. Ya tiene dueño.",
+      "boardEyebrow": "Cuadro de honor",
+      "neverWon": "Nunca ganada",
+      "open": "LIBRE",
+      "remaining_one": "{{count}} corona más nunca se ha ganado.",
+      "remaining_other": "{{count}} coronas más nunca se han ganado.",
+      "figRounds": "VUELTAS",
+      "figAvgToPar": "MEDIA AL PAR",
+      "figHarderThan": "MÁS DIFÍCIL QUE",
+      "headline": "Coronas en este club",
+      "sub": "Conecta tu hándicap y cada vuelta aquí cuenta automáticamente. Gana una corona y tu nombre estará en el cuadro.",
+      "slim": "Juega por las coronas de este club"
+    },
+    "eyebrow": "ESTO PODRÍA SER TUYO",
+    "cta": "Conecta tu hándicap",
+    "footnote": "TARDA 30 SEGUNDOS · NUNCA PUBLICAMOS EN TU NOMBRE",
+    "slimCta": "Conectar →",
+    "dismissA11y": "Descartar"
   }
 }

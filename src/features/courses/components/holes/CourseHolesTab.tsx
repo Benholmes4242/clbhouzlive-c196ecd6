@@ -10,7 +10,6 @@ import { HolesEmptyState } from './HolesEmptyState';
 import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
-import { HolesGhost } from '@/components/handicap/ConnectGhostPreviews';
 import { HoleDataSheet, type HoleDataSection } from './HoleDataSheet';
 import { CourseTeeCard } from './CourseTeeCard';
 
@@ -123,7 +122,6 @@ export const CourseHolesTab: React.FC<Props> = ({
   const ghost = wantsGhost ? (
     <ConnectGhostPrompt
       surface="holes"
-      ghost={<HolesGhost />}
       onConnect={() => navigate('/handicap')}
     />
   ) : null;
