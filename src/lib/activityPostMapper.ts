@@ -120,8 +120,9 @@ export function mapActivityPostToFeedPost(
     courseId: reviewData?.courseId ?? post.course?.id ?? post.course_id ?? undefined,
     review,
     isReview,
-    isLikedByMe: false, // RPC lacks field
-    isFollowedByMe: false, // RPC lacks field
+    isLikedByMe: viewer.isLikedByMe ?? false,
+    isFollowedByMe: viewer.isFollowedByMe ?? false,
+
     engagementScore: 0,
     handicapIndex: null,
     homeClub: null,
