@@ -22,7 +22,9 @@ interface TickerProps {
 }
 
 function entryScoreColour(score: number): string {
-  if (score < 0) return '#DC2626'; // under par -> red (matches handicap pages)
+  // ONE red for under par on dark — the token, not a literal, so the ticker and
+  // the hero board can never drift into two reds that happen to agree today.
+  if (score < 0) return TOPAR_UNDER_DARK;
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'white';
 }
