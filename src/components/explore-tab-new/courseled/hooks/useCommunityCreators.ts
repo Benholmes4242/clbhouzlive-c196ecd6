@@ -65,6 +65,12 @@ export function buildCommunityCreators({
   for (const m of pool) {
     const uid = m.post.userId;
     if (!uid || uid === viewerId) continue;
+    // THE CAPTION IS A PERSON, so an unresolved identity cannot carry a card:
+    // the hook falls back to "Player" when no profile row came back, and a card
+    // captioned "Player" says less than the course tile beside it. Business
+    // actors are excluded for the same reason — a card about a person.
+    if (m.post.actorType && m.post.actorType !== 'personal') continue;
+    if (!m.post.username) continue;
     const list = byAuthor.get(uid);
     if (list) list.push(m);
     else byAuthor.set(uid, [m]);
