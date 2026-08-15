@@ -159,18 +159,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {r.player?.full_name ?? BLANK}
                 </span>
                 {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
-                  <span
-                    role="img"
-                    aria-label={t('overview.board.clbhouzPick')}
-                    title={t('overview.board.clbhouzPick')}
-                    style={{
-                      flexShrink: 0,
-                      width: 5,
-                      height: 5,
-                      borderRadius: 999,
-                      background: AMBER,
-                    }}
-                  />
+                  <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />
                 )}
               </div>
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
