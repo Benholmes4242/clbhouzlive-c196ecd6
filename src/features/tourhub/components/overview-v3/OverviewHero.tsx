@@ -271,7 +271,38 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
         </div>
       )}
     </div>
+
+    {/* The live board EXTENDS the hero downward. It tracks the active slide and
+        cross-fades in place on swipe; on a results or upcoming slide it renders
+        nothing at all and the page below moves up. No collapse control. */}
+    <AnimatePresence mode="wait" initial={false}>
+      {boardTournamentId && boardRound != null && boardEntries.length > 0 && (
+        <motion.div
+          key={boardTournamentId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <HeroBoardSection
+            tournamentId={boardTournamentId}
+            entries={boardEntries as any[]}
+            currentRound={boardRound}
+            onFullLeaderboard={() => navigate(tournamentRoute(boardTournamentId))}
+            onRowTap={(playerId) =>
+              analyticsEvents.track('hero_board_row_tap', {
+                tournament_id: boardTournamentId,
+                round: boardRound,
+                player_id: playerId,
+              })
+            }
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
+
 }
 
 export default OverviewHero;
