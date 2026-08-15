@@ -307,7 +307,15 @@
     "beatFieldOnTourPartial": "[~~Ṁáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
     "beatFieldVoicePartial": "[~~{{who}} ɱáţĉĥéđ őř ƀéáţ ţĥé ƒíéļđ áṽéřáĝé őñ {{beat}} őƒ ţĥé {{scored}} ĥőļéš ŵíţĥ ƒíéļđ đáţá.~~]",
     "holeByHole": "[~~Šĉőřéĉářđ~~]",
-    "hideHoleByHole": "[~~Ĥíđé šĉőřéĉářđ~~]"
+    "hideHoleByHole": "[~~Ĥíđé šĉőřéĉářđ~~]",
+    "rankHereVoiceBest": "[~~{{whose}} ƀéšţ őƒ {{count}} řőúñđš ĥéřé.~~]",
+    "rankHereNeutralBest": "[~~Ɓéšţ őƒ {{count}} řőúñđš ĥéřé.~~]",
+    "trajHole": "[~~Ĥőļé {{n}}~~]",
+    "trajPar": "[~~Ƥář {{n}}~~]",
+    "trajField": "[~~Ƒíéļđ {{n}}~~]",
+    "trajThrough": "[~~Ţĥřőúĝĥ {{n}}~~]",
+    "trajBeatField": "[~~Ɓéáţ ţĥé ƒíéļđ őñ {{n}}~~]",
+    "trajAria": "[~~Řőúñđ ţřájéĉţőřý, {{n}} ţő πář. Ðřáĝ ţő řéáđ éáĉĥ ĥőļé.~~]"
   },
   "card": {
     "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
