@@ -187,14 +187,26 @@ function monotoneSampler(pts: { x: number; y: number }[]): (x: number) => number
 const RAMP_HARD_HEX = DIFFICULTY_HARD_HEX;
 const rampColor = difficultyRampColor;
 
-/** Shape chart - graded bars are the field, the amber line is the member. */
+/**
+ * Shape chart - graded bars are the field, the amber line is the member.
+ *
+ * THE EXTREMES ARE LABELLED ON THEIR OWN BARS (§A2). The hardest and easiest
+ * holes are already drawn as the tallest and shortest bar here, so a sentence
+ * naming them narrated the chart. Labels are DERIVED (max / min of the field's
+ * per-hole average), the FIRST of any tie takes the label, and a FLAT chart
+ * (max equals min) labels neither.
+ */
 const ShapeChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hardestHole: number;
   hardestText: string;
+  easiestHole: number;
+  easiestText: string;
+  flat: boolean;
   hasYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hardestText, hasYou }) => {
+}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou }) => {
+
   const W = 340;
   /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
   const H = 78;
