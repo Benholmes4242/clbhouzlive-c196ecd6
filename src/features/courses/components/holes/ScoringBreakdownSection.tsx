@@ -981,13 +981,16 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               const k = (v - form.best) / form.span;
               return k <= 0.33 ? A.GREEN : k <= 0.66 ? A.AMBER : A.RED;
             };
-            const segs = pts.slice(0, -1).map((p, i) => ({
-              d: monotonePath([p, pts[i + 1]]),
-              tone: zone((form.series[i] + form.series[i + 1]) / 2),
-              key: i,
-            }));
+            const line = monotonePath(pts);
+            /** Area under the curve, closed along the plot floor. */
+            const area = `${line} L ${pts[pts.length - 1].x} ${H} L ${pts[0].x} ${H} Z`;
             const bi = form.bestIndex;
+
             const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
+            /** The fill carries the direction of travel, as on the index tile. */
+            const fillTone =
+              delta == null || Math.abs(delta) < 0.5 ? A.AMBER : delta > 0 ? A.IMPROVED : A.DRIFTED;
+
             return (
               <>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
@@ -1022,28 +1025,46 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   aria-hidden
                   style={{ display: 'block' }}
                 >
-                  {/* The halo is the PANEL colour, never white-on-white by
-                      accident: A.PANEL is the surface this sits on. */}
+                  <defs>
+                    <linearGradient id="form-trend-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={fillTone} stopOpacity={0.42} />
+                      <stop offset="100%" stopColor={fillTone} stopOpacity={0.03} />
+                    </linearGradient>
+                    {/* One stop per round, coloured by its zone, so a good spell
+                        renders green and a bad one red along one continuous line. */}
+                    <linearGradient id="form-trend-stroke" x1="0" y1="0" x2="1" y2="0">
+                      {form.series.map((v, i) => (
+                        <stop
+                          key={i}
+                          offset={`${(i / (form.series.length - 1)) * 100}%`}
+                          stopColor={zone(v)}
+                        />
+                      ))}
+                    </linearGradient>
+                  </defs>
+                  <path d={area} fill="url(#form-trend-fill)" />
+                  {/* The white halo is what stops the line reading flat on its own fill. */}
                   <path
-                    d={monotonePath(pts)}
+                    d={line}
                     fill="none"
-                    stroke={A.PANEL}
-                    strokeWidth={5}
+                    stroke="#FFFFFF"
+                    strokeOpacity={0.6}
+                    strokeWidth={4}
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"
                   />
-                  {segs.map((s) => (
-                    <path
-                      key={s.key}
-                      d={s.d}
-                      fill="none"
-                      stroke={s.tone}
-                      strokeWidth={2.25}
-                      strokeLinecap="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  ))}
-                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.2} fill={A.GREEN} />
+                  <path
+                    d={line}
+                    fill="none"
+                    stroke="url(#form-trend-stroke)"
+                    strokeWidth={2.2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke="#FFFFFF" strokeWidth={1.6} />
+
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                   <span style={{ ...LABEL, fontSize: 8.5 }}>
