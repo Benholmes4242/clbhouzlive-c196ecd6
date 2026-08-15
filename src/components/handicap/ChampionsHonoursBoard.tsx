@@ -54,6 +54,8 @@ interface Props {
   remainderLine?: string | null;
   neverWonLabel: string;
   openLabel: string;
+  /** Uppercase labels for the three course figures. */
+  figureLabels?: { rounds: string; avg: string; harder: string };
 }
 
 const PHOTO_BAND_HEIGHT = 132;
@@ -195,7 +197,7 @@ export const ChampionsHonoursBoard: React.FC<Props> = ({
   neverWonLabel,
   openLabel,
   figureLabels = { rounds: 'ROUNDS', avg: 'AVG TO PAR', harder: 'HARDER THAN' },
-}: Props & { figureLabels?: { rounds: string; avg: string; harder: string } }) => {
+}) => {
   const rows = orderHonoursRows(crowns);
   const hasPhoto = !!courseHeaderImage;
 
