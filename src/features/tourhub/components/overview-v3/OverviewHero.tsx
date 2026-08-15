@@ -189,12 +189,14 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
 
 
   return (
+    <>
     <div
       style={{ position: 'relative', width: '100%', height }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
+
       <AnimatePresence mode="wait">
         <motion.div
           key={active.tournament.id}
