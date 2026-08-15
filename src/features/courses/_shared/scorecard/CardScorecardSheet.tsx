@@ -574,26 +574,35 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const captions = useMemo(() => {
     const out: string[] = [];
     if (!isTour && courseContext) {
-      const avg = courseContext.yourAvgToPar;
+      /*
+       * THE CAPTION COMPARES AGAINST THE OTHER ROUNDS, NOT AN AVERAGE THAT
+       * CONTAINS THIS ROUND. The hero cell keeps the inclusive average — it is
+       * labelled "their average here" and that is what it is. The two figures
+       * differ on one card and that is intended.
+       *
+       * Gated on avg_to_par_others being non-null, not on roundsHere > 1: the
+       * null is the honest signal and cannot drift.
+       */
+      const avgOthers = courseContext.avgToParOthers;
       const roundsHere = courseContext.roundsHere ?? 0;
-      // A member's first round here has nothing to compare against.
-      if (avg != null && roundsHere > 1 && totals.played) {
-        const diff = totals.toPar - avg;
+      const othersCount = Math.max(roundsHere - 1, 1);
+      if (avgOthers != null && totals.played) {
+        const diff = totals.toPar - avgOthers;
         const d = Math.abs(Math.round(diff * 10) / 10);
         // Impersonal variants carry no subject at all, so a missing name can
         // never produce a line that opens with an apostrophe.
         if (d < 0.5) {
           out.push(impersonal
-            ? t('courses:scorecard.vsAvgLevelNeutral')
-            : t('courses:scorecard.vsAvgLevel', { whose }));
+            ? t('courses:scorecard.vsOthersLevelNeutral', { count: othersCount })
+            : t('courses:scorecard.vsOthersLevel', { whose, count: othersCount }));
         } else if (diff < 0) {
           out.push(impersonal
-            ? t('courses:scorecard.vsAvgBetterNeutral', { n: d.toFixed(1) })
-            : t('courses:scorecard.vsAvgBetter', { n: d.toFixed(1), whose }));
+            ? t('courses:scorecard.vsOthersBetterNeutral', { n: d.toFixed(1), count: othersCount })
+            : t('courses:scorecard.vsOthersBetter', { n: d.toFixed(1), whose, count: othersCount }));
         } else {
           out.push(impersonal
-            ? t('courses:scorecard.vsAvgWorseNeutral', { n: d.toFixed(1) })
-            : t('courses:scorecard.vsAvgWorse', { n: d.toFixed(1), whose }));
+            ? t('courses:scorecard.vsOthersWorseNeutral', { n: d.toFixed(1), count: othersCount })
+            : t('courses:scorecard.vsOthersWorse', { n: d.toFixed(1), whose, count: othersCount }));
         }
       }
       if (courseContext.rankHere != null && roundsHere > 0) {
