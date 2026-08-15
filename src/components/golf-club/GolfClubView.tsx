@@ -406,8 +406,9 @@ const MONO_FIGURE: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0, "tnum" 1',
   letterSpacing: '-0.03em',
   fontWeight: 700,
-  fontSize: 13,
+  fontSize: 12,
   color: 'rgba(255,255,255,0.95)',
+  whiteSpace: 'nowrap',
 };
 
 const CELL_LABEL: React.CSSProperties = {
