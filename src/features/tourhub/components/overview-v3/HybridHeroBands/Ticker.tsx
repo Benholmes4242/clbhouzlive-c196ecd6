@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
