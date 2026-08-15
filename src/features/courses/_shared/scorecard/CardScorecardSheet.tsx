@@ -39,16 +39,12 @@ const SENTENCE: React.CSSProperties = {
   fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
 };
 
-/** Matches TrajectoryLine's field stroke exactly — one value, two places. */
-const FIELD_LINE_SWATCH = '#C3CAD2';
+/*
+ * The chart legend keys and FIELD_LINE_SWATCH are GONE
+ * (BRIEF_SCORECARD_TRAJECTORY_WHOOP §8): the field line is no longer drawn and
+ * the round stroke is graded per hole, so neither key had anything to name.
+ */
 
-/** One legend key: a swatch that matches the chart, then a 7.5/800 DIM label. */
-const LegendKey: React.FC<{ swatch: React.ReactNode; label: string }> = ({ swatch, label }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-    {swatch}
-    <span style={{ ...LABEL, fontSize: 7.5 }}>{label}</span>
-  </span>
-);
 
 /**
  * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
@@ -242,6 +238,16 @@ const Nine: React.FC<{
 
 
 
+/**
+ * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
+ * Its numerals (3 birdie, 2 eagle, 1 ace, 5 bogey, 6 double+ against par 4) are
+ * EXAMPLES. Unheaded and sitting between the total row and the breakdown panel,
+ * a member read "2 EAGLE, 1 ACE, 6 DOUBLE+" as counts directly above a panel
+ * stating DOUBLE+ 0. It now carries the same heading HolesScoringKey uses
+ * (courses:holes.scoringKey.title), is LEFT-ALIGNED with it, and sits ABOVE the
+ * total row with the grid it decodes — so nothing numeric stands between the
+ * total and the breakdown.
+ */
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
   const keys: { strokes: number; label: string }[] = [
@@ -252,13 +258,18 @@ const Legend: React.FC = () => {
     { strokes: 6, label: t('courses:scorecard.legendDouble') },
   ];
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-      {keys.map((k) => (
-        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-          <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
-          <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
-        </span>
-      ))}
+    <div>
+      <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8 }}>
+        {t('courses:holes.scoringKey.title')}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+        {keys.map((k) => (
+          <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+            <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
+            <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
@@ -580,16 +591,27 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         }
       }
       if (courseContext.rankHere != null && roundsHere > 0) {
+        /*
+         * RANK 1 TAKES NO ORDINAL (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.3):
+         * formatOrdinal(1) returns "1st", so the caption read "1st best of 2
+         * rounds here". THE RANK ITSELF IS CORRECT - a round belongs in its own
+         * ranking - only the wording changes.
+         */
+        const best = courseContext.rankHere === 1;
         out.push(impersonal
-          ? t('courses:scorecard.rankHereNeutral', {
-              ordinal: formatOrdinal(courseContext.rankHere),
-              count: roundsHere,
-            })
-          : t('courses:scorecard.rankHereVoice', {
-              whose: whoseCap,
-              ordinal: formatOrdinal(courseContext.rankHere),
-              count: roundsHere,
-            }));
+          ? best
+            ? t('courses:scorecard.rankHereNeutralBest', { count: roundsHere })
+            : t('courses:scorecard.rankHereNeutral', {
+                ordinal: formatOrdinal(courseContext.rankHere),
+                count: roundsHere,
+              })
+          : best
+            ? t('courses:scorecard.rankHereVoiceBest', { whose: whoseCap, count: roundsHere })
+            : t('courses:scorecard.rankHereVoice', {
+                whose: whoseCap,
+                ordinal: formatOrdinal(courseContext.rankHere),
+                count: roundsHere,
+              }));
       }
     }
     return out;
@@ -801,29 +823,20 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
 
                 {/*
-                  LEGEND — the swatches must match what the chart actually draws.
-                  The round line is INK unless the round is the viewer's own, in
-                  which case it is AMBER (amber means the viewing member). The
-                  beads are deliberately unnamed: red for birdie-or-better and
-                  over-par ink for double-or-worse are read straight off the
-                  card above, so a key for them only added noise.
+                  FULL BLEED (BRIEF_SCORECARD_TRAJECTORY_WHOOP §3): the plot must
+                  reach the card edges, so the chart breaks out of the Panel's
+                  16px horizontal padding. The value row and the tick row keep the
+                  inset — they carry it themselves.
+
+                  The chart legend row that used to sit here is GONE (§8): the
+                  field key had nothing left to point at once the field line was
+                  removed, and a single-colour swatch cannot represent a stroke
+                  graded per hole.
                 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
-                  {(isOwner || hasName) && (
-                    <LegendKey
-                      swatch={<i style={{ width: 12, height: 2, borderRadius: 1, background: isOwner ? A.AMBER : A.INK }} />}
-                      label={isOwner ? t('courses:scorecard.you') : firstName}
-                    />
-                  )}
-                  {withField && (
-                    <LegendKey
-                      swatch={<i style={{ width: 12, height: 1.6, borderRadius: 1, background: FIELD_LINE_SWATCH }} />}
-                      label={t('courses:scorecard.fieldAvg')}
-                    />
-                  )}
+                <div style={{ margin: '0 -16px' }}>
+                  <TrajectoryLine holes={holes} interactive />
                 </div>
 
-                <TrajectoryLine holes={holes} own={isOwner} />
 
                 {(captions.length > 0 || fieldCaption) && (
                   <>
@@ -844,6 +857,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     {back.length > 0 && (
                       <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
                     )}
+
+                    <Legend />
 
                     {/*
                       TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
@@ -891,8 +906,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </div>
 
 
-
-                    <Legend />
                   </div>
                 )}
               </Panel>

@@ -1,29 +1,44 @@
-import React from 'react';
-import { A, LABEL, FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import React, { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { A, LABEL, FIGS, NUM, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { beadForScore } from '@/features/courses/_shared/beadForScore';
 import { monotonePath } from '@/lib/charts/monotonePath';
 
 /**
  * Cumulative to-par across the round.
  *
- * THE PLAYER LINE IS SPLIT AT LEVEL PAR — RED (TOPAR_UNDER_LIGHT) where the
- * round sat BELOW level, INK (TOPAR_OVER_LIGHT) where it sat above — and is
- * FILLED TO THE LEVEL RULE so the distance from par is the story. This matches
- * the friends tile exactly: one fill, one meaning, across both surfaces.
- * The old amber "own round" tone is GONE; amber meant the viewer, and the
- * to-par split now owns the colour.
+ * THE STROKE IS GRADED PER HOLE (BRIEF_SCORECARD_TRAJECTORY_WHOOP §4). One path,
+ * one horizontal gradient, one pair of stops per hole, coloured by THAT HOLE'S
+ * to-par using the same four buckets the sheet's breakdown panel counts:
+ * birdie-or-better / par / bogey / double-or-worse. The stroke therefore says
+ * WHAT HAPPENED ON EACH HOLE — eighteen facts.
  *
- * RED IS EARNED: a round that never went under par draws in one tone with one
- * fill and no red anywhere.
+ * THE FILL KEEPS ITS LEVEL-PAR SPLIT and its clip paths: red below level, ink
+ * above, so distance from par is still the story. Stroke and fill answer
+ * different questions and that is intended.
  *
- * The field average stays ONE grey stroke — unfilled, unsplit, behind the
- * player's white halo. Over par plots UP.
+ * OVERTURNED: the old comment claimed this chart matched the friends tile
+ * exactly ("one fill, one meaning, across both surfaces"). THAT CLAIM IS NOW
+ * FALSE — the friends tile still draws a single level-par split stroke, this
+ * chart grades its stroke per hole. Do not restore the parity claim.
  *
- * Beads mark only the holes that swung the round:
- *   birdie or better -> TOPAR_UNDER red, good in golf (eagle+ drawn larger)
- *   double or worse  -> TOPAR_OVER ink
- *   bogey            -> no bead at all (a normal outcome; marking every one
- *                       turns the line into noise)
+ * RED IS EARNED: a round that never went under par draws no under-par fill. The
+ * graded stroke may still show birdie red on a hole in such a round, because a
+ * birdie happened.
+ *
+ * THE FIELD LINE IS NOT DRAWN (§0.2). THE REASON IS GEOMETRY, NOT TASTE: the
+ * y-scale used to pool both series, the field's cumulative to-par reaches around
+ * +8 over eighteen holes, and a -1 round travels between -2 and 0 — so the
+ * subject of the sheet got about a fifth of the plot height and could not move.
+ * Saturating a line that cannot travel changes nothing. THE FIELD IS NOT DELETED
+ * AS DATA: it moves to the scrub readout, where the comparison is actually
+ * decided per hole, and the sheet still carries it in prose and in the hero.
+ *
+ * Beads mark only the OUTLIERS (§6): d <= -2 and d >= 2. With a graded stroke a
+ * birdie bead would say the same thing twice at the same point. The filter lives
+ * HERE, at the call site — beadForScore is shared with the Clubhouse feed and is
+ * not touched.
  *
  * The to-par tokens come from `tourhub/_shared/tokens` so a member card and a
  * tour card colour the same score identically. Course difficulty (red harder /
@@ -35,11 +50,10 @@ import { monotonePath } from '@/lib/charts/monotonePath';
  * used to hardcode the light surface, so the dark feed card drew ink on
  * near-black and a white halo over a dark panel. Both surfaces now come from
  * one map and `surface` defaults to 'light', so every existing caller is
- * unchanged.
+ * unchanged. THE HALO IS THE PANEL COLOUR, NEVER WHITE ON DARK.
  */
 const SURFACE_TOKENS = {
   light: {
-    field: '#C3CAD2',
     baseline: 'rgba(15,23,42,0.10)',
     over: A.INK,
     under: TOPAR_RED,
@@ -48,13 +62,19 @@ const SURFACE_TOKENS = {
     beadStroke: '#FFFFFF',
     tickInk: A.INK,
     tickDim: A.DIM,
-    // The signed-off LIGHT values. They do not move: the friends rail, the
-    // scorecard sheet and the course analytics all draw on light.
-    fillAbove: 0.2,
-    fillBelow: 0.26,
+    rule: 'rgba(15,23,42,0.28)',
+    readInk: A.INK,
+    readDim: A.DIM,
+    // THE GRADED STROKE's four buckets.
+    gradeUnder: TOPAR_RED,
+    gradeEven: TOPAR_EVEN_LIGHT,
+    gradeBogey: A.MUTE,
+    gradeOver: A.INK,
+    // The signed-off LIGHT values, now in the vibrant register (§3).
+    fillAbove: 0.5,
+    fillBelow: 0.55,
   },
   dark: {
-    field: 'rgba(255,255,255,0.34)',
     baseline: 'rgba(255,255,255,0.18)',
     over: '#E8EDF2',
     under: '#FF6B60',
@@ -63,11 +83,15 @@ const SURFACE_TOKENS = {
     beadStroke: '#0B0D10',
     tickInk: 'rgba(255,255,255,0.82)',
     tickDim: 'rgba(255,255,255,0.40)',
-    // BRIEF_ROUND_POST_ENRICHMENT §5: the light figures read far fainter on
-    // near-black, so the dark surface carries its own, richer pair — here in
-    // the map, never as a caller-side prop override.
-    fillAbove: 0.3,
-    fillBelow: 0.42,
+    rule: 'rgba(255,255,255,0.34)',
+    readInk: '#F4F7F9',
+    readDim: 'rgba(255,255,255,0.40)',
+    gradeUnder: '#FF6B60',
+    gradeEven: 'rgba(255,255,255,0.40)',
+    gradeBogey: 'rgba(255,255,255,0.68)',
+    gradeOver: '#E8EDF2',
+    fillAbove: 0.5,
+    fillBelow: 0.55,
   },
 } as const;
 
@@ -75,7 +99,7 @@ export interface TrajectoryHole {
   holeNo: number;
   par: number | null;
   strokes: number | null;
-  /** Optional field average for the hole. Absent = the field line stops. */
+  /** Optional field average for the hole. Read PER HOLE in the scrub readout. */
   fieldAvg?: number | null;
   /**
    * false = NEVER STARTED. Such a hole takes no strokes and no par, so the line
@@ -91,6 +115,12 @@ interface Props {
   own?: boolean;
   /** Which surface the chart is drawn on. Defaults to light. */
   surface?: 'light' | 'dark';
+  /**
+   * THE SCRUB MUST NOT SHIP TO THE FEED (§1): a drag target inside a vertically
+   * scrolling feed steals the scroll. Default FALSE; only the scorecard sheet
+   * passes true.
+   */
+  interactive?: boolean;
 }
 
 let uidSeq = 0;
@@ -100,70 +130,94 @@ interface Pt {
   cum: number;
 }
 
-export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, surface = 'light' }) => {
+const fmt1 = (n: number) => (Math.round(n * 10) / 10).toFixed(1);
+const fmtRel = (n: number) =>
+  n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
+
+export const TrajectoryLine: React.FC<Props> = ({
+  holes,
+  height = 150,
+  surface = 'light',
+  interactive = false,
+}) => {
   const T = SURFACE_TOKENS[surface];
+  const { t } = useTranslation(['courses']);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [hover, setHover] = useState<number | null>(null);
 
   /**
    * X IS DERIVED FROM HOLE POSITION, NOT ARRAY INDEX INTO A FILTERED LIST
    * (§3.3). A hole with no value keeps its slot and the line BREAKS there — two
-   * segments, no bridge, no interpolation. Previously the unscored holes were
-   * filtered out and the axis compressed, so a partial round plotted seventeen
-   * holes across an eighteen-hole axis and ended at the wrong to-par.
+   * segments, no bridge, no interpolation.
    *
    * Position 0 is the tee (level par); the hole at array index i sits at
-   * position i + 1. On a complete round this is identical to the old geometry.
+   * position i + 1, and is NOT selectable by the scrub.
    */
-  const m = holes.length;
-  if (m < 2) return null;
+  const model = useMemo(() => {
+    const m = holes.length;
+    const segments: Pt[][] = [];
+    const beads: { pos: number; cum: number; tone: string; r: number }[] = [];
+    /** pos -> { d, cum } for every SCORED hole. Drives the gradient + readout. */
+    const scored = new Map<number, { d: number; cum: number }>();
+    let cumYou = 0;
+    let lastScored = 0;
+    let current: Pt[] | null = [{ pos: 0, cum: 0 }];
 
-  const segments: Pt[][] = [];
-  const beads: { pos: number; cum: number; tone: string; r: number }[] = [];
-  const fieldPts: Pt[] = [{ pos: 0, cum: 0 }];
-  let cumYou = 0;
-  let cumField = 0;
-  let fieldOpen = true;
-  let current: Pt[] | null = [{ pos: 0, cum: 0 }];
+    holes.forEach((h, i) => {
+      const pos = i + 1;
+      // NEVER STARTED: not a gap. Skip it entirely.
+      if (h.played === false) return;
 
-  holes.forEach((h, i) => {
-    const pos = i + 1;
-    // NEVER STARTED: not a gap. Skip it entirely.
-    if (h.played === false) return;
+      const plottable = h.par != null && h.strokes != null && (h.strokes as number) > 0;
+      if (!plottable) {
+        // THE BREAK. Close the open segment; the next scored hole starts a new one.
+        if (current && current.length >= 2) segments.push(current);
+        current = null;
+        return;
+      }
 
-    const plottable = h.par != null && h.strokes != null && (h.strokes as number) > 0;
-    if (!plottable) {
-      // THE BREAK. Close the open segment; the next scored hole starts a new one.
-      if (current && current.length >= 2) segments.push(current);
-      current = null;
-      fieldOpen = false;
-      return;
-    }
+      const d = (h.strokes as number) - (h.par as number);
+      cumYou += d;
+      lastScored = pos;
+      if (!current) current = [];
+      current.push({ pos, cum: cumYou });
+      scored.set(pos, { d, cum: cumYou });
 
-    cumYou += (h.strokes as number) - (h.par as number);
-    if (!current) current = [];
-    current.push({ pos, cum: cumYou });
+      // BEADS REDUCE TO THE OUTLIERS (§6) — filtered here, never in beadForScore.
+      if (d <= -2 || d >= 2) {
+        const bead = beadForScore(h.strokes, h.par, surface);
+        if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
+      }
+    });
+    if (current && current.length >= 2) segments.push(current);
 
-    if (fieldOpen && h.fieldAvg != null) {
-      cumField += (h.fieldAvg as number) - (h.par as number);
-      fieldPts.push({ pos, cum: cumField });
-    } else {
-      fieldOpen = false;
-    }
+    return { m, segments, beads, scored, lastScored, finalToPar: cumYou };
+  }, [holes, surface]);
 
-    const bead = beadForScore(h.strokes, h.par, surface);
-    if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
-  });
-  if (current && current.length >= 2) segments.push(current);
-
+  const { m, segments, beads, scored, lastScored, finalToPar } = model;
   const allPts = segments.flat();
-  if (allPts.length < 2) return null;
+
+  const beatField = useMemo(() => {
+    const pool = holes.filter(
+      (h) => h.fieldAvg != null && h.strokes != null && (h.strokes as number) > 0,
+    );
+    if (pool.length < 2) return null;
+    return pool.filter((h) => (h.strokes as number) <= (h.fieldAvg as number)).length;
+  }, [holes]);
+
+  if (m < 2 || allPts.length < 2) return null;
 
   const w = 340;
-  const padX = 4;
-  const padY = 14;
+  const padX = 0;
+  const padY = 10;
 
-  // >= 3: the leading level-par point does not on its own make a series.
-  const hasField = fieldPts.length >= 3;
-  const all = [...allPts.map((p) => p.cum), ...(hasField ? fieldPts.map((p) => p.cum) : []), 0];
+  /**
+   * THE SCALE IS THE PLAYER'S OWN RANGE AND ZERO (§2). The field term is gone
+   * unconditionally. Zero stays in the pool: level par must remain on the chart
+   * even for a round entirely over or under it, because the fill and the
+   * earned-red rule both reference it.
+   */
+  const all = [...allPts.map((p) => p.cum), 0];
   const min = Math.min(...all);
   const max = Math.max(...all);
   const span = Math.max(max - min, 1);
@@ -176,159 +230,327 @@ export const TrajectoryLine: React.FC<Props> = ({ holes, height = 104, surface =
   const zeroY = y(0);
 
   const toPts = (seg: Pt[]) => seg.map((p) => ({ x: x(p.pos), y: y(p.cum) }));
+  // MONOTONE CUBIC ONLY: a basis spline would dip the curve below par across a
+  // run of pars.
   const lineDs = segments.map((seg) => monotonePath(toPts(seg)));
   // THE FILL IS BUILT FROM THE PLAYER SERIES ONLY, one closed shape per segment.
   const fillDs = segments.map((seg, i) => {
     const pts = toPts(seg);
     return `${lineDs[i]} L${pts[pts.length - 1].x.toFixed(2)},${zeroY.toFixed(2)} L${pts[0].x.toFixed(2)},${zeroY.toFixed(2)} Z`;
   });
-  const fieldD = hasField
-    ? monotonePath(fieldPts.map((p) => ({ x: x(p.pos), y: y(p.cum) })))
-    : '';
 
   const uid = `traj-${(uidSeq = (uidSeq + 1) % 100000)}`;
   const clipAbove = `${uid}-ca`;
   const clipBelow = `${uid}-cb`;
   const gradAbove = `${uid}-ga`;
   const gradBelow = `${uid}-gb`;
+  const gradStroke = `${uid}-gs`;
+
+  const gradeFor = (d: number) =>
+    d <= -1 ? T.gradeUnder : d === 0 ? T.gradeEven : d === 1 ? T.gradeBogey : T.gradeOver;
+
+  /**
+   * STOP PLACEMENT IS LOAD-BEARING (§4): each stop sits at that hole's OWN x
+   * fraction with a hard second stop just before the next hole's offset. Even
+   * intervals would slide every colour change off the hole it describes.
+   */
+  const strokeStops = (() => {
+    const positions = [...scored.keys()].sort((a, b) => a - b);
+    const out: { offset: number; color: string }[] = [];
+    positions.forEach((pos, i) => {
+      const d = scored.get(pos)!.d;
+      const c = gradeFor(d);
+      const o = x(pos) / w;
+      const next = positions[i + 1] != null ? x(positions[i + 1]) / w : 1;
+      if (i === 0) out.push({ offset: 0, color: c });
+      out.push({ offset: o, color: c });
+      out.push({ offset: Math.max(o, next - 0.0001), color: c });
+    });
+    if (out.length > 0) out.push({ offset: 1, color: out[out.length - 1].color });
+    return out;
+  })();
 
   // TICKS INDEX `holes` — the leading point is not a hole, so every tick
   // resolves to holes[i].holeNo (1 / 5 / 10 / 14 / 18 on a full round).
   const ticks = [...new Set([0, Math.floor(m / 4), Math.floor(m / 2), Math.floor((3 * m) / 4), m - 1])];
 
+  const hovered = hover != null ? holes[hover - 1] : null;
+  const hoveredScored = hover != null ? scored.get(hover) ?? null : null;
+
+  const pick = (clientX: number) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.width <= 0) return;
+    const frac = (clientX - r.left) / r.width;
+    // NEAREST HOLE, CLAMPED 1..m. Position 0 is the tee and is not a hole.
+    const pos = Math.min(m, Math.max(1, Math.round(frac * m)));
+    setHover(pos);
+  };
+
+  const plot = (
+    <svg
+      viewBox={`0 0 ${w} ${height}`}
+      width="100%"
+      height={height}
+      style={{ display: 'block' }}
+      aria-hidden="true"
+    >
+      <defs>
+        <clipPath id={clipAbove}>
+          <rect x={0} y={0} width={w} height={Math.max(zeroY, 0)} />
+        </clipPath>
+        {wentUnder && (
+          <clipPath id={clipBelow}>
+            <rect x={0} y={zeroY} width={w} height={Math.max(height - zeroY, 0)} />
+          </clipPath>
+        )}
+        {/* ABOVE LEVEL: density at the TOP, fading down to the level rule. */}
+        <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={T.over} stopOpacity={T.fillAbove} />
+          <stop offset="100%" stopColor={T.over} stopOpacity={0.02} />
+        </linearGradient>
+        {wentUnder && (
+          /* BELOW LEVEL: density at the LOW POINT, fading UP to the rule. */
+          <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor={T.under} stopOpacity={T.fillBelow} />
+            <stop offset="100%" stopColor={T.under} stopOpacity={0.02} />
+          </linearGradient>
+        )}
+        {/* THE GRADED STROKE — userSpaceOnUse so the offsets are fractions of the
+            PLOT, not of the path's bounding box. */}
+        <linearGradient id={gradStroke} gradientUnits="userSpaceOnUse" x1={0} y1={0} x2={w} y2={0}>
+          {strokeStops.map((s, i) => (
+            <stop key={i} offset={`${(s.offset * 100).toFixed(4)}%`} stopColor={s.color} />
+          ))}
+        </linearGradient>
+      </defs>
+
+      {/* fill to the level line */}
+      {fillDs.map((d, i) => (
+        <React.Fragment key={`fill-${i}`}>
+          <path d={d} fill={`url(#${gradAbove})`} stroke="none" clipPath={`url(#${clipAbove})`} />
+          {wentUnder && (
+            <path d={d} fill={`url(#${gradBelow})`} stroke="none" clipPath={`url(#${clipBelow})`} />
+          )}
+        </React.Fragment>
+      ))}
+
+      {/* level par — unconditional: the fill and the earned-red rule both
+          reference it. */}
+      <line
+        x1={padX}
+        x2={w - padX}
+        y1={zeroY}
+        y2={zeroY}
+        stroke={T.baseline}
+        strokeWidth={1}
+        strokeDasharray="3 4"
+      />
+
+      {/* HALO — drawn ONCE per segment, unclipped. Without it the stroke
+          disappears into its own fill. */}
+      {lineDs.map((d, i) => (
+        <path
+          key={`halo-${i}`}
+          d={d}
+          fill="none"
+          stroke={T.halo}
+          strokeOpacity={T.haloOpacity}
+          strokeWidth={3.2 + 3.5}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      ))}
+
+      {/* the player, graded per hole */}
+      {lineDs.map((d, i) => (
+        <path
+          key={`line-${i}`}
+          d={d}
+          fill="none"
+          stroke={`url(#${gradStroke})`}
+          strokeWidth={3.2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      ))}
+
+      {/* beads last, so they sit on top */}
+      {beads.map((b) => (
+        <circle
+          key={b.pos}
+          cx={x(b.pos)}
+          cy={y(b.cum)}
+          r={b.r}
+          fill={b.tone}
+          stroke={T.beadStroke}
+          strokeWidth={1.5}
+        />
+      ))}
+
+      {/* THE SCRUB MARKER — rule plus a point on the curve, gone on release. */}
+      {hover != null && (
+        <>
+          <line
+            x1={x(hover)}
+            x2={x(hover)}
+            y1={0}
+            y2={height}
+            stroke={T.rule}
+            strokeWidth={1}
+          />
+          {hoveredScored && (
+            <circle
+              cx={x(hover)}
+              cy={y(hoveredScored.cum)}
+              r={4}
+              fill={gradeFor(hoveredScored.d)}
+              stroke={T.halo}
+              strokeWidth={1.5}
+            />
+          )}
+        </>
+      )}
+    </svg>
+  );
+
+  /* ---------------------------------------------------------- value row */
+
+  const figure = hoveredScored
+    ? String(hovered?.strokes ?? '')
+    : fmtRel(finalToPar);
+  const figureTone = hoveredScored
+    ? gradeFor(hoveredScored.d)
+    : finalToPar < 0
+      ? T.under
+      : finalToPar === 0
+        ? T.gradeEven
+        : T.over;
+
+  const subParts: string[] = [];
+  if (hover != null && hovered) {
+    subParts.push(t('courses:scorecard.trajHole', { n: hovered.holeNo }));
+    if (hovered.par != null) subParts.push(t('courses:scorecard.trajPar', { n: hovered.par }));
+    // NEVER print a field figure for a hole with no fieldAvg — omit the segment.
+    if (hovered.fieldAvg != null) {
+      subParts.push(t('courses:scorecard.trajField', { n: fmt1(hovered.fieldAvg) }));
+    }
+  } else {
+    subParts.push(t('courses:scorecard.trajThrough', { n: lastScored }));
+  }
+
+  const rightText =
+    hoveredScored != null
+      ? fmtRel(hoveredScored.cum)
+      : beatField != null
+        ? t('courses:scorecard.trajBeatField', { n: beatField })
+        : '';
+
+  if (!interactive) {
+    return (
+      <>
+        {plot}
+        <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />
+      </>
+    );
+  }
+
   return (
     <>
-      <svg
-        viewBox={`0 0 ${w} ${height}`}
-        width="100%"
-        height={height}
-        style={{ display: 'block' }}
-        aria-hidden="true"
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '0 16px',
+          marginBottom: 4,
+        }}
       >
-        <defs>
-          <clipPath id={clipAbove}>
-            <rect x={0} y={0} width={w} height={Math.max(zeroY, 0)} />
-          </clipPath>
-          {wentUnder && (
-            <clipPath id={clipBelow}>
-              <rect x={0} y={zeroY} width={w} height={Math.max(height - zeroY, 0)} />
-            </clipPath>
-          )}
-          {/* ABOVE LEVEL: density at the TOP, fading down to the level rule. */}
-          <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={T.over} stopOpacity={T.fillAbove} />
-            <stop offset="100%" stopColor={T.over} stopOpacity={0.02} />
-          </linearGradient>
-          {wentUnder && (
-            /* BELOW LEVEL: density at the LOW POINT, fading UP to the rule. */
-            <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stopColor={T.under} stopOpacity={T.fillBelow} />
-              <stop offset="100%" stopColor={T.under} stopOpacity={0.02} />
-            </linearGradient>
-          )}
-        </defs>
-
-        {/* fill to the level line */}
-        {fillDs.map((d, i) => (
-          <React.Fragment key={`fill-${i}`}>
-            <path d={d} fill={`url(#${gradAbove})`} stroke="none" clipPath={`url(#${clipAbove})`} />
-            {wentUnder && (
-              <path d={d} fill={`url(#${gradBelow})`} stroke="none" clipPath={`url(#${clipBelow})`} />
-            )}
-          </React.Fragment>
-        ))}
-
-        {/* level par — unconditional: the field line needs a reference even on
-            an all-over-par round. */}
-        <line
-          x1={padX}
-          x2={w - padX}
-          y1={zeroY}
-          y2={zeroY}
-          stroke={T.baseline}
-          strokeWidth={1}
-          strokeDasharray="3 4"
-        />
-
-        {/* the field: one grey stroke, BEHIND the player's halo */}
-        {hasField && (
-          <path
-            d={fieldD}
-            fill="none"
-            stroke={T.field}
-            strokeWidth={1.6}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ ...NUM, fontSize: 26, lineHeight: 1.05, color: figureTone }}>{figure}</div>
+          <div style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: T.readDim, marginTop: 3 }}>
+            {subParts.join(' \u00B7 ')}
+          </div>
+        </div>
+        {!!rightText && (
+          <div style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: T.readInk, textAlign: 'right', flexShrink: 0 }}>
+            {rightText}
+          </div>
         )}
-
-        {/* HALO — drawn ONCE per segment, unclipped. Without it the stroke
-            disappears into its own fill. */}
-        {lineDs.map((d, i) => (
-          <path
-            key={`halo-${i}`}
-            d={d}
-            fill="none"
-            stroke={T.halo}
-            strokeOpacity={T.haloOpacity}
-            strokeWidth={6}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-        ))}
-
-        {/* the player, split at level par */}
-        {lineDs.map((d, i) => (
-          <React.Fragment key={`line-${i}`}>
-            <path
-              d={d}
-              fill="none"
-              stroke={T.over}
-              strokeWidth={2}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              clipPath={wentUnder ? `url(#${clipAbove})` : undefined}
-            />
-            {wentUnder && (
-              <path
-                d={d}
-                fill="none"
-                stroke={T.under}
-                strokeWidth={2}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                clipPath={`url(#${clipBelow})`}
-              />
-            )}
-          </React.Fragment>
-        ))}
-
-        {/* beads last, so they sit on top */}
-        {beads.map((b) => (
-          <circle
-            key={b.pos}
-            cx={x(b.pos)}
-            cy={y(b.cum)}
-            r={b.r}
-            fill={b.tone}
-            stroke={T.beadStroke}
-            strokeWidth={1.5}
-          />
-        ))}
-      </svg>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '2px 2px 0' }}>
-        {ticks.map((i) => (
-          <span
-            key={i}
-            style={{ ...LABEL, ...FIGS, fontSize: 8.5, color: i === m - 1 ? T.tickInk : T.tickDim }}
-          >
-            {holes[i].holeNo}
-          </span>
-        ))}
       </div>
+
+      <div
+        ref={wrapRef}
+        role="img"
+        aria-label={t('courses:scorecard.trajAria', { n: fmtRel(finalToPar) })}
+        style={{ touchAction: 'pan-y', cursor: 'crosshair' }}
+        onPointerDown={(e) => pick(e.clientX)}
+        onPointerMove={(e) => {
+          if (e.buttons > 0 || e.pointerType === 'mouse') pick(e.clientX);
+        }}
+        onPointerUp={() => setHover(null)}
+        onPointerCancel={() => setHover(null)}
+        onPointerLeave={() => setHover(null)}
+      >
+        {plot}
+      </div>
+
+      <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} inset />
     </>
   );
 };
+
+/**
+ * TICK LABELS SIT UNDER THEIR OWN POINTS (§7). space-between put five labels at
+ * 0/25/50/75/100%, while their holes sit at pos/m — hole 1's label landed ~19px
+ * left of hole 1. Each label is now positioned at the SAME x() the curve uses,
+ * translated back by half its width, clamped away from the container edges.
+ */
+const TickRow: React.FC<{
+  ticks: number[];
+  holes: TrajectoryHole[];
+  m: number;
+  x: (pos: number) => number;
+  w: number;
+  T: typeof SURFACE_TOKENS['light'] | typeof SURFACE_TOKENS['dark'];
+  inset?: boolean;
+}> = ({ ticks, holes, m, x, w, T, inset }) => (
+  <div
+    style={{
+      position: 'relative',
+      height: 12,
+      margin: '2px 0 0',
+      padding: inset ? '0 16px' : 0,
+    }}
+  >
+    {ticks.map((i) => {
+      const frac = x(i + 1) / w;
+      const edgeLeft = frac <= 0.02;
+      const edgeRight = frac >= 0.98;
+      return (
+        <span
+          key={i}
+          style={{
+            position: 'absolute',
+            /* The plot is FULL BLEED while this row keeps its 16px inset, so an
+               inset label resolves its x against the plot's width, not the row's. */
+            left: inset
+              ? `calc((100% + 32px) * ${frac.toFixed(5)} - 16px)`
+              : `${(frac * 100).toFixed(3)}%`,
+            transform: edgeLeft ? 'none' : edgeRight ? 'translateX(-100%)' : 'translateX(-50%)',
+            ...LABEL,
+            ...FIGS,
+            fontSize: 8.5,
+            color: i === m - 1 ? T.tickInk : T.tickDim,
+          }}
+        >
+          {holes[i].holeNo}
+        </span>
+      );
+    })}
+  </div>
+);
 
 export default TrajectoryLine;
