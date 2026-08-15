@@ -597,11 +597,6 @@ export function HonoursBoard({
   const shownItems: WireEvent[] | HonoursLeader[] =
     mode === 'recent' ? featShown : leaderShown;
 
-  const hasHidden =
-    mode === 'recent'
-      ? events.length > featShown.length
-      : leaders.length > leaderShown.length;
-
   const renderItem = (item: WireEvent | HonoursLeader) =>
     mode === 'recent' ? (
       <FeatPlaque key={(item as WireEvent).id} event={item as WireEvent} onPress={onRowPress} />
