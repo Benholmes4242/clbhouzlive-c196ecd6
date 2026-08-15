@@ -801,29 +801,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
 
                 {/*
-                  LEGEND — the swatches must match what the chart actually draws.
-                  The round line is INK unless the round is the viewer's own, in
-                  which case it is AMBER (amber means the viewing member). The
-                  beads are deliberately unnamed: red for birdie-or-better and
-                  over-par ink for double-or-worse are read straight off the
-                  card above, so a key for them only added noise.
-                */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
-                  {(isOwner || hasName) && (
-                    <LegendKey
-                      swatch={<i style={{ width: 12, height: 2, borderRadius: 1, background: isOwner ? A.AMBER : A.INK }} />}
-                      label={isOwner ? t('courses:scorecard.you') : firstName}
-                    />
-                  )}
-                  {withField && (
-                    <LegendKey
-                      swatch={<i style={{ width: 12, height: 1.6, borderRadius: 1, background: FIELD_LINE_SWATCH }} />}
-                      label={t('courses:scorecard.fieldAvg')}
-                    />
-                  )}
-                </div>
+                  FULL BLEED (BRIEF_SCORECARD_TRAJECTORY_WHOOP §3): the plot must
+                  reach the card edges, so the chart breaks out of the Panel's
+                  16px horizontal padding. The value row and the tick row keep the
+                  inset — they carry it themselves.
 
-                <TrajectoryLine holes={holes} own={isOwner} />
+                  The chart legend row that used to sit here is GONE (§8): the
+                  field key had nothing left to point at once the field line was
+                  removed, and a single-colour swatch cannot represent a stroke
+                  graded per hole.
+                */}
+                <div style={{ margin: '0 -16px' }}>
+                  <TrajectoryLine holes={holes} interactive />
 
                 {(captions.length > 0 || fieldCaption) && (
                   <>
