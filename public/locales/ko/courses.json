@@ -183,7 +183,18 @@
     "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
     "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
     "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
-    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here."
+    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
+    "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
+    "rankHereVoice": "{{whose}} {{ordinal}} best of {{count}} rounds here.",
+    "rankHereNeutral": "{{ordinal}} best of {{count}} rounds here.",
+    "rankHereVoiceBest": "{{whose}} best of {{count}} rounds here.",
+    "rankHereNeutralBest": "Best of {{count}} rounds here.",
+    "vsAvgLevel": "Right on {{whose}} average here.",
+    "vsAvgBetter": "{{n}} shots better than {{whose}} average here.",
+    "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
+    "vsAvgLevelNeutral": "Right on the average here.",
+    "vsAvgBetterNeutral": "{{n}} shots better than the average here.",
+    "vsAvgWorseNeutral": "{{n}} shots worse than the average here."
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
