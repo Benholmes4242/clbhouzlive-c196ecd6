@@ -190,35 +190,36 @@ export function FeatPlaque({
     >
       <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <HolderAvatar event={e} />
-        <span
-          style={{
-            ...LABEL,
-            fontSize: 9,
-            color: A.MUTE,
-            marginLeft: 'auto',
-            fontVariantNumeric: 'tabular-nums lining-nums',
-          }}
-        >
-          {formatYearNumeric(e.at)}
+        {/* The date, and DIRECTLY UNDER IT the feat in words. */}
+        <span style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: A.MUTE,
+              display: 'block',
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            {formatYearNumeric(e.at)}
+          </span>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: ACH_GOLD_INK,
+              display: 'block',
+              marginTop: 4,
+            }}
+          >
+            {e.kind === 'ace'
+              ? t('discover.honours.badgeAce', 'Ace')
+              : t('discover.honours.badgeAlbatross', 'Albatross')}
+          </span>
         </span>
       </span>
 
-      {/* The feat, IN WORDS. */}
-      <span
-        style={{
-          ...LABEL,
-          fontSize: 9,
-          color: ACH_GOLD_INK,
-          marginTop: 9,
-          display: 'block',
-        }}
-      >
-        {e.kind === 'ace'
-          ? t('discover.honours.badgeAce', 'Ace')
-          : t('discover.honours.badgeAlbatross', 'Albatross')}
-      </span>
-
-      <span style={{ ...NAME_STYLE(!!e.isOwn), display: 'block', marginTop: 3 }}>
+      <span style={{ ...NAME_STYLE(!!e.isOwn), display: 'block', marginTop: 9 }}>
         {e.isOwn ? t('discover.wire.you', 'You') : e.actorName}
       </span>
 
@@ -245,6 +246,7 @@ export function FeatPlaque({
     </button>
   );
 }
+
 
 /* ───────────────────────────── the leaders ───────────────────────────── */
 
