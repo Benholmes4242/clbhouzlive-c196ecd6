@@ -347,8 +347,9 @@ const ShapeChart: React.FC<{
           )}
         </svg>
 
-        {/* The hardest hole carries its own value, in the ramp's deep red. */}
-        {hardestTopY != null && hardestText && (
+        {/* THE TWO EXTREMES CARRY THEIR OWN FIGURES, each above its own bar: the
+            hardest in the ramp's deep red, the easiest in its light end's ink. */}
+        {!flat && hardestTopY != null && hardestText && (
           <span
             style={{
               position: 'absolute',
@@ -366,6 +367,25 @@ const ShapeChart: React.FC<{
             {hardestText}
           </span>
         )}
+        {!flat && easiestTopY != null && easiestText && (
+          <span
+            style={{
+              position: 'absolute',
+              left: `${(cx(easiestIdx) / W) * 100}%`,
+              top: Math.max(0, easiestTopY - 14),
+              transform: 'translateX(-50%)',
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '-0.025em',
+              color: A.BODY,
+              whiteSpace: 'nowrap',
+              ...FIGS,
+            }}
+          >
+            {easiestText}
+          </span>
+        )}
+
 
         {/* End dot in real pixels so it stays circular. */}
         {endPt && (
