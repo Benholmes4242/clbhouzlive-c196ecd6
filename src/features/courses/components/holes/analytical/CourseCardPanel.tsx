@@ -435,14 +435,279 @@ const TeeList: React.FC<{
   );
 };
 
-const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
+/* ── The sheet's TYPE SCALE (§6) ─────────────────────────────────────────
+   Ben's words: slick, clean, professional. Not thick bold text.
 
-/** Fixed, load-bearing grid: HOLE / yards / PAR / SI. No cell sizes to content. */
-const CARD_GRID = '30px 1fr 46px 46px';
-const CARD_GAP = 10;
+   NOTHING HERE RENDERS AT WEIGHT 800 and NOTHING BELOW 8.5px. The principle,
+   which matters more than the numbers: FIGURES GET BIGGER AND TIGHTER, NEVER
+   HEAVIER. A figure should be the heaviest thing in its own block and nothing
+   else needs to be.
 
-/* The sheet does NOT hold its own selected tee (§2): the panel owns it and the
-   pills and the tee list write to the same state, so the two can never diverge. */
+   Declared locally ON PURPOSE. Repointing the canonical KICKER / LABEL / TITLE
+   in ./tokens is an app-wide run of its own - ~76 files import them. */
+const SH_KICKER: React.CSSProperties = {
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '0.19em',
+  textTransform: 'uppercase',
+  color: A.MUTE,
+};
+
+/** NO LABEL RENDERS IN DIM (§6): labels take the readable muted tone. */
+const SH_LABEL: React.CSSProperties = {
+  fontSize: 8.5,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: A.MUTE,
+};
+
+const SH_BODY: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 400,
+  lineHeight: 1.55,
+  color: A.BODY,
+};
+
+/** Figures are tight and tabular. Size and tracking vary; weight does not. */
+const shFig = (size: number, color: string = A.INK): React.CSSProperties => ({
+  fontSize: size,
+  fontWeight: 700,
+  letterSpacing: '-0.04em',
+  color,
+  ...FIGS,
+});
+
+const SHEET_PANEL: React.CSSProperties = {
+  background: A.PANEL,
+  border: `1px solid ${A.BORDER}`,
+  borderRadius: 16,
+};
+
+/**
+ * Fixed, load-bearing grid: HOLE / LENGTH (bar) / YARDS / PAR / SI (§4).
+ * No cell sizes to content - the existing rule.
+ */
+const CARD_GRID = '26px 1fr 46px 30px 30px';
+const CARD_GAP = 9;
+
+/**
+ * WHITE OR INK ON THE SI CHIP (§4.1) - COMPUTED, never a hardcoded stroke-index
+ * threshold, because the ramp is imported and its darkness is not ours to
+ * assume. Standard sRGB relative luminance off the ramp's own rgb() string.
+ */
+function chipInk(rgb: string): string {
+  const m = rgb.match(/(\d+(?:\.\d+)?)/g);
+  if (!m || m.length < 3) return A.INK;
+  const lin = m.slice(0, 3).map((v) => {
+    const c = Number(v) / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  const L = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+  return L < 0.45 ? '#FFFFFF' : A.INK;
+}
+
+/** SI 1 sits at the ramp's hard end, SI 18 at its light end. */
+function siRampT(si: number, minSi: number, maxSi: number): number {
+  if (maxSi <= minSi) return 1;
+  return (maxSi - si) / (maxSi - minSi);
+}
+
+/**
+ * LENGTH BARS ARE NORMALISED WITHIN PAR TYPE (§4.2), and this is the part that
+ * matters. Normalised across all eighteen, every par 3 is a stub and the bar
+ * only repeats what the PAR column already says. Within type, a 194-yard par 3
+ * reads as the harder tee shot than a 161.
+ *
+ * The shortest hole of a type is FLOORED near a quarter width so it is still a
+ * bar; a par type holding one hole renders full width.
+ */
+const BAR_FLOOR = 0.26;
+
+function lengthBarWidths(
+  holes: { hole_no: number; par: number | null; yards: number | null }[],
+): Map<number, number> {
+  const byPar = new Map<number, { hole_no: number; yards: number }[]>();
+  for (const h of holes) {
+    if (h.par == null || h.yards == null || !Number.isFinite(Number(h.yards))) continue;
+    const key = Number(h.par);
+    const list = byPar.get(key) ?? [];
+    list.push({ hole_no: h.hole_no, yards: Number(h.yards) });
+    byPar.set(key, list);
+  }
+  const out = new Map<number, number>();
+  for (const list of byPar.values()) {
+    const min = Math.min(...list.map((x) => x.yards));
+    const max = Math.max(...list.map((x) => x.yards));
+    for (const x of list) {
+      const k = max === min ? 1 : BAR_FLOOR + (1 - BAR_FLOOR) * ((x.yards - min) / (max - min));
+      out.set(x.hole_no, k);
+    }
+  }
+  return out;
+}
+
+/**
+ * TOUGHEST RUN IS DEFINED, NOT PICKED (§5): the three CONSECUTIVE holes with
+ * the lowest mean stroke index, ties resolving to the EARLIEST run.
+ *
+ * IT DOES NOT WRAP 18 -> 1. A run of "17-18-1" cannot be printed as a range
+ * without reading as a typo, and printing it as "17-1" reads as a range running
+ * backwards. A stretch on the card is a stretch a member walks in order, so the
+ * runs considered are 1-3 through 16-18 only.
+ */
+function toughestRun(
+  holes: { hole_no: number; si: number | null }[],
+): { from: number; to: number } | null {
+  const si = holes.map((h) => (h.si == null ? null : Number(h.si)));
+  let best: { from: number; to: number; mean: number } | null = null;
+  for (let i = 0; i + 2 < holes.length; i++) {
+    const trio = [si[i], si[i + 1], si[i + 2]];
+    if (trio.some((v) => v == null || !Number.isFinite(v))) continue;
+    const mean = (trio as number[]).reduce((a, b) => a + b, 0) / 3;
+    if (!best || mean < best.mean) {
+      best = { from: holes[i].hole_no, to: holes[i + 2].hole_no, mean };
+    }
+  }
+  return best ? { from: best.from, to: best.to } : null;
+}
+
+/** Shape cell: figure over a label, with an optional small uppercase tail. */
+const ShapeCell: React.FC<{
+  label: string;
+  value: string;
+  tail?: string | null;
+  size?: number;
+  color?: string;
+}> = ({ label, value, tail, size = 20, color = A.INK }) => (
+  <div style={{ minWidth: 0 }}>
+    <div style={SH_LABEL}>{label}</div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
+      <span style={{ ...shFig(size, color), whiteSpace: 'nowrap' }}>{value}</span>
+      {tail ? (
+        <span style={{ ...SH_LABEL, fontSize: 8.5, whiteSpace: 'nowrap' }}>{tail}</span>
+      ) : null}
+    </div>
+  </div>
+);
+
+/**
+ * THE SHAPE PANEL (§5) - what the card currently makes a member count by eye.
+ * Every figure derives from the tee set the page ALREADY loads: no new query,
+ * no SQL, nothing scoring-derived (§7).
+ *
+ * A CELL WITHOUT A VALUE IS OMITTED and the row rebalances - no dashes, no
+ * zeros. If nothing resolves, the panel does not render at all.
+ */
+const ShapePanel: React.FC<{
+  holes: { hole_no: number; par: number | null; yards: number | null; si: number | null }[];
+}> = ({ holes }) => {
+  const { t } = useTranslation(['courses']);
+
+  const parMix = useMemo(() => {
+    const counts = [3, 4, 5].map((par) => ({
+      par,
+      n: holes.filter((h) => h.par != null && Number(h.par) === par).length,
+    }));
+    return counts.some((c) => c.n > 0) ? counts : null;
+  }, [holes]);
+
+  const longest = useMemo(() => {
+    const withYards = holes.filter((h) => h.yards != null && Number.isFinite(Number(h.yards)));
+    if (withYards.length === 0) return null;
+    return withYards.reduce((a, b) => (Number(b.yards) > Number(a.yards) ? b : a));
+  }, [holes]);
+
+  const si1 = useMemo(() => {
+    const withSi = holes.filter((h) => h.si != null && Number.isFinite(Number(h.si)));
+    if (withSi.length === 0) return null;
+    return withSi.reduce((a, b) => (Number(b.si) < Number(a.si) ? b : a));
+  }, [holes]);
+
+  const run = useMemo(() => toughestRun(holes), [holes]);
+
+  const cells: React.ReactNode[] = [];
+  if (longest) {
+    cells.push(
+      <ShapeCell
+        key="longest"
+        label={t('courses:courseDetail.card.shape.longest')}
+        value={fmtInt(longest.yards)}
+        tail={t('courses:courseDetail.card.shape.holeTail', { n: longest.hole_no })}
+      />,
+    );
+  }
+  if (si1) {
+    cells.push(
+      <ShapeCell
+        key="si1"
+        label={t('courses:courseDetail.card.shape.strokeIndexOne')}
+        value={String(si1.hole_no)}
+        tail={
+          si1.yards != null
+            ? t('courses:courseDetail.card.shape.yardsTail', { yards: fmtInt(si1.yards) })
+            : null
+        }
+        color={DIFFICULTY_HARD_HEX}
+      />,
+    );
+  }
+  if (run) {
+    /* ONE SIZE DOWN so the range never wraps, and NO TAIL - the stroke indices
+       are not shown here. */
+    cells.push(
+      <ShapeCell
+        key="run"
+        label={t('courses:courseDetail.card.shape.toughestRun')}
+        value={`${run.from}\u2013${run.to}`}
+        size={17}
+        color={difficultyRampColor(0.72)}
+      />,
+    );
+  }
+
+  if (!parMix && cells.length === 0) return null;
+
+  return (
+    <div style={{ ...SHEET_PANEL, padding: '16px 16px 15px' }}>
+      {/* THE PAR MIX: three counts spread evenly across the FULL panel width,
+          each figure CENTRED DIRECTLY ABOVE ITS OWN LABEL. No bar, no stacked
+          segments, no legend. */}
+      {parMix ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+          {parMix.map((c) => (
+            <div key={c.par} style={{ textAlign: 'center', minWidth: 0 }}>
+              <div style={shFig(24)}>{c.n}</div>
+              <div style={{ ...SH_LABEL, marginTop: 5 }}>
+                {t('courses:courseDetail.card.shape.parN', { n: c.par })}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {cells.length > 0 ? (
+        <>
+          {parMix ? <Hairline style={{ marginTop: 15 }} /> : null}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
+              gap: 10,
+              paddingTop: parMix ? 14 : 0,
+            }}
+          >
+            {cells}
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+};
+
+/* The sheet does NOT hold its own selected tee (§2): the panel owns it, and the
+   tee ROWS - the sheet's only tee control now that the pills are gone - write
+   to the same state, so the two surfaces can never diverge. */
 const SheetBody: React.FC<{
   tees: TeeSet[];
   selected: string;
@@ -455,14 +720,23 @@ const SheetBody: React.FC<{
     [tees, selected],
   );
 
-  const pick = onPick;
-
   const holes = useMemo(
     () => [...(active?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
     [active],
   );
   const out = holes.filter((h) => h.hole_no <= 9);
   const inn = holes.filter((h) => h.hole_no > 9);
+
+  const bars = useMemo(() => lengthBarWidths(holes), [holes]);
+
+  /** SI chips grade across the card's OWN spread, not an assumed 1-18. */
+  const siRange = useMemo(() => {
+    const vals = holes
+      .map((h) => (h.si == null ? null : Number(h.si)))
+      .filter((v): v is number => v != null && Number.isFinite(v));
+    if (vals.length === 0) return null;
+    return { min: Math.min(...vals), max: Math.max(...vals) };
+  }, [holes]);
 
   /** An incomplete total is not a total: one missing hole omits the figure. */
   const sum = (list: typeof holes, key: 'par' | 'yards'): number | null => {
@@ -476,6 +750,35 @@ const SheetBody: React.FC<{
   };
 
   if (!active) return null;
+
+  /* THE SLOPE SECTION LEADS THE SHEET (§2), and the FALLBACK CARRIES: a tee with
+     no slope promotes LENGTH to the headline exactly as the panel does, so a
+     panel whose hero figure is missing never renders blank. */
+  const slope =
+    active.slope_rating && active.slope_rating > 0 ? Math.round(active.slope_rating) : null;
+  const delta = slope != null ? slope - STANDARD_SLOPE : null;
+  const deltaText =
+    delta == null ? '' : delta > 0 ? `+${delta}` : delta < 0 ? `\u2212${Math.abs(delta)}` : 'E';
+  const sentence =
+    delta == null
+      ? null
+      : delta > 0
+      ? t('courses:courseDetail.card.playsHarder')
+      : delta < 0
+      ? t('courses:courseDetail.card.playsEasier')
+      : t('courses:courseDetail.card.playsAverage');
+
+  const footCells = [
+    { label: t('courses:teeCard.stat.par'), value: active.par_total ? String(active.par_total) : null },
+    {
+      label: t('courses:courseDetail.card.courseRating'),
+      value:
+        active.course_rating && active.course_rating > 0 ? active.course_rating.toFixed(1) : null,
+    },
+    slope != null
+      ? { label: t('courses:teeCard.stat.yards'), value: active.total_yards == null ? null : fmtInt(active.total_yards) }
+      : { label: t('courses:teeCard.stat.slope'), value: null },
+  ].filter((c) => c.value != null);
 
   const summaryRow = (label: string, list: typeof holes, figSize: number) => {
     const y = sum(list, 'yards');
@@ -492,223 +795,245 @@ const SheetBody: React.FC<{
           borderTop: `1px solid ${A.HAIRLINE}`,
         }}
       >
-        <span
-          style={{
-            fontSize: 8.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: A.INK,
-          }}
-        >
-          {label}
-        </span>
-        <span
-          style={{
-            fontSize: figSize,
-            fontWeight: 700,
-            color: A.INK,
-            textAlign: 'right',
-            ...FIGS,
-          }}
-        >
+        <span style={{ ...SH_LABEL, color: A.INK }}>{label}</span>
+        <span aria-hidden="true" />
+        <span style={{ ...shFig(figSize), textAlign: 'right' }}>
           {y == null ? '' : formatNumber(Math.round(y))}
         </span>
-        <span
-          style={{
-            fontSize: figSize,
-            fontWeight: 700,
-            color: A.INK,
-            textAlign: 'right',
-            ...FIGS,
-          }}
-        >
-          {p == null ? '' : p}
-        </span>
+        <span style={{ ...shFig(figSize), textAlign: 'right' }}>{p == null ? '' : p}</span>
         <span aria-hidden="true" />
       </div>
     );
   };
 
-  const holeRow = (h: (typeof holes)[number]) => (
-    <div
-      key={h.hole_no}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: CARD_GRID,
-        alignItems: 'center',
-        gap: CARD_GAP,
-        padding: '8.5px 0',
-      }}
-    >
-      <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, ...FIGS }}>{h.hole_no}</span>
-      <span
-        style={{ fontSize: 13, fontWeight: 600, color: A.BODY, textAlign: 'right', ...FIGS }}
-      >
-        {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
-      </span>
-      <span
-        style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, textAlign: 'right', ...FIGS }}
-      >
-        {h.par}
-      </span>
-      <span
-        style={{ fontSize: 13, fontWeight: 700, color: A.MUTE, textAlign: 'right', ...FIGS }}
-      >
-        {h.si == null ? '' : h.si}
-      </span>
-    </div>
-  );
+  const holeRow = (h: (typeof holes)[number]) => {
+    /* PAR 3 SITS ONE STEP BACK (§4.3) - a lighter weight and the muted tone, so
+       par type is readable down the column without a fourth colour. */
+    const isShort = h.par != null && Number(h.par) === 3;
+    const barK = bars.get(h.hole_no) ?? null;
+    const siChip =
+      h.si != null && siRange != null
+        ? difficultyRampColor(siRampT(Number(h.si), siRange.min, siRange.max))
+        : null;
 
-  /* Summary panel: only the cells that carry a value, evenly distributed. */
-  const summaryCells = [
-    { label: t('courses:teeCard.stat.par'), value: active.par_total ? active.par_total : null },
-    {
-      label: t('courses:courseDetail.card.courseRating'),
-      value:
-        active.course_rating && active.course_rating > 0 ? active.course_rating.toFixed(1) : null,
-    },
-    {
-      label: t('courses:teeCard.stat.slope'),
-      value: active.slope_rating ? Math.round(active.slope_rating) : null,
-    },
-  ].filter((c) => c.value != null);
-
-  return (
-    <>
-      {/* Tee pills, each carrying its yardage inline - the only yardage on open. */}
+    return (
       <div
-        style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '0 16px 14px' }}
-        aria-label={t('courses:teeCard.a11yPills')}
+        key={h.hole_no}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: CARD_GRID,
+          alignItems: 'center',
+          gap: CARD_GAP,
+          padding: '8px 0',
+        }}
       >
-        {tees.map((tee) => {
-          const on = tee.tee_label === active.tee_label;
-          return (
-            <button
-              key={tee.tee_label}
-              type="button"
-              onClick={() => pick(tee.tee_label)}
-              aria-pressed={on}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 7,
-                flexShrink: 0,
-                borderRadius: 999,
-                padding: '9px 14px',
-                minHeight: 36,
-                cursor: 'pointer',
-                fontFamily: SANS,
-                background: on ? A.INK : A.PANEL,
-                border: `1px solid ${on ? A.INK : A.BORDER}`,
-                transition: 'background-color 160ms ease, border-color 160ms ease',
-              }}
-            >
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: on ? A.PANEL : A.INK }}>
-                {tee.tee_label}
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: on ? 'rgba(255,255,255,0.78)' : A.MUTE,
-                  ...FIGS,
-                }}
-              >
-                {fmtInt(tee.total_yards)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+        <span style={shFig(13)}>{h.hole_no}</span>
 
-      <div style={{ padding: '0 16px 32px', display: 'grid', gap: 12 }}>
-        {/* Summary panel: PAR / COURSE RATING / SLOPE. */}
-        {summaryCells.length > 0 ? (
-          <div
-            style={{
-              background: A.PANEL,
-              border: `1px solid ${A.BORDER}`,
-              borderRadius: 16,
-              padding: '18px 16px',
-              display: 'grid',
-              gridTemplateColumns: `repeat(${summaryCells.length}, minmax(0, 1fr))`,
-            }}
+        {/* LENGTH: a SOLID ink bar, not a ramp and not a fading gradient - the
+            register does not do faded. SI owns the colour on this row. */}
+        {barK != null ? (
+          <span
+            aria-hidden="true"
+            style={{ display: 'block', height: 4, borderRadius: 2, background: A.TRACK }}
           >
-            {summaryCells.map((cell) => (
-              <div key={cell.label} style={SUMMARY_CELL}>
-                <div style={{ ...LABEL, fontSize: 8 }}>{cell.label}</div>
-                <div
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    letterSpacing: '-0.02em',
-                    color: A.INK,
-                    marginTop: 7,
-                    whiteSpace: 'nowrap',
-                    ...FIGS,
-                  }}
-                >
-                  {cell.value}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : null}
+            <span
+              style={{
+                display: 'block',
+                height: '100%',
+                width: `${Math.round(barK * 100)}%`,
+                borderRadius: 2,
+                background: isShort ? 'rgba(14,18,22,0.34)' : A.INK,
+              }}
+            />
+          </span>
+        ) : (
+          <span aria-hidden="true" />
+        )}
 
-        {/* Scorecard table. No zebra striping; hairlines only above the summaries.
-            NOTE: no overflow: hidden here - it would kill the sticky header. */}
-        <div
+        <span
           style={{
-            background: A.PANEL,
-            border: `1px solid ${A.BORDER}`,
-            borderRadius: 16,
-            padding: '0 16px 14px',
+            ...shFig(13, isShort ? A.MUTE : A.BODY),
+            fontWeight: isShort ? 500 : 600,
+            textAlign: 'right',
           }}
         >
+          {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
+        </span>
+
+        <span
+          style={{
+            ...shFig(13, isShort ? A.MUTE : A.INK),
+            fontWeight: isShort ? 500 : 700,
+            textAlign: 'right',
+          }}
+        >
+          {h.par}
+        </span>
+
+        {/* SI TAKES THE RAMP (§4.1). Numerals go white or ink by COMPUTED
+            luminance - never a hardcoded stroke-index threshold. */}
+        <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          {siChip ? (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 24,
+                height: 19,
+                padding: '0 5px',
+                borderRadius: 5,
+                background: siChip,
+                ...shFig(11.5, chipInk(siChip)),
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {h.si}
+            </span>
+          ) : null}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: '0 16px 32px', display: 'grid', gap: 12 }}>
+      {/* ── a-f: THE SLOPE SECTION, one panel, leading the sheet ───────────── */}
+      <div style={{ ...SHEET_PANEL, padding: '16px 16px 15px' }}>
+        <div style={SH_KICKER}>
+          {`${
+            slope != null
+              ? t('courses:courseDetail.card.slopeLabel')
+              : t('courses:courseDetail.card.lengthLabel')
+          } \u00B7 ${t('courses:courseDetail.card.sheetTitle', { tee: active.tee_label })}`}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
+          <span style={{ ...shFig(44), letterSpacing: '-0.05em', lineHeight: 0.94 }}>
+            {slope != null ? slope : fmtInt(active.total_yards)}
+          </span>
+          {slope != null ? (
+            <>
+              {/* The delta takes the ramp's HARD END. Red means DEMANDING: a
+                  demanding course is a good course, and nothing on this sheet is
+                  a score or a member, so nothing here takes the to-par red. */}
+              <span style={shFig(17, DIFFICULTY_HARD_HEX)}>{deltaText}</span>
+              <span style={SH_BODY}>
+                {t('courses:courseDetail.card.vsStandard', { standard: STANDARD_SLOPE })}
+              </span>
+            </>
+          ) : (
+            <span style={SH_BODY}>{t('courses:courseDetail.card.yardsUnit')}</span>
+          )}
+        </div>
+
+        {/* THE SAME SlopeScale THE PANEL DRAWS - shared, not forked. */}
+        {slope != null ? <SlopeScale slope={slope} /> : null}
+
+        {/* THE TEE ROWS ARE THE TEE SELECTOR (§3). The pills are gone: tapping a
+            row switches the whole sheet, and it writes the same remembered tee. */}
+        <TeeList tees={tees} activeLabel={active.tee_label} showAll onPick={onPick} />
+
+        {slope != null && sentence ? (
+          <p style={{ ...SH_BODY, margin: '14px 0 0' }}>{sentence}</p>
+        ) : null}
+
+        {footCells.length > 0 ? (
+          <>
+            <Hairline style={{ marginTop: 15 }} />
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${footCells.length}, minmax(0, 1fr))`,
+                paddingTop: 14,
+              }}
+            >
+              {footCells.map((cell) => (
+                <div key={cell.label} style={SUMMARY_CELL}>
+                  <div style={SH_LABEL}>{cell.label}</div>
+                  <div style={{ ...shFig(21), marginTop: 6, whiteSpace: 'nowrap' }}>
+                    {cell.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : null}
+      </div>
+
+      {/* ── §5: THE SHAPE PANEL, between the slope section and the table ───── */}
+      <ShapePanel holes={holes} />
+
+      {/* ── §4: THE HOLE TABLE. No zebra striping; hairlines only above the
+             summaries. NOTE: no overflow: hidden here - it kills the sticky
+             header. */}
+      <div style={{ ...SHEET_PANEL, padding: '0 16px 12px' }}>
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            background: A.PANEL,
+            margin: '0 -16px',
+            padding: '14px 16px 10px',
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            display: 'grid',
+            gridTemplateColumns: CARD_GRID,
+            gap: CARD_GAP,
+          }}
+        >
+          <span style={SH_LABEL}>{t('courses:teeCard.col.hole')}</span>
+          <span style={SH_LABEL}>{t('courses:teeCard.col.length')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.yards')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.par')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.si')}</span>
+        </div>
+
+        {out.map(holeRow)}
+        {out.length > 0 && summaryRow(t('courses:teeCard.out'), out, 13)}
+
+        {inn.length > 0 ? (
+          <>
+            <div style={{ height: 14 }} aria-hidden="true" />
+            {inn.map(holeRow)}
+            {summaryRow(t('courses:teeCard.in'), inn, 13)}
+          </>
+        ) : null}
+
+        <div style={{ height: 6 }} aria-hidden="true" />
+        {summaryRow(t('courses:teeCard.total'), holes, 14)}
+
+        {/* THE RAMP IS EXPLAINED ONCE, AT THE FOOT (§4.4). Not at the head: the
+            scorecard sheet has just taught us what happens when a key sits above
+            data - its numerals got read as counts. */}
+        {siRange ? (
           <div
             style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 1,
-              background: A.PANEL,
-              margin: '0 -16px',
-              padding: '14px 16px 10px',
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              display: 'grid',
-              gridTemplateColumns: CARD_GRID,
-              gap: CARD_GAP,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              paddingTop: 14,
             }}
           >
-            <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:teeCard.col.hole')}</span>
-            <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>
-              {t('courses:teeCard.col.yards')}
-            </span>
-            <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>
-              {t('courses:teeCard.col.par')}
-            </span>
-            <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>
-              {t('courses:teeCard.col.si')}
-            </span>
+            <span style={SH_LABEL}>{t('courses:courseDetail.card.rampEasier')}</span>
+            <span
+              aria-hidden="true"
+              style={{
+                width: 76,
+                height: 5,
+                borderRadius: 3,
+                background: `linear-gradient(90deg, ${difficultyRampColor(0)}, ${difficultyRampColor(
+                  1,
+                )})`,
+              }}
+            />
+            <span style={SH_LABEL}>{t('courses:courseDetail.card.rampHarder')}</span>
           </div>
-
-          {out.map(holeRow)}
-          {out.length > 0 && summaryRow(t('courses:teeCard.out'), out, 13)}
-
-          {inn.length > 0 ? (
-            <>
-              <div style={{ height: 14 }} aria-hidden="true" />
-              {inn.map(holeRow)}
-              {summaryRow(t('courses:teeCard.in'), inn, 13)}
-            </>
-          ) : null}
-
-          <div style={{ height: 6 }} aria-hidden="true" />
-          {summaryRow(t('courses:teeCard.total'), holes, 14)}
-        </div>
+        ) : null}
       </div>
-    </>
+    </div>
   );
 };
 
