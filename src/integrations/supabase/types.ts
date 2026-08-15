@@ -10425,6 +10425,59 @@ export type Database = {
           },
         ]
       }
+      sr_leaderboard_history: {
+        Row: {
+          captured_at: string
+          id: number
+          player_id: string
+          position: number | null
+          position_tied: boolean | null
+          score: number | null
+          status: string | null
+          strokes: number | null
+          thru: number | null
+          today: number | null
+          today_round: number | null
+          tournament_id: string
+        }
+        Insert: {
+          captured_at?: string
+          id?: number
+          player_id: string
+          position?: number | null
+          position_tied?: boolean | null
+          score?: number | null
+          status?: string | null
+          strokes?: number | null
+          thru?: number | null
+          today?: number | null
+          today_round?: number | null
+          tournament_id: string
+        }
+        Update: {
+          captured_at?: string
+          id?: number
+          player_id?: string
+          position?: number | null
+          position_tied?: boolean | null
+          score?: number | null
+          status?: string | null
+          strokes?: number | null
+          thru?: number | null
+          today?: number | null
+          today_round?: number | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sr_leaderboard_history_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sr_leaderboards: {
         Row: {
           created_at: string | null
