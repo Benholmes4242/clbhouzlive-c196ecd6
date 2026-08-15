@@ -1021,28 +1021,46 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   aria-hidden
                   style={{ display: 'block' }}
                 >
-                  {/* The halo is the PANEL colour, never white-on-white by
-                      accident: A.PANEL is the surface this sits on. */}
+                  <defs>
+                    <linearGradient id="form-trend-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={fillTone} stopOpacity={0.42} />
+                      <stop offset="100%" stopColor={fillTone} stopOpacity={0.03} />
+                    </linearGradient>
+                    {/* One stop per round, coloured by its zone, so a good spell
+                        renders green and a bad one red along one continuous line. */}
+                    <linearGradient id="form-trend-stroke" x1="0" y1="0" x2="1" y2="0">
+                      {form.series.map((v, i) => (
+                        <stop
+                          key={i}
+                          offset={`${(i / (form.series.length - 1)) * 100}%`}
+                          stopColor={zone(v)}
+                        />
+                      ))}
+                    </linearGradient>
+                  </defs>
+                  <path d={area} fill="url(#form-trend-fill)" />
+                  {/* The white halo is what stops the line reading flat on its own fill. */}
                   <path
-                    d={monotonePath(pts)}
+                    d={line}
                     fill="none"
-                    stroke={A.PANEL}
-                    strokeWidth={5}
+                    stroke="#FFFFFF"
+                    strokeOpacity={0.6}
+                    strokeWidth={4}
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"
                   />
-                  {segs.map((s) => (
-                    <path
-                      key={s.key}
-                      d={s.d}
-                      fill="none"
-                      stroke={s.tone}
-                      strokeWidth={2.25}
-                      strokeLinecap="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  ))}
-                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.2} fill={A.GREEN} />
+                  <path
+                    d={line}
+                    fill="none"
+                    stroke="url(#form-trend-stroke)"
+                    strokeWidth={2.2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke="#FFFFFF" strokeWidth={1.6} />
+
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                   <span style={{ ...LABEL, fontSize: 8.5 }}>
