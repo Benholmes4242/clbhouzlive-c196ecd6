@@ -805,6 +805,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <Action
                     align="left"
                     style={{ flexShrink: 0, minHeight: 0 }}
+                    tone={A.AMBER}
                     label={showCard
                       ? t('courses:scorecard.hideHoleByHole')
                       : t('courses:scorecard.holeByHole')}
