@@ -235,7 +235,8 @@
       "axisHarder": "[Harder]",
       "finishedLabel": "[Fïnïshéd]",
       "todaySuffix": "[{{value}} tódáý]",
-      "fieldAverageWaiting": "[Field average once {{n}} rounds are in]"
+      "fieldAverageWaiting": "[Field average once {{n}} rounds are in]",
+      "courseShapeLabel": "[Çöûrsé shåpé]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
@@ -381,6 +382,9 @@
     "status": {
       "finished": "FINISHED",
       "thru": "THRU {{n}}"
+    },
+    "board": {
+      "clbhouzPick": "[çlbhöûz pïçk]"
     }
   },
   "empty": {

@@ -235,7 +235,8 @@
       "axisHarder": "難しい",
       "finishedLabel": "終了",
       "todaySuffix": "本日 {{value}}",
-      "fieldAverageWaiting": "{{n}}ラウンドが揃い次第、フィールド平均を表示"
+      "fieldAverageWaiting": "{{n}}ラウンドが揃い次第、フィールド平均を表示",
+      "courseShapeLabel": "コースの傾向"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -381,6 +382,9 @@
     "status": {
       "finished": "終了",
       "thru": "{{n}}ホール"
+    },
+    "board": {
+      "clbhouzPick": "clbhouz の注目選手"
     }
   },
   "empty": {

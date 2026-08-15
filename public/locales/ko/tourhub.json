@@ -235,7 +235,8 @@
       "axisHarder": "어려움",
       "finishedLabel": "종료",
       "todaySuffix": "오늘 {{value}}",
-      "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시"
+      "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시",
+      "courseShapeLabel": "코스 난이도"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
@@ -381,6 +382,9 @@
     "status": {
       "finished": "종료",
       "thru": "{{n}}홀"
+    },
+    "board": {
+      "clbhouzPick": "clbhouz 주목 선수"
     }
   },
   "empty": {
