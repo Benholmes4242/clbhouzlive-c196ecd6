@@ -15,6 +15,7 @@ import {
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 
 interface Row {
   id: string;
