@@ -93,21 +93,86 @@ export const RAMP_TOPAR = {
 } as const;
 
 /**
- * DIFFICULTY RAMP - one hue, varying intensity, across the course's OWN spread.
- * Pale = easiest hole, deep red = hardest. Red means DEMANDING, not bad, and
- * deliberately NOT the green/amber/red zone ramp: a hole is easy or hard, not
- * good or bad. Shared so the "How it plays" chart and the hole rows grade
- * identically.
+ * THE DEMANDING RAMP - BRIEF_COURSE_TAB_NO_FADED_COLOUR §2.
+ *
+ * SIX DISCRETE STOPS, STEPPED - not an interpolation. Interpolating across
+ * eighteen holes produced adjacent values that were indistinguishable, which is
+ * the faded problem in another form. Every stop is a LITERAL TONE: no stop is a
+ * lower-opacity or desaturated version of any other, so nothing on this tab
+ * reads as a colour that failed to arrive.
+ *
+ * Monotone in lightness, stop 0 -> stop 5 (relative luminance
+ * 0.606 / 0.414 / 0.319 / 0.143 / 0.087 / 0.050).
+ *
+ * Stop 2 was tuned from the brief's sampled #B8705F, which read muddy and sat
+ * within 0.03 luminance of the hole-by-hole bogey slate (#7C8B9C). #D8836A is a
+ * brighter terracotta, clearly warm, and 0.07 clear of the slate in lightness.
+ * Stop 3 kept the sampled #C0392B - it is the only value here that has to read
+ * as unambiguous red, and it does.
+ *
+ * RED MEANS DEMANDING. Nothing on this tab is a score or a member, so this is
+ * neither the to-par red nor the member amber.
+ *
+ * THIS IS THE ONLY DEFINITION IN THE CODEBASE. Every consumer imports it.
  */
-const DIFF_EASY: [number, number, number] = [228, 233, 239];
-const DIFF_HARD: [number, number, number] = [154, 32, 26];
-export const DIFFICULTY_HARD_HEX = '#9A201A';
+export const DIFFICULTY_RAMP = [
+  '#C7CDD4', // 0 easiest - a solid neutral, never a faint red
+  '#A6ADB6', // 1
+  '#D8836A', // 2 warm middle
+  '#C0392B', // 3
+  '#A02219', // 4
+  '#7E140F', // 5 hardest
+] as const;
 
-export function difficultyRampColor(t: number): string {
-  const k = Math.max(0, Math.min(1, t));
-  const c = DIFF_EASY.map((a, i) => Math.round(a + (DIFF_HARD[i] - a) * k));
-  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+export const DIFFICULTY_HARD_HEX = DIFFICULTY_RAMP[5];
+export const DIFFICULTY_EASY_HEX = DIFFICULTY_RAMP[0];
+
+/** Stop by INDEX, clamped. The stepped form callers should prefer. */
+export function difficultyRampStop(i: number): string {
+  const k = Math.max(0, Math.min(DIFFICULTY_RAMP.length - 1, Math.round(i)));
+  return DIFFICULTY_RAMP[k];
 }
+
+/**
+ * 0..1 -> a STOP, not a blend. Kept for callers that hold a normalised position
+ * on the course's own spread; the result is always one of the six literals.
+ */
+export function difficultyRampColor(t: number): string {
+  const k = Math.max(0, Math.min(1, Number.isFinite(t) ? t : 0));
+  return difficultyRampStop(Math.round(k * (DIFFICULTY_RAMP.length - 1)));
+}
+
+function relLuminance(colour: string): number | null {
+  let rgb: number[] | null = null;
+  const hex = colour.trim().replace('#', '');
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    rgb = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  } else {
+    const m = colour.match(/(\d+(?:\.\d+)?)/g);
+    if (m && m.length >= 3) rgb = m.slice(0, 3).map(Number);
+  }
+  if (!rgb) return null;
+  const lin = rgb.map((v) => {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+}
+
+/**
+ * TEXT ON A RAMP TONE (§8). COMPUTED, never a hardcoded threshold: it picks
+ * whichever of white or ink carries the HIGHER contrast ratio, so moving a ramp
+ * stop can never silently produce an unreadable numeral. Accepts hex or rgb().
+ */
+export function rampInk(colour: string): string {
+  const L = relLuminance(colour);
+  if (L == null) return A.INK;
+  const inkL = relLuminance(A.INK) ?? 0;
+  const white = (1.05) / (L + 0.05);
+  const ink = (Math.max(L, inkL) + 0.05) / (Math.min(L, inkL) + 0.05);
+  return white >= ink ? '#FFFFFF' : A.INK;
+}
+
 
 
 export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
