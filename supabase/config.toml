@@ -210,6 +210,9 @@ verify_jwt = false
 [functions.gam-backdate-replay]
 verify_jwt = false
 
+[functions.request-course]
+verify_jwt = true
+
 [functions.request-course-claim]
 verify_jwt = true
 
