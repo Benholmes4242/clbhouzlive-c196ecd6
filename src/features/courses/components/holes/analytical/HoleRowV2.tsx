@@ -157,9 +157,6 @@ function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
-function markerLeft(value: number, scaleMax: number): string {
-  return markerOffset(value, 0, scaleMax);
-}
 
 
 /**
