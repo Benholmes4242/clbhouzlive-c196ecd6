@@ -153,7 +153,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="text-[30px] md:text-[36px] font-bold leading-[1.25] auth-tagline-animate"
             style={{ letterSpacing: DISPLAY_TRACKING, color: 'rgba(255,255,255,0.96)', textWrap: 'balance' as any, padding: '0 8px' }}
           >
-            {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#FFFFFF', verticalAlign: 'baseline', marginLeft: 2 }} />
+            {t('auth:hero.tagline')}<span aria-hidden="true" style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', backgroundColor: '#F7931E', verticalAlign: 'baseline', marginLeft: 2 }} />
           </h1>
         </div>
 
