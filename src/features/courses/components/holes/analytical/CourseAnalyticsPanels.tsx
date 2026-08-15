@@ -797,28 +797,27 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
       <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} />
 
 
-      {/* Block 3 - Hole by hole */}
+      {/* Block 3 - Hole by hole. THE NARRATION IS GONE (§A1): the columns beneath
+          are labelled HOLE / PAR / SI / FIELD / YOU, and the section now opens
+          with the WHOLE course's spread before the parts (§A5). */}
       <Panel
         kicker={t('courses:holes.preview.eyebrow')}
         action={{
           label: t('courses:holes.preview.seeAllShort', { count: holes.length }),
           onClick: () => setHolesSheetOpen(true),
         }}
-        subline={
+        aside={
           totalRounds > 0
-            ? t('courses:holes.preview.description', {
-                holes: formatNumber(holes.length),
+            ? t('courses:courseDetail.plays.rounds', {
                 count: totalRounds,
                 rounds: formatNumber(totalRounds),
-                personal: hasYou ? t('courses:holes.preview.personalClause') : '',
               })
-            : t('courses:holes.preview.descriptionNoRounds', { holes: formatNumber(holes.length) })
+            : undefined
         }
-
         headerGap={10}
         style={{ padding: '18px 16px 12px' }}
       >
-        <HoleRampLegend hasYou={hasYou} />
+        {courseShares && <DistributionStrip shares={courseShares} />}
 
         {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
           <HoleRowV2
@@ -830,6 +829,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
             open={openHoles.has(h.hole_no)}
             onToggle={() => toggle(h.hole_no, 'preview')}
             last={i === arr.length - 1}
+            hasYou={hasYou}
+            courseShares={courseShares}
           />
         ))}
       </Panel>
@@ -849,24 +850,40 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         }}
       >
         <div style={{ padding: '0 16px 10px' }}>
-          <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              gap: 10,
+            }}
+          >
+            <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
+            {/* THE ROUNDS COUNT IS META (§B2), right-aligned, the same treatment
+                every other panel's sample size takes - not a sentence. */}
+            {totalRounds > 0 && (
+              <div style={{ ...LABEL, ...FIGS }}>
+                {t('courses:courseDetail.plays.rounds', {
+                  count: totalRounds,
+                  rounds: formatNumber(totalRounds),
+                })}
+              </div>
+            )}
+          </div>
           <h2
             id="course-holes-sheet-title"
             style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 700, color: A.INK }}
           >
             {t('courses:courseDetail.holes.sheetTitle')}
           </h2>
-          <div style={LABEL}>
-            {t('courses:courseDetail.holes.sheetSub', {
-              count: totalRounds,
-              rounds: formatNumber(totalRounds),
-            })}
-            {' \u00B7 '}
-            {t('courses:courseDetail.holes.tapHint')}
-          </div>
+          {/* THE INSTRUCTION SERVES ITS PURPOSE ONCE (§B2): after a hole has been
+              opened it does not persist. */}
+          {openHoles.size === 0 && (
+            <div style={LABEL}>{t('courses:courseDetail.holes.tapHint')}</div>
+          )}
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 28px' }}>
-          <HoleRampLegend hasYou={hasYou} />
+          {courseShares && <DistributionStrip shares={courseShares} />}
           {holes.map((h, i, arr) => (
             <HoleRowV2
               key={h.hole_no}
@@ -877,10 +894,13 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
               open={openHoles.has(h.hole_no)}
               onToggle={() => toggle(h.hole_no, 'sheet')}
               last={i === arr.length - 1}
+              hasYou={hasYou}
+              courseShares={courseShares}
             />
           ))}
         </div>
       </BottomSheet>
+
     </div>
   );
 };
