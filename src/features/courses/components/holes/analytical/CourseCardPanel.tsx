@@ -478,6 +478,8 @@ const shFig = (size: number, color: string = A.INK): React.CSSProperties => ({
   ...FIGS,
 });
 
+const SUMMARY_CELL: React.CSSProperties = { textAlign: 'center', minWidth: 0 };
+
 const SHEET_PANEL: React.CSSProperties = {
   background: A.PANEL,
   border: `1px solid ${A.BORDER}`,
