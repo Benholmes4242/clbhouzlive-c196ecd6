@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 import { useTranslation } from 'react-i18next';
+import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -226,19 +227,25 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         />
                       </div>
                       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <div
-                          style={{
-                            fontSize: 15.5,
-                            fontWeight: 700,
-                            letterSpacing: '-0.02em',
-                            color: INK,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          {p.playerName}
+                        {/* The name carries the SAME amber mark as the hero board
+                            row, so a member reads the two as one statement. */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                          <span
+                            style={{
+                              fontSize: 15.5,
+                              fontWeight: 700,
+                              letterSpacing: '-0.02em',
+                              color: INK,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              lineHeight: 1.2,
+                              minWidth: 0,
+                            }}
+                          >
+                            {p.playerName}
+                          </span>
+                          <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
                         </div>
                         <CardStateSlot state={state} pick={p} live={live} settled={settled} v={v} t={t} />
                       </div>
