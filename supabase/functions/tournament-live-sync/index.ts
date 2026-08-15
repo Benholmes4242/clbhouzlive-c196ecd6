@@ -161,6 +161,8 @@ Deno.serve(async (req) => {
             .from('ai_predictions')
             .select('id, generated_at')
             .eq('tournament_id', upcoming.id)
+            .order('generated_at', { ascending: false })
+            .limit(1)
             .maybeSingle();
 
           if (!existingPrediction) {

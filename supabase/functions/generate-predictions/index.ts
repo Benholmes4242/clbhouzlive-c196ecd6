@@ -896,6 +896,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           .from('ai_predictions')
           .select('*')
           .eq('tournament_id', tournament.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         if (cached && !isPredictionStale(cached)) {
           return new Response(
@@ -922,6 +924,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           .from('ai_predictions')
           .select('*')
           .eq('tournament_id', tournament.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         if (fresh && !isPredictionStale(fresh)) {
           console.log(`[ti] double-check: fresh row appeared, skipping generation`);
