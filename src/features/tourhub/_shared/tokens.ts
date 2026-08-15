@@ -200,6 +200,16 @@ export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/c
 // ============================================================================
 export const CHARCOAL = '#15171F';                           // canonical charcoal — Clubhouse feed, player hero gradient end, live-now card
 
+// ============================================================================
+// HERO BOARD SURFACE (Tour Overview hero leaderboard block ONLY)
+// ============================================================================
+// Deliberately COLDER and DEEPER than CHARCOAL — not a duplicate of it. The hero
+// board reads as glassy near-black continuing out of the photo's bottom scrim;
+// CHARCOAL's warm grey-blue reads as grey against it. Do not retune CHARCOAL to
+// match these: it would move the Clubhouse feed and the player hero with it.
+export const HERO_BOARD_SURFACE = '#0B0F14';                 // the block
+export const HERO_BOARD_SURFACE_SOFT = '#121820';            // stat strip — one step lighter
+
 
 
 
