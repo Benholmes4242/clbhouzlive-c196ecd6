@@ -50,7 +50,8 @@
       "hole": "[~~Ĥőļé~~]",
       "par": "[~~Ƥář~~]",
       "si": "[~~ŠÍ~~]",
-      "yards": "[~~Ýářđš~~]"
+      "yards": "[~~Ýářđš~~]",
+      "length": "[Length]"
     },
     "a11yBlock": "[~~Ĉőúřšé ĉářđ~~]",
     "a11yPills": "[~~Ĉĥőőšé ţéé~~]",
@@ -911,7 +912,19 @@
       "ydsUnit": "[~~ýđš~~]",
       "seeFullShort": "[~~Šéé ţĥé ƒúļļ ĉářđ~~]",
       "fullCard": "[~~Ƒúļļ ĉářđ~~]",
-      "standardMark": "[~~Šţáñđářđ {{standard}}~~]"
+      "standardMark": "[~~Šţáñđářđ {{standard}}~~]",
+      "rampEasier": "[Easier]",
+      "rampHarder": "[Harder]",
+      "a11yTeeRow": "[{{tee}} tees, slope {{slope}}]",
+      "a11yTeeRowNoSlope": "[{{tee}} tees, no slope rating]",
+      "shape": {
+        "longest": "[Longest]",
+        "strokeIndexOne": "[Stroke index 1]",
+        "toughestRun": "[Toughest run]",
+        "holeTail": "[Hole {{n}}]",
+        "yardsTail": "[{{yards}} yds]",
+        "parN": "[Par {{n}}]"
+      }
     },
     "plays": {
       "fieldAvg": "[~~Ƒíéļđ áṽĝ~~]",

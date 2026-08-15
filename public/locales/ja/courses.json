@@ -655,7 +655,19 @@
       "ydsUnit": "yds",
       "seeFullShort": "See the full card",
       "fullCard": "Full card",
-      "standardMark": "Standard {{standard}}"
+      "standardMark": "Standard {{standard}}",
+      "rampEasier": "易しい",
+      "rampHarder": "難しい",
+      "a11yTeeRow": "{{tee}}ティー、スロープ{{slope}}",
+      "a11yTeeRowNoSlope": "{{tee}}ティー、スロープなし",
+      "shape": {
+        "longest": "最長",
+        "strokeIndexOne": "ストロークインデックス1",
+        "toughestRun": "最難関の3ホール",
+        "holeTail": "{{n}}番",
+        "yardsTail": "{{yards}}ヤード",
+        "parN": "パー{{n}}"
+      }
     },
     "plays": {
       "legendField": "Field",
@@ -938,6 +950,11 @@
       "all": "All",
       "video": "Video",
       "played": "Played"
+    }
+  },
+  "teeCard": {
+    "col": {
+      "length": "距離"
     }
   }
 }

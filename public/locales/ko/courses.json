@@ -655,7 +655,19 @@
       "ydsUnit": "yds",
       "seeFullShort": "See the full card",
       "fullCard": "Full card",
-      "standardMark": "Standard {{standard}}"
+      "standardMark": "Standard {{standard}}",
+      "rampEasier": "쉬움",
+      "rampHarder": "어려움",
+      "a11yTeeRow": "{{tee}} 티, 슬로프 {{slope}}",
+      "a11yTeeRowNoSlope": "{{tee}} 티, 슬로프 없음",
+      "shape": {
+        "longest": "최장 홀",
+        "strokeIndexOne": "스트로크 인덱스 1",
+        "toughestRun": "가장 어려운 구간",
+        "holeTail": "{{n}}번 홀",
+        "yardsTail": "{{yards}} 야드",
+        "parN": "파 {{n}}"
+      }
     },
     "plays": {
       "legendField": "Field",
@@ -938,6 +950,11 @@
       "all": "All",
       "video": "Video",
       "played": "Played"
+    }
+  },
+  "teeCard": {
+    "col": {
+      "length": "거리"
     }
   }
 }
