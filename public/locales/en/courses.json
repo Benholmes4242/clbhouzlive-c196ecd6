@@ -50,7 +50,8 @@
       "hole": "Hole",
       "par": "Par",
       "si": "SI",
-      "yards": "Yards"
+      "yards": "Yards",
+      "length": "Length"
     },
     "a11yBlock": "Course card",
     "a11yPills": "Choose tee",
@@ -911,7 +912,19 @@
       "ydsUnit": "yds",
       "seeFullShort": "See the full card",
       "fullCard": "Full card",
-      "standardMark": "Standard {{standard}}"
+      "standardMark": "Standard {{standard}}",
+      "rampEasier": "Easier",
+      "rampHarder": "Harder",
+      "a11yTeeRow": "{{tee}} tees, slope {{slope}}",
+      "a11yTeeRowNoSlope": "{{tee}} tees, no slope rating",
+      "shape": {
+        "longest": "Longest",
+        "strokeIndexOne": "Stroke index 1",
+        "toughestRun": "Toughest run",
+        "holeTail": "Hole {{n}}",
+        "yardsTail": "{{yards}} yds",
+        "parN": "Par {{n}}"
+      }
     },
     "plays": {
       "fieldAvg": "Field avg",
