@@ -726,6 +726,9 @@ const SheetBody: React.FC<{
   const inn = holes.filter((h) => h.hole_no > 9);
 
   const bars = useMemo(() => lengthBarWidths(holes), [holes]);
+  /** §C3 - the same run the shape panel names, so one definition marks both. */
+  const run = useMemo(() => toughestRun(holes), [holes]);
+
 
   /** SI chips grade across the card's OWN spread, not an assumed 1-18. */
   const siRange = useMemo(() => {
