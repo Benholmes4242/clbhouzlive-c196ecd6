@@ -19,7 +19,7 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, DIFFICULTY_RAMP, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
 
 /** Labelled figure cell used by the How-it-plays strip and the extremes row. */
@@ -388,18 +388,19 @@ const ShapeChart: React.FC<{
   );
 };
 
-/** Bar-ramp legend: easier -> harder, one hue. Carries no amber. */
+/**
+ * Bar-ramp legend: easier -> harder, as DISCRETE SWATCHES (§5). A smooth
+ * gradient advertised colours the bars can never take; the key now shows the
+ * ramp's actual six stops, which is what a bar can be.
+ */
 const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, harder }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
     <span style={{ ...LABEL, fontSize: 7 }}>{easier}</span>
-    <i
-      style={{
-        width: 34,
-        height: 5,
-        borderRadius: 2,
-        background: `linear-gradient(90deg, ${rampColor(0.06)}, ${rampColor(1)})`,
-      }}
-    />
+    <i aria-hidden="true" style={{ display: 'inline-flex', gap: 1.5 }}>
+      {DIFFICULTY_RAMP.map((tone) => (
+        <i key={tone} style={{ width: 6, height: 5, borderRadius: 1, background: tone }} />
+      ))}
+    </i>
     <span style={{ ...LABEL, fontSize: 7 }}>{harder}</span>
   </span>
 );

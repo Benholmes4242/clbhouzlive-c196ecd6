@@ -12,8 +12,8 @@
  *
  * BRIEF_COURSE_CARD_EVERY_TEE: the panel now holds EVERY tee set and shows one.
  * All of them sit beneath the headline as label / graded track / slope / yardage,
- * ordered hardest first, with the resolved tee at full opacity and the rest
- * faded. Tapping a row re-reads the whole panel and writes the same remembered
+ * ordered hardest first. Every bar carries its OWN slope's ramp stop; selection
+ * is marked structurally, never by colour or opacity. Tapping a row re-reads the whole panel and writes the same remembered
  * tee the sheet's pills do - ONE selection, owned by CourseCardPanel.
  *
  * BRIEF_COURSE_CARD_SHEET_VIBRANT: the SHEET now opens the way the panel opens -
@@ -57,7 +57,9 @@ import {
   KICKER,
   LABEL,
   SANS,
+  DIFFICULTY_RAMP,
   difficultyRampColor,
+  rampInk,
 } from './tokens';
 
 /** WHS standard slope. A course of exactly 113 plays to average difficulty. */
@@ -79,15 +81,6 @@ const STANDARD_SLOPE = 113;
  * hexes themselves come from the analytical tokens (A.GREEN / A.AMBER / A.RED)
  * rather than being retyped.
  */
-const ZONE_EASIER_MAX = 104; // below 105: easier than standard
-const ZONE_STANDARD_MAX = 129; // 105-129: around standard; 130 and up: harder
-
-function zoneColour(slope: number): string {
-  if (slope <= ZONE_EASIER_MAX) return A.GREEN;
-  if (slope <= ZONE_STANDARD_MAX) return A.AMBER;
-  return A.RED;
-}
-
 interface Props {
   courseId: string | undefined;
   /** Names the sheet. Falls back to the tee title when absent. */
@@ -156,37 +149,23 @@ const DOT = 11;
 const scalePct = (v: number) =>
   ((Math.min(SCALE_MAX, Math.max(SCALE_MIN, v)) - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
 
-/** The three zones behind a track, at 0.22 so a fill still reads over them.
-    Only the outer edges round: the joins between zones are butt ends. */
-const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => {
-  const bands = [
-    { from: SCALE_MIN, to: ZONE_EASIER_MAX + 1, colour: A.GREEN },
-    { from: ZONE_EASIER_MAX + 1, to: ZONE_STANDARD_MAX + 1, colour: A.AMBER },
-    { from: ZONE_STANDARD_MAX + 1, to: SCALE_MAX, colour: A.RED },
-  ];
-  return (
-    <>
-      {bands.map((z, i) => (
-        <div
-          key={z.colour}
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: `${scalePct(z.from)}%`,
-            width: `${scalePct(z.to) - scalePct(z.from)}%`,
-            background: z.colour,
-            opacity: 0.22,
-            borderTopLeftRadius: i === 0 ? radius : 0,
-            borderBottomLeftRadius: i === 0 ? radius : 0,
-            borderTopRightRadius: i === bands.length - 1 ? radius : 0,
-            borderBottomRightRadius: i === bands.length - 1 ? radius : 0,
-          }}
-        />
-      ))}
-    </>
-  );
-};
+/**
+ * SLOPE -> DEMANDING RAMP STOP (BRIEF_COURSE_TAB_NO_FADED_COLOUR §2/§3).
+ *
+ * The three-zone green/amber/red bed at 0.22 is GONE: both of its ends were
+ * tints, and it painted the whole width regardless of the one fact on the track.
+ * A slope now maps to ONE LITERAL STOP of the shared demanding ramp, stepped, so
+ * a 135 tee draws at the demanding end whether or not it is the tee selected.
+ */
+function slopeRampStop(slope: number): string {
+  const s = Math.round(slope);
+  if (s <= 99) return DIFFICULTY_RAMP[0];
+  if (s <= 108) return DIFFICULTY_RAMP[1];
+  if (s <= 117) return DIFFICULTY_RAMP[2];
+  if (s <= 125) return DIFFICULTY_RAMP[3];
+  if (s <= 133) return DIFFICULTY_RAMP[4];
+  return DIFFICULTY_RAMP[5];
+}
 
 /**
  * SHARED between the panel and the sheet - NOT forked. The sheet passes
@@ -203,7 +182,7 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
   const std = scalePct(STANDARD_SLOPE);
   const left = Math.min(here, std);
   const width = Math.abs(here - std);
-  const zone = zoneColour(slope);
+  const above = slope >= STANDARD_SLOPE;
 
   return (
     <div style={{ marginTop: 14 }} aria-hidden="true">
@@ -215,11 +194,10 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
           background: A.TRACK,
         }}
       >
-        {/* THE TRACK IS GRADED (§4). A grey track with a dot tells a member
-            WHERE the number is but not WHAT IT MEANS. */}
-        <ZoneBed radius={3} />
-        {/* Span between standard and this course, in this tee's zone colour -
-            works in both directions. */}
+        {/* THE TRACK IS ONE SOLID NEUTRAL (§4) and ONLY THE STANDARD-TO-COURSE
+            SPAN IS COLOURED - the coloured part is the part that carries the
+            fact. A course BELOW 113 fills LEFTWARD at the ramp's easy end, which
+            is a real statement about an easier course, not an empty state. */}
         <div
           style={{
             position: 'absolute',
@@ -228,10 +206,10 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
             left: `${left}%`,
             width: `${width}%`,
             borderRadius: 3,
-            background: zone,
+            background: above ? DIFFICULTY_RAMP[5] : DIFFICULTY_RAMP[0],
           }}
         />
-        {/* Standard notch, overhanging 3px top and bottom. */}
+        {/* Standard notch, FULL INK (§4), overhanging 3px top and bottom. */}
         <div
           style={{
             position: 'absolute',
@@ -240,10 +218,11 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
             bottom: -3,
             width: 1.5,
             marginLeft: -0.75,
-            background: 'rgba(14,18,22,0.28)',
+            background: A.INK,
           }}
         />
-        {/* This course. Clamped so the dot never hangs off the track. */}
+        {/* This course: filled at the ramp's demanding end with a white ring.
+            Clamped so the dot never hangs off the track. */}
         <div
           style={{
             position: 'absolute',
@@ -254,7 +233,7 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
             marginLeft: -DOT / 2,
             marginTop: -DOT / 2,
             borderRadius: '50%',
-            background: zone,
+            background: DIFFICULTY_RAMP[5],
             border: '2.5px solid #FFFFFF',
             boxShadow: '0 1px 3px rgba(14,18,22,0.22)',
             boxSizing: 'border-box',
@@ -301,8 +280,9 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
    is a convention at some clubs and meaningless at others, and this catalogue
    spans ten countries.
 
-   The resolved tee is at full opacity and the rest at 0.34 - that is what makes
-   the block a comparison rather than a list. */
+   BRIEF_COURSE_TAB_NO_FADED_COLOUR §3 replaced the old opacity treatment: every
+   row is fully legible, the bar means DIFFICULTY, and the selected row is marked
+   by a leading ink rule and a neutral wash. */
 /* 40px is the floor, not the rule: the rule is that every track starts on the
    same x. Where the catalogue maps several WHS courses onto one club the labels
    arrive composited ("Black - Himalayas") and 40px truncates them all to
@@ -311,7 +291,6 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
 const TEE_LABEL_W_MIN = 40;
 const TEE_LABEL_W_MAX = 104;
 const TEE_YARDS_W = 46;
-const FADED = 0.34;
 
 const TeeRow: React.FC<{
   tee: TeeSet;
@@ -340,8 +319,13 @@ const TeeRow: React.FC<{
       cursor: 'pointer',
       fontFamily: SANS,
       textAlign: 'left',
-      opacity: on ? 1 : FADED,
-      transition: 'opacity 160ms ease',
+      /* SELECTION IS STRUCTURAL, NOT CHROMATIC (§3.2): a leading ink rule and a
+         faint neutral wash. NEVER opacity on the inactive rows - a control you
+         cannot read is not a control (§3.3). */
+      borderLeft: `2px solid ${on ? A.INK : 'transparent'}`,
+      background: on ? 'rgba(14,18,22,0.04)' : 'transparent',
+      paddingLeft: 6,
+      transition: 'background 160ms ease',
       ...FIGS,
     }}
   >
@@ -349,7 +333,8 @@ const TeeRow: React.FC<{
       style={{
         ...LABEL,
         fontSize: 8.5,
-        color: A.INK,
+        /* Only EMPHASIS differs between rows, never legibility (§3.3). */
+        color: on ? A.INK : A.BODY,
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -361,7 +346,8 @@ const TeeRow: React.FC<{
         an empty column: it reads as "no difficulty" rather than "not rated". */}
     {slope != null ? (
       <span style={{ position: 'relative', height: 6, borderRadius: 3, background: A.TRACK }}>
-        <ZoneBed radius={3} />
+        {/* THE BAR MEANS DIFFICULTY (§3.1), never selection: it takes THIS tee's
+            own slope stop, and picking another tee changes no bar's colour. */}
         <span
           style={{
             position: 'absolute',
@@ -370,18 +356,26 @@ const TeeRow: React.FC<{
             left: 0,
             width: `${scalePct(slope)}%`,
             borderRadius: 3,
-            background: zoneColour(slope),
+            background: slopeRampStop(slope),
           }}
         />
       </span>
     ) : (
       <span aria-hidden="true" />
     )}
-    <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, minWidth: 24, textAlign: 'right' }}>
+    <span
+      style={{
+        fontSize: 14,
+        fontWeight: 700,
+        color: on ? A.INK : A.BODY,
+        minWidth: 24,
+        textAlign: 'right',
+      }}
+    >
       {slope != null ? slope : ''}
     </span>
-    {/* §6: no label renders in DIM - the readable muted tone instead. */}
-    <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE, textAlign: 'right' }}>
+    {/* §3.3: unselected yardages take the MUTED tone, never the dim one. */}
+    <span style={{ ...LABEL, fontSize: 8.5, color: on ? A.BODY : A.MUTE, textAlign: 'right' }}>
       {tee.total_yards == null ? '' : fmtInt(tee.total_yards)}
     </span>
   </button>
@@ -412,8 +406,8 @@ const TeeList: React.FC<{
       );
   }, [tees]);
 
-  // ONE TEE ONLY (§6): no comparison to make, and one row at full opacity is
-  // just the headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
+  // ONE TEE ONLY (§6): no comparison to make, and a single row is just the
+  // headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
   // a column of empty tracks is worse than the panel as it ships.
   if (tees.length < 2) return null;
   if (!showAll && !rows.some((r) => r.slope != null)) return null;
@@ -502,22 +496,6 @@ const SHEET_PANEL: React.CSSProperties = {
  */
 const CARD_GRID = '26px 1fr 46px 30px 30px';
 const CARD_GAP = 9;
-
-/**
- * WHITE OR INK ON THE SI CHIP (§4.1) - COMPUTED, never a hardcoded stroke-index
- * threshold, because the ramp is imported and its darkness is not ours to
- * assume. Standard sRGB relative luminance off the ramp's own rgb() string.
- */
-function chipInk(rgb: string): string {
-  const m = rgb.match(/(\d+(?:\.\d+)?)/g);
-  if (!m || m.length < 3) return A.INK;
-  const lin = m.slice(0, 3).map((v) => {
-    const c = Number(v) / 255;
-    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  const L = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-  return L < 0.45 ? '#FFFFFF' : A.INK;
-}
 
 /** SI 1 sits at the ramp's hard end, SI 18 at its light end. */
 function siRampT(si: number, minSi: number, maxSi: number): number {
@@ -904,7 +882,7 @@ const SheetBody: React.FC<{
                 padding: '0 5px',
                 borderRadius: 5,
                 background: siChip,
-                ...shFig(11.5, chipInk(siChip)),
+                ...shFig(11.5, rampInk(siChip)),
                 letterSpacing: '-0.02em',
               }}
             >
@@ -1038,17 +1016,12 @@ const SheetBody: React.FC<{
             }}
           >
             <span style={SH_LABEL}>{t('courses:courseDetail.card.rampEasier')}</span>
-            <span
-              aria-hidden="true"
-              style={{
-                width: 76,
-                height: 5,
-                borderRadius: 3,
-                background: `linear-gradient(90deg, ${difficultyRampColor(0)}, ${difficultyRampColor(
-                  1,
-                )})`,
-              }}
-            />
+            {/* DISCRETE SWATCHES (§7), matching the How it plays key. */}
+            <span aria-hidden="true" style={{ display: 'inline-flex', gap: 2 }}>
+              {DIFFICULTY_RAMP.map((tone) => (
+                <i key={tone} style={{ width: 11, height: 5, borderRadius: 1, background: tone }} />
+              ))}
+            </span>
             <span style={SH_LABEL}>{t('courses:courseDetail.card.rampHarder')}</span>
           </div>
         ) : null}
