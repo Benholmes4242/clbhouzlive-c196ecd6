@@ -195,16 +195,23 @@ function AxisMarkers() {
   );
 }
 
+/**
+ * The fetch lives in a hook so the CALLER can decide whether the toggle is
+ * offered at all — a control that opens onto nothing is worse than no control.
+ */
+export function useCourseShapeRows(tournamentId: string, round: number) {
+  const { data } = useTournamentHoleAverages(tournamentId || undefined, round, { live: true });
+  const rows: HoleAverageRow[] = data ?? [];
+  const usable = rows.filter((r) => Number.isFinite(Number(r.field_avg) - Number(r.par))).length >= 3;
+  return { rows, usable };
+}
+
 export function CourseShapePanel({
-  tournamentId,
-  round,
+  rows,
 }: {
-  tournamentId: string;
-  round: number;
+  rows: HoleAverageRow[];
 }) {
   const { t } = useTranslation('tourhub');
-  const { data: holeRows } = useTournamentHoleAverages(tournamentId || undefined, round, { live: true });
-  const rows: HoleAverageRow[] = holeRows ?? [];
 
   const all = useMemo<LadderRow[]>(
     () =>

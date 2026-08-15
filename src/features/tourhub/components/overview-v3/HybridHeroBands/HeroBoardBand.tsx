@@ -33,7 +33,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 import { FONT, CHARCOAL, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useAIPredictions } from '../../../hooks/useAIPredictions';
-import { CourseShapePanel } from './CourseShapePanel';
+import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
 import {
   fieldAverageToday,
   lowRoundToday,
@@ -138,6 +138,7 @@ export function HeroBoardSection({
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   const [shapeOpen, setShapeOpen] = useState(false);
+  const shape = useCourseShapeRows(tournamentId, currentRound);
 
   const field = useMemo(() => fieldAverageToday(entries as any, currentRound), [entries, currentRound]);
   const low = useMemo(() => lowRoundToday(entries as any, currentRound), [entries, currentRound]);
@@ -279,6 +280,7 @@ export function HeroBoardSection({
 
       {/* COURSE SHAPE — collapsed by default; the only thing on this block that
           opens and closes. */}
+      {shape.usable && (
       <button
         type="button"
         onClick={() => setShapeOpen((v) => !v)}
@@ -315,10 +317,9 @@ export function HeroBoardSection({
           style={{ transform: shapeOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
         />
       </button>
-
-      {shapeOpen && (
-        <CourseShapePanel tournamentId={tournamentId} round={currentRound} />
       )}
+
+      {shape.usable && shapeOpen && <CourseShapePanel rows={shape.rows} />}
     </div>
   );
 }
