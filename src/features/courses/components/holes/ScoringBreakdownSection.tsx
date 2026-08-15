@@ -6,22 +6,33 @@ import {
   type ScoringBreakdownHole,
 } from './useCourseScoringBreakdown';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useMyHolePerformance } from '@/hooks/gam/useMyHolePerformance';
+import { useMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
+import { useLegendPulse } from '@/hooks/gam/useLegendPulse';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { legendCategoryLabel, formatLegendGap } from '@/lib/gam/visuals';
+import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED } from './analytical/tokens';
 import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
 
 /**
- * "Where your shots go" in the analytical treatment
- * (BRIEF_COURSE_YOU_TAB_ANALYTICAL_V2 s2-s5).
+ * "Where your shots go" - the CHART-LED You tab
+ * (BRIEF_YOU_TAB_CHART_LED, superseding the text-closing V2 panels).
  *
- *   - the average-round panel is headline PLUS reference: a lone "+8.5" with
- *     no field figure beside it reads as an alarm even when it is several
- *     shots better than everyone else
+ * Six panels, in order: an average round here, where the shots go (the merge
+ * of damaging holes and doubles), how each par plays for you, how your round
+ * unfolds, your form here, within reach.
+ *
+ * DECISIONS CARRIED FORWARD UNCHANGED:
  *   - the field reference is only drawn when both sides are commensurable:
  *     identical derivation (sum of per-hole averages to par) over the SAME
  *     set of hole numbers
- *   - damaging rows are tightened; the unit moves into the column header
- *   - "what's costing you" is headline-led on doubles a round
- *   - the thirds bars use a neutral ink ladder assigned by rank, never colour
+ *   - REFERENCE_NOISE_FLOOR governs the WORDS on a row, never the field mark
+ *   - the thirds take a neutral ink ladder assigned by rank, NEVER colour and
+ *     never a tint - the cumulative curve inherits that rule
+ *   - the share denominator is the viewer's own total_over_par, never the
+ *     field's
+ *   - a caption advises; it never narrates what the chart above it shows
  */
 
 const OVER = '#C8372B';
@@ -38,28 +49,26 @@ const CAPTION: React.CSSProperties = {
 const DAMAGE_GRID = '30px 1fr 52px';
 
 /**
- * Noise floor shared with the s3 caption logic - the two MUST move together,
- * and they do: this one constant drives both the caption branch and the ink
- * ladder's gate (BRIEF_THIRDS_FLOOR_AND_DOUBLES_SOURCE s0).
+ * Noise floor shared with the thirds caption logic - the two MUST move
+ * together, and they do: this one constant drives both the caption branch and
+ * the ink ladder's gate (BRIEF_THIRDS_FLOOR_AND_DOUBLES_SOURCE s0).
  *
- * DERIVED, NOT CHOSEN. Over every (member, course) pair with 5+ hole-by-hole
- * rounds, the spread a member would show from SAMPLING ALONE - 1.693 * sd of a
- * third's per-round total / sqrt(rounds), the expected range of three means -
- * has a median of 0.78 and a mean of 0.84. Below ~0.8 the worst third is not
- * reliably the worst third, so a directional caption would be describing
- * noise. At or above it the ordering is claiming something.
- *
- * The old 1.5 called the MEDIAN card (spread 1.10) even, which is why a full
- * shot of back-six fade was reported as "no weak stretch" while the bars above
- * plainly showed it.
+ * DERIVED, NOT CHOSEN, and DELIBERATELY 0.8 - not the 1.5 the earlier brief
+ * set. Over every (member, course) pair with 5+ hole-by-hole rounds the spread
+ * expected from SAMPLING ALONE has a median of 0.78. The old 1.5 called the
+ * median card (spread 1.10) even, which is why a full shot of back-six fade
+ * was reported as "no weak stretch" while the bars plainly showed it.
  */
 const THIRDS_NOISE_FLOOR = 0.8;
 
-/** Neutral ink ladder for the thirds bars, worst first. Never semantic colour. */
+/** Neutral ink ladder for the thirds, worst first. Never semantic colour. */
 const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
 
 /** Below this, viewer and field are level - no direction claimed either way. */
 const REFERENCE_NOISE_FLOOR = 0.5;
+
+/** Minimum rounds before a trend line is a reading rather than noise. */
+const FORM_MIN_ROUNDS = 10;
 
 function listGrammar(items: string[]): string {
   if (items.length === 0) return '';
@@ -84,40 +93,33 @@ function toneFor(v: number, digits = 1): string {
 }
 
 /**
- * A MARGIN IS NOT A SCORE (BRIEF_YOU_TAB_MARGIN_AND_GAPS s1).
- *
- * toneFor implements the to-par convention and is correct for every to-par
- * FIGURE. It is wrong for a comparison BETWEEN two scores: a bigger margin is
- * BETTER, so the to-par rule inverts and paints the good outcome red - red
- * meaning "you are beating the field" ten pixels from red meaning "you make
- * too many doubles".
- *
- * A margin is MOVEMENT-shaped, so it takes INDEX_DELTA (A.IMPROVED /
- * A.DRIFTED) via the analytical tokens. `gap` here is field minus you, so
- * POSITIVE means the member is better than the field.
+ * A MARGIN IS NOT A SCORE (BRIEF_YOU_TAB_MARGIN_AND_GAPS s1). `gap` is field
+ * minus you, so POSITIVE means the member is better than the field.
  */
 function marginTone(gap: number): string {
   if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) return A.MUTE;
   return gap > 0 ? A.IMPROVED : A.DRIFTED;
 }
 
-/** The field's bar. Neutral - the comparison, not a verdict. */
+/** The field's bar / mark. Neutral - the comparison, not a verdict. */
 const FIELD_BAR = '#C6CFD8';
+const FIELD_TICK = 'rgba(15,23,42,0.55)';
 
-/**
- * A row inside the noise floor: neutral ink, NO direction claimed. This is the
- * common case on real courses - a fifth of a shot across a hole average is
- * noise, so most damaging holes are level with the field.
- */
+/** A row inside the noise floor: neutral ink, NO direction claimed. */
 const LEVEL_BAR = 'rgba(14,18,22,0.34)';
 
+/**
+ * The 18-hole chart's quiet stop. A SOLID NEUTRAL, not a lightened red - the
+ * cost column has always been ink on this page and red is reserved for the
+ * doubles figures (BRIEF_YOU_TAB_CHART_LED s1.3).
+ */
+const COLUMN_QUIET = '#C6CFD8';
 
 /**
  * One bar on a scale shared with its sibling.
  *
  * THE MEMBER'S BAR IS SHORTER WHEN THEY ARE BETTER. These are to-par values,
- * so a LOWER figure is the better one - do not invert this. A short "Yours"
- * bar beside a long "The field here" bar is the member winning.
+ * so a LOWER figure is the better one - do not invert this.
  */
 const CompareBar: React.FC<{
   label: string;
@@ -139,15 +141,8 @@ const CompareBar: React.FC<{
         gap: 9,
       }}
     >
-      <span style={{ ...LABEL, fontSize: size === 'md' ? 8 : 7.5 }}>{label}</span>
-      <span
-        style={{
-          display: 'block',
-          height: h,
-          borderRadius: h / 2,
-          background: A.TRACK,
-        }}
-      >
+      <span style={{ ...LABEL, fontSize: size === 'md' ? 8.5 : 8.5 }}>{label}</span>
+      <span style={{ display: 'block', height: h, borderRadius: h / 2, background: A.TRACK }}>
         <span
           style={{
             display: 'block',
@@ -172,6 +167,65 @@ const CompareBar: React.FC<{
   );
 };
 
+/**
+ * THE RING IS A CHART, NOT A DECORATION: arc lengths are hole counts, a zero
+ * bucket draws NO segment, and the centre figure is the average gross.
+ */
+const DistributionRing: React.FC<{
+  segments: { key: string; value: number; tone: string }[];
+  centre: string;
+  centreLabel: string;
+  size?: number;
+  stroke?: number;
+}> = ({ segments, centre, centreLabel, size = 118, stroke = 13 }) => {
+  const total = segments.reduce((s, x) => s + Math.max(0, x.value), 0);
+  if (total <= 0) return null;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  let offset = 0;
+  const arcs = segments
+    .filter((s) => s.value > 0)
+    .map((s) => {
+      const len = (s.value / total) * c;
+      const a = { key: s.key, tone: s.tone, len, offset };
+      offset += len;
+      return a;
+    });
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} style={{ display: 'block', transform: 'rotate(-90deg)' }} aria-hidden>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={A.TRACK} strokeWidth={stroke} />
+        {arcs.map((a) => (
+          <circle
+            key={a.key}
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={a.tone}
+            strokeWidth={stroke}
+            strokeDasharray={`${a.len} ${c - a.len}`}
+            strokeDashoffset={-a.offset}
+          />
+        ))}
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+        }}
+      >
+        <span style={{ ...NUM, fontSize: 26, lineHeight: 1, color: A.INK }}>{centre}</span>
+        <span style={{ ...LABEL, fontSize: 8.5 }}>{centreLabel}</span>
+      </div>
+    </div>
+  );
+};
 
 interface Props {
   golfCourseId: string | undefined;
@@ -179,9 +233,16 @@ interface Props {
 
 export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { t } = useTranslation(['courses']);
+  const { user } = useSupabaseSession();
   const { data, isLoading } = useCourseScoringBreakdown(golfCourseId);
-  // Already loaded by the Course tab - React Query serves this from cache.
+  // Already loaded by the Course tab - React Query serves these from cache.
   const { data: analysis } = useCourseHoleAnalysis(golfCourseId);
+  const { data: myHoles } = useMyHolePerformance(user?.id, golfCourseId, {
+    enabled: Boolean(user?.id && golfCourseId),
+  });
+  /** Gross per round in date order at this course - the form panel's series. */
+  const { data: myRounds } = useMyRoundsAtCourse(golfCourseId);
+  const { data: pulse } = useLegendPulse(user?.id, 60);
 
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
@@ -198,10 +259,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   /**
    * Field reference. Both sides are "sum of per-hole average to par" - the
-   * SAME derivation - and both are restricted to the hole numbers present in
-   * both populations, so the two figures are commensurable. If the field
-   * analysis does not cover every hole the member has played, we draw nothing
-   * rather than compare an 18-hole figure with a 14-hole one.
+   * SAME derivation - restricted to the hole numbers present in both
+   * populations. If the field analysis does not cover every hole the member
+   * has played we draw nothing rather than compare 18 holes with 14.
    */
   const reference = useMemo(() => {
     if (!parsed) return null;
@@ -218,14 +278,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       you += h.shots_over_par || 0;
       field += f.avg_to_par;
     }
-    return { you, field, gap: field - you, holes: shared.length, rounds: analysis?.total_rounds ?? 0 };
+    return { you, field, gap: field - you, holes: shared.length };
   }, [parsed, analysis]);
 
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
-        <Panel><Skeleton className="h-[150px] w-full" /></Panel>
         <Panel><Skeleton className="h-[190px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[240px] w-full" /></Panel>
         <Panel><Skeleton className="h-[150px] w-full" /></Panel>
       </div>
     );
@@ -236,40 +296,17 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { rounds, total, avgGross, holes } = parsed;
   const hasInterpretation = rounds >= 5;
 
-  // Stratum 1: top 5 by shots_over_par desc. THE RANKING IS UNCHANGED - still
-  // by shots lost, per the subhead. The field is a second dimension, not a
-  // reordering (BRIEF_DAMAGING_HOLES_VS_FIELD s6).
-  const damaging = [...holes]
-    .sort((a, b) => b.shots_over_par - a.shots_over_par)
-    .slice(0, 5);
-  const top1 = damaging[0]?.shots_over_par || 1;
+  const holesByNo = new Map(holes.map((h) => [h.hole_no, h]));
 
-  /**
-   * Per-hole field cost: the field's average shots over par on that hole.
-   * Same derivation as the member's `shots_over_par`, so the two are
-   * commensurable HOLE BY HOLE - which is the only claim each row makes. This
-   * map is deliberately independent of the panel-wide `reference` gate above:
-   * that gate refuses a whole-round total when the hole SETS differ, while a
-   * row only needs its own hole covered.
-   */
+  /** Per-hole field cost, commensurable HOLE BY HOLE. */
   const fieldCostByHole = new Map<number, number>();
   if (analysis?.available) {
     for (const f of analysis.holes ?? []) {
       if (f?.avg_to_par != null) fieldCostByHole.set(f.hole_no, Number(f.avg_to_par));
     }
   }
-  const damagingFieldCosts = damaging
-    .map((h) => fieldCostByHole.get(h.hole_no))
-    .filter((v): v is number => v != null);
-  const anyField = damagingFieldCosts.length > 0;
-  /**
-   * The scale must include the FIELD values, or a notch on a hole where the
-   * field loses more than the member sits off the end of its own track.
-   */
-  const damageScale = Math.max(top1, ...damagingFieldCosts, 0.1) * 1.1;
 
-
-  // Stratum 2: totals across all played holes
+  // ---------------------------------------------------------------- totals
   const sumPar = holes.reduce((s, h) => s + (h.par_or_better || 0), 0);
   const sumBog = holes.reduce((s, h) => s + (h.bogeys || 0), 0);
   const sumDbl = holes.reduce((s, h) => s + (h.doubles_plus || 0), 0);
@@ -277,15 +314,70 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const pctPar = Math.round((sumPar / stratum2Total) * 100);
   const pctBog = Math.round((sumBog / stratum2Total) * 100);
   const pctDbl = Math.max(0, 100 - pctPar - pctBog);
+  const doublesPerRound = rounds > 0 ? sumDbl / rounds : 0;
 
-  const topDoubles = [...holes]
-    .filter((h) => (h.doubles_plus || 0) > 0)
-    .sort((a, b) => b.doubles_plus - a.doubles_plus)
-    .slice(0, 4);
-  /** Bars are on the worst source's count, so the leader always fills. */
-  const topDoublesMax = Math.max(...topDoubles.map((h) => h.doubles_plus || 0), 1);
+  // ------------------------------------------------- panel 2, the 18 holes
+  const ordered = [...holes].sort((a, b) => a.hole_no - b.hole_no);
+  const damagingAll = [...holes]
+    .filter((h) => (h.shots_over_par || 0) > 0)
+    .sort((a, b) => b.shots_over_par - a.shots_over_par);
+  const damaging = damagingAll.slice(0, 3);
+  const worstSet = new Set(damaging.map((h) => h.hole_no));
+  const columnMax = Math.max(...ordered.map((h) => h.shots_over_par || 0), 0.1);
 
-  // Stratum 3: thirds
+  const damagingFieldCosts = damaging
+    .map((h) => fieldCostByHole.get(h.hole_no))
+    .filter((v): v is number => v != null);
+  const anyField = damagingFieldCosts.length > 0;
+  const damageScale = Math.max(damaging[0]?.shots_over_par || 0.1, ...damagingFieldCosts, 0.1) * 1.1;
+
+  /**
+   * Share denominator: the member's OWN total shots over par here. Never the
+   * field total - "x% of everything you drop here" is a share of the viewer.
+   */
+  const s1Sum = +damaging.reduce((s, h) => s + h.shots_over_par, 0).toFixed(1);
+  const s1Share = total > 0 ? Math.round((s1Sum / total) * 100) : 0;
+  const restShare = Math.max(0, 100 - s1Share);
+  const s1HoleLabels = damaging.map((h) => String(h.hole_no));
+  const s1Advice = t('courses:holes.scoringBreakdown.s1Advice', {
+    holes:
+      s1HoleLabels.length === 1
+        ? t('courses:holes.scoringBreakdown.holeOne', { n: s1HoleLabels[0] })
+        : t('courses:holes.scoringBreakdown.holeMany', { list: listGrammar(s1HoleLabels) }),
+  });
+
+  // --------------------------------------------- panel 3, par-type scoring
+  /**
+   * RECONCILIATION. Every played hole belongs to exactly one par bucket and
+   * each bucket sums its own holes' shots_over_par, so
+   *   sum(parTypes.you) === total_over_par
+   * and, on the field side, sum(parTypes.field) === sum of the field's
+   * per-hole avg_to_par over the SAME holes. A breakdown that does not add to
+   * the figure above it is a fault; the assertion below is the guard.
+   */
+  const parTypes = (() => {
+    const byPar = new Map<number, { you: number; field: number; covered: boolean; holes: number }>();
+    for (const h of ordered) {
+      const bucket = byPar.get(h.par) ?? { you: 0, field: 0, covered: true, holes: 0 };
+      bucket.you += h.shots_over_par || 0;
+      bucket.holes += 1;
+      const f = fieldCostByHole.get(h.hole_no);
+      if (f == null) bucket.covered = false;
+      else bucket.field += f;
+      byPar.set(h.par, bucket);
+    }
+    return [...byPar.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([par, b]) => ({ par, ...b }));
+  })();
+  const parTypesYouSum = +parTypes.reduce((s, p) => s + p.you, 0).toFixed(2);
+  const parTypeScale =
+    Math.max(
+      ...parTypes.map((p) => Math.max(p.you, p.covered ? p.field : 0)),
+      0.1,
+    ) * 1.1;
+
+  // ------------------------------------------------- panel 4, the unfolding
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
     h.hole_no <= 6 ? 0 : h.hole_no <= 12 ? 1 : 2;
   const thirdSums = [0, 0, 0];
@@ -300,7 +392,6 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     t('courses:holes.scoringBreakdown.third2'),
     t('courses:holes.scoringBreakdown.third3'),
   ];
-  const maxThird = Math.max(...thirdSums, 0.0001);
   let worstIdx = 0;
   let bestIdx = 0;
   thirdSums.forEach((v, i) => {
@@ -309,16 +400,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     if (v < thirdSums[bestIdx] || !thirdHas[bestIdx]) bestIdx = i;
   });
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
-  /** Same threshold the caption uses: below it, ink nothing. */
+  /** Below the floor: ink nothing, claim nothing. The curve still draws. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
-  /**
-   * THE MAGNITUDE, ALWAYS TO ONE DECIMAL. `spread` is a NUMBER (+"1.0" is 1),
-   * so interpolating it raw prints "cost 1 shots more" at exactly the spreads
-   * the lower floor now admits. The strings already carry {{spread}}; they just
-   * needed a figure that survives the trip.
-   */
-  const spreadFig = spread.toFixed(1);
-
   /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
   const thirdRank = [0, 1, 2]
     .slice()
@@ -328,78 +411,96 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       return acc;
     }, {});
 
-  // Sentences
-  const s1Holes = damaging.slice(0, 3);
-  const s1Sum = +s1Holes.reduce((s, h) => s + h.shots_over_par, 0).toFixed(1);
+  /** Cumulative shots dropped, hole 1 to 18. Monotone cubic, never a spline. */
+  const cumulative = (() => {
+    const W = 300;
+    const H = 78;
+    const pts: { x: number; y: number }[] = [];
+    let run = 0;
+    const seq = ordered;
+    if (seq.length < 2) return null;
+    seq.forEach((h, i) => {
+      run += h.shots_over_par || 0;
+      pts.push({ x: (i / (seq.length - 1)) * W, y: run });
+    });
+    const max = Math.max(...pts.map((p) => p.y), 0.1);
+    const scaled = pts.map((p) => ({ x: p.x, y: H - (p.y / max) * (H - 4) }));
+    return { W, H, d: monotonePath(scaled), area: `${monotonePath(scaled)} L${W},${H} L0,${H} Z`, total: run };
+  })();
+
+  const s3Advice = thirdsEven
+    ? t('courses:holes.scoringBreakdown.s3AdviceEven')
+    : worstIdx === 2
+      ? t('courses:holes.scoringBreakdown.s3AdviceLate')
+      : worstIdx === 0
+        ? t('courses:holes.scoringBreakdown.s3AdviceEarly')
+        : t('courses:holes.scoringBreakdown.s3AdviceMiddle');
+
+  // ----------------------------------------------------- panel 5, the form
   /**
-   * Share denominator: the member's OWN total shots over par at this course
-   * (total_over_par, the sum of every played hole's average to par). Never the
-   * field total - "x% of everything you drop here" is a share of the viewer.
+   * Gross per round in date order at this course. useMyRoundsAtCourse returns
+   * the most recent 20, newest first - reversed here so the curve reads left
+   * to right in time. Below FORM_MIN_ROUNDS the panel does not render: a trend
+   * over four rounds is noise, and NO next round is ever projected.
    */
-  const s1Share = total > 0 ? Math.round((s1Sum / total) * 100) : 0;
-  const s1HoleLabels = s1Holes.map((h) => String(h.hole_no));
-  const s1Sentence = t('courses:holes.scoringBreakdown.s1Sentence', {
-    holes:
-      s1HoleLabels.length === 1
-        ? t('courses:holes.scoringBreakdown.holeOne', { n: s1HoleLabels[0] })
-        : t('courses:holes.scoringBreakdown.holeMany', { list: listGrammar(s1HoleLabels) }),
-    sum: s1Sum,
-    share: s1Share,
-  });
+  const form = (() => {
+    const rows = (myRounds ?? []).filter((r) => r.grossScore != null);
+    if (rows.length < FORM_MIN_ROUNDS) return null;
+    const series = [...rows].reverse().map((r) => Number(r.grossScore));
+    const best = Math.min(...series);
+    const worst = Math.max(...series);
+    const span = worst - best || 1;
+    const last10 = series.slice(-10);
+    const prior = series.slice(0, -10);
+    const avg = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
+    const recentAvg = avg(last10);
+    const priorAvg = prior.length >= 5 ? avg(prior.slice(-10)) : null;
+    return { series, best, worst, span, recentAvg, priorAvg, bestIndex: series.indexOf(best) };
+  })();
 
-  const doublesPerRound = rounds > 0 ? sumDbl / rounds : 0;
-  const s2Sentence =
-    doublesPerRound >= 1
-      ? t('courses:holes.scoringBreakdown.s2SentenceHigh', {
-          total: sumDbl,
-          perRound: +doublesPerRound.toFixed(1),
-        })
-      : t('courses:holes.scoringBreakdown.s2SentenceLow');
+  // ------------------------------------------------ panel 6, within reach
+  const birdied = (() => {
+    const rows = myHoles ?? [];
+    if (rows.length === 0) return null;
+    const withBirdie = rows.filter((r) => (r.birdie_count || 0) > 0 || (r.eagle_or_better_count || 0) > 0);
+    const outstanding = rows.filter((r) => (r.birdie_count || 0) === 0 && (r.eagle_or_better_count || 0) === 0);
+    return {
+      done: withBirdie.length,
+      of: rows.length,
+      lastOne: outstanding.length === 1 ? outstanding[0].hole_no : null,
+    };
+  })();
 
-  let s3Sentence: string;
-  if (thirdsEven) {
-    s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEven');
-  } else {
-    const bestLabel = thirdLabels[bestIdx].toLowerCase();
-    const worstLabel = thirdLabels[worstIdx].toLowerCase();
-    if (worstIdx === 2) {
-      s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceLate', {
-        worst: worstLabel,
-        best: bestLabel,
-        spread: spreadFig,
-      });
-    } else if (worstIdx === 0) {
-      s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceEarly', {
-        best: bestLabel,
-        worst: worstLabel,
-        spread: spreadFig,
-      });
-    } else {
-      s3Sentence = t('courses:holes.scoringBreakdown.s3SentenceMiddle', {
-        best: bestLabel,
-        spread: spreadFig,
-      });
-    }
-  }
+  /**
+   * The nearest crown chase, COURSE SCOPED. useLegendPulse is member-wide, so
+   * the rows are filtered to this course - never a chase somewhere else, and
+   * never an invented one. A LEVEL value is said, not drawn as a distance.
+   */
+  const chase = (() => {
+    if (!golfCourseId) return null;
+    const rows = (pulse ?? []).filter(
+      (p) => p.course_id === golfCourseId && (p.kind === 'chase' || p.kind === 'threat'),
+    );
+    if (rows.length === 0) return null;
+    const withGap = rows.filter((p) => p.gap_to_first != null);
+    if (withGap.length === 0) return null;
+    const nearest = withGap.reduce((a, b) =>
+      Math.abs(b.gap_to_first as number) < Math.abs(a.gap_to_first as number) ? b : a,
+    );
+    const gap = Number(nearest.gap_to_first);
+    return {
+      label: legendCategoryLabel[nearest.category] ?? nearest.category,
+      level: Math.abs(gap) < 0.0001,
+      gapText: formatLegendGap(nearest.category, Math.abs(gap)),
+      rank: nearest.viewer_rank,
+    };
+  })();
 
   const Caption: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <p style={CAPTION}>{children}</p>
   );
 
-  /**
-   * Headline. With field data it is the GAP (the one fact a member cannot read
-   * off their own scorecard); without it, it falls back to the member's own
-   * average to par. The label is derived in the SAME branch as the figure, so
-   * the two can never disagree about what the number means.
-   *
-   * `reference.gap` is field minus you, so POSITIVE means the member is better
-   * than the field. Tone is taken from the negated gap so "better" reads as the
-   * improvement tone through the existing toneFor convention.
-   */
-  /**
-   * Round ONCE, here, and derive the gap from the DISPLAYED components so the
-   * subtraction a member can do on screen is always true.
-   */
+  /** Round ONCE so the subtraction a member can do on screen is always true. */
   const r1 = (v: number) => Math.round(v * 10) / 10;
   const disp = reference
     ? (() => {
@@ -409,46 +510,11 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       })()
     : null;
 
-  const headline = (() => {
-    if (disp) {
-      const gap = disp.gap;
-      if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) {
-        return {
-          text: signed(0),
-          tone: marginTone(0),
-          label: t('courses:courseDetail.you.gapLevel'),
-        };
-      }
-      return {
-        // THE MAGNITUDE ALONE. A plus sign means MORE SHOTS everywhere else on
-        // this page, so "+3.6 better than the field" reads as a penalty. The
-        // direction lives in the label and in the tone.
-        text: Math.abs(gap).toFixed(1),
-        tone: marginTone(gap),
-        label:
-          gap > 0
-            ? t('courses:courseDetail.you.gapBetterShots')
-            : t('courses:courseDetail.you.gapWorseShots'),
-      };
-    }
-
-    // No field reference: this figure is the member's own to-par SCORE, not a
-    // margin, so it keeps signed() and toneFor().
-    // Round before branching so -0.04 never renders "-0.0".
-    const roundedTotal = Math.round(total * 10) / 10;
-    return {
-      text: signed(total),
-      tone: toneFor(total),
-      label:
-        roundedTotal > 0
-          ? t('courses:courseDetail.you.shotsOverPar')
-          : roundedTotal < 0
-            ? t('courses:courseDetail.you.shotsUnderPar')
-            : t('courses:courseDetail.you.levelPar'),
-    };
+  const bestGross = (() => {
+    const rows = (myRounds ?? []).filter((r) => r.grossScore != null);
+    if (rows.length === 0) return null;
+    return Math.min(...rows.map((r) => Number(r.grossScore)));
   })();
-
-
 
   const split = [
     { key: 'par', label: t('courses:courseDetail.you.parOrBetter'), pct: pctPar, holes: sumPar, tone: UNDER },
@@ -458,23 +524,51 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS, ...FIGS }}>
-      {/* An average round here - headline PLUS reference */}
+      {/* 1 - AN AVERAGE ROUND HERE */}
       <Panel
         title={t('courses:courseDetail.you.avgRound')}
         aside={t('courses:courseDetail.you.roundsCount', { count: rounds })}
       >
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ ...NUM, fontSize: 44, lineHeight: 1, color: headline.tone }}>{headline.text}</div>
-          <div style={{ ...LABEL, marginTop: 8 }}>{headline.label}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <DistributionRing
+            segments={[
+              { key: 'par', value: sumPar, tone: UNDER },
+              { key: 'bog', value: sumBog, tone: BAND_AMBER },
+              { key: 'dbl', value: sumDbl, tone: OVER },
+            ]}
+            centre={avgGross != null ? avgGross.toFixed(1) : signed(total)}
+            centreLabel={
+              avgGross != null
+                ? t('courses:courseDetail.you.avgGross')
+                : t('courses:courseDetail.you.shotsOverPar')
+            }
+          />
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {split.map((s) => (
+              <div key={s.key} style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span
+                  aria-hidden
+                  style={{ width: 8, height: 8, borderRadius: 2, background: s.tone, flexShrink: 0 }}
+                />
+                <span style={{ ...LABEL, fontSize: 8.5, flex: 1, minWidth: 0, whiteSpace: 'pre-line' }}>
+                  {s.label}
+                </span>
+                <span style={{ ...NUM, fontSize: 16, color: A.INK }}>
+                  {s.pct}
+                  <span style={{ fontSize: 11 }}>%</span>
+                </span>
+                <span style={{ ...LABEL, fontSize: 8.5, width: 52, textAlign: 'right' }}>
+                  {t('courses:holes.scoringBreakdown.nHoles', { count: s.holes })}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
+        {/* The field bars only where the two sides are commensurable. */}
         {disp && (
           <>
             <Hairline style={{ margin: '16px 0 14px' }} />
-            {/* The distance the two figures state and never showed: ONE shared
-                scale, headroom so neither bar touches the edge. The FIGURES
-                keep the to-par convention (toneFor); only the bars carry the
-                margin tone. */}
             {(() => {
               const scale = Math.max(disp.you, disp.field, 0.1) * 1.08;
               const tone = marginTone(disp.gap);
@@ -502,281 +596,349 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           </>
         )}
 
-
         <Hairline style={{ margin: '16px 0 14px' }} />
         <StatRow
-          size={17}
+          size={19}
           items={[
-            ...(avgGross != null
-              ? [{ label: t('courses:courseDetail.you.avgGross'), value: avgGross.toFixed(1) }]
-              : []),
-            {
-              label: t('courses:courseDetail.you.parOrBetterShort'),
-              value: `${pctPar}%`,
-            },
             {
               label: t('courses:courseDetail.you.doublesARound'),
               value: (+doublesPerRound.toFixed(1)).toFixed(1),
-              // A count, not a to-par figure - see the headline above. Neutral.
             },
-            { label: t('courses:courseDetail.you.roundsLabel'), value: String(rounds) },
+            ...(bestGross != null
+              ? [{ label: t('courses:holes.scoringBreakdown.bestHere'), value: String(bestGross) }]
+              : [{ label: t('courses:courseDetail.you.roundsLabel'), value: String(rounds) }]),
           ]}
         />
       </Panel>
 
-      {/* Your most damaging holes - tightened rows, unit in the header */}
-      <Panel
-        title={t('courses:courseDetail.you.damagingHoles')}
-        aside={t('courses:courseDetail.you.byShotsLost')}
-      >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: DAMAGE_GRID,
-            gap: 11,
-            alignItems: 'baseline',
-            paddingBottom: 4,
-          }}
+      {/* 2 - WHERE THE SHOTS GO (the merge) */}
+      {damagingAll.length > 0 && (
+        <Panel
+          title={t('courses:holes.scoringBreakdown.mergeTitle')}
+          aside={t('courses:holes.scoringBreakdown.mergeAside')}
         >
-          <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.you.colHole')}</span>
-          <span style={LABEL}>{t('courses:holes.scoringBreakdown.s1Sub')}</span>
-          <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
-        </div>
-        {damaging.map((h) => {
-          /**
-           * COMMENSURABILITY, PER ROW (BRIEF_DAMAGING_HOLES_VS_FIELD s3).
-           *
-           * The row gets a notch and a verdict ONLY when the field analysis has
-           * a reading for THIS hole number. Never fall back to the course-wide
-           * field average: that is a different quantity and it would make the
-           * verdict false. No reading -> renders as it did before, red bar,
-           * no notch, no verdict.
-           */
-          const fieldCost = fieldCostByHole.get(h.hole_no) ?? null;
-          // Positive gap = the member is BETTER than the field on this hole.
-          const gap = fieldCost == null ? null : fieldCost - h.shots_over_par;
-          const level = gap != null && Math.abs(gap) < REFERENCE_NOISE_FLOOR;
-          const barTone = gap == null ? OVER : level ? LEVEL_BAR : marginTone(gap);
-          const barW = Math.max(4, Math.min(100, (h.shots_over_par / damageScale) * 100));
-          const notchW = fieldCost == null ? 0 : Math.max(0, Math.min(100, (fieldCost / damageScale) * 100));
-          const verdict =
-            gap == null
-              ? null
-              : level
-                ? t('courses:holes.scoringBreakdown.vsLevel')
-                : gap > 0
-                  ? t('courses:holes.scoringBreakdown.vsBetter')
-                  : t('courses:holes.scoringBreakdown.vsWorse');
-          return (
-            <div
-              key={h.hole_no}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: DAMAGE_GRID,
-                gap: 11,
-                alignItems: 'center',
-                padding: '7px 0',
-              }}
-            >
-              <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
-              <span style={{ minWidth: 0 }}>
-                <span style={{ ...LABEL, fontSize: 8, display: 'block' }}>
-                  {t('courses:holes.scoringBreakdown.parYouAvg', {
-                    par: h.par,
-                    avg: h.avg_score.toFixed(2),
-                  })}
-                </span>
-                <span
-                  style={{
-                    display: 'block',
-                    position: 'relative',
-                    height: 7,
-                    borderRadius: 3.5,
-                    background: A.TRACK,
-                    marginTop: 5,
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'block',
-                      height: 7,
-                      borderRadius: 3.5,
-                      width: `${barW}%`,
-                      background: barTone,
-                    }}
-                  />
-                  {fieldCost != null && (
-                    /* The field's cost on the SAME scale. Where the bar runs
-                       past the notch, that stretch is the member's alone. */
-                    <span
-                      aria-hidden
-                      style={{
-                        position: 'absolute',
-                        top: -1.5,
-                        left: `${notchW}%`,
-                        width: 2,
-                        height: 10,
-                        borderRadius: 1,
-                        background: 'rgba(15,23,42,0.55)',
-                        transform: 'translateX(-1px)',
-                      }}
-                    />
-                  )}
-                </span>
-                {verdict && (
-                  <span
-                    style={{
-                      ...LABEL,
-                      fontSize: 7.5,
-                      display: 'block',
-                      marginTop: 5,
-                      color: level ? A.DIM : barTone,
-                    }}
-                  >
-                    {verdict}
-                  </span>
-                )}
-              </span>
-              {/* INK, not red: the bar carries the direction now. */}
-              <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'right' }}>
-                +{h.shots_over_par.toFixed(1)}
-              </span>
-            </div>
-          );
-        })}
-        {anyField && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              paddingTop: 6,
-            }}
-          >
-            <span
-              aria-hidden
-              style={{ display: 'block', width: 2, height: 9, borderRadius: 1, background: 'rgba(15,23,42,0.55)' }}
-            />
-            <span style={{ ...LABEL, fontSize: 7.5 }}>{t('courses:holes.scoringBreakdown.vsFieldLegend')}</span>
-          </div>
-        )}
-
-        {hasInterpretation ? (
-          <Caption>{s1Sentence}</Caption>
-        ) : (
-          <Caption>{t('courses:holes.scoringBreakdown.moreRoundsHint')}</Caption>
-        )}
-      </Panel>
-
-      {/* What's costing you the shots - headline led on doubles a round */}
-      <Panel
-        title={t('courses:courseDetail.you.costingShots')}
-        aside={t('courses:courseDetail.you.everyHole')}
-      >
-        <div style={{ textAlign: 'center' }}>
-          {/* A COUNT, not a to-par figure. Red on this page means "under par"
-              (good), so painting a bad-thing count red says the opposite of
-              what it means. Neutral ink; the label carries the sense. */}
-          <div style={{ ...NUM, fontSize: 40, lineHeight: 1, color: A.INK }}>
-            {(+doublesPerRound.toFixed(1)).toFixed(1)}
-          </div>
-          <div style={{ ...LABEL, marginTop: 8 }}>{t('courses:courseDetail.you.doublesARound')}</div>
-        </div>
-
-        <Hairline style={{ margin: '16px 0 14px' }} />
-
-        <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
-          {split
-            .filter((s) => s.pct > 0)
-            .map((s) => (
-              <span
-                key={s.key}
-                style={{ height: 6, flex: s.pct, background: s.tone, borderRadius: 3 }}
-              />
-            ))}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-          {split.map((s) => (
-            <div key={s.key} style={{ textAlign: 'center', minWidth: 0 }}>
-              <div style={LABEL}>{s.label}</div>
-              <div style={{ ...NUM, fontSize: 20, color: s.tone, marginTop: 3 }}>
-                {s.pct}
-                <span style={{ fontSize: 12, fontWeight: 700 }}>%</span>
-              </div>
-              <div style={{ ...LABEL, fontSize: 8, marginTop: 2 }}>
-                {t('courses:holes.scoringBreakdown.nHoles', { count: s.holes })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {topDoubles.length > 0 && (
-          <>
-            <div style={{ ...LABEL, marginTop: 20, marginBottom: 10 }}>
-              {t('courses:courseDetail.you.doublesFrom')}
-            </div>
-            {topDoubles.map((h) => {
-              const n = h.doubles_plus || 0;
-              const barW = Math.max(4, Math.min(100, (n / topDoublesMax) * 100));
-              /**
-               * SHARE OF THE VIEWER'S OWN DOUBLES (s3), the same rule the s1
-               * share follows: `sumDbl` is this member's count across every hole
-               * they have played here. Never the field's total - "13% of them"
-               * has to mean 13% of the doubles the sentence beneath counts.
-               */
-              const share = sumDbl > 0 ? Math.round((n / sumDbl) * 100) : 0;
+          {/* a. every hole, not five - the fourteen quiet ones are the point */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 92 }}>
+            {ordered.map((h) => {
+              const v = h.shots_over_par || 0;
+              const isWorst = worstSet.has(h.hole_no);
+              const barH = Math.max(2, (v / columnMax) * 62);
               return (
                 <div
                   key={h.hole_no}
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '52px 1fr 30px 34px',
+                    flex: 1,
+                    minWidth: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 9,
-                    padding: '5px 0',
+                    justifyContent: 'flex-end',
+                    gap: 4,
                   }}
                 >
-                  <span style={{ ...LABEL, fontSize: 8 }}>
-                    {t('courses:holes.scoringBreakdown.holeN', { n: h.hole_no })}
-                  </span>
+                  {isWorst && (
+                    <span style={{ ...NUM, fontSize: 8.5, color: A.INK }}>{v.toFixed(1)}</span>
+                  )}
                   <span
-                    style={{ display: 'block', height: 6, borderRadius: 3, background: A.TRACK }}
+                    aria-hidden
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      height: barH,
+                      borderRadius: 2,
+                      background: isWorst ? A.INK : COLUMN_QUIET,
+                    }}
+                  />
+                  <span
+                    style={{
+                      ...LABEL,
+                      fontSize: 8.5,
+                      letterSpacing: 0,
+                      color: isWorst ? A.INK : A.MUTE,
+                    }}
                   >
-                    {/* RED STAYS. This is a count of doubles - a bad thing -
-                        which is the over-par tone doing its job (s3). */}
-                    <span
-                      style={{
-                        display: 'block',
-                        height: 6,
-                        borderRadius: 3,
-                        width: `${barW}%`,
-                        background: OVER,
-                      }}
-                    />
+                    {h.hole_no}
                   </span>
-                  <span style={{ ...NUM, fontSize: 14, color: OVER, textAlign: 'right' }}>{n}</span>
-                  <span style={{ ...LABEL, fontSize: 8, textAlign: 'right' }}>{share}%</span>
                 </div>
               );
             })}
-          </>
-        )}
+          </div>
 
-        {hasInterpretation && <Caption>{s2Sentence}</Caption>}
-      </Panel>
+          {/* b. the share, as a mark you can point at */}
+          <Hairline style={{ margin: '14px 0 12px' }} />
+          <div style={{ display: 'flex', gap: 3 }}>
+            <span
+              style={{
+                height: 8,
+                borderRadius: 4,
+                background: A.INK,
+                flex: Math.max(1, s1Share),
+              }}
+            />
+            <span
+              style={{
+                height: 8,
+                borderRadius: 4,
+                background: COLUMN_QUIET,
+                flex: Math.max(1, restShare),
+              }}
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+            <span style={{ ...LABEL, fontSize: 8.5, color: A.INK }}>
+              {t('courses:holes.scoringBreakdown.shareTop', { share: s1Share })}
+            </span>
+            <span style={{ ...LABEL, fontSize: 8.5 }}>
+              {t('courses:holes.scoringBreakdown.shareRest', {
+                count: Math.max(0, ordered.length - damaging.length),
+                share: restShare,
+              })}
+            </span>
+          </div>
 
-      {/* How your round unfolds - neutral ink ladder by rank */}
-      {hasInterpretation && (
+          {/* c. the three the coaching line names, in detail */}
+          <Hairline style={{ margin: '14px 0 10px' }} />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: DAMAGE_GRID,
+              gap: 11,
+              alignItems: 'baseline',
+              paddingBottom: 4,
+            }}
+          >
+            <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.you.colHole')}</span>
+            <span style={LABEL}>{t('courses:holes.scoringBreakdown.s1Sub')}</span>
+            <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
+          </div>
+          {damaging.map((h) => {
+            /**
+             * COMMENSURABILITY, PER ROW. The row gets a mark and a verdict only
+             * where the field analysis reads THIS hole. The floor governs the
+             * WORDS; the field tick renders in every case.
+             */
+            const fieldCost = fieldCostByHole.get(h.hole_no) ?? null;
+            const gap = fieldCost == null ? null : fieldCost - h.shots_over_par;
+            const level = gap != null && Math.abs(gap) < REFERENCE_NOISE_FLOOR;
+            const barTone = gap == null ? A.INK : level ? LEVEL_BAR : marginTone(gap);
+            const barW = Math.max(4, Math.min(100, (h.shots_over_par / damageScale) * 100));
+            const notchW = fieldCost == null ? 0 : Math.max(0, Math.min(100, (fieldCost / damageScale) * 100));
+            const verdict =
+              gap == null
+                ? null
+                : level
+                  ? t('courses:holes.scoringBreakdown.vsLevel')
+                  : gap > 0
+                    ? t('courses:holes.scoringBreakdown.vsBetter')
+                    : t('courses:holes.scoringBreakdown.vsWorse');
+            const dbl = h.doubles_plus || 0;
+            const dblShare = sumDbl > 0 ? Math.round((dbl / sumDbl) * 100) : 0;
+            return (
+              <div
+                key={h.hole_no}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: DAMAGE_GRID,
+                  gap: 11,
+                  alignItems: 'center',
+                  padding: '7px 0',
+                }}
+              >
+                <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ ...LABEL, fontSize: 8.5, display: 'block' }}>
+                    {t('courses:holes.scoringBreakdown.parYouAvg', {
+                      par: h.par,
+                      avg: h.avg_score.toFixed(2),
+                    })}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      position: 'relative',
+                      height: 7,
+                      borderRadius: 3.5,
+                      background: A.TRACK,
+                      marginTop: 5,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'block',
+                        height: 7,
+                        borderRadius: 3.5,
+                        width: `${barW}%`,
+                        background: barTone,
+                      }}
+                    />
+                    {fieldCost != null && (
+                      <span
+                        aria-hidden
+                        style={{
+                          position: 'absolute',
+                          top: -1.5,
+                          left: `${notchW}%`,
+                          width: 2,
+                          height: 10,
+                          borderRadius: 1,
+                          background: FIELD_TICK,
+                          transform: 'translateX(-1px)',
+                        }}
+                      />
+                    )}
+                  </span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: 8,
+                      marginTop: 5,
+                    }}
+                  >
+                    {verdict && (
+                      <span style={{ ...LABEL, fontSize: 8.5, color: level ? A.MUTE : barTone }}>
+                        {verdict}
+                      </span>
+                    )}
+                    {dbl > 0 && (
+                      <span style={{ ...LABEL, fontSize: 8.5, color: OVER }}>
+                        {t('courses:holes.scoringBreakdown.doublesShare', {
+                          count: dbl,
+                          share: dblShare,
+                        })}
+                      </span>
+                    )}
+                  </span>
+                </span>
+                <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'right' }}>
+                  +{h.shots_over_par.toFixed(1)}
+                </span>
+              </div>
+            );
+          })}
+          {anyField && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 6 }}>
+              <span
+                aria-hidden
+                style={{ display: 'block', width: 2, height: 9, borderRadius: 1, background: FIELD_TICK }}
+              />
+              <span style={{ ...LABEL, fontSize: 8.5 }}>
+                {t('courses:holes.scoringBreakdown.vsFieldLegend')}
+              </span>
+            </div>
+          )}
+
+          {/* d. one line, and it advises */}
+          <Caption>
+            {hasInterpretation ? s1Advice : t('courses:holes.scoringBreakdown.moreRoundsHint')}
+          </Caption>
+        </Panel>
+      )}
+
+      {/* 3 - HOW EACH PAR PLAYS FOR YOU */}
+      {parTypes.length > 0 && (
+        <Panel
+          title={t('courses:holes.scoringBreakdown.parTypeTitle')}
+          aside={t('courses:holes.scoringBreakdown.parTypeAside')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+            {parTypes.map((p) => {
+              const barW = Math.max(3, Math.min(100, (Math.max(0, p.you) / parTypeScale) * 100));
+              const tickW = p.covered
+                ? Math.max(0, Math.min(100, (Math.max(0, p.field) / parTypeScale) * 100))
+                : null;
+              // field minus you: POSITIVE means the member is better here.
+              const margin = p.covered ? p.field - p.you : null;
+              return (
+                <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '56px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
+                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                    {t('courses:holes.scoringBreakdown.parLabel', { n: p.par })}
+                  </span>
+                  <span style={{ display: 'block', position: 'relative', height: 7, borderRadius: 3.5, background: A.TRACK }}>
+                    <span
+                      style={{
+                        display: 'block',
+                        height: 7,
+                        borderRadius: 3.5,
+                        width: `${barW}%`,
+                        background: A.INK,
+                      }}
+                    />
+                    {tickW != null && (
+                      <span
+                        aria-hidden
+                        style={{
+                          position: 'absolute',
+                          top: -1.5,
+                          left: `${tickW}%`,
+                          width: 2,
+                          height: 10,
+                          borderRadius: 1,
+                          background: FIELD_TICK,
+                          transform: 'translateX(-1px)',
+                        }}
+                      />
+                    )}
+                  </span>
+                  <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'right' }}>
+                    {signed(p.you)}
+                  </span>
+                  <span
+                    style={{
+                      ...NUM,
+                      fontSize: 13,
+                      color: margin == null ? A.MUTE : marginTone(margin),
+                      textAlign: 'right',
+                    }}
+                  >
+                    {margin == null ? '' : signed(Math.abs(margin) < REFERENCE_NOISE_FLOOR ? 0 : margin)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+            <span style={{ ...LABEL, fontSize: 8.5 }}>
+              {t('courses:holes.scoringBreakdown.parTypeTotal')}
+            </span>
+            {/* Reconciles with the headline by construction - see the comment
+                above parTypes: every played hole lands in exactly one bucket. */}
+            <span style={{ ...NUM, fontSize: 13, color: A.INK }}>{signed(parTypesYouSum)}</span>
+          </div>
+        </Panel>
+      )}
+
+      {/* 4 - HOW YOUR ROUND UNFOLDS */}
+      {hasInterpretation && cumulative && (
         <Panel
           title={t('courses:courseDetail.you.roundUnfolds')}
           aside={t('courses:courseDetail.you.byThird')}
         >
+          <svg
+            viewBox={`0 0 ${cumulative.W} ${cumulative.H}`}
+            width="100%"
+            height={cumulative.H}
+            preserveAspectRatio="none"
+            aria-hidden
+            style={{ display: 'block' }}
+          >
+            <path d={cumulative.area} fill="rgba(14,18,22,0.06)" />
+            <path
+              d={cumulative.d}
+              fill="none"
+              stroke={A.INK}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
               gap: 12,
-              alignItems: 'end',
+              marginTop: 12,
             }}
           >
             {thirdSums.map((v, i) => {
@@ -784,24 +946,178 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               const shade = thirdsEven ? THIRD_LADDER[2] : THIRD_LADDER[thirdRank[i]];
               return (
                 <div key={i} style={{ textAlign: 'center', minWidth: 0 }}>
-                  <div
-                    style={{ ...NUM, fontSize: 17, color: isWorst ? A.INK : A.MUTE, marginBottom: 6 }}
-                  >
+                  <div style={{ ...NUM, fontSize: 18, color: isWorst ? A.INK : A.MUTE }}>
                     +{v.toFixed(1)}
                   </div>
-                  <div
-                    style={{
-                      height: Math.max(10, (v / maxThird) * 62),
-                      borderRadius: 4,
-                      background: shade,
-                    }}
-                  />
-                  <div style={{ ...LABEL, marginTop: 7 }}>{thirdLabels[i]}</div>
+                  {/* Neutral ink by rank. NEVER semantic colour, never a tint. */}
+                  <div style={{ height: 3, borderRadius: 2, background: shade, marginTop: 6 }} />
+                  <div style={{ ...LABEL, fontSize: 8.5, marginTop: 7 }}>{thirdLabels[i]}</div>
                 </div>
               );
             })}
           </div>
-          <Caption>{s3Sentence}</Caption>
+          <Caption>{s3Advice}</Caption>
+        </Panel>
+      )}
+
+      {/* 5 - YOUR FORM HERE */}
+      {form && (
+        <Panel
+          title={t('courses:holes.scoringBreakdown.formTitle')}
+          aside={t('courses:holes.scoringBreakdown.formAside', { count: form.series.length })}
+        >
+          {(() => {
+            const W = 300;
+            const H = 96;
+            const pad = 10;
+            /**
+             * WORSE IS HIGHER. A gross of 84 sits ABOVE a gross of 72, so the
+             * mapping SUBTRACTS from the plot height - a falling gross draws a
+             * falling line.
+             */
+            const y = (v: number) => pad + (1 - (v - form.best) / form.span) * (H - pad * 2);
+            const x = (i: number) => (i / (form.series.length - 1)) * W;
+            const pts = form.series.map((v, i) => ({ x: x(i), y: y(v) }));
+            const zone = (v: number) => {
+              const k = (v - form.best) / form.span;
+              return k <= 0.33 ? A.GREEN : k <= 0.66 ? A.AMBER : A.RED;
+            };
+            const segs = pts.slice(0, -1).map((p, i) => ({
+              d: monotonePath([p, pts[i + 1]]),
+              tone: zone((form.series[i] + form.series[i + 1]) / 2),
+              key: i,
+            }));
+            const bi = form.bestIndex;
+            const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
+            return (
+              <>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
+                  <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
+                    {form.recentAvg.toFixed(1)}
+                  </span>
+                  {delta == null ? (
+                    <span style={{ ...LABEL, fontSize: 8.5 }}>
+                      {t('courses:holes.scoringBreakdown.formLast10')}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        ...LABEL,
+                        fontSize: 8.5,
+                        color: Math.abs(delta) < 0.5 ? A.MUTE : delta > 0 ? A.IMPROVED : A.DRIFTED,
+                      }}
+                    >
+                      {Math.abs(delta) < 0.5
+                        ? t('courses:holes.scoringBreakdown.formLevel')
+                        : delta > 0
+                          ? t('courses:holes.scoringBreakdown.formBetter', { n: Math.abs(delta).toFixed(1) })
+                          : t('courses:holes.scoringBreakdown.formWorse', { n: Math.abs(delta).toFixed(1) })}
+                    </span>
+                  )}
+                </div>
+                <svg
+                  viewBox={`0 0 ${W} ${H}`}
+                  width="100%"
+                  height={H}
+                  preserveAspectRatio="none"
+                  aria-hidden
+                  style={{ display: 'block' }}
+                >
+                  {/* The halo is the PANEL colour, never white-on-white by
+                      accident: A.PANEL is the surface this sits on. */}
+                  <path
+                    d={monotonePath(pts)}
+                    fill="none"
+                    stroke={A.PANEL}
+                    strokeWidth={5}
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  {segs.map((s) => (
+                    <path
+                      key={s.key}
+                      d={s.d}
+                      fill="none"
+                      stroke={s.tone}
+                      strokeWidth={2.25}
+                      strokeLinecap="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ))}
+                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.2} fill={A.GREEN} />
+                </svg>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                    {t('courses:holes.scoringBreakdown.formBest', { n: form.best })}
+                  </span>
+                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                    {t('courses:holes.scoringBreakdown.formWorstHere', { n: form.worst })}
+                  </span>
+                </div>
+              </>
+            );
+          })()}
+        </Panel>
+      )}
+
+      {/* 6 - WITHIN REACH */}
+      {(birdied || chase) && (
+        <Panel
+          title={t('courses:holes.scoringBreakdown.reachTitle')}
+          aside={t('courses:holes.scoringBreakdown.reachAside')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {birdied && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>
+                    {t('courses:holes.scoringBreakdown.reachBirdies')}
+                  </div>
+                  {birdied.lastOne != null && (
+                    <div style={{ ...LABEL, fontSize: 8.5, marginTop: 4 }}>
+                      {t('courses:courseDetail.you.oneToGoHole', { n: birdied.lastOne })}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      height: 6,
+                      borderRadius: 3,
+                      background: A.TRACK,
+                      marginTop: 7,
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 6,
+                        borderRadius: 3,
+                        width: `${Math.round((birdied.done / Math.max(1, birdied.of)) * 100)}%`,
+                        background: A.INK,
+                      }}
+                    />
+                  </div>
+                </div>
+                <span style={{ ...NUM, fontSize: 17, color: A.INK, whiteSpace: 'nowrap' }}>
+                  {t('courses:holes.scoringBreakdown.reachOf', { done: birdied.done, of: birdied.of })}
+                </span>
+              </div>
+            )}
+            {chase && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{chase.label}</div>
+                  <div style={{ ...LABEL, fontSize: 8.5, marginTop: 4 }}>
+                    {/* A TIE IS NOT A DISTANCE. */}
+                    {chase.level
+                      ? t('courses:holes.scoringBreakdown.reachChaseLevel')
+                      : t('courses:holes.scoringBreakdown.reachChaseGap', { gap: chase.gapText })}
+                  </div>
+                </div>
+                {chase.rank != null && (
+                  <span style={{ ...NUM, fontSize: 17, color: A.INK }}>#{chase.rank}</span>
+                )}
+              </div>
+            )}
+          </div>
         </Panel>
       )}
     </div>
