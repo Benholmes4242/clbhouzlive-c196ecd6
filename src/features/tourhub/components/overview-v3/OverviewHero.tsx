@@ -23,6 +23,7 @@ import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
 import { tournamentRoute } from '../../routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
+import { PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
 
@@ -39,7 +40,7 @@ interface OverviewHeroProps {
  * so the full overview hero container is `OVERVIEW_HERO_TOTAL_HEIGHT`.
  */
 export const OVERVIEW_HERO_HEIGHT =
-  'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
+  `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`;
 
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
 export const OVERVIEW_HERO_TICKER_HEIGHT = 36;

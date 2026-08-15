@@ -11,7 +11,7 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  CHARCOAL, WHITE_ALPHA_65, WHITE_ALPHA_55, WHITE_ALPHA_10, AMBER,
+  HERO_BOARD_SURFACE, WHITE_ALPHA_65, WHITE_ALPHA_12, AMBER,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -60,7 +60,9 @@ interface Props {
 /** Surface tokens per theme. INK has no named dark counterpart - plain white. */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
-  dark: { surface: CHARCOAL, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_55, hairline: WHITE_ALPHA_10, press: 'active:bg-white/[0.06]' },
+  // dark is used ONLY by the Tour Overview hero board, so it draws on that
+  // block's surface (colder/deeper than CHARCOAL) rather than charcoal.
+  dark: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
 
 /**

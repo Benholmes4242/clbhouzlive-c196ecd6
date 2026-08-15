@@ -27,7 +27,7 @@ import {
   COURSE_SCRIMS,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { FONT } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 
 import { type HeroState } from '../HybridHero.utils';
@@ -108,8 +108,10 @@ export function PhotoBand({
       style={{
         position: 'relative',
         width: '100%',
-        flex: 1,
-        minHeight: PHOTO_BAND_HEIGHT,
+        // HARD height, not a floor. `flex: 1` used to let the band absorb the
+        // hero column's slack, so PHOTO_BAND_HEIGHT never actually applied.
+        height: PHOTO_BAND_HEIGHT,
+        flexGrow: 0,
         overflow: 'hidden',
         flexShrink: 0,
       }}
@@ -153,14 +155,17 @@ export function PhotoBand({
         }}
       />
 
-      {/* Bottom scrim — heavier so the lower-third holds legibility */}
+      {/* Bottom scrim — heavier so the lower-third holds legibility, and it ENDS
+          on HERO_BOARD_SURFACE so the seam into the board below is invisible.
+          Ending on rgba(0,0,0,0.92) let the green base gradient bleed through as
+          a cast at the top of the board. */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0, height: 260,
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,0.92) 100%)',
+            `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, ${HERO_BOARD_SURFACE} 100%)`,
           zIndex: 2,
         }}
       />
@@ -178,18 +183,23 @@ export function PhotoBand({
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
       >
-        {/* Title */}
+        {/* Title — clamped to two lines; long sponsor-prefixed names step down
+            rather than clip mid-word (threshold from real sr_tournaments names). */}
         <h1
           style={{
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: 34,
+            fontSize: title.length > 30 ? 28 : 34,
             fontWeight: 700,
             lineHeight: 0.96,
             letterSpacing: '-0.025em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
             textWrap: 'balance',
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden',
           }}
         >
           <span>{titleSplit.main}</span>
