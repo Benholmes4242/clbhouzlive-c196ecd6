@@ -171,7 +171,19 @@
     "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "holeByHole": "전체 스코어카드",
-    "hideHoleByHole": "전체 스코어카드 숨기기"
+    "hideHoleByHole": "전체 스코어카드 숨기기",
+    "vsOthersLevel_one": "Right on {{whose}} other round here.",
+    "vsOthersLevel_other": "Right on {{whose}} other {{count}} rounds here.",
+    "vsOthersLevelNeutral_one": "Right on the other round here.",
+    "vsOthersLevelNeutral_other": "Right on the other {{count}} rounds here.",
+    "vsOthersBetter_one": "{{n}} shots better than {{whose}} other round here.",
+    "vsOthersBetter_other": "{{n}} shots better than {{whose}} other {{count}} rounds here.",
+    "vsOthersBetterNeutral_one": "{{n}} shots better than the other round here.",
+    "vsOthersBetterNeutral_other": "{{n}} shots better than the other {{count}} rounds here.",
+    "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
+    "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
+    "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
+    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here."
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
