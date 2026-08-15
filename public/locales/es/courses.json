@@ -660,7 +660,19 @@
       "ydsUnit": "yds",
       "seeFullShort": "See the full card",
       "fullCard": "Full card",
-      "standardMark": "Standard {{standard}}"
+      "standardMark": "Standard {{standard}}",
+      "rampEasier": "Más fácil",
+      "rampHarder": "Más difícil",
+      "a11yTeeRow": "Tees {{tee}}, slope {{slope}}",
+      "a11yTeeRowNoSlope": "Tees {{tee}}, sin slope",
+      "shape": {
+        "longest": "El más largo",
+        "strokeIndexOne": "Índice de golpe 1",
+        "toughestRun": "Tramo más duro",
+        "holeTail": "Hoyo {{n}}",
+        "yardsTail": "{{yards}} yd",
+        "parN": "Par {{n}}"
+      }
     },
     "plays": {
       "legendField": "Field",
@@ -778,6 +790,9 @@
     "syncNote": {
       "heading": "Play here?",
       "body": "Tee cards are built from members' synced rounds. Sync your WHS handicap and the tees you play will appear."
+    },
+    "col": {
+      "length": "Longitud"
     }
   },
   "discover": {
