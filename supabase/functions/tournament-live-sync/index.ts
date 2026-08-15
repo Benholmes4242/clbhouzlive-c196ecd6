@@ -1059,8 +1059,34 @@ async function syncLeaderboard(
         console.log('[LiveSync Debug] Smotherman activeRound:', JSON.stringify(activeRound));
         console.log('[LiveSync Debug] Smotherman derivedThru:', derivedThru);
       }
+      // Same derived values the upsert writes (4.2) — no second derivation.
+      const histToday = activeRound?.score ?? null;
+      const histTodayRound = activeRound ? rounds.indexOf(activeRound) + 1 : null;
+      if (
+        leaderboardChanged(priorByPlayer.get(player.id), {
+          position: entry.position,
+          position_tied: entry.tied || false,
+          score: entry.score,
+          thru: derivedThru,
+          today: histToday,
+        })
+      ) {
+        historyRows.push({
+          tournament_id: tournamentDbId,
+          player_id: player.id,
+          position: entry.position ?? null,
+          position_tied: entry.tied || false,
+          score: entry.score ?? null,
+          thru: derivedThru,
+          today: histToday,
+          status: derivedStatus,
+          today_round: histTodayRound,
+          strokes: entry.strokes ?? null,
+        });
+      }
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
+
         tournament_id: tournamentDbId,
         player_id: player.id,
         team_id: null,
