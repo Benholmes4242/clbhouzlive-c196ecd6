@@ -999,6 +999,13 @@ const SheetBody: React.FC<{
         <div style={{ height: 6 }} aria-hidden="true" />
         {summaryRow(t('courses:teeCard.total'), holes, 14)}
 
+        {/* §C2 - OUT AGAINST IN. Every figure here is already summed for the two
+            total rows above; nothing new is fetched. A NINE-HOLE CARD renders no
+            comparison, detected by hole count, and a card with no stroke indexes
+            renders the yards and par measures only. */}
+        <OutInCompare out={out} inn={inn} />
+
+
         {/* THE RAMP IS EXPLAINED ONCE, AT THE FOOT (§4.4). Not at the head: the
             scorecard sheet has just taught us what happens when a key sits above
             data - its numerals got read as counts. */}
