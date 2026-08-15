@@ -33,12 +33,24 @@ Deno.serve(async (req) => {
     }
 
     // Find tournaments with predictions that are still scheduled
-    const { data: predictions, error: predErr } = await supabase
+    let { data: predictions, error: predErr } = await supabase
       .from("ai_predictions")
       .select("*, sr_tournaments!inner(id, name, status, start_date, venue_name)")
       .in("sr_tournaments.status", ["scheduled", "created"]);
 
     if (predErr) throw predErr;
+
+    // ai_predictions is APPEND-ONLY — keep only the latest row per tournament so a
+    // superseded prediction is never mutated by the withdrawal validator.
+    const latestByTournament = new Map<string, any>();
+    for (const row of (predictions ?? []) as any[]) {
+      const key = row.tournament_id;
+      const prev = latestByTournament.get(key);
+      if (!prev || new Date(row.generated_at).getTime() > new Date(prev.generated_at).getTime()) {
+        latestByTournament.set(key, row);
+      }
+    }
+    predictions = [...latestByTournament.values()] as any;
     if (!predictions || predictions.length === 0) {
       return new Response(
         JSON.stringify({ message: "No scheduled tournaments with predictions" }),
