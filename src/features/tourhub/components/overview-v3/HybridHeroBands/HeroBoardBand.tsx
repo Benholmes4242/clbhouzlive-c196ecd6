@@ -237,7 +237,7 @@ export function HeroBoardSection({
         >
           {t('overview.ticker.fullLeaderboard')}
         </span>
-        <ChevronRight size={14} color={AMBER} strokeWidth={2.5} />
+        <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
       </button>
 
       {hasStrip && (
@@ -246,7 +246,7 @@ export function HeroBoardSection({
             display: 'flex',
             gap: 10,
             padding: '12px 16px 16px',
-            background: HERO_BOARD_SURFACE_SOFT,
+            background: HERO_BOARD_SURFACE,
             borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           }}
         >
@@ -313,7 +313,7 @@ export function HeroBoardSection({
         </span>
         <ChevronDown
           size={14}
-          color={AMBER}
+          color="#FFFFFF"
           strokeWidth={2.5}
           style={{ transform: shapeOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
         />
