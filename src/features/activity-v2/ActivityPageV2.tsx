@@ -181,7 +181,21 @@ export const ActivityPageV2: React.FC = () => {
     return CHIPS.some((c) => c.key === f) ? (f as ChipKey) : 'all';
   })();
   const [chip, setChip] = useState<ChipKey>(initialChip);
-  const filter = chipToFilter(chip);
+  /**
+   * ONE PREDICATE FOR "NEW" (BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §1.3).
+   *
+   * The server's p_filter='new' is `n.is_read = false`, evaluated at request
+   * time. The chip count and the NEW section are `!is_read || visit-snapshot`,
+   * evaluated against the rows already on screen. Those two disagree the moment
+   * anything marks read mid-visit, which is exactly the reported fault: chip
+   * said 2, the New tab said "all caught up".
+   *
+   * So the New chip DOES NOT ask the server for a filtered page. It reads the
+   * SAME rows the All tab reads and applies the SAME predicate as bucketise().
+   * The chip count and the New tab list are then literally the same array and
+   * can never diverge.
+   */
+  const filter = chipToFilter(chip === 'new' ? 'all' : chip);
   const feed = useActivityFeedV2(filter);
 
   const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
@@ -192,6 +206,7 @@ export const ActivityPageV2: React.FC = () => {
     () => (feed.data?.pages ?? []).flat(),
     [feed.data],
   );
+
 
   // Visit snapshot: capture notif_ids that were unread at any point during
   // this visit. Keeps them presented as "New" even after auto-read + a
@@ -225,7 +240,9 @@ export const ActivityPageV2: React.FC = () => {
         ),
       };
     });
-    await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+    // Both read-state columns (§2), so the two can never drift further.
+    await supabase.from('notifications').update({ is_read: true, read: true }).eq('id', notifId);
+
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
   };
@@ -235,20 +252,33 @@ export const ActivityPageV2: React.FC = () => {
     setSheetOpen(true);
   };
 
-  // -- Auto-read on visit (Fix A) -------------------------------------
-  // Marks the ACTIVE ACTOR's notifications read once per mount, scoped
-  // exactly like the feed/badges. Does NOT invalidate the feed cache so
-  // the "New" section stays highlighted for the whole visit; on the next
-  // visit rows render read. friend_request excluded (own lifecycle).
-  const didAutoRead = useRef(false);
-  useEffect(() => {
-    if (didAutoRead.current || !recipientActorId || !user?.id) return;
-    didAutoRead.current = true;
+  // -- Auto-read ON EXIT, NEVER ON ARRIVAL ----------------------------
+  //
+  // BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §1.2. This ran on MOUNT, which is
+  // the exact failure the Discover "new since you last looked" work already
+  // ruled out: the marker is cleared before the member can read it. Landing on
+  // Activity flipped every row read, so tapping the New chip (server predicate
+  // is_read=false) returned nothing while the chip still counted the visit
+  // snapshot. Marking read on view stays — it just happens when they LEAVE.
+  //
+  // Signals: visibilitychange -> hidden (the dependable background signal in
+  // the Median WebView, it fires before suspension so the write dispatches)
+  // plus unmount, which always fires. Never on mount, tab change or scroll.
+  //
+  // The stamp (user_profiles.last_notifications_seen_at) is SERVER-SIDE but
+  // does NOT go through mark_surface_seen, so GREATEST is not doing the work:
+  // monotonicity is enforced here by only writing rows whose current stamp is
+  // null or older than this one.
+  const markReadOnExitRef = useRef<() => void>(() => {});
+  markReadOnExitRef.current = () => {
+    if (!recipientActorId || !user?.id) return;
     const now = new Date().toISOString();
-    (async () => {
+    void (async () => {
       await supabase
         .from('notifications')
-        .update({ is_read: true })
+        // Both columns, always — see §2. `read` is abandoned but must not
+        // drift further apart from is_read.
+        .update({ is_read: true, read: true })
         .eq('recipient_actor_type', recipientActorType)
         .eq('recipient_actor_id', recipientActorId)
         .eq('is_read', false)
@@ -257,12 +287,24 @@ export const ActivityPageV2: React.FC = () => {
       await supabase
         .from('user_profiles')
         .update({ last_notifications_seen_at: now })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .or(`last_notifications_seen_at.is.null,last_notifications_seen_at.lt.${now}`);
       qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
       qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipientActorType, recipientActorId, user?.id]);
+  };
+
+  useEffect(() => {
+    const onHidden = () => {
+      if (document.hidden) markReadOnExitRef.current();
+    };
+    document.addEventListener('visibilitychange', onHidden);
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden);
+      markReadOnExitRef.current();
+    };
+  }, []);
+
 
   // -- Mark-all-read (actor-scoped) -----------------------------------
   const handleMarkAllRead = async () => {
@@ -270,7 +312,8 @@ export const ActivityPageV2: React.FC = () => {
     const now = new Date().toISOString();
     const { error: notifErr } = await supabase
       .from('notifications')
-      .update({ is_read: true })
+      // Both read-state columns (§2).
+      .update({ is_read: true, read: true })
       .eq('recipient_actor_type', recipientActorType)
       .eq('recipient_actor_id', recipientActorId)
       .eq('is_read', false)
@@ -279,15 +322,21 @@ export const ActivityPageV2: React.FC = () => {
     const { error: seenErr } = await supabase
       .from('user_profiles')
       .update({ last_notifications_seen_at: now })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      // Monotonic: the stamp only ever moves forwards.
+      .or(`last_notifications_seen_at.is.null,last_notifications_seen_at.lt.${now}`);
     if (notifErr || seenErr) {
       toast.error("Couldn't mark all read. Try again.");
       return;
     }
+    // Explicit "mark all read" is the ONE place the visit snapshot is dropped:
+    // the member asked for the New marker to go, so the chip must fall to 0.
+    visitUnreadIds.current.clear();
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+
     toast.success('All caught up');
   };
 
@@ -367,8 +416,14 @@ export const ActivityPageV2: React.FC = () => {
     );
   };
 
+  // On the New chip the visible rows ARE buckets.new — the same array the chip
+  // counts (§1.3/§1.4: the All tab's NEW section is authoritative).
+  const isNewChip = chip === 'new';
+  const visibleRows = isNewChip ? buckets.new : allRows;
+
   const isErrored = feed.isError && allRows.length === 0;
-  const isEmpty = !feed.isLoading && !feed.isError && allRows.length === 0;
+  const isEmpty = !feed.isLoading && !feed.isError && visibleRows.length === 0;
+
 
   return (
     <ManagePageShell
@@ -431,11 +486,18 @@ export const ActivityPageV2: React.FC = () => {
 
         {!isEmpty && !isErrored && !feed.isLoading && (
           <div style={{ paddingBottom: 40 }}>
-            {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
-            {renderBucket(BUCKET_LABELS.today, buckets.today)}
-            {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
-            {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
-            {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+            {isNewChip ? (
+              renderBucket(BUCKET_LABELS.new, buckets.new, 'new')
+            ) : (
+              <>
+                {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
+                {renderBucket(BUCKET_LABELS.today, buckets.today)}
+                {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
+                {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
+                {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+              </>
+            )}
+
             <div ref={sentinelRef} style={{ height: 1 }} />
             {feed.isFetchingNextPage && (
               <div style={{ padding: '8px 0' }}>

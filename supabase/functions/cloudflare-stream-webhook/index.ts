@@ -261,6 +261,7 @@ Deno.serve(async (req) => {
               entity_type: 'post',
               entity_id: row.post_id,
               is_read: false,
+              read: false,
               is_deleted: false,
               data: { post_id: row.post_id, stream_id: uid },
             });

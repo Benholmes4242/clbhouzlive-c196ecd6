@@ -80,6 +80,10 @@ const PostDeepLinkPage: React.FC = () => {
           status,
           course_id,
           source_review_id,
+          whs_score_id,
+          like_count,
+          comment_count,
+
           user_profiles!posts_user_profile_id_fkey (
             id,
             username,
@@ -168,17 +172,22 @@ const PostDeepLinkPage: React.FC = () => {
       });
 
       // Full FeedPost mapping for the authenticated fullscreen viewer
+      // COUNTS COME FROM THE POST ROW (§3.1). The notification path selected
+      // neither column and hardcoded zero, which is why a liked post opened
+      // from Activity showed an empty heart while the same post in the feed
+      // showed the count. The feed's own select already reads these.
       const activityPost: ActivityPost = {
         id: row.id,
         type: 'post',
         content: row.content ?? '',
-        likes: 0,
-        comments: 0,
-        shares: 0,
+        likes: row.like_count ?? 0,
+        comments: row.comment_count ?? 0,
+        shares: 0, // posts has no share_count column; shares are not surfaced here
         timeAgo: '',
         created_at: row.created_at,
         course_id: row.course_id ?? null,
         source_review_id: row.source_review_id ?? null,
+
         isReview: !!row.source_review_id || row.post_type === 'review',
         rating: ratingRow?.rating ?? undefined,
         course: courseRow ? {
@@ -210,8 +219,23 @@ const PostDeepLinkPage: React.FC = () => {
         },
       };
 
-      setFeedPost(mapActivityPostToFeedPost(activityPost));
+      // THE LIKED FLAG (§3.1). Resolved through viewer_liked_post, which is the
+      // only correct route: round-backed posts store the viewer's like in
+      // content_reactions against whs_score_id, not in post_likes, so reading
+      // post_likes directly here would report false for every round post.
+      let likedByMe = false;
+      if (user?.id) {
+        const { data: liked } = await supabase.rpc('viewer_liked_post', {
+          p_post_id: row.id,
+          p_viewer: user.id,
+          p_actor_type: 'personal',
+        });
+        likedByMe = liked === true;
+      }
+
+      setFeedPost(mapActivityPostToFeedPost(activityPost, { isLikedByMe: likedByMe }));
       setIsLoading(false);
+
     }
 
     loadPost();

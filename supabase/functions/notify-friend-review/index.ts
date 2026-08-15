@@ -77,6 +77,7 @@ serve(async (req) => {
       entity_type: 'course',
       entity_id: course_id,
       is_read: false,
+      read: false,
       is_deleted: false,
       data: {
         course_id,
