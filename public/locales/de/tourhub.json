@@ -80,8 +80,7 @@
     },
     "ticker": {
       "top10Label": "TOP 10",
-      "showBoard": "TABELLE",
-      "hideBoard": "AUSBLENDEN",
+      "alsoOutLabel": "AUCH IM FELD",
       "fullLeaderboard": "Komplette Rangliste"
     },
     "fieldStrength": {

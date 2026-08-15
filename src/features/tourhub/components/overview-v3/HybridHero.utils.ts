@@ -219,9 +219,14 @@ export function deriveHeroState(
 
 // ---------- Top-10 ticker ---------------------------------------------------
 
-export function deriveTickerRows(leaderboard: any[]): TickerRow[] {
+/**
+ * Rows for the hero wire strip. `offset` lets the strip CONTINUE a board that
+ * already shows the leading positions (see HERO_BOARD_ROWS) so no player ever
+ * appears in both.
+ */
+export function deriveTickerRows(leaderboard: any[], offset = 0): TickerRow[] {
   if (!leaderboard) return [];
-  return leaderboard.slice(0, 10).map(entry => {
+  return leaderboard.slice(offset, offset + 10).map(entry => {
     const player = entry.player;
     const last = player?.last_name;
     const full = player?.full_name || `${player?.first_name ?? ''} ${player?.last_name ?? ''}`.trim();

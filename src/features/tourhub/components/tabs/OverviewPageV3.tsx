@@ -18,7 +18,6 @@ import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
-import { OnTheCourseSlot } from '../overview-v3/OnTheCourseSlot';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { WifiOff } from 'lucide-react';
@@ -79,7 +78,6 @@ export function OverviewPageV3() {
             transition={{ duration: 0.2 }}
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 2 : 12 }}
           >
-            <OnTheCourseSlot />
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
             <TISlot />
           </motion.div>

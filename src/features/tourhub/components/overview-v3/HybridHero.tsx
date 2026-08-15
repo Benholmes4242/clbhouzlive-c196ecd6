@@ -34,8 +34,7 @@ import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { HeroWireTicker, type TickerFact } from './HybridHeroBands/HeroWireTicker';
-import { HeroBoardBand } from './HybridHeroBands/HeroBoardBand';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+import { HERO_BOARD_ROWS } from './HybridHeroBands/HeroBoardBand';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { formatMonthDay } from '@/i18n/format';
 import {
@@ -48,14 +47,6 @@ import { BG, INK_15 } from './HybridHero.constants';
 
 
 import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
-
-/**
- * Session-lifted board preference. A member who expands the hero board once
- * finds it expanded on the next live tournament they open — until the app is
- * restarted. Deliberately module state, NOT storage: this is a preference about
- * right now, not a setting.
- */
-let heroBoardExpandedSession = false;
 
 // ---------- Skeleton -------------------------------------------------------
 
@@ -177,7 +168,17 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   }, [baseState, isTeamEvent]);
 
   // Ticker + tie detection
-  const top10 = useMemo(() => deriveTickerRows(safeLeaderboard), [safeLeaderboard]);
+  /**
+   * The board below the hero permanently shows positions 1-HERO_BOARD_ROWS, so
+   * the strip becomes the CONTINUATION of it, not a repeat: it starts at the
+   * first position the board does not show. Offset derived from the board's row
+   * count — never hardcoded twice.
+   */
+  const tickerOffset = kind === 'live' && safeLeaderboard.length > HERO_BOARD_ROWS ? HERO_BOARD_ROWS : 0;
+  const top10 = useMemo(
+    () => deriveTickerRows(safeLeaderboard, tickerOffset),
+    [safeLeaderboard, tickerOffset],
+  );
   const tiedLeaders = useMemo(() => {
     // Once a tournament is decided (winner known), never show a "tied for the lead"
     // summary — a playoff/scorecard playoff has already broken the 72-hole tie.
@@ -434,28 +435,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     return facts;
   }, [state.kind, top10.length, datesString, tournament.venueName, tournament.purse, defendingChamp, t]);
 
-  // ---- Hero board (live only) --------------------------------------------
-  const [boardExpanded, setBoardExpanded] = useState(heroBoardExpandedSession);
-  useEffect(() => {
-    setBoardExpanded(heroBoardExpandedSession);
-  }, [tournament.id]);
-
-  // currentRound comes from the live HeroState (deriveHeroState reads
-  // tournament.currentRound). No live state ⇒ no board ⇒ todayFromEntry is
-  // never reached without it.
-  const liveRound = state.kind === 'live' ? state.round : null;
-  const boardAvailable = state.kind === 'live' && liveRound != null && safeLeaderboard.length > 0;
-  const showBoard = boardAvailable && boardExpanded;
-
-  const toggleBoard = () => {
-    const next = !boardExpanded;
-    heroBoardExpandedSession = next;
-    setBoardExpanded(next);
-    if (next) {
-      analyticsEvents.track('hero_board_expanded', { tournament_id: tournament.id, round: liveRound });
-    }
-  };
-
   if (!isCancelled) {
     return (
       <div
@@ -467,21 +446,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           flexDirection: 'column',
         }}
       >
-        {showBoard ? (
-          <HeroBoardBand
-            tournamentId={tournament.id}
-            entries={safeLeaderboard}
-            currentRound={liveRound as number}
-            onFullLeaderboard={onCtaTap}
-            onRowTap={(playerId) =>
-              analyticsEvents.track('hero_board_row_tap', {
-                tournament_id: tournament.id,
-                round: liveRound,
-                player_id: playerId,
-              })
-            }
-          />
-        ) : (
         <PhotoBand
           title={tournament.name}
           venueName={tournament.venueName}
@@ -506,13 +470,10 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           venueYardage={tournament.venueYardage}
           purse={tournament.purse}
         />
-        )}
         <HeroWireTicker
           rows={top10}
           emptyStateFacts={emptyStateFacts}
-          expandable={boardAvailable}
-          expanded={showBoard}
-          onToggleExpanded={toggleBoard}
+          labelKind={tickerOffset > 0 ? 'continuation' : 'top10'}
         />
       </div>
     );

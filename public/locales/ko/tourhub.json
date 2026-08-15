@@ -80,8 +80,7 @@
     },
     "ticker": {
       "top10Label": "TOP 10",
-      "showBoard": "순위표",
-      "hideBoard": "접기",
+      "alsoOutLabel": "다른 선수",
       "fullLeaderboard": "전체 리더보드"
     },
     "fieldStrength": {

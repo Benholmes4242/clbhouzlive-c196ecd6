@@ -80,8 +80,7 @@
     },
     "ticker": {
       "top10Label": "TOP 10",
-      "showBoard": "順位表",
-      "hideBoard": "閉じる",
+      "alsoOutLabel": "その他の選手",
       "fullLeaderboard": "リーダーボード全体"
     },
     "fieldStrength": {

@@ -80,8 +80,7 @@
     },
     "ticker": {
       "top10Label": "TOP 10",
-      "showBoard": "TABLA",
-      "hideBoard": "OCULTAR",
+      "alsoOutLabel": "TAMBIÉN EN JUEGO",
       "fullLeaderboard": "Clasificación completa"
     },
     "fieldStrength": {

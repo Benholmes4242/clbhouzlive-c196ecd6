@@ -80,8 +80,7 @@
     },
     "ticker": {
       "top10Label": "[~~ŢŐƤ 10~~]",
-      "showBoard": "[BOARD]",
-      "hideBoard": "[HIDE]",
+      "alsoOutLabel": "[ĀĻŠŐ ŌŨŢ]",
       "fullLeaderboard": "[Full leaderboard]"
     },
     "fieldStrength": {

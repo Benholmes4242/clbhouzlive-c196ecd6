@@ -15,7 +15,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
+import { useNavigate } from 'react-router-dom';
+
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
+import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
+import { tournamentRoute } from '../../routes';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
@@ -44,6 +50,7 @@ export const OVERVIEW_HERO_TOTAL_HEIGHT =
 
 export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
 
@@ -131,6 +138,17 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   const viewingTid = activeSlide?.tournament.id ?? null;
   const viewingLive = activeSlide?.type === 'live';
 
+  /**
+   * The board below the hero reads the ACTIVE SLIDE directly — not the debounced
+   * viewing* context — so the photo on screen and the board under it can never
+   * belong to different tournaments. The leaderboard query key is shared with
+   * HybridHero, so this costs no extra network.
+   */
+  const boardTournamentId = viewingLive ? viewingTid : null;
+  const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
+  const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
+  const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
+
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
   // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI
   // fetches per intermediate slide.
@@ -189,12 +207,14 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
 
 
   return (
+    <>
     <div
       style={{ position: 'relative', width: '100%', height }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
+
       <AnimatePresence mode="wait">
         <motion.div
           key={active.tournament.id}
@@ -269,7 +289,41 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
         </div>
       )}
     </div>
+
+    {/* The live board EXTENDS the hero downward. It tracks the active slide and
+        cross-fades in place on swipe; on a results or upcoming slide it renders
+        nothing at all and the page below moves up. No collapse control. */}
+    <AnimatePresence mode="wait" initial={false}>
+      {boardTournamentId && boardRound != null && boardEntries.length > 0 && (
+        <motion.div
+          key={boardTournamentId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <HeroBoardSection
+            tournamentId={boardTournamentId}
+            entries={boardEntries as any[]}
+            currentRound={boardRound}
+            onFullLeaderboard={() => {
+              const target = tournamentRoute(boardTournamentId, { kind: 'overview' });
+              navigate(target.to, { state: target.state });
+            }}
+            onRowTap={(playerId) =>
+              analyticsEvents.track('hero_board_row_tap', {
+                tournament_id: boardTournamentId,
+                round: boardRound,
+                player_id: playerId,
+              })
+            }
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
+
 }
 
 export default OverviewHero;
