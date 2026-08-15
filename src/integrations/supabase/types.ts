@@ -10429,12 +10429,13 @@ export type Database = {
         Row: {
           captured_at: string
           id: number
-          player_id: string
+          player_id: string | null
           position: number | null
           position_tied: boolean | null
           score: number | null
           status: string | null
           strokes: number | null
+          team_id: string | null
           thru: number | null
           today: number | null
           today_round: number | null
@@ -10443,12 +10444,13 @@ export type Database = {
         Insert: {
           captured_at?: string
           id?: number
-          player_id: string
+          player_id?: string | null
           position?: number | null
           position_tied?: boolean | null
           score?: number | null
           status?: string | null
           strokes?: number | null
+          team_id?: string | null
           thru?: number | null
           today?: number | null
           today_round?: number | null
@@ -10457,12 +10459,13 @@ export type Database = {
         Update: {
           captured_at?: string
           id?: number
-          player_id?: string
+          player_id?: string | null
           position?: number | null
           position_tied?: boolean | null
           score?: number | null
           status?: string | null
           strokes?: number | null
+          team_id?: string | null
           thru?: number | null
           today?: number | null
           today_round?: number | null
