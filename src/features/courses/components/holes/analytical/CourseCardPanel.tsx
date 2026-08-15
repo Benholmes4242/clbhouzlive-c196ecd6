@@ -562,6 +562,118 @@ function toughestRun(
   return best ? { from: best.from, to: best.to } : null;
 }
 
+/**
+ * §C2 - OUT AGAINST IN. Three measures, each two bars on one track: yards, par
+ * and mean stroke index. The nine that leads a measure takes the ink bar; both
+ * bars share one domain per measure so the lengths are the reading.
+ */
+type CardHole = { hole_no: number; par: number | null; yards: number | null; si: number | null };
+
+const OutInCompare: React.FC<{ out: CardHole[]; inn: CardHole[] }> = ({ out, inn }) => {
+  const { t } = useTranslation(['courses']);
+  /* A NINE-HOLE CARD HAS NOTHING TO COMPARE - by hole count, never by assuming 18. */
+  if (out.length < 9 || inn.length < 9) return null;
+
+  const total = (list: CardHole[], key: 'yards' | 'par'): number | null => {
+    let s = 0;
+    for (const h of list) {
+      const v = h[key];
+      if (v == null || !Number.isFinite(Number(v))) return null;
+      s += Number(v);
+    }
+    return s;
+  };
+  const meanSi = (list: CardHole[]): number | null => {
+    const vals = list
+      .map((h) => (h.si == null ? null : Number(h.si)))
+      .filter((v): v is number => v != null && Number.isFinite(v));
+    if (vals.length !== list.length || vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  };
+
+  const measures = [
+    {
+      label: t('courses:courseDetail.card.compare.yards'),
+      a: total(out, 'yards'),
+      b: total(inn, 'yards'),
+      fmt: (v: number) => formatNumber(Math.round(v)),
+    },
+    {
+      label: t('courses:courseDetail.card.compare.par'),
+      a: total(out, 'par'),
+      b: total(inn, 'par'),
+      fmt: (v: number) => String(Math.round(v)),
+    },
+    {
+      label: t('courses:courseDetail.card.compare.si'),
+      a: meanSi(out),
+      b: meanSi(inn),
+      fmt: (v: number) => v.toFixed(1),
+    },
+  ].filter((m) => m.a != null && m.b != null) as {
+    label: string;
+    a: number;
+    b: number;
+    fmt: (v: number) => string;
+  }[];
+
+  if (measures.length === 0) return null;
+
+  const bar = (v: number, domain: number, lead: boolean) => (
+    <span
+      aria-hidden="true"
+      style={{ display: 'block', height: 4, borderRadius: 2, background: A.TRACK }}
+    >
+      <span
+        style={{
+          display: 'block',
+          height: '100%',
+          width: `${Math.max(4, Math.round((v / domain) * 100))}%`,
+          borderRadius: 2,
+          background: lead ? A.INK : A.BODY,
+        }}
+      />
+    </span>
+  );
+
+  return (
+    <>
+      <Hairline style={{ marginTop: 14 }} />
+      <div style={{ paddingTop: 12, display: 'grid', gap: 11 }}>
+        <div style={SH_LABEL}>{t('courses:courseDetail.card.compare.kicker')}</div>
+        {measures.map((m) => {
+          const domain = Math.max(m.a, m.b) || 1;
+          return (
+            <div key={m.label} style={{ display: 'grid', gap: 5 }}>
+              <div style={SH_LABEL}>{m.label}</div>
+              {(
+                [
+                  [t('courses:courseDetail.card.compare.out'), m.a, m.a >= m.b] as const,
+                  [t('courses:courseDetail.card.compare.in'), m.b, m.b > m.a] as const,
+                ]
+              ).map(([name, value, lead]) => (
+                <div
+                  key={name}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '30px 1fr 46px',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <span style={SH_LABEL}>{name}</span>
+                  {bar(value, domain, lead)}
+                  <span style={{ ...shFig(12.5), textAlign: 'right' }}>{m.fmt(value)}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
 /** Shape cell: centred figure over a centred label, with an optional tail. */
 const ShapeCell: React.FC<{
   label: string;
