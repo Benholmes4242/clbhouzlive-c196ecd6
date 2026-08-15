@@ -34,7 +34,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
-import { A, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, toParParts } from './tokens';
+import { A, DIFFICULTY_RAMP, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, difficultyRampStop, toParParts } from './tokens';
 
 
 /** HOLE / PAR / SI / ramp / figures. Load-bearing: columns never size to content. */
