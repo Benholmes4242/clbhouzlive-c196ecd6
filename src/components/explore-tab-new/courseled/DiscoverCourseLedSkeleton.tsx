@@ -274,54 +274,74 @@ export function MostPlayedPanel() {
 }
 
 /**
- * Section 7 — honours board: gold-wash panel, centred header, 2 GROUPED rows.
- * BRIEF_HONOURS_BOARD_PLAYER_LED — grouped rows are taller than flat ones: a
- * one-feat group is 8 + 34 (holder) + 6 + 30 (course line 16 + detail 14) + 8
- * = 86px, against the old flat row's 52px. The shell holds 86px rows so the
- * panel does not resize when the wire settles.
+ * Section 7 — honours board: gold-wash panel, left-aligned header with the
+ * mode toggle top right, then a RAIL of plaque-shaped blocks.
+ *
+ * BRIEF_HONOURS_BOARD_PLAQUE_RAIL §8 — a rail is a completely different shape
+ * from stacked rows, so the shell holds PLAQUES: 168 wide, 178 tall, 10 apart,
+ * bled off the right edge. Values are literals here on purpose — HonoursBoard
+ * imports this shell, so this leaf must not import back from it.
  */
+const SK_PLAQUE_W = 168;
+const SK_PLAQUE_H = 178;
+
 export function HonoursPanel() {
   return (
     <section>
-      <div style={{ ...HONOURS_SHELL, padding: '4px 14px' }}>
-        <div
-          style={{
-            padding: '14px 0 12px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 7,
-            borderBottom: `1px solid ${GOLD_HAIR}`,
-          }}
-        >
-          <TextBar w={128} h={10} />
-          <TextBar w={190} h={10} />
-        </div>
-        {[0, 1].map((i) => (
-          <div
-            key={i}
-            style={{
-              padding: '8px 0',
-              borderBottom: i === 1 ? 'none' : `1px solid ${GOLD_HAIR}`,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 11, minHeight: 34 }}>
-              <Bar style={{ height: 34, width: 34, borderRadius: 12, flexShrink: 0 }} />
-              <TextBar w={104} h={13} />
-              <div style={{ marginLeft: 'auto' }}>
-                <Bar style={{ height: 15, width: 42, borderRadius: 5 }} />
-              </div>
-            </div>
-            <div style={{ marginTop: 6, marginLeft: 45 }}>
-              <div style={{ height: 16, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={132} h={11} />
-              </div>
-              <div style={{ height: 14, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={96} h={10} />
-              </div>
+      <div style={{ ...HONOURS_SHELL, padding: '0 0 2px' }}>
+        <div style={{ padding: '14px 14px 12px', borderBottom: `1px solid ${GOLD_HAIR}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <TextBar w={128} h={10} />
+            <div style={{ marginLeft: 'auto' }}>
+              <Bar style={{ height: 24, width: 118, borderRadius: 999 }} />
             </div>
           </div>
-        ))}
+          <div style={{ marginTop: 6 }}>
+            <TextBar w={166} h={16} />
+          </div>
+          <div style={{ marginTop: 3 }}>
+            <TextBar w={112} h={11} />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, padding: '12px 0 12px 14px', overflow: 'hidden' }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              style={{
+                width: SK_PLAQUE_W,
+                height: SK_PLAQUE_H,
+                flex: 'none',
+                borderRadius: 12,
+                border: `1px solid ${GOLD_HAIR}`,
+                background: '#FFFFFF',
+                padding: '11px 11px 10px',
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                <Bar style={{ height: 54, width: 54, borderRadius: 18, flexShrink: 0 }} />
+                <div style={{ marginLeft: 'auto' }}>
+                  <TextBar w={26} h={9} />
+                </div>
+              </div>
+              <div style={{ marginTop: 9 }}>
+                <TextBar w={44} h={9} />
+              </div>
+              <div style={{ marginTop: 3 }}>
+                <TextBar w={92} h={13} />
+              </div>
+              <div style={{ marginTop: 2 }}>
+                <TextBar w={124} h={13} />
+              </div>
+              <div style={{ marginTop: 'auto', borderTop: `1px solid ${GOLD_HAIR}`, paddingTop: 8 }}>
+                <TextBar w={106} h={9} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

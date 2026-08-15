@@ -1462,7 +1462,21 @@
       "badgeAlbatross": "[Åľbåţŕöšš]",
       "badgeCount": "{{label}} ×{{count}}",
       "more": "[{{count}} möré]",
-      "showLess": "[Šhöw ľéšš]"
+      "showLess": "[Šhöw ľéšš]",
+      "headlineAces_one": "[{{count}} ace.]",
+      "headlineAces_other": "[{{count}} aces.]",
+      "headlineAlbatrosses_one": "[{{count}} albatross.]",
+      "headlineAlbatrosses_other": "[{{count}} albatrosses.]",
+      "subRecent": "[In clbhouz history]",
+      "subLeaders_one": "[{{count}} golfer]",
+      "subLeaders_other": "[{{count}} golfers]",
+      "modeRecent": "[Recent]",
+      "modeLeaders": "[Leaders]",
+      "featCount_one": "[feat]",
+      "featCount_other": "[feats]",
+      "featCountWith_one": "[{{count}} feat]",
+      "featCountWith_other": "[{{count}} feats]",
+      "latestAt": "[Latest {{year}} · {{course}}]"
     }
   },
   "statBrowse": {
