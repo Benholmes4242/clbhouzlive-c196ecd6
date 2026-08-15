@@ -15,7 +15,13 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
+import { useNavigate } from 'react-router-dom';
+
 import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarouselData';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
+import { HeroBoardSection } from './HybridHeroBands/HeroBoardBand';
+import { tournamentRoute } from '../../routes';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
@@ -44,6 +50,7 @@ export const OVERVIEW_HERO_TOTAL_HEIGHT =
 
 export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
 
@@ -130,6 +137,17 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
   const viewingLive = activeSlide?.type === 'live';
+
+  /**
+   * The board below the hero reads the ACTIVE SLIDE directly — not the debounced
+   * viewing* context — so the photo on screen and the board under it can never
+   * belong to different tournaments. The leaderboard query key is shared with
+   * HybridHero, so this costs no extra network.
+   */
+  const boardTournamentId = viewingLive ? viewingTid : null;
+  const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
+  const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
+  const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
 
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
   // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI

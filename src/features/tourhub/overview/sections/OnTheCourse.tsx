@@ -35,7 +35,6 @@ import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { LiveFieldPanel } from './LiveFieldPanel';
 import { formatToPar } from '../data/liveRoundStats';
 
 
@@ -277,12 +276,6 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
   return (
     <div style={{ marginTop: SPACE.sectionSection }}>
       <SectionShell eyebrow={t('overview.onTheCourse.eyebrow')} rightMeta={rightMeta}>
-        <LiveFieldPanel
-          entries={(leaderboardQuery.data ?? []) as any[]}
-          round={round}
-          tournamentId={tournamentId ?? ''}
-          live={live}
-        />
         <CutWatchLine tournamentId={tournamentId} />
         <div
 
