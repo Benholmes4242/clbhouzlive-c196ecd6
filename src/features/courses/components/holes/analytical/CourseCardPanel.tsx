@@ -309,12 +309,16 @@ const TeeRow: React.FC<{
   slope: number | null;
   on: boolean;
   labelW: number;
+  /** §3: THESE ARE REAL CONTROLS. The name says the tee and its slope; the bar
+      inside stays decorative. */
+  a11yName: string;
   onPick: () => void;
-}> = ({ tee, slope, on, labelW, onPick }) => (
+}> = ({ tee, slope, on, labelW, a11yName, onPick }) => (
   <button
     type="button"
     onClick={onPick}
     aria-pressed={on}
+    aria-label={a11yName}
     style={{
       display: 'grid',
       gridTemplateColumns: `${labelW}px 1fr auto ${TEE_YARDS_W}px`,
@@ -376,8 +380,16 @@ const TeeRow: React.FC<{
 const TeeList: React.FC<{
   tees: TeeSet[];
   activeLabel: string;
+  /**
+   * THE SHEET USES THIS LIST AS ITS TEE SELECTOR (§3), so it cannot vanish the
+   * way the panel's comparison can: with showAll the rows render whenever there
+   * is more than one tee, slope or no slope. The panel passes nothing and keeps
+   * its own behaviour exactly.
+   */
+  showAll?: boolean;
   onPick: (label: string) => void;
-}> = ({ tees, activeLabel, onPick }) => {
+}> = ({ tees, activeLabel, showAll = false, onPick }) => {
+  const { t } = useTranslation(['courses']);
   const rows = useMemo(() => {
     const withSlope = (x: TeeSet) =>
       x.slope_rating && x.slope_rating > 0 ? Math.round(x.slope_rating) : null;
@@ -394,7 +406,7 @@ const TeeList: React.FC<{
   // just the headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
   // a column of empty tracks is worse than the panel as it ships.
   if (tees.length < 2) return null;
-  if (!rows.some((r) => r.slope != null)) return null;
+  if (!showAll && !rows.some((r) => r.slope != null)) return null;
 
   // ~5.4px per character at LABEL 8.5 uppercase with 0.13em tracking.
   const labelW = Math.min(
@@ -411,6 +423,11 @@ const TeeList: React.FC<{
           slope={slope}
           on={tee.tee_label === activeLabel}
           labelW={labelW}
+          a11yName={
+            slope != null
+              ? t('courses:courseDetail.card.a11yTeeRow', { tee: tee.tee_label, slope })
+              : t('courses:courseDetail.card.a11yTeeRowNoSlope', { tee: tee.tee_label })
+          }
           onPick={() => onPick(tee.tee_label)}
         />
       ))}
