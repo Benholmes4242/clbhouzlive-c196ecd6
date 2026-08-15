@@ -181,7 +181,21 @@ export const ActivityPageV2: React.FC = () => {
     return CHIPS.some((c) => c.key === f) ? (f as ChipKey) : 'all';
   })();
   const [chip, setChip] = useState<ChipKey>(initialChip);
-  const filter = chipToFilter(chip);
+  /**
+   * ONE PREDICATE FOR "NEW" (BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §1.3).
+   *
+   * The server's p_filter='new' is `n.is_read = false`, evaluated at request
+   * time. The chip count and the NEW section are `!is_read || visit-snapshot`,
+   * evaluated against the rows already on screen. Those two disagree the moment
+   * anything marks read mid-visit, which is exactly the reported fault: chip
+   * said 2, the New tab said "all caught up".
+   *
+   * So the New chip DOES NOT ask the server for a filtered page. It reads the
+   * SAME rows the All tab reads and applies the SAME predicate as bucketise().
+   * The chip count and the New tab list are then literally the same array and
+   * can never diverge.
+   */
+  const filter = chipToFilter(chip === 'new' ? 'all' : chip);
   const feed = useActivityFeedV2(filter);
 
   const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
@@ -192,6 +206,7 @@ export const ActivityPageV2: React.FC = () => {
     () => (feed.data?.pages ?? []).flat(),
     [feed.data],
   );
+
 
   // Visit snapshot: capture notif_ids that were unread at any point during
   // this visit. Keeps them presented as "New" even after auto-read + a
