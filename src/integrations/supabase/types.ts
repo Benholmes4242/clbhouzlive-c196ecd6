@@ -29,6 +29,24 @@ export type Database = {
         }
         Relationships: []
       }
+      _round_post_fn_backup: {
+        Row: {
+          def: string | null
+          proname: unknown
+          saved_at: string | null
+        }
+        Insert: {
+          def?: string | null
+          proname?: unknown
+          saved_at?: string | null
+        }
+        Update: {
+          def?: string | null
+          proname?: unknown
+          saved_at?: string | null
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           category: string
