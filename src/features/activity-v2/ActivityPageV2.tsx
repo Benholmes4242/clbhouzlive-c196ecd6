@@ -312,7 +312,8 @@ export const ActivityPageV2: React.FC = () => {
     const now = new Date().toISOString();
     const { error: notifErr } = await supabase
       .from('notifications')
-      .update({ is_read: true })
+      // Both read-state columns (§2).
+      .update({ is_read: true, read: true })
       .eq('recipient_actor_type', recipientActorType)
       .eq('recipient_actor_id', recipientActorId)
       .eq('is_read', false)
@@ -321,15 +322,21 @@ export const ActivityPageV2: React.FC = () => {
     const { error: seenErr } = await supabase
       .from('user_profiles')
       .update({ last_notifications_seen_at: now })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      // Monotonic: the stamp only ever moves forwards.
+      .or(`last_notifications_seen_at.is.null,last_notifications_seen_at.lt.${now}`);
     if (notifErr || seenErr) {
       toast.error("Couldn't mark all read. Try again.");
       return;
     }
+    // Explicit "mark all read" is the ONE place the visit snapshot is dropped:
+    // the member asked for the New marker to go, so the chip must fall to 0.
+    visitUnreadIds.current.clear();
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+
     toast.success('All caught up');
   };
 
