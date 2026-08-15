@@ -306,7 +306,10 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
             tournamentId={boardTournamentId}
             entries={boardEntries as any[]}
             currentRound={boardRound}
-            onFullLeaderboard={() => navigate(tournamentRoute(boardTournamentId))}
+            onFullLeaderboard={() => {
+              const target = tournamentRoute(boardTournamentId, 'overview');
+              navigate(target.to, { state: target.state });
+            }}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
                 tournament_id: boardTournamentId,
