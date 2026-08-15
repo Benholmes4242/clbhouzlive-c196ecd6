@@ -459,34 +459,45 @@ export const HoleRowV2: React.FC<{
               {t('courses:courseDetail.plays.legendField')}
             </span>
           </span>
-          {/* Unplayed hole: the slot keeps its width so the column never realigns. */}
-          <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }} aria-hidden={!you}>
-            <span
-              style={{
-                display: 'block',
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: A.AMBER_DEEP,
-                lineHeight: 1.1,
-              }}
-            >
-              {you ? you.text : ''}
-            </span>
-            {you && (
-              <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
-                {t('courses:courseDetail.plays.legendYou')}
+          {/* NO VIEWER, NO SLOT (§B7): the column is not reserved for a member
+              who has never played here. An unplayed hole for a member who HAS
+              played keeps its width so the column cannot realign row to row. */}
+          {hasYou && (
+            <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }} aria-hidden={!you}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em',
+                  color: A.AMBER_DEEP,
+                  lineHeight: 1.1,
+                }}
+              >
+                {you ? you.text : ''}
               </span>
-            )}
-          </span>
+              {you && (
+                <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+                  {t('courses:courseDetail.plays.legendYou')}
+                </span>
+              )}
+            </span>
+          )}
         </span>
       </button>
 
       {open && (
         <div style={{ padding: `0 0 16px ${DETAIL_INSET}px` }}>
-          {/* The four shares as four EVEN columns, one row: swatch+figure over label. */}
+          {/* The four shares as four EVEN columns, one row: swatch+figure over label.
+              Beneath each, THE COURSE-WIDE SHARE AS A HAIRLINE MARK (§B4): the
+              hole's own share is the bar, the course's is the tick, both on one
+              domain so a bogey trap is visible rather than described. Where the
+              two agree the mark still renders - it is a fact, not a verdict. */}
           <div style={{ display: 'flex', alignItems: 'flex-start', ...FIGS }}>
-            {segs.map((s) => (
+            {segs.map((s) => {
+              const holeShare = s.pctValue / total;
+              const courseShare = courseShares ? courseShares[s.key] : null;
+              return (
               <span
                 key={s.key}
                 style={{
@@ -517,9 +528,45 @@ export const HoleRowV2: React.FC<{
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    {Math.round((s.pctValue / total) * 100)}%
+                    {Math.round(holeShare * 100)}%
                   </span>
                 </span>
+                {courseShare != null && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      position: 'relative',
+                      display: 'block',
+                      width: '76%',
+                      height: 4,
+                      marginTop: 4,
+                      borderRadius: 2,
+                      background: A.TRACK,
+                    }}
+                  >
+                    <i
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: `${Math.min(100, (holeShare / shareDomain) * 100)}%`,
+                        borderRadius: 2,
+                        background: s.bg,
+                        display: 'block',
+                      }}
+                    />
+                    <i
+                      style={{
+                        position: 'absolute',
+                        top: -2,
+                        bottom: -2,
+                        left: `${Math.min(100, (courseShare / shareDomain) * 100)}%`,
+                        width: 1,
+                        background: A.INK,
+                        display: 'block',
+                      }}
+                    />
+                  </span>
+                )}
                 <span
                   style={{
                     ...MICRO,
@@ -532,8 +579,15 @@ export const HoleRowV2: React.FC<{
                   {s.label}
                 </span>
               </span>
-            ))}
+              );
+            })}
           </div>
+          {courseShares && (
+            <div style={{ ...MICRO, fontSize: 7, marginTop: 6 }}>
+              {t('courses:courseDetail.holes.courseAverageMark')}
+            </div>
+          )}
+
 
 
           <Hairline style={{ margin: '12px 0 10px' }} />
