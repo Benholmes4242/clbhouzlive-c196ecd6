@@ -993,6 +993,37 @@ async function syncLeaderboard(
       const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
+      // History, team side (BRIEF_LEADERBOARD_HISTORY_WRITER §1.3, extended).
+      // A LIV team standing moves for exactly the same reasons a player's does,
+      // so it takes the same five-field comparison against the same in-memory
+      // map, and writes player_id null — the XOR constraint on
+      // sr_leaderboard_history makes the row unambiguously a TEAM row.
+      const teamHistToday = activeRound?.score ?? null;
+      const teamHistTodayRound = activeRound ? rounds.indexOf(activeRound) + 1 : null;
+      if (
+        leaderboardChanged(priorByTeam.get(teamId), {
+          position: entry.position,
+          position_tied: entry.tied || false,
+          score: entry.score,
+          thru: derivedThru,
+          today: teamHistToday,
+        })
+      ) {
+        historyRows.push({
+          tournament_id: tournamentDbId,
+          team_id: teamId,
+          player_id: null,
+          position: entry.position ?? null,
+          position_tied: entry.tied || false,
+          score: entry.score ?? null,
+          thru: derivedThru,
+          today: teamHistToday,
+          status: derivedStatus,
+          today_round: teamHistTodayRound,
+          strokes: entry.strokes ?? null,
+        });
+      }
+
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournamentDbId,
         team_id: teamId,
