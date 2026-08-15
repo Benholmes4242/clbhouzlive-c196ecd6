@@ -108,9 +108,11 @@ export function PhotoBand({
       style={{
         position: 'relative',
         width: '100%',
-        // HARD height, not a floor. `flex: 1` used to let the band absorb the
-        // hero column's slack, so PHOTO_BAND_HEIGHT never actually applied.
-        height: PHOTO_BAND_HEIGHT,
+        // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
+        // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
+        // — otherwise the inset showed as a white gap above the live board.
+        height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+
         flexGrow: 0,
         overflow: 'hidden',
         flexShrink: 0,
