@@ -20,7 +20,14 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, DIFFICULTY_HARD_HEX, DIFFICULTY_RAMP, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
-import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
+import {
+  DistributionStrip,
+  HoleRowV2,
+  PREVIEW_COUNT_V2,
+  buildHoleScale,
+  courseBucketShares,
+} from './HoleRowV2';
+
 
 /** Labelled figure cell used by the How-it-plays strip and the extremes row. */
 const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; sub?: string }> = ({
