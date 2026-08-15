@@ -254,8 +254,11 @@ async function scoreOne(supabase: any, tournamentId: string): Promise<any> {
       `Best: ${bestPick?.playerName} (${bestPick?.actualPosition}), ` +
       `Avg Position: ${avgPosition?.toFixed(1)}`);
 
-    return new Response(JSON.stringify({
+    return {
       success: true,
+      tournament: tournament.name,
+      predictionId: prediction.id,
+      generatedAt: prediction.generated_at,
       grade,
       picksInTop5: inTop5,
       picksInTop10: inTop10,
@@ -263,14 +266,9 @@ async function scoreOne(supabase: any, tournamentId: string): Promise<any> {
       bestPick: bestPick?.playerName,
       bestPickPosition: bestPick?.actualPosition,
       averagePosition: avgPosition,
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
+    };
   } catch (error) {
     console.error('[ScorePredictions] Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return { error: (error as Error).message };
   }
-});
+}
