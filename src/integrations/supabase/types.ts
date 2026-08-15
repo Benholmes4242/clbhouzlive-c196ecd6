@@ -16222,6 +16222,7 @@ export type Database = {
           pcc: number | null
           permalink_url: string | null
           play_date: string
+          raw_holes_payload: Json | null
           raw_payload: Json | null
           slope_rating: number | null
           stableford_points: number | null
@@ -16255,6 +16256,7 @@ export type Database = {
           pcc?: number | null
           permalink_url?: string | null
           play_date: string
+          raw_holes_payload?: Json | null
           raw_payload?: Json | null
           slope_rating?: number | null
           stableford_points?: number | null
@@ -16288,6 +16290,7 @@ export type Database = {
           pcc?: number | null
           permalink_url?: string | null
           play_date?: string
+          raw_holes_payload?: Json | null
           raw_payload?: Json | null
           slope_rating?: number | null
           stableford_points?: number | null
