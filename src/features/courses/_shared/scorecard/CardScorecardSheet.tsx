@@ -591,16 +591,27 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         }
       }
       if (courseContext.rankHere != null && roundsHere > 0) {
+        /*
+         * RANK 1 TAKES NO ORDINAL (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.3):
+         * formatOrdinal(1) returns "1st", so the caption read "1st best of 2
+         * rounds here". THE RANK ITSELF IS CORRECT - a round belongs in its own
+         * ranking - only the wording changes.
+         */
+        const best = courseContext.rankHere === 1;
         out.push(impersonal
-          ? t('courses:scorecard.rankHereNeutral', {
-              ordinal: formatOrdinal(courseContext.rankHere),
-              count: roundsHere,
-            })
-          : t('courses:scorecard.rankHereVoice', {
-              whose: whoseCap,
-              ordinal: formatOrdinal(courseContext.rankHere),
-              count: roundsHere,
-            }));
+          ? best
+            ? t('courses:scorecard.rankHereNeutralBest', { count: roundsHere })
+            : t('courses:scorecard.rankHereNeutral', {
+                ordinal: formatOrdinal(courseContext.rankHere),
+                count: roundsHere,
+              })
+          : best
+            ? t('courses:scorecard.rankHereVoiceBest', { whose: whoseCap, count: roundsHere })
+            : t('courses:scorecard.rankHereVoice', {
+                whose: whoseCap,
+                ordinal: formatOrdinal(courseContext.rankHere),
+                count: roundsHere,
+              }));
       }
     }
     return out;
