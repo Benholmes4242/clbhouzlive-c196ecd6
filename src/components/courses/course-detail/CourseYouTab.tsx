@@ -4,8 +4,16 @@
  * Three states:
  *   A. Played        - your journey, your review, your hole-level layer.
  *   B. Connected, not played  - course-specific hook card + up for grabs.
- *   C. Not connected - hook card, what you'd unlock, up for grabs.
+ *   C. Not connected - the field's real shape, with a channel where yours belongs.
  * Logged out gets a sign-in nudge.
+ *
+ * STATE C RULE (BRIEF_YOU_TAB_EMPTY_MISSING_LINE §0, replacing the former
+ * "ranges only" UnlockList): the empty state shows REAL FIELD DATA with a drawn
+ * CHANNEL where the member's own line would sit. It never renders a
+ * value-shaped placeholder ("+ -", "- of 18"): a placeholder cannot be told
+ * apart from a figure that failed to load, and absent values render nothing.
+ * Nothing on this screen is invented, and nothing implies the member has
+ * played here.
  *
  * ASCII only.
  */
@@ -23,7 +31,20 @@ import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { Skeleton } from '@/components/ui/skeleton';
-import { A, EmptyState, FIGS, LABEL, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import {
+  A,
+  DIFFICULTY_HARD_HEX,
+  EmptyState,
+  FIGS,
+  Hairline,
+  KICKER,
+  LABEL,
+  Panel,
+  SANS,
+  bizFigure,
+  difficultyRampColor,
+  difficultyRampStop,
+} from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   courseId: string;
@@ -35,6 +56,17 @@ const ordinal = (n: number) => {
   const v = n % 100;
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
+
+/**
+ * NOISE FLOOR for the field chart. Under this many rounds the per-hole spread
+ * is one or two members' bad afternoons drawn as a course shape, so the chart
+ * and its channel are withheld and the hero keeps its headline alone. The
+ * REFERENCE panel is unaffected: a stated figure carries its own sample size.
+ */
+const CHART_ROUNDS_FLOOR = 5;
+
+/** Labels never take the DIM tone on this screen (§7). */
+const LABEL_MUTE: React.CSSProperties = { ...LABEL, color: A.MUTE };
 
 const Notice: React.FC<{ title: string; body: string; cta?: { label: string; onClick: () => void } }> = ({
   title, body, cta,
@@ -62,68 +94,380 @@ const HookCard: React.FC<{
   </div>
 );
 
-/** State C block 2 - no invented figures, ranges only. */
-const UnlockList: React.FC<{ unclaimedCount: number }> = ({ unclaimedCount }) => {
-  const rows: { label: string; hint: string }[] = [
-    { label: 'Your average score here', hint: '+ -' },
-    { label: 'Your most damaging holes', hint: '1-18' },
-    { label: "Holes you've birdied", hint: '- of 18' },
-    { label: 'Your line against the field', hint: '18 holes' },
-  ];
-  if (unclaimedCount > 0) {
-    rows.push({ label: 'Crowns you could take', hint: `${unclaimedCount} open` });
+interface FieldHole {
+  holeNo: number;
+  par: number;
+  toPar: number;
+}
+
+interface FieldShape {
+  holes: FieldHole[];
+  total: number;
+  fieldAvg: string;
+  rounds: number;
+  hardest: FieldHole;
+  easiest: FieldHole;
+  /** True when every hole shares one average - the chart is flat and labels neither. */
+  flat: boolean;
+  beastHoleLabel: string;
+  beastPct: number | null;
+  parRows: { par: number; count: number; mean: number }[];
+}
+
+/**
+ * THE EIGHTEEN-HOLE FIELD CHART (§2.1). One bar per hole from the field's
+ * avg_to_par, on the demanding ramp, SIX DISCRETE STOPS - the stop is chosen by
+ * the hole's normalised position on the course's own spread and then snapped, so
+ * adjacent holes never read as an interpolation. Hardest and easiest carry their
+ * own figures above their own bars, derived as max and min; on a tie the first
+ * only; a flat chart labels neither.
+ */
+const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
+  const { holes, hardest, easiest, flat } = shape;
+  const values = holes.map((h) => h.toPar);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const span = max - min;
+
+  return (
+    <div style={{ width: '100%' }}>
+      {/* Figure row: only the two extremes speak, and only when they differ. */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 13, marginBottom: 4 }}>
+        {holes.map((h) => {
+          const isHardest = !flat && h.holeNo === hardest.holeNo;
+          const isEasiest = !flat && h.holeNo === easiest.holeNo;
+          if (!isHardest && !isEasiest) return <div key={h.holeNo} style={{ flex: 1 }} />;
+          return (
+            <div
+              key={h.holeNo}
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                ...FIGS,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                color: isHardest ? DIFFICULTY_HARD_HEX : A.MUTE,
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+              }}
+            >
+              {fmtToPar(h.toPar, 1)}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 62 }}>
+        {holes.map((h) => {
+          const t = span > 0 ? (h.toPar - min) / span : 0.5;
+          const height = span > 0 ? 10 + Math.round(t * 52) : 28;
+          return (
+            <div
+              key={h.holeNo}
+              style={{
+                flex: 1,
+                height,
+                borderRadius: 2,
+                background: span > 0 ? difficultyRampColor(t) : difficultyRampStop(2),
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', gap: 2, marginTop: 5 }}>
+        {holes.map((h) => {
+          const isExtreme = !flat && (h.holeNo === hardest.holeNo || h.holeNo === easiest.holeNo);
+          return (
+            <div
+              key={h.holeNo}
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                ...FIGS,
+                fontSize: 8.5,
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                lineHeight: 1,
+                color: isExtreme ? A.INK : A.MUTE,
+              }}
+            >
+              {h.holeNo}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * THE CHANNEL (§2.2). A SOLID DASHED STROKE on the plain surface - not a tint of
+ * the ramp, not a low-opacity fill, not a blurred ghost. UNSTARTED IS ITS OWN
+ * STATE, not a weaker version of started, the same rule that governs the
+ * unclaimed plates on the Champions gate. It renders only under a drawn line.
+ */
+const Channel: React.FC = () => (
+  <div style={{ width: '100%' }}>
+    <div
+      style={{
+        height: 34,
+        borderRadius: 4,
+        border: `1px dashed ${A.MUTE}`,
+        background: 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <span style={{ ...LABEL_MUTE, fontSize: 8.5, letterSpacing: '0.16em' }}>Your line here</span>
+    </div>
+  </div>
+);
+
+/**
+ * STATE C HERO (§2). State C gets its own hero rather than bending HookCard,
+ * which stays exactly as state B needs it.
+ */
+const FieldHero: React.FC<{
+  courseName: string;
+  shape: FieldShape | null;
+  showChart: boolean;
+  onConnect: () => void;
+}> = ({ courseName, shape, showChart, onConnect }) => (
+  <div style={{ padding: '0 16px' }}>
+    <Panel>
+      <div style={{ ...KICKER, marginBottom: 12 }}>Your game here</div>
+
+      {shape ? (
+        <>
+          <div style={{ ...bizFigure(46, DIFFICULTY_HARD_HEX), marginBottom: 6 }}>{shape.fieldAvg}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
+            {`What the field plays ${courseName} to`}
+          </div>
+          <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 400, lineHeight: 1.55, color: A.MUTE }}>
+            {`Across ${shape.rounds} ${shape.rounds === 1 ? 'round' : 'rounds'} posted here. Connect your handicap and every round you have already posted at this course comes across, going back years.`}
+          </p>
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>
+            {`See how you play ${courseName}`}
+          </div>
+          <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 400, lineHeight: 1.55, color: A.MUTE }}>
+            Connect your handicap and every round you have already posted at this course comes across, going back years.
+          </p>
+        </>
+      )}
+
+      {shape && showChart && (
+        <div style={{ marginTop: 18 }}>
+          <div style={{ ...LABEL_MUTE, marginBottom: 8 }}>The field, hole by hole</div>
+          <FieldChart shape={shape} />
+          <div style={{ marginTop: 10 }}>
+            <Channel />
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={onConnect}
+        style={{
+          marginTop: 18,
+          width: '100%',
+          border: 'none',
+          background: A.INK,
+          color: A.PANEL,
+          borderRadius: 999,
+          padding: '13px 22px',
+          fontSize: 14,
+          fontWeight: 700,
+          letterSpacing: '-0.01em',
+          fontFamily: SANS,
+          cursor: 'pointer',
+        }}
+      >
+        Connect your handicap
+      </button>
+      <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, fontWeight: 500, color: A.MUTE }}>
+        About 30 seconds with your England Golf login
+      </div>
+    </Panel>
+  </div>
+);
+
+/**
+ * THE REFERENCE PANEL (§3), replacing UnlockList. Every figure is the FIELD'S
+ * and every one is true. There is no member figure on this screen, so the
+ * par-type rows render with the field ALONE - no empty amber slot where a tick
+ * would go, because a missing value is not drawn.
+ *
+ * RECONCILIATION ASSERT (§3): the par-type means are unweighted means of the
+ * per-hole field averages within each par type, so
+ *   sum(mean_p * count_p) == sum over all holes of avg_to_par == the headline
+ * exactly, by construction. A dev-only check below fails loudly on drift.
+ */
+const ReferencePanel: React.FC<{ shape: FieldShape }> = ({ shape }) => {
+  const { fieldAvg, rounds, hardest, easiest, flat, parRows, total } = shape;
+
+  if (import.meta.env.DEV && parRows.length > 0) {
+    const recomposed = parRows.reduce((s, r) => s + r.mean * r.count, 0);
+    if (Math.abs(recomposed - total) > 0.005) {
+      // eslint-disable-next-line no-console
+      console.error('[CourseYouTab] par-type rows do not reconcile with the field headline', {
+        recomposed, total,
+      });
+    }
   }
+
+  const rows: { label: string; figure: string; tone: string; sub?: string }[] = [];
+  rows.push({
+    label: 'Shots over par a round',
+    figure: fieldAvg,
+    tone: DIFFICULTY_HARD_HEX,
+    sub: `${rounds} ${rounds === 1 ? 'round' : 'rounds'}`,
+  });
+  if (!flat) {
+    rows.push({
+      label: 'Hardest hole',
+      figure: fmtToPar(hardest.toPar, 1),
+      tone: A.INK,
+      sub: `${ordinal(hardest.holeNo)}, par ${hardest.par}`,
+    });
+    rows.push({
+      label: 'Easiest hole',
+      figure: fmtToPar(easiest.toPar, 1),
+      tone: A.INK,
+      sub: `${ordinal(easiest.holeNo)}, par ${easiest.par}`,
+    });
+  }
+
+  if (rows.length === 0 && parRows.length === 0) return null;
+
+  const parMax = parRows.length > 0 ? Math.max(...parRows.map((r) => r.mean)) : 0;
+  const parMin = parRows.length > 0 ? Math.min(...parRows.map((r) => r.mean)) : 0;
+  const parSpan = parMax - parMin;
 
   return (
     <div style={{ padding: '0 16px' }}>
       <Panel>
-        <div style={{ ...LABEL, marginBottom: 12 }}>What you'd unlock</div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em', marginBottom: 14 }}>
-          Your side of this course
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ ...LABEL_MUTE, marginBottom: 14 }}>How this course plays</div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
           {rows.map((r) => (
             <div key={r.label} style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-              <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK }}>{r.label}</div>
-              <div style={{ ...FIGS, fontSize: 12.5, fontWeight: 700, color: A.DIM, whiteSpace: 'nowrap' }}>
-                {r.hint}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>{r.label}</div>
+                {r.sub && (
+                  <div style={{ marginTop: 2, fontSize: 11.5, fontWeight: 500, color: A.MUTE, ...FIGS }}>{r.sub}</div>
+                )}
               </div>
+              <div style={{ ...bizFigure(19, r.tone), whiteSpace: 'nowrap' }}>{r.figure}</div>
             </div>
           ))}
         </div>
+
+        {parRows.length > 0 && (
+          <>
+            <Hairline style={{ margin: '16px 0 14px' }} />
+            <div style={{ ...LABEL_MUTE, marginBottom: 12 }}>How each par plays</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {parRows.map((r) => {
+                const t = parSpan > 0 ? (r.mean - parMin) / parSpan : 0.5;
+                const width = parMax > 0 ? Math.max(6, Math.round((r.mean / parMax) * 100)) : 6;
+                return (
+                  <div key={r.par} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 44, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+                      {`Par ${r.par}`}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, height: 6, background: A.TRACK, borderRadius: 3 }}>
+                      <div
+                        style={{
+                          width: `${width}%`,
+                          height: '100%',
+                          borderRadius: 3,
+                          background: parSpan > 0 ? difficultyRampColor(t) : difficultyRampStop(2),
+                        }}
+                      />
+                    </div>
+                    <div style={{ ...bizFigure(13, A.INK), width: 38, textAlign: 'right', flexShrink: 0 }}>
+                      {fmtToPar(r.mean, 1)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </Panel>
     </div>
   );
 };
 
-/** Blocks 3 (state C) and 2 (state B). */
+/**
+ * UP FOR GRABS (§4) - blocks 3 (state C) and 2 (state B). The record gross is a
+ * FIGURE with its holder beside it; the unclaimed count is its own figure in the
+ * ramp's hard end. A count of zero renders no row - never "0 crowns". If
+ * neither resolves the panel does not render.
+ */
 const UpForGrabs: React.FC<{
   recordLabel: string | null;
   holderName: string | null;
   unclaimedCount: number;
-}> = ({ recordLabel, holderName, unclaimedCount }) => (
-  <div style={{ padding: '0 16px' }}>
-    <Panel>
-      <div style={{ ...LABEL, marginBottom: 10 }}>Up for grabs</div>
-      {recordLabel ? (
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>
-            {`Course record: ${recordLabel}${holderName ? ` by ${holderName}` : ''}`}
-          </div>
-          {unclaimedCount > 0 && (
-            <div style={{ marginTop: 4, fontSize: 13, color: A.MUTE, lineHeight: 1.5 }}>
-              {`${unclaimedCount} more crowns here have never been claimed`}
+}> = ({ recordLabel, holderName, unclaimedCount }) => {
+  const hasCrowns = unclaimedCount > 0;
+  if (!recordLabel && !hasCrowns) return null;
+
+  return (
+    <div style={{ padding: '0 16px' }}>
+      <Panel>
+        <div style={{ ...LABEL_MUTE, marginBottom: 14 }}>Up for grabs</div>
+
+        {recordLabel ? (
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>Course record</div>
+              {holderName && (
+                <div
+                  style={{
+                    marginTop: 2,
+                    fontSize: 11.5,
+                    fontWeight: 500,
+                    color: A.MUTE,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {holderName}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ) : (
-        <div style={{ fontSize: 14, fontWeight: 700, color: A.INK, lineHeight: 1.5 }}>
-          No course record yet - it is there for the taking.
-        </div>
-      )}
-    </Panel>
-  </div>
-);
+            <div style={{ ...bizFigure(24, A.INK), whiteSpace: 'nowrap' }}>{recordLabel}</div>
+          </div>
+        ) : (
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, lineHeight: 1.45 }}>
+            No course record yet - it is there for the taking.
+          </div>
+        )}
+
+        {hasCrowns && (
+          <>
+            {recordLabel && <Hairline style={{ margin: '14px 0' }} />}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: recordLabel ? 0 : 14 }}>
+              <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
+                {unclaimedCount === 1 ? 'Crown never claimed' : 'Crowns never claimed'}
+              </div>
+              <div style={{ ...bizFigure(24, DIFFICULTY_HARD_HEX), whiteSpace: 'nowrap' }}>{unclaimedCount}</div>
+            </div>
+          </>
+        )}
+      </Panel>
+    </div>
+  );
+};
 
 export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   const navigate = useNavigate();
@@ -134,23 +478,57 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
 
-  // fieldAvg: sum of the per-hole field averages to par. beastHole: the hole
-  // with the highest field average. beastPct: share of the field over par on
-  // that hole, derived from its scoring distribution.
-  const { fieldAvg, beastHoleLabel, beastPct } = React.useMemo(() => {
-    const holes = analysis?.available ? (analysis.holes ?? []) : [];
-    if (holes.length === 0) return { fieldAvg: null as string | null, beastHoleLabel: null as string | null, beastPct: null as number | null };
-    const total = holes.reduce((sum, h) => sum + (Number.isFinite(h.avg_to_par) ? h.avg_to_par : 0), 0);
-    const beast = holes.reduce((a, b) => (b.avg_to_par > a.avg_to_par ? b : a), holes[0]);
-    const d = beast.dist;
+  // The field's real shape, all of it from the EXISTING hole analysis query.
+  // total: sum of the per-hole field averages to par (the headline).
+  // hardest/easiest: max and min, first occurrence on a tie.
+  // beastPct: share of the field over par on the hardest hole (state B copy).
+  // parRows: unweighted mean over par per par type, which recomposes to total.
+  const shape: FieldShape | null = React.useMemo(() => {
+    const raw = analysis?.available ? (analysis.holes ?? []) : [];
+    const holes: FieldHole[] = raw
+      .filter((h) => Number.isFinite(h.avg_to_par))
+      .map((h) => ({ holeNo: h.hole_no, par: h.par, toPar: h.avg_to_par }))
+      .sort((a, b) => a.holeNo - b.holeNo);
+    if (holes.length === 0) return null;
+
+    const total = holes.reduce((sum, h) => sum + h.toPar, 0);
+    // Strict comparisons only, so a tie keeps the FIRST hole.
+    const hardest = holes.reduce((a, b) => (b.toPar > a.toPar ? b : a), holes[0]);
+    const easiest = holes.reduce((a, b) => (b.toPar < a.toPar ? b : a), holes[0]);
+
+    const beastRaw = raw.find((h) => h.hole_no === hardest.holeNo);
+    const d = beastRaw?.dist;
     const played = d
       ? (d.ace ?? 0) + (d.albatross ?? 0) + (d.eagle ?? 0) + (d.birdie ?? 0) + (d.par ?? 0) + (d.bogey ?? 0) + (d.double ?? 0)
       : 0;
     const over = d ? (d.bogey ?? 0) + (d.double ?? 0) : 0;
+
+    const byPar = new Map<number, number[]>();
+    holes.forEach((h) => {
+      if (!Number.isFinite(h.par) || h.par <= 0) return;
+      const list = byPar.get(h.par) ?? [];
+      list.push(h.toPar);
+      byPar.set(h.par, list);
+    });
+    const parRows = Array.from(byPar.entries())
+      .map(([par, vals]) => ({
+        par,
+        count: vals.length,
+        mean: vals.reduce((s, v) => s + v, 0) / vals.length,
+      }))
+      .sort((a, b) => a.par - b.par);
+
     return {
+      holes,
+      total,
       fieldAvg: fmtToPar(total, 1),
-      beastHoleLabel: `${ordinal(beast.hole_no)}`,
+      rounds: analysis?.total_rounds ?? 0,
+      hardest,
+      easiest,
+      flat: hardest.toPar === easiest.toPar,
+      beastHoleLabel: ordinal(hardest.holeNo),
       beastPct: played > 0 ? Math.round((over / played) * 100) : null,
+      parRows,
     };
   }, [analysis]);
 
@@ -206,23 +584,23 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
     );
   }
 
-  // State C - no handicap connection.
+  // State C - no handicap connection. Real field data, and a channel where the
+  // member's own line belongs. No chart frame and no channel without a line
+  // above it: with no hole data the hero stands alone.
   if (!connection) {
+    const showChart = !!shape && shape.rounds >= CHART_ROUNDS_FLOOR;
     return wrap(
       <div style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <HookCard
-          headline={fieldAvg ? `The field plays this course to ${fieldAvg}` : `See how you play ${courseName}`}
-          body="Where do you sit? Connect your handicap and every round you have ever posted here appears straight away, going back years."
-          cta={{
-            label: 'Connect your handicap',
-            onClick: () => {
-              analyticsEvents.track('course_connect_cta_tapped', { course_id: courseId, source: 'you_tab' });
-              navigate('/handicap');
-            },
+        <FieldHero
+          courseName={courseName}
+          shape={shape}
+          showChart={showChart}
+          onConnect={() => {
+            analyticsEvents.track('course_connect_cta_tapped', { course_id: courseId, source: 'you_tab' });
+            navigate('/handicap');
           }}
-          footnote="Takes about 30 seconds with your England Golf login"
         />
-        <UnlockList unclaimedCount={unclaimedCount} />
+        {shape && <ReferencePanel shape={shape} />}
         <UpForGrabs recordLabel={recordLabel} holderName={holderName} unclaimedCount={unclaimedCount} />
       </div>,
     );
@@ -230,10 +608,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
 
   // State B - connected, but nothing logged here yet.
   if (!hasPlayed) {
-    const body = fieldAvg && beastHoleLabel && beastPct !== null
-      ? `The field plays it to ${fieldAvg}, and the ${beastHoleLabel} beats ${beastPct}% of everyone who walks up it. Post a round here and this page fills in on its own.`
-      : fieldAvg
-        ? `The field plays it to ${fieldAvg}. Post a round here and this page fills in on its own.`
+    const body = shape && shape.beastPct !== null
+      ? `The field plays it to ${shape.fieldAvg}, and the ${shape.beastHoleLabel} beats ${shape.beastPct}% of everyone who walks up it. Post a round here and this page fills in on its own.`
+      : shape
+        ? `The field plays it to ${shape.fieldAvg}. Post a round here and this page fills in on its own.`
         : 'Post a round here and this page fills in on its own.';
 
     return wrap(
