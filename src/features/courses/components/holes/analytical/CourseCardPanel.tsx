@@ -847,7 +847,7 @@ const SheetBody: React.FC<{
           padding: '8px 0',
         }}
       >
-        <span style={shFig(13)}>{h.hole_no}</span>
+        <span style={{ ...shFig(13), textAlign: 'center' }}>{h.hole_no}</span>
 
         {/* LENGTH: a SOLID ink bar, not a ramp and not a fading gradient - the
             register does not do faded. SI owns the colour on this row. */}
@@ -874,7 +874,7 @@ const SheetBody: React.FC<{
           style={{
             ...shFig(13, isShort ? A.MUTE : A.BODY),
             fontWeight: isShort ? 500 : 600,
-            textAlign: 'right',
+            textAlign: 'center',
           }}
         >
           {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
@@ -884,7 +884,7 @@ const SheetBody: React.FC<{
           style={{
             ...shFig(13, isShort ? A.MUTE : A.INK),
             fontWeight: isShort ? 500 : 700,
-            textAlign: 'right',
+            textAlign: 'center',
           }}
         >
           {h.par}
@@ -892,7 +892,7 @@ const SheetBody: React.FC<{
 
         {/* SI TAKES THE RAMP (§4.1). Numerals go white or ink by COMPUTED
             luminance - never a hardcoded stroke-index threshold. */}
-        <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <span style={{ display: 'flex', justifyContent: 'center' }}>
           {siChip ? (
             <span
               style={{
@@ -1003,11 +1003,11 @@ const SheetBody: React.FC<{
             gap: CARD_GAP,
           }}
         >
-          <span style={SH_LABEL}>{t('courses:teeCard.col.hole')}</span>
-          <span style={SH_LABEL}>{t('courses:teeCard.col.length')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.yards')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.par')}</span>
-          <span style={{ ...SH_LABEL, textAlign: 'right' }}>{t('courses:teeCard.col.si')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.hole')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.length')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.yards')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.par')}</span>
+          <span style={{ ...SH_LABEL, textAlign: 'center' }}>{t('courses:teeCard.col.si')}</span>
         </div>
 
         {out.map(holeRow)}
