@@ -93,9 +93,6 @@
     "preview": {
       "eyebrow": "Hole by hole",
       "title": "How the field scores every hole",
-      "description": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{count}} rounds{{personal}}.",
-      "personalClause": " and your own average alongside",
-      "descriptionNoRounds": "Par, stroke index and yardage for all {{holes}}, with the spread of scores across the field.",
       "legendBirdie": "Birdie+",
       "legendPar": "Par",
       "legendBogey": "Bogey",
@@ -708,6 +705,14 @@
         "holeTail": "{{n}}番",
         "yardsTail": "{{yards}}ヤード",
         "parN": "パー{{n}}"
+      },
+      "compare": {
+        "kicker": "OUT AGAINST IN",
+        "out": "Out",
+        "in": "In",
+        "yards": "Yards",
+        "par": "Par",
+        "si": "Mean SI"
       }
     },
     "plays": {
@@ -724,8 +729,8 @@
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
       "scaleLabel": "難易度スケール",
-      "scaleCaption": "コース内の他のホールとの比較 — 右にいくほど難しい。",
-      "yourGapVsField": "フィールドとの差"
+      "yourGapVsField": "フィールドとの差",
+      "courseAverageMark": "Tick marks the course average"
     },
     "records": {
       "youHold": "You hold this board",
@@ -757,6 +762,13 @@
       "gapWorseShots": "ここでのフィールドとの差（悪い）",
       "youHere": "あなた",
       "fieldOnHole": "フィールド"
+    },
+    "parTypes": {
+      "kicker": "HOW EACH PAR PLAYS",
+      "holesN_one": "{{count}} hole",
+      "holesN_other": "{{count}} holes",
+      "keyBoth": "Bar is the field. Tick is you.",
+      "keyField": "Bar is the field average over par."
     }
   },
   "network": {

@@ -239,10 +239,6 @@
     "preview": {
       "eyebrow": "Hole by hole",
       "title": "How the field scores every hole",
-      "description_one": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{rounds}} round{{personal}}.",
-      "description_other": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{rounds}} rounds{{personal}}.",
-      "personalClause": " and your own average alongside",
-      "descriptionNoRounds": "Par, stroke index and yardage for all {{holes}}, with the spread of scores across the field.",
       "legendBirdie": "Birdie+",
       "legendPar": "Par",
       "legendBogey": "Bogey",
@@ -920,9 +916,9 @@
       "lengthLabel": "Length",
       "courseRating": "Course rating",
       "vsStandard": "vs standard slope of {{standard}}",
-      "playsHarder": "Higher handicaps give up more strokes here, relative to a scratch golfer, than at an average course.",
-      "playsEasier": "Higher handicaps give up fewer strokes here, relative to a scratch golfer, than at an average course.",
-      "playsAverage": "Higher handicaps give up about as many strokes here, relative to a scratch golfer, as at an average course.",
+      "playsHarder": "Higher handicaps give up more strokes here than at an average course.",
+      "playsEasier": "Higher handicaps give up fewer strokes here than at an average course.",
+      "playsAverage": "Higher handicaps give up about as many strokes here as at an average course.",
       "yardsUnit": "yards",
       "ydsUnit": "yds",
       "seeFullShort": "See the full card",
@@ -939,6 +935,14 @@
         "holeTail": "Hole {{n}}",
         "yardsTail": "{{yards}} yds",
         "parN": "Par {{n}}"
+      },
+      "compare": {
+        "kicker": "OUT AGAINST IN",
+        "out": "Out",
+        "in": "In",
+        "yards": "Yards",
+        "par": "Par",
+        "si": "Mean SI"
       }
     },
     "plays": {
@@ -968,15 +972,13 @@
       "colField": "Field",
       "colYou": "You",
       "sheetTitle": "How the field scores",
-      "sheetSub_one": "From {{rounds}} round with hole-by-hole detail",
-      "sheetSub_other": "From {{rounds}} rounds with hole-by-hole detail",
       "yards": "Yards",
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
       "scaleLabel": "Difficulty scale",
-      "scaleCaption": "This hole against every other hole on the course — further right plays harder.",
-      "yourGapVsField": "Your gap vs field"
+      "yourGapVsField": "Your gap vs field",
+      "courseAverageMark": "Tick marks the course average"
     },
     "records": {
       "kicker": "THE RECORD BOOK",
@@ -1061,6 +1063,13 @@
       "gapWorseShots": "Shots worse than the field here",
       "youHere": "You here",
       "fieldOnHole": "Field here"
+    },
+    "parTypes": {
+      "kicker": "HOW EACH PAR PLAYS",
+      "holesN_one": "{{count}} hole",
+      "holesN_other": "{{count}} holes",
+      "keyBoth": "Bar is the field. Tick is you.",
+      "keyField": "Bar is the field average over par."
     }
   },
   "network": {
