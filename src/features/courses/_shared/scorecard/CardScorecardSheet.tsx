@@ -71,7 +71,13 @@ export interface CardScorecardRounds {
 
 /** Member-only enrichment from `get_round_course_context`. Defaults off. */
 export interface CardScorecardCourseContext {
+  /** Inclusive of this round — the hero cell figure. */
   yourAvgToPar?: number | null;
+  /**
+   * Average of the member's OTHER rounds here, NULL when this is the only one.
+   * The caption compares against this, never the self-inclusive average.
+   */
+  avgToParOthers?: number | null;
   roundsHere?: number | null;
   rankHere?: number | null;
 }
