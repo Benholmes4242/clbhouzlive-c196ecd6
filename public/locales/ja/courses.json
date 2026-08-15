@@ -958,6 +958,14 @@
       "chip": "クリエイター",
       "clips_other": "クリップ{{count}}本",
       "photos_other": "写真{{count}}枚"
+    },
+    "honoursSeeAllPlain": "すべて見る",
+    "honours": {
+      "badgeAce": "ホールインワン",
+      "badgeAlbatross": "アルバトロス",
+      "badgeCount": "{{label}} ×{{count}}",
+      "more": "他{{count}}件",
+      "showLess": "閉じる"
     }
   },
   "statBrowse": {

@@ -1007,6 +1007,14 @@
       "clips_other": "{{count}} clips",
       "photos_one": "{{count}} foto",
       "photos_other": "{{count}} fotos"
+    },
+    "honoursSeeAllPlain": "Ver todo",
+    "honours": {
+      "badgeAce": "Hoyo en uno",
+      "badgeAlbatross": "Albatros",
+      "badgeCount": "{{label}} ×{{count}}",
+      "more": "{{count}} más",
+      "showLess": "Ver menos"
     }
   },
   "statBrowse": {
