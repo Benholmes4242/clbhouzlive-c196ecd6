@@ -238,6 +238,16 @@ const Nine: React.FC<{
 
 
 
+/**
+ * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
+ * Its numerals (3 birdie, 2 eagle, 1 ace, 5 bogey, 6 double+ against par 4) are
+ * EXAMPLES. Unheaded and sitting between the total row and the breakdown panel,
+ * a member read "2 EAGLE, 1 ACE, 6 DOUBLE+" as counts directly above a panel
+ * stating DOUBLE+ 0. It now carries the same heading HolesScoringKey uses
+ * (courses:holes.scoringKey.title), is LEFT-ALIGNED with it, and sits ABOVE the
+ * total row with the grid it decodes — so nothing numeric stands between the
+ * total and the breakdown.
+ */
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
   const keys: { strokes: number; label: string }[] = [
@@ -248,13 +258,18 @@ const Legend: React.FC = () => {
     { strokes: 6, label: t('courses:scorecard.legendDouble') },
   ];
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-      {keys.map((k) => (
-        <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-          <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
-          <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
-        </span>
-      ))}
+    <div>
+      <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8 }}>
+        {t('courses:holes.scoringKey.title')}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+        {keys.map((k) => (
+          <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
+            <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
+            <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
