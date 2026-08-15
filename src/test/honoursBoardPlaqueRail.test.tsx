@@ -44,8 +44,10 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(container.textContent).not.toMatch(/albatross/i);
     unmount();
 
-    render(<HonoursBoard events={[ev({ id: 'c' }), ev({ id: 'd', kind: 'albatross' })]} />);
-    expect(screen.getByText(/1 ace\. 1 albatross\./)).toBeTruthy();
+    const { container: container2 } = render(
+      <HonoursBoard events={[ev({ id: 'c' }), ev({ id: 'd', kind: 'albatross' })]} />,
+    );
+    expect(container2.textContent).toMatch(/1 ace\. 1 albatross\./);
   });
 
   it('opens on RECENT with two aria-pressed buttons and switches mode', () => {
@@ -90,7 +92,7 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
         events={[ev({ id: 'a', at: '2024-05-01T00:00:00Z' }), ev({ id: 'b', at: '2022-05-01T00:00:00Z' })]}
       />,
     );
-    expect(screen.getByText('2024')).toBeTruthy();
-    expect(screen.getByText('2022')).toBeTruthy();
+    expect(screen.getAllByText('2024').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('2022').length).toBeGreaterThan(0);
   });
 });

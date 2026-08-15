@@ -337,7 +337,7 @@ function LeaderPlaque({
             {l.total}
           </span>
           <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE, display: 'block', marginTop: 3 }}>
-            {t('discover.honours.featCount', { count: l.total, defaultValue: 'feats' })}
+            {t('discover.honours.featCount', { count: l.total, defaultValue: 'feats', defaultValue_one: 'feat' })}
           </span>
         </span>
       </span>
@@ -395,12 +395,19 @@ export function useHonoursHeadline(events: WireEvent[]) {
   const albatrosses = events.length - aces;
   const parts: string[] = [];
   if (aces > 0)
-    parts.push(t('discover.honours.headlineAces', { count: aces, defaultValue: '{{count}} aces.' }));
+    parts.push(
+      t('discover.honours.headlineAces', {
+        count: aces,
+        defaultValue: '{{count}} aces.',
+        defaultValue_one: '{{count}} ace.',
+      }),
+    );
   if (albatrosses > 0)
     parts.push(
       t('discover.honours.headlineAlbatrosses', {
         count: albatrosses,
         defaultValue: '{{count}} albatrosses.',
+        defaultValue_one: '{{count}} albatross.',
       }),
     );
   return parts.join(' ');
@@ -584,6 +591,7 @@ export function HonoursBoard({
                 : t('discover.honours.subLeaders', {
                     count: leaders.length,
                     defaultValue: '{{count}} golfers',
+                    defaultValue_one: '{{count}} golfer',
                   })}
             </div>
           </div>
@@ -653,6 +661,7 @@ export function HonoursBoard({
                     {t('discover.honours.featCountWith', {
                       count: y.events.length,
                       defaultValue: '{{count}} feats',
+                      defaultValue_one: '{{count}} feat',
                     })}
                   </span>
                 </div>
