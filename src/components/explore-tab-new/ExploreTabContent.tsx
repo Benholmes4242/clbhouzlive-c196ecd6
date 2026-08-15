@@ -591,7 +591,7 @@ export default function ExploreTabContent({
           events={honours}
           isPending={wireLoading}
           onRowPress={handleHonoursRow}
-          limit={12}
+          limit={20}
           onSeeAll={openHonoursSheet}
         />
 

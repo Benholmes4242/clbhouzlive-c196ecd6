@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
@@ -590,10 +590,23 @@ export function HonoursBoard({
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
 
-  /* The rail costs no height as it grows, so the page cap is generous; the
-     terminal "See all" card is offered whenever the sheet exists, because the
-     rail is not the whole board even when it happens to hold all of it. */
+  /* The rail cap now applies to both modes so the carousel never overwhelms. */
   const featShown = limit ? feats.slice(0, limit) : feats;
+  const leaderShown = limit ? leaders.slice(0, limit) : leaders;
+
+  const shownItems: WireEvent[] | HonoursLeader[] =
+    mode === 'recent' ? featShown : leaderShown;
+
+  const renderItem = (item: WireEvent | HonoursLeader) =>
+    mode === 'recent' ? (
+      <FeatPlaque key={(item as WireEvent).id} event={item as WireEvent} onPress={onRowPress} />
+    ) : (
+      <LeaderPlaque
+        key={(item as HonoursLeader).key}
+        leader={item as HonoursLeader}
+        onPress={onRowPress}
+      />
+    );
 
   /* §7 — the grid groups RECENT by year. A leader is not a year. */
   const years: { year: string; events: WireEvent[] }[] = [];
@@ -685,34 +698,46 @@ export function HonoursBoard({
         ) : null}
 
         {layout === 'rail' ? (
-          <div style={{ ...railStyle, paddingTop: 12 }}>
-            {(mode === 'recent' ? featShown : leaders).map((item) =>
-              mode === 'recent' ? (
-                <FeatPlaque key={(item as WireEvent).id} event={item as WireEvent} onPress={onRowPress} />
-              ) : (
-                <LeaderPlaque key={(item as HonoursLeader).key} leader={item as HonoursLeader} onPress={onRowPress} />
-              ),
-            )}
-            {onSeeAll ? (
-              <button
-                type="button"
-                onClick={onSeeAll}
+          <div style={{ ...railStyle, alignItems: 'flex-start', paddingTop: 12 }}>
+            {shownItems.length > 0 ? (
+              <div
                 style={{
-                  ...PLAQUE_SHELL,
-                  width: 108,
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  background: 'transparent',
-                  borderStyle: 'dashed',
-                  cursor: 'pointer',
-                  ...LABEL,
-                  fontSize: 9,
-                  color: A.INK,
+                  flex: 'none',
+                  width: PLAQUE_W,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
                 }}
               >
-                {t('discover.honoursSeeAllPlain', 'See all')}
-              </button>
+                {renderItem(shownItems[0])}
+                {onSeeAll ? (
+                  <button
+                    type="button"
+                    onClick={onSeeAll}
+                    style={{
+                      ...LABEL,
+                      fontSize: 9,
+                      color: A.INK,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      width: '100%',
+                      padding: '5px 10px',
+                      border: `1px solid ${GOLD_BORDER}`,
+                      borderRadius: 999,
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      fontFamily: SANS,
+                    }}
+                  >
+                    {t('discover.honoursSeeAllPlain', 'See all')}
+                    <ChevronRight size={11} strokeWidth={2.5} />
+                  </button>
+                ) : null}
+              </div>
             ) : null}
+            {shownItems.slice(1).map((item) => renderItem(item))}
           </div>
         ) : mode === 'leaders' ? (
           <div style={gridStyle}>
