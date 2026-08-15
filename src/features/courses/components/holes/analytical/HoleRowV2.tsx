@@ -330,6 +330,14 @@ export const HoleRowV2: React.FC<{
 
   const lastIdx = segs.length - 1;
 
+  /** ONE domain for the hole's shares and the course's, so the marks compare. */
+  const shareDomain = Math.max(
+    0.05,
+    ...segs.map((s) => s.pctValue / total),
+    ...(courseShares ? BUCKETS.map((b) => courseShares[b.key]) : []),
+  );
+
+
 
   return (
     /* SELECTION IS A LEADING RULE AND A NEUTRAL WASH (§B5), not the heavy outline
