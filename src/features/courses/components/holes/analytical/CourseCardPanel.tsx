@@ -805,14 +805,19 @@ const SheetBody: React.FC<{
   };
 
   const holeRow = (h: (typeof holes)[number]) => {
-    /* PAR 3 SITS ONE STEP BACK (§4.3) - a lighter weight and the muted tone, so
-       par type is readable down the column without a fourth colour. */
-    const isShort = h.par != null && Number(h.par) === 3;
+    /* §C1 CORRECTION: the par-3 tone and weight step is GONE. Dimming the bar,
+       the yardage AND the par read as a disabled row, which is exactly the fault
+       the no-faded-colour rule exists to stop. Par type is already legible three
+       ways: the PAR column states it, the SI chip carries its own colour, and the
+       length bar is normalised WITHIN par type so a par 3 is never a stub. */
     const barK = bars.get(h.hole_no) ?? null;
     const siChip =
       h.si != null && siRange != null
         ? difficultyRampColor(siRampT(Number(h.si), siRange.min, siRange.max))
         : null;
+    /* §C3: the toughest run is marked WHERE THE HOLES ARE, with a leading rule -
+       not a wash, and no figure in the row changes. */
+    const inRun = run != null && h.hole_no >= run.from && h.hole_no <= run.to;
 
     return (
       <div
@@ -823,12 +828,14 @@ const SheetBody: React.FC<{
           alignItems: 'center',
           gap: CARD_GAP,
           padding: '8px 0',
+          ...(inRun
+            ? { margin: '0 -10px', paddingLeft: 10, paddingRight: 10, boxShadow: `inset 2px 0 0 ${A.INK}` }
+            : null),
         }}
       >
         <span style={{ ...shFig(13), textAlign: 'center' }}>{h.hole_no}</span>
 
-        {/* LENGTH: a SOLID ink bar, not a ramp and not a fading gradient - the
-            register does not do faded. SI owns the colour on this row. */}
+        {/* LENGTH: a SOLID ink bar on EVERY row, par 3s included. */}
         {barK != null ? (
           <span
             aria-hidden="true"
@@ -840,7 +847,7 @@ const SheetBody: React.FC<{
                 height: '100%',
                 width: `${Math.round(barK * 100)}%`,
                 borderRadius: 2,
-                background: isShort ? 'rgba(14,18,22,0.34)' : A.INK,
+                background: A.INK,
               }}
             />
           </span>
@@ -848,25 +855,12 @@ const SheetBody: React.FC<{
           <span aria-hidden="true" />
         )}
 
-        <span
-          style={{
-            ...shFig(13, isShort ? A.MUTE : A.BODY),
-            fontWeight: isShort ? 500 : 600,
-            textAlign: 'center',
-          }}
-        >
+        <span style={{ ...shFig(13, A.BODY), fontWeight: 600, textAlign: 'center' }}>
           {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
         </span>
 
-        <span
-          style={{
-            ...shFig(13, isShort ? A.MUTE : A.INK),
-            fontWeight: isShort ? 500 : 700,
-            textAlign: 'center',
-          }}
-        >
-          {h.par}
-        </span>
+        <span style={{ ...shFig(13, A.INK), fontWeight: 700, textAlign: 'center' }}>{h.par}</span>
+
 
         {/* SI TAKES THE RAMP (§4.1). Numerals go white or ink by COMPUTED
             luminance - never a hardcoded stroke-index threshold. */}
