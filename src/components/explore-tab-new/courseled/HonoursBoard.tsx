@@ -505,8 +505,10 @@ export function HonoursBoard({
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
 
+  /* The rail costs no height as it grows, so the page cap is generous; the
+     terminal "See all" card is offered whenever the sheet exists, because the
+     rail is not the whole board even when it happens to hold all of it. */
   const featShown = limit ? feats.slice(0, limit) : feats;
-  const overflow = limit ? feats.length > featShown.length : false;
 
   /* §7 — the grid groups RECENT by year. A leader is not a year. */
   const years: { year: string; events: WireEvent[] }[] = [];
@@ -606,7 +608,7 @@ export function HonoursBoard({
                 <LeaderPlaque key={(item as HonoursLeader).key} leader={item as HonoursLeader} onPress={onRowPress} />
               ),
             )}
-            {overflow && onSeeAll ? (
+            {onSeeAll ? (
               <button
                 type="button"
                 onClick={onSeeAll}
