@@ -190,7 +190,7 @@ export function PhotoBand({
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: title.length > 30 ? 28 : 34,
+            fontSize: title.length > 30 ? 25 : 30,
             fontWeight: 700,
             lineHeight: 0.96,
             letterSpacing: '-0.025em',
@@ -314,7 +314,7 @@ export function PhotoBand({
                   margin: '-6px -4px',
                   cursor: 'pointer',
                   fontFamily: FONT,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   // Quiet action on a dark hero band: white-62, never amber
