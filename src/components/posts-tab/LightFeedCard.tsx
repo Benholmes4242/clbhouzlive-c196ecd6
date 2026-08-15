@@ -25,6 +25,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from '@/components/feed/InlineVideo';
+import { MuteButton } from '@/audio/MuteButton';
 import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
