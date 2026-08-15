@@ -953,7 +953,12 @@
     "momentsCount": "{{count}} moments",
     "momentsCount_one": "{{count}} moment",
     "whosBeenPlaying": "プレーした人",
-    "suggestedMark": "おすすめ"
+    "suggestedMark": "おすすめ",
+    "creator": {
+      "chip": "クリエイター",
+      "clips_other": "クリップ{{count}}本",
+      "photos_other": "写真{{count}}枚"
+    }
   },
   "statBrowse": {
     "colArea": "エリア",

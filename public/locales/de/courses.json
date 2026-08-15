@@ -1000,7 +1000,14 @@
     "momentsCount": "{{count}} Momente",
     "momentsCount_one": "{{count}} Moment",
     "whosBeenPlaying": "Wer gespielt hat",
-    "suggestedMark": "VORSCHLAG"
+    "suggestedMark": "VORSCHLAG",
+    "creator": {
+      "chip": "Creator",
+      "clips_one": "{{count}} Clip",
+      "clips_other": "{{count}} Clips",
+      "photos_one": "{{count}} Foto",
+      "photos_other": "{{count}} Fotos"
+    }
   },
   "statBrowse": {
     "colArea": "Gebiet",

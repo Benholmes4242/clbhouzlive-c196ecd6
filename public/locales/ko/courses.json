@@ -953,7 +953,12 @@
     "momentsCount": "{{count}} moments",
     "momentsCount_one": "{{count}} moment",
     "whosBeenPlaying": "플레이한 사람",
-    "suggestedMark": "추천"
+    "suggestedMark": "추천",
+    "creator": {
+      "chip": "크리에이터",
+      "clips_other": "클립 {{count}}개",
+      "photos_other": "사진 {{count}}장"
+    }
   },
   "statBrowse": {
     "colArea": "지역",
