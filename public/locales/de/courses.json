@@ -137,7 +137,7 @@
     "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "holeByHole": "Vollständige Scorekarte",
-    "hideHoleByHole": "Vollständige Scorekarte ausblenden",
+    "hideHoleByHole": "Vollständige Scorekarte ausblenden"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
