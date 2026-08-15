@@ -240,7 +240,9 @@ export const ActivityPageV2: React.FC = () => {
         ),
       };
     });
-    await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+    // Both read-state columns (§2), so the two can never drift further.
+    await supabase.from('notifications').update({ is_read: true, read: true }).eq('id', notifId);
+
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
   };
