@@ -1116,5 +1116,20 @@ async function syncLeaderboard(
     }
   }
 
+  // ── Best-effort archive write: ONE insert per pass, never blocks the sync ──
+  if (historyRows.length > 0) {
+    try {
+      const { error: histErr } = await supabase.from('sr_leaderboard_history').insert(historyRows);
+      if (histErr) {
+        console.error(`[LiveSync history] insert failed (${historyRows.length} rows dropped):`, histErr.message);
+      } else {
+        console.log(`[LiveSync history] ${historyRows.length} changed rows archived`);
+      }
+    } catch (e: any) {
+      console.error('[LiveSync history] insert threw (ignored):', e?.message ?? String(e));
+    }
+  }
+
   return { records, sportradarStatus };
+
 }
