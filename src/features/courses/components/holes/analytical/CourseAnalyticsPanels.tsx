@@ -447,6 +447,184 @@ const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, hard
   </span>
 );
 
+/**
+ * HOW EACH PAR PLAYS (§A4) - one row per par type PRESENT at this course.
+ *
+ * The bar is the FIELD's mean shots over par for that par type, on the demanding
+ * ramp; the tick is the VIEWER's on the same track. Both derive from the
+ * per-hole averages already loaded for the shape chart and the hole rows - no
+ * new query, no hook, no SQL.
+ *
+ * COMMENSURABILITY: the viewer's tick renders ONLY where the viewer has an
+ * average for EVERY hole of that par type, so the two sides derive identically
+ * over the same holes. A par 6 or par 2 gets its own row and is never folded in.
+ * A member with no rounds here sees the field alone - the course's own shape is
+ * worth showing to someone who has never played it.
+ */
+export interface ParTypeRow {
+  par: number;
+  holes: number;
+  field: number;
+  you: number | null;
+}
+
+export function buildParTypeRows(
+  holes: CourseHole[],
+  myByHole: Map<number, MyHolePerformanceRow>,
+): ParTypeRow[] {
+  const byPar = new Map<number, CourseHole[]>();
+  holes.forEach((h) => {
+    if (h.par == null || !Number.isFinite(h.avg_to_par)) return;
+    const list = byPar.get(h.par) ?? [];
+    list.push(h);
+    byPar.set(h.par, list);
+  });
+  return [...byPar.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([par, list]) => {
+      const field = list.reduce((s, h) => s + h.avg_to_par, 0) / list.length;
+      const mine = list.map((h) => myByHole.get(h.hole_no)?.avg_to_par ?? null);
+      const complete = mine.every((v) => v != null && Number.isFinite(v));
+      return {
+        par,
+        holes: list.length,
+        field,
+        you: complete ? (mine as number[]).reduce((s, v) => s + v, 0) / mine.length : null,
+      };
+    });
+}
+
+const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows, fieldAvg }) => {
+  const { t } = useTranslation(['courses']);
+  if (rows.length === 0) return null;
+
+  /* ONE domain across every row, floored, so the rows are comparable and a
+     course that plays close to par still draws bars. */
+  const domain = Math.max(
+    0.2,
+    ...rows.map((r) => r.field),
+    ...rows.map((r) => (r.you == null ? 0 : r.you)),
+  );
+
+  const fMin = Math.min(...rows.map((r) => r.field));
+  const fMax = Math.max(...rows.map((r) => r.field));
+  const fSpan = Math.max(0.01, fMax - fMin);
+  const anyYou = rows.some((r) => r.you != null);
+
+  return (
+    <Panel
+      kicker={t('courses:courseDetail.parTypes.kicker')}
+      headerGap={12}
+      style={{ padding: '14px 13px 12px' }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {rows.map((r) => {
+          const fieldFig = toParParts(r.field);
+          const youFig = toParParts(r.you);
+          return (
+            <div
+              key={r.par}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '46px 1fr auto',
+                alignItems: 'center',
+                gap: 10,
+                ...FIGS,
+              }}
+            >
+              <span style={{ display: 'block' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, display: 'block' }}>
+                  {t('courses:courseDetail.card.shape.parN', { n: r.par })}
+                </span>
+                <span style={{ ...LABEL, fontSize: 7.5, display: 'block', marginTop: 1 }}>
+                  {t('courses:courseDetail.parTypes.holesN', { count: r.holes })}
+                </span>
+              </span>
+
+              <span
+                style={{
+                  position: 'relative',
+                  display: 'block',
+                  height: 8,
+                  borderRadius: 4,
+                  background: A.TRACK,
+                }}
+              >
+                <i
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: `${Math.max(2, Math.min(100, (Math.max(0, r.field) / domain) * 100))}%`,
+                    borderRadius: 4,
+                    background: difficultyRampColor((r.field - fMin) / fSpan),
+                    display: 'block',
+                  }}
+                />
+                {r.you != null && (
+                  <i
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: -3,
+                      bottom: -3,
+                      left: `${Math.min(100, (Math.max(0, r.you) / domain) * 100)}%`,
+                      width: 2,
+                      borderRadius: 1,
+                      background: A.AMBER,
+                      display: 'block',
+                    }}
+                  />
+                )}
+              </span>
+
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 10,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: fieldFig ? fieldFig.tone : A.INK,
+                    minWidth: 34,
+                    textAlign: 'right',
+                  }}
+                >
+                  {fieldFig ? fieldFig.text : ''}
+                </span>
+                {anyYou && (
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: A.AMBER_DEEP,
+                      minWidth: 34,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {youFig ? youFig.text : ''}
+                  </span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* SAID ONCE, beneath the rows - never on every row. */}
+      <div style={{ ...LABEL, fontSize: 7.5, marginTop: 11 }}>
+        {anyYou
+          ? t('courses:courseDetail.parTypes.keyBoth')
+          : t('courses:courseDetail.parTypes.keyField')}
+      </div>
+    </Panel>
+  );
+};
 
 
 export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
