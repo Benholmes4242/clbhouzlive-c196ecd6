@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
-import { ChampionsGhost } from '@/components/handicap/ConnectGhostPreviews';
+import ChampionsHonoursBoard, { type HonoursCrown, type HonoursFigures } from '@/components/handicap/ChampionsHonoursBoard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -21,6 +22,15 @@ const write = (k: string) => {
 
 interface Props {
   window: 'all_time' | '90d';
+  /** Course context for the honours board preview. */
+  courseName?: string;
+  /** The image the page already loaded for the course header. No new fetch here. */
+  courseHeaderImage?: string | null;
+  /** Every crown category on this club, in the board's own display order. */
+  crowns?: HonoursCrown[];
+  /** True once the crown query has settled. Unresolved is not absent: no card. */
+  boardSettled?: boolean;
+  figures?: HonoursFigures;
 }
 
 interface CardShellProps {
@@ -58,8 +68,16 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
   </div>
 );
 
-export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
+export const ChampionsInfoCarousel: React.FC<Props> = ({
+  window,
+  courseName,
+  courseHeaderImage,
+  crowns,
+  boardSettled = false,
+  figures,
+}) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const { user } = useSupabaseSession();
   const { data: whsConnection } = useWhsConnection(user?.id);
   const isSynced = !!whsConnection;
@@ -71,13 +89,60 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
 
   if (gone) return null;
 
-  // Unsynced users get the ghost prompt in place of the old sync CTA. It
-  // supersedes the info card entirely for this state - one prompt, one place.
+  // Unsynced members get the honours board gate in place of the old sync CTA.
   if (!isSynced) {
+    // UNRESOLVED IS NOT ABSENT: nothing renders until the crown data has settled,
+    // so the headline can never claim a zero it has not measured.
+    if (!boardSettled || !crowns || crowns.length === 0) return null;
+
+    const total = crowns.length;
+    const held = crowns.filter((c) => !!(c.holderName && c.holderName.trim())).length;
+    const open = total - held;
+
+    // Every edge case is its own string — never concatenation. Numerals, not words.
+    const headline =
+      total === 1
+        ? open === 0
+          ? t('connectGhost.champions.headlineOneTotalHeld')
+          : t('connectGhost.champions.headlineOneTotalOpen')
+        : open === 0
+          ? t('connectGhost.champions.headlineAll', { total })
+          : held === 0
+            ? t('connectGhost.champions.headlineNone', { total })
+            : open === 1
+              ? t('connectGhost.champions.headlineSomeOne', { total })
+              : t('connectGhost.champions.headlineSome', { total, open });
+
+    // The counted line covers the unclaimed crowns not already shown as a row.
+    const shownOpen = held >= 3 && open > 0 ? 1 : Math.min(open, Math.max(0, 4 - Math.min(held, 4)));
+    const remaining = Math.max(0, open - shownOpen);
+
     return (
       <ConnectGhostPrompt
         surface="champions"
-        ghost={<ChampionsGhost />}
+        headlineOverride={headline}
+        preview={
+          <ChampionsHonoursBoard
+            courseName={courseName ?? ''}
+            courseHeaderImage={courseHeaderImage}
+            eyebrow={t('connectGhost.champions.boardEyebrow')}
+            headline={headline}
+            figures={figures}
+            crowns={crowns}
+            remainderLine={
+              remaining > 0
+                ? t('connectGhost.champions.remaining', { count: remaining })
+                : null
+            }
+            neverWonLabel={t('connectGhost.champions.neverWon')}
+            openLabel={t('connectGhost.champions.open')}
+            figureLabels={{
+              rounds: t('connectGhost.champions.figRounds'),
+              avg: t('connectGhost.champions.figAvgToPar'),
+              harder: t('connectGhost.champions.figHarderThan'),
+            }}
+          />
+        }
         onConnect={() => navigate('/handicap')}
       />
     );
