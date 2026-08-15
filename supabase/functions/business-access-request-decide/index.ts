@@ -131,7 +131,9 @@ serve(async (req) => {
     // This marks "business_access_request" notifications as read for this specific request
     const { error: clearNotifError } = await supabase
       .from("notifications")
-      .update({ is_read: true })
+      // Both read-state columns (BRIEF §2): is_read is authoritative, `read`
+      // is the abandoned twin and must not drift further.
+      .update({ is_read: true, read: true })
       .eq("type", "business_access_request")
       .eq("entity_id", request.business_id)
       .contains("data", { request_id: request_id });

@@ -83,7 +83,8 @@ export function useUnseenFriendReviews() {
     // Also mark the DB notifications as read so the dot stays cleared on refresh
     supabase
       .from('notifications')
-      .update({ is_read: true })
+      // Both read-state columns (BRIEF §2).
+      .update({ is_read: true, read: true })
       .eq('user_id', user.id)
       .eq('type', 'friend_course_review')
       .eq('is_read', false)
