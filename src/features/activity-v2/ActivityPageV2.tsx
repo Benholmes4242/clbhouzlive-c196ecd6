@@ -486,11 +486,18 @@ export const ActivityPageV2: React.FC = () => {
 
         {!isEmpty && !isErrored && !feed.isLoading && (
           <div style={{ paddingBottom: 40 }}>
-            {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
-            {renderBucket(BUCKET_LABELS.today, buckets.today)}
-            {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
-            {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
-            {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+            {isNewChip ? (
+              renderBucket(BUCKET_LABELS.new, buckets.new, 'new')
+            ) : (
+              <>
+                {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
+                {renderBucket(BUCKET_LABELS.today, buckets.today)}
+                {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
+                {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
+                {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+              </>
+            )}
+
             <div ref={sentinelRef} style={{ height: 1 }} />
             {feed.isFetchingNextPage && (
               <div style={{ padding: '8px 0' }}>
