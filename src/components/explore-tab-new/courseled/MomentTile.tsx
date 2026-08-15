@@ -33,6 +33,9 @@ export function MomentPlayGlyph() {
   return (
     <span
       aria-hidden
+      /* SAME GLASS AS THE FIGURE CHIP (liquid-glass.css): flat base fill, blur
+         as an @supports enhancement. */
+      className="standout-figure-chip"
       style={{
         position: 'absolute',
         top: '50%',
@@ -41,9 +44,6 @@ export function MomentPlayGlyph() {
         width: 28,
         height: 28,
         borderRadius: 999,
-        background: 'rgba(10,14,10,0.5)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
