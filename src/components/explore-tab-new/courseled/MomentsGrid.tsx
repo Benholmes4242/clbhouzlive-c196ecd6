@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 
+import { CreatorCard } from './CreatorCard';
 import { MomentTile } from './MomentTile';
+import type { CommunityCreator } from './hooks/useCommunityCreators';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 import { isNewSince } from './newSince';
 import { NEW_CARD_RING } from './tokens';
@@ -22,7 +24,16 @@ import { NEW_CARD_RING } from './tokens';
  *
  * Every tile is labelled with the COURSE, never the poster — Discover is
  * course-led, and an unlabelled wall of media is unattributed.
+ *
+ * CREATOR CARDS (BRIEF_COMMUNITY_CREATOR_CARDS) enter IN THE COLUMN FLOW, each
+ * taking the TALL slot of a block — so a card is exactly `tall`, the same
+ * arithmetic every other block obeys. Cards never take block 0 (the section
+ * opens on media) and they take DIFFERENT blocks, so alternation puts them in
+ * different columns at different depths rather than in a level banner row.
+ * The geometry, the gutter and the tiles are untouched; a caller that passes no
+ * creators (the see-all sheet, the community page) renders exactly as before.
  */
+
 
 interface Props {
   moments: Moment[];
