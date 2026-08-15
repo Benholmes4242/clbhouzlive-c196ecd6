@@ -250,20 +250,33 @@ export const ActivityPageV2: React.FC = () => {
     setSheetOpen(true);
   };
 
-  // -- Auto-read on visit (Fix A) -------------------------------------
-  // Marks the ACTIVE ACTOR's notifications read once per mount, scoped
-  // exactly like the feed/badges. Does NOT invalidate the feed cache so
-  // the "New" section stays highlighted for the whole visit; on the next
-  // visit rows render read. friend_request excluded (own lifecycle).
-  const didAutoRead = useRef(false);
-  useEffect(() => {
-    if (didAutoRead.current || !recipientActorId || !user?.id) return;
-    didAutoRead.current = true;
+  // -- Auto-read ON EXIT, NEVER ON ARRIVAL ----------------------------
+  //
+  // BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §1.2. This ran on MOUNT, which is
+  // the exact failure the Discover "new since you last looked" work already
+  // ruled out: the marker is cleared before the member can read it. Landing on
+  // Activity flipped every row read, so tapping the New chip (server predicate
+  // is_read=false) returned nothing while the chip still counted the visit
+  // snapshot. Marking read on view stays — it just happens when they LEAVE.
+  //
+  // Signals: visibilitychange -> hidden (the dependable background signal in
+  // the Median WebView, it fires before suspension so the write dispatches)
+  // plus unmount, which always fires. Never on mount, tab change or scroll.
+  //
+  // The stamp (user_profiles.last_notifications_seen_at) is SERVER-SIDE but
+  // does NOT go through mark_surface_seen, so GREATEST is not doing the work:
+  // monotonicity is enforced here by only writing rows whose current stamp is
+  // null or older than this one.
+  const markReadOnExitRef = useRef<() => void>(() => {});
+  markReadOnExitRef.current = () => {
+    if (!recipientActorId || !user?.id) return;
     const now = new Date().toISOString();
-    (async () => {
+    void (async () => {
       await supabase
         .from('notifications')
-        .update({ is_read: true })
+        // Both columns, always — see §2. `read` is abandoned but must not
+        // drift further apart from is_read.
+        .update({ is_read: true, read: true })
         .eq('recipient_actor_type', recipientActorType)
         .eq('recipient_actor_id', recipientActorId)
         .eq('is_read', false)
@@ -272,12 +285,24 @@ export const ActivityPageV2: React.FC = () => {
       await supabase
         .from('user_profiles')
         .update({ last_notifications_seen_at: now })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .or(`last_notifications_seen_at.is.null,last_notifications_seen_at.lt.${now}`);
       qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
       qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipientActorType, recipientActorId, user?.id]);
+  };
+
+  useEffect(() => {
+    const onHidden = () => {
+      if (document.hidden) markReadOnExitRef.current();
+    };
+    document.addEventListener('visibilitychange', onHidden);
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden);
+      markReadOnExitRef.current();
+    };
+  }, []);
+
 
   // -- Mark-all-read (actor-scoped) -----------------------------------
   const handleMarkAllRead = async () => {
