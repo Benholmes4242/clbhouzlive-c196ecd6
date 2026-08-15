@@ -1066,6 +1066,11 @@ const BorrowedFullscreenSlot: React.FC<{
   );
   const skipFitSwapRef = React.useRef<boolean>(false);
   const targetRectRef = React.useRef<RestingRect | null>(initialTargetRect);
+  // Bumped when a late intrinsic-aspect read corrects the resting rect.
+  const [, setRectVersion] = React.useState(0);
+  const lateCorrectCleanupRef = React.useRef<null | (() => void)>(null);
+  React.useEffect(() => () => { lateCorrectCleanupRef.current?.(); }, []);
+
   // Aspect-aware: precompute whether target rest is COVER (portrait video →
   // full viewport, no fit swap, no underlay) or CONTAIN (landscape video →
   // letterboxed inside safe area, underlay fades DURING expand).
