@@ -80,6 +80,11 @@ const PostDeepLinkPage: React.FC = () => {
           status,
           course_id,
           source_review_id,
+          whs_score_id,
+          like_count,
+          comment_count,
+          share_count,
+
           user_profiles!posts_user_profile_id_fkey (
             id,
             username,
