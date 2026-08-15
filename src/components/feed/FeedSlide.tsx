@@ -537,13 +537,48 @@ const FullscreenVideoSlot: React.FC<{
   // sliver over white. Mirror BorrowedFullscreenSlot (~L905): compute the
   // rect from a layout effect on mount, then re-resolve on visualViewport
   // resize + orientationchange while the slide is active.
+  //
+  // FIT-WIDTH FIX: the post row's width/height default to 1080x1920 in
+  // feedMapper when the DB has no dimensions, so a genuinely LANDSCAPE clip
+  // was resolved as portrait → COVER → cropped to roughly a third of its
+  // width in the viewer. The live element's intrinsic aspect is authoritative
+  // once metadata lands, so we prefer it over the (possibly defaulted) props
+  // and re-resolve. Landscape then takes the CONTAIN branch of
+  // resolveRestingRect → fits width, blurred self-backdrop fills the bars.
+  const [laneAspect, setLaneAspect] = React.useState<number | null>(null);
+  const dims = React.useMemo(() => {
+    if (laneAspect && laneAspect > 0) return { w: laneAspect * 1000, h: 1000 };
+    return { w: mediaW, h: mediaH };
+  }, [laneAspect, mediaW, mediaH]);
   const [settledRect, setSettledRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video'),
+    resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video'),
   );
+  // Poll the engine for the lane's intrinsic aspect until metadata lands.
+  React.useEffect(() => {
+    if (isBorrowSlide || !isActive) return;
+    let cancelled = false;
+    const read = () => {
+      if (cancelled) return true;
+      const a = VideoEngine.getLaneAspect('fullscreen');
+      if (a && a > 0) {
+        setLaneAspect((prev) => (prev && Math.abs(prev - a) < 0.001 ? prev : a));
+        return true;
+      }
+      return false;
+    };
+    if (read()) return;
+    const timers = [60, 160, 320, 600, 1200, 2000].map((ms) =>
+      setTimeout(read, ms),
+    );
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+  }, [isBorrowSlide, isActive, resumeKey]);
   React.useLayoutEffect(() => {
     if (isBorrowSlide) return;
     const measure = () => {
-      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
+      const next = resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video');
       setSettledRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -563,7 +598,8 @@ const FullscreenVideoSlot: React.FC<{
       vv?.removeEventListener('resize', measure);
       window.removeEventListener('orientationchange', measure);
     };
-  }, [mediaW, mediaH, isBorrowSlide, isActive]);
+  }, [dims.w, dims.h, isBorrowSlide, isActive]);
+
 
 
   React.useEffect(() => {
@@ -1030,6 +1066,11 @@ const BorrowedFullscreenSlot: React.FC<{
   );
   const skipFitSwapRef = React.useRef<boolean>(false);
   const targetRectRef = React.useRef<RestingRect | null>(initialTargetRect);
+  // Bumped when a late intrinsic-aspect read corrects the resting rect.
+  const [, setRectVersion] = React.useState(0);
+  const lateCorrectCleanupRef = React.useRef<null | (() => void)>(null);
+  React.useEffect(() => () => { lateCorrectCleanupRef.current?.(); }, []);
+
   // Aspect-aware: precompute whether target rest is COVER (portrait video →
   // full viewport, no fit swap, no underlay) or CONTAIN (landscape video →
   // letterboxed inside safe area, underlay fades DURING expand).
@@ -1163,6 +1204,42 @@ const BorrowedFullscreenSlot: React.FC<{
       // rAF-defer so initial style (originRect) commits before we flip.
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
+
+    // LATE ASPECT CORRECTION (fit-width fix): when the lane had no metadata
+    // yet we fell back to the origin snapshot, whose dims default to
+    // 1080x1920 in feedMapper when the DB row carries none. A genuinely
+    // landscape clip would then rest COVER and lose most of its width. Poll
+    // briefly for the element's intrinsic aspect and, if it disagrees, move
+    // to the correct resting rect (CONTAIN → fits width, blurred backdrop
+    // fills the bars). No-op in the common case (source === 'lane').
+    if (source !== 'lane') {
+      let cancelled = false;
+      const correct = () => {
+        if (cancelled) return true;
+        const a = VideoEngine.getLaneAspect(borrow.laneId);
+        if (!a || a <= 0) return false;
+        const nextRect = resolveRestingRect(a * 1000, 1000, getCurrentViewport(), 'video');
+        const cur = targetRectRef.current;
+        if (!cur || (cur.fit === nextRect.fit && Math.abs(cur.height - nextRect.height) < 1)) return true;
+        targetRectRef.current = nextRect;
+        restingFitRef.current = nextRect.fit;
+        setRectVersion((v) => v + 1);
+        if (nextRect.fit === 'contain') {
+          setUnderlayVisible(true);
+          setFitContain(true);
+          try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+        }
+        return true;
+      };
+      if (!correct()) {
+        const timers = [80, 200, 400, 800, 1500].map((ms) => setTimeout(correct, ms));
+        lateCorrectCleanupRef.current = () => {
+          cancelled = true;
+          timers.forEach(clearTimeout);
+        };
+      }
+    }
+
 
     // CUT mode: wrapper rendered at the resting rect on the first commit, and
     // this layout effect reparents the live <video> before paint. No rAF gap,
