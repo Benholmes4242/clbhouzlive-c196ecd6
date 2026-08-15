@@ -735,8 +735,12 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
           hardestText={beastFig ? beastFig.text : ''}
+          easiestHole={stats.easiest.hole_no}
+          easiestText={bestFig ? bestFig.text : ''}
+          flat={flatShape}
           hasYou={hasYou}
         />
+
 
         {/* Legend: the bar ramp, and - only when there is one - the member line. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
