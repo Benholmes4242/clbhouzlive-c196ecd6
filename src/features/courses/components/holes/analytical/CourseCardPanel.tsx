@@ -584,7 +584,7 @@ function toughestRun(
   return best ? { from: best.from, to: best.to } : null;
 }
 
-/** Shape cell: figure over a label, with an optional small uppercase tail. */
+/** Shape cell: centred figure over a centred label, with an optional tail. */
 const ShapeCell: React.FC<{
   label: string;
   value: string;
@@ -592,9 +592,17 @@ const ShapeCell: React.FC<{
   size?: number;
   color?: string;
 }> = ({ label, value, tail, size = 20, color = A.INK }) => (
-  <div style={{ minWidth: 0 }}>
-    <div style={SH_LABEL}>{label}</div>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 6 }}>
+  <div style={{ minWidth: 0, textAlign: 'center' }}>
+    <div style={{ ...SH_LABEL, textAlign: 'center' }}>{label}</div>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: 5,
+        marginTop: 6,
+      }}
+    >
       <span style={{ ...shFig(size, color), whiteSpace: 'nowrap' }}>{value}</span>
       {tail ? (
         <span style={{ ...SH_LABEL, fontSize: 8.5, whiteSpace: 'nowrap' }}>{tail}</span>
