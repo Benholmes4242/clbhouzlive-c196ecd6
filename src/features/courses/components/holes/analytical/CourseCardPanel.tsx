@@ -188,7 +188,15 @@ const ZoneBed: React.FC<{ radius: number }> = ({ radius }) => {
   );
 };
 
-const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
+/**
+ * SHARED between the panel and the sheet - NOT forked. The sheet passes
+ * rangeLabelStyle because §6 bans 7.5px DIM labels there; the panel passes
+ * nothing and renders exactly as it shipped.
+ */
+const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSProperties }> = ({
+  slope,
+  rangeLabelStyle,
+}) => {
   const { t } = useTranslation(['courses']);
 
   const here = scalePct(slope);
@@ -263,6 +271,7 @@ const SlopeScale: React.FC<{ slope: number }> = ({ slope }) => {
           justifyContent: 'space-between',
           ...LABEL,
           fontSize: 7,
+          ...rangeLabelStyle,
         }}
       >
         <span>{SCALE_MIN}</span>
@@ -371,7 +380,8 @@ const TeeRow: React.FC<{
     <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, minWidth: 24, textAlign: 'right' }}>
       {slope != null ? slope : ''}
     </span>
-    <span style={{ ...LABEL, fontSize: 8.5, color: A.DIM, textAlign: 'right' }}>
+    {/* §6: no label renders in DIM - the readable muted tone instead. */}
+    <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE, textAlign: 'right' }}>
       {tee.total_yards == null ? '' : fmtInt(tee.total_yards)}
     </span>
   </button>
@@ -930,7 +940,7 @@ const SheetBody: React.FC<{
         </div>
 
         {/* THE SAME SlopeScale THE PANEL DRAWS - shared, not forked. */}
-        {slope != null ? <SlopeScale slope={slope} /> : null}
+        {slope != null ? <SlopeScale slope={slope} rangeLabelStyle={SH_LABEL} /> : null}
 
         {/* THE TEE ROWS ARE THE TEE SELECTOR (§3). The pills are gone: tapping a
             row switches the whole sheet, and it writes the same remembered tee. */}
