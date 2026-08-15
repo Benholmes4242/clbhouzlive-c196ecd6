@@ -276,6 +276,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;
   const media = items[0];
+  const hasVideo = items.some((m) => m?.type === 'video');
 
   const ratio = useMemo(() => {
     if (!media || !media.width || !media.height) return FALLBACK_RATIO;
