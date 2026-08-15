@@ -864,17 +864,23 @@ async function syncLeaderboard(
   // ONE fetch per sync pass of the rows we are about to overwrite, keyed by
   // player_id. Change detection compares against this map — never a per-player
   // SELECT inside the loop.
+  // A LIV pass writes team rows and player rows from the SAME leaderboard, so
+  // the one fetch fills TWO maps off the same result set — one keyed by
+  // player_id, one by team_id. sr_leaderboards holds exactly one of the two per
+  // row, which is why a row can never land in both maps.
   const priorByPlayer = new Map<string, any>();
+  const priorByTeam = new Map<string, any>();
   {
     const { data: priorRows, error: priorErr } = await supabase
       .from('sr_leaderboards')
-      .select('player_id, position, position_tied, score, thru, today')
+      .select('player_id, team_id, position, position_tied, score, thru, today')
       .eq('tournament_id', tournamentDbId);
     if (priorErr) {
       console.error('[LiveSync history] prior-rows fetch failed (history skipped this pass):', priorErr.message);
     } else {
       for (const r of priorRows ?? []) {
         if (r.player_id) priorByPlayer.set(r.player_id as string, r);
+        else if (r.team_id) priorByTeam.set(r.team_id as string, r);
       }
     }
   }
@@ -987,6 +993,37 @@ async function syncLeaderboard(
       const derivedThru = activeRound?.thru ?? (fallbackThru > 0 ? fallbackThru : null);
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
+      // History, team side (BRIEF_LEADERBOARD_HISTORY_WRITER §1.3, extended).
+      // A LIV team standing moves for exactly the same reasons a player's does,
+      // so it takes the same five-field comparison against the same in-memory
+      // map, and writes player_id null — the XOR constraint on
+      // sr_leaderboard_history makes the row unambiguously a TEAM row.
+      const teamHistToday = activeRound?.score ?? null;
+      const teamHistTodayRound = activeRound ? rounds.indexOf(activeRound) + 1 : null;
+      if (
+        leaderboardChanged(priorByTeam.get(teamId), {
+          position: entry.position,
+          position_tied: entry.tied || false,
+          score: entry.score,
+          thru: derivedThru,
+          today: teamHistToday,
+        })
+      ) {
+        historyRows.push({
+          tournament_id: tournamentDbId,
+          team_id: teamId,
+          player_id: null,
+          position: entry.position ?? null,
+          position_tied: entry.tied || false,
+          score: entry.score ?? null,
+          thru: derivedThru,
+          today: teamHistToday,
+          status: derivedStatus,
+          today_round: teamHistTodayRound,
+          strokes: entry.strokes ?? null,
+        });
+      }
+
       const { error } = await supabase.from('sr_leaderboards').upsert({
         tournament_id: tournamentDbId,
         team_id: teamId,
@@ -1074,6 +1111,7 @@ async function syncLeaderboard(
         historyRows.push({
           tournament_id: tournamentDbId,
           player_id: player.id,
+          team_id: null,
           position: entry.position ?? null,
           position_tied: entry.tied || false,
           score: entry.score ?? null,
