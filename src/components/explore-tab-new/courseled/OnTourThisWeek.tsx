@@ -12,7 +12,7 @@ import { TourRail as TourRailShell } from './DiscoverCourseLedSkeleton';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { SCRIM_BASE, SCRIM_HOTSPOT, SCRIM_TOP_BAND } from './photoScrim';
+import { SCRIM_STANDOUT } from './photoScrim';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 
 /**
@@ -375,11 +375,8 @@ export function OnTourThisWeek({ lastSeen = null, onTournamentPress, onMediaPres
                   imageUrl={match?.imageUrl ?? null}
                   style={{ height: PHOTO_H }}
                 >
-                  {/* THE FRIENDS RAIL'S SCRIM, imported not copied. Order:
-                      hotspot, base, top. */}
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_HOTSPOT }} />
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_BASE }} />
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_TOP_BAND }} />
+                  {/* THE STANDOUT-TILE SCRIM, imported not copied. */}
+                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
                   <GlassChip side="left">{e.tourLabel}</GlassChip>
                   {peek ? (
                     <GlassChip>

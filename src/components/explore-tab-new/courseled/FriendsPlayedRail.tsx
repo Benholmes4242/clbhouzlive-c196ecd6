@@ -13,7 +13,7 @@ import {
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
-import { SCRIM_BASE, SCRIM_HOTSPOT, SCRIM_TOP_BAND } from './photoScrim';
+import { SCRIM_STANDOUT } from './photoScrim';
 
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
@@ -52,14 +52,10 @@ export const RAIL_CAP = 10;
 const CARD_W = 224;
 const PHOTO_H = 104;
 
-/* Rail scrim — THREE LAYERS, now defined once in ./photoScrim and shared with
-   OnTourThisWeek so the two rails can never drift apart. The rationale for the
-   hotspot is preserved there: a glass chip over a photo must stay readable on
-   EVERY photo, and the answer is STRENGTHENING THE SCRIM UNDER THE CHIP rather
-   than darkening the glass. */
-const RAIL_SCRIM = SCRIM_BASE;
-const SCRIM_CHIP = SCRIM_HOTSPOT;
-const SCRIM_TOP = SCRIM_TOP_BAND;
+/* Rail scrim — THE STANDOUT-TILE SCRIM. The three-layer base/hotspot/top stack
+   is gone: this rail now paints the same single bottom-weighted layer as the
+   Standout Rounds and Personal Bests tiles, held once in ./photoScrim. */
+const RAIL_SCRIM = SCRIM_STANDOUT;
 
 
 /* ────────────────────────────── GLASS ────────────────────────────────────
@@ -476,8 +472,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 style={{ height: PHOTO_H, flexShrink: 0 }}
               >
                 <div style={{ position: 'absolute', inset: 0, background: RAIL_SCRIM }} />
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM_CHIP }} />
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM_TOP }} />
 
                 {/* THE WHEN-CHIP, GLASS. The GOLD ring for a hole in one is the
                     only gold on the card and is unchanged. */}
