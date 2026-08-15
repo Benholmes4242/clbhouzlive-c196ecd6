@@ -93,9 +93,6 @@
     "preview": {
       "eyebrow": "Hole by hole",
       "title": "How the field scores every hole",
-      "description": "Par, stroke index and yardage for all {{holes}}, with the spread of scores from {{count}} rounds{{personal}}.",
-      "personalClause": " and your own average alongside",
-      "descriptionNoRounds": "Par, stroke index and yardage for all {{holes}}, with the spread of scores across the field.",
       "legendBirdie": "Birdie+",
       "legendPar": "Par",
       "legendBogey": "Bogey",
@@ -708,6 +705,14 @@
         "holeTail": "{{n}}번 홀",
         "yardsTail": "{{yards}} 야드",
         "parN": "파 {{n}}"
+      },
+      "compare": {
+        "kicker": "OUT AGAINST IN",
+        "out": "Out",
+        "in": "In",
+        "yards": "Yards",
+        "par": "Par",
+        "si": "Mean SI"
       }
     },
     "plays": {
@@ -724,8 +729,8 @@
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
       "scaleLabel": "난이도 스케일",
-      "scaleCaption": "코스의 다른 홀과 비교 — 오른쪽일수록 어렵습니다.",
-      "yourGapVsField": "필드와의 차이"
+      "yourGapVsField": "필드와의 차이",
+      "courseAverageMark": "Tick marks the course average"
     },
     "records": {
       "youHold": "You hold this board",
@@ -757,6 +762,13 @@
       "gapWorseShots": "이 코스 평균보다 나쁜 타수",
       "youHere": "나",
       "fieldOnHole": "평균"
+    },
+    "parTypes": {
+      "kicker": "HOW EACH PAR PLAYS",
+      "holesN_one": "{{count}} hole",
+      "holesN_other": "{{count}} holes",
+      "keyBoth": "Bar is the field. Tick is you.",
+      "keyField": "Bar is the field average over par."
     }
   },
   "network": {

@@ -157,46 +157,88 @@ function pct(row: CourseHole, keys: (keyof CourseHole['dist'])[]): number {
   return keys.reduce((s, k) => s + (row.dist[k] ?? 0), 0);
 }
 
+/** The four buckets, in ramp order. ONE definition: the row, the strip and the
+ *  expanded detail all read it, so a bucket can never be defined twice. */
+export const BUCKETS = [
+  { key: 'birdie' as const, keys: ['ace', 'albatross', 'eagle', 'birdie'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.birdie, labelKey: 'courses:holes.preview.legendBirdie' },
+  { key: 'par' as const, keys: ['par'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.par, labelKey: 'courses:holes.preview.legendPar' },
+  { key: 'bogey' as const, keys: ['bogey'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.bogey, labelKey: 'courses:holes.preview.legendBogey' },
+  { key: 'double' as const, keys: ['double'] as (keyof CourseHole['dist'])[], bg: RAMP_TOPAR.double, labelKey: 'courses:holes.preview.legendDouble' },
+] as const;
 
+export type BucketShares = Record<'birdie' | 'par' | 'bogey' | 'double', number>;
 
 /**
- * Legend for the to-par ramp. Rendered ONCE per surface, above the rows.
- * SWATCHES TAKE RAMP_TOPAR, the same four tones as the bar and the expanded
- * percentage dots - three places, one source, or the legend stops explaining
- * the bar. FOUR items only: the field tick and the member dot no longer sit on
- * the ramp, so legending them here would describe something the row does not
- * draw.
+ * THE WHOLE COURSE'S SPREAD (BRIEF_COURSE_TAB_AND_SHEETS_CHART_LED A5): the
+ * per-hole distributions already loaded, summed. Shares are 0..1 fractions of
+ * every hole-round on the course. Returns null when nothing is counted.
  */
+export function courseBucketShares(holes: CourseHole[]): BucketShares | null {
+  const raw = BUCKETS.map((b) => holes.reduce((s, h) => s + pct(h, b.keys), 0));
+  const total = raw.reduce((s, v) => s + v, 0);
+  if (total <= 0) return null;
+  const out = {} as BucketShares;
+  BUCKETS.forEach((b, i) => {
+    out[b.key] = raw[i] / total;
+  });
+  return out;
+}
 
-export const HoleRampLegend: React.FC<{ hasYou?: boolean }> = () => {
+/**
+ * THE DISTRIBUTION STRIP - the whole course before the parts. ONE component,
+ * rendered by the Course tab's hole-by-hole panel and by the sheet, in the same
+ * four tones as every row beneath it, so the strip teaches the rows. Its four
+ * labelled percentages ARE the key: no separate legend row is drawn.
+ */
+export const DistributionStrip: React.FC<{ shares: BucketShares; style?: React.CSSProperties }> = ({
+  shares,
+  style,
+}) => {
   const { t } = useTranslation(['courses']);
-  const items = [
-    { bg: RAMP_TOPAR.birdie, label: t('courses:holes.preview.legendBirdie') },
-    { bg: RAMP_TOPAR.par, label: t('courses:holes.preview.legendPar') },
-    { bg: RAMP_TOPAR.bogey, label: t('courses:holes.preview.legendBogey') },
-    { bg: RAMP_TOPAR.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const lastIdx = BUCKETS.length - 1;
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 12,
-        paddingBottom: 10,
-      }}
-    >
-      {items.map((it) => (
-        <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <i
-            style={{ width: 10, height: 5, borderRadius: 2, background: it.bg, display: 'block' }}
-          />
-          <span style={{ ...MICRO }}>{it.label}</span>
-        </span>
-      ))}
+    <div style={{ paddingBottom: 12, ...style }}>
+      <div style={{ display: 'flex', gap: 1.5, height: 8 }}>
+        {BUCKETS.map((b, i) => {
+          const empty = shares[b.key] <= 0;
+          return (
+            <i
+              key={b.key}
+              style={{
+                width: empty ? 2 : `${shares[b.key] * 100}%`,
+                flexShrink: 0,
+                background: b.bg,
+                opacity: empty ? 0.28 : 1,
+                borderRadius: i === 0 ? '4px 0 0 4px' : i === lastIdx ? '0 4px 4px 0' : 0,
+              }}
+            />
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', marginTop: 7, ...FIGS }}>
+        {BUCKETS.map((b) => (
+          <span
+            key={b.key}
+            style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <i
+                style={{ width: 8, height: 8, borderRadius: 2, background: b.bg, display: 'block', flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
+                {Math.round(shares[b.key] * 100)}%
+              </span>
+            </span>
+            <span style={{ ...MICRO, marginTop: 3, whiteSpace: 'nowrap', textAlign: 'center' }}>
+              {t(b.labelKey)}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
+
 
 
 export const HoleRowV2: React.FC<{
@@ -208,44 +250,61 @@ export const HoleRowV2: React.FC<{
   onToggle: () => void;
   /** Last row on the surface: no trailing hairline. */
   last?: boolean;
-}> = ({ row, mine = null, scale, totalHoles, open, onToggle, last = false }) => {
+  /**
+   * NO VIEWER, NO VIEWER COLUMNS (§B7). A member with no rounds here sees the
+   * field's figures and nothing else - not a dash, not a zero, not a reserved
+   * slot. The surface knows this, the row does not, so it is passed in.
+   */
+  hasYou?: boolean;
+  /**
+   * Course-wide bucket shares, for the expanded detail's comparison marks (§B4).
+   * Already summed for the distribution strip - no second pass, no new query.
+   */
+  courseShares?: BucketShares | null;
+}> = ({
+  row,
+  mine = null,
+  scale,
+  totalHoles,
+  open,
+  onToggle,
+  last = false,
+  hasYou = true,
+  courseShares = null,
+}) => {
   const { t } = useTranslation(['courses']);
   const field = toParParts(row.avg_to_par);
-  const you = toParParts(mine?.avg_to_par);
+  const you = hasYou ? toParParts(mine?.avg_to_par) : null;
   const rank = scale.rankByHole.get(row.hole_no) ?? null;
 
-  const segs = [
-    {
-      key: 'birdie',
-      pctValue: pct(row, ['ace', 'albatross', 'eagle', 'birdie']),
-      bg: RAMP_TOPAR.birdie,
-      label: t('courses:holes.preview.legendBirdie'),
-    },
-    {
-      key: 'par',
-      pctValue: row.dist.par ?? 0,
-      bg: RAMP_TOPAR.par,
-      label: t('courses:holes.preview.legendPar'),
-    },
-    {
-      key: 'bogey',
-      pctValue: row.dist.bogey ?? 0,
-      bg: RAMP_TOPAR.bogey,
-      label: t('courses:holes.preview.legendBogey'),
-    },
-    {
-      key: 'double',
-      pctValue: row.dist.double ?? 0,
-      bg: RAMP_TOPAR.double,
-      label: t('courses:holes.preview.legendDouble'),
-    },
-  ];
+  const segs = BUCKETS.map((b) => ({
+    key: b.key,
+    pctValue: pct(row, b.keys),
+    bg: b.bg,
+    label: t(b.labelKey),
+  }));
   const total = segs.reduce((s, x) => s + x.pctValue, 0) || 1;
 
-  const gap =
-    mine?.avg_to_par != null && Number.isFinite(row.avg_to_par)
-      ? toParParts(mine.avg_to_par - row.avg_to_par)
+  /**
+   * YOUR GAP IS A MARGIN, NOT A TO-PAR FIGURE (§B6): better than the field is
+   * the index-delta GREEN, worse is its RED. The to-par convention (under par
+   * red) would print a member who beats the field in the same tone as a member
+   * who loses to it on a hole that plays under par.
+   */
+  const gapRaw =
+    hasYou && mine?.avg_to_par != null && Number.isFinite(row.avg_to_par)
+      ? mine.avg_to_par - row.avg_to_par
       : null;
+  const gap =
+    gapRaw == null
+      ? null
+      : (() => {
+          const r = Math.round(gapRaw * 10) / 10;
+          if (r > 0) return { text: `+${r.toFixed(1)}`, tone: A.DRIFTED };
+          if (r < 0) return { text: `\u2212${Math.abs(r).toFixed(1)}`, tone: A.IMPROVED };
+          return { text: 'E', tone: A.MUTE };
+        })();
+
 
   /**
    * The hole's own position on the course's difficulty spread, or null below the
@@ -271,13 +330,38 @@ export const HoleRowV2: React.FC<{
 
   const lastIdx = segs.length - 1;
 
+  /** ONE domain for the hole's shares and the course's, so the marks compare. */
+  const shareDomain = Math.max(
+    0.05,
+    ...segs.map((s) => s.pctValue / total),
+    ...(courseShares ? BUCKETS.map((b) => courseShares[b.key]) : []),
+  );
+
+
 
   return (
-    <div>
+    /* SELECTION IS A LEADING RULE AND A NEUTRAL WASH (§B5), not the heavy outline
+       this row used to take. The rule is a shape, not a colour, so selection does
+       not rely on colour alone, and aria-expanded carries it to assistive tech;
+       the button keeps the platform focus ring for keyboard use. */
+    <div
+      style={
+        open
+          ? {
+              margin: '0 -12px',
+              padding: '0 12px',
+              background: A.CANVAS,
+              boxShadow: `inset 3px 0 0 ${A.INK}`,
+              borderRadius: 4,
+            }
+          : undefined
+      }
+    >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
+
         style={{
           display: 'grid',
           gridTemplateColumns: HOLE_GRID_V2,
@@ -383,34 +467,45 @@ export const HoleRowV2: React.FC<{
               {t('courses:courseDetail.plays.legendField')}
             </span>
           </span>
-          {/* Unplayed hole: the slot keeps its width so the column never realigns. */}
-          <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }} aria-hidden={!you}>
-            <span
-              style={{
-                display: 'block',
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: A.AMBER_DEEP,
-                lineHeight: 1.1,
-              }}
-            >
-              {you ? you.text : ''}
-            </span>
-            {you && (
-              <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
-                {t('courses:courseDetail.plays.legendYou')}
+          {/* NO VIEWER, NO SLOT (§B7): the column is not reserved for a member
+              who has never played here. An unplayed hole for a member who HAS
+              played keeps its width so the column cannot realign row to row. */}
+          {hasYou && (
+            <span style={{ display: 'block', minWidth: 34, textAlign: 'right' }} aria-hidden={!you}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em',
+                  color: A.AMBER_DEEP,
+                  lineHeight: 1.1,
+                }}
+              >
+                {you ? you.text : ''}
               </span>
-            )}
-          </span>
+              {you && (
+                <span style={{ ...MICRO, display: 'block', marginTop: 1 }}>
+                  {t('courses:courseDetail.plays.legendYou')}
+                </span>
+              )}
+            </span>
+          )}
         </span>
       </button>
 
       {open && (
         <div style={{ padding: `0 0 16px ${DETAIL_INSET}px` }}>
-          {/* The four shares as four EVEN columns, one row: swatch+figure over label. */}
+          {/* The four shares as four EVEN columns, one row: swatch+figure over label.
+              Beneath each, THE COURSE-WIDE SHARE AS A HAIRLINE MARK (§B4): the
+              hole's own share is the bar, the course's is the tick, both on one
+              domain so a bogey trap is visible rather than described. Where the
+              two agree the mark still renders - it is a fact, not a verdict. */}
           <div style={{ display: 'flex', alignItems: 'flex-start', ...FIGS }}>
-            {segs.map((s) => (
+            {segs.map((s) => {
+              const holeShare = s.pctValue / total;
+              const courseShare = courseShares ? courseShares[s.key] : null;
+              return (
               <span
                 key={s.key}
                 style={{
@@ -441,9 +536,45 @@ export const HoleRowV2: React.FC<{
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    {Math.round((s.pctValue / total) * 100)}%
+                    {Math.round(holeShare * 100)}%
                   </span>
                 </span>
+                {courseShare != null && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      position: 'relative',
+                      display: 'block',
+                      width: '76%',
+                      height: 4,
+                      marginTop: 4,
+                      borderRadius: 2,
+                      background: A.TRACK,
+                    }}
+                  >
+                    <i
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: `${Math.min(100, (holeShare / shareDomain) * 100)}%`,
+                        borderRadius: 2,
+                        background: s.bg,
+                        display: 'block',
+                      }}
+                    />
+                    <i
+                      style={{
+                        position: 'absolute',
+                        top: -2,
+                        bottom: -2,
+                        left: `${Math.min(100, (courseShare / shareDomain) * 100)}%`,
+                        width: 1,
+                        background: A.INK,
+                        display: 'block',
+                      }}
+                    />
+                  </span>
+                )}
                 <span
                   style={{
                     ...MICRO,
@@ -456,8 +587,15 @@ export const HoleRowV2: React.FC<{
                   {s.label}
                 </span>
               </span>
-            ))}
+              );
+            })}
           </div>
+          {courseShares && (
+            <div style={{ ...MICRO, fontSize: 7, marginTop: 6 }}>
+              {t('courses:courseDetail.holes.courseAverageMark')}
+            </div>
+          )}
+
 
 
           <Hairline style={{ margin: '12px 0 10px' }} />
@@ -530,17 +668,10 @@ export const HoleRowV2: React.FC<{
                 {t('courses:courseDetail.card.rampHarder')}
               </span>
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 500,
-                lineHeight: 1.35,
-                color: A.MUTE,
-                marginTop: 5,
-              }}
-            >
-              {t('courses:courseDetail.holes.scaleCaption', { total: totalHoles })}
-            </div>
+            {/* scaleCaption DELETED (§B1). The track is FILLED from the easier end,
+                so the length of the fill is the reading; a sentence telling the
+                member which way the bar runs narrated the bar above it. */}
+
           </div>
 
 

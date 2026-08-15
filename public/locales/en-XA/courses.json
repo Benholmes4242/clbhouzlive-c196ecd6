@@ -239,10 +239,6 @@
     "preview": {
       "eyebrow": "[~~Ĥőļé ƀý ĥőļé~~]",
       "title": "[~~Ĥőŵ ţĥé ƒíéļđ šĉőřéš éṽéřý ĥőļé~~]",
-      "description_one": "[~~Ƥář, šţřőǩé íñđéẋ áñđ ýářđáĝé ƒőř áļļ {{holes}}, ŵíţĥ ţĥé šƥřéáđ őƒ šĉőřéš ƒřőɱ {{rounds}} řőúñđ{{personal}}.~~]",
-      "description_other": "[~~Ƥář, šţřőǩé íñđéẋ áñđ ýářđáĝé ƒőř áļļ {{holes}}, ŵíţĥ ţĥé šƥřéáđ őƒ šĉőřéš ƒřőɱ {{rounds}} řőúñđš{{personal}}.~~]",
-      "personalClause": "[~~ áñđ ýőúř őŵñ áṽéřáĝé áļőñĝšíđé~~]",
-      "descriptionNoRounds": "[~~Ƥář, šţřőǩé íñđéẋ áñđ ýářđáĝé ƒőř áļļ {{holes}}, ŵíţĥ ţĥé šƥřéáđ őƒ šĉőřéš áĉřőšš ţĥé ƒíéļđ.~~]",
       "legendBirdie": "[~~Ɓířđíé+~~]",
       "legendPar": "[~~Ƥář~~]",
       "legendBogey": "[~~Ɓőĝéý~~]",
@@ -939,6 +935,14 @@
         "holeTail": "[Hole {{n}}]",
         "yardsTail": "[{{yards}} yds]",
         "parN": "[Par {{n}}]"
+      },
+      "compare": {
+        "kicker": "OUT AGAINST IN",
+        "out": "Out",
+        "in": "In",
+        "yards": "Yards",
+        "par": "Par",
+        "si": "Mean SI"
       }
     },
     "plays": {
@@ -968,15 +972,13 @@
       "colField": "[~~Ƒíéļđ~~]",
       "colYou": "[~~Ýőú~~]",
       "sheetTitle": "[~~Ĥőŵ ţĥé ƒíéļđ šĉőřéš~~]",
-      "sheetSub_one": "[~~Ƒřőɱ {{rounds}} řőúñđ ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ~~]",
-      "sheetSub_other": "[~~Ƒřőɱ {{rounds}} řőúñđš ŵíţĥ ĥőļé-ƀý-ĥőļé đéţáíļ~~]",
       "yards": "[~~Ýářđš~~]",
       "difficultyRank": "[~~Đíƒƒíĉúļţý řáñǩ~~]",
       "rankOf": "[~~{{rank}} őƒ {{total}}~~]",
       "yourGap": "[~~Ýőúř ĝáƥ~~]",
       "scaleLabel": "[~~Đíƒƒíĉúļţý šĉáļé~~]",
-      "scaleCaption": "[~~Ţĥíš ĥőļé áĝáíñšţ éṽéřý őţĥéř ĥőļé őñ ţĥé ĉőúřšé — ƒúřţĥéř říĝĥţ ƥļáýš ĥářđéř.~~]",
-      "yourGapVsField": "[~~Ýőúř ĝáƥ ṽš ƒíéļđ~~]"
+      "yourGapVsField": "[~~Ýőúř ĝáƥ ṽš ƒíéļđ~~]",
+      "courseAverageMark": "Tick marks the course average"
     },
     "records": {
       "kicker": "[~~ŢĤÉ ŘÉĈŐŘĐ ƁŐŐǨ~~]",
@@ -1061,6 +1063,13 @@
       "gapWorseShots": "[~~Šĥőţš ŵőřšé ţĥáñ ţĥé ƒíéļđ ĥéřé~~]",
       "youHere": "[~~Ýőú ĥéřé~~]",
       "fieldOnHole": "[~~Ƒíéļđ ĥéřé~~]"
+    },
+    "parTypes": {
+      "kicker": "HOW EACH PAR PLAYS",
+      "holesN_one": "{{count}} hole",
+      "holesN_other": "{{count}} holes",
+      "keyBoth": "Bar is the field. Tick is you.",
+      "keyField": "Bar is the field average over par."
     }
   },
   "network": {

@@ -380,20 +380,9 @@ export const HoleDataSheet: React.FC<Props> = ({
                 >
                   {t('courses:holes.preview.title')}
                 </h3>
-                <p style={{ margin: '6px 0 0', fontSize: 12.5, color: INK_55, lineHeight: 1.5 }}>
-                  {totalRounds > 0
-                    ? t('courses:holes.preview.description', {
-                        holes: formatNumber(totalHoles),
-                        count: totalRounds,
-                        rounds: formatNumber(totalRounds),
-                        personal: viewerHasPlayed
-                          ? t('courses:holes.preview.personalClause')
-                          : '',
-                      })
-                    : t('courses:holes.preview.descriptionNoRounds', {
-                        holes: formatNumber(totalHoles),
-                      })}
-                </p>
+                {/* The hole-by-hole narration is DELETED here too, with its keys:
+                    the table's own columns already say what it said. */}
+
               </>
             )}
           </div>

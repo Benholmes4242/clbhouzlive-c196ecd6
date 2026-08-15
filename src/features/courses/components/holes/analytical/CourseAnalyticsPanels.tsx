@@ -20,7 +20,14 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, DIFFICULTY_HARD_HEX, DIFFICULTY_RAMP, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
-import { HoleRampLegend, HoleRowV2, PREVIEW_COUNT_V2, buildHoleScale } from './HoleRowV2';
+import {
+  DistributionStrip,
+  HoleRowV2,
+  PREVIEW_COUNT_V2,
+  buildHoleScale,
+  courseBucketShares,
+} from './HoleRowV2';
+
 
 /** Labelled figure cell used by the How-it-plays strip and the extremes row. */
 const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; sub?: string }> = ({
@@ -180,14 +187,26 @@ function monotoneSampler(pts: { x: number; y: number }[]): (x: number) => number
 const RAMP_HARD_HEX = DIFFICULTY_HARD_HEX;
 const rampColor = difficultyRampColor;
 
-/** Shape chart - graded bars are the field, the amber line is the member. */
+/**
+ * Shape chart - graded bars are the field, the amber line is the member.
+ *
+ * THE EXTREMES ARE LABELLED ON THEIR OWN BARS (§A2). The hardest and easiest
+ * holes are already drawn as the tallest and shortest bar here, so a sentence
+ * naming them narrated the chart. Labels are DERIVED (max / min of the field's
+ * per-hole average), the FIRST of any tie takes the label, and a FLAT chart
+ * (max equals min) labels neither.
+ */
 const ShapeChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hardestHole: number;
   hardestText: string;
+  easiestHole: number;
+  easiestText: string;
+  flat: boolean;
   hasYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hardestText, hasYou }) => {
+}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou }) => {
+
   const W = 340;
   /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
   const H = 78;
@@ -263,6 +282,9 @@ const ShapeChart: React.FC<{
 
   const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
   const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
+  const easiestIdx = holes.findIndex((h) => h.hole_no === easiestHole);
+  const easiestTopY = easiestIdx >= 0 ? Math.min(y(holes[easiestIdx].avg_to_par), yBase) : null;
+
 
   // 1, 6, 12, 18 - the ends are read, the middles orient.
   const axisIdx = Array.from(
@@ -325,8 +347,9 @@ const ShapeChart: React.FC<{
           )}
         </svg>
 
-        {/* The hardest hole carries its own value, in the ramp's deep red. */}
-        {hardestTopY != null && hardestText && (
+        {/* THE TWO EXTREMES CARRY THEIR OWN FIGURES, each above its own bar: the
+            hardest in the ramp's deep red, the easiest in its light end's ink. */}
+        {!flat && hardestTopY != null && hardestText && (
           <span
             style={{
               position: 'absolute',
@@ -344,6 +367,25 @@ const ShapeChart: React.FC<{
             {hardestText}
           </span>
         )}
+        {!flat && easiestTopY != null && easiestText && (
+          <span
+            style={{
+              position: 'absolute',
+              left: `${(cx(easiestIdx) / W) * 100}%`,
+              top: Math.max(0, easiestTopY - 14),
+              transform: 'translateX(-50%)',
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '-0.025em',
+              color: A.BODY,
+              whiteSpace: 'nowrap',
+              ...FIGS,
+            }}
+          >
+            {easiestText}
+          </span>
+        )}
+
 
         {/* End dot in real pixels so it stays circular. */}
         {endPt && (
@@ -405,6 +447,184 @@ const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, hard
   </span>
 );
 
+/**
+ * HOW EACH PAR PLAYS (§A4) - one row per par type PRESENT at this course.
+ *
+ * The bar is the FIELD's mean shots over par for that par type, on the demanding
+ * ramp; the tick is the VIEWER's on the same track. Both derive from the
+ * per-hole averages already loaded for the shape chart and the hole rows - no
+ * new query, no hook, no SQL.
+ *
+ * COMMENSURABILITY: the viewer's tick renders ONLY where the viewer has an
+ * average for EVERY hole of that par type, so the two sides derive identically
+ * over the same holes. A par 6 or par 2 gets its own row and is never folded in.
+ * A member with no rounds here sees the field alone - the course's own shape is
+ * worth showing to someone who has never played it.
+ */
+export interface ParTypeRow {
+  par: number;
+  holes: number;
+  field: number;
+  you: number | null;
+}
+
+export function buildParTypeRows(
+  holes: CourseHole[],
+  myByHole: Map<number, MyHolePerformanceRow>,
+): ParTypeRow[] {
+  const byPar = new Map<number, CourseHole[]>();
+  holes.forEach((h) => {
+    if (h.par == null || !Number.isFinite(h.avg_to_par)) return;
+    const list = byPar.get(h.par) ?? [];
+    list.push(h);
+    byPar.set(h.par, list);
+  });
+  return [...byPar.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([par, list]) => {
+      const field = list.reduce((s, h) => s + h.avg_to_par, 0) / list.length;
+      const mine = list.map((h) => myByHole.get(h.hole_no)?.avg_to_par ?? null);
+      const complete = mine.every((v) => v != null && Number.isFinite(v));
+      return {
+        par,
+        holes: list.length,
+        field,
+        you: complete ? (mine as number[]).reduce((s, v) => s + v, 0) / mine.length : null,
+      };
+    });
+}
+
+const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows, fieldAvg }) => {
+  const { t } = useTranslation(['courses']);
+  if (rows.length === 0) return null;
+
+  /* ONE domain across every row, floored, so the rows are comparable and a
+     course that plays close to par still draws bars. */
+  const domain = Math.max(
+    0.2,
+    ...rows.map((r) => r.field),
+    ...rows.map((r) => (r.you == null ? 0 : r.you)),
+  );
+
+  const fMin = Math.min(...rows.map((r) => r.field));
+  const fMax = Math.max(...rows.map((r) => r.field));
+  const fSpan = Math.max(0.01, fMax - fMin);
+  const anyYou = rows.some((r) => r.you != null);
+
+  return (
+    <Panel
+      kicker={t('courses:courseDetail.parTypes.kicker')}
+      headerGap={12}
+      style={{ padding: '14px 13px 12px' }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {rows.map((r) => {
+          const fieldFig = toParParts(r.field);
+          const youFig = toParParts(r.you);
+          return (
+            <div
+              key={r.par}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '46px 1fr auto',
+                alignItems: 'center',
+                gap: 10,
+                ...FIGS,
+              }}
+            >
+              <span style={{ display: 'block' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, display: 'block' }}>
+                  {t('courses:courseDetail.card.shape.parN', { n: r.par })}
+                </span>
+                <span style={{ ...LABEL, fontSize: 7.5, display: 'block', marginTop: 1 }}>
+                  {t('courses:courseDetail.parTypes.holesN', { count: r.holes })}
+                </span>
+              </span>
+
+              <span
+                style={{
+                  position: 'relative',
+                  display: 'block',
+                  height: 8,
+                  borderRadius: 4,
+                  background: A.TRACK,
+                }}
+              >
+                <i
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: `${Math.max(2, Math.min(100, (Math.max(0, r.field) / domain) * 100))}%`,
+                    borderRadius: 4,
+                    background: difficultyRampColor((r.field - fMin) / fSpan),
+                    display: 'block',
+                  }}
+                />
+                {r.you != null && (
+                  <i
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: -3,
+                      bottom: -3,
+                      left: `${Math.min(100, (Math.max(0, r.you) / domain) * 100)}%`,
+                      width: 2,
+                      borderRadius: 1,
+                      background: A.AMBER,
+                      display: 'block',
+                    }}
+                  />
+                )}
+              </span>
+
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 10,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: fieldFig ? fieldFig.tone : A.INK,
+                    minWidth: 34,
+                    textAlign: 'right',
+                  }}
+                >
+                  {fieldFig ? fieldFig.text : ''}
+                </span>
+                {anyYou && (
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: A.AMBER_DEEP,
+                      minWidth: 34,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {youFig ? youFig.text : ''}
+                  </span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* SAID ONCE, beneath the rows - never on every row. */}
+      <div style={{ ...LABEL, fontSize: 7.5, marginTop: 11 }}>
+        {anyYou
+          ? t('courses:courseDetail.parTypes.keyBoth')
+          : t('courses:courseDetail.parTypes.keyField')}
+      </div>
+    </Panel>
+  );
+};
 
 
 export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
@@ -476,8 +696,27 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const scale = buildHoleScale(holes, myByHole, totalRounds);
 
-  const hardestLabel = t('courses:courseDetail.plays.hardestHole');
-  const easiestLabel = t('courses:courseDetail.plays.easiestHole');
+  /* A FLAT CHART LABELS NEITHER EXTREME (§A2). */
+  const flatShape = stats.hardest.avg_to_par === stats.easiest.avg_to_par;
+
+  /** §A4 and §A5 - both derived from the per-hole data already loaded. */
+  const parRows = buildParTypeRows(holes, myByHole);
+  const courseShares = courseBucketShares(holes);
+
+  /* RECONCILIATION (§A4): each par type weighted by its hole count must return
+     the field average this section states. Reported in dev when it does not. */
+  if (import.meta.env.DEV && parRows.length > 0) {
+    const wHoles = parRows.reduce((s, r) => s + r.holes, 0);
+    const weighted = parRows.reduce((s, r) => s + r.field * r.holes, 0) / (wHoles || 1);
+    const stated =
+      holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).reduce((s, h) => s + h.avg_to_par, 0) /
+      Math.max(1, holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).length);
+    if (Math.abs(weighted - stated) > 0.005) {
+      // eslint-disable-next-line no-console
+      console.warn('[par-type reconciliation]', { weighted, stated, fieldAvg: stats.fieldAvg });
+    }
+  }
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
@@ -496,8 +735,12 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
           hardestText={beastFig ? beastFig.text : ''}
+          easiestHole={stats.easiest.hole_no}
+          easiestText={bestFig ? bestFig.text : ''}
+          flat={flatShape}
           hasYou={hasYou}
         />
+
 
         {/* Legend: the bar ramp, and - only when there is one - the member line. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
@@ -517,104 +760,64 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
         <Hairline style={{ margin: '11px 0 9px' }} />
 
+        {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
+            on their own bars in the chart above, so the figures beneath carry only
+            what the chart cannot say. */}
         {hasYou ? (
-          /* WITH personal data: three averages in a row, hole callouts demote
-             to the meta line beneath. Five cells across a phone is unreadable. */
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-              <Figure
-                label={t('courses:courseDetail.plays.fieldAvg')}
-                value={field ? field.text : '\u2014'}
-                tone={field ? field.tone : A.INK}
-              />
-              {you && (
-                <Figure
-                  label={t('courses:courseDetail.plays.yourAvg')}
-                  value={you.text}
-                  tone={A.AMBER_DEEP}
-                />
-              )}
-              <Figure
-                label={t('courses:courseDetail.plays.youBeat')}
-                value={`${stats.beat}/${stats.withYou}`}
-              />
-            </div>
-            {(beastFig || bestFig) && (
-              <div
-                style={{
-                  marginTop: 8,
-                  textAlign: 'center',
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  color: A.MUTE,
-                  ...FIGS,
-                }}
-              >
-                {beastFig && (
-                  <span>
-                    {hardestLabel} {formatNumber(stats.hardest.hole_no)}{' '}
-                    <span style={{ color: beastFig.tone, fontWeight: 700 }}>{beastFig.text}</span>
-                  </span>
-                )}
-                {beastFig && bestFig ? ' \u00B7 ' : null}
-                {bestFig && (
-                  <span>
-                    {easiestLabel} {formatNumber(stats.easiest.hole_no)}{' '}
-                    <span style={{ color: bestFig.tone, fontWeight: 700 }}>{bestFig.text}</span>
-                  </span>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          /* WITHOUT personal data: the field average slots BETWEEN the two hole
-             callouts - one row, one hairline, no amber anywhere. */
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-            <Figure
-              label={hardestLabel}
-              value={beastFig ? beastFig.text : '\u2014'}
-              tone={beastFig ? beastFig.tone : A.INK}
-              sub={t('courses:courseDetail.plays.holeN', { hole: stats.hardest.hole_no })}
-            />
             <Figure
               label={t('courses:courseDetail.plays.fieldAvg')}
               value={field ? field.text : '\u2014'}
               tone={field ? field.tone : A.INK}
             />
+            {you && (
+              <Figure
+                label={t('courses:courseDetail.plays.yourAvg')}
+                value={you.text}
+                tone={A.AMBER_DEEP}
+              />
+            )}
             <Figure
-              label={easiestLabel}
-              value={bestFig ? bestFig.text : '\u2014'}
-              tone={bestFig ? bestFig.tone : A.INK}
-              sub={t('courses:courseDetail.plays.holeN', { hole: stats.easiest.hole_no })}
+              label={t('courses:courseDetail.plays.youBeat')}
+              value={`${stats.beat}/${stats.withYou}`}
+            />
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)' }}>
+            <Figure
+              label={t('courses:courseDetail.plays.fieldAvg')}
+              value={field ? field.text : '\u2014'}
+              tone={field ? field.tone : A.INK}
             />
           </div>
         )}
-
-
       </Panel>
 
-      {/* Block 3 - Hole by hole */}
+      {/* §A4 - How each par plays, between How it plays and Hole by hole. */}
+      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} />
+
+
+      {/* Block 3 - Hole by hole. THE NARRATION IS GONE (§A1): the columns beneath
+          are labelled HOLE / PAR / SI / FIELD / YOU, and the section now opens
+          with the WHOLE course's spread before the parts (§A5). */}
       <Panel
         kicker={t('courses:holes.preview.eyebrow')}
         action={{
           label: t('courses:holes.preview.seeAllShort', { count: holes.length }),
           onClick: () => setHolesSheetOpen(true),
         }}
-        subline={
+        aside={
           totalRounds > 0
-            ? t('courses:holes.preview.description', {
-                holes: formatNumber(holes.length),
+            ? t('courses:courseDetail.plays.rounds', {
                 count: totalRounds,
                 rounds: formatNumber(totalRounds),
-                personal: hasYou ? t('courses:holes.preview.personalClause') : '',
               })
-            : t('courses:holes.preview.descriptionNoRounds', { holes: formatNumber(holes.length) })
+            : undefined
         }
-
         headerGap={10}
         style={{ padding: '18px 16px 12px' }}
       >
-        <HoleRampLegend hasYou={hasYou} />
+        {courseShares && <DistributionStrip shares={courseShares} />}
 
         {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
           <HoleRowV2
@@ -626,6 +829,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
             open={openHoles.has(h.hole_no)}
             onToggle={() => toggle(h.hole_no, 'preview')}
             last={i === arr.length - 1}
+            hasYou={hasYou}
+            courseShares={courseShares}
           />
         ))}
       </Panel>
@@ -645,24 +850,40 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         }}
       >
         <div style={{ padding: '0 16px 10px' }}>
-          <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              gap: 10,
+            }}
+          >
+            <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
+            {/* THE ROUNDS COUNT IS META (§B2), right-aligned, the same treatment
+                every other panel's sample size takes - not a sentence. */}
+            {totalRounds > 0 && (
+              <div style={{ ...LABEL, ...FIGS }}>
+                {t('courses:courseDetail.plays.rounds', {
+                  count: totalRounds,
+                  rounds: formatNumber(totalRounds),
+                })}
+              </div>
+            )}
+          </div>
           <h2
             id="course-holes-sheet-title"
             style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 700, color: A.INK }}
           >
             {t('courses:courseDetail.holes.sheetTitle')}
           </h2>
-          <div style={LABEL}>
-            {t('courses:courseDetail.holes.sheetSub', {
-              count: totalRounds,
-              rounds: formatNumber(totalRounds),
-            })}
-            {' \u00B7 '}
-            {t('courses:courseDetail.holes.tapHint')}
-          </div>
+          {/* THE INSTRUCTION SERVES ITS PURPOSE ONCE (§B2): after a hole has been
+              opened it does not persist. */}
+          {openHoles.size === 0 && (
+            <div style={LABEL}>{t('courses:courseDetail.holes.tapHint')}</div>
+          )}
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 28px' }}>
-          <HoleRampLegend hasYou={hasYou} />
+          {courseShares && <DistributionStrip shares={courseShares} />}
           {holes.map((h, i, arr) => (
             <HoleRowV2
               key={h.hole_no}
@@ -673,10 +894,13 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
               open={openHoles.has(h.hole_no)}
               onToggle={() => toggle(h.hole_no, 'sheet')}
               last={i === arr.length - 1}
+              hasYou={hasYou}
+              courseShares={courseShares}
             />
           ))}
         </div>
       </BottomSheet>
+
     </div>
   );
 };

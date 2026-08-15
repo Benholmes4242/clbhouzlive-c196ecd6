@@ -562,6 +562,118 @@ function toughestRun(
   return best ? { from: best.from, to: best.to } : null;
 }
 
+/**
+ * §C2 - OUT AGAINST IN. Three measures, each two bars on one track: yards, par
+ * and mean stroke index. The nine that leads a measure takes the ink bar; both
+ * bars share one domain per measure so the lengths are the reading.
+ */
+type CardHole = { hole_no: number; par: number | null; yards: number | null; si: number | null };
+
+const OutInCompare: React.FC<{ out: CardHole[]; inn: CardHole[] }> = ({ out, inn }) => {
+  const { t } = useTranslation(['courses']);
+  /* A NINE-HOLE CARD HAS NOTHING TO COMPARE - by hole count, never by assuming 18. */
+  if (out.length < 9 || inn.length < 9) return null;
+
+  const total = (list: CardHole[], key: 'yards' | 'par'): number | null => {
+    let s = 0;
+    for (const h of list) {
+      const v = h[key];
+      if (v == null || !Number.isFinite(Number(v))) return null;
+      s += Number(v);
+    }
+    return s;
+  };
+  const meanSi = (list: CardHole[]): number | null => {
+    const vals = list
+      .map((h) => (h.si == null ? null : Number(h.si)))
+      .filter((v): v is number => v != null && Number.isFinite(v));
+    if (vals.length !== list.length || vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  };
+
+  const measures = [
+    {
+      label: t('courses:courseDetail.card.compare.yards'),
+      a: total(out, 'yards'),
+      b: total(inn, 'yards'),
+      fmt: (v: number) => formatNumber(Math.round(v)),
+    },
+    {
+      label: t('courses:courseDetail.card.compare.par'),
+      a: total(out, 'par'),
+      b: total(inn, 'par'),
+      fmt: (v: number) => String(Math.round(v)),
+    },
+    {
+      label: t('courses:courseDetail.card.compare.si'),
+      a: meanSi(out),
+      b: meanSi(inn),
+      fmt: (v: number) => v.toFixed(1),
+    },
+  ].filter((m) => m.a != null && m.b != null) as {
+    label: string;
+    a: number;
+    b: number;
+    fmt: (v: number) => string;
+  }[];
+
+  if (measures.length === 0) return null;
+
+  const bar = (v: number, domain: number, lead: boolean) => (
+    <span
+      aria-hidden="true"
+      style={{ display: 'block', height: 4, borderRadius: 2, background: A.TRACK }}
+    >
+      <span
+        style={{
+          display: 'block',
+          height: '100%',
+          width: `${Math.max(4, Math.round((v / domain) * 100))}%`,
+          borderRadius: 2,
+          background: lead ? A.INK : A.BODY,
+        }}
+      />
+    </span>
+  );
+
+  return (
+    <>
+      <Hairline style={{ marginTop: 14 }} />
+      <div style={{ paddingTop: 12, display: 'grid', gap: 11 }}>
+        <div style={SH_LABEL}>{t('courses:courseDetail.card.compare.kicker')}</div>
+        {measures.map((m) => {
+          const domain = Math.max(m.a, m.b) || 1;
+          return (
+            <div key={m.label} style={{ display: 'grid', gap: 5 }}>
+              <div style={SH_LABEL}>{m.label}</div>
+              {(
+                [
+                  [t('courses:courseDetail.card.compare.out'), m.a, m.a >= m.b] as const,
+                  [t('courses:courseDetail.card.compare.in'), m.b, m.b > m.a] as const,
+                ]
+              ).map(([name, value, lead]) => (
+                <div
+                  key={name}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '30px 1fr 46px',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <span style={SH_LABEL}>{name}</span>
+                  {bar(value, domain, lead)}
+                  <span style={{ ...shFig(12.5), textAlign: 'right' }}>{m.fmt(value)}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
 /** Shape cell: centred figure over a centred label, with an optional tail. */
 const ShapeCell: React.FC<{
   label: string;
@@ -726,6 +838,9 @@ const SheetBody: React.FC<{
   const inn = holes.filter((h) => h.hole_no > 9);
 
   const bars = useMemo(() => lengthBarWidths(holes), [holes]);
+  /** §C3 - the same run the shape panel names, so one definition marks both. */
+  const run = useMemo(() => toughestRun(holes), [holes]);
+
 
   /** SI chips grade across the card's OWN spread, not an assumed 1-18. */
   const siRange = useMemo(() => {
@@ -805,14 +920,19 @@ const SheetBody: React.FC<{
   };
 
   const holeRow = (h: (typeof holes)[number]) => {
-    /* PAR 3 SITS ONE STEP BACK (§4.3) - a lighter weight and the muted tone, so
-       par type is readable down the column without a fourth colour. */
-    const isShort = h.par != null && Number(h.par) === 3;
+    /* §C1 CORRECTION: the par-3 tone and weight step is GONE. Dimming the bar,
+       the yardage AND the par read as a disabled row, which is exactly the fault
+       the no-faded-colour rule exists to stop. Par type is already legible three
+       ways: the PAR column states it, the SI chip carries its own colour, and the
+       length bar is normalised WITHIN par type so a par 3 is never a stub. */
     const barK = bars.get(h.hole_no) ?? null;
     const siChip =
       h.si != null && siRange != null
         ? difficultyRampColor(siRampT(Number(h.si), siRange.min, siRange.max))
         : null;
+    /* §C3: the toughest run is marked WHERE THE HOLES ARE, with a leading rule -
+       not a wash, and no figure in the row changes. */
+    const inRun = run != null && h.hole_no >= run.from && h.hole_no <= run.to;
 
     return (
       <div
@@ -823,12 +943,14 @@ const SheetBody: React.FC<{
           alignItems: 'center',
           gap: CARD_GAP,
           padding: '8px 0',
+          ...(inRun
+            ? { margin: '0 -10px', paddingLeft: 10, paddingRight: 10, boxShadow: `inset 2px 0 0 ${A.INK}` }
+            : null),
         }}
       >
         <span style={{ ...shFig(13), textAlign: 'center' }}>{h.hole_no}</span>
 
-        {/* LENGTH: a SOLID ink bar, not a ramp and not a fading gradient - the
-            register does not do faded. SI owns the colour on this row. */}
+        {/* LENGTH: a SOLID ink bar on EVERY row, par 3s included. */}
         {barK != null ? (
           <span
             aria-hidden="true"
@@ -840,7 +962,7 @@ const SheetBody: React.FC<{
                 height: '100%',
                 width: `${Math.round(barK * 100)}%`,
                 borderRadius: 2,
-                background: isShort ? 'rgba(14,18,22,0.34)' : A.INK,
+                background: A.INK,
               }}
             />
           </span>
@@ -848,25 +970,12 @@ const SheetBody: React.FC<{
           <span aria-hidden="true" />
         )}
 
-        <span
-          style={{
-            ...shFig(13, isShort ? A.MUTE : A.BODY),
-            fontWeight: isShort ? 500 : 600,
-            textAlign: 'center',
-          }}
-        >
+        <span style={{ ...shFig(13, A.BODY), fontWeight: 600, textAlign: 'center' }}>
           {h.yards == null ? '' : formatNumber(Math.round(h.yards))}
         </span>
 
-        <span
-          style={{
-            ...shFig(13, isShort ? A.MUTE : A.INK),
-            fontWeight: isShort ? 500 : 700,
-            textAlign: 'center',
-          }}
-        >
-          {h.par}
-        </span>
+        <span style={{ ...shFig(13, A.INK), fontWeight: 700, textAlign: 'center' }}>{h.par}</span>
+
 
         {/* SI TAKES THE RAMP (§4.1). Numerals go white or ink by COMPUTED
             luminance - never a hardcoded stroke-index threshold. */}
@@ -1001,6 +1110,13 @@ const SheetBody: React.FC<{
 
         <div style={{ height: 6 }} aria-hidden="true" />
         {summaryRow(t('courses:teeCard.total'), holes, 14)}
+
+        {/* §C2 - OUT AGAINST IN. Every figure here is already summed for the two
+            total rows above; nothing new is fetched. A NINE-HOLE CARD renders no
+            comparison, detected by hole count, and a card with no stroke indexes
+            renders the yards and par measures only. */}
+        <OutInCompare out={out} inn={inn} />
+
 
         {/* THE RAMP IS EXPLAINED ONCE, AT THE FOOT (§4.4). Not at the head: the
             scorecard sheet has just taught us what happens when a key sits above
