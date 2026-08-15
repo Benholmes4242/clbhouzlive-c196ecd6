@@ -1111,6 +1111,7 @@ async function syncLeaderboard(
         historyRows.push({
           tournament_id: tournamentDbId,
           player_id: player.id,
+          team_id: null,
           position: entry.position ?? null,
           position_tied: entry.tied || false,
           score: entry.score ?? null,
