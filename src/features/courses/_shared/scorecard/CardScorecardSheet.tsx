@@ -847,6 +847,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
                     )}
 
+                    <Legend />
+
                     {/*
                       TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
                       a summary line floating beneath it. Two rows on the same
@@ -893,8 +895,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </div>
 
 
-
-                    <Legend />
                   </div>
                 )}
               </Panel>
