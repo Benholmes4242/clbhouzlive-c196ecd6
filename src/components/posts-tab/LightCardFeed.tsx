@@ -306,6 +306,41 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
   }, [fsIsOpen, earlyIdx]);
 
+  // ── Resume after a borrow returns (profile feed only) ──
+  // The viewer borrows the 'active' physical lane and, on close, returns it at
+  // role 'prev' (the shared default, correct for the Clubhouse feed). On a
+  // profile the member comes back to the very card they tapped — it is still
+  // the on-screen card — so we re-assert active for whichever physical lane
+  // holds the CURRENTLY VISIBLE card's media. Pure role bookkeeping: the
+  // element is already parented and paused at its true position, so it
+  // resumes rather than reloads. If the member scrolled while the viewer was
+  // open, no lane matches the visible card and we leave the roles alone.
+  const wasFsOpenRef = useRef(false);
+  useEffect(() => {
+    const closed = wasFsOpenRef.current && !fsIsOpen;
+    wasFsOpenRef.current = fsIsOpen;
+    if (!closed) return;
+    const post = postsRef.current[playingIdxRef.current];
+    const m = post?.mediaItems?.[0];
+    if (!post || !m || m.type !== 'video') return;
+    const target = `${post.id}:0`;
+    try {
+      for (const r of ['prev', 'next'] as const) {
+        const lane = feedLaneRoles.laneForRole(r);
+        const snap = VideoEngine.snapshot(lane);
+        const key = snap.postId == null
+          ? null
+          : (snap.postId.includes(':') ? snap.postId : `${snap.postId}:0`);
+        if (key === target) {
+          feedLaneRoles.promoteToActive(lane);
+          break;
+        }
+      }
+    } catch { /* engine not booted */ }
+  }, [fsIsOpen]);
+
+
+
   // Activation scorecard — one feed.activate emit per promotion.
   const activateT0Ref = useRef<number>(0);
   useEffect(() => {

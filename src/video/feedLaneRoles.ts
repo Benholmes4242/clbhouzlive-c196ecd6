@@ -141,6 +141,30 @@ class FeedLaneRolesImpl {
     return this.frozen.has(lane);
   }
 
+  /**
+   * Re-assert `lane` as the 'active' role by SWAPPING role bindings with
+   * whichever physical lane currently holds 'active'. Pure bookkeeping — no
+   * load / seek / attach, and elements never migrate.
+   *
+   * Additive API used ONLY by the profile (posts-tab) feed after a borrow
+   * returns: on a profile the member comes back to the very card they tapped,
+   * so the returned lane — which still holds that card's element, painted and
+   * paused at its true position — must hold 'active' for it to resume. The
+   * default rejoin rule ('prev') is untouched, so the Clubhouse borrow path
+   * is byte-identical.
+   */
+  promoteToActive(lane: LaneId): boolean {
+    if (!this.isFeedLane(lane)) return false;
+    if (this.frozen.has(lane)) return false;
+    const role = this.roleForLane(lane);
+    if (!role || role === 'active') return false;
+    const currentActive = this.map.active;
+    this.map[role] = currentActive;
+    this.map.active = lane;
+    this.emit();
+    return true;
+  }
+
   /** React subscription — fires on any role map or freeze-set change. */
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener);

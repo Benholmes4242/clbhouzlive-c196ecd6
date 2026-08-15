@@ -25,6 +25,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from '@/components/feed/InlineVideo';
+import { MuteButton } from '@/audio/MuteButton';
 import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
@@ -276,6 +277,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;
   const media = items[0];
+  const hasVideo = items.some((m) => m?.type === 'video');
 
   const ratio = useMemo(() => {
     if (!media || !media.width || !media.height) return FALLBACK_RATIO;
@@ -590,6 +592,15 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               onClick={() => onComment(post, effectiveActor)}
             />
             <FooterButton icon={Share} onClick={() => onShare(post)} />
+            {/* Media control, not a social action — right-aligned after Share.
+                Gated on the post having video exactly as FeedActionRail does.
+                MuteButton is the canonical session writer; no local state. */}
+            {hasVideo ? (
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+                <MuteButton size="md" />
+              </div>
+            ) : null}
+
           </div>
         );
 
