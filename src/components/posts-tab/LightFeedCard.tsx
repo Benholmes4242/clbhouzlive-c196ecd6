@@ -590,6 +590,15 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               onClick={() => onComment(post, effectiveActor)}
             />
             <FooterButton icon={Share} onClick={() => onShare(post)} />
+            {/* Media control, not a social action — right-aligned after Share.
+                Gated on the post having video exactly as FeedActionRail does.
+                MuteButton is the canonical session writer; no local state. */}
+            {hasVideo ? (
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+                <MuteButton size="md" />
+              </div>
+            ) : null}
+
           </div>
         );
 
