@@ -250,44 +250,61 @@ export const HoleRowV2: React.FC<{
   onToggle: () => void;
   /** Last row on the surface: no trailing hairline. */
   last?: boolean;
-}> = ({ row, mine = null, scale, totalHoles, open, onToggle, last = false }) => {
+  /**
+   * NO VIEWER, NO VIEWER COLUMNS (§B7). A member with no rounds here sees the
+   * field's figures and nothing else - not a dash, not a zero, not a reserved
+   * slot. The surface knows this, the row does not, so it is passed in.
+   */
+  hasYou?: boolean;
+  /**
+   * Course-wide bucket shares, for the expanded detail's comparison marks (§B4).
+   * Already summed for the distribution strip - no second pass, no new query.
+   */
+  courseShares?: BucketShares | null;
+}> = ({
+  row,
+  mine = null,
+  scale,
+  totalHoles,
+  open,
+  onToggle,
+  last = false,
+  hasYou = true,
+  courseShares = null,
+}) => {
   const { t } = useTranslation(['courses']);
   const field = toParParts(row.avg_to_par);
-  const you = toParParts(mine?.avg_to_par);
+  const you = hasYou ? toParParts(mine?.avg_to_par) : null;
   const rank = scale.rankByHole.get(row.hole_no) ?? null;
 
-  const segs = [
-    {
-      key: 'birdie',
-      pctValue: pct(row, ['ace', 'albatross', 'eagle', 'birdie']),
-      bg: RAMP_TOPAR.birdie,
-      label: t('courses:holes.preview.legendBirdie'),
-    },
-    {
-      key: 'par',
-      pctValue: row.dist.par ?? 0,
-      bg: RAMP_TOPAR.par,
-      label: t('courses:holes.preview.legendPar'),
-    },
-    {
-      key: 'bogey',
-      pctValue: row.dist.bogey ?? 0,
-      bg: RAMP_TOPAR.bogey,
-      label: t('courses:holes.preview.legendBogey'),
-    },
-    {
-      key: 'double',
-      pctValue: row.dist.double ?? 0,
-      bg: RAMP_TOPAR.double,
-      label: t('courses:holes.preview.legendDouble'),
-    },
-  ];
+  const segs = BUCKETS.map((b) => ({
+    key: b.key,
+    pctValue: pct(row, b.keys),
+    bg: b.bg,
+    label: t(b.labelKey),
+  }));
   const total = segs.reduce((s, x) => s + x.pctValue, 0) || 1;
 
-  const gap =
-    mine?.avg_to_par != null && Number.isFinite(row.avg_to_par)
-      ? toParParts(mine.avg_to_par - row.avg_to_par)
+  /**
+   * YOUR GAP IS A MARGIN, NOT A TO-PAR FIGURE (§B6): better than the field is
+   * the index-delta GREEN, worse is its RED. The to-par convention (under par
+   * red) would print a member who beats the field in the same tone as a member
+   * who loses to it on a hole that plays under par.
+   */
+  const gapRaw =
+    hasYou && mine?.avg_to_par != null && Number.isFinite(row.avg_to_par)
+      ? mine.avg_to_par - row.avg_to_par
       : null;
+  const gap =
+    gapRaw == null
+      ? null
+      : (() => {
+          const r = Math.round(gapRaw * 10) / 10;
+          if (r > 0) return { text: `+${r.toFixed(1)}`, tone: A.DRIFTED };
+          if (r < 0) return { text: `\u2212${Math.abs(r).toFixed(1)}`, tone: A.IMPROVED };
+          return { text: 'E', tone: A.MUTE };
+        })();
+
 
   /**
    * The hole's own position on the course's difficulty spread, or null below the
