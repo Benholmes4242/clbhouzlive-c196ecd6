@@ -9,7 +9,10 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export interface RoundCourseContext {
   course_id: string;
+  /** Every 18-hole round here, INCLUDING this one. Hero cell figure. */
   your_avg_to_par: number | null;
+  /** Average EXCLUDING this round. NULL when this is the only round here. */
+  avg_to_par_others: number | null;
   rounds_here: number | null;
   rank_here: number | null;
   best_here: number | null;
