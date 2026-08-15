@@ -65,7 +65,7 @@
     "empty": "Nothing here yet",
     "error": "Something went wrong",
     "loading": "Loading...",
-    "loadingEllipsis": "Loading\u2026",
+    "loadingEllipsis": "Loading…",
     "noResults": "No results",
     "offline": "You're offline",
     "posting": "Posting...",
@@ -81,32 +81,32 @@
   },
   "settings": {
     "autoPostRounds": {
-      "title": "\ub77c\uc6b4\ub4dc \uc790\ub3d9 \uac8c\uc2dc",
-      "subtitle": "\ub77c\uc6b4\ub4dc\ub97c \uae30\ub85d\ud558\uba74 \ud074\ub7fd\ud558\uc6b0\uc2a4\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4. \ub208\uc5d0 \ub744\ub294 \ub77c\uc6b4\ub4dc\ub9cc \ud314\ub85c\uc6cc\uac00 \uc544\ub2cc \ud68c\uc6d0\uc5d0\uac8c\ub3c4 \ub178\ucd9c\ub429\ub2c8\ub2e4."
+      "title": "라운드 자동 게시",
+      "subtitle": "라운드를 기록하면 클럽하우스에 표시됩니다. 눈에 띄는 라운드만 팔로워가 아닌 회원에게도 노출됩니다."
     }
   },
   "feed": {
     "crownCategory": {
-      "lowest_gross_all_time": "\ucd5c\uc800 \uadf8\ub85c\uc2a4",
-      "best_score_diff_all_time": "\ucd5c\uace0 \uc2a4\ucf54\uc5b4 \ub514\ud37c\ub80c\uc15c",
-      "best_stableford_all_time": "\ucd5c\uace0 \uc2a4\ud14c\uc774\ube14\ud3ec\ub4dc",
-      "most_aces_all_time": "\ud640\uc778\uc6d0 \ucd5c\ub2e4",
-      "most_albatrosses_all_time": "\uc54c\ubc14\ud2b8\ub85c\uc2a4 \ucd5c\ub2e4",
-      "most_eagles_all_time": "\uc774\uae00 \ucd5c\ub2e4",
-      "most_birdies_all_time": "\ubc84\ub514 \ucd5c\ub2e4"
+      "lowest_gross_all_time": "최저 그로스",
+      "best_score_diff_all_time": "최고 스코어 디퍼렌셜",
+      "best_stableford_all_time": "최고 스테이블포드",
+      "most_aces_all_time": "홀인원 최다",
+      "most_albatrosses_all_time": "알바트로스 최다",
+      "most_eagles_all_time": "이글 최다",
+      "most_birdies_all_time": "버디 최다"
     }
   },
   "business": {
     "hero": {
-      "communityRating": "\ucee4\ubba4\ub2c8\ud2f0 \ud3c9\uc810",
-      "ratings": "\ud3c9\uac00 {{count}}\uac74",
-      "edit": "\ud3b8\uc9d1",
-      "follow": "\ud314\ub85c\uc6b0",
-      "following": "\ud314\ub85c\uc789",
-      "manage": "\uad00\ub9ac",
-      "verified": "\uc778\uc99d\ub428",
-      "readMore": "\ub354 \ubcf4\uae30",
-      "readLess": "\uc811\uae30"
+      "communityRating": "커뮤니티 평점",
+      "ratings": "평가 {{count}}건",
+      "edit": "편집",
+      "follow": "팔로우",
+      "following": "팔로잉",
+      "manage": "관리",
+      "verified": "인증됨",
+      "readMore": "더 보기",
+      "readLess": "접기"
     },
     "emptyState": {
       "kicker": "FOR BUSINESSES",
@@ -217,15 +217,15 @@
     "nextRound": {
       "eyebrow": "Next round",
       "sample": "Last 20 rounds",
-      "lineHold": "\ub2e4\uc74c \ub77c\uc6b4\ub4dc\uc5d0\uc11c \ud578\ub514\ucea1\uc774 \uc62c\ub77c\uac08 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
-      "subHold": "{{cut}}\ubcf4\ub2e4 \uc88b\uc73c\uba74 \ub0b4\ub824\uac11\ub2c8\ub2e4.",
-      "lineRise": "\ub2e4\uc74c \ub77c\uc6b4\ub4dc\uc5d0\uc11c \ud578\ub514\ucea1\uc774 {{settle}}\ub85c \uc62c\ub77c\uac11\ub2c8\ub2e4",
-      "subRise": "{{cut}}\ubcf4\ub2e4 \uc88b\uc9c0 \uc54a\uc73c\uba74.",
-      "beatLabel": "\ucd5c\uadfc {{total}}\ub77c\uc6b4\ub4dc \uc911 {{count}}\uac1c\uac00 {{cut}}\ubcf4\ub2e4 \uc88b\uc2b5\ub2c8\ub2e4",
-      "scaleShoot": "\uc2a4\ucf54\uc5b4",
-      "scaleBecomes": "\ud578\ub514\ucea1",
-      "noChange": "\ubcc0\ud654 \uc5c6\uc74c",
-      "yourBest": "\ucd5c\uace0 \uae30\ub85d"
+      "lineHold": "다음 라운드에서 핸디캡이 올라갈 수 없습니다.",
+      "subHold": "{{cut}}보다 좋으면 내려갑니다.",
+      "lineRise": "다음 라운드에서 핸디캡이 {{settle}}로 올라갑니다",
+      "subRise": "{{cut}}보다 좋지 않으면.",
+      "beatLabel": "최근 {{total}}라운드 중 {{count}}개가 {{cut}}보다 좋습니다",
+      "scaleShoot": "스코어",
+      "scaleBecomes": "핸디캡",
+      "noChange": "변화 없음",
+      "yourBest": "최고 기록"
     },
     "pulse": {
       "findPlayer": "Find any player's handicap",
@@ -235,12 +235,12 @@
       "noRecent": "No recent rounds"
     },
     "lastRound": {
-      "playedTo": "\ud50c\ub808\uc774 \uae30\ub85d",
-      "gross": "\uadf8\ub85c\uc2a4",
-      "stableford": "\uc2a4\ud14c\uc774\ube14\ud3ec\ub4dc",
-      "index": "\ud578\ub514\ucea1",
-      "indexHeldAt": "\ud578\ub514\ucea1 \uc720\uc9c0",
-      "notBest8": "\uc0c1\uc704 8\uac1c\uc5d0 \ud3ec\ud568\ub418\uc9c0 \uc54a\uc74c"
+      "playedTo": "플레이 기록",
+      "gross": "그로스",
+      "stableford": "스테이블포드",
+      "index": "핸디캡",
+      "indexHeldAt": "핸디캡 유지",
+      "notBest8": "상위 8개에 포함되지 않음"
     },
     "records": {
       "emptyHint": "Raundeu reul deungnok hamyeon girogi yeogie pyosi doemnida."
@@ -304,5 +304,31 @@
         "best": "BEST EVER"
       }
     }
+  },
+  "connectGhost": {
+    "champions": {
+      "headlineSome": "왕관 {{total}}개. {{open}}개는 아직 주인이 없습니다.",
+      "headlineSomeOne": "왕관 {{total}}개. 1개는 아직 주인이 없습니다.",
+      "headlineNone": "왕관 {{total}}개. 아직 하나도 차지되지 않았습니다.",
+      "headlineAll": "왕관 {{total}}개. 모두 주인이 있습니다.",
+      "headlineOneTotalOpen": "왕관 1개. 아직 주인이 없습니다.",
+      "headlineOneTotalHeld": "왕관 1개. 주인이 있습니다.",
+      "boardEyebrow": "명예의 보드",
+      "neverWon": "아직 없음",
+      "open": "공석",
+      "remaining_one": "왕관 {{count}}개가 아직 주인이 없습니다.",
+      "remaining_other": "왕관 {{count}}개가 아직 주인이 없습니다.",
+      "figRounds": "라운드",
+      "figAvgToPar": "평균 대 파",
+      "figHarderThan": "난이도",
+      "headline": "이 클럽의 왕관",
+      "sub": "핸디캡을 연동하면 이곳의 모든 라운드가 자동으로 집계됩니다. 왕관을 차지하면 보드에 이름이 올라갑니다.",
+      "slim": "이 클럽의 왕관에 도전하세요"
+    },
+    "eyebrow": "당신의 것이 될 수 있습니다",
+    "cta": "핸디캡 연동",
+    "footnote": "30초 소요 · 대신 게시하지 않습니다",
+    "slimCta": "연동 →",
+    "dismissA11y": "닫기"
   }
 }

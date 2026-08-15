@@ -136,7 +136,21 @@
     "champions": {
       "headline": "[~~Šéṽéñ ĉřőŵñš áţ ţĥíš ĉļúƀ~~]",
       "sub": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ áñđ éṽéřý řőúñđ ýőú ƥļáý ĥéřé ĉőúñţš áúţőɱáţíĉáļļý - ñő ļőĝĝíñĝ, ñő áđɱíñ. Ţáǩé á ĉřőŵñ áñđ ýőúř ñáɱé šíţš őñ ţĥé ƀőářđ.~~]",
-      "slim": "[~~Ƥļáý ƒőř ţĥé ĉřőŵñš áţ ţĥíš ĉļúƀ~~]"
+      "slim": "[~~Ƥļáý ƒőř ţĥé ĉřőŵñš áţ ţĥíš ĉļúƀ~~]",
+      "headlineSome": "[{{total}} crowns. {{open}} never won.]",
+      "headlineSomeOne": "[{{total}} crowns. 1 never won.]",
+      "headlineNone": "[{{total}} crowns. Not one has been won.]",
+      "headlineAll": "[{{total}} crowns. Every one is spoken for.]",
+      "headlineOneTotalOpen": "[1 crown. It has never been won.]",
+      "headlineOneTotalHeld": "[1 crown. It is spoken for.]",
+      "boardEyebrow": "[Honours board]",
+      "neverWon": "[Never been won]",
+      "open": "[OPEN]",
+      "remaining_one": "[{{count}} more crown has never been won.]",
+      "remaining_other": "[{{count}} more crowns have never been won.]",
+      "figRounds": "[ROUNDS]",
+      "figAvgToPar": "[AVG TO PAR]",
+      "figHarderThan": "[HARDER THAN]"
     }
   },
   "verifiedAccounts": {
