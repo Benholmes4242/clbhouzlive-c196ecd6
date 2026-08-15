@@ -230,7 +230,9 @@ serve(async (req) => {
         .from('ai_predictions')
         .select('*')
         .eq('tournament_id', tournament.id)
-        .single();
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (existing && !isPredictionStale(existing)) {
         console.log(`[generate-predictions] Using cached predictions`);
@@ -894,6 +896,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           .from('ai_predictions')
           .select('*')
           .eq('tournament_id', tournament.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         if (cached && !isPredictionStale(cached)) {
           return new Response(
@@ -920,6 +924,8 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
           .from('ai_predictions')
           .select('*')
           .eq('tournament_id', tournament.id)
+          .order('generated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         if (fresh && !isPredictionStale(fresh)) {
           console.log(`[ti] double-check: fresh row appeared, skipping generation`);
@@ -1011,9 +1017,12 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
     const displayPicks = enrichedContenders.slice(0, 3);
     const alternates = enrichedContenders.slice(5, 8);
 
+    // APPEND-ONLY: every generation is a new row. A prediction made at a moment in
+    // time with a given model_version / prompt_version / research_context can never
+    // be regenerated, so it is never overwritten. Readers take the latest row.
     const { error: upsertError } = await supabase
       .from('ai_predictions')
-      .upsert({
+      .insert({
         tournament_id: tournament.id,
         predictions: displayPicks,
         dark_horses: alternates,

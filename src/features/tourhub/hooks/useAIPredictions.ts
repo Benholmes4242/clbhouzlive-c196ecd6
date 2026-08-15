@@ -460,10 +460,14 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     return null;
   }
 
+  // ai_predictions is APPEND-ONLY — a tournament can hold several rows, one per
+  // generation. Always read the most recent; maybeSingle() alone would error.
   const { data: aiPredictions } = await supabase
     .from('ai_predictions')
     .select('*')
     .eq('tournament_id', tournament.id)
+    .order('generated_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   // Treat a row whose logic_version is below the current expected version
