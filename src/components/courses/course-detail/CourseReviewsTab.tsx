@@ -519,7 +519,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   if (isLoading) {
     return (
-      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 32 }}>
+      <div style={{ background: SLATE_50, minHeight: '100%', paddingBottom: 8 }}>
         {/* Distribution card skeleton */}
         <div style={{ padding: '16px 16px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <Skeleton className="h-[128px] w-full rounded-[16px]" />
@@ -580,7 +580,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Empty state
   if (!hasRatings) {
     return (
-      <div style={{ paddingBottom: 32 }}>
+      <div style={{ paddingBottom: 8 }}>
         <div style={{ padding: '20px 16px' }}>
           <EmptyState
             title={t('review.empty.title')}
@@ -610,7 +610,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-    <div style={{ paddingBottom: 32, background: SLATE_50, minHeight: '100%' }}>
+    <div style={{ paddingBottom: 8, background: SLATE_50, minHeight: '100%' }}>
       {(() => {
         const maxTierCount = Math.max(...TIER_ROWS.map(t => reviewCountsByTier[t.key] ?? 0), 1);
         return (

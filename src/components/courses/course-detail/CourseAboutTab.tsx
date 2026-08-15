@@ -152,7 +152,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   return (
     <div
       className="animate-in fade-in duration-200"
-      style={{ paddingBottom: 32, background: SLATE_50 }}
+      style={{ paddingBottom: 8, background: SLATE_50 }}
     >
       {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
       <CourseLocationPills course={course} />
