@@ -1200,6 +1200,42 @@ const BorrowedFullscreenSlot: React.FC<{
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
 
+    // LATE ASPECT CORRECTION (fit-width fix): when the lane had no metadata
+    // yet we fell back to the origin snapshot, whose dims default to
+    // 1080x1920 in feedMapper when the DB row carries none. A genuinely
+    // landscape clip would then rest COVER and lose most of its width. Poll
+    // briefly for the element's intrinsic aspect and, if it disagrees, move
+    // to the correct resting rect (CONTAIN → fits width, blurred backdrop
+    // fills the bars). No-op in the common case (source === 'lane').
+    if (source !== 'lane') {
+      let cancelled = false;
+      const correct = () => {
+        if (cancelled) return true;
+        const a = VideoEngine.getLaneAspect(borrow.laneId);
+        if (!a || a <= 0) return false;
+        const nextRect = resolveRestingRect(a * 1000, 1000, getCurrentViewport(), 'video');
+        const cur = targetRectRef.current;
+        if (!cur || (cur.fit === nextRect.fit && Math.abs(cur.height - nextRect.height) < 1)) return true;
+        targetRectRef.current = nextRect;
+        restingFitRef.current = nextRect.fit;
+        setRectVersion((v) => v + 1);
+        if (nextRect.fit === 'contain') {
+          setUnderlayVisible(true);
+          setFitContain(true);
+          try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+        }
+        return true;
+      };
+      if (!correct()) {
+        const timers = [80, 200, 400, 800, 1500].map((ms) => setTimeout(correct, ms));
+        lateCorrectCleanupRef.current = () => {
+          cancelled = true;
+          timers.forEach(clearTimeout);
+        };
+      }
+    }
+
+
     // CUT mode: wrapper rendered at the resting rect on the first commit, and
     // this layout effect reparents the live <video> before paint. No rAF gap,
     // no tile-sized/first-frame flash before the fullscreen pixels are live.
