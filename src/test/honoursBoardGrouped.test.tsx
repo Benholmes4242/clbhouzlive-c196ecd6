@@ -68,13 +68,13 @@ describe('BRIEF_HONOURS_BOARD_PLAYER_LED', () => {
   });
 
   it('collapses only above the threshold, with a real button that toggles', () => {
-    const three = [1, 2, 3].map((n) => ev({ id: `x${n}`, at: `202${n}-01-01T00:00:00Z` }));
-    const { unmount } = render(<HonoursBoard events={three} />);
+    const five = [1, 2, 3, 4, 5].map((n) => ev({ id: `x${n}`, at: `202${n}-01-01T00:00:00Z` }));
+    const { unmount } = render(<HonoursBoard events={five} />);
     expect(screen.queryByRole('button', { name: /more/i })).toBeNull();
     unmount();
 
-    const four = [...three, ev({ id: 'x4', at: '2019-01-01T00:00:00Z' })];
-    render(<HonoursBoard events={four} />);
+    const six = [...five, ev({ id: 'x6', at: '2019-01-01T00:00:00Z' })];
+    render(<HonoursBoard events={six} />);
     const btn = screen.getByRole('button', { name: /1 more/i });
     expect(btn.getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(btn);
@@ -83,7 +83,7 @@ describe('BRIEF_HONOURS_BOARD_PLAYER_LED', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /Show less/i }));
     expect(screen.getByRole('button', { name: /1 more/i })).toBeTruthy();
-    expect(HONOURS_FEATS_BEFORE_COLLAPSE).toBe(3);
+    expect(HONOURS_FEATS_BEFORE_COLLAPSE).toBe(5);
   });
 
   it('renders nothing for an empty board and one group for one player', () => {

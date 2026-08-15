@@ -277,8 +277,8 @@ export function MostPlayedPanel() {
 /**
  * Section 7 — honours board: gold-wash panel, centred header, 2 GROUPED rows.
  * BRIEF_HONOURS_BOARD_PLAYER_LED — grouped rows are taller than flat ones: a
- * one-feat group is 12 + 34 (holder) + 8 + 33 (course line 18 + detail 15) + 12
- * = 99px, against the old flat row's 52px. The shell holds 99px rows so the
+ * one-feat group is 8 + 34 (holder) + 6 + 30 (course line 16 + detail 14) + 8
+ * = 86px, against the old flat row's 52px. The shell holds 86px rows so the
  * panel does not resize when the wire settles.
  */
 export function HonoursPanel() {
@@ -302,7 +302,7 @@ export function HonoursPanel() {
           <div
             key={i}
             style={{
-              padding: '12px 0',
+              padding: '8px 0',
               borderBottom: i === 1 ? 'none' : `1px solid ${GOLD_HAIR}`,
             }}
           >
@@ -313,12 +313,12 @@ export function HonoursPanel() {
                 <Bar style={{ height: 15, width: 42, borderRadius: 5 }} />
               </div>
             </div>
-            <div style={{ marginTop: 8, marginLeft: 45 }}>
-              <div style={{ height: 18, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={132} h={13} />
+            <div style={{ marginTop: 6, marginLeft: 45 }}>
+              <div style={{ height: 16, display: 'flex', alignItems: 'center' }}>
+                <TextBar w={132} h={11} />
               </div>
-              <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={96} h={11} />
+              <div style={{ height: 14, display: 'flex', alignItems: 'center' }}>
+                <TextBar w={96} h={10} />
               </div>
             </div>
           </div>

@@ -42,8 +42,8 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 export { GOLD_INK, GOLD_HAIR, GOLD_BORDER, HONOURS_WASH, HONOURS_SHELL } from './honoursTokens';
 
-/** §5 — the collapse threshold, named. "More than three", not "three or more". */
-export const HONOURS_FEATS_BEFORE_COLLAPSE = 3;
+/** §5 — the collapse threshold, named. "More than five", not "five or more". */
+export const HONOURS_FEATS_BEFORE_COLLAPSE = 5;
 
 /** The holder, 34x34, canonical squircle with the canonical traced hairline. */
 function HolderAvatar({ event: e }: { event: WireEvent }) {
@@ -201,7 +201,7 @@ function FeatLine({
         cursor: tappable ? 'pointer' : 'default',
       }}
     >
-      <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, height: 18 }}>
+      <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, height: 16 }}>
         <span
           style={{
             flex: 1,
@@ -234,7 +234,7 @@ function FeatLine({
         <span
           style={{
             display: 'block',
-            height: 15,
+            height: 14,
             fontSize: 11.5,
             fontWeight: 600,
             color: A.MUTE,
@@ -274,7 +274,7 @@ export function HonoursGroupRow({
   return (
     <div
       style={{
-        padding: group.isOwn ? '12px 14px 12px 11px' : '12px 0',
+        padding: group.isOwn ? '8px 14px 8px 11px' : '8px 0',
         margin: group.isOwn ? '0 -14px' : undefined,
         background: group.isOwn ? HONOURS_OWN_WASH : undefined,
         borderLeft: group.isOwn ? `3px solid ${HONOURS_OWN_RULE}` : undefined,
@@ -307,11 +307,11 @@ export function HonoursGroupRow({
 
       <div
         style={{
-          marginTop: 8,
+          marginTop: 6,
           marginLeft: 45,
           display: 'flex',
           flexDirection: 'column',
-          gap: 9,
+          gap: 6,
         }}
       >
         {shown.map((e) => (
@@ -328,7 +328,7 @@ export function HonoursGroupRow({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            marginTop: 9,
+            marginTop: 6,
             marginLeft: 45,
             padding: 0,
             border: 'none',
