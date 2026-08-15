@@ -327,7 +327,19 @@
     "trajField": "[~~Ƒíéļđ {{n}}~~]",
     "trajThrough": "[~~Ţĥřőúĝĥ {{n}}~~]",
     "trajBeatField": "[~~Ɓéáţ ţĥé ƒíéļđ őñ {{n}}~~]",
-    "trajAria": "[~~Řőúñđ ţřájéĉţőřý, {{n}} ţő πář. Ðřáĝ ţő řéáđ éáĉĥ ĥőļé.~~]"
+    "trajAria": "[~~Řőúñđ ţřájéĉţőřý, {{n}} ţő πář. Ðřáĝ ţő řéáđ éáĉĥ ĥőļé.~~]",
+    "vsOthersLevel_one": "[~~Říghţ őñ {{whose}} őţhéř řőúñd héřé.~~]",
+    "vsOthersLevel_other": "[~~Říghţ őñ {{whose}} őţhéř {{count}} řőúñdš héřé.~~]",
+    "vsOthersLevelNeutral_one": "[~~Říghţ őñ ţhé őţhéř řőúñd héřé.~~]",
+    "vsOthersLevelNeutral_other": "[~~Říghţ őñ ţhé őţhéř {{count}} řőúñdš héřé.~~]",
+    "vsOthersBetter_one": "[~~{{n}} šhőţš béţţéř ţháñ {{whose}} őţhéř řőúñd héřé.~~]",
+    "vsOthersBetter_other": "[~~{{n}} šhőţš béţţéř ţháñ {{whose}} őţhéř {{count}} řőúñdš héřé.~~]",
+    "vsOthersBetterNeutral_one": "[~~{{n}} šhőţš béţţéř ţháñ ţhé őţhéř řőúñd héřé.~~]",
+    "vsOthersBetterNeutral_other": "[~~{{n}} šhőţš béţţéř ţháñ ţhé őţhéř {{count}} řőúñdš héřé.~~]",
+    "vsOthersWorse_one": "[~~{{n}} šhőţš wőřšé ţháñ {{whose}} őţhéř řőúñd héřé.~~]",
+    "vsOthersWorse_other": "[~~{{n}} šhőţš wőřšé ţháñ {{whose}} őţhéř {{count}} řőúñdš héřé.~~]",
+    "vsOthersWorseNeutral_one": "[~~{{n}} šhőţš wőřšé ţháñ ţhé őţhéř řőúñd héřé.~~]",
+    "vsOthersWorseNeutral_other": "[~~{{n}} šhőţš wőřšé ţháñ ţhé őţhéř {{count}} řőúñdš héřé.~~]"
   },
   "card": {
     "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",

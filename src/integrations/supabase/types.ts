@@ -20160,6 +20160,7 @@ export type Database = {
       get_round_course_context: {
         Args: { p_whs_score_id: string }
         Returns: {
+          avg_to_par_others: number
           best_here: number
           course_id: string
           rank_here: number

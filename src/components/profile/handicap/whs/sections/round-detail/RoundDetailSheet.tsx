@@ -176,6 +176,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       surface="member"
       courseContext={ctx ? {
         yourAvgToPar: ctx.your_avg_to_par,
+        avgToParOthers: ctx.avg_to_par_others,
         roundsHere: ctx.rounds_here,
         rankHere: ctx.rank_here,
       } : null}
