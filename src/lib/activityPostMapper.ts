@@ -16,7 +16,25 @@ import {
   generateStreamThumbnailUrl,
 } from '@/config/cloudflareStream';
 
-export function mapActivityPostToFeedPost(post: ActivityPost): FeedPost {
+/**
+ * COUNTS AND THE LIKED FLAG (BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §3).
+ *
+ * ActivityPost carries `likes`/`comments` but nothing about the VIEWER, so this
+ * mapper used to hardcode `isLikedByMe: false`. Callers that do know the viewer
+ * state (the notification/deep-link path, which resolves it with
+ * viewer_liked_post — the only correct route, since round-backed posts record
+ * the like in content_reactions and not in post_likes) pass it in here.
+ */
+export type ActivityPostViewerState = {
+  isLikedByMe?: boolean;
+  isFollowedByMe?: boolean;
+};
+
+export function mapActivityPostToFeedPost(
+  post: ActivityPost,
+  viewer: ActivityPostViewerState = {},
+): FeedPost {
+
   const userData = extractUserData(post);
   const isReview = isReviewPost(post);
   const reviewData = isReview ? extractReviewData(post) : null;
