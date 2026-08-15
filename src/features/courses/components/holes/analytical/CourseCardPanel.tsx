@@ -12,8 +12,8 @@
  *
  * BRIEF_COURSE_CARD_EVERY_TEE: the panel now holds EVERY tee set and shows one.
  * All of them sit beneath the headline as label / graded track / slope / yardage,
- * ordered hardest first, with the resolved tee at full opacity and the rest
- * faded. Tapping a row re-reads the whole panel and writes the same remembered
+ * ordered hardest first. Every bar carries its OWN slope's ramp stop; selection
+ * is marked structurally, never by colour or opacity. Tapping a row re-reads the whole panel and writes the same remembered
  * tee the sheet's pills do - ONE selection, owned by CourseCardPanel.
  *
  * BRIEF_COURSE_CARD_SHEET_VIBRANT: the SHEET now opens the way the panel opens -
@@ -280,8 +280,9 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
    is a convention at some clubs and meaningless at others, and this catalogue
    spans ten countries.
 
-   The resolved tee is at full opacity and the rest at 0.34 - that is what makes
-   the block a comparison rather than a list. */
+   BRIEF_COURSE_TAB_NO_FADED_COLOUR §3 replaced the old opacity treatment: every
+   row is fully legible, the bar means DIFFICULTY, and the selected row is marked
+   by a leading ink rule and a neutral wash. */
 /* 40px is the floor, not the rule: the rule is that every track starts on the
    same x. Where the catalogue maps several WHS courses onto one club the labels
    arrive composited ("Black - Himalayas") and 40px truncates them all to
@@ -405,8 +406,8 @@ const TeeList: React.FC<{
       );
   }, [tees]);
 
-  // ONE TEE ONLY (§6): no comparison to make, and one row at full opacity is
-  // just the headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
+  // ONE TEE ONLY (§6): no comparison to make, and a single row is just the
+  // headline repeated. IF NO TEE CARRIES A SLOPE (§5): no list at all -
   // a column of empty tracks is worse than the panel as it ships.
   if (tees.length < 2) return null;
   if (!showAll && !rows.some((r) => r.slope != null)) return null;
