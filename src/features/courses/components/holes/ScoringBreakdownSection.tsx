@@ -987,6 +987,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             const bi = form.bestIndex;
 
             const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
+            /** The fill carries the direction of travel, as on the index tile. */
+            const fillTone =
+              delta == null || Math.abs(delta) < 0.5 ? A.AMBER : delta > 0 ? A.IMPROVED : A.DRIFTED;
+
             return (
               <>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
