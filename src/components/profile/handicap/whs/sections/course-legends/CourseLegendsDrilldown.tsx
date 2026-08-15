@@ -260,6 +260,24 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
 
+  // Honours-board rows for the connect gate: every visible crown category in the
+  // board's own display order, with its rank-1 holder, value and attained date.
+  // No new query — this is the data the board already renders.
+  const honoursCrowns = useMemo(
+    () =>
+      visibleCategories.map((cat) => {
+        const champion = groupedWithTotals.get(cat)?.rows.find((r) => r.rank === 1) ?? null;
+        return {
+          key: cat,
+          label: legendCategoryLabel[cat],
+          holderName: champion ? champion.name : null,
+          valueDisplay: champion ? champion.valueDisplay : null,
+          attainedAt: champion?.attained_at ?? null,
+        };
+      }),
+    [visibleCategories, groupedWithTotals],
+  );
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Deep-link autoscroll: once the crown sections are painted, bring the
@@ -376,7 +394,20 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
 
-      <ChampionsInfoCarousel window={window} />
+      <ChampionsInfoCarousel
+        window={window}
+        courseName={ctx.courseName}
+        courseHeaderImage={courseHeaderImage}
+        boardSettled={!isLoading && !isError}
+        crowns={honoursCrowns}
+        figures={{
+          rounds: null,
+          avgToPar: meta?.avg_over_par != null
+            ? `${meta.avg_over_par > 0 ? '+' : ''}${meta.avg_over_par.toFixed(1)}`
+            : null,
+          harderThanPct: null,
+        }}
+      />
 
       {/* In-tab course search — always shown (synced + non-synced). Includes
           a small connect-WHS cue beneath for non-synced users. */}
