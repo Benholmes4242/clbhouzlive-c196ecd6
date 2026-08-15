@@ -406,16 +406,18 @@ const MONO_FIGURE: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0, "tnum" 1',
   letterSpacing: '-0.03em',
   fontWeight: 700,
-  fontSize: 13,
+  fontSize: 12,
   color: 'rgba(255,255,255,0.95)',
+  whiteSpace: 'nowrap',
 };
 
 const CELL_LABEL: React.CSSProperties = {
-  fontSize: 9.5,
+  fontSize: 8,
   fontWeight: 700,
   letterSpacing: '0.1em',
   textTransform: 'uppercase',
   color: 'rgba(255,255,255,0.7)',
+  whiteSpace: 'nowrap',
 };
 
 /** Round FIRST, then decide direction — otherwise -0.04 prints as "-0.0". */
@@ -427,7 +429,7 @@ const signedToPar = (raw: number): string => {
 };
 
 const HeroStatCell: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
     <span style={CELL_LABEL}>{label}</span>
     <span style={MONO_FIGURE}>{value}</span>
   </span>
@@ -522,8 +524,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             padding: '4px 8px',
             marginLeft: -8,
             border: 0,
-            gap: 6,
-            flexWrap: 'wrap',
+            gap: 4,
+            whiteSpace: 'nowrap',
           }}
         >
           {cells.map((cell, i) => (
