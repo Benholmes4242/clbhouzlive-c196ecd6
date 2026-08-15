@@ -70,7 +70,7 @@ export function HeroBoardBand({
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
-          padding: '12px 16px',
+          padding: '9px 16px',
           background: 'transparent',
           border: 'none',
           borderTop: `0.5px solid ${WHITE_ALPHA_10}`,
