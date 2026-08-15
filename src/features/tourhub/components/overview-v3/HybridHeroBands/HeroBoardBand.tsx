@@ -32,7 +32,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { FONT, CHARCOAL, WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
-import { useTournamentPredictions } from '../../../hooks/useTournamentPredictions';
+import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel } from './CourseShapePanel';
 import {
   fieldAverageToday,
@@ -146,7 +146,11 @@ export function HeroBoardSection({
    * Tournament Intelligence picks. NO NEW QUERY — the overview already makes
    * this call for TIPicksCarousel, so this is a cache read.
    */
-  const { data: predictions } = useTournamentPredictions(tournamentId);
+  // BRIEF SAID useTournamentPredictions().data.topContenders — that type has no
+  // topContenders (it exposes `predictions`). The overview's TI picks come from
+  // useAIPredictions(tournamentId), which TIPicksCarousel already calls with the
+  // same key, so this is a cache read and not a new query.
+  const { data: predictions } = useAIPredictions(tournamentId);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of (predictions?.topContenders ?? []) as any[]) {
