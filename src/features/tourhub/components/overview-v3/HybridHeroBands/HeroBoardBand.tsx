@@ -30,7 +30,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, AMBER, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
@@ -237,7 +237,7 @@ export function HeroBoardSection({
         >
           {t('overview.ticker.fullLeaderboard')}
         </span>
-        <ChevronRight size={14} color={AMBER} strokeWidth={2.5} />
+        <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
       </button>
 
       {hasStrip && (
@@ -246,7 +246,7 @@ export function HeroBoardSection({
             display: 'flex',
             gap: 10,
             padding: '12px 16px 16px',
-            background: HERO_BOARD_SURFACE_SOFT,
+            background: HERO_BOARD_SURFACE,
             borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           }}
         >
@@ -313,7 +313,7 @@ export function HeroBoardSection({
         </span>
         <ChevronDown
           size={14}
-          color={AMBER}
+          color="#FFFFFF"
           strokeWidth={2.5}
           style={{ transform: shapeOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
         />
