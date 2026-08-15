@@ -981,12 +981,11 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               const k = (v - form.best) / form.span;
               return k <= 0.33 ? A.GREEN : k <= 0.66 ? A.AMBER : A.RED;
             };
-            const segs = pts.slice(0, -1).map((p, i) => ({
-              d: monotonePath([p, pts[i + 1]]),
-              tone: zone((form.series[i] + form.series[i + 1]) / 2),
-              key: i,
-            }));
+            const line = monotonePath(pts);
+            /** Area under the curve, closed along the plot floor. */
+            const area = `${line} L ${pts[pts.length - 1].x} ${H} L ${pts[0].x} ${H} Z`;
             const bi = form.bestIndex;
+
             const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
             return (
               <>
