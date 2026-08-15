@@ -146,7 +146,18 @@
       "reachBirdies": "Hoyos con birdie aquí",
       "reachOf": "{{done}} de {{of}}",
       "reachChaseLevel": "Empatado con el titular",
-      "reachChaseGap": "a {{gap}}"
+      "reachChaseGap": "a {{gap}}",
+      "bogey": "BOGEY",
+      "third1": "Hoyos 1-6",
+      "third2": "Hoyos 7-12",
+      "third3": "Hoyos 13-18",
+      "holeOne": "Hoyo {{n}}",
+      "holeMany": "Hoyos {{list}}",
+      "nHoles_one": "{{count}} hoyo",
+      "nHoles_other": "{{count}} hoyos",
+      "parYouAvg": "Par {{par}} · promedias {{avg}}",
+      "s1Sub": "Ordenados por golpes perdidos, no por dificultad",
+      "moreRoundsHint": "Juega unas vueltas más aquí y te mostraremos los patrones."
     }
   },
   "scorecard": {

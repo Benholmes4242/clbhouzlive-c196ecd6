@@ -146,7 +146,18 @@
       "reachBirdies": "Löcher mit Birdie hier",
       "reachOf": "{{done}} von {{of}}",
       "reachChaseLevel": "Gleichstand mit dem Halter",
-      "reachChaseGap": "{{gap}} entfernt"
+      "reachChaseGap": "{{gap}} entfernt",
+      "bogey": "BOGEY",
+      "third1": "Löcher 1-6",
+      "third2": "Löcher 7-12",
+      "third3": "Löcher 13-18",
+      "holeOne": "Loch {{n}}",
+      "holeMany": "Löcher {{list}}",
+      "nHoles_one": "{{count}} Loch",
+      "nHoles_other": "{{count}} Löcher",
+      "parYouAvg": "Par {{par}} · du spielst {{avg}}",
+      "s1Sub": "Nach verlorenen Schlägen, nicht nach Schwierigkeit",
+      "moreRoundsHint": "Spiele hier ein paar Runden mehr und wir zeigen dir die Muster."
     }
   },
   "scorecard": {

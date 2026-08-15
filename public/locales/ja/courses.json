@@ -142,7 +142,18 @@
       "reachBirdies": "バーディーを取ったホール",
       "reachOf": "{{of}}中{{done}}",
       "reachChaseLevel": "保持者と同値",
-      "reachChaseGap": "{{gap}}差"
+      "reachChaseGap": "{{gap}}差",
+      "bogey": "ボギー",
+      "third1": "1-6番",
+      "third2": "7-12番",
+      "third3": "13-18番",
+      "holeOne": "{{n}}番",
+      "holeMany": "{{list}}番",
+      "nHoles_one": "{{count}}ホール",
+      "nHoles_other": "{{count}}ホール",
+      "parYouAvg": "パー{{par}} · 平均{{avg}}",
+      "s1Sub": "難易度ではなく、失った打数順",
+      "moreRoundsHint": "ここで数ラウンド重ねると傾向が見えてきます。"
     }
   },
   "scorecard": {

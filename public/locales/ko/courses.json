@@ -142,7 +142,18 @@
       "reachBirdies": "버디를 잡은 홀",
       "reachOf": "{{of}} 중 {{done}}",
       "reachChaseLevel": "보유자와 동일",
-      "reachChaseGap": "{{gap}} 차이"
+      "reachChaseGap": "{{gap}} 차이",
+      "bogey": "보기",
+      "third1": "1-6번 홀",
+      "third2": "7-12번 홀",
+      "third3": "13-18번 홀",
+      "holeOne": "{{n}}번 홀",
+      "holeMany": "{{list}}번 홀",
+      "nHoles_one": "{{count}}홀",
+      "nHoles_other": "{{count}}홀",
+      "parYouAvg": "파 {{par}} · 평균 {{avg}}",
+      "s1Sub": "난이도가 아니라 잃은 타수 순",
+      "moreRoundsHint": "이 코스에서 몇 라운드 더 치면 패턴을 보여드립니다."
     }
   },
   "scorecard": {
