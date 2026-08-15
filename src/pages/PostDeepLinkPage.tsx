@@ -173,17 +173,22 @@ const PostDeepLinkPage: React.FC = () => {
       });
 
       // Full FeedPost mapping for the authenticated fullscreen viewer
+      // COUNTS COME FROM THE POST ROW (§3.1). The notification path selected
+      // neither column and hardcoded zero, which is why a liked post opened
+      // from Activity showed an empty heart while the same post in the feed
+      // showed the count. The feed's own select already reads these.
       const activityPost: ActivityPost = {
         id: row.id,
         type: 'post',
         content: row.content ?? '',
-        likes: 0,
-        comments: 0,
-        shares: 0,
+        likes: row.like_count ?? 0,
+        comments: row.comment_count ?? 0,
+        shares: row.share_count ?? 0,
         timeAgo: '',
         created_at: row.created_at,
         course_id: row.course_id ?? null,
         source_review_id: row.source_review_id ?? null,
+
         isReview: !!row.source_review_id || row.post_type === 'review',
         rating: ratingRow?.rating ?? undefined,
         course: courseRow ? {
