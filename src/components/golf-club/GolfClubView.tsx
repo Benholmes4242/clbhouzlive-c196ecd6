@@ -411,11 +411,12 @@ const MONO_FIGURE: React.CSSProperties = {
 };
 
 const CELL_LABEL: React.CSSProperties = {
-  fontSize: 9.5,
+  fontSize: 8,
   fontWeight: 700,
   letterSpacing: '0.1em',
   textTransform: 'uppercase',
   color: 'rgba(255,255,255,0.7)',
+  whiteSpace: 'nowrap',
 };
 
 /** Round FIRST, then decide direction — otherwise -0.04 prints as "-0.0". */
