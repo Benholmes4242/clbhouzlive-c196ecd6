@@ -1,13 +1,21 @@
 /**
  * ConnectGhostPrompt — the persuasive connect-your-WHS-handicap prompt.
  *
- * Renders a blurred, decorative "ghost" of the section the user would unlock
- * (aria-hidden, pointer-events: none) with a promise block underneath: eyebrow
- * / headline / sub / amber CTA / footnote.
+ * THE RULE (BRIEF_CONNECT_GATE_HONOURS_BOARD, overturning the original blurred
+ * "ghost" design documented here before):
+ *
+ *  - THE PREVIEW IS REAL CONTENT, NEVER BLURRED. A tint or a blur is not a quiet
+ *    version of content, it is content made unreadable, and a blur cannot make a
+ *    reward concrete because nothing in it can be read.
+ *  - A SURFACE WITH NOTHING SHORT AND TRUE TO SHOW RENDERS NO PREVIEW AT ALL —
+ *    the promise block alone is a complete card. No placeholder, no decoration.
+ *  - THE AMBER IS GONE. Amber means the viewing member app-wide, and this card is
+ *    shown to somebody who is not on the board. The CTA is INK, matching the You
+ *    tab where the same action already renders in ink.
  *
  * Dismissal is per-surface via versioned localStorage keys (matching the
  * ChampionsInfoCarousel pattern, wrapped in try/catch). Once dismissed the
- * full card is replaced by a slim amber re-entry row.
+ * full card is replaced by a slim neutral re-entry row.
  *
  * Connected users must never see this — the parent decides render/no-render
  * based on useWhsConnection. This component assumes it should render.
@@ -16,24 +24,24 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const AMBER = '#F7931E';
 const INK = '#0F172A';
 const INK_60 = '#64748B';
 const INK_45 = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
-const AMBER_TINT_BG = 'rgba(247,147,30,0.10)';
-const AMBER_TINT_BORDER = 'rgba(247,147,30,0.20)';
-const AMBER_TEXT_DEEP = '#9A5B08';
+const NEUTRAL_BG = 'rgba(15,23,42,0.04)';
+const NEUTRAL_BORDER = 'rgba(15,23,42,0.10)';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export type ConnectGhostSurface = 'holes' | 'about' | 'profile' | 'champions';
 
 interface Props {
   surface: ConnectGhostSurface;
-  ghost: React.ReactNode;
+  /**
+   * A REAL, unblurred slice of the section being unlocked. When omitted the card
+   * renders the promise block alone — never a placeholder.
+   */
+  preview?: React.ReactNode;
   onConnect: () => void;
-  /** Extra blur amount if the surface's real components have heavy detail. */
-  blurPx?: number;
   /** Optional copy overrides. When omitted the surface i18n copy is used. */
   eyebrowOverride?: string;
   headlineOverride?: string;
@@ -54,9 +62,8 @@ const writeDismissed = (key: string) => {
 
 export const ConnectGhostPrompt: React.FC<Props> = ({
   surface,
-  ghost,
+  preview,
   onConnect,
-  blurPx = 5,
   eyebrowOverride,
   headlineOverride,
   bodyOverride,
@@ -88,8 +95,8 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
-            background: AMBER_TINT_BG,
-            border: `1px solid ${AMBER_TINT_BORDER}`,
+            background: NEUTRAL_BG,
+            border: `1px solid ${NEUTRAL_BORDER}`,
             borderRadius: 14,
             padding: '12px 14px',
             cursor: 'pointer',
@@ -97,10 +104,10 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             fontFamily: FONT,
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 700, color: AMBER_TEXT_DEEP, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {slimBenefit}
           </span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: AMBER, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>
             {t('connectGhost.slimCta')}
           </span>
         </button>
@@ -146,30 +153,18 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
         </button>
         )}
 
-        {/* Ghost preview — decorative, blurred, unreadable. */}
-        <div
-          aria-hidden="true"
-          style={{
-            filter: `blur(${blurPx}px)`,
-            opacity: 0.5,
-            userSelect: 'none',
-            pointerEvents: 'none',
-            padding: 16,
-            background: '#FFFFFF',
-          }}
-        >
-          {ghost}
-        </div>
+        {preview ? (
+          <div style={{ borderBottom: `1px solid ${HAIRLINE}` }}>{preview}</div>
+        ) : null}
 
         {/* Promise block */}
         <div
           style={{
-            borderTop: `1px solid ${HAIRLINE}`,
-            padding: '16px 16px 18px',
+            padding: '14px 16px 16px',
             background: '#FFFFFF',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: AMBER, marginBottom: 6 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: INK_60, marginBottom: 6 }}>
             {eyebrow}
           </div>
           <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: INK, lineHeight: 1.2 }}>
@@ -185,7 +180,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
               marginTop: 14,
               width: '100%',
               padding: '13px 0',
-              background: AMBER,
+              background: INK,
               color: '#FFFFFF',
               border: 'none',
               borderRadius: 13,
@@ -198,7 +193,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             {cta}
           </button>
           {footnote ? (
-            <div style={{ marginTop: 10, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.04em', color: INK_45, textAlign: 'center' }}>
+            <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', color: INK_60, textAlign: 'center' }}>
               {footnote}
             </div>
           ) : null}
