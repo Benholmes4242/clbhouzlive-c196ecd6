@@ -39,16 +39,12 @@ const SENTENCE: React.CSSProperties = {
   fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
 };
 
-/** Matches TrajectoryLine's field stroke exactly — one value, two places. */
-const FIELD_LINE_SWATCH = '#C3CAD2';
+/*
+ * The chart legend keys and FIELD_LINE_SWATCH are GONE
+ * (BRIEF_SCORECARD_TRAJECTORY_WHOOP §8): the field line is no longer drawn and
+ * the round stroke is graded per hole, so neither key had anything to name.
+ */
 
-/** One legend key: a swatch that matches the chart, then a 7.5/800 DIM label. */
-const LegendKey: React.FC<{ swatch: React.ReactNode; label: string }> = ({ swatch, label }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-    {swatch}
-    <span style={{ ...LABEL, fontSize: 7.5 }}>{label}</span>
-  </span>
-);
 
 /**
  * A PLAYER'S SCORE AGAINST PAR — under par is RED (good in golf), over par is
