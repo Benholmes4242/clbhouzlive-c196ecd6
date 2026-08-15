@@ -534,7 +534,11 @@ const TickRow: React.FC<{
           key={i}
           style={{
             position: 'absolute',
-            left: `${(frac * 100).toFixed(3)}%`,
+            /* The plot is FULL BLEED while this row keeps its 16px inset, so an
+               inset label resolves its x against the plot's width, not the row's. */
+            left: inset
+              ? `calc((100% + 32px) * ${frac.toFixed(5)} - 16px)`
+              : `${(frac * 100).toFixed(3)}%`,
             transform: edgeLeft ? 'none' : edgeRight ? 'translateX(-100%)' : 'translateX(-50%)',
             ...LABEL,
             ...FIGS,
