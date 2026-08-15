@@ -11,6 +11,7 @@ import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
+  CHARCOAL, WHITE_ALPHA_65, WHITE_ALPHA_55, WHITE_ALPHA_10,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -36,7 +37,21 @@ interface Props {
   limit?: number;
   /** Active round from sr_tournaments.current_round - scopes TODAY and THRU. */
   currentRound?: number | null;
+  /**
+   * Surface the board is drawn on. 'light' (default) keeps the tournament-page
+   * consumers pixel-identical; 'dark' maps every surface token to its dark
+   * counterpart for the photo-backed hero board. Same component, not a fork.
+   */
+  theme?: 'light' | 'dark';
+  /** Row tap hook (analytics). Fires before the scorecard sheet opens. */
+  onRowTap?: (playerId: string) => void;
 }
+
+/** Surface tokens per theme. INK has no named dark counterpart - plain white. */
+const THEME_TOKENS = {
+  light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
+  dark: { surface: CHARCOAL, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_55, hairline: WHITE_ALPHA_10, press: 'active:bg-white/[0.06]' },
+} as const;
 
 /**
  * Canonical scoring: fmtScore + getScoreColor(..., 'light') - the same helpers
@@ -57,22 +72,26 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'light', onRowTap }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
+  const T = THEME_TOKENS[theme];
+  // Dark hero board: an absent TODAY reads as an em dash (never a zero, never
+  // the previous round). Light board keeps its blank-cell doctrine.
+  const todayBlank = theme === 'dark' ? '\u2014' : BLANK;
 
 
   return (
     <>
-      <div style={{ background: SURFACE, fontFamily: FONT }}>
+      <div style={{ background: T.surface, fontFamily: FONT }}>
         <div
           style={{
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
-            borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+            borderBottom: `0.5px solid ${T.hairline}`,
             fontSize: 10, fontWeight: 700, letterSpacing: '0.10em',
-            color: INK_FAINT, textTransform: 'uppercase',
+            color: T.faint, textTransform: 'uppercase',
           }}
         >
           <div style={{ width: 34, flexShrink: 0 }}>{t('board.columns.pos')}</div>
@@ -94,7 +113,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
             <button
               key={r.id}
               type="button"
-              onClick={() => setTarget({
+              onClick={() => { onRowTap?.(r.player?.id ?? ''); setTarget({
                 playerId: r.player?.id ?? '',
                 playerName: r.player?.full_name ?? '',
                 countryCode: cc,
@@ -104,37 +123,37 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound }: Pr
                 today,
                 thru: r.thru ?? null,
                 status: r.status ?? null,
-              })}
+              }); }}
               style={{
                 display: 'flex', alignItems: 'center', width: '100%',
                 padding: '10px 16px',
-                borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
+                borderBottom: `0.5px solid ${T.hairline}`,
                 background: 'transparent', border: 'none',
                 borderLeft: 'none', borderRight: 'none', borderTop: 'none',
                 textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
               }}
-              className="active:bg-black/[0.03] transition-colors"
+              className={`${T.press} transition-colors`}
             >
-              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 34, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {posText}
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
                 {flag ? (
                   <span style={{ fontSize: 11, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>{flag}</span>
                 ) : cc ? (
-                  <span style={{ fontSize: 10, fontWeight: 700, color: INK_FAINT, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
                 ) : null}
-                <span style={{ fontSize: 13, fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: T.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.player?.full_name ?? BLANK}
                 </span>
               </div>
-              <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, 'light'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                {today == null ? BLANK : fmtScore(today)}
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                {today == null ? todayBlank : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, 'light'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme, theme === 'dark' && r.position === 1 ? 'leader' : 'standard'), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>

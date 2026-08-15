@@ -79,7 +79,10 @@
       "reasonDefault": "This event did not complete enough rounds for an official result."
     },
     "ticker": {
-      "top10Label": "TOP 10"
+      "top10Label": "TOP 10",
+      "showBoard": "順位表",
+      "hideBoard": "閉じる",
+      "fullLeaderboard": "リーダーボード全体"
     },
     "fieldStrength": {
       "eyebrow": "FIELD",

@@ -79,7 +79,10 @@
       "reasonDefault": "This event did not complete enough rounds for an official result."
     },
     "ticker": {
-      "top10Label": "TOP 10"
+      "top10Label": "TOP 10",
+      "showBoard": "순위표",
+      "hideBoard": "접기",
+      "fullLeaderboard": "전체 리더보드"
     },
     "fieldStrength": {
       "eyebrow": "FIELD",
