@@ -385,6 +385,7 @@ function PickScrimBand({
   padding = '12px 15px 11px',
   grabber = false,
   objectPosition = '50% 45%',
+  tone = 'light',
 }: {
   candidates: string[];
   children: React.ReactNode;
@@ -395,12 +396,19 @@ function PickScrimBand({
   /** Sheets carry their grabber ON the band, in white so it survives the photo. */
   grabber?: boolean;
   objectPosition?: string;
+  /**
+   * TONE — a variant, not a fork (same pattern as TrajectoryLine's `surface`).
+   * 'light' fades to the sheet's #FFFFFF and is what BOTH sheets use.
+   * 'dark' keeps the photograph and gives white text a floor; the TILE only.
+   */
+  tone?: 'light' | 'dark';
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
+  const dark = tone === 'dark';
   return (
     <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: dark ? 'rgba(10,14,10,0.55)' : 'rgba(15,23,42,0.10)' }} />
       {src ? (
         <img
           aria-hidden
@@ -421,11 +429,16 @@ function PickScrimBand({
       <div
         aria-hidden
         style={{
+          background: dark
+            ? // Starts at 0.12, NOT transparent — a bright sky needs a floor or
+              // the pick label at the top disappears.
+              'linear-gradient(180deg, rgba(10,14,10,0.12) 0%, rgba(10,14,10,0.50) 44%, rgba(10,14,10,0.92) 100%)'
+            : `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
         }}
       />
+
 
       {grabber ? (
         <div
