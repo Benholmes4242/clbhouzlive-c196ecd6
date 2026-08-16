@@ -1,15 +1,14 @@
 /**
- * BRIEF_MESSAGES_ECHO_PALETTE §2.6 — the photograph sits BEHIND THE HEADER ONLY.
- * It never runs behind the rows, because rows carry small type and a photograph
- * under twelve of them is noise, not context.
+ * BRIEF_MESSAGES_DARK §2.2 — THE IMAGE IS INFORMATION OR IT IS ABSENT.
  *
- * RESOLVER, AND WHAT IT COSTS (reported because the brief asks):
- *   1. A course the two of you have played together (thread header) — resolved
- *      by matching the shared round's course NAME against `gam_user_courses`,
- *      which the member already has loaded for Analytics/Echo.
- *   2. Otherwise the member's MOST PLAYED course — `gam_user_courses` row 0.
- *   3. No rounds anywhere — NO IMAGE. The near-black surface is the fallback,
- *      never a grey placeholder.
+ * WITHDRAWN FROM BRIEF_MESSAGES_ECHO_PALETTE §2.6: the most-played-course
+ * fallback, and the photograph on the inbox header. A picture of the member's
+ * own club behind a thread with someone they have never played is atmosphere,
+ * not information, so there is NO FALLBACK LEFT.
+ *
+ * WHAT REMAINS: a thread carries a photograph ONLY when there is a REAL SHARED
+ * COURSE — the venue the two of you actually played. Everything else gets the
+ * plain dark header.
  *
  * Zero new network calls: `gam_user_courses` (60s staleTime) and
  * `useCourseCardData` (30min staleTime, cache key SHARED with the clubhouse
@@ -17,8 +16,8 @@
  *
  * WHY NAME MATCHING: shared rounds come back with a whs_courses id, which is not
  * a golf_courses id, and the bridge table is not exposed to the client. The name
- * is what both sides agree on. A miss falls through to the most-played course,
- * which is still an honest photograph of the member's golf.
+ * is what both sides agree on. A MISS DRAWS NO PHOTOGRAPH — it does not fall
+ * through to another course.
  */
 
 import { useMemo } from 'react';
@@ -29,23 +28,25 @@ export interface MessagesStagePhoto {
   imageUrl: string | null;
   courseId: string | null;
   courseName: string | null;
-  /** False => draw the black surface, not a placeholder. */
-  hasAnyRounds: boolean;
 }
 
 function normalise(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
+/**
+ * @param sharedCourseName the course the two members actually played together.
+ *   Null/absent => no photograph, by design.
+ */
 export function useMessagesStagePhoto(
-  preferredCourseName?: string | null,
+  sharedCourseName?: string | null,
 ): MessagesStagePhoto {
   const { data: courses } = useUserAnalyticsCourses();
   const rows = courses ?? [];
 
-  const match = useMemo(() => {
-    if (!preferredCourseName) return null;
-    const target = normalise(preferredCourseName);
+  const chosen = useMemo(() => {
+    if (!sharedCourseName) return null;
+    const target = normalise(sharedCourseName);
     return (
       rows.find((r) => normalise(r.course_name) === target) ??
       rows.find(
@@ -55,18 +56,16 @@ export function useMessagesStagePhoto(
       ) ??
       null
     );
-  }, [rows, preferredCourseName]);
+  }, [rows, sharedCourseName]);
 
-  const chosen = match ?? rows[0] ?? null;
   const { data: card } = useCourseCardData(chosen?.course_id ?? null, !!chosen);
 
   return useMemo(
     () => ({
-      imageUrl: card?.thumbnailImage ?? null,
+      imageUrl: chosen ? card?.thumbnailImage ?? null : null,
       courseId: chosen?.course_id ?? null,
       courseName: chosen?.course_name ?? null,
-      hasAnyRounds: rows.length > 0,
     }),
-    [card?.thumbnailImage, chosen?.course_id, chosen?.course_name, rows.length],
+    [card?.thumbnailImage, chosen],
   );
 }
