@@ -15,6 +15,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { FIGURE } from '@/lib/tokens/type';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
