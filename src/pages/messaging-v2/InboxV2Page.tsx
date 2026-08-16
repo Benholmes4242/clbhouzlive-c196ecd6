@@ -1,11 +1,15 @@
 /**
- * BRIEF_MESSAGES_ECHO_PALETTE §1 / §2 — the inbox on Echo's palette.
+ * BRIEF_MESSAGES_DARK §2 / §4 — the inbox on the Clubhouse canvas (#05070A).
  *
- * The photograph sits behind the HEADER ONLY (§2.6). The rows run on the flat
- * near-black surface because twelve rows of small type over a photograph is
- * noise. Search appears at eight threads (§2.5). Threads with nothing said in
- * them are not rendered at all (§2.1).
+ * THE LIST CARRIES NO PHOTOGRAPH (§2.1, withdrawn from the previous brief). On
+ * Echo a photograph had a referent — the course being asked about. Here it had
+ * none: not the member's course, not the thread's course, just a picture behind
+ * a utility list. THE IMAGE IS INFORMATION OR IT IS ABSENT, NEVER ATMOSPHERE.
+ *
+ * Search appears at eight threads (§4.5). Threads with nothing said in them are
+ * not rendered at all (§4.1).
  */
+
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
