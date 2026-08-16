@@ -80,7 +80,8 @@
     "peopleAnd": "Search people and businesses",
     "prompt": "Search for someone to message.",
     "searching": "Searching…",
-    "threads": "Search conversations"
+    "threads": "Search conversations",
+    "noResultsHint": "Try a full name or a username."
   },
   "sheet": {
     "detailsTitle": "Details"
@@ -109,6 +110,10 @@
   },
   "compose": {
     "playedWith": "Played with",
-    "roundsTogether": "{{count}} rounds together"
+    "roundsTogether": "{{count}} rounds together",
+    "chooseSomeone": "Choose someone",
+    "oneSelected": "1 selected",
+    "nSelected": "{{count}} selected",
+    "nSelectedGroup": "{{count}} selected · group"
   }
 }

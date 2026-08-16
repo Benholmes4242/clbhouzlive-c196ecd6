@@ -80,7 +80,8 @@
     "peopleAnd": "Search people and businesses",
     "prompt": "Search for someone to message.",
     "searching": "Searching…",
-    "threads": "Unterhaltungen suchen"
+    "threads": "Unterhaltungen suchen",
+    "noResultsHint": "Versuche den vollen Namen oder einen Benutzernamen."
   },
   "sheet": {
     "detailsTitle": "Details"
@@ -109,6 +110,10 @@
   },
   "compose": {
     "playedWith": "Zusammen gespielt",
-    "roundsTogether": "{{count}} Runden zusammen"
+    "roundsTogether": "{{count}} Runden zusammen",
+    "chooseSomeone": "Jemanden auswählen",
+    "oneSelected": "1 ausgewählt",
+    "nSelected": "{{count}} ausgewählt",
+    "nSelectedGroup": "{{count}} ausgewählt · Gruppe"
   }
 }
