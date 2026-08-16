@@ -531,14 +531,23 @@ function CourseFitLine({ score, t }: { score: number | null | undefined; t: TFun
 
 // ---- Sheet shell ----
 
+/**
+ * SheetShell — shared by BOTH TI sheets and by nothing else (checked). The
+ * `scrim` prop is optional and OFF by default: when present the header rides a
+ * scrim band, the grabber moves onto it in white, and the sheet surface becomes
+ * #FFFFFF so the gradient lands on the sheet's OWN white with no seam. Without
+ * it the shell behaves exactly as before on V4.bg.
+ */
 function SheetShell({
   onClose,
   header,
   children,
+  scrim,
 }: {
   onClose: () => void;
   header?: React.ReactNode;
   children: React.ReactNode;
+  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string };
 }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
@@ -549,7 +558,7 @@ function SheetShell({
           left: 0,
           right: 0,
           bottom: 0,
-          background: V4.bg,
+          background: scrim ? '#FFFFFF' : V4.bg,
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
           height: 'auto',
@@ -560,10 +569,25 @@ function SheetShell({
           overflow: 'hidden',
         }}
       >
-        <div style={{ flexShrink: 0, padding: '10px 20px 0' }}>
-          <div style={{ width: 36, height: 4, background: HAIR, borderRadius: 999, margin: '4px auto 14px' }} />
-          {header}
-        </div>
+        {scrim ? (
+          <div style={{ flexShrink: 0 }}>
+            <PickScrimBand
+              candidates={scrim.candidates}
+              minHeight={scrim.minHeight}
+              fadeStart={scrim.fadeStart ?? 23}
+              objectPosition={scrim.objectPosition}
+              padding="14px 20px 12px"
+              grabber
+            >
+              {header}
+            </PickScrimBand>
+          </div>
+        ) : (
+          <div style={{ flexShrink: 0, padding: '10px 20px 0' }}>
+            <div style={{ width: 36, height: 4, background: HAIR, borderRadius: 999, margin: '4px auto 14px' }} />
+            {header}
+          </div>
+        )}
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '0 20px 30px' }}>
           {children}
         </div>
@@ -571,6 +595,7 @@ function SheetShell({
     </div>
   );
 }
+
 
 // ---- Case sheet ----
 
