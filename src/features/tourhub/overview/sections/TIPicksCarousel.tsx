@@ -125,6 +125,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
     live: state === 'live',
   });
 
+  // Every scrim band on this section carries the tournament venue photograph.
+  const venueImageUrl = useTournamentVenueImage(tournamentId);
+  const scrimCandidates = useMemo(() => (venueImageUrl ? [venueImageUrl] : []), [venueImageUrl]);
+
   const show = !!tournamentId && picks.length > 0;
   const settled = state === 'completed';
 
@@ -175,7 +179,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 const live = liveMap?.[p.playerId];
                 const v = settled ? tiVerdict(live) : { kind: 'none' as const, label: null, score: null };
                 const isWin = v.kind === 'win';
-                // ONE resolution for both the avatar and the band behind it.
+                // The headshot is the AVATAR only — it never feeds the scrim.
                 const headshots = p.photoUrl
                   ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
                   : getPlayerHeadshotCandidates(p.playerName, tourCode);
@@ -199,10 +203,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       cursor: 'pointer',
                     }}
                   >
-                    {/* THE SCRIM BAND — the hero's move, at tile scale. The photo
-                        is atmosphere; the avatar is still the identity. The fade
+                    {/* THE SCRIM BAND — the hero's move, at tile scale. All three
+                        tiles carry the SAME venue photograph: they are three picks
+                        for one tournament, and the repetition is what ties the
+                        section to the page. The avatar is the identity. The fade
                         ENDS ON #FFFFFF, the tile's own white, so there is no seam. */}
-                    <PickScrimBand candidates={headshots}>
+                    <PickScrimBand candidates={scrimCandidates}>
                       <div
                         style={{
                           display: 'flex',
@@ -330,6 +336,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             {sheet?.kind === 'case' ? (
               <CaseSheet
                 pick={sheet.pick}
+                tournamentId={tournamentId}
                 state={state}
                 live={liveMap?.[sheet.pick.playerId]}
                 tourCode={tourCode}
@@ -342,6 +349,23 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
       )}
     </AnimatePresence>
   );
+}
+
+/**
+ * useTournamentVenueImage — the ONE scrim source for Tournament Intelligence.
+ * Every band (tiles, case sheet, board sheet) carries the tournament's venue
+ * photograph, the same image the hero uses. No headshot ever feeds a scrim:
+ * a face is not atmosphere. Returns null when nothing resolves, and the band
+ * then paints the gradient alone at the same height.
+ */
+function useTournamentVenueImage(tournamentId: string | undefined) {
+  const { data: tournament } = useTourTournament(tournamentId ?? '');
+  const venueAdapter = useMemo(
+    () => (tournament?.venue_name ? [{ venue_name: tournament.venue_name } as TourTournament] : []),
+    [tournament?.venue_name]
+  );
+  const { data: imageMap } = useBatchCourseImages(venueAdapter);
+  return tournament?.venue_name ? imageMap?.get(tournament.venue_name) ?? null : null;
 }
 
 /**
@@ -360,8 +384,7 @@ function PickScrimBand({
   fadeStart = 26,
   padding = '12px 15px 11px',
   grabber = false,
-  objectPosition = '50% 12%',
-  treatment = 'portrait',
+  objectPosition = '50% 45%',
 }: {
   candidates: string[];
   children: React.ReactNode;
@@ -372,16 +395,9 @@ function PickScrimBand({
   /** Sheets carry their grabber ON the band, in white so it survives the photo. */
   grabber?: boolean;
   objectPosition?: string;
-  /**
-   * 'portrait' — a HEADSHOT. A face cannot be atmosphere: it is blurred and
-   * darkened so only the player's colour and texture carry the band.
-   * 'scene' — a landscape/venue photograph, atmospheric by nature: unblurred.
-   */
-  treatment?: 'portrait' | 'scene';
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
-  const portrait = treatment === 'portrait';
   return (
     <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
@@ -398,16 +414,9 @@ function PickScrimBand({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: portrait ? '50% 30%' : objectPosition,
-            // A headshot blurs out of recognition — no croppable subject, so it
-            // cannot be cut badly at any viewport. Scale hides the blur's edges.
-            filter: portrait ? 'blur(20px) saturate(150%)' : undefined,
-            transform: portrait ? 'scale(1.25)' : undefined,
+            objectPosition,
           }}
         />
-      ) : null}
-      {portrait && src ? (
-        <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(12,17,26,0.34)' }} />
       ) : null}
       <div
         aria-hidden
@@ -565,7 +574,7 @@ function SheetShell({
   onClose: () => void;
   header?: React.ReactNode;
   children: React.ReactNode;
-  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string; treatment?: 'portrait' | 'scene' };
+  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string };
 }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
@@ -594,7 +603,6 @@ function SheetShell({
               minHeight={scrim.minHeight}
               fadeStart={scrim.fadeStart ?? 23}
               objectPosition={scrim.objectPosition}
-              treatment={scrim.treatment ?? 'portrait'}
               padding="14px 20px 12px"
               grabber
             >
@@ -620,6 +628,7 @@ function SheetShell({
 
 function CaseSheet({
   pick,
+  tournamentId,
   state,
   live,
   tourCode,
@@ -627,6 +636,7 @@ function CaseSheet({
   onNavigatePlayer,
 }: {
   pick: AITopContender;
+  tournamentId: string | undefined;
   state: EventState;
   live: PickLiveState | undefined;
   tourCode: string;
@@ -644,10 +654,13 @@ function CaseSheet({
   const winsValue = typeof stats?.wins === 'number' ? stats.wins : seasonSummary?.wins;
   const top10sValue = typeof stats?.top_10s === 'number' ? stats.top_10s : seasonSummary?.top10s;
 
-  // ONE resolution for the avatar and for the band behind it.
+  // The headshot is the AVATAR only — it never feeds the scrim.
   const headshots = pick.photoUrl
     ? [pick.photoUrl, ...getPlayerHeadshotCandidates(pick.playerName, tourCode)]
     : getPlayerHeadshotCandidates(pick.playerName, tourCode);
+
+  const venueImageUrl = useTournamentVenueImage(tournamentId);
+  const caseScrim = useMemo(() => (venueImageUrl ? [venueImageUrl] : []), [venueImageUrl]);
 
   const headScore = live?.score ?? null;
 
@@ -723,7 +736,7 @@ function CaseSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, treatment: 'portrait' }}
+      scrim={{ candidates: caseScrim, minHeight: 168, fadeStart: 23 }}
     >
 
       {/* Verdict banner — the score lives in the HEAD, beside the name, so the
@@ -1199,13 +1212,7 @@ function AllPicksSheet({
   // The board is about THREE picks: leading it with one player's face would say
   // it is about him. It carries the TOURNAMENT COURSE image — the same
   // photograph the hero uses — or the gradient alone when none resolves.
-  const { data: tournament } = useTourTournament(tournamentId ?? '');
-  const venueAdapter = useMemo(
-    () => (tournament?.venue_name ? [{ venue_name: tournament.venue_name } as TourTournament] : []),
-    [tournament?.venue_name]
-  );
-  const { data: imageMap } = useBatchCourseImages(venueAdapter);
-  const venueImageUrl = tournament?.venue_name ? imageMap?.get(tournament.venue_name) ?? null : null;
+  const venueImageUrl = useTournamentVenueImage(tournamentId ?? undefined);
   const scrimCandidates = venueImageUrl ? [venueImageUrl] : [];
 
   const header = (
@@ -1254,7 +1261,7 @@ function AllPicksSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, treatment: 'scene', objectPosition: '50% 45%' }}
+      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18 }}
 
     >
       <div style={{ marginTop: 2 }}>
