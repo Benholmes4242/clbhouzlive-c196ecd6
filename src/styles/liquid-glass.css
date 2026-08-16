@@ -47,25 +47,39 @@
 }
 
 /* ============================================================================
-   STANDOUT FIGURE CHIP (BRIEF_STANDOUT_TILE_MARGIN §5a)
-   The figure chip on Standout Rounds / Personal Bests tiles, matched to the
-   friends rail's glass score chip. The FLAT, higher-opacity fill is the BASE —
-   backdrop-filter is the enhancement, because it is the property most likely
-   to no-op on the Median WebView and the chip sits over a photograph where
-   unreadable is the failure mode.
+   STANDOUT FIGURE CHIP (BRIEF_STANDOUT_TILE_MARGIN §5a, BRIEF_GLASS_BADGES_DARK)
+   The figure chip on Standout Rounds / Personal Bests tiles, the moment
+   duration badge and the CREATOR badge all render this one class.
+
+   DARK IN BOTH BRANCHES, like .otw-panel. The FLAT, higher-opacity fill is the
+   BASE — backdrop-filter is the enhancement, because it is the property most
+   likely to no-op on the Median WebView and the chip sits over a photograph
+   where unreadable is the failure mode. It used to be dark in the base and
+   WHITE under @supports, i.e. the blurred case — the one that can afford the
+   most — carried the riskiest colour, and since iOS supports the property that
+   was the only variant members ever saw.
+
+   THE RULE IS NOT A BLANKET ONE: a NEUTRAL figure on photography takes dark
+   glass. A COLOUR-CARRYING band chip (ReviewTile's rated score, where the
+   green/amber/red hue is what dies on a photo) may still need white glass —
+   do not sweep the two together.
+
+   The white border stays: it is the edge that makes this read as glass rather
+   than a flat plate, and it is what keeps the chip visible on a dark photo.
    ============================================================================ */
 .standout-figure-chip {
-  background: rgba(24, 30, 26, 0.46);
+  background: rgba(24, 30, 26, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .standout-figure-chip {
-    background: rgba(255, 255, 255, 0.17);
+    background: rgba(24, 30, 26, 0.4);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
 
 /* ============================================================================
    ON TOUR THIS WEEK — DARK GLASS PANEL + LOCKSTEP TICKER

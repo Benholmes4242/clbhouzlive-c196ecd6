@@ -289,7 +289,6 @@ export function MomentTile({
                   padding: '2px 5px',
                   letterSpacing: 0,
                   fontVariantNumeric: 'tabular-nums lining-nums',
-                  textShadow: '0 1px 2px rgba(10,14,10,0.5)',
                   pointerEvents: 'none',
                 }}
               >

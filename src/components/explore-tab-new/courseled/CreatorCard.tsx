@@ -101,9 +101,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
             textTransform: 'uppercase',
             borderRadius: 4,
             padding: '3px 5px',
-            /* The glass fill is a light tint, so white needs its own floor over
-               a bright frame — same treatment as the figure chip. */
-            textShadow: '0 1px 2px rgba(10,14,10,0.55)',
+            /* Dark glass now (BRIEF_GLASS_BADGES_DARK) — no shadow floor. */
           }}
         >
           {t('discover.creator.chip', 'Creator')}
