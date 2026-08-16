@@ -56,19 +56,10 @@ async function fetchPlayedWith(userId: string): Promise<PlayedWithMember[]> {
   if (partnerIds.length === 0) return [];
 
   const { data: profiles, error: profErr } = await supabase
-    .from('profiles')
+    .from('user_profiles')
     .select('id, display_name, username, avatar_url, verified')
     .in('id', partnerIds);
   if (profErr) throw profErr;
-
-  // The viewer's own rounds are enough to say WHERE and WHEN for each partner:
-  // the most recent round they share is by definition a round the viewer played.
-  const { data: recent } = await supabase
-    .from('whs_scores')
-    .select('play_date, course_id, whs_courses(name)')
-    .order('play_date', { ascending: false })
-    .limit(1);
-  void recent; // per-partner context comes from the shared-round detail fetch.
 
   const byId = new Map(
     (profiles ?? []).map((p) => [
