@@ -69,14 +69,16 @@ function StatCell({
   value,
   color,
   sub,
+  align = 'left',
 }: {
   label: string;
   value: string;
   color?: string;
   sub?: string | null;
+  align?: 'left' | 'center' | 'right';
 }) {
   return (
-    <div style={{ flex: '1 1 0', minWidth: 0, textAlign: 'left' }}>
+    <div style={{ flex: '1 1 0', minWidth: 0, textAlign: align }}>
       <div
         style={{
           fontSize: 7.5,
