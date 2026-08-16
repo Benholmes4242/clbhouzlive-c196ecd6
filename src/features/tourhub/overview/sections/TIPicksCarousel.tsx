@@ -46,6 +46,10 @@ const RED_TX = '#B91C1C';
 const GOLD_BG = 'linear-gradient(135deg,#FDE68A 0%,#F7931E 100%)';
 const GOLD_TX = '#7C4A03';
 const GOLD_RING = 'rgba(247,147,30,0.45)';
+/** The winning-pick ring on the DARK band: 0.45 amber disappears over a photo,
+ *  so the dark tone takes near-solid amber gold at full strength. */
+const GOLD_RING_STRONG = 'rgba(250,176,74,0.95)';
+
 const GOLD_SHADOW = '0 2px 12px rgba(247,147,30,0.18)';
 const NEUTRAL_BG = 'rgba(15,23,42,0.06)';
 const FIT_TRACK = 'rgba(15,23,42,0.07)';
