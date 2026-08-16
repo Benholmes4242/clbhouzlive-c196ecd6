@@ -429,7 +429,17 @@ export default tseslint.config(
     rules: {
       "querykeys/no-array-derived-key": "warn",
     },
+  },
+  // ─── SETTLED-STATE GUARD — warn today, error once the sweep clears ────────
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/**/*.test.{ts,tsx}", "src/test/**", "src/mocks/**"],
+    plugins: { settled: settledPlugin },
+    rules: {
+      "settled/no-not-loading-empty-check": "warn",
+    },
   }
+
 
 );
 
