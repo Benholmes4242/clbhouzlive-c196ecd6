@@ -25,7 +25,8 @@ import { TOPAR_UNDER_LIGHT } from '../../_shared/tokens';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
-import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
+import { useSinglePlayerStatistics, useTourTournament, type TourTournament } from '../../hooks/useTourHubData';
+import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -316,6 +317,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             {sheet?.kind === 'index' ? (
               <AllPicksSheet
                 picks={picks}
+                tournamentId={tournamentId}
                 state={state}
                 tourCode={tourCode}
                 liveMap={liveMap}
@@ -359,6 +361,7 @@ function PickScrimBand({
   padding = '12px 15px 11px',
   grabber = false,
   objectPosition = '50% 12%',
+  treatment = 'portrait',
 }: {
   candidates: string[];
   children: React.ReactNode;
@@ -369,9 +372,16 @@ function PickScrimBand({
   /** Sheets carry their grabber ON the band, in white so it survives the photo. */
   grabber?: boolean;
   objectPosition?: string;
+  /**
+   * 'portrait' — a HEADSHOT. A face cannot be atmosphere: it is blurred and
+   * darkened so only the player's colour and texture carry the band.
+   * 'scene' — a landscape/venue photograph, atmospheric by nature: unblurred.
+   */
+  treatment?: 'portrait' | 'scene';
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
+  const portrait = treatment === 'portrait';
   return (
     <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
@@ -388,11 +398,16 @@ function PickScrimBand({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            // A headshot is a portrait crop in a wide band: bias to the TOP so
-            // the face is never cut at the chin.
-            objectPosition,
+            objectPosition: portrait ? '50% 30%' : objectPosition,
+            // A headshot blurs out of recognition — no croppable subject, so it
+            // cannot be cut badly at any viewport. Scale hides the blur's edges.
+            filter: portrait ? 'blur(20px) saturate(150%)' : undefined,
+            transform: portrait ? 'scale(1.25)' : undefined,
           }}
         />
+      ) : null}
+      {portrait && src ? (
+        <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(12,17,26,0.34)' }} />
       ) : null}
       <div
         aria-hidden
@@ -402,6 +417,7 @@ function PickScrimBand({
           background: `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
         }}
       />
+
       {grabber ? (
         <div
           aria-hidden
@@ -549,7 +565,7 @@ function SheetShell({
   onClose: () => void;
   header?: React.ReactNode;
   children: React.ReactNode;
-  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string };
+  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string; treatment?: 'portrait' | 'scene' };
 }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
@@ -578,6 +594,7 @@ function SheetShell({
               minHeight={scrim.minHeight}
               fadeStart={scrim.fadeStart ?? 23}
               objectPosition={scrim.objectPosition}
+              treatment={scrim.treatment ?? 'portrait'}
               padding="14px 20px 12px"
               grabber
             >
@@ -646,7 +663,7 @@ function CaseSheet({
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {t('overview.tiPicks.case.eyebrowPick', { n: pick.rank })}
+        {t('overview.tiPicks.case.eyebrow')}
       </span>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
         <div
@@ -706,11 +723,12 @@ function CaseSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, objectPosition: '50% 14%' }}
+      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, treatment: 'portrait' }}
     >
 
-      {/* Verdict banner */}
-      <VerdictBanner v={v} state={state} live={live} t={t} />
+      {/* Verdict banner — the score lives in the HEAD, beside the name, so the
+          banner carries only what the head does not: position and THRU. */}
+      <VerdictBanner v={v} state={state} live={live} t={t} hideScore={headScore != null} />
 
       {/* Course fit meter */}
       {pick.courseFitScore != null && (
@@ -756,7 +774,7 @@ function CaseSheet({
             marginBottom: 10,
           }}
         >
-          {t('overview.tiPicks.case.whyPicked')}
+          {t('overview.tiPicks.case.whyWePicked')}
         </div>
         {(pick.reasons ?? []).map((r, i) => (
           <div
@@ -871,11 +889,14 @@ function VerdictBanner({
   state,
   live,
   t,
+  hideScore = false,
 }: {
   v: TiVerdict;
   state: EventState;
   live: PickLiveState | undefined;
   t: TFunction;
+  /** The head already carries the score: the banner must not repeat it. */
+  hideScore?: boolean;
 }) {
   const settled = state === 'completed';
   if (!settled && state !== 'live') return null;
@@ -883,6 +904,13 @@ function VerdictBanner({
   // In progress → neutral banner (only when we have a row)
   if (!settled) {
     if (!live || live.position == null) return null;
+    const posText = `${live.positionTied ? 'T' : ''}${live.position}`;
+    const thruLabel =
+      live.thru == null
+        ? null
+        : live.thru >= 18
+          ? t('overview.status.finished')
+          : t('overview.status.thru', { n: live.thru });
     return (
       <div
         style={{
@@ -895,27 +923,51 @@ function VerdictBanner({
           gap: 12,
         }}
       >
-        {/* No "ON THE COURSE" label — the position, score and thru say it. */}
-        <TourStatusBlock
-          score={live.score}
-          position={live.position}
-          positionTied={live.positionTied}
-          thru={live.thru}
-          status={live.status}
-          align="right"
-        />
+        {hideScore ? (
+          // POSITION and THRU only — the score sits beside the name above.
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 17, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+              {posText}
+            </span>
+            {thruLabel ? (
+              <span
+                style={{
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: INK_45,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {thruLabel}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          /* No "ON THE COURSE" label — the position, score and thru say it. */
+          <TourStatusBlock
+            score={live.score}
+            position={live.position}
+            positionTied={live.positionTied}
+            thru={live.thru}
+            status={live.status}
+            align="right"
+          />
+        )}
       </div>
     );
   }
 
   // Settled — the OUTCOME, never the word "Finished".
   if (v.kind === 'none') return null;
+  const scoreRight = (text: string) => (hideScore ? '' : text);
   if (v.kind === 'win') {
     return (
       <BannerRow
         left={t('overview.tiPicks.case.wonIt')}
         leftColor={GOLD_TX}
-        right={`${t('overview.tiPicks.verdict.won')}${v.score != null ? ` · ${v.score}` : ''}`}
+        right={scoreRight(`${t('overview.tiPicks.verdict.won')}${v.score != null ? ` · ${v.score}` : ''}`)}
         rightColor={GOLD_TX}
         background={GOLD_BG}
       />
@@ -926,7 +978,7 @@ function VerdictBanner({
       <BannerRow
         left={v.label ?? ''}
         leftColor={GREEN_TX}
-        right={v.score != null ? String(v.score) : ''}
+        right={scoreRight(v.score != null ? String(v.score) : '')}
         rightColor={GREEN_TX}
         background={GREEN_BG}
       />
@@ -936,12 +988,13 @@ function VerdictBanner({
     <BannerRow
       left={v.kind === 'mc' ? (v.label ?? 'MC') : (v.label ?? '')}
       leftColor={RED_TX}
-      right={v.kind === 'mc' ? '' : v.score != null ? String(v.score) : ''}
+      right={v.kind === 'mc' ? '' : scoreRight(v.score != null ? String(v.score) : '')}
       rightColor={RED_TX}
       background={RED_BG}
     />
   );
 }
+
 
 
 
@@ -1113,6 +1166,7 @@ function AllPicksSheet({
   picks,
   state,
   tourCode,
+  tournamentId,
   liveMap,
   onPick,
   onClose,
@@ -1121,6 +1175,7 @@ function AllPicksSheet({
   picks: AITopContender[];
   state: EventState;
   tourCode: string;
+  tournamentId: string | undefined;
   liveMap: Record<string, PickLiveState> | undefined;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
@@ -1141,14 +1196,17 @@ function AllPicksSheet({
   const showRecord = settled && total > 0;
   const recordGood = insideCount >= Math.ceil(total / 2);
 
-  // The board's scrim carries the leading pick's headshot — the same photo the
-  // tile opened with, so the sheet reads as that section swelling upward.
-  const lead = ordered[0];
-  const scrimCandidates = lead
-    ? lead.photoUrl
-      ? [lead.photoUrl, ...getPlayerHeadshotCandidates(lead.playerName, tourCode)]
-      : getPlayerHeadshotCandidates(lead.playerName, tourCode)
-    : [];
+  // The board is about THREE picks: leading it with one player's face would say
+  // it is about him. It carries the TOURNAMENT COURSE image — the same
+  // photograph the hero uses — or the gradient alone when none resolves.
+  const { data: tournament } = useTourTournament(tournamentId ?? '');
+  const venueAdapter = useMemo(
+    () => (tournament?.venue_name ? [{ venue_name: tournament.venue_name } as TourTournament] : []),
+    [tournament?.venue_name]
+  );
+  const { data: imageMap } = useBatchCourseImages(venueAdapter);
+  const venueImageUrl = tournament?.venue_name ? imageMap?.get(tournament.venue_name) ?? null : null;
+  const scrimCandidates = venueImageUrl ? [venueImageUrl] : [];
 
   const header = (
     <>
@@ -1165,11 +1223,11 @@ function AllPicksSheet({
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {t('overview.tiPicks.board.eyebrow', { n: total })}
+          {t('overview.tiPicks.eyebrow')}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontSize: 25, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.02 }}>
-            {t('overview.tiPicks.board.title')}
+            {t('overview.tiPicks.board.titleCount', { count: total })}
           </div>
           {showRecord ? (
             <span
@@ -1196,7 +1254,8 @@ function AllPicksSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, objectPosition: '50% 14%' }}
+      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, treatment: 'scene', objectPosition: '50% 45%' }}
+
     >
       <div style={{ marginTop: 2 }}>
         {ordered.map((p, i) => {
