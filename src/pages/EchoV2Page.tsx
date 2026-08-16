@@ -39,6 +39,7 @@ import {
   Asked,
   Basis,
   ChartCard,
+  AnswerText,
   Follow,
   Prose,
   Says,
@@ -258,9 +259,7 @@ const EchoV2Page: React.FC = () => {
             ) : (
               <Says key={m.id}>
                 {splitBlocks(m.content).map((b, i) => (
-                  <Prose key={i} first={i === 0}>
-                    {b}
-                  </Prose>
+                  <AnswerText key={i} text={b} first={i === 0} />
                 ))}
               </Says>
             ),
@@ -280,7 +279,7 @@ const EchoV2Page: React.FC = () => {
 
           {!thinking && state.streaming && latest.text && (
             <Says>
-              <Prose first>{lead}</Prose>
+              <AnswerText text={lead} first />
 
               {courseChart && (
                 <>
@@ -320,7 +319,7 @@ const EchoV2Page: React.FC = () => {
               )}
 
               {rest.map((b, i) => (
-                <Prose key={i}>{b}</Prose>
+                <AnswerText key={i} text={b} />
               ))}
             </Says>
           )}

@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { EC, T } from '../tokens';
+import { parseEchoMarkdown, type Span } from '../lib/echoMarkdown';
 import { EchoWaveform } from './EchoWaveform';
 
 export const Asked: React.FC<{ q: string }> = ({ q }) => (
@@ -78,6 +79,84 @@ export const Basis: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 export const Prose: React.FC<{ children: React.ReactNode; first?: boolean }> = ({ children, first }) => (
   <div style={{ ...T.BODY, marginTop: first ? 0 : 14, whiteSpace: 'pre-wrap' }}>{children}</div>
+);
+
+/**
+ * §1 (markdown correction) — ECHO'S OWN MARKDOWN, NOT A LIBRARY'S.
+ *
+ * The model returns markdown; we render the four constructs we have a design
+ * for and STRIP the rest (see lib/echoMarkdown). Bold is WEIGHT in the brighter
+ * ink tier, never a colour change. `##` is the app's LABEL — a section marker
+ * inside an answer, not a title, so it never takes the DISPLAY scale.
+ */
+export const AnswerText: React.FC<{ text: string; first?: boolean }> = ({ text, first }) => {
+  const blocks = React.useMemo(() => parseEchoMarkdown(text), [text]);
+  if (blocks.length === 0) return null;
+
+  return (
+    <>
+      {blocks.map((b, i) => {
+        const top = i === 0 ? (first ? 0 : 14) : b.kind === 'h' ? 20 : 12;
+        if (b.kind === 'h') {
+          return (
+            <div key={i} style={{ ...T.LABEL, marginTop: top, marginBottom: 2 }}>
+              {b.text}
+            </div>
+          );
+        }
+        if (b.kind === 'ul') {
+          return (
+            <div key={i} style={{ ...T.BODY, marginTop: top, display: 'grid', gap: 6 }}>
+              {b.items.map((it, j) => (
+                <div key={j} style={{ display: 'flex', gap: 9, alignItems: 'baseline' }}>
+                  <span
+                    aria-hidden
+                    style={
+                      it.marker
+                        ? { flex: '0 0 auto', color: EC.INK_3, fontWeight: 700, fontSize: 13 }
+                        : {
+                            flex: '0 0 auto',
+                            width: 4,
+                            height: 4,
+                            borderRadius: 2,
+                            background: EC.INK_3,
+                            transform: 'translateY(-3px)',
+                          }
+                    }
+                  >
+                    {it.marker ? `${it.marker}.` : ''}
+                  </span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <Spans spans={it.spans} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          );
+        }
+        return (
+          <div key={i} style={{ ...T.BODY, marginTop: top }}>
+            <Spans spans={b.spans} />
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+/** Bold is weight 700 in the brighter tier. NOT a colour change of its own. */
+const Spans: React.FC<{ spans: Span[] }> = ({ spans }) => (
+  <>
+    {spans.map((s, i) =>
+      s.bold ? (
+        <strong key={i} style={{ fontWeight: 700, color: EC.INK }}>
+          {s.text}
+        </strong>
+      ) : (
+        <React.Fragment key={i}>{s.text}</React.Fragment>
+      ),
+    )}
+  </>
 );
 
 export const Follow: React.FC<{ items: string[]; onPick: (t: string) => void }> = ({ items, onPick }) => (

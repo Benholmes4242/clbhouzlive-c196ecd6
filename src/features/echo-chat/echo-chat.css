@@ -81,14 +81,19 @@
 
 /* IT MUST NOT CLIP. The mark computes its own width in the component; here we
    only guarantee nothing squeezes or hides it. */
+/* §2 THE MARK MUST NOT CLIP. flex-shrink: 0 on the mark AND on every bar, and
+   !important because any ancestor rule using the `flex` shorthand would
+   otherwise reset shrink back to 1 and clip the right-hand bar. */
 .ec-wave {
   display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
   overflow: visible;
 }
 .ec-wave-bar {
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
+  flex-grow: 0;
+  min-width: 2px;
   transform-origin: center;
 }
 /* IT ANIMATES ONLY WHILE THINKING. */
