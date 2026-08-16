@@ -492,12 +492,13 @@ const ThreadV2Page: React.FC = () => {
             <button
               type="button"
               onClick={() => refetch()}
-              className="rounded-full"
+              className="rounded-full ec-glass--pill"
               style={{
-                background: AMBER,
-                color: '#FFFFFF',
+                /* §6 AMBER IS THE VIEWING MEMBER — not a retry button. */
+                color: INK,
                 fontSize: 14,
-                fontWeight: 500,
+                fontWeight: 600,
+
                 padding: '8px 20px',
                 border: 'none',
               }}
