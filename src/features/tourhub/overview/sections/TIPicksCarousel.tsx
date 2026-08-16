@@ -203,12 +203,19 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       cursor: 'pointer',
                     }}
                   >
-                    {/* THE SCRIM BAND — the hero's move, at tile scale. All three
-                        tiles carry the SAME venue photograph: they are three picks
-                        for one tournament, and the repetition is what ties the
-                        section to the page. The avatar is the identity. The fade
-                        ENDS ON #FFFFFF, the tile's own white, so there is no seam. */}
-                    <PickScrimBand candidates={scrimCandidates}>
+                    {/* THE SCRIM BAND — DARK on the tile (the sheets stay light).
+                        All three tiles carry the SAME venue photograph: they are
+                        three picks for one tournament, and the repetition is what
+                        ties the section to the page. The dark gradient keeps the
+                        picture instead of bleaching it and gives the white name,
+                        score and reason somewhere solid to sit — the treatment the
+                        course cards already use. */}
+                    <PickScrimBand
+                      candidates={scrimCandidates}
+                      tone="dark"
+                      minHeight={168}
+                      padding="12px 15px 13px"
+                    >
                       <div
                         style={{
                           display: 'flex',
@@ -218,91 +225,88 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                           minHeight: 10,
                         }}
                       >
-                        <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.78)' }}>
+                        <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.75)' }}>
                           {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
                         </span>
-                        {/* The status tag keeps its ink tokens (untouched), so it
-                            rides a glass pill to stay legible over the photo. */}
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            borderRadius: 999,
-                            background: 'rgba(255,255,255,0.82)',
-                            padding: '2px 7px',
-                          }}
-                        >
-                          <PickStatusTag live={live} t={t} />
-                        </span>
+                        <PickStatusTag live={live} t={t} tone="dark" />
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11 }}>
-                        <div
-                          role="link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToPlayer(p.playerId);
-                          }}
-                          style={{ cursor: 'pointer', flexShrink: 0 }}
-                        >
-                          <SquircleAvatar
-                            size={52}
-                            srcCandidates={headshots}
-                            alt={p.playerName}
-                            userId={p.playerId}
-                            hairlineRing
-                            ringColor={LIGHT_HAIRLINE}
-                          />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                          {/* The name carries the SAME amber mark as the hero board
-                              row, so a member reads the two as one statement. */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-                            <span
-                              style={{
-                                fontSize: 15.5,
-                                fontWeight: 700,
-                                letterSpacing: '-0.02em',
-                                color: INK,
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                lineHeight: 1.2,
-                                minWidth: 0,
-                              }}
-                            >
-                              {p.playerName}
-                            </span>
-                            <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11 }}>
+                          <div
+                            role="link"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToPlayer(p.playerId);
+                            }}
+                            style={{ cursor: 'pointer', flexShrink: 0 }}
+                          >
+                            <SquircleAvatar
+                              size={46}
+                              srcCandidates={headshots}
+                              alt={p.playerName}
+                              userId={p.playerId}
+                              hairlineRing
+                              ringColor={isWin ? GOLD_RING_STRONG : 'rgba(255,255,255,0.55)'}
+                            />
                           </div>
-                          <CardStateSlot state={state} pick={p} live={live} settled={settled} v={v} t={t} />
+                          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+                            {/* The name carries the SAME amber mark as the hero board
+                                row, so a member reads the two as one statement. */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1 }}>
+                              <span
+                                style={{
+                                  fontSize: 15.5,
+                                  fontWeight: 700,
+                                  letterSpacing: '-0.02em',
+                                  color: '#FFFFFF',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  lineHeight: 1.2,
+                                  minWidth: 0,
+                                }}
+                              >
+                                {p.playerName}
+                              </span>
+                              <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+                            </div>
+                            <CardStateSlot
+                              state={state}
+                              pick={p}
+                              live={live}
+                              settled={settled}
+                              v={v}
+                              t={t}
+                              tone="dark"
+                            />
+                          </div>
+                        </div>
+
+                        {/* The reason now lives INSIDE the photograph. */}
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: 'rgba(255,255,255,0.86)',
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {p.pulledQuote || p.reasons?.[0] || '—'}
                         </div>
                       </div>
                     </PickScrimBand>
 
-                    <div style={{ padding: '0 15px 14px' }}>
-                      <div
-                        style={{
-                          fontSize: 13.5,
-                          fontWeight: 500,
-                          color: 'rgba(15,23,42,0.78)',
-                          lineHeight: 1.45,
-                          minHeight: 39,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          margin: '4px 0 0',
-                        }}
-                      >
-                        {p.pulledQuote || p.reasons?.[0] || '—'}
-                      </div>
-
+                    {/* THE WHITE BODY — one row only. Everything else is on the photo. */}
+                    <div style={{ padding: '13px 15px 14px' }}>
                       {/* Affordance, not a control — the whole card is the tap target */}
                       <span
                         style={{
                           display: 'block',
-                          marginTop: 12,
                           fontSize: 9,
                           fontWeight: 700,
                           color: AMBER_DEEP,
@@ -313,6 +317,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         {t('overview.tiPicks.card.theCase')}
                       </span>
                     </div>
+
                   </button>
                 );
               })}
