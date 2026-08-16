@@ -47,7 +47,9 @@ function monthLabel(yyyyMm: string): string {
 
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
   const { t } = useTranslation('common');
-  const { data: scores, isLoading, isError, refetch } = useAllScores(connectionId);
+  const { data: scores, isLoading: fetching, isFetched, isError, refetch } = useAllScores(connectionId);
+  // Settled is not "not loading": useAllScores is gated on connectionId.
+  const isLoading = !isFetched || fetching;
 
   const tiles: Tile[] = useMemo(() => {
     const list = scores ?? [];

@@ -130,7 +130,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const deepCat = searchParams.get('cat') as LegendCategory | null;
 
   const { activeActor } = useActiveActor();
-  const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
+  const { data, isLoading: fetching, isFetched, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
+  // Settled is not "not loading": useCourseLegends is gated on courseId.
+  const isLoading = !isFetched || fetching;
   const { data: meta } = useCourseMeta(ctx.courseId);
   const { data: prosRaw } = useProBenchmarks();
   const { profile } = useProfileData();
