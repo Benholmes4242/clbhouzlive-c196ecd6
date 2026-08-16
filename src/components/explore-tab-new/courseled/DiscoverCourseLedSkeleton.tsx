@@ -6,12 +6,25 @@ import { HONOURS_SHELL, GOLD_HAIR } from './honoursTokens';
 /**
  * DISCOVER, COURSE-LED — loading silhouette.
  *
- * Every block below is measured off the shipped component it stands in for
- * (rail card 224x(99+52), tour card 272x(100 + stat row + meta line), world
- * card image 128 over three 48px rows, mosaic 220 tall + 106 shorts, most
- * played rows 60, honours header + 58px rows), so the loaded page lands on
- * its own outline with no section boundary shifting.
+ * THE RULE, AND IT OUTRANKS EVERY MEASUREMENT BELOW
+ * (BRIEF_SKELETON_AUDIT_DISCOVER_AND_TOUR A5):
+ *   A SKELETON BLOCK IS UPDATED IN THE SAME PASS AS THE SECTION IT STANDS IN
+ *   FOR, NEVER AS A LATER TIDY-UP. A skeleton written a week after its section
+ *   is a skeleton that is already wrong.
+ *
+ * Every block below is MEASURED off the rendered component it stands in for,
+ * not read off the JSX and added up:
+ *   friends rail   224 x 222  (104 photo + 34 shape strip + 84 body)
+ *   tour rail      266 x 210  (OnTourThisWeek TILE_W / TILE_H, full-bleed)
+ *   reviews        two columns, PAGE_CAP 4 tiles, 265 rendered each
+ *   around world   masonry, six photo heights + 62 body
+ *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
+ *   most played    panel of 60px rows
+ *   honours        rail of 168 x 178 plaques (HonoursBoard PLAQUE_W / PLAQUE_H)
+ * so the loaded page lands on its own outline with no section boundary
+ * shifting.
  */
+
 
 
 /**
@@ -58,29 +71,44 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
   return <Bar style={{ height: h, width: w }} />;
 }
 
-/** Section 2 — friends rail: 224px cards, 99px image, 52px body. */
+/**
+ * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 104px
+ * photograph (PHOTO_H) carrying the glass score chip, the full-bleed round
+ * shape strip at 34 (SHAPE_H), then the body — two reserved insight lines
+ * (INSIGHT_TWO_LINE_RESERVE ~30), a hairline, and the member/reaction row.
+ * Total 222. Was 151 (99 + 52) against a tile that no longer exists.
+ */
 export function FriendsRail() {
   return (
     <section>
       <EyebrowBar w={168} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
-          <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 99, width: '100%' }} />
-            <div
-              style={{
-                padding: '9px 11px',
-                minHeight: 52,
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 6,
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                <TextBar w={96} h={12} />
-                <TextBar w={62} h={10} />
+          <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
+            <Bar style={{ borderRadius: 0, height: 104, width: '100%' }} />
+            {/* The shape strip is full bleed and sits directly under the photo. */}
+            <Bar style={{ borderRadius: 0, height: 34, width: '100%' }} />
+            <div style={{ padding: '9px 11px 10px' }}>
+              <div style={{ minHeight: 30, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <TextBar w={'92%'} h={10} />
+                <TextBar w={'64%'} h={10} />
               </div>
-              <TextBar w={20} h={15} />
+              <div
+                style={{
+                  marginTop: 9,
+                  borderTop: `1px solid ${A.BORDER}`,
+                  paddingTop: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  height: 25,
+                  boxSizing: 'border-box',
+                }}
+              >
+                <TextBar w={96} h={13} />
+                <TextBar w={22} h={13} />
+              </div>
             </div>
           </div>
         ))}
@@ -144,18 +172,18 @@ export function TourRail() {
 
 
 /**
- * Slot 3 — LATEST REVIEWS mosaic. Measured off the live section:
- * two-column grid with an 8px gap (LatestReviews.tsx:78), six tiles
- * (PAGE_CAP, LatestReviews.tsx:26), each REVIEW_TILE_HEIGHT = 172 at radius 14
- * (ReviewTile.tsx:24 and its default `radius`).
+ * Slot 3 — LATEST REVIEWS mosaic. MEASURED on the rendered section: two
+ * columns with an 8px gap, PAGE_CAP = 4 tiles (LatestReviews.tsx:27), each
+ * measuring 265 tall — REVIEW_TILE_HEIGHT (186) is the PHOTO, not the tile, so
+ * the old 172 x 6 shell was both the wrong height and the wrong count.
  */
 export function ReviewsMosaic() {
   return (
     <section>
       <EyebrowBar w={126} aside />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <Bar key={i} style={{ height: 172, borderRadius: 14 }} />
+        {[0, 1, 2, 3].map((i) => (
+          <Bar key={i} style={{ height: 265, borderRadius: 14 }} />
         ))}
       </div>
     </section>
@@ -228,15 +256,40 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
   );
 }
 
-/** Section 5 — moments mosaic: tall 220 lead tile, 109 shorts, 2px gap. */
+/**
+ * Section 5 — moments mosaic. MEASURED on the rendered section: MomentsGrid
+ * lays out BLOCK ROWS of `tall` (220) with a 2px gutter, and finishes on a
+ * trailing row of SHORTS where SHORT = (tall - gap) / 2 = 109. At cap 8 that
+ * renders 220 / 220 / 109, which is what this draws.
+ *
+ * BRIEF_COMMUNITY_CREATOR_CARDS changes nothing here: a creator card occupies a
+ * TALL slot and is exactly `tall`, so the block rows keep their heights and the
+ * silhouette does not need to tell a card from a tile.
+ */
 export function MomentsMosaic() {
   return (
     <section>
       <EyebrowBar w={142} aside />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-        <Bar style={{ height: 220, borderRadius: 8, gridRow: 'span 2' }} />
-        <Bar style={{ height: 109, borderRadius: 8 }} />
-        <Bar style={{ height: 109, borderRadius: 8 }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {[0, 1].map((b) => (
+          <div key={b} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <Bar
+              style={{
+                height: 220,
+                borderRadius: 8,
+                gridColumn: b % 2 === 0 ? 1 : 2,
+                gridRow: '1 / span 2',
+              }}
+            />
+            <Bar style={{ height: 109, borderRadius: 8, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 1 }} />
+            <Bar style={{ height: 109, borderRadius: 8, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 2 }} />
+          </div>
+        ))}
+        {/* The trailing shorts row: cap 8 never divides into whole blocks. */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          <Bar style={{ height: 109, borderRadius: 8 }} />
+          <Bar style={{ height: 109, borderRadius: 8 }} />
+        </div>
       </div>
     </section>
   );
