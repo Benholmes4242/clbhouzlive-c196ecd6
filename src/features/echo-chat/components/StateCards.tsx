@@ -1,121 +1,121 @@
 /**
- * BRIEF_ECHO_CADDIE §5 — THE OTHER STATES.
+ * BRIEF_ECHO_CHAT — the states that are not a plain answer. All of them are
+ * BLOCKS IN THE THREAD, not full-screen cards: the member's question stays
+ * above them and the thread keeps scrolling.
  *
- * STATES 5, 6 AND 7 ARE THREE DIFFERENT THINGS AND DO NOT COLLAPSE.
- *   NO DATA (5)      — Echo understood; the member has no rounds there. Offers
- *                      the field's version. Never implies the question was wrong.
- *   OUT OF SCOPE (6) — Echo declines a non-golf question. Names what it does and
- *                      offers two real questions. No apology, no error styling.
- *   ERROR (7)        — the only failure. One retry, no error codes, and the
- *                      question stays in the composer (handled by the page).
+ * NO DATA       — Echo understood; the member has never played that course, so
+ *                 there is no hole data and no field aggregate. Prose plus the
+ *                 field offer. NEVER an empty chart (§4b of the correction).
+ * OUT OF SCOPE  — Echo declines a non-golf question. No apology, no error tone.
+ * ERROR         — the only failure. One retry; the question stays in the
+ *                 composer, which the page owns.
+ * ENTRY (§8.1)  — three labelled example questions, one per kind.
  */
 
 import React from 'react';
-import { RotateCcw } from 'lucide-react';
 import { EC, T } from '../tokens';
+import { EchoWaveform } from './EchoWaveform';
+import { Follow, Prose } from './ThreadPrimitives';
 
-const Card: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="ec-glass ec-fade-in" style={{ borderRadius: 20, padding: 20, margin: '0 20px' }}>
-    {children}
+export const NoDataBlock: React.FC<{
+  lead: string;
+  prompts: string[];
+  onPick: (t: string) => void;
+}> = ({ lead, prompts, onPick }) => (
+  <div className="ec-fade-in">
+    <Prose first>{lead}</Prose>
+    {prompts.length > 0 && <Follow items={prompts.slice(0, 2)} onPick={onPick} />}
   </div>
 );
 
-const Suggestion: React.FC<{ text: string; onPick: (t: string) => void }> = ({ text, onPick }) => (
-  <button
-    type="button"
-    onClick={() => onPick(text)}
-    className="ec-glass ec-glass--quiet active:opacity-70"
-    style={{
-      display: 'block',
-      width: '100%',
-      textAlign: 'left',
-      borderRadius: 14,
-      padding: '12px 14px',
-      ...T.ADVICE,
-      color: EC.INK,
-    }}
-  >
-    {text}
-  </button>
-);
-
-export const NoDataCard: React.FC<{
-  courseName: string | null;
-  fieldPrompt: string;
-  onPick: (t: string) => void;
-  copy: { eyebrow: string; lead: (c: string) => string; advice: string };
-}> = ({ courseName, fieldPrompt, onPick, copy }) => (
-  <Card>
-    <span style={T.EYEBROW}>{copy.eyebrow}</span>
-    <div style={{ ...T.HERO_WORDS, marginTop: 12 }}>{copy.lead(courseName ?? 'there')}</div>
-    <p style={{ ...T.ADVICE, margin: '14px 0 16px' }}>{copy.advice}</p>
-    <Suggestion text={fieldPrompt} onPick={onPick} />
-  </Card>
-);
-
-export const OutOfScopeCard: React.FC<{
+export const OutOfScopeBlock: React.FC<{
+  lead: string;
   prompts: string[];
   onPick: (t: string) => void;
-  copy: { eyebrow: string; lead: string };
-}> = ({ prompts, onPick, copy }) => (
-  <Card>
-    <span style={T.EYEBROW}>{copy.eyebrow}</span>
-    <div style={{ ...T.HERO_WORDS, marginTop: 12 }}>{copy.lead}</div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
-      {prompts.slice(0, 2).map((p) => (
-        <Suggestion key={p} text={p} onPick={onPick} />
-      ))}
-    </div>
-  </Card>
+}> = ({ lead, prompts, onPick }) => (
+  <div className="ec-fade-in">
+    <Prose first>{lead}</Prose>
+    {prompts.length > 0 && <Follow items={prompts.slice(0, 2)} onPick={onPick} />}
+  </div>
 );
 
-export const ErrorCard: React.FC<{
+export const ErrorBlock: React.FC<{
+  lead: string;
+  reassure: string;
+  retry: string;
   onRetry: () => void;
-  copy: { eyebrow: string; lead: string; retry: string };
-}> = ({ onRetry, copy }) => (
-  <Card>
-    {/* The only state that reads as a failure. */}
-    <span style={{ ...T.EYEBROW, color: '#E5484D' }}>{copy.eyebrow}</span>
-    <div style={{ ...T.HERO_WORDS, marginTop: 12 }}>{copy.lead}</div>
+}> = ({ lead, reassure, retry, onRetry }) => (
+  <div className="ec-fade-in">
+    <div style={{ ...T.BODY, color: EC.INK }}>{lead}</div>
+    <div style={{ ...T.BODY, fontSize: 14, marginTop: 5 }}>{reassure}</div>
     <button
       type="button"
       onClick={onRetry}
       className="active:opacity-70"
       style={{
-        marginTop: 18,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '11px 16px',
-        borderRadius: 14,
+        marginTop: 14,
+        padding: '11px 20px',
+        borderRadius: 999,
         border: 'none',
         background: EC.INK,
         color: EC.BLACK,
-        fontSize: 14.5,
+        fontSize: 14,
         fontWeight: 700,
       }}
     >
-      <RotateCcw size={14} strokeWidth={2.6} />
-      {copy.retry}
+      {retry}
     </button>
-  </Card>
+  </div>
 );
 
-export const AskCard: React.FC<{
-  /** §2b honest label when the photograph is the member's most played course. */
-  label: string;
-  courseName: string | null;
-  lead: string;
-  prompts: string[];
+export interface EntryExample {
+  /** "Your golf" / "A course" / "The game" / "The tour". */
+  kind: string;
+  question: string;
+}
+
+/**
+ * §8.1 ENTRY TEACHES THE THREE KINDS by showing one example of each, labelled.
+ * Not a sentence explaining what Echo does — three lines a member can read and
+ * tap. The examples are real and drawn from this member where they can be.
+ */
+export const EntryPanel: React.FC<{
+  headline: string;
+  examples: EntryExample[];
   onPick: (t: string) => void;
-}> = ({ label, courseName, lead, prompts, onPick }) => (
-  <div style={{ padding: '0 20px' }}>
-    <span style={T.EYEBROW}>{label}</span>
-    {courseName && <div style={{ ...T.HERO_WORDS, marginTop: 8 }}>{courseName}</div>}
-    <p style={{ ...T.BODY, margin: '12px 0 18px', color: EC.INK_2 }}>{lead}</p>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {prompts.slice(0, 3).map((p) => (
-        <Suggestion key={p} text={p} onPick={onPick} />
+}> = ({ headline, examples, onPick }) => (
+  <div
+    style={{
+      flex: 1,
+      minHeight: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      padding: '0 22px',
+      overflowY: 'auto',
+    }}
+  >
+    <div style={{ display: 'grid', placeItems: 'center' }}>
+      {/* Static. A permanently animating logo is a distraction, not a brand. */}
+      <EchoWaveform size={56} />
+    </div>
+
+    <div style={{ ...T.DISPLAY, textAlign: 'center', marginTop: 26 }}>{headline}</div>
+
+    <div style={{ display: 'grid', gap: 9, marginTop: 30 }}>
+      {examples.map((ex) => (
+        <button
+          key={ex.kind}
+          type="button"
+          onClick={() => onPick(ex.question)}
+          className="ec-glass active:opacity-70"
+          style={{ padding: '13px 16px', borderRadius: 14, textAlign: 'left' }}
+        >
+          <div style={{ ...T.LABEL, fontSize: 8.5 }}>{ex.kind}</div>
+          <div style={{ fontSize: 14.5, color: EC.INK, marginTop: 5, lineHeight: 1.35 }}>
+            {ex.question}
+          </div>
+        </button>
       ))}
     </div>
   </div>
