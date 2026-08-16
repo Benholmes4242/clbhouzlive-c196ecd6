@@ -267,45 +267,18 @@ const InboxV2Page: React.FC = () => {
                 {t('common:action.tryAgain')}
               </button>
             </div>
-          ) : visible.length === 0 ? (
+          ) : visible.length === 0 && query.trim() ? (
             <div
               className="flex flex-col items-center justify-center text-center"
-              style={{ padding: '72px 32px', gap: 16 }}
+              style={{ padding: '72px 32px' }}
             >
-              <MessageCircle size={26} color={MSG.INK_3} />
-              <div className="flex flex-col items-center" style={{ gap: 6 }}>
-                <p style={{ color: MSG.INK, fontSize: 19, fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
-                  {query.trim()
-                    ? t('messaging:search.noResults')
-                    : t('messaging:empty.inboxTitle')}
-                </p>
-                {query.trim() ? null : (
-                  <p style={{ color: MSG.INK_3, fontSize: 14, lineHeight: 1.45, maxWidth: 250, margin: 0 }}>
-                    {t('messaging:empty.inboxBody')}
-                  </p>
-                )}
-              </div>
-              {query.trim() ? null : (
-                <button
-                  type="button"
-                  onClick={() => setComposeOpen(true)}
-                  className="ec-glass--pill active:opacity-70"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    color: MSG.INK,
-                    borderRadius: 999,
-                    padding: '11px 22px',
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                  }}
-                >
-                  <PencilLine size={15} />
-                  {t('messaging:action.newMessage')}
-                </button>
-              )}
+              <p style={{ color: MSG.INK_2, fontSize: 14.5, fontWeight: 600, margin: 0 }}>
+                {t('messaging:search.noResults')}
+              </p>
             </div>
+          ) : visible.length === 0 ? (
+            /* ADDENDUM — THE EMPTY STATE IS THE COMPOSE LIST, INLINE. */
+            <InboxEmptyState onCompose={() => setComposeOpen(true)} />
           ) : (
             <div>
               {actor?.actorType === 'business' && !bannerDismissed && (
