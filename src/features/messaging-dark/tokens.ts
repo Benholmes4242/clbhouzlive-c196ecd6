@@ -28,7 +28,7 @@ export const MSG = {
   /** THE VIEWING MEMBER. Own bubbles, own scores. Never chrome, never unread. */
   AMBER: EC.AMBER,
   /** Hairline on glass and between rows. A border, not a semantic tone. */
-  EDGE: EC.EDGE,
+  EDGE: EC.LINE,
   /** Row separator on the near-black surface. */
   RULE: 'rgba(255,255,255,0.07)',
   /** Failure. The only other colour on the surface. */
