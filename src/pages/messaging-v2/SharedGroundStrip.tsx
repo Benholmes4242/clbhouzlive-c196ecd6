@@ -20,7 +20,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useAllScores } from '@/lib/whs/hooks';
-import { RoundDetailSheet } from '@/components/profile/handicap/RoundDetailSheet';
+import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import type { SharedGround } from '@/hooks/messaging/useSharedGround';
