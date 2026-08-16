@@ -33,7 +33,20 @@
 import React from 'react';
 import { EC } from '../tokens';
 
-const HEIGHTS = [0.30, 0.55, 0.82, 1, 0.82, 0.55, 0.30];
+/**
+ * THE MARK IS SYMMETRIC AT ANY BAR COUNT. Slicing a fixed 7-bar array left the
+ * 5-bar mark ending on its tallest bar, which read as a clipped right edge.
+ * Heights are now derived from the bar's distance to the centre, so the shape
+ * always rises to a peak and falls back down.
+ */
+const heightsFor = (count: number): number[] => {
+  if (count === 1) return [1];
+  const mid = (count - 1) / 2;
+  return Array.from({ length: count }, (_, i) => {
+    const t = 1 - Math.abs(i - mid) / mid; // 0 at the edges, 1 at the centre
+    return 0.3 + 0.7 * t;
+  });
+};
 
 export const EchoWaveform: React.FC<{
   size?: number;
@@ -42,8 +55,8 @@ export const EchoWaveform: React.FC<{
   bars?: number;
   colour?: string;
 }> = ({ size = 22, live = false, bars = 7, colour = EC.AMBER }) => {
-  const count = Math.max(1, Math.min(HEIGHTS.length, bars));
-  const hs = HEIGHTS.slice(0, count);
+  const count = Math.max(1, Math.min(9, bars));
+  const hs = heightsFor(count);
   // 4. THE 2px FLOOR — on the bar and on the gap.
   const bw = Math.max(2, Math.round(size * 0.07));
   const gap = Math.max(2, Math.round(size * 0.06));
