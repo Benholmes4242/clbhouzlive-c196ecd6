@@ -24,9 +24,9 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
-import { shortCourseName } from '@/features/courses/_shared/courseLabel';
-import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
+import { SubScoreStack, bandColor } from '@/features/courses/_shared/scoreBands';
+import { A, CAPTION, LABEL, NUM, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+
 
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
