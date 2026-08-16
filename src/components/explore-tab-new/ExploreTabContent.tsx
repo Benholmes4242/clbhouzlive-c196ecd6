@@ -359,20 +359,12 @@ export default function ExploreTabContent({
     [navigate],
   );
 
-  // Moments open the shared fullscreen viewer READ-ONLY: Discover reports, it
-  // is not a second engagement surface. Both surfaces (mosaic + sheet) share
-  // this handler, so the tapped media's identity must travel with the post —
-  // otherwise every tile of a multi-media post opens the post's first media.
-  const momentPosts = useMemo(() => {
-    const seen = new Set<string>();
-    const posts = [] as typeof momentList[number]['post'][];
-    for (const m of momentList) {
-      if (seen.has(m.post.id)) continue;
-      seen.add(m.post.id);
-      posts.push(m.post);
-    }
-    return posts;
-  }, [momentList]);
+  // Both surfaces (mosaic + sheet) share this handler, so the tapped media's
+  // identity must travel with the post — otherwise every tile of a multi-media
+  // post opens the post's first media, and swiping onto that post in the viewer
+  // shows a photo instead of the clip that earned the tile (no autoplay). The
+  // queue leads each post with its best-ranked moment's media.
+  const momentPosts = useMemo(() => buildMomentQueue(momentList), [momentList]);
 
   const handleMoment = useCallback(
     (m: Moment) => {
