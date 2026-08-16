@@ -1,4 +1,44 @@
 {
+  "caddie": {
+    "mark": "Echo",
+    "composer": "Ask Echo",
+    "label": {
+      "home": "Your home course",
+      "course": "In context"
+    },
+    "ask": {
+      "lead": "Ask about a hole, a number or how to play it."
+    },
+    "sources": {
+      "rounds": "Your rounds here",
+      "holes": "The hole data",
+      "course": "Course records",
+      "tour": "This week on tour"
+    },
+    "nodata": {
+      "eyebrow": "No rounds of yours here",
+      "lead": "You have not played {{course}} yet.",
+      "advice": "Echo can still read how the course plays for the field.",
+      "field": "How does this course play for everyone else?"
+    },
+    "scope": {
+      "eyebrow": "What Echo reads",
+      "lead": "Echo reads your rounds, the courses you play and this week on tour."
+    },
+    "error": {
+      "eyebrow": "That did not go through",
+      "lead": "Echo could not reach the course data. Your question is still there.",
+      "retry": "Try again"
+    },
+    "norounds": {
+      "eyebrow": "Nothing to read yet",
+      "lead": "Connect your handicap and Echo can read your own rounds. Until then, ask about any course or this week on tour."
+    },
+    "history": {
+      "empty": "No conversations yet",
+      "emptyLead": "Ask Echo about a course and it will be here."
+    }
+  },
   "history": {
     "title": "History",
     "group": {
