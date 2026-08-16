@@ -1,3 +1,33 @@
+/**
+ * ADDENDUM TO BRIEF_MESSAGES_DARK — THE THREAD DETAILS SHEET.
+ *
+ * §1.1 IT WAS LIGHT over a dark thread. It is dark now and sits A STEP LIGHTER
+ *      than the canvas (EC.PANEL over MSG.BLACK) so it reads as a layer above.
+ * §1.3 IT WAS THIN. Avatar, name, three utility actions — no route to the
+ *      person and no route to compare, on a thread with someone you may have
+ *      played a hundred rounds with. Both routes exist in the app already; this
+ *      sheet opens them rather than rebuilding either.
+ * §2   IT IS A UTILITY SHEET AND RESTRAINT IS THE DESIGN. It does NOT become a
+ *      profile and it does NOT rebuild the compare sheet. The relationship
+ *      figures are ONE SUMMARY CARD WITH A DOOR, never a panel.
+ * §3.1 NO SHARED GOLF -> NO SUMMARY CARD AND NO COMPARE ROW. The row is
+ *      absent, not disabled.
+ * §3.2 A BUSINESS THREAD carries no handicap index and no compare: name,
+ *      handle, the word Business, and the conversation's own actions.
+ * §4   DESTRUCTIVE STAYS RED. In this app red also means UNDER PAR, and that
+ *      collision is recorded as a decision: a destructive action that does not
+ *      look destructive is worse. If it ever changes it changes app-wide.
+ * §5   AMBER ONLY ON THE MEMBER'S OWN FIGURE in the head-to-head — one usage in
+ *      this file. Verified badges on this sheet are ink, not amber.
+ *
+ * SHARED MEDIA: there is no per-conversation media surface in the app, so the
+ * row is absent rather than built here.
+ *
+ * Unchanged: mute / archive / block / leave / delete behaviour and their
+ * confirmations, the group member management RPCs, the routes View profile and
+ * Compare navigate to, the compare sheet itself, and the token module.
+ */
+
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,12 +46,14 @@ import {
   X,
   Check,
   Trash2,
+  ChevronRight,
+  User,
+  Ban,
+  GitCompareArrows,
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { FIGS } from '@/lib/tokens/type';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   useEntityPickerSearch,
@@ -31,16 +63,25 @@ import {
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useConversationDetail } from '@/hooks/messaging/useConversationDetail';
 import { useConversations } from '@/hooks/messaging/useConversations';
+import { useSharedGroundOne } from '@/hooks/messaging/useSharedGround';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFriendLeaderboard } from '@/lib/whs/hooks';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
+import { EC } from '@/features/echo-chat/tokens';
+import { MSG, MT, FIGS } from '@/features/messaging-dark/tokens';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const AMBER = '#F7931E';
-const DANGER = '#DC2626';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/** §5 — the sheet is a step lighter than the canvas. No new tokens declared. */
+const SHEET = EC.PANEL;
+const RAISED = EC.RAISED;
+const INK = MSG.INK;
+const SUB = MSG.INK_2;
+const HINT = MSG.INK_3;
+const AMBER = MSG.AMBER;
+const DANGER = MSG.DANGER;
+const HAIRLINE = EC.LINE;
 
 interface Props {
   open: boolean;
@@ -63,6 +104,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const navigate = useNavigate();
   const qc = useQueryClient();
   const actor = useMessagingActor();
+  const { user } = useSupabaseSession();
   const { detail, members, isLoading, refetch } = useConversationDetail(
     open ? conversationId : null,
   );
@@ -93,6 +135,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmBlock, setConfirmBlock] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const invalidateAll = useCallback(() => {
@@ -178,7 +221,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   const handleAddMembers = useCallback(
     async (picks: Candidate[]) => {
       if (!actor || picks.length === 0) return;
-      const members = picks.map((p) => ({
+      const payload = picks.map((p) => ({
         actor_type: p.actor_type,
         actor_id: p.actor_id,
       }));
@@ -187,7 +230,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
           p_conversation_id: conversationId,
           p_as_actor_type: actor.actorType,
           p_as_actor_id: actor.actorId,
-          p_members: members as unknown as Json,
+          p_members: payload as unknown as Json,
         });
         if (error) throw error;
       }, 'Could not add members');
@@ -208,7 +251,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
       });
       if (error) throw error;
     }, 'Could not update mute');
-  }, [actor, detail, conversationId, runRpc]);
+  }, [actor, detail, conversationId, runRpc, muted]);
 
   const handleToggleArchive = useCallback(async () => {
     if (!actor || !detail) return;
@@ -222,7 +265,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
       });
       if (error) throw error;
     }, 'Could not update archive');
-  }, [actor, detail, conversationId, runRpc]);
+  }, [actor, detail, conversationId, runRpc, archived]);
 
   const handleLeave = useCallback(async () => {
     if (!actor) return;
@@ -272,7 +315,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     }
   }, [actor, conversationId, qc, navigate, onClose]);
 
-  // For DMs, derive identity for header
+  // For DMs, derive identity for the header
   const dmOther = useMemo<ConversationMember | null>(() => {
     if (!detail || detail.type !== 'direct' || !actor) return null;
     return (
@@ -282,38 +325,112 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
     );
   }, [detail, members, actor]);
 
+  const isBusinessThread = dmOther?.actor_type === 'business';
+  const rivalUserId = !isGroup && !isBusinessThread ? dmOther?.actor_id ?? null : null;
+
+  // §3b — the summary card's two facts. Shared rounds are already cached by the
+  // thread strip, so this sheet adds no query on an opened thread.
+  const { ground } = useSharedGroundOne(user?.id, open ? rivalUserId : null);
+  const hasSharedGolf = !!rivalUserId && ground.count > 0 && ground.rounds.length > 0;
+
+  const h2h = useMemo(() => {
+    let mine = 0;
+    let theirs = 0;
+    for (const r of ground.rounds) {
+      if (r.user_gross == null || r.rival_gross == null) continue;
+      if (r.user_gross < r.rival_gross) mine += 1;
+      else if (r.rival_gross < r.user_gross) theirs += 1;
+    }
+    return { mine, theirs };
+  }, [ground.rounds]);
+
+  // §3a — THEIR HANDICAP INDEX. Read from the circle leaderboard the handicap
+  // surfaces already fill; a member outside the circle simply has no line.
+  const { data: circle } = useFriendLeaderboard(rivalUserId ? user?.id : undefined);
+  const rivalIndex = useMemo(() => {
+    if (!rivalUserId) return null;
+    const row = (circle ?? []).find((r) => r.friend_user_id === rivalUserId);
+    return row?.friend_handicap_index ?? null;
+  }, [circle, rivalUserId]);
+
+  const { blockUser } = useBlockActions({ currentUserId: user?.id ?? '' });
+
   const headerTitle = isGroup ? detail?.title ?? 'Group' : dmOther?.name ?? 'Conversation';
   const headerAvatar = isGroup ? detail?.avatar_url ?? null : dmOther?.avatar_url ?? null;
   const headerId = isGroup ? detail?.conversation_id ?? '' : dmOther?.actor_id ?? '';
 
-  return (
-    <BottomSheet open={open} onClose={onClose} zIndexBase={1500}>
-      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} />
+  const goProfile = useCallback(() => {
+    if (!dmOther) return;
+    onClose();
+    if (dmOther.actor_type === 'business') {
+      navigate(`/business/${dmOther.actor_id}`);
+      return;
+    }
+    navigate(`/profile/${dmOther.username ?? dmOther.actor_id}`);
+  }, [dmOther, navigate, onClose]);
 
-      <div style={{ background: CANVAS, paddingBottom: 32 }}>
+  const goCompare = useCallback(() => {
+    if (!rivalUserId) return;
+    onClose();
+    navigate(`/handicap?subtab=circle&compare=${encodeURIComponent(rivalUserId)}`);
+  }, [rivalUserId, navigate, onClose]);
+
+  const handleBlock = useCallback(async () => {
+    if (!rivalUserId && !dmOther) return;
+    if (dmOther?.actor_type !== 'personal') return;
+    try {
+      setBusy(true);
+      await blockUser(dmOther.actor_id);
+      onClose();
+      navigate('/messages');
+    } finally {
+      setBusy(false);
+    }
+  }, [blockUser, dmOther, rivalUserId, navigate, onClose]);
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      zIndexBase={1500}
+      variant="dark"
+      surfaceColor={SHEET}
+    >
+      <SheetHeader title={t('messaging:sheet.detailsTitle')} onClose={onClose} dark />
+
+      <div style={{ background: SHEET, paddingBottom: 28 }}>
         {isLoading || !detail ? (
           <div style={{ padding: '20px 16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-              <Skeleton style={{ width: 72, height: 72, borderRadius: 24 }} />
-              <Skeleton style={{ width: 140, height: 16, borderRadius: 4 }} />
-            </div>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
-                <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
-                <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* Identity */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 12,
-                padding: '16px 16px 24px',
+                gap: 10,
+                marginBottom: 24,
+              }}
+            >
+              <div style={{ width: 72, height: 72, borderRadius: '34%', background: RAISED }} />
+              <div style={{ width: 140, height: 13, borderRadius: 3, background: RAISED }} />
+              <div style={{ width: 92, height: 10, borderRadius: 3, background: RAISED }} />
+            </div>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0' }}>
+                <div style={{ width: 22, height: 22, borderRadius: 7, background: RAISED }} />
+                <div style={{ flex: 1, height: 11, borderRadius: 3, background: RAISED }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* §3a WHO */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 10,
+                padding: '12px 16px 20px',
                 borderBottom: `0.5px solid ${HAIRLINE}`,
               }}
             >
@@ -336,11 +453,11 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     }}
                     style={{
                       flex: 1,
-                      background: '#FFF',
+                      background: RAISED,
                       border: `1px solid ${HAIRLINE}`,
                       borderRadius: 10,
-                      padding: '8px 12px',
-                      fontSize: 16,
+                      padding: '9px 12px',
+                      fontSize: 15,
                       color: INK,
                       outline: 'none',
                     }}
@@ -350,11 +467,11 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                     onClick={handleSaveTitle}
                     disabled={busy}
                     style={{
-                      background: INK,
-                      color: '#FFF',
+                      background: '#FFFFFF',
+                      color: MSG.BLACK,
                       border: 'none',
                       borderRadius: 10,
-                      padding: '8px 14px',
+                      padding: '9px 14px',
                       fontSize: 14,
                       fontWeight: 600,
                     }}
@@ -363,57 +480,87 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                   </button>
                 </div>
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 600,
-                      color: INK,
-                      textAlign: 'center',
-                    }}
-                  >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: INK }}>
                     {headerTitle}
                   </span>
                   {!isGroup && dmOther?.verified ? (
-                    <BadgeCheck size={16} style={{ color: AMBER }} />
+                    /* §5 verified is INK on this sheet — amber is the member's own figure. */
+                    <BadgeCheck size={16} style={{ color: INK }} />
                   ) : null}
                   {isGroup && isAdmin ? (
                     <button
                       type="button"
                       onClick={() => setTitleEdit(detail.title ?? '')}
-                      aria-label={t('a11y.editTitle')}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: SUB,
-                        padding: 4,
-                      }}
+                      aria-label={t('messaging:a11y.editTitle')}
+                      style={{ background: 'transparent', border: 'none', color: HINT, padding: 4 }}
                     >
-                      <Pencil size={16} />
+                      <Pencil size={15} />
                     </button>
                   ) : null}
                 </div>
               )}
+
               {isGroup ? (
-                <span style={{ ...FIGS, color: SUB, fontSize: 13 }}>
+                <span style={{ ...MT.CONTEXT, color: SUB }}>
                   {members.length} {members.length === 1 ? 'member' : 'members'}
                 </span>
-              ) : null}
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...FIGS }}>
+                  {dmOther?.username ? (
+                    <span style={{ ...MT.CONTEXT, color: SUB }}>@{dmOther.username}</span>
+                  ) : null}
+                  {isBusinessThread ? (
+                    <span style={{ ...MT.CONTEXT, color: SUB }}>
+                      {t('messaging:context.business', { defaultValue: 'Business' })}
+                    </span>
+                  ) : rivalIndex != null ? (
+                    <>
+                      {dmOther?.username ? <Dot /> : null}
+                      <span style={{ ...MT.CONTEXT, color: SUB }}>
+                        Index {rivalIndex.toFixed(1)}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              )}
             </div>
+
+            {/* §3b THE SUMMARY CARD — one card, then a door. Absent with no shared golf. */}
+            {hasSharedGolf ? (
+              <div style={{ padding: '14px 16px 4px' }}>
+                <div
+                  style={{
+                    background: RAISED,
+                    borderRadius: 14,
+                    padding: '13px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 16,
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <span style={MT.MICRO}>Together</span>
+                    <span style={{ ...MT.SCORE, color: INK }}>{ground.count}</span>
+                  </div>
+                  <div style={{ width: '0.5px', alignSelf: 'stretch', background: HAIRLINE }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <span style={MT.MICRO}>Head to head</span>
+                    <span style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      {/* §5 THE ONE AMBER: the member's own figure. */}
+                      <span style={{ ...MT.SCORE, color: AMBER }}>{h2h.mine}</span>
+                      <span style={{ ...MT.SCORE, color: HINT, fontSize: 13 }}>–</span>
+                      <span style={{ ...MT.SCORE, color: INK }}>{h2h.theirs}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {/* Members (groups only) */}
             {isGroup ? (
               <div style={{ borderBottom: `0.5px solid ${HAIRLINE}` }}>
-                <div
-                  style={{
-                    padding: '16px 16px 12px',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    letterSpacing: 0.6,
-                    textTransform: 'uppercase',
-                    color: SUB,
-                  }}
-                >
+                <div style={{ ...MT.EYEBROW, padding: '16px 16px 10px' }}>
                   {t('messaging:list.members')}
                 </div>
 
@@ -425,7 +572,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      padding: '12px 16px',
+                      padding: '11px 16px',
                       width: '100%',
                       background: 'transparent',
                       border: 'none',
@@ -437,27 +584,26 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       style={{
                         width: 40,
                         height: 40,
-                        borderRadius: 14,
-                        background: '#EDEFF2',
+                        borderRadius: '34%',
+                        background: RAISED,
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <Plus size={20} color={INK} />
+                      <Plus size={19} color={INK} />
                     </div>
-                    <span style={{ fontSize: 15, fontWeight: 500 }}>{t('messaging:action.addPeople')}</span>
+                    <span style={{ fontSize: 15, fontWeight: 600 }}>
+                      {t('messaging:action.addPeople')}
+                    </span>
                   </button>
                 ) : null}
 
                 {members.map((m) => {
                   const key = `${m.actor_type}:${m.actor_id}`;
                   const isSelf =
-                    actor &&
-                    m.actor_type === actor.actorType &&
-                    m.actor_id === actor.actorId;
+                    actor && m.actor_type === actor.actorType && m.actor_id === actor.actorId;
                   const isTargetOwner = m.role === 'owner';
-                  // Admin can act on non-owners and non-self. Only owner can promote/demote admins.
                   const canActOnRow = !!isAdmin && !isSelf && !isTargetOwner;
                   const canPromoteDemote = isOwner && !isSelf && !isTargetOwner;
                   const canRemove = canActOnRow;
@@ -469,7 +615,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '12px 16px',
+                        padding: '11px 16px',
                         position: 'relative',
                       }}
                     >
@@ -481,18 +627,10 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                         hairlineRing
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 6,
-                            minWidth: 0,
-                          }}
-                        >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                           <span
                             style={{
-                              fontSize: 15,
-                              fontWeight: 500,
+                              ...MT.NAME,
                               color: INK,
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -503,24 +641,19 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                             {isSelf ? ' (You)' : ''}
                           </span>
                           {m.verified ? (
-                            <BadgeCheck size={13} style={{ color: AMBER, flexShrink: 0 }} />
+                            <BadgeCheck size={13} style={{ color: INK, flexShrink: 0 }} />
                           ) : null}
                         </div>
                         {roleLabel(m.role) ? (
-                          <div style={{ fontSize: 12, color: SUB }}>{roleLabel(m.role)}</div>
+                          <div style={{ ...MT.CONTEXT, color: HINT }}>{roleLabel(m.role)}</div>
                         ) : null}
                       </div>
                       {showMenu ? (
                         <button
                           type="button"
                           onClick={() => setRowMenu(rowMenu === key ? null : key)}
-                          aria-label={t('a11y.memberActions')}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: SUB,
-                            padding: 6,
-                          }}
+                          aria-label={t('messaging:a11y.memberActions')}
+                          style={{ background: 'transparent', border: 'none', color: HINT, padding: 6 }}
                         >
                           <MoreHorizontal size={18} />
                         </button>
@@ -531,7 +664,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                             position: 'absolute',
                             top: 44,
                             right: 12,
-                            background: '#FFF',
+                            background: RAISED,
                             border: `1px solid ${HAIRLINE}`,
                             borderRadius: 12,
                             minWidth: 180,
@@ -542,9 +675,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                           {canPromoteDemote ? (
                             <button
                               type="button"
-                              onClick={() =>
-                                handleSetRole(m, m.role === 'admin' ? 'member' : 'admin')
-                              }
+                              onClick={() => handleSetRole(m, m.role === 'admin' ? 'member' : 'admin')}
                               disabled={busy}
                               style={menuItemStyle(INK)}
                             >
@@ -569,16 +700,30 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
               </div>
             ) : null}
 
-            {/* Actions */}
-            <div style={{ padding: '8px 0' }}>
+            {/* §3c THE ACTIONS */}
+            <div style={{ padding: '8px 0 0' }}>
+              {!isGroup && dmOther ? (
+                <ActionRow
+                  icon={<User size={19} color={INK} />}
+                  label="View profile"
+                  onClick={goProfile}
+                  chevron
+                />
+              ) : null}
+
+              {/* §3.1 no shared golf -> the Compare row is ABSENT, not disabled. */}
+              {hasSharedGolf ? (
+                <ActionRow
+                  icon={<GitCompareArrows size={19} color={INK} />}
+                  label="Compare"
+                  sub="Head to head, hole by hole"
+                  onClick={goCompare}
+                  chevron
+                />
+              ) : null}
+
               <ActionRow
-                icon={
-                  muted ? (
-                    <BellOff size={20} color={INK} />
-                  ) : (
-                    <Bell size={20} color={INK} />
-                  )
-                }
+                icon={muted ? <BellOff size={19} color={INK} /> : <Bell size={19} color={INK} />}
                 label={muted ? 'Unmute' : 'Mute notifications'}
                 onClick={handleToggleMute}
                 disabled={busy}
@@ -586,19 +731,36 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
               <ActionRow
                 icon={
                   archived ? (
-                    <ArchiveRestore size={20} color={INK} />
+                    <ArchiveRestore size={19} color={INK} />
                   ) : (
-                    <Archive size={20} color={INK} />
+                    <Archive size={19} color={INK} />
                   )
                 }
-                label={archived ? 'Unarchive' : 'Archive'}
+                label={archived ? 'Unarchive conversation' : 'Archive conversation'}
                 onClick={handleToggleArchive}
                 disabled={busy}
               />
+
+              {!isGroup && dmOther?.actor_type === 'personal' ? (
+                <ActionRow
+                  icon={<Ban size={19} color={INK} />}
+                  label={confirmBlock ? 'Tap again to confirm' : 'Block'}
+                  onClick={() => {
+                    if (!confirmBlock) {
+                      setConfirmBlock(true);
+                      setTimeout(() => setConfirmBlock(false), 3000);
+                      return;
+                    }
+                    void handleBlock();
+                  }}
+                  disabled={busy}
+                />
+              ) : null}
+
               {isGroup ? (
                 <>
                   <ActionRow
-                    icon={<LogOut size={20} color={DANGER} />}
+                    icon={<LogOut size={19} color={DANGER} />}
                     label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
                     onClick={() => {
                       if (!confirmLeave) {
@@ -613,7 +775,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                   />
                   {isAdmin ? (
                     <ActionRow
-                      icon={<Trash2 size={20} color={DANGER} />}
+                      icon={<Trash2 size={19} color={DANGER} />}
                       label={confirmDelete ? 'Tap again to confirm' : 'Delete group'}
                       onClick={() => {
                         if (!confirmDelete) {
@@ -629,8 +791,9 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                   ) : null}
                 </>
               ) : (
+                /* §4 DESTRUCTIVE STAYS RED — a recorded decision, not an accident. */
                 <ActionRow
-                  icon={<Trash2 size={20} color={DANGER} />}
+                  icon={<Trash2 size={19} color={DANGER} />}
                   label={confirmLeave ? 'Tap again to confirm' : 'Delete conversation'}
                   onClick={() => {
                     if (!confirmLeave) {
@@ -659,17 +822,21 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
   );
 };
 
+const Dot: React.FC = () => (
+  <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: 999, background: HINT }} />
+);
+
 function menuItemStyle(color: string): React.CSSProperties {
   return {
     display: 'block',
     width: '100%',
     textAlign: 'left',
-    padding: '12px',
+    padding: '11px 12px',
     background: 'transparent',
     border: 'none',
     color,
     fontSize: 14,
-    fontWeight: 500,
+    fontWeight: 600,
     borderRadius: 8,
   };
 }
@@ -677,15 +844,26 @@ function menuItemStyle(color: string): React.CSSProperties {
 interface ActionRowProps {
   icon: React.ReactNode;
   label: string;
+  sub?: string;
   onClick: () => void;
   disabled?: boolean;
   danger?: boolean;
+  chevron?: boolean;
 }
-const ActionRow: React.FC<ActionRowProps> = ({ icon, label, onClick, disabled, danger }) => (
+const ActionRow: React.FC<ActionRowProps> = ({
+  icon,
+  label,
+  sub,
+  onClick,
+  disabled,
+  danger,
+  chevron,
+}) => (
   <button
     type="button"
     onClick={onClick}
     disabled={disabled}
+    className="active:opacity-70"
     style={{
       display: 'flex',
       alignItems: 'center',
@@ -694,25 +872,28 @@ const ActionRow: React.FC<ActionRowProps> = ({ icon, label, onClick, disabled, d
       width: '100%',
       background: 'transparent',
       border: 'none',
+      borderTop: `0.5px solid ${HAIRLINE}`,
       color: danger ? DANGER : INK,
-      fontSize: 15,
-      fontWeight: 500,
       textAlign: 'left',
-      opacity: disabled ? 0.5 : 1,
     }}
   >
     <div
       style={{
-        width: 28,
-        height: 28,
+        width: 26,
+        height: 26,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        flexShrink: 0,
       }}
     >
       {icon}
     </div>
-    {label}
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.011em' }}>{label}</span>
+      {sub ? <span style={{ ...MT.CONTEXT, color: HINT }}>{sub}</span> : null}
+    </span>
+    {chevron ? <ChevronRight size={17} color={HINT} /> : null}
   </button>
 );
 
@@ -724,8 +905,7 @@ function farFutureIso(): string {
   return d.toISOString();
 }
 
-
-// ============ Add people sub-sheet ============
+// ============ Add people sub-sheet (§1.1 — dark too) ============
 
 interface AddPeopleSheetProps {
   open: boolean;
@@ -764,9 +944,7 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
       name: bb.name,
       avatar_url: bb.logo_url,
     }));
-    return [...p, ...b].filter(
-      (c) => !existingKeys.has(`${c.actor_type}:${c.actor_id}`),
-    );
+    return [...p, ...b].filter((c) => !existingKeys.has(`${c.actor_type}:${c.actor_id}`));
   }, [people, businesses, existingKeys]);
 
   const toggle = (c: Candidate) => {
@@ -800,9 +978,15 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
   };
 
   return (
-    <BottomSheet open={open} onClose={handleClose} zIndexBase={1600}>
-      <SheetHeader title={t('action.addPeople')} onClose={handleClose} />
-      <div style={{ background: CANVAS, paddingBottom: 16 }}>
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      zIndexBase={1600}
+      variant="dark"
+      surfaceColor={SHEET}
+    >
+      <SheetHeader title={t('messaging:action.addPeople')} onClose={handleClose} dark />
+      <div style={{ background: SHEET, paddingBottom: 16 }}>
         {selected.length > 0 ? (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '10px 16px 4px' }}>
             {selected.map((s) => (
@@ -814,12 +998,13 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  background: '#EDEFF2',
+                  background: RAISED,
                   color: INK,
                   border: 'none',
                   borderRadius: 999,
                   padding: '6px 10px',
                   fontSize: 13,
+                  fontWeight: 600,
                 }}
               >
                 {s.name}
@@ -834,13 +1019,14 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={t('search.peopleAnd')}
+            placeholder={t('messaging:search.peopleAnd')}
+            className="msg-input"
             style={{
               width: '100%',
-              background: '#FFF',
+              background: RAISED,
               border: `1px solid ${HAIRLINE}`,
               borderRadius: 12,
-              padding: '12px 14px',
+              padding: '11px 14px',
               fontSize: 15,
               color: INK,
               outline: 'none',
@@ -849,54 +1035,61 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
         </div>
 
         <div style={{ maxHeight: '45dvh', overflowY: 'auto' }}>
-          {results.map((c) => (
-            <button
-              key={`${c.actor_type}:${c.actor_id}`}
-              type="button"
-              onClick={() => toggle(c)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '12px 16px',
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                textAlign: 'left',
-              }}
-            >
-              <SquircleAvatar
-                src={c.avatar_url}
-                userId={c.actor_id}
-                alt={c.name}
-                size={40}
-                hairlineRing
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: INK, fontSize: 15, fontWeight: 500 }}>{c.name}</div>
-                <div style={{ color: SUB, fontSize: 12 }}>
-                  {c.actor_type === 'business' ? 'Business' : 'Personal'}
-                </div>
-              </div>
-              <div
+          {results.map((c) => {
+            const sel = isSel(c);
+            return (
+              <button
+                key={`${c.actor_type}:${c.actor_id}`}
+                type="button"
+                onClick={() => toggle(c)}
                 style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 999,
-                  border: `1.5px solid ${isSel(c) ? INK : HAIRLINE}`,
-                  background: isSel(c) ? INK : 'transparent',
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  gap: 12,
+                  padding: '11px 16px',
+                  width: '100%',
+                  background: sel ? RAISED : 'transparent',
+                  border: 'none',
+                  textAlign: 'left',
                 }}
               >
-                {isSel(c) ? <Check size={14} color="#FFF" /> : null}
-              </div>
-            </button>
-          ))}
+                <SquircleAvatar
+                  src={c.avatar_url}
+                  userId={c.actor_id}
+                  alt={c.name}
+                  size={42}
+                  hairlineRing
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ ...MT.NAME, color: INK, fontWeight: 700 }}>{c.name}</div>
+                  {c.actor_type === 'business' ? (
+                    <div style={{ ...MT.CONTEXT, color: HINT }}>
+                      {t('messaging:context.business', { defaultValue: 'Business' })}
+                    </div>
+                  ) : null}
+                </div>
+                <div
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 999,
+                    border: `1.5px solid ${sel ? '#FFFFFF' : HAIRLINE}`,
+                    background: sel ? '#FFFFFF' : 'transparent',
+                    color: MSG.BLACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {sel ? <Check size={14} strokeWidth={2.5} /> : null}
+                </div>
+              </button>
+            );
+          })}
           {query.trim().length > 0 && results.length === 0 ? (
-            <div style={{ padding: 32, textAlign: 'center', color: SUB, fontSize: 13 }}>
-              {t('common:state.noResults')}
+            <div style={{ padding: 32, textAlign: 'center', ...MT.CONTEXT, color: HINT }}>
+              {t('messaging:search.noResults')}
             </div>
           ) : null}
         </div>
@@ -908,17 +1101,18 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
             disabled={selected.length === 0}
             style={{
               width: '100%',
-              background: INK,
-              color: '#FFF',
+              background: selected.length === 0 ? RAISED : '#FFFFFF',
+              color: selected.length === 0 ? HINT : MSG.BLACK,
               border: 'none',
               borderRadius: 14,
-              padding: '12px 16px',
+              padding: '13px 16px',
               fontSize: 15,
-              fontWeight: 600,
-              opacity: selected.length === 0 ? 0.4 : 1,
+              fontWeight: 700,
             }}
           >
-            {selected.length > 0 ? t('messaging:addSheet.addWithCount', { count: selected.length }) : t('messaging:addSheet.addZero')}
+            {selected.length > 0
+              ? t('messaging:addSheet.addWithCount', { count: selected.length })
+              : t('messaging:addSheet.addZero')}
           </button>
         </div>
       </div>
