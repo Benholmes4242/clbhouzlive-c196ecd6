@@ -101,11 +101,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     [selected],
   );
 
-  // Intro framing shown when the acting business is targeting any personal.
-  const showIntro = useMemo(() => {
-    if (!actor || actor.actorType !== 'business') return false;
-    return selected.some((s) => s.actor_type === 'personal');
-  }, [actor, selected]);
+
+
 
   const reset = useCallback(() => {
     setQuery('');
