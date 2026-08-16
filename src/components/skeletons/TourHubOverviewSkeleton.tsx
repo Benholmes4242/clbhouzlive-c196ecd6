@@ -166,10 +166,10 @@ export const TourHubOverviewSkeleton = () => {
         }}
       >
         <ComingUpBlock />
-        <div>
-          <LensRow />
-          <WorldRankingsBlock />
-        </div>
+        {/* The lens row and the board are SEPARATE children on the live page,
+            so they take the 32px section gap between them here too. */}
+        <LensRow />
+        <WorldRankingsBlock />
         {/* NOTHING BELOW THIS POINT. StatWatch, CourseOfTheWeek and
             CollegeFranchise are conditional and keep their own inline holds. */}
       </div>
