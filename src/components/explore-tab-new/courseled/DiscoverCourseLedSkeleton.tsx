@@ -47,25 +47,34 @@ function Bar({
   );
 }
 
-/** Eyebrow: the live KICKER line box measures 15px with a 10px gap beneath. */
+/**
+ * Section head. MEASURED on every live section: the KICKER line box is 15 and
+ * the SUBLINE that follows it occupies 19, so the head is 34 and the body
+ * starts exactly where the live one does. The old 15 + a 10px gap made EVERY
+ * block on the page nine pixels short, which is why the whole page used to
+ * settle upward by 9 on load.
+ */
 function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 2px',
-        marginBottom: 10,
-        height: 15,
-      }}
-    >
-      <Bar style={{ height: 10, width: w }} />
-      {aside ? (
-        <Bar style={{ height: 10, width: 44, marginLeft: 'auto' }} />
-      ) : null}
-    </div>
+    <>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 2px',
+          height: 15,
+        }}
+      >
+        <Bar style={{ height: 10, width: w }} />
+        {aside ? <Bar style={{ height: 10, width: 44, marginLeft: 'auto' }} /> : null}
+      </div>
+      <div style={{ height: 19, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
+        <Bar style={{ height: 10, width: 196 }} />
+      </div>
+    </>
   );
 }
+
 
 function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
   return <Bar style={{ height: h, width: w }} />;
