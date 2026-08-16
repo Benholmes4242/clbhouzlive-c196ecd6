@@ -891,21 +891,11 @@ function VerdictBanner({
 
           display: 'flex',
           alignItems: 'flex-end',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           gap: 12,
         }}
       >
-        <span
-          style={{
-            fontSize: 7.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: A.DIM,
-          }}
-        >
-          {t('overview.tiPicks.case.onCourse')}
-        </span>
+        {/* No "ON THE COURSE" label — the position, score and thru say it. */}
         <TourStatusBlock
           score={live.score}
           position={live.position}
@@ -918,12 +908,12 @@ function VerdictBanner({
     );
   }
 
-  // Settled
+  // Settled — the OUTCOME, never the word "Finished".
   if (v.kind === 'none') return null;
   if (v.kind === 'win') {
     return (
       <BannerRow
-        left={`🏆 ${t('overview.tiPicks.case.champion')}`}
+        left={t('overview.tiPicks.case.wonIt')}
         leftColor={GOLD_TX}
         right={`${t('overview.tiPicks.verdict.won')}${v.score != null ? ` · ${v.score}` : ''}`}
         rightColor={GOLD_TX}
@@ -934,7 +924,7 @@ function VerdictBanner({
   if (v.kind === 'top20') {
     return (
       <BannerRow
-        left={t('overview.tiPicks.case.finished')}
+        left={v.label ?? ''}
         leftColor={GREEN_TX}
         right={`${v.label}${v.score != null ? ` · ${v.score}` : ''}`}
         rightColor={GREEN_TX}
@@ -944,7 +934,7 @@ function VerdictBanner({
   }
   return (
     <BannerRow
-      left={t('overview.tiPicks.case.finished')}
+      left={v.kind === 'mc' ? (v.label ?? 'MC') : (v.label ?? '')}
       leftColor={RED_TX}
       right={v.kind === 'mc' ? (v.label ?? 'MC') : `${v.label}${v.score != null ? ` · ${v.score}` : ''}`}
       rightColor={RED_TX}
@@ -952,6 +942,7 @@ function VerdictBanner({
     />
   );
 }
+
 
 function BannerRow({
   left,
