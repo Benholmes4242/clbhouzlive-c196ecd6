@@ -300,10 +300,27 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     leftVisual = <IconTile spec={spec.tile} />;
   } else if (spec.left === 'stacked_likers') {
     const urls = Array.isArray(row.liker_avatar_urls) ? (row.liker_avatar_urls as string[]) : [];
-    leftVisual = <StackedLikers urls={urls} actorUrl={row.actor_avatar_url} actorName={row.actor_display_name} />;
+    leftVisual = (
+      <StackedLikers
+        urls={urls}
+        actorUrl={row.actor_avatar_url}
+        actorName={row.actor_display_name}
+        actorUserId={row.actor_user_id}
+      />
+    );
   } else {
-    leftVisual = <AvatarSquircle url={row.actor_avatar_url} name={row.actor_display_name} />;
+    leftVisual = (
+      <SquircleAvatar
+        size={40}
+        src={row.actor_avatar_url}
+        alt={row.actor_display_name ?? ''}
+        userId={row.actor_user_id}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
+      />
+    );
   }
+
 
   // ------- Right element -------
   let rightEl: React.ReactNode = null;
