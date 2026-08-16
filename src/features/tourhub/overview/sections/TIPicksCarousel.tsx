@@ -340,7 +340,54 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
   );
 }
 
+/**
+ * PickScrimBand — the tile's head. A headshot behind a gradient that fades from
+ * transparent to the tile's EXACT white (#FFFFFF); any near-white here would
+ * ship as a horizontal band across every tile. The band NEVER collapses: with
+ * no resolvable headshot it paints the gradient over a flat slate tone, so the
+ * tile's shape is identical either way and the carousel stays even.
+ */
+function PickScrimBand({ candidates, children }: { candidates: string[]; children: React.ReactNode }) {
+  const [idx, setIdx] = useState(0);
+  const src = idx < candidates.length ? candidates[idx] : null;
+  return (
+    <div style={{ position: 'relative', minHeight: 96, padding: '12px 15px 11px', overflow: 'hidden' }}>
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
+      {src ? (
+        <img
+          aria-hidden
+          src={src}
+          alt=""
+          loading="lazy"
+          onError={() => setIdx((i) => i + 1)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            // A headshot is a portrait crop in a wide band: bias to the TOP so
+            // the face is never cut at the chin.
+            objectPosition: '50% 12%',
+          }}
+        />
+      ) : null}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0.55) 58%, rgba(255,255,255,0.88) 82%, #FFFFFF 100%)',
+        }}
+      />
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 11 }}>{children}</div>
+    </div>
+  );
+}
+
 // ---- Card state slot: chip / neutral live / course fit line ----
+
 
 // ---- Shared pick grammar: the index meta line and the live-state tag ----
 
