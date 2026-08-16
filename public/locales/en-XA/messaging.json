@@ -50,7 +50,16 @@
     "threadStartGroup": "[~~Ţĥíš íš ţĥé šţářţ őƒ {{name}}.~~]",
     "threadStartGroupGeneric": "[~~Ţĥíš íš ţĥé šţářţ őƒ ţĥíš ĝřőúƥ.~~]",
     "threadStartWith": "[~~Ţĥíš íš ţĥé šţářţ őƒ ýőúř ĉőñṽéřšáţíőñ ŵíţĥ {{name}}.~~]",
-    "threadCommonGround": "[Ýöû äñd {{name}} hävé pläyéd {{count}} röûñds tögéthér, möst récéñtly ät {{course}}.]"
+    "threadCommonGround": "[Ýöû äñd {{name}} hävé pläyéd {{count}} röûñds tögéthér, möst récéñtly ät {{course}}.]",
+    "startTitle": "[Nothing here yet]",
+    "startPlayed": "[Start with someone you've played with.]",
+    "startCircle": "[Start with someone in your circle.]",
+    "inCircle": "[In your circle]",
+    "messageSomeoneElse": "[Message someone else]",
+    "messageSomeone": "[Message someone]",
+    "bareTitle": "[No conversations yet]",
+    "bareBody": "[Follow a few golfers and your conversations will start here.]",
+    "bareUnresolvedBody": "[Search for a golfer, club or business to start a conversation.]"
   },
   "error": {
     "couldntLoadInbox": "[~~Ĉőúļđñ'ţ ļőáđ ɱéššáĝéš~~]",

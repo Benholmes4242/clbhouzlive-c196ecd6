@@ -50,7 +50,16 @@
     "threadStartGroup": "This is the start of {{name}}.",
     "threadStartGroupGeneric": "This is the start of this group.",
     "threadStartWith": "This is the start of your conversation with {{name}}.",
-    "threadCommonGround": "Du und {{name}} habt {{count}} Runden zusammen gespielt, zuletzt in {{course}}."
+    "threadCommonGround": "Du und {{name}} habt {{count}} Runden zusammen gespielt, zuletzt in {{course}}.",
+    "startTitle": "Noch nichts hier",
+    "startPlayed": "Beginne mit jemandem, mit dem du gespielt hast.",
+    "startCircle": "Beginne mit jemandem aus deinem Kreis.",
+    "inCircle": "In deinem Kreis",
+    "messageSomeoneElse": "Jemand anderem schreiben",
+    "messageSomeone": "Jemandem schreiben",
+    "bareTitle": "Noch keine Unterhaltungen",
+    "bareBody": "Folge einigen Golfern, dann beginnen hier deine Unterhaltungen.",
+    "bareUnresolvedBody": "Suche nach einem Golfer, Club oder Unternehmen, um zu schreiben."
   },
   "error": {
     "couldntLoadInbox": "Couldn't load messages",
