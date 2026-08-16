@@ -488,18 +488,51 @@ const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
 /**
  * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
  * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ * On the DARK tile band the chip rides a rgba(10,14,10,0.5) pill with a
+ * white-24 border; the live dot stays red either way.
  */
-function PickStatusTag({ live, t }: { live: PickLiveState | undefined; t: TFunction }) {
+function PickStatusTag({
+  live,
+  t,
+  tone = 'light',
+}: {
+  live: PickLiveState | undefined;
+  t: TFunction;
+  tone?: 'light' | 'dark';
+}) {
   if (!live || live.thru == null) return null;
   if (DEMOTED_STATUS.has((live.status ?? '').toUpperCase())) return null;
+  const dark = tone === 'dark';
+  const wrap = (children: React.ReactNode, color: string) => (
+    <span
+      style={{
+        ...PICK_META,
+        color,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        ...(dark
+          ? {
+              borderRadius: 999,
+              padding: '3px 8px',
+              background: 'rgba(10,14,10,0.5)',
+              border: '1px solid rgba(255,255,255,0.24)',
+            }
+          : null),
+      }}
+    >
+      {children}
+    </span>
+  );
   if (live.thru >= 18) {
-    return <span style={{ ...PICK_META, color: A.DIM }}>{t('overview.status.finished')}</span>;
+    return wrap(t('overview.status.finished'), dark ? 'rgba(255,255,255,0.72)' : A.DIM);
   }
-  return (
-    <span style={{ ...PICK_META, color: A.MUTE, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+  return wrap(
+    <>
       <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
       {t('overview.status.thru', { n: live.thru })}
-    </span>
+    </>,
+    dark ? 'rgba(255,255,255,0.86)' : A.MUTE,
   );
 }
 
@@ -511,6 +544,7 @@ function CardStateSlot({
   settled,
   v,
   t,
+  tone = 'light',
 }: {
   state: EventState;
   pick: AITopContender;
@@ -518,18 +552,21 @@ function CardStateSlot({
   settled: boolean;
   v: TiVerdict;
   t: TFunction;
+  tone?: 'light' | 'dark';
 }) {
+  const dark = tone === 'dark';
   if (settled) {
     if (v.kind === 'none') {
       // Settled with no leaderboard row → show fit if present.
-      return <CourseFitLine score={pick.courseFitScore} t={t} />;
+      return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
     }
     return <VerdictChip v={v} t={t} />;
   }
   if (state === 'live' && live) {
     const cutV = tiVerdict(live);
     if (cutV.kind === 'mc') return <VerdictChip v={cutV} t={t} />;
-    if (live.position != null)
+    if (live.position != null) {
+      if (dark) return <DarkScoreBlock live={live} />;
       return (
         <TourStatusBlock
           score={live.score}
@@ -540,10 +577,47 @@ function CardStateSlot({
           align="left"
         />
       );
+    }
   }
   // Pre-tournament (upcoming) or live-with-no-row → course fit
-  return <CourseFitLine score={pick.courseFitScore} t={t} />;
+  return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
 }
+
+/**
+ * DarkScoreBlock — score + position over the photograph, right-aligned.
+ * THE TOKEN SWITCHES: under par uses TOPAR_UNDER_DARK (#DC2626), because
+ * TOPAR_UNDER_LIGHT is tuned for ink on white and goes muddy on a photo.
+ * Level / over par become white-tinted (INK is invisible here).
+ */
+function DarkScoreBlock({ live }: { live: PickLiveState }) {
+  const score = live.score;
+  const scoreText = formatTiScore(score) ?? (score == null ? null : String(score));
+  const pos = formatTiPosition(live.position, live.positionTied);
+  const color =
+    score == null || !Number.isFinite(score)
+      ? 'rgba(255,255,255,0.86)'
+      : score < 0
+        ? TOPAR_UNDER_DARK
+        : score === 0
+          ? 'rgba(255,255,255,0.86)'
+          : 'rgba(255,255,255,0.7)';
+  if (!scoreText && !pos) return null;
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+      {scoreText ? (
+        <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color, fontVariantNumeric: 'tabular-nums' }}>
+          {scoreText}
+        </span>
+      ) : null}
+      {pos ? (
+        <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>
+          {pos}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 
 function CourseFitLine({ score, t }: { score: number | null | undefined; t: TFunction }) {
   if (score == null) return <div style={{ height: 16 }} />;
