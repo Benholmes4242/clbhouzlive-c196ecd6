@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, MoreVertical, BadgeCheck, MessageCircle } from 'lucide-react';
+import { ChevronLeft, MoreVertical, BadgeCheck } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useThread } from '@/hooks/messaging/useThread';
 import { useConversations } from '@/hooks/messaging/useConversations';
@@ -532,85 +532,39 @@ const ThreadV2Page: React.FC = () => {
                   ? t('messaging:empty.threadStartWith', { name: header.name })
                   : t('messaging:empty.threadStart'));
             return (
+              /* ADDENDUM §1.4 — NO GENERIC GLYPH. The empty thread says what the
+                 two of you have in common, or says plainly there are no
+                 messages yet. It does not draw a speech bubble. */
               <div
                 className="flex flex-col items-center justify-center text-center"
-                style={{ padding: '80px 24px', gap: 12 }}
+                style={{ padding: '96px 24px', gap: 8 }}
               >
-                <div
-                  className="thread-empty-squircle ec-glass"
+                <p
                   style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 17,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    willChange: 'transform',
+                    color: INK,
+                    fontSize: 17,
+                    fontWeight: 700,
+                    margin: 0,
+                    lineHeight: '22px',
+                    letterSpacing: '-0.02em',
                   }}
                 >
-                  <MessageCircle size={24} color={INK} strokeWidth={2} />
-
-                  <div
-                    aria-hidden
-                    className="thread-empty-sheen"
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background:
-                        'linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.14) 50%, transparent 60%)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col items-center" style={{ gap: 4 }}>
-                  <p
-                    style={{
-                      color: INK,
-                      fontSize: 17,
-                      fontWeight: 600,
-                      margin: 0,
-                      lineHeight: '22px',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {t('messaging:empty.sayHello')}
-                  </p>
-                  <p
-                    style={{
-                      color: SUB,
-                      fontSize: 14,
-                      margin: 0,
-                      lineHeight: 1.5,
-                      maxWidth: 260,
-                    }}
-                  >
-                    {subtitle}
-                  </p>
-                </div>
-                <style>{`
-                  @keyframes thread-empty-float {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-3px); }
-                  }
-                  @keyframes thread-empty-sheen {
-                    0% { transform: translateX(-120%); }
-                    60%, 100% { transform: translateX(120%); }
-                  }
-                  .thread-empty-squircle {
-                    animation: thread-empty-float 3.6s ease-in-out infinite;
-                  }
-                  .thread-empty-sheen {
-                    animation: thread-empty-sheen 5s ease-in-out infinite;
-                  }
-                  @media (prefers-reduced-motion: reduce) {
-                    .thread-empty-squircle { animation: none; }
-                    .thread-empty-sheen { display: none; }
-                  }
-                `}</style>
+                  {t('messaging:empty.sayHello')}
+                </p>
+                <p
+                  style={{
+                    color: SUB,
+                    fontSize: 14,
+                    margin: 0,
+                    lineHeight: 1.5,
+                    maxWidth: 260,
+                  }}
+                >
+                  {subtitle}
+                </p>
               </div>
             );
+
           })()
         ) : (
           <>
