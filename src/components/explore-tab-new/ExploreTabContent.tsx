@@ -61,15 +61,19 @@ import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
  *
  * Vertical space is curated and capped; horizontal rails absorb volume, so a
  * heavy week grows sideways rather than pushing the discovery feed off screen.
- * Six sections, six different anatomies — rail, feed, facts, mosaic,
- * leaderboard, ledger.
+ * SEVEN sections, seven different anatomies — rail, facts rail, mosaic, feed,
+ * mosaic, leaderboard, board. THIS LIST IS THE RENDER ORDER; the previous
+ * comment documented six with "Around the world" second, which the code had
+ * never matched.
  *
- *   1 Where your friends played   rail       (hidden with no friend rounds)
- *   2 Around the world            feed       region pills live here
- *   3 On tour this week           facts rail (next-up fallback off-week)
- *   4 Moments of the week         mosaic     read-only viewer
- *   5 Most played this week       leaderboard
- *   6 The honours board          board      never windowed
+ *   1 Where your friends played   rail        (hidden with no friend rounds)
+ *   2 On tour this week           facts rail  (next-up fallback off-week)
+ *   3 Latest reviews              mosaic
+ *   4 Around the world            feed        region pills live here
+ *   5 From the community          mosaic      read-only viewer
+ *   6 Most played this week       leaderboard
+ *   7 The honours board           board       never windowed
+
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
