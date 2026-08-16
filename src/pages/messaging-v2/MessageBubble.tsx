@@ -158,13 +158,18 @@ export const MessageBubble: React.FC<Props> = ({
         </button>
       )}
       <div
+        className={!isOutgoing && !isDeleted && !hugMedia ? 'ec-glass' : undefined}
         style={{
           position: "relative",
           maxWidth: '78%',
+          /* §4.3 A ONE-WORD MESSAGE IS A BUBBLE, NOT A DISC. The floor plus the
+             fixed radius means "Hi" comes out as a short rounded rectangle. */
+          minWidth: isDeleted || hugMedia ? 0 : 58,
           background: isDeleted || hugMedia ? 'transparent' : bg,
           color: fg,
           borderRadius,
           padding: isDeleted ? '0' : hugMedia ? '0' : '8px 12px',
+
           border: isDeleted
             ? `0.5px dashed ${HAIRLINE}`
             : !isOutgoing && !hugMedia
