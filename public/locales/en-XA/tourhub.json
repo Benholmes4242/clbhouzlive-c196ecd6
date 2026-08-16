@@ -300,7 +300,11 @@
         "finished": "[~~F~~]",
         "thruN": "[~~thrú {{n}}~~]"
       },
-      "thruSep": "[~~ · {{value}}~~]"
+      "thruSep": "[~~ · {{value}}~~]",
+      "board": {
+        "titleCount_one": "[~~Óúr píçk~~]",
+        "titleCount_other": "[~~Óúr {{count}} píçkš~~]"
+      }
     },
     "collegeFranchise": {
       "eyebrow": "[~~ÇÓLLÉGÉ FRÁÑÇHÍŠÉ~~]",
