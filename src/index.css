@@ -1909,28 +1909,12 @@ html.overlay-open .clubhouse-progress {
 
 /* Messages shell — same fixed viewport contract as Echo for real iOS/Median
    webviews: the page shell is removed from document flow, while only the
-   message list/inbox content scrolls internally. */
-.messages-root {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 100svh;
-  width: 100%;
-  max-width: 480px;
-  background: #F8FAFC;
-  overflow: hidden;
-}
-@media (min-width: 768px) {
-  .messages-root { max-width: var(--ipad-read); }
-}
-@supports (height: 100dvh) {
-  .messages-root { height: 100dvh; }
-}
-@supports not (height: 100svh) {
-  .messages-root { height: 100vh; }
-}
+   message list/inbox content scrolls internally.
+   THE SHELL IS FLUID. There is no fixed width, no max-width and no centring
+   transform here: 393/480 were a device mock in the reference harness, and a
+   translateX(-50%) left over from that centring is what pushed the whole
+   surface half a viewport off-screen on real phones. Geometry lives in
+   features/messaging-dark/messages-dark.css — ONE definition. */
 
 
 /* Video fills container like TikTok/IG */
