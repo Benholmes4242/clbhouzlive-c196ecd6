@@ -80,7 +80,8 @@
     "peopleAnd": "Search people and businesses",
     "prompt": "Search for someone to message.",
     "searching": "Searching…",
-    "threads": "대화 검색"
+    "threads": "대화 검색",
+    "noResultsHint": "전체 이름이나 사용자명으로 검색해 보세요."
   },
   "sheet": {
     "detailsTitle": "Details"
@@ -109,6 +110,10 @@
   },
   "compose": {
     "playedWith": "함께 플레이한 골퍼",
-    "roundsTogether": "함께 {{count}}라운드"
+    "roundsTogether": "함께 {{count}}라운드",
+    "chooseSomeone": "상대 선택",
+    "oneSelected": "1명 선택",
+    "nSelected": "{{count}}명 선택",
+    "nSelectedGroup": "{{count}}명 선택 · 그룹"
   }
 }

@@ -1,3 +1,30 @@
+/**
+ * ADDENDUM TO BRIEF_MESSAGES_DARK — THE COMPOSE SHEET.
+ *
+ * §1.1 IT WAS LIGHT. A white sheet rising over #05070A was the one transition
+ *      inside Messages nobody chose. It is dark now, and it sits A STEP LIGHTER
+ *      than the canvas (EC.PANEL over MSG.BLACK) so it reads as a layer above
+ *      rather than the same plane.
+ *
+ * §1.2 THE CONTEXT LINE IS WHERE AND WHEN, NEVER A COUNT. Shared-round counts
+ *      are PAIRING-BASED and not deduped (a day where both players post two
+ *      rounds counts four), and on a compose sheet recency is the useful fact
+ *      anyway: "who did I just play with", not "who have I played most". The
+ *      course and date come from the SAME cache the thread strip already fills
+ *      (['whs-shared-rounds', ...]) — no new shape of query.
+ *
+ * §3.1 A ROW WITH NO CONTEXT CARRIES NO LINE. Never a dash, never a
+ *      placeholder, never a fabricated course.
+ * §3.2 SELECTION IS VISIBLE ON THE WHOLE ROW — the row lifts to the panel tone
+ *      and the tick fills.
+ * §4   THE ACTION IS WHITE WHEN ENABLED, and the footer says what is selected,
+ *      naming a GROUP before it is created.
+ * §6   NO AMBER ANYWHERE. Everyone on this sheet is someone else.
+ *
+ * Unchanged: multi-select behaviour, msg_start_direct / msg_create_group, the
+ * search query and its ranking/debounce, the token module, the typeface.
+ */
+
 import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +33,6 @@ import { X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   useEntityPickerSearch,
@@ -15,15 +41,21 @@ import {
 } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { usePlayedWith } from '@/hooks/messaging/usePlayedWith';
+import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
+import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { EC } from '@/features/echo-chat/tokens';
 import type { Json } from '@/integrations/supabase/types';
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/** §2 the sheet's own surface — one step lighter than the canvas behind it. */
+const SHEET = EC.PANEL;
+/** The lifted tone: a selected row, the search field, the disabled action. */
+const RAISED = EC.RAISED;
+
+/** How many played-with rows may fetch their course/date. */
+const CONTEXT_CAP = 8;
 
 type Candidate = {
   actor_type: 'personal' | 'business';
@@ -32,6 +64,42 @@ type Candidate = {
   avatar_url: string | null;
   verified?: boolean;
 };
+
+/** "Broadstone · 12 Aug" — or nothing at all (§3.1). */
+function formatWhen(dateISO: string | null): string | null {
+  if (!dateISO) return null;
+  const d = new Date(dateISO);
+  if (Number.isNaN(d.getTime())) return null;
+  const sameYear = d.getFullYear() === new Date().getFullYear();
+  return d.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  });
+}
+
+const RowSkeleton: React.FC = () => (
+  <div style={{ padding: '0 16px' }}>
+    {[0, 1, 2, 3].map((i) => (
+      <div
+        key={i}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '12px 0',
+          borderBottom: `0.5px solid ${MSG.RULE}`,
+        }}
+      >
+        <div style={{ width: 42, height: 42, borderRadius: '34%', background: 'rgba(255,255,255,0.07)' }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ height: 10, width: '40%', borderRadius: 3, background: 'rgba(255,255,255,0.09)' }} />
+          <div style={{ height: 9, width: '58%', borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 interface NewConversationSheetProps {
   open: boolean;
@@ -48,10 +116,26 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
 
-  // §5 the sheet opens on golfers you have played with, so it must know who
-  // they are before the member types anything.
   const { user } = useSupabaseSession();
   const playedWith = usePlayedWith(user?.id, open);
+
+  // Where and when, from the thread strip's own cache keys.
+  const playedIds = useMemo(
+    () => playedWith.members.slice(0, CONTEXT_CAP).map((m) => m.userId),
+    [playedWith.members],
+  );
+  const { byUserId } = useSharedGroundBatch(user?.id, playedIds, CONTEXT_CAP);
+
+  /** §3.1 course and date if we hold it, else nothing. Never a count. */
+  const contextFor = useCallback(
+    (userId: string): string | null => {
+      const g = byUserId[userId];
+      if (!g?.lastCourseName) return null;
+      const when = formatWhen(g.lastPlayDate);
+      return when ? `${g.lastCourseName} · ${when}` : g.lastCourseName;
+    },
+    [byUserId],
+  );
 
   const { people, businesses, isLoading } = useEntityPickerSearch({
     query: debounced,
@@ -75,7 +159,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
       verified: b.verified,
     }));
     const list = [...personActors, ...bizActors];
-    // Exclude the current actor itself.
     return list.filter(
       (c) => !(actor && c.actor_type === actor.actorType && c.actor_id === actor.actorId),
     );
@@ -100,9 +183,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
       selected.some((s) => s.actor_type === c.actor_type && s.actor_id === c.actor_id),
     [selected],
   );
-
-
-
 
   const reset = useCallback(() => {
     setQuery('');
@@ -170,21 +250,124 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     }
   }, [actor, selected, title, busy, navigate, handleClose]);
 
-  return (
-    <BottomSheet open={open} onClose={handleClose} zIndexBase={1400}>
-      <SheetHeader title={t('action.newMessage')} onClose={handleClose} />
+  /** §4 the footer states the selection, and names a group before it exists. */
+  const footerLabel =
+    selected.length === 0
+      ? t('compose.chooseSomeone', { defaultValue: 'Choose someone' })
+      : selected.length === 1
+      ? t('compose.oneSelected', { defaultValue: '1 selected' })
+      : selected.length === 2
+      ? t('compose.nSelected', {
+          count: selected.length,
+          defaultValue: `${selected.length} selected`,
+        })
+      : t('compose.nSelectedGroup', {
+          count: selected.length,
+          defaultValue: `${selected.length} selected · group`,
+        });
 
-      <div style={{ background: CANVAS, paddingBottom: 12 }}>
-        {/* Selected chips */}
-        {selected.length > 0 && (
+  const actionEnabled = selected.length >= 1 && !busy;
+
+  /** One row shape for both the default set and the search results (§5.4). */
+  const renderRow = (
+    c: Candidate,
+    context: string | null,
+    opts: { disabled?: boolean; userId?: string } = {},
+  ) => {
+    const selectedRow = isSelected(c);
+    const disabled = !!opts.disabled;
+    return (
+      <button
+        key={`${c.actor_type}:${c.actor_id}`}
+        type="button"
+        disabled={disabled}
+        onClick={() => !disabled && toggleSelect(c)}
+        className="active:opacity-80"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          width: '100%',
+          padding: '11px 16px',
+          // §3.2 the whole row lifts when selected.
+          background: selectedRow ? RAISED : 'transparent',
+          border: 'none',
+          borderBottom: `0.5px solid ${MSG.RULE}`,
+          textAlign: 'left',
+          opacity: disabled ? 0.45 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}
+      >
+        <SquircleAvatar
+          src={c.avatar_url ?? undefined}
+          userId={opts.userId}
+          alt={c.name}
+          size={42}
+          hairlineRing
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              display: 'flex',
-              gap: 8,
-              flexWrap: 'wrap',
-              padding: '12px 16px 4px',
+              ...MT.NAME,
+              fontWeight: 700,
+              color: MSG.INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
+            {c.name}
+          </div>
+          {/* §3.1 no context, no line. */}
+          {context && (
+            <div
+              style={{
+                ...MT.CONTEXT,
+                marginTop: 3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {context}
+            </div>
+          )}
+        </div>
+        <div
+          aria-hidden
+          style={{
+            flexShrink: 0,
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            border: `1.5px solid ${selectedRow ? '#FFFFFF' : MSG.EDGE}`,
+            background: selectedRow ? '#FFFFFF' : 'transparent',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: MSG.BLACK,
+          }}
+        >
+          {selectedRow && <Check size={14} strokeWidth={2.5} />}
+        </div>
+      </button>
+    );
+  };
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      zIndexBase={1400}
+      variant="dark"
+      surfaceColor={SHEET}
+    >
+      <SheetHeader title={t('action.newMessage')} onClose={handleClose} dark />
+
+      <div style={{ background: SHEET, paddingBottom: 4 }}>
+        {/* Selected chips */}
+        {selected.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '12px 16px 0' }}>
             {selected.map((s) => (
               <button
                 key={`${s.actor_type}:${s.actor_id}`}
@@ -195,23 +378,23 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                   alignItems: 'center',
                   gap: 6,
                   padding: '4px 8px 4px 4px',
-                  background: '#FFFFFF',
-                  border: `0.5px solid ${HAIRLINE}`,
+                  background: RAISED,
+                  border: `0.5px solid ${MSG.EDGE}`,
                   borderRadius: 999,
-                  color: INK,
+                  color: MSG.INK,
                   fontSize: 13,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 <SquircleAvatar src={s.avatar_url ?? undefined} alt={s.name} size={20} hairlineRing />
                 <span>{s.name}</span>
-                <X size={14} color={SUB} />
+                <X size={14} color={MSG.INK_3} />
               </button>
             ))}
           </div>
         )}
 
-        {/* Search input */}
+        {/* Search field */}
         <div style={{ padding: '12px 16px' }}>
           <input
             type="text"
@@ -222,9 +405,9 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               width: '100%',
               padding: '12px 14px',
               borderRadius: 12,
-              background: '#FFFFFF',
-              border: `0.5px solid ${HAIRLINE}`,
-              color: INK,
+              background: RAISED,
+              border: `0.5px solid ${MSG.EDGE}`,
+              color: MSG.INK,
               fontSize: 15,
               outline: 'none',
             }}
@@ -243,9 +426,9 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
                 width: '100%',
                 padding: '12px 14px',
                 borderRadius: 12,
-                background: '#FFFFFF',
-                border: `0.5px solid ${HAIRLINE}`,
-                color: INK,
+                background: RAISED,
+                border: `0.5px solid ${MSG.EDGE}`,
+                color: MSG.INK,
                 fontSize: 15,
                 outline: 'none',
               }}
@@ -256,248 +439,103 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
         {/* Results */}
         <div
           style={{
-            maxHeight: '50vh',
+            maxHeight: '50dvh',
             overflowY: 'auto',
-            borderTop: `0.5px solid ${HAIRLINE}`,
+            WebkitOverflowScrolling: 'touch',
+            borderTop: `0.5px solid ${MSG.RULE}`,
           }}
         >
           {debounced.trim().length === 0 ? (
-            /* §5 NEW MESSAGE NO LONGER OPENS ONTO NOTHING. It opens on the
-               golfers you have actually played with, most shared rounds first. */
+            /* §5.1 DEFAULT — the played-with set, most recent first. */
             playedWith.isLoading ? (
-              <div style={{ padding: '8px 16px' }}>
-                {[0, 1, 2].map((i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
-                    <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
-                    <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
-                  </div>
-                ))}
-              </div>
+              <RowSkeleton />
             ) : playedWith.members.length === 0 ? (
-              <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+              <div style={{ padding: '28px 16px', ...MT.PREVIEW, color: MSG.INK_3, textAlign: 'center' }}>
                 {t('search.prompt')}
               </div>
             ) : (
               <>
-                <div
-                  style={{
-                    padding: '12px 16px 6px',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color: SUB,
-                  }}
-                >
+                <div style={{ ...MT.EYEBROW, padding: '12px 16px 6px' }}>
                   {t('compose.playedWith', { defaultValue: 'Played with' })}
                 </div>
-                {playedWith.members.map((m) => {
-                  const candidate: Candidate = {
-                    actor_type: 'personal',
-                    actor_id: m.userId,
-                    name: m.name,
-                    avatar_url: m.avatarUrl,
-                    verified: m.verified,
-                  };
-                  const selectedRow = isSelected(candidate);
-                  return (
-                    <button
-                      key={m.userId}
-                      type="button"
-                      onClick={() => toggleSelect(candidate)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        width: '100%',
-                        padding: '12px 16px',
-                        background: 'transparent',
-                        border: 'none',
-                        borderBottom: `0.5px solid ${HAIRLINE}`,
-                        textAlign: 'left',
-                      }}
-                    >
-                      <SquircleAvatar
-                        src={m.avatarUrl ?? undefined}
-                        userId={m.userId}
-                        alt={m.name}
-                        size={44}
-                        hairlineRing
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            color: INK,
-                            fontSize: 15,
-                            fontWeight: 500,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {m.name}
-                        </div>
-                        <div style={{ color: SUB, fontSize: 12, marginTop: 2 }}>
-                          {t('compose.roundsTogether', {
-                            count: m.sharedRounds,
-                            defaultValue: `${m.sharedRounds} rounds together`,
-                          })}
-                        </div>
-                      </div>
-                      <div
-                        aria-hidden
-                        style={{
-                          width: 22,
-                          height: 22,
-                          borderRadius: 999,
-                          border: `1.5px solid ${selectedRow ? INK : 'rgba(0,0,0,0.18)'}`,
-                          background: selectedRow ? INK : 'transparent',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#FFFFFF',
-                        }}
-                      >
-                        {selectedRow && <Check size={14} strokeWidth={2.5} />}
-                      </div>
-                    </button>
-                  );
-                })}
+                {playedWith.members.map((m) =>
+                  renderRow(
+                    {
+                      actor_type: 'personal',
+                      actor_id: m.userId,
+                      name: m.name,
+                      avatar_url: m.avatarUrl,
+                      verified: m.verified,
+                    },
+                    contextFor(m.userId),
+                    { userId: m.userId },
+                  ),
+                )}
               </>
             )
-
           ) : isLoading ? (
-            <div style={{ padding: '8px 16px' }}>
-              {[0, 1, 2].map((i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
-                  <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
-                  <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
-                </div>
-              ))}
-            </div>
+            <RowSkeleton />
           ) : candidates.length === 0 ? (
-            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              {t('search.noResults')}
+            /* §5.5 NO RESULTS — one line, one suggestion, no illustration. */
+            <div style={{ padding: '28px 16px' }}>
+              <div style={{ ...MT.NAME, fontWeight: 700, color: MSG.INK }}>
+                {t('search.noResults')}
+              </div>
+              <div style={{ ...MT.PREVIEW, color: MSG.INK_3, marginTop: 6 }}>
+                {t('search.noResultsHint', {
+                  defaultValue: 'Try a full name or a username.',
+                })}
+              </div>
             </div>
           ) : (
+            /* §5.4 SEARCHING — the same row shape and the same context line. */
             candidates.map((c) => {
               const permission = actor
                 ? canActorMessage({ actorType: actor.actorType }, { actorType: c.actor_type })
                 : { allowed: false as const, reason: 'Not signed in' };
               const disabled = !permission.allowed;
-              const selectedRow = isSelected(c);
-              return (
-                <button
-                  key={`${c.actor_type}:${c.actor_id}`}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => !disabled && toggleSelect(c)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: `0.5px solid ${HAIRLINE}`,
-                    textAlign: 'left',
-                    opacity: disabled ? 0.5 : 1,
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  <SquircleAvatar src={c.avatar_url ?? undefined} alt={c.name} size={44} hairlineRing />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        color: INK,
-                        fontSize: 15,
-                        fontWeight: 500,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {c.name}
-                    </div>
-                    <div style={{ color: SUB, fontSize: 12, marginTop: 2 }}>
-                      {c.actor_type === 'business'
-                        ? 'Business'
-                        : disabled
-                        ? (permission as { allowed: false; reason: string }).reason
-                        : 'Person'}
-                    </div>
-                  </div>
-                  <div
-                    aria-hidden
-                    style={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: 999,
-                      border: `1.5px solid ${selectedRow ? INK : 'rgba(0,0,0,0.18)'}`,
-                      background: selectedRow ? INK : 'transparent',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#FFFFFF',
-                    }}
-                  >
-                    {selectedRow && <Check size={14} strokeWidth={2.5} />}
-                  </div>
-                </button>
-              );
+              const context = disabled
+                ? (permission as { allowed: false; reason: string }).reason
+                : c.actor_type === 'business'
+                ? t('context.business')
+                : contextFor(c.actor_id);
+              return renderRow(c, context, {
+                disabled,
+                userId: c.actor_type === 'personal' ? c.actor_id : undefined,
+              });
             })
           )}
         </div>
 
-        {/* Footer actions */}
+        {/* §4 the footer states the selection; the action is WHITE when enabled */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 12,
             padding: '12px 16px 4px',
-            borderTop: `0.5px solid ${HAIRLINE}`,
+            borderTop: `0.5px solid ${MSG.RULE}`,
           }}
         >
-          <div style={{ flex: 1 }} />
-          {selected.length <= 1 ? (
-            <button
-              type="button"
-              disabled={selected.length !== 1 || busy}
-              onClick={startDM}
-              style={{
-                background: INK,
-                color: '#FFFFFF',
-                fontSize: 14,
-                fontWeight: 500,
-                padding: '12px 16px',
-                borderRadius: 999,
-                border: 'none',
-                opacity: selected.length !== 1 || busy ? 0.4 : 1,
-              }}
-            >
-              {t('action.message')}
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={createGroup}
-              style={{
-                background: INK,
-                color: '#FFFFFF',
-                fontSize: 14,
-                fontWeight: 500,
-                padding: '12px 16px',
-                borderRadius: 999,
-                border: 'none',
-                opacity: busy ? 0.4 : 1,
-              }}
-            >
-              {t('action.createGroup')}
-            </button>
-          )}
+          <div style={{ ...MT.CONTEXT, flex: 1, minWidth: 0 }}>{footerLabel}</div>
+          <button
+            type="button"
+            disabled={!actionEnabled}
+            onClick={selected.length >= 2 ? createGroup : startDM}
+            className="active:opacity-80"
+            style={{
+              flexShrink: 0,
+              background: actionEnabled ? '#FFFFFF' : RAISED,
+              color: actionEnabled ? MSG.BLACK : MSG.INK_3,
+              border: actionEnabled ? 'none' : `0.5px solid ${MSG.EDGE}`,
+              fontSize: 14,
+              fontWeight: 700,
+              padding: '11px 18px',
+              borderRadius: 999,
+            }}
+          >
+            {selected.length >= 2 ? t('action.createGroup') : t('action.message')}
+          </button>
         </div>
       </div>
     </BottomSheet>

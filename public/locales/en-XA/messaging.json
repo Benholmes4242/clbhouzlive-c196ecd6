@@ -80,7 +80,8 @@
     "peopleAnd": "[~~Šéářĉĥ ƥéőƥļé áñđ ƀúšíñéššéš~~]",
     "prompt": "[~~Šéářĉĥ ƒőř šőɱéőñé ţő ɱéššáĝé.~~]",
     "searching": "[~~Šéářĉĥíñĝ…~~]",
-    "threads": "[Séärçh çöñvérsätiöñs]"
+    "threads": "[Séärçh çöñvérsätiöñs]",
+    "noResultsHint": "[Try a full name or a username.]"
   },
   "sheet": {
     "detailsTitle": "[~~Đéţáíļš~~]"
@@ -109,6 +110,10 @@
   },
   "compose": {
     "playedWith": "[Pläyéd with]",
-    "roundsTogether": "[{{count}} röûñds tögéthér]"
+    "roundsTogether": "[{{count}} röûñds tögéthér]",
+    "chooseSomeone": "[Ch00se s0me0ne]",
+    "oneSelected": "[1 selected]",
+    "nSelected": "[{{count}} selected]",
+    "nSelectedGroup": "[{{count}} selected · group]"
   }
 }

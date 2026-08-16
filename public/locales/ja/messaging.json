@@ -80,7 +80,8 @@
     "peopleAnd": "Search people and businesses",
     "prompt": "Search for someone to message.",
     "searching": "Searching…",
-    "threads": "会話を検索"
+    "threads": "会話を検索",
+    "noResultsHint": "フルネームかユーザー名で検索してください。"
   },
   "sheet": {
     "detailsTitle": "Details"
@@ -109,6 +110,10 @@
   },
   "compose": {
     "playedWith": "一緒にプレーした人",
-    "roundsTogether": "一緒に{{count}}ラウンド"
+    "roundsTogether": "一緒に{{count}}ラウンド",
+    "chooseSomeone": "相手を選択",
+    "oneSelected": "1人選択",
+    "nSelected": "{{count}}人選択",
+    "nSelectedGroup": "{{count}}人選択・グループ"
   }
 }
