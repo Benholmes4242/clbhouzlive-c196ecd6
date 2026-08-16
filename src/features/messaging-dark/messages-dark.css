@@ -100,13 +100,28 @@
 }
 
 /* Full-height dark canvas. The near-black is a SOLID value (§3.3): no faded
-   colour, no gradient over the list. */
+   colour, no gradient over the list.
+   EDGE TO EDGE. No width, no max-width, no centring — the dark surface fills
+   the viewport. `transform: none` is explicit so no earlier centring rule can
+   shift the shell off-screen. */
 .messages-root {
   position: fixed;
   inset: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: none;
+  transform: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100svh;
+}
+@supports (height: 100dvh) {
+  .messages-root { height: 100dvh; }
+}
+@supports not (height: 100svh) {
+  .messages-root { height: 100vh; }
 }
 
 .msg-input {
