@@ -1064,6 +1064,9 @@ function Last5Block({
               const v = verdictFromResult(r);
               const isWin = v.kind === 'win';
               const isMc = v.kind === 'mc';
+              // RED MEANS UNDER PAR on tour surfaces, so a red MC beside a green
+              // 2 reads as two SCORES. Amber — the one colour that already means
+              // clbhouz here — marks the win; everything else is neutral.
               const style: React.CSSProperties = {
                 flex: 1,
                 textAlign: 'center',
@@ -1073,11 +1076,11 @@ function Last5Block({
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: 0.3,
-                ...(v.kind === 'none'
-                  ? { background: NEUTRAL_BG, color: INK_60 }
-                  : chipColors(v.kind)),
+                background: isWin ? 'rgba(247,147,30,0.12)' : 'transparent',
+                border: `1px solid ${isWin ? AMBER : HAIR}`,
+                color: isWin ? AMBER_DEEP : isMc ? INK_45 : INK,
               };
-              const label = isWin ? '🏆 1' : isMc ? (v.label ?? 'MC') : (v.label ?? '—');
+              const label = isWin ? '1' : isMc ? (v.label ?? 'MC') : (v.label ?? '—');
               return (
                 <div key={i} style={style}>
                   {label}
@@ -1085,7 +1088,20 @@ function Last5Block({
               );
             })}
       </div>
+      <div
+        style={{
+          marginTop: 7,
+          fontSize: 9,
+          fontWeight: 700,
+          color: INK_45,
+          letterSpacing: '0.09em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {t('overview.tiPicks.case.mostRecentRight')}
+      </div>
     </div>
+
   );
 }
 
