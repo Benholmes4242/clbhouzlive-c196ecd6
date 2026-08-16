@@ -32,13 +32,13 @@ import '@/features/messaging-dark/messages-dark.css';
 /**
  * BRIEF_MESSAGES_ECHO_PALETTE §1 / §4 — the thread on Echo's palette.
  * Near-black surface, course photograph behind the header, scrim for
- * legibility, glass chrome, and AMBER reserved for the viewing member.
+ * legibility, glass chrome, and no amber at all on this screen (§6): the
+ * member's own bubble is white, the send key is white, the retry pill is ink.
  */
 const CANVAS = MSG.BLACK;
 const INK = MSG.INK;
 const SUB = MSG.INK_2;
 const HINT = MSG.INK_3;
-const AMBER = MSG.AMBER;
 const HAIRLINE = MSG.RULE;
 
 

@@ -131,7 +131,8 @@
   border: 0;
   outline: 0;
   color: #F5F7F8;
-  caret-color: #F7931E;
+  /* BRIEF_MESSAGES_DARK §6 — search/compose focus is WHITE, not amber. */
+  caret-color: #F4F6F8;
 }
 .msg-input::placeholder { color: #7C8489; }
 
