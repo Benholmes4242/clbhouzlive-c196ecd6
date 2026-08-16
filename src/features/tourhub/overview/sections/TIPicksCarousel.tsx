@@ -625,64 +625,88 @@ function CaseSheet({
   const winsValue = typeof stats?.wins === 'number' ? stats.wins : seasonSummary?.wins;
   const top10sValue = typeof stats?.top_10s === 'number' ? stats.top_10s : seasonSummary?.top10s;
 
+  // ONE resolution for the avatar and for the band behind it.
+  const headshots = pick.photoUrl
+    ? [pick.photoUrl, ...getPlayerHeadshotCandidates(pick.playerName, tourCode)]
+    : getPlayerHeadshotCandidates(pick.playerName, tourCode);
+
+  const headScore = live?.score ?? null;
+
   const header = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
-      <div
-        role="link"
-        onClick={() => onNavigatePlayer(pick.playerId)}
-        style={{ cursor: 'pointer', flexShrink: 0 }}
+    <>
+      <span
+        style={{
+          fontSize: 9.5,
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.82)',
+          letterSpacing: '0.11em',
+          textTransform: 'uppercase',
+          fontVariantNumeric: 'tabular-nums',
+        }}
       >
-        <PlayerAvatar
-          playerId={pick.playerId}
-          playerName={pick.playerName}
-          tourCode={tourCode}
-          photoUrl={pick.photoUrl}
-          size="xl"
-          ringColor={LIGHT_HAIRLINE}
-        />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              color: INK,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('overview.tiPicks.case.eyebrow')}
-          </span>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: INK_45,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            #{pick.rank}
-          </span>
-        </div>
-        <h2
-          style={{
-            fontSize: 26,
-            fontWeight: 700,
-            color: INK,
-            margin: '2px 0 0',
-            letterSpacing: '-0.024em',
-            lineHeight: 1.1,
-          }}
+        {t('overview.tiPicks.case.eyebrowPick', { n: pick.rank })}
+      </span>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+        <div
+          role="link"
+          onClick={() => onNavigatePlayer(pick.playerId)}
+          style={{ cursor: 'pointer', flexShrink: 0 }}
         >
-          {pick.playerName}
-        </h2>
+          <SquircleAvatar
+            size={58}
+            srcCandidates={headshots}
+            alt={pick.playerName}
+            userId={pick.playerId}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <h2
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                color: INK,
+                margin: 0,
+                letterSpacing: '-0.024em',
+                lineHeight: 1.12,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minWidth: 0,
+              }}
+            >
+              {pick.playerName}
+            </h2>
+            <ClbhouzPickMark size={13} label={t('overview.board.clbhouzPick')} />
+          </div>
+        </div>
+        {headScore != null ? (
+          <span
+            style={{
+              flexShrink: 0,
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              fontVariantNumeric: 'tabular-nums',
+              color: headScore < 0 ? TOPAR_UNDER_LIGHT : headScore > 0 ? INK : INK_60,
+            }}
+          >
+            {formatTiScore(headScore)}
+          </span>
+        ) : null}
       </div>
-    </div>
+    </>
   );
 
   return (
-    <SheetShell onClose={onClose} header={header}>
+    <SheetShell
+      onClose={onClose}
+      header={header}
+      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, objectPosition: '50% 14%' }}
+    >
+
       {/* Verdict banner */}
       <VerdictBanner v={v} state={state} live={live} t={t} />
 
