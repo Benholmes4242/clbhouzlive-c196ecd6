@@ -2,7 +2,7 @@
  * BRIEF_MESSAGES_ECHO_PALETTE §1 / §6 — Messages runs on Echo's palette.
  *
  * WHAT IS TAKEN: the near-black surface, the three SOLID ink tiers, the glass
- * (imported from echo-caddie.css — ONE definition, §3.1), and amber meaning
+ * (imported from echo-chat.css — ONE definition, §3.1), and amber meaning
  * THE VIEWING MEMBER.
  *
  * WHAT IS NOT TAKEN: the waveform. That is Echo's mark and it does not appear
@@ -14,7 +14,7 @@
  */
 
 import type React from 'react';
-import { EC } from '@/features/echo-caddie/tokens';
+import { EC } from '@/features/echo-chat/tokens';
 
 export const MSG = {
   /** The surface. Same near-black as the caddie stage. */

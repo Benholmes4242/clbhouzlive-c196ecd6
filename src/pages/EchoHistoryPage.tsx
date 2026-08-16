@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
-import { EchoWaveform } from '@/features/echo-caddie/components/EchoWaveform';
-import '@/features/echo-caddie/echo-caddie.css';
+import { EchoWaveform } from '@/features/echo-chat/components/EchoWaveform';
+import '@/features/echo-chat/echo-chat.css';
 import { formatRelativeRounded } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
@@ -83,6 +83,56 @@ function buildGroups(chats: EchoChatRow[]): ChatGroup[] {
   return out;
 }
 
+/**
+ * BRIEF_ECHO_CHAT §8.2 — HISTORY GROUPS BY DAY. The question leads each row and
+ * the time sits beneath it, because THE QUESTION IS WHAT A MEMBER SCANS FOR.
+ * Within a day, identically-titled chats still collapse under their most
+ * recent one (no chat is ever hidden, and pinned rows stand alone).
+ */
+interface DaySection {
+  key: string;
+  label: string;
+  groups: ChatGroup[];
+}
+
+function dayLabel(iso: string | null, t: (k: string, d: string) => string): string {
+  if (!iso) return t('history.today', 'Today');
+  const d = new Date(iso);
+  const today = new Date();
+  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((startOf(today) - startOf(d)) / 86_400_000);
+  if (diff <= 0) return t('history.today', 'Today');
+  if (diff === 1) return t('history.yesterday', 'Yesterday');
+  return d.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: d.getFullYear() === today.getFullYear() ? undefined : 'numeric',
+  });
+}
+
+function buildDaySections(
+  chats: EchoChatRow[],
+  t: (k: string, d: string) => string,
+): DaySection[] {
+  const buckets = new Map<string, EchoChatRow[]>();
+  const order: string[] = [];
+  for (const c of chats) {
+    const iso = c.last_message_at;
+    const key = iso ? iso.slice(0, 10) : 'unknown';
+    if (!buckets.has(key)) {
+      buckets.set(key, []);
+      order.push(key);
+    }
+    buckets.get(key)!.push(c);
+  }
+  return order.map((key) => ({
+    key,
+    label: dayLabel(buckets.get(key)![0].last_message_at, t),
+    groups: buildGroups(buckets.get(key)!),
+  }));
+}
+
 const EchoHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -109,7 +159,10 @@ const EchoHistoryPage: React.FC = () => {
     return () => unlockBodyScroll();
   }, [sheetMode]);
 
-  const groups = useMemo(() => buildGroups(chats), [chats]);
+  const daySections = useMemo(
+    () => buildDaySections(chats, (k, d) => t(k, { defaultValue: d })),
+    [chats, t],
+  );
 
   const toggleGroup = useCallback((key: string) => {
     setExpandedKeys((prev) => {
@@ -346,7 +399,7 @@ const EchoHistoryPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <EchoWaveform size={28} active={false} />
+                <EchoWaveform size={28} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
@@ -366,7 +419,21 @@ const EchoHistoryPage: React.FC = () => {
             </div>
           ) : (
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-              {groups.map((g) => {
+              {daySections.map((section) => (
+                <React.Fragment key={section.key}>
+                  <li
+                    style={{
+                      padding: '16px 14px 7px',
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      color: SUB,
+                    }}
+                  >
+                    {section.label}
+                  </li>
+                  {section.groups.map((g) => {
                 const expanded = expandedKeys.has(g.key);
                 const groupIds = [g.leader.id, ...g.rest.map((r) => r.id)];
                 return (
@@ -396,7 +463,9 @@ const EchoHistoryPage: React.FC = () => {
                       : null}
                   </React.Fragment>
                 );
-              })}
+                  })}
+                </React.Fragment>
+              ))}
             </ul>
           )}
         </div>
@@ -629,10 +698,11 @@ const ChatRow: React.FC<{
           >
             {title}
           </span>
-          <span style={{ fontSize: 11, color: MUTED, flexShrink: 0 }}>
-            {relativeTime(chat.last_message_at)}
-          </span>
         </button>
+        {/* §8.2 the time sits BENEATH the question, never competing with it. */}
+        <span style={{ fontSize: 11, color: MUTED }}>
+          {relativeTime(chat.last_message_at)}
+        </span>
         {groupCount > 1 && onToggleGroup ? (
           <button
             type="button"

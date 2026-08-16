@@ -114,6 +114,38 @@ function classifyIntent(query: string): {
   return { intents, consensusLevel, playerName, courseQuery, countryQuery };
 }
 
+// ─── BRIEF_ECHO_CHAT §0.2 — THE QUESTION KIND ────────────────────────────
+//
+// THE WHOLE ANSWER SHAPE HANGS OFF THIS MAPPING, so it lives in one place and
+// is stated here. The client renders three shapes and nothing else:
+//
+//   your_golf  data-led   reads the member's rounds
+//   course     data-led   reads course/tournament/player data, no member rounds
+//   game       knowledge  READS NOTHING — prose only, no chart, no sources,
+//                         no basis line
+//
+// The five raw intents are NOT sent to the client: they are not 1:1 with the
+// shapes and a client switching on them would drift the moment a sixth intent
+// is added. Mapping, per the approved reading:
+//
+//   user_advice          -> your_golf   (the member's own game)
+//   course               -> course
+//   tournament, player   -> course      (data-led, but read no member rounds)
+//   general              -> game        (nothing was opened, nothing is cited)
+//
+// user_advice wins when it is present at all, because an answer that reads the
+// member's rounds must be allowed to say so.
+type EchoQuestionKind = "your_golf" | "course" | "game";
+
+function mapIntentsToKind(intents: QueryIntent[]): EchoQuestionKind {
+  if (intents.includes("user_advice")) return "your_golf";
+  if (intents.includes("course") || intents.includes("tournament") || intents.includes("player")) {
+    return "course";
+  }
+  return "game";
+}
+
+
 // ─── Echo context fetcher (ported unchanged) ─────────────────────────────
 async function fetchEchoContext(
   userId: string,
@@ -812,6 +844,9 @@ serve(async (req: Request) => {
   // 6) Route + intent + context (all needed before streaming).
   const { intents, consensusLevel, playerName, courseQuery, countryQuery } = classifyIntent(message);
   const routeLevel: ConsensusLevel = consensusLevel;
+  // BRIEF_ECHO_CHAT §0.2 — emitted on the EXISTING `meta` event (no second
+  // event). See mapIntentsToKind for the mapping and why it is server-side.
+  const questionKind = mapIntentsToKind(intents);
 
   // 7) Cache lookup (single/dual/full only — NEVER live).
   const queryHash = await sha256Hex(`${userId}|${normalizeQuery(message)}`);
@@ -832,7 +867,7 @@ serve(async (req: Request) => {
           cacheBumpHitFireAndForget(queryHash, cacheRoute, cached.hit_count);
           // Stream cached text as a single delta (client renders progressively either way).
           send({ delta: cached.response_text });
-          const meta = { ...(cached.meta || {}), cached: true, ms: Date.now() - t0 };
+          const meta = { ...(cached.meta || {}), kind: questionKind, cached: true, ms: Date.now() - t0 };
           send(meta, "meta");
           // Persist assistant message with cached flag.
           await supabaseAdmin.from("echo_chat_messages").insert({
@@ -854,6 +889,7 @@ serve(async (req: Request) => {
         const meta = {
           v: BUILD,
           route: routeLevel,
+          kind: questionKind,
           strength: Number(strength.toFixed(2)),
           engines,
           live,

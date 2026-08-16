@@ -1,13 +1,13 @@
 /**
  * BRIEF_MESSAGES_ECHO_PALETTE §3 — the glass is NOT redefined here.
  *
- * echo-caddie.css owns the single `.ec-glass` definition (flat fill base, blur
+ * echo-chat.css owns the single `.ec-glass` definition (flat fill base, blur
  * only inside @supports). Messages imports it and adds nothing but layout.
  * If you find yourself writing a background rgba() with a backdrop-filter in
  * this file, you are building the second definition the brief forbids.
  */
 
-@import '@/features/echo-caddie/echo-caddie.css';
+@import '@/features/echo-chat/echo-chat.css';
 
 /* ── Rows ──────────────────────────────────────────────────────────────── */
 

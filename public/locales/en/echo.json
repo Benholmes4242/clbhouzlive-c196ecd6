@@ -1,44 +1,4 @@
 {
-  "caddie": {
-    "mark": "Echo",
-    "composer": "Ask Echo",
-    "label": {
-      "home": "Your home course",
-      "course": "In context"
-    },
-    "ask": {
-      "lead": "Ask about a hole, a number or how to play it."
-    },
-    "sources": {
-      "rounds": "Your rounds here",
-      "holes": "The hole data",
-      "course": "Course records",
-      "tour": "This week on tour"
-    },
-    "nodata": {
-      "eyebrow": "No rounds of yours here",
-      "lead": "You have not played {{course}} yet.",
-      "advice": "Echo can still read how the course plays for the field.",
-      "field": "How does this course play for everyone else?"
-    },
-    "scope": {
-      "eyebrow": "What Echo reads",
-      "lead": "Echo reads your rounds, the courses you play and this week on tour."
-    },
-    "error": {
-      "eyebrow": "That did not go through",
-      "lead": "Echo could not reach the course data. Your question is still there.",
-      "retry": "Try again"
-    },
-    "norounds": {
-      "eyebrow": "Nothing to read yet",
-      "lead": "Connect your handicap and Echo can read your own rounds. Until then, ask about any course or this week on tour."
-    },
-    "history": {
-      "empty": "No conversations yet",
-      "emptyLead": "Ask Echo about a course and it will be here."
-    }
-  },
   "history": {
     "title": "History",
     "group": {
@@ -54,6 +14,61 @@
         "title": "Delete all {{count}} conversations?",
         "body": "This can't be undone."
       }
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "empty": "No conversations yet",
+    "emptyLead": "Ask Echo about a course and it will be here."
+  },
+  "chat": {
+    "mark": "Echo",
+    "composer": "Ask Echo",
+    "thinking": "Thinking",
+    "entry": {
+      "headline": "Ask Echo about your golf, a course, or the game.",
+      "kind": {
+        "your_golf": "Your golf",
+        "course": "A course",
+        "game": "The game"
+      },
+      "example": {
+        "yourGolfWithCourse": "Which holes cost me most at {{course}}?",
+        "yourGolfNoRounds": "How do I start bringing my handicap down?",
+        "course": "How does {{course}} play?",
+        "courseGeneric": "What should I know before playing Royal St George's?",
+        "game": "What makes a great links course?"
+      }
+    },
+    "sources": {
+      "rounds": "Your rounds here",
+      "holes": "The hole data",
+      "course": "Course records",
+      "tour": "This week on tour"
+    },
+    "basis": {
+      "roundsHere": "Your {{count}} round here",
+      "roundsHere_plural": "Your {{count}} rounds here",
+      "acrossCourses": "Your {{rounds}} rounds across {{courses}} courses",
+      "benchmark": "Your average"
+    },
+    "chart": {
+      "holesTitle": "Where the strokes go",
+      "coursesTitle": "Course by course"
+    },
+    "nodata": {
+      "lead": "You have not played {{course}}, so Echo has no rounds of yours to read there.",
+      "leadGeneric": "Echo has no rounds of yours to read there yet."
+    },
+    "scope": {
+      "lead": "Echo answers golf — your rounds, the courses you play, and the game itself."
+    },
+    "error": {
+      "lead": "That did not go through.",
+      "reassure": "Your question is still in the composer.",
+      "retry": "Try again"
+    },
+    "norounds": {
+      "lead": "Connect your handicap and Echo can read your own rounds. Until then, ask about any course or the game."
     }
   }
 }

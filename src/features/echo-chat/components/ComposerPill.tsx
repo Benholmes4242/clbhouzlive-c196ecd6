@@ -1,25 +1,30 @@
 /**
- * BRIEF_ECHO_CADDIE §6.3 — THE COMPOSER IS A GLASS PILL at the foot, present in
- * every state. §6.2: no chat chrome — no avatar, no send bubble, no typing dots.
+ * BRIEF_ECHO_CHAT — THE COMPOSER IS A GLASS PILL at the foot, present in every
+ * state.
  *
- * §5.4 the ERROR state keeps the question in the composer, so the value is owned
- * by the page, never by this component.
+ * NO WAVEFORM HERE. §5.3 / acceptance E: exactly one waveform is visible at a
+ * time, and it belongs to the speaker mark in the thread. A second mark in the
+ * composer is the duplicate glyph Ben caught.
+ *
+ * §7 the send action is INK, never amber.
+ *
+ * The ERROR state keeps the question in the composer, so the value is owned by
+ * the page, never by this component.
  */
 
 import React, { useEffect, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { EC, T } from '../tokens';
-import { EchoWaveform } from './EchoWaveform';
+import { EC } from '../tokens';
 
 export const ComposerPill: React.FC<{
   value: string;
   onChange: (v: string) => void;
   onSend: (v: string) => void;
   disabled?: boolean;
-  /** True while Echo is thinking or speaking — the only time the mark moves. */
-  active?: boolean;
   placeholder: string;
-}> = ({ value, onChange, onSend, disabled = false, active = false, placeholder }) => {
+  /** Keep the caret where a member left it — focused by default. */
+  autoFocus?: boolean;
+}> = ({ value, onChange, onSend, disabled = false, placeholder, autoFocus = false }) => {
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -28,6 +33,10 @@ export const ComposerPill: React.FC<{
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, 92)}px`;
   }, [value]);
+
+  useEffect(() => {
+    if (autoFocus && !disabled) ref.current?.focus();
+  }, [autoFocus, disabled]);
 
   const submit = () => {
     const v = value.trim();
@@ -42,21 +51,19 @@ export const ComposerPill: React.FC<{
       style={{
         padding: '10px 16px',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)',
+        flex: '0 0 auto',
       }}
     >
       <div
         className="ec-glass ec-glass--pill"
         style={{
-          borderRadius: 26,
-          padding: '10px 10px 10px 14px',
+          borderRadius: 999,
+          padding: '9px 9px 9px 16px',
           display: 'flex',
           alignItems: 'flex-end',
           gap: 10,
         }}
       >
-        <span style={{ paddingBottom: 5, flex: '0 0 auto' }}>
-          <EchoWaveform size={22} active={active} />
-        </span>
         <textarea
           ref={ref}
           className="ec-input"
@@ -70,7 +77,7 @@ export const ComposerPill: React.FC<{
               submit();
             }
           }}
-          style={{ ...T.ADVICE, color: EC.INK, paddingBottom: 4, maxHeight: 92 }}
+          style={{ fontSize: 14.5, lineHeight: 1.4, paddingBottom: 6, maxHeight: 92 }}
         />
         <button
           type="button"
@@ -80,17 +87,17 @@ export const ComposerPill: React.FC<{
           className="active:opacity-70"
           style={{
             flex: '0 0 auto',
-            width: 34,
-            height: 34,
-            borderRadius: 17,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
             border: 'none',
             display: 'grid',
             placeItems: 'center',
-            // Two solid states, not one colour at two alphas (§7).
-            background: canSend ? EC.INK : '#2A2F36',
+            // Two solid states, not one colour at two alphas (§1).
+            background: canSend ? EC.INK : '#232A33',
           }}
         >
-          <ArrowUp size={17} strokeWidth={2.6} color={canSend ? EC.BLACK : EC.INK_3} />
+          <ArrowUp size={16} strokeWidth={2.6} color={canSend ? EC.BLACK : EC.INK_3} />
         </button>
       </div>
     </div>
