@@ -1,16 +1,18 @@
 /**
- * BRIEF_ECHO_CADDIE §7 — colour and type for the caddie surface.
+ * BRIEF_ECHO_CHAT §1 / §7 — colour and type for the Echo thread.
  *
- * NO FADED COLOUR. The three ink tiers below are THREE SEPARATE SOLID VALUES.
- * Nothing here derives a tone by reducing another element's opacity or
- * saturation — that is the rule the whole app now runs on and Echo does not get
- * an exemption.
+ * #05070A IS THE CLUBHOUSE CANVAS (CardFeed, ClubhouseSkeletonShimmer), so
+ * Echo, Messages and the feed share one surface colour and the journey between
+ * them is dark to dark.
  *
- * AMBER: app-wide amber means THE VIEWING MEMBER, and on this surface it is
- * ALSO Echo's mark. Narrow rule, deliberately: amber appears on THE MARK and on
- * THE MEMBER'S OWN FIGURES, and nowhere else. Never chrome, never links, never
- * emphasis. `grep -n AMBER` over this feature should only ever find the
- * waveform and a member figure.
+ * NO FADED COLOUR. The three ink tiers are THREE SEPARATE SOLID VALUES; nothing
+ * takes its tone by reducing another element's opacity or saturation.
+ *
+ * AMBER APPEARS ON THE WAVEFORM AND NOWHERE ELSE ON THIS SURFACE (§7) — not on
+ * the member's bubble, not on the send action, not on chart bars, figures,
+ * labels or the thinking ticks. `grep AMBER` over this feature must find the
+ * mark and nothing else. This is a deliberate narrowing of the app-wide rule:
+ * elsewhere amber marks the viewing member, here it marks Echo.
  *
  * THE DEMANDING RAMP IS NOT DECLARED HERE. It is imported from its single
  * definition (features/courses/.../analytical/tokens) by the consumer.
@@ -19,98 +21,79 @@
 import type React from 'react';
 
 export const EC = {
-  /** The image-absent / no-rounds surface. A missing photograph is not drawn. */
-  BLACK: '#08090B',
-  /** Ink tier 1 — headlines, hero figures. */
-  INK: '#FFFFFF',
-  /** Ink tier 2 — body and advice. A solid value, not white at an alpha. */
-  INK_2: '#C9CFD7',
-  /** Ink tier 3 — eyebrows, basis lines. A solid value, not white at an alpha. */
-  INK_3: '#8B929C',
-  /** Echo's mark, and the member's own figures. Nothing else. */
+  /** The Clubhouse canvas. Echo renders no photograph in any state (§2). */
+  BLACK: '#05070A',
+  /** A chart's card. Solid, not the canvas at an alpha. */
+  PANEL: '#10151C',
+  /** Track behind a bar. */
+  RAISED: '#181F28',
+  /** Hairline / border. */
+  LINE: '#252E39',
+  /** Ink tier 1 — the member's bubble text sits on white, so this is the ink. */
+  INK: '#F4F6F8',
+  /** Ink tier 2 — body prose. A solid value, not white at an alpha. */
+  INK_2: '#A9B4C0',
+  /** Ink tier 3 — eyebrows, basis lines, hole numerals. Solid. */
+  INK_3: '#6C7885',
+  /** ECHO'S MARK. The only amber on this surface. */
   AMBER: '#F7931E',
-  /** Hairline on glass. A border, not a tone doing semantic work. */
-  EDGE: 'rgba(255,255,255,0.13)',
+  /** The one failure tone. */
+  RED: '#E5484D',
 } as const;
 
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
 
-/**
- * TYPE. Nothing at weight 800. Nothing below 8.5px. Figures get BIGGER and
- * TIGHTER, never heavier. Body copy runs LARGER than elsewhere in the app —
- * it is read over a photograph, at arm's length, one idea at a time.
- */
+/** Nothing at weight 800. Nothing below 8.5px. */
 export const T = {
-  /** Panel eyebrow / state label. */
-  EYEBROW: {
-    fontSize: 9.5,
+  /** Section / basis label. */
+  LABEL: {
+    fontSize: 9,
     fontWeight: 700,
-    letterSpacing: '0.18em',
+    letterSpacing: '0.16em',
     textTransform: 'uppercase',
     color: EC.INK_3,
   } as React.CSSProperties,
 
-  /** The one hero figure a panel carries. Big and tight. */
-  HERO: {
-    fontSize: 64,
-    lineHeight: 0.92,
-    fontWeight: 700,
-    letterSpacing: '-0.045em',
-    color: EC.INK,
-    ...FIGS,
-  } as React.CSSProperties,
-
-  /** A hero that is words rather than a number (Echo's lead line). */
-  HERO_WORDS: {
-    fontSize: 27,
-    lineHeight: 1.16,
-    fontWeight: 700,
-    letterSpacing: '-0.022em',
-    color: EC.INK,
-  } as React.CSSProperties,
-
-  /** Supporting figure inside a figure group. */
-  FIG: {
-    fontSize: 22,
-    fontWeight: 700,
-    letterSpacing: '-0.03em',
-    color: EC.INK,
-    ...FIGS,
-  } as React.CSSProperties,
-
-  /** The advice line. Says what to DO. */
-  ADVICE: {
-    fontSize: 16,
-    lineHeight: 1.42,
-    fontWeight: 500,
-    letterSpacing: '-0.008em',
-    color: EC.INK_2,
-  } as React.CSSProperties,
-
-  /** Body copy on the ask / empty states. Larger than elsewhere. */
-  BODY: {
-    fontSize: 17,
-    lineHeight: 1.38,
-    fontWeight: 600,
-    letterSpacing: '-0.014em',
-    color: EC.INK,
-  } as React.CSSProperties,
-
-  /** §4.4 the basis. A figure without its sample is not analytical. */
-  BASIS: {
-    fontSize: 11.5,
-    fontWeight: 600,
-    letterSpacing: '0.01em',
-    color: EC.INK_3,
-    ...FIGS,
-  } as React.CSSProperties,
-
-  /** Small caption / hole numerals under the chart. */
+  /** Smallest label used — the floor. */
   MICRO: {
     fontSize: 8.5,
     fontWeight: 700,
-    letterSpacing: '0.02em',
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase',
     color: EC.INK_3,
+    ...FIGS,
+  } as React.CSSProperties,
+
+  /** Echo's prose. Not a bubble — body tone, flowing down the thread (§3.2). */
+  BODY: {
+    fontSize: 15,
+    lineHeight: 1.55,
+    fontWeight: 400,
+    color: EC.INK_2,
+  } as React.CSSProperties,
+
+  /** The member's question, inside the white bubble. */
+  ASKED: {
+    fontSize: 15,
+    lineHeight: 1.4,
+    fontWeight: 400,
+    color: EC.BLACK,
+  } as React.CSSProperties,
+
+  /** Entry headline / history headline. */
+  DISPLAY: {
+    fontSize: 27,
+    fontWeight: 700,
+    letterSpacing: '-0.045em',
+    lineHeight: 1.18,
+    color: EC.INK,
+  } as React.CSSProperties,
+
+  /** A figure called out beside a chart bar. */
+  FIG: {
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: EC.INK,
     ...FIGS,
   } as React.CSSProperties,
 } as const;
