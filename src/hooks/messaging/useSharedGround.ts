@@ -21,8 +21,11 @@
 
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
-import { fetchSharedRounds, fetchSharedRoundCounts } from '@/lib/whs/api';
-import type { SharedRoundResult } from '@/lib/whs/types';
+import {
+  fetchSharedRounds,
+  fetchSharedRoundCounts,
+  type SharedRoundResult,
+} from '@/lib/whs/api';
 
 export interface SharedGround {
   /** Rounds played together, most recent first, deduped. */
