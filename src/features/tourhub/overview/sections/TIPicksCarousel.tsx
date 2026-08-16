@@ -813,9 +813,10 @@ function CaseSheet({
           {statsLoading ? (
             <>
               {[0, 1, 2, 3].map((i) => (
-                <Skeleton key={i} style={{ height: 62, borderRadius: 12 }} />
+                <Skeleton key={i} style={{ height: 40, borderRadius: 6 }} />
               ))}
             </>
+
           ) : (
             <>
               <StatTile label={t('overview.tiPicks.case.worldRankTile')} value={pick.worldRanking ? `#${pick.worldRanking}` : '—'} />
