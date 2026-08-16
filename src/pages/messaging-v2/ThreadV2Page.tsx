@@ -510,25 +510,37 @@ const ThreadV2Page: React.FC = () => {
           (() => {
             const isGroup = (detail?.type ?? conv?.type) === 'group';
             const hasName = header.name && header.name !== 'Conversation' && header.name !== 'Unknown';
-            const subtitle = isGroup
-              ? hasName
-                ? t('messaging:empty.threadStartGroup', { name: header.name })
-                : t('messaging:empty.threadStartGroupGeneric')
-              : hasName
-                ? t('messaging:empty.threadStartWith', { name: header.name })
-                : t('messaging:empty.threadStart');
+            // §4.5 THE EMPTY THREAD SAYS WHAT YOU HAVE IN COMMON. The golf you
+            // have already played together is a better opener than "say hello".
+            const commonGround =
+              !isGroup && ground.count > 0 && ground.lastCourseName
+                ? t('messaging:empty.threadCommonGround', {
+                    name: rivalFirstName,
+                    count: ground.count,
+                    course: ground.lastCourseName,
+                    defaultValue: `You and ${rivalFirstName} have played ${ground.count} rounds together, most recently at ${ground.lastCourseName}.`,
+                  })
+                : null;
+            const subtitle =
+              commonGround ??
+              (isGroup
+                ? hasName
+                  ? t('messaging:empty.threadStartGroup', { name: header.name })
+                  : t('messaging:empty.threadStartGroupGeneric')
+                : hasName
+                  ? t('messaging:empty.threadStartWith', { name: header.name })
+                  : t('messaging:empty.threadStart'));
             return (
               <div
                 className="flex flex-col items-center justify-center text-center"
                 style={{ padding: '80px 24px', gap: 12 }}
               >
                 <div
-                  className="thread-empty-squircle"
+                  className="thread-empty-squircle ec-glass"
                   style={{
                     width: 52,
                     height: 52,
                     borderRadius: 17,
-                    background: '#15171F',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -537,7 +549,8 @@ const ThreadV2Page: React.FC = () => {
                     willChange: 'transform',
                   }}
                 >
-                  <MessageCircle size={24} color="#FFFFFF" strokeWidth={2} />
+                  <MessageCircle size={24} color={INK} strokeWidth={2} />
+
                   <div
                     aria-hidden
                     className="thread-empty-sheen"
