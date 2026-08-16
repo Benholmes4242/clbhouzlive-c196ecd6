@@ -65,3 +65,45 @@ export const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label,
     <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
   </div>
 );
+
+/**
+ * SubScoreStack — the CONDENSED arrangement (BRIEF_COURSE_META_CONDENSE §3):
+ * a quarter-width column with the 3px track on top and the figure + label on
+ * one line beneath it. Same bands, same values, only the arrangement differs.
+ */
+export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ label, score }) => (
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ height: 3, borderRadius: 2, background: TRACK }}>
+      <div
+        style={{
+          width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
+          height: '100%',
+          borderRadius: 2,
+          background: bandColor(score),
+        }}
+      />
+    </div>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 4,
+        marginTop: 4,
+        minWidth: 0,
+      }}
+    >
+      <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
+      <span
+        style={{
+          ...barLabelStyle,
+          width: 'auto',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  </div>
+);
+
