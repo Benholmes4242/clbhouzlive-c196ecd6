@@ -30,11 +30,15 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   containerStyle,
   headerScale = 'default',
 }) => {
-  const { data: creators, isLoading } = useSuggestedCreators(userId);
+  const { data: creators, isLoading: fetching, isFetched } = useSuggestedCreators(userId);
+  const isLoading = !isFetched || fetching;
   const isDark = variant === 'dark';
 
-  // Guard: don't render if not loading and < 2 creators
+  // Guard: don't render once the query HAS run and returned nothing. `isFetched`
+  // (not !isLoading) — the query is gated on userId, so it reports isLoading:false
+  // before it has ever run.
   if (!isLoading && (!creators || creators.length < 1)) return null;
+
 
   const isSearchScale = headerScale === 'search';
   const headerPadding = isSearchScale ? '16px 16px 8px' : '0 16px';

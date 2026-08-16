@@ -49,7 +49,12 @@ const variantFor = (a: WhsFriendActivityWithImage): FriendRoundVariant =>
       : 'eg-only';
 
 export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
-  const { data, isLoading } = useFriendsActivity(ownerUserId);
+  // SETTLED IS NOT "NOT LOADING" — useFriendsActivity is gated on ownerUserId,
+  // so a disabled query is isLoading:false before it has ever run. Deciding
+  // "no rounds, render nothing" from !isLoading hides the section on first paint.
+  const { data, isLoading: fetching, isFetched } = useFriendsActivity(ownerUserId);
+  const isLoading = !isFetched || fetching;
+
   const [sheetActivity, setSheetActivity] =
     useState<WhsFriendActivityWithImage | null>(null);
   const { resolve } = useMemberTapResolver();

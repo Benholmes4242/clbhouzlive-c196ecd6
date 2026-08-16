@@ -84,7 +84,96 @@ const queryKeyPlugin = {
   },
 };
 
+/**
+ * ─── SETTLED-STATE GUARD ─────────────────────────────────────────────────────
+ * A DISABLED React Query (v5) is `isPending` with `fetchStatus: 'idle'`, so
+ * `isLoading` (= isPending && isFetching) is FALSE before the query has ever
+ * run. Any expression that combines a negated isLoading with a null/empty test
+ * on that query's data therefore CLAIMS "no data" before the database has been
+ * asked. Six shipped defects came from exactly this shape.
+ *
+ * WARN by design (section 3.4 of the brief): ~87 `!isLoading` sites exist and
+ * most are harmless ("not currently fetching"). Suppress those inline with
+ * `// eslint-disable-next-line settled/no-not-loading-empty-check`.
+ */
+const settledPlugin = {
+  rules: {
+    "no-not-loading-empty-check": {
+      meta: {
+        type: "problem",
+        docs: { description: "Do not decide data absence from !isLoading." },
+        schema: [],
+        messages: {
+          notLoading:
+            "A disabled React Query is isLoading:false before it has run. Use isFetched / isSuccess to decide whether data is genuinely absent.",
+        },
+      },
+      create(context) {
+        // `!isLoading`, `!q.isLoading`, `!someThingLoading`
+        const isNegatedLoading = (node) => {
+          if (!node || node.type !== "UnaryExpression" || node.operator !== "!") return false;
+          const a = node.argument;
+          const name =
+            a.type === "Identifier" ? a.name
+            : a.type === "MemberExpression" && a.property && a.property.name ? a.property.name
+            : null;
+          return !!name && /^is[A-Za-z]*Loading$|Loading$/.test(name) && /loading/i.test(name);
+        };
+
+        // A claim that data is absent: `!data`, `data == null`, `x.length === 0`,
+        // `!x || x.length < 1`, `(data ?? []).length === 0`, `!data?.rows`.
+        const isAbsenceClaim = (node) => {
+          if (!node) return false;
+          switch (node.type) {
+            case "UnaryExpression":
+              return node.operator === "!" && !isNegatedLoading(node);
+            case "BinaryExpression": {
+              const nullish =
+                (n) => n.type === "Literal" && n.value === null;
+              if ((node.operator === "==" || node.operator === "===") && (nullish(node.left) || nullish(node.right))) return true;
+              const isLength = (n) =>
+                n.type === "MemberExpression" && n.property && n.property.name === "length";
+              if (isLength(node.left) || isLength(node.right)) {
+                return ["===", "==", "<", "<="].includes(node.operator);
+              }
+              return false;
+            }
+            case "LogicalExpression":
+              return isAbsenceClaim(node.left) || isAbsenceClaim(node.right);
+            default:
+              return false;
+          }
+        };
+
+        const walk = (node) => {
+          if (!node || node.type !== "LogicalExpression" || node.operator !== "&&") return false;
+          const parts = [];
+          const flatten = (n) => {
+            if (n.type === "LogicalExpression" && n.operator === "&&") {
+              flatten(n.left); flatten(n.right);
+            } else parts.push(n);
+          };
+          flatten(node);
+          const hasLoading = parts.some(isNegatedLoading);
+          if (!hasLoading) return false;
+          return parts.some((p) => !isNegatedLoading(p) && isAbsenceClaim(p));
+        };
+
+        return {
+          LogicalExpression(node) {
+            // Report only the outermost matching expression.
+            const parent = node.parent;
+            if (parent && parent.type === "LogicalExpression" && parent.operator === "&&") return;
+            if (walk(node)) context.report({ node, messageId: "notLoading" });
+          },
+        };
+      },
+    },
+  },
+};
+
 const i18nLiteralOptions = {
+
   mode: "jsx-text-only",
   "should-validate-template": false,
   "jsx-attributes": {
@@ -340,7 +429,17 @@ export default tseslint.config(
     rules: {
       "querykeys/no-array-derived-key": "warn",
     },
+  },
+  // ─── SETTLED-STATE GUARD — warn today, error once the sweep clears ────────
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/**/*.test.{ts,tsx}", "src/test/**", "src/mocks/**"],
+    plugins: { settled: settledPlugin },
+    rules: {
+      "settled/no-not-loading-empty-check": "warn",
+    },
   }
+
 
 );
 

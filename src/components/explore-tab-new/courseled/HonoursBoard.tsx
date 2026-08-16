@@ -187,9 +187,16 @@ export function FeatPlaque({
   return (
     <button
       type="button"
+      disabled={!tappable}
       onClick={tappable ? () => onPress?.(e) : undefined}
-      style={{ ...PLAQUE_SHELL, cursor: tappable ? 'pointer' : 'default' }}
+      style={{
+        ...PLAQUE_SHELL,
+        cursor: tappable ? 'pointer' : 'default',
+        // A feat with no score genuinely cannot open — say so visually.
+        opacity: tappable ? 1 : 0.62,
+      }}
     >
+
       <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <HolderAvatar event={e} />
         {/* The date, and DIRECTLY UNDER IT the feat in words. */}
@@ -338,6 +345,7 @@ function LeaderFeatRow({
   return (
     <button
       type="button"
+      disabled={!tappable}
       onClick={tappable ? () => onPress?.(e) : undefined}
       style={{
         display: 'block',
@@ -348,9 +356,12 @@ function LeaderFeatRow({
         padding: '7px 0 0',
         borderTop: `1px solid ${GOLD_HAIR}`,
         cursor: tappable ? 'pointer' : 'default',
+        // A row with no score cannot open — render it visibly inert.
+        opacity: tappable ? 1 : 0.62,
         fontFamily: SANS,
       }}
     >
+
       <span
         style={{
           fontSize: 11.5,

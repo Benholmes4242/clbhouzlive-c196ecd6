@@ -58,7 +58,13 @@ export const RoundDetailSheet: React.FC<Props> = ({
   const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
-  const isRoundLoading = userQuery.isLoading;
+  // SETTLED IS NOT "NOT LOADING". useRoundDetail is id-gated, so a disabled
+  // query reports isLoading:false BEFORE it has ever run. Only `isFetched`
+  // tells us the database has actually answered. With no scoreId at all the
+  // query can never run — that is genuinely unreadable, so treat it as settled.
+  const roundSettled = !scoreId ? true : userQuery.isFetched;
+  const isRoundLoading = !roundSettled;
+
 
   const profileQuery = useUserProfile(profileUserId ?? undefined);
   const profile = profileQuery.data;
@@ -109,12 +115,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ? (userData.adjusted_gross ?? userData.actual_gross ?? null)
     : null;
   const toParVal = (grossVal != null && totalPar > 0) ? grossVal - totalPar : null;
+  // 'unavailable' stays reachable — but only once the query HAS run and
+  // returned nothing (deleted score, or RLS-blocked for this viewer).
   const emptyVariant: 'syncing' | 'nohbh' | 'unavailable' =
-    !isRoundLoading && userData == null
-      ? 'unavailable'
-      : userData?.hole_by_hole_fetched
-        ? 'nohbh'
-        : 'syncing';
+    !roundSettled
+      ? 'syncing'
+      : userData == null
+        ? 'unavailable'
+        : userData.hole_by_hole_fetched
+          ? 'nohbh'
+          : 'syncing';
+
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? '';
