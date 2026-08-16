@@ -268,7 +268,7 @@ export default function CommunityPage() {
             />
 
             <h2 style={HEADING_STYLE}>{t('community.everything', 'Everything')}</h2>
-            <CommunityEverythingGrid moments={pool} onTilePress={handleTile} />
+            <CommunityEverythingGrid moments={gridMoments} onTilePress={handleTile} />
           </>
         )}
       </main>
