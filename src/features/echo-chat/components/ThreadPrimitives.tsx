@@ -22,16 +22,15 @@ export const Asked: React.FC<{ q: string }> = ({ q }) => (
         minWidth: 64,
         textAlign: 'left',
         background: '#FFFFFF',
-        color: '#05070A',
         padding: '10px 15px',
         borderRadius: '18px 18px 4px 18px',
         ...T.ASKED,
-        color2: undefined as never,
-      } as React.CSSProperties}
+      }}
     >
       {q}
     </span>
   </div>
+
 );
 
 /**
