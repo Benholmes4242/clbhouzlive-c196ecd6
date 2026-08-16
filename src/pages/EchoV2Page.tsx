@@ -1,16 +1,22 @@
 /**
- * BRIEF_ECHO_CADDIE — FULL REPLACEMENT of the Echo surface.
+ * BRIEF_ECHO_CHAT — ECHO IS A DARK SCROLLING CHAT ON THE CLUBHOUSE CANVAS, and
+ * THE SHAPE OF THE ANSWER FOLLOWS THE KIND OF QUESTION.
  *
- * THE SCREEN IS THE COURSE. Echo speaks over the venue's own photograph, and
- * answers arrive as SWIPEABLE PANELS carrying ONE IDEA EACH.
+ * THIS SUPERSEDES BRIEF_ECHO_CADDIE. What went with it: the swipe panels, the
+ * photograph stage and its most-played-course fallback, and the prose→panels
+ * builder. Answers SCROLL — three ideas are three blocks down one thread.
  *
- * WHAT WENT: the header, the bubbles, the message thread, the light canvas, the
- * typing indicator and every avatar (§6.2). Nothing in echo-v2/components is
- * imported here any more — only the STREAM and the HISTORY STORE survive,
- * because the brief keeps the model, the route and the store unchanged.
+ * THE THREE KINDS (§0.2) arrive on the stream's existing `meta` event as
+ * `kind: your_golf | course | game`, mapped server-side (see
+ * echo-intelligence-v2 → mapIntentsToKind). What sources are named, whether a
+ * chart appears and whether a basis line prints are all consequences of it.
  *
- * ELEVEN STATES, all in scope — see `Phase` below. States 5, 6 and 7 are three
- * different things and are deliberately not one "something went wrong".
+ * IF `kind` IS ABSENT the client falls back to the LEAST CLAIMING shape: prose,
+ * no chart, no source list, no basis line. A data answer is never guessed from
+ * prose — that is exactly what went wrong last time.
+ *
+ * §5.3 / acceptance E — ONE WAVEFORM, NEVER TWO: the only mark in the thread is
+ * the one on the current answer (`Says`), and it animates only while thinking.
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -22,19 +28,29 @@ import { useTranslation } from 'react-i18next';
 import { useEchoChatMessages } from '@/features/echo-v2/hooks/useEchoChatMessages';
 import { useEchoStream } from '@/features/echo-v2/hooks/useEchoStream';
 import { useEchoSuggestions, ECHO_FALLBACK_SUGGESTIONS } from '@/features/echo-v2/hooks/useEchoSuggestions';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMyHolePerformance } from '@/hooks/gam/useMyHolePerformance';
 
-import '@/features/echo-caddie/echo-caddie.css';
-import { EC, T } from '@/features/echo-caddie/tokens';
-import { CourseStage } from '@/features/echo-caddie/components/CourseStage';
-import { ComposerPill } from '@/features/echo-caddie/components/ComposerPill';
-import { EchoWaveform } from '@/features/echo-caddie/components/EchoWaveform';
-import { ThinkingSources } from '@/features/echo-caddie/components/ThinkingSources';
-import { AnswerPanels } from '@/features/echo-caddie/components/AnswerPanels';
-import { AskCard, ErrorCard, NoDataCard, OutOfScopeCard } from '@/features/echo-caddie/components/StateCards';
-import { useEchoStage } from '@/features/echo-caddie/hooks/useEchoStage';
-import { buildPanels } from '@/features/echo-caddie/lib/panels';
+import '@/features/echo-chat/echo-chat.css';
+import { EC, T } from '@/features/echo-chat/tokens';
+import { ComposerPill } from '@/features/echo-chat/components/ComposerPill';
+import { ThinkingSources } from '@/features/echo-chat/components/ThinkingSources';
+import { HolesBar } from '@/features/echo-chat/components/HolesBar';
+import { CompareBars } from '@/features/echo-chat/components/CompareBars';
+import {
+  Asked,
+  Basis,
+  ChartCard,
+  Follow,
+  Prose,
+  Says,
+} from '@/features/echo-chat/components/ThreadPrimitives';
+import {
+  EntryPanel,
+  ErrorBlock,
+  NoDataBlock,
+  OutOfScopeBlock,
+  type EntryExample,
+} from '@/features/echo-chat/components/StateCards';
+import { useEchoAnswerData, type EchoKind } from '@/features/echo-chat/hooks/useEchoAnswerData';
 
 /** §6 minimal chrome: back, and the way into history. No title bar. */
 const TopChrome: React.FC<{ onBack: () => void; onHistory: () => void }> = ({ onBack, onHistory }) => (
@@ -69,26 +85,25 @@ const TopChrome: React.FC<{ onBack: () => void; onHistory: () => void }> = ({ on
   </div>
 );
 
-/** §6.1 the mark, static outside thinking/speaking, over the photograph. */
-const Mark: React.FC<{ active: boolean; label: string }> = ({ active, label }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '0 20px 14px' }}>
-    <EchoWaveform size={26} active={active} />
-    <span style={T.EYEBROW}>{label}</span>
-  </div>
-);
-
-/** Non-golf detection is Echo's, not ours — it says so in the prose. */
+/** Echo's own words when it declines — the prose says so, we only read it. */
 const OUT_OF_SCOPE = /\b(i (?:can only|only) (?:help|answer|talk)|golf[- ]related|outside (?:my|what i)|not (?:a )?golf)\b/i;
 
-type Phase =
-  | 'ask'          // 1
-  | 'thinking'     // 2
-  | 'answer'       // 3 / 4
-  | 'no-data'      // 5
-  | 'out-of-scope' // 6
-  | 'error'        // 7
-  | 'no-course'    // 8
-  | 'no-rounds';   // 9
+/**
+ * §4.5 THE ADVICE LINE IS ADVICE. §4.6 IF ECHO ONLY HAS ONE THING TO SAY, IT
+ * SAYS IT ONCE — so an answer is split on its own paragraph breaks and never
+ * padded to three blocks.
+ */
+function splitBlocks(text: string): string[] {
+  return text
+    .split(/\n{2,}/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function readKind(meta: { kind?: string } | null | undefined): EchoKind | null {
+  const k = meta?.kind;
+  return k === 'your_golf' || k === 'course' || k === 'game' ? k : null;
+}
 
 const EchoV2Page: React.FC = () => {
   const { chatId } = useParams<{ chatId?: string }>();
@@ -97,7 +112,6 @@ const EchoV2Page: React.FC = () => {
   const location = useLocation();
   const qc = useQueryClient();
   const { t } = useTranslation('echo');
-  const { user } = useSupabaseSession();
 
   const contextCourseId = params.get('course') ?? params.get('courseId') ?? null;
 
@@ -105,72 +119,45 @@ const EchoV2Page: React.FC = () => {
   const [lastQuestion, setLastQuestion] = useState<string | null>(null);
   const [errored, setErrored] = useState(false);
   const sentRef = useRef<string | null>(null);
+  const threadRef = useRef<HTMLDivElement | null>(null);
 
   const { data: messages = [] } = useEchoChatMessages(chatId ?? null);
   const { state, send } = useEchoStream();
-
-  const stage = useEchoStage(contextCourseId);
-  const { data: holeRows = [] } = useMyHolePerformance(user?.id, stage.courseId ?? undefined, {
-    enabled: !!stage.courseId && stage.roundsHere > 0,
-  });
-
-  const { suggestions } = useEchoSuggestions();
-  const prompts = suggestions.length > 0 ? suggestions : [...ECHO_FALLBACK_SUGGESTIONS];
 
   useEffect(() => {
     setErrored(false);
     setLastQuestion(null);
   }, [chatId]);
 
-  /** The latest assistant answer: live stream first, else the stored thread. */
-  const answerText = useMemo(() => {
-    if (state.streaming && state.text) return state.text;
+  /** The latest assistant answer and its meta: live stream first, else stored. */
+  const latest = useMemo(() => {
+    if (state.streaming || state.text) {
+      return { text: state.text, kind: readKind(state.meta as { kind?: string } | null) };
+    }
     for (let i = messages.length - 1; i >= 0; i -= 1) {
-      if (messages[i].role === 'assistant') return messages[i].content;
+      if (messages[i].role === 'assistant') {
+        return {
+          text: messages[i].content,
+          kind: readKind(messages[i].meta as { kind?: string }),
+        };
+      }
     }
-    return null;
-  }, [state.streaming, state.text, messages]);
+    return { text: '', kind: null as EchoKind | null };
+  }, [state.streaming, state.text, state.meta, messages]);
 
-  const phase: Phase = useMemo(() => {
-    if (errored) return 'error';
-    if (state.streaming && !state.text) return 'thinking';
-    if (answerText) {
-      if (OUT_OF_SCOPE.test(answerText.slice(0, 260))) return 'out-of-scope';
-      return 'answer';
-    }
-    if (!stage.hasAnyRounds && !stage.loading) return 'no-rounds';
-    if (stage.courseId && stage.roundsHere === 0 && lastQuestion) return 'no-data';
-    if (stage.isHomeFallback) return 'no-course';
-    return 'ask';
-  }, [errored, state.streaming, state.text, answerText, stage.hasAnyRounds, stage.loading, stage.courseId, stage.roundsHere, stage.isHomeFallback, lastQuestion]);
+  const data = useEchoAnswerData(contextCourseId, latest.kind, lastQuestion);
+  const { suggestions } = useEchoSuggestions();
+  const prompts = suggestions.length > 0 ? suggestions : [...ECHO_FALLBACK_SUGGESTIONS];
 
-  const panels = useMemo(
-    () =>
-      phase === 'answer'
-        ? buildPanels({
-            answerText,
-            row: stage.roundsHere > 0 ? stage.row : null,
-            holes: holeRows,
-            courseName: stage.courseName,
-          })
-        : [],
-    [phase, answerText, stage.row, stage.roundsHere, stage.courseName, holeRows],
-  );
-
-  /**
-   * §5.1 THE SOURCES NAMED MUST BE THE SOURCES ACTUALLY READ. Echo has no field
-   * aggregate, so "the field's rounds" is never listed.
-   */
+  /** §5.1 only the reads that actually fired, in resolve order. */
   const thinkingSources = useMemo(() => {
     const out: string[] = [];
-    if (stage.roundsHere > 0) out.push(t('caddie.sources.rounds', 'Your rounds here'));
-    if (holeRows.length > 0) out.push(t('caddie.sources.holes', 'The hole data'));
-    if (stage.courseId) out.push(t('caddie.sources.course', 'Course records'));
-    const q = (lastQuestion ?? '').toLowerCase();
-    if (/tour|tournament|player|open|major|week/.test(q)) out.push(t('caddie.sources.tour', 'This week on tour'));
-    if (out.length === 0) out.push(t('caddie.sources.course', 'Course records'));
+    if (data.sources('rounds')) out.push(t('chat.sources.rounds', 'Your rounds here'));
+    if (data.sources('holes')) out.push(t('chat.sources.holes', 'The hole data'));
+    if (data.sources('course')) out.push(t('chat.sources.course', 'Course records'));
+    if (data.sources('tour')) out.push(t('chat.sources.tour', 'This week on tour'));
     return out;
-  }, [stage.roundsHere, stage.courseId, holeRows.length, lastQuestion, t]);
+  }, [data, t]);
 
   const handleSend = useCallback(
     async (text: string) => {
@@ -189,7 +176,7 @@ const EchoV2Page: React.FC = () => {
         },
         onError: () => {
           setErrored(true);
-          // §5.4 losing what someone typed is what makes a failure feel like one.
+          // Losing what someone typed is what makes a failure feel like one.
           setComposerValue(text);
         },
       });
@@ -197,100 +184,207 @@ const EchoV2Page: React.FC = () => {
     [chatId, navigate, qc, send, location.search],
   );
 
+  /** §3.4 THE THREAD STAYS SCROLLED TO THE LATEST. */
+  useEffect(() => {
+    const el = threadRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages.length, state.text, state.streaming, errored]);
+
   const onBack = () => {
     if (location.key !== 'default') navigate(-1);
     else navigate('/');
   };
 
-  const speaking = state.streaming;
-  const tone = phase === 'answer' ? 'answer' : 'ask';
-  // §2c a member with no rounds gets the black treatment — no image at all.
-  const imageUrl = phase === 'no-rounds' ? null : stage.imageUrl;
+  const thinking = state.streaming && !state.text;
+  const outOfScope = !!latest.text && OUT_OF_SCOPE.test(latest.text.slice(0, 260));
 
-  const homeLabel = t('caddie.label.home', 'Your home course');
-  const courseLabel = t('caddie.label.course', 'In context');
+  /**
+   * §8.1 ENTRY teaches the three kinds by SHOWING one example of each, drawn
+   * from this member where it can be. With no rounds, the "Your golf" example
+   * is REPLACED rather than shown with nothing behind it.
+   */
+  const entryExamples = useMemo<EntryExample[]>(() => {
+    const mostPlayed = data.courseBars[0]?.label ?? null;
+    const yourGolf =
+      data.hasAnyRounds && mostPlayed
+        ? t('chat.entry.example.yourGolfWithCourse', 'Which holes cost me most at {{course}}?', {
+            course: mostPlayed,
+          })
+        : t('chat.entry.example.yourGolfNoRounds', 'How do I start bringing my handicap down?');
+    const course = data.courseName
+      ? t('chat.entry.example.course', 'How does {{course}} play?', { course: data.courseName })
+      : mostPlayed
+        ? t('chat.entry.example.course', 'How does {{course}} play?', { course: mostPlayed })
+        : t('chat.entry.example.courseGeneric', "What should I know before playing Royal St George's?");
+    return [
+      { kind: t('chat.entry.kind.your_golf', 'Your golf'), question: yourGolf },
+      { kind: t('chat.entry.kind.course', 'A course'), question: course },
+      { kind: t('chat.entry.kind.game', 'The game'), question: t('chat.entry.example.game', 'What makes a great links course?') },
+    ];
+  }, [data.courseBars, data.hasAnyRounds, data.courseName, t]);
+
+  const showEntry = messages.length === 0 && !state.streaming && !latest.text && !errored;
+
+  /** §4.2 / correction 4b — the chart is the MEMBER'S OWN hole performance. */
+  const courseChart = latest.kind === 'course' && data.holes.length > 0;
+  /** §4.3 — the member's bars against their own benchmark tick. */
+  const golfChart = latest.kind === 'your_golf' && data.courseBars.length > 1;
+  const benchmark = useMemo(() => {
+    if (data.courseBars.length === 0) return 0;
+    return data.courseBars.reduce((n, b) => n + b.value, 0) / data.courseBars.length;
+  }, [data.courseBars]);
+
+  const blocks = splitBlocks(latest.text);
+  /** No chart for a "game" answer, and never a chart before its first prose. */
+  const lead = blocks[0] ?? '';
+  const rest = blocks.slice(1);
 
   return (
-    <CourseStage imageUrl={imageUrl} tone={tone}>
+    <div className="ec-root">
       <TopChrome onBack={onBack} onHistory={() => navigate('/echo/history')} />
 
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
-        {phase !== 'answer' && (
-          <Mark active={speaking} label={t('caddie.mark', 'Echo')} />
-        )}
+      {showEntry ? (
+        <EntryPanel
+          headline={t('chat.entry.headline', 'Ask Echo about your golf, a course, or the game.')}
+          examples={entryExamples}
+          onPick={handleSend}
+        />
+      ) : (
+        <div className="ec-thread" ref={threadRef} style={{ padding: '4px 18px 8px' }}>
+          {messages.map((m) =>
+            m.role === 'user' ? (
+              <Asked key={m.id} q={m.content} />
+            ) : (
+              <Says key={m.id}>
+                {splitBlocks(m.content).map((b, i) => (
+                  <Prose key={i} first={i === 0}>
+                    {b}
+                  </Prose>
+                ))}
+              </Says>
+            ),
+          )}
 
-        {phase === 'thinking' && <ThinkingSources sources={thinkingSources} />}
+          {/* The live turn. The stored thread renders it once persisted. */}
+          {state.streaming && lastQuestion && <Asked q={lastQuestion} />}
 
-        {phase === 'answer' && panels.length > 0 && <AnswerPanels panels={panels} />}
+          {thinking && (
+            <Says live>
+              <ThinkingSources
+                sources={thinkingSources}
+                thinkingLabel={t('chat.thinking', 'Thinking')}
+              />
+            </Says>
+          )}
 
-        {phase === 'error' && (
-          <ErrorCard
-            onRetry={() => {
-              const q = sentRef.current;
-              if (q) void handleSend(q);
-            }}
-            copy={{
-              eyebrow: t('caddie.error.eyebrow', 'That did not go through'),
-              lead: t('caddie.error.lead', 'Echo could not reach the course data. Your question is still there.'),
-              retry: t('caddie.error.retry', 'Try again'),
-            }}
-          />
-        )}
+          {!thinking && state.streaming && latest.text && (
+            <Says>
+              <Prose first>{lead}</Prose>
 
-        {phase === 'out-of-scope' && (
-          <OutOfScopeCard
-            prompts={prompts}
-            onPick={handleSend}
-            copy={{
-              eyebrow: t('caddie.scope.eyebrow', 'What Echo reads'),
-              lead: t('caddie.scope.lead', 'Echo reads your rounds, the courses you play and this week on tour.'),
-            }}
-          />
-        )}
+              {courseChart && (
+                <>
+                  <ChartCard>
+                    <div style={T.LABEL}>{t('chat.chart.holesTitle', 'Where the strokes go')}</div>
+                    <div style={{ marginTop: 12 }}>
+                      <HolesBar holes={data.holes} highlightHole={data.worstHole} />
+                    </div>
+                    <Basis>
+                      {t('chat.basis.roundsHere', {
+                        count: data.roundsHere,
+                        defaultValue: 'Your {{count}} rounds here',
+                      })}
+                    </Basis>
+                  </ChartCard>
+                </>
+              )}
 
-        {phase === 'no-data' && (
-          <NoDataCard
-            courseName={stage.courseName}
-            fieldPrompt={t('caddie.nodata.field', 'How does this course play for everyone else?')}
-            onPick={handleSend}
-            copy={{
-              eyebrow: t('caddie.nodata.eyebrow', 'No rounds of yours here'),
-              lead: (c) => t('caddie.nodata.lead', 'You have not played {{course}} yet.', { course: c }),
-              advice: t('caddie.nodata.advice', 'Echo can still read how the course plays for the field.'),
-            }}
-          />
-        )}
+              {golfChart && (
+                <ChartCard>
+                  <div style={T.LABEL}>{t('chat.chart.coursesTitle', 'Course by course')}</div>
+                  <div style={{ marginTop: 12 }}>
+                    <CompareBars
+                      bars={data.courseBars}
+                      benchmark={benchmark}
+                      benchmarkLabel={t('chat.basis.benchmark', 'Your average')}
+                    />
+                  </div>
+                  <Basis>
+                    {t('chat.basis.acrossCourses', {
+                      rounds: data.totalRounds,
+                      courses: data.courseCount,
+                      defaultValue: 'Your {{rounds}} rounds across {{courses}} courses',
+                    })}
+                  </Basis>
+                </ChartCard>
+              )}
 
-        {(phase === 'ask' || phase === 'no-course' || phase === 'no-rounds') && (
-          <AskCard
-            label={
-              phase === 'no-course'
-                ? homeLabel
-                : phase === 'no-rounds'
-                  ? t('caddie.norounds.eyebrow', 'Nothing to read yet')
-                  : courseLabel
-            }
-            courseName={phase === 'no-rounds' ? null : stage.courseName}
-            lead={
-              phase === 'no-rounds'
-                ? t('caddie.norounds.lead', 'Connect your handicap and Echo can read your own rounds. Until then, ask about any course or this week on tour.')
-                : t('caddie.ask.lead', 'Ask about a hole, a number or how to play it.')
-            }
-            prompts={prompts}
-            onPick={handleSend}
-          />
-        )}
-      </div>
+              {rest.map((b, i) => (
+                <Prose key={i}>{b}</Prose>
+              ))}
+            </Says>
+          )}
+
+          {outOfScope && !state.streaming && (
+            <Says>
+              <OutOfScopeBlock
+                lead={t(
+                  'chat.scope.lead',
+                  'Echo answers golf — your rounds, the courses you play, and the game itself.',
+                )}
+                prompts={prompts}
+                onPick={handleSend}
+              />
+            </Says>
+          )}
+
+          {/* Echo understood, but there are no rounds of the member's to read. */}
+          {!state.streaming && !latest.text && !errored && lastQuestion && contextCourseId && data.roundsHere === 0 && (
+            <Says>
+              <NoDataBlock
+                lead={
+                  data.courseName
+                    ? t('chat.nodata.lead', 'You have not played {{course}}, so Echo has no rounds of yours to read there.', { course: data.courseName })
+                    : t('chat.nodata.leadGeneric', 'Echo has no rounds of yours to read there yet.')
+                }
+                prompts={prompts}
+                onPick={handleSend}
+              />
+            </Says>
+          )}
+
+          {errored && (
+            <Says>
+              <ErrorBlock
+                lead={t('chat.error.lead', 'That did not go through.')}
+                reassure={t('chat.error.reassure', 'Your question is still in the composer.')}
+                retry={t('chat.error.retry', 'Try again')}
+                onRetry={() => {
+                  const q = sentRef.current;
+                  if (q) void handleSend(q);
+                }}
+              />
+            </Says>
+          )}
+
+          {!data.hasAnyRounds && !data.loading && messages.length === 0 && !state.streaming && (
+            <Says>
+              <Prose first>
+                {t('chat.norounds.lead', 'Connect your handicap and Echo can read your own rounds. Until then, ask about any course or the game.')}
+              </Prose>
+            </Says>
+          )}
+        </div>
+      )}
 
       <ComposerPill
         value={composerValue}
         onChange={setComposerValue}
         onSend={handleSend}
         disabled={state.streaming}
-        active={speaking}
-        placeholder={t('caddie.composer', 'Ask Echo')}
+        placeholder={t('chat.composer', 'Ask Echo')}
       />
-    </CourseStage>
+    </div>
   );
 };
 
