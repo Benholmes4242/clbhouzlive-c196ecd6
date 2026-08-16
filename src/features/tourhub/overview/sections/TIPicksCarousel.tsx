@@ -1164,6 +1164,7 @@ function AllPicksSheet({
   picks,
   state,
   tourCode,
+  tournamentId,
   liveMap,
   onPick,
   onClose,
@@ -1172,6 +1173,7 @@ function AllPicksSheet({
   picks: AITopContender[];
   state: EventState;
   tourCode: string;
+  tournamentId: string | undefined;
   liveMap: Record<string, PickLiveState> | undefined;
   onPick: (p: AITopContender) => void;
   onClose: () => void;
@@ -1192,14 +1194,17 @@ function AllPicksSheet({
   const showRecord = settled && total > 0;
   const recordGood = insideCount >= Math.ceil(total / 2);
 
-  // The board's scrim carries the leading pick's headshot — the same photo the
-  // tile opened with, so the sheet reads as that section swelling upward.
-  const lead = ordered[0];
-  const scrimCandidates = lead
-    ? lead.photoUrl
-      ? [lead.photoUrl, ...getPlayerHeadshotCandidates(lead.playerName, tourCode)]
-      : getPlayerHeadshotCandidates(lead.playerName, tourCode)
-    : [];
+  // The board is about THREE picks: leading it with one player's face would say
+  // it is about him. It carries the TOURNAMENT COURSE image — the same
+  // photograph the hero uses — or the gradient alone when none resolves.
+  const { data: tournament } = useTourTournament(tournamentId ?? '');
+  const venueAdapter = useMemo(
+    () => (tournament?.venue_name ? [{ venue_name: tournament.venue_name } as TourTournament] : []),
+    [tournament?.venue_name]
+  );
+  const { data: imageMap } = useBatchCourseImages(venueAdapter);
+  const venueImageUrl = tournament?.venue_name ? imageMap?.get(tournament.venue_name) ?? null : null;
+  const scrimCandidates = venueImageUrl ? [venueImageUrl] : [];
 
   const header = (
     <>
@@ -1216,11 +1221,11 @@ function AllPicksSheet({
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {t('overview.tiPicks.board.eyebrow', { n: total })}
+          {t('overview.tiPicks.eyebrow')}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ fontSize: 25, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.02 }}>
-            {t('overview.tiPicks.board.title')}
+            {t('overview.tiPicks.board.titleCount', { count: total })}
           </div>
           {showRecord ? (
             <span
@@ -1247,7 +1252,8 @@ function AllPicksSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, objectPosition: '50% 14%' }}
+      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, treatment: 'scene', objectPosition: '50% 45%' }}
+
     >
       <div style={{ marginTop: 2 }}>
         {ordered.map((p, i) => {
