@@ -1,12 +1,16 @@
 /**
- * BRIEF_ECHO_CADDIE §4.3 — THE CHART IS THE APP'S OWN.
+ * BRIEF_ECHO_CHAT §4.2 — THE CHART IS THE APP'S OWN eighteen-hole bar
+ * construction, on the DEMANDING RAMP, SIX DISCRETE STOPS, STEPPED never
+ * interpolated. The ramp is IMPORTED from its single definition; nothing here
+ * declares one.
  *
- * Same construction as the Course tab's eighteen-hole bar chart: the DEMANDING
- * RAMP, SIX DISCRETE STOPS, STEPPED — never interpolated. The ramp is IMPORTED
- * from its single definition; nothing here declares one.
+ * THE MEMBER'S OWN HOLE IS PICKED OUT IN WHITE. Not amber — §7 narrows amber to
+ * Echo's mark on this surface and nothing else, chart bars included.
  *
- * The member's own hole is picked out in AMBER — that is the member's own
- * figure, the only other amber role on this surface besides Echo's mark.
+ * CORRECTION TO THE BRIEF (§4.2, answered): the data is the MEMBER'S OWN hole
+ * performance at that course, not the field's. There is no field aggregate in
+ * echo_get_*, so a course the member has never played renders NO CHART and
+ * routes to the no-data block instead.
  */
 
 import React from 'react';
@@ -28,50 +32,47 @@ function stopFor(v: number, min: number, max: number): number {
 
 export const HolesBar: React.FC<{
   holes: HoleDatum[];
-  /** Hole to pick out as the member's own. */
+  /** Hole to pick out — the worst one, drawn in white with its figure. */
   highlightHole?: number | null;
   height?: number;
-}> = ({ holes, highlightHole = null, height = 92 }) => {
+}> = ({ holes, highlightHole = null, height = 74 }) => {
   if (holes.length === 0) return null;
   const values = holes.map((h) => h.avgToPar);
   const min = Math.min(...values);
   const max = Math.max(...values, min + 0.01);
-  const span = Math.max(Math.abs(max), 0.01);
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height }}>
         {holes.map((h) => {
-          const isMine = highlightHole != null && h.holeNo === highlightHole;
-          const mag = Math.max(0.06, Math.min(1, Math.abs(h.avgToPar) / span));
+          const t = (h.avgToPar - min) / (max - min);
+          const mine = highlightHole != null && h.holeNo === highlightHole;
           return (
             <div
               key={h.holeNo}
-              style={{
-                flex: 1,
-                height: `${mag * 100}%`,
-                minHeight: 4,
-                borderRadius: 2,
-                background: isMine ? EC.AMBER : difficultyRampStop(stopFor(h.avgToPar, min, max)),
-              }}
-            />
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+            >
+              {mine && (
+                <span style={{ ...T.FIG, fontSize: 9.5 }}>
+                  {h.avgToPar > 0 ? '+' : h.avgToPar < 0 ? '\u2212' : ''}
+                  {Math.abs(h.avgToPar).toFixed(1)}
+                </span>
+              )}
+              <i
+                style={{
+                  width: '100%',
+                  height: `${18 + Math.max(0, Math.min(1, t)) * (height - 18)}px`,
+                  borderRadius: '3px 3px 1px 1px',
+                  background: mine ? EC.INK : difficultyRampStop(stopFor(h.avgToPar, min, max)),
+                }}
+              />
+            </div>
           );
         })}
       </div>
-      <div style={{ display: 'flex', gap: 3, marginTop: 6 }}>
-        {holes.map((h) => (
-          <span
-            key={h.holeNo}
-            style={{
-              ...T.MICRO,
-              flex: 1,
-              textAlign: 'center',
-              color: highlightHole != null && h.holeNo === highlightHole ? EC.AMBER : EC.INK_3,
-            }}
-          >
-            {h.holeNo}
-          </span>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+        <span style={T.MICRO}>{holes[0].holeNo}</span>
+        <span style={T.MICRO}>{holes[holes.length - 1].holeNo}</span>
       </div>
     </div>
   );
