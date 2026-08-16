@@ -54,7 +54,7 @@ export function useEchoAnswerData(
   question: string | null,
 ): EchoAnswerData {
   const { user } = useSupabaseSession();
-  const { data: courses = [], isLoading: coursesLoading } = useUserAnalyticsCourses(user?.id);
+  const { data: courses = [], isLoading: coursesLoading } = useUserAnalyticsCourses();
 
   const row = useMemo(
     () => (contextCourseId ? courses.find((c) => c.course_id === contextCourseId) ?? null : null),
